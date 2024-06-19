@@ -1,11 +1,51 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+*.vcxproj
+*.sln
+*.user
+*.filters
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Fortran module files
+*.mod
+*.smod
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Visual Studio user specific files
+.vs/
+Level.code-workspace
+
+# Builds
+build/*
+bin/*
+
+#Temp folders
+ToImplement*/
+
+#Cmake files
+cmake_install.cmake
 CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
 CMakeScripts
+CTestTestfile.cmake
+
+#Other
 Testing
 Makefile
-cmake_install.cmake
 install_manifest.txt
 compile_commands.json
-CTestTestfile.cmake
 _deps
