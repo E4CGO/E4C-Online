@@ -56,7 +56,7 @@ void SceneTitle::Initialize()
 		rouge->GetModel()->FindNode("Knife_Offhand")->visible = false;
 		rouge->GetModel()->FindNode("Throwable")->visible = false;
 
-		test = std::make_unique<ModelDX12>("Data/Model/Jammo/Jammo.fbx");
+		test = std::make_unique<ModelDX12>("Data/Model/Character/Barbarian.glb");
 		test->PlayAnimation(0, true);
 	}
 
@@ -139,7 +139,7 @@ void SceneTitle::Update(float elapsedTime)
 
 	if (test != nullptr)
 	{
-		const DirectX::XMFLOAT4X4 w = { 0.01f,0.f,0.f,0.f, 0.f,0.01f,0.f,0.f, 0.f,0.f,0.01f,0.f, 0.f,0.f,0.f,1.f };
+		const DirectX::XMFLOAT4X4 w = { 1.f,0.f,0.f,0.f, 0.f,1.f,0.f,0.f, 0.f,0.f,1.f,0.f, 0.f,0.f,0.f,1.f };
 		test->UpdateAnimation(elapsedTime);
 		test->UpdateTransform(w);
 	}
