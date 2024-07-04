@@ -2,7 +2,7 @@
 #include "FrameBuffer.h"
 
 // コンストラクタ
-FrameBuffer::FrameBuffer(ID3D11Device* device, IDXGISwapChain* swapchain)
+FrameBuffer::FrameBuffer(ID3D11Device* device, IDXGISwapChain* swapchain, DXGI_FORMAT format)
 {
 	HRESULT hr = S_OK;
 	UINT width, height;
@@ -40,7 +40,7 @@ FrameBuffer::FrameBuffer(ID3D11Device* device, IDXGISwapChain* swapchain)
 		texture2dDesc.Height = height;
 		texture2dDesc.MipLevels = 1;
 		texture2dDesc.ArraySize = 1;
-		texture2dDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		texture2dDesc.Format = format;
 		texture2dDesc.SampleDesc.Count = 1;
 		texture2dDesc.SampleDesc.Quality = 0;
 		texture2dDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -67,7 +67,7 @@ FrameBuffer::FrameBuffer(ID3D11Device* device, IDXGISwapChain* swapchain)
 }
 
 // コンストラクタ
-FrameBuffer::FrameBuffer(ID3D11Device* device, UINT width, UINT height)
+FrameBuffer::FrameBuffer(ID3D11Device* device, UINT width, UINT height, DXGI_FORMAT format)
 {
 	HRESULT hr = S_OK;
 	// レンダーターゲット
@@ -79,7 +79,7 @@ FrameBuffer::FrameBuffer(ID3D11Device* device, UINT width, UINT height)
 		texture2dDesc.Height = height;
 		texture2dDesc.MipLevels = 1;
 		texture2dDesc.ArraySize = 1;
-		texture2dDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		texture2dDesc.Format = format;
 		//texture2dDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
 		texture2dDesc.SampleDesc.Count = 1;
 		texture2dDesc.SampleDesc.Quality = 0;

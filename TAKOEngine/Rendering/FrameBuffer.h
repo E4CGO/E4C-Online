@@ -6,8 +6,8 @@
 class FrameBuffer
 {
 public:
-	FrameBuffer(ID3D11Device* device, IDXGISwapChain* swapchain);
-	FrameBuffer(ID3D11Device* device, UINT width, UINT height);
+	FrameBuffer(ID3D11Device* device, IDXGISwapChain* swapchain, DXGI_FORMAT format = DXGI_FORMAT_D24_UNORM_S8_UINT);
+	FrameBuffer(ID3D11Device* device, UINT width, UINT height, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM);
 
 	// カラーマップ取得
 	ID3D11ShaderResourceView* GetColorMap() const { return colorMap.Get(); }
