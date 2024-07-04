@@ -70,6 +70,119 @@ HRESULT GpuResourceUtils::LoadPixelShader(
 	return hr;
 }
 
+//ジオメトリシェーダー
+HRESULT GpuResourceUtils::LoadGeometryShader(
+	ID3D11Device* device,
+	const char* filename,
+	ID3D11GeometryShader** geometryShader)
+{
+	//ファイルを開く
+	FILE* fp = nullptr;
+	fopen_s(&fp, filename, "rb");
+	_ASSERT_EXPR_A(fp, "Geometry Shader File not found");
+
+	//ファイルのサイズを求める
+	fseek(fp, 0, SEEK_END);
+	long size = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+
+	//メモリ上に頂点シェーダーデータを格納する領域を用意する
+	std::unique_ptr<u_char[]> data = std::make_unique<u_char[]>(size);
+	fread(data.get(), size, 1, fp);
+	fclose(fp);
+
+	//ジオメトリシェーダー生成
+	HRESULT hr = device->CreateGeometryShader(data.get(), size, nullptr, geometryShader);
+	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+	return hr;
+}
+
+
+//ハルシェーダー
+HRESULT GpuResourceUtils::LoadHullShader(
+	ID3D11Device* device,
+	const char* filename,
+	ID3D11HullShader** hullShader)
+{
+	//ファイルを開く
+	FILE* fp = nullptr;
+	fopen_s(&fp, filename, "rb");
+	_ASSERT_EXPR_A(fp, "hull Shader File not found");
+
+	//ファイルのサイズを求める
+	fseek(fp, 0, SEEK_END);
+	long size = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+
+	//メモリ上に頂点シェーダーデータを格納する領域を用意する
+	std::unique_ptr<u_char[]> data = std::make_unique<u_char[]>(size);
+	fread(data.get(), size, 1, fp);
+	fclose(fp);
+
+	//ハルシェーダー生成
+	HRESULT hr = device->CreateHullShader(data.get(), size, nullptr, hullShader);
+	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+	return hr;
+}
+
+//ドメインシェーダー
+HRESULT GpuResourceUtils::LoadDomainShader(
+	ID3D11Device* device,
+	const char* filename,
+	ID3D11DomainShader** domainShader)
+{
+	//ファイルを開く
+	FILE* fp = nullptr;
+	fopen_s(&fp, filename, "rb");
+	_ASSERT_EXPR_A(fp, "domain　Shader File not found");
+
+	//ファイルのサイズを求める
+	fseek(fp, 0, SEEK_END);
+	long size = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+
+	//メモリ上に頂点シェーダーデータを格納する領域を用意する
+	std::unique_ptr<u_char[]> data = std::make_unique<u_char[]>(size);
+	fread(data.get(), size, 1, fp);
+	fclose(fp);
+
+	//ドメインシェーダー生成
+	HRESULT hr = device->CreateDomainShader(data.get(), size, nullptr, domainShader);
+	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+	return hr;
+}
+
+//コンピュートシェーダー
+HRESULT GpuResourceUtils::LoadComputeShader(
+	ID3D11Device* device,
+	const char* filename,
+	ID3D11ComputeShader** computeShader)
+{
+	//ファイルを開く
+	FILE* fp = nullptr;
+	fopen_s(&fp, filename, "rb");
+	_ASSERT_EXPR_A(fp, "domain　Shader File not found");
+
+	//ファイルのサイズを求める
+	fseek(fp, 0, SEEK_END);
+	long size = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+
+	//メモリ上に頂点シェーダーデータを格納する領域を用意する
+	std::unique_ptr<u_char[]> data = std::make_unique<u_char[]>(size);
+	fread(data.get(), size, 1, fp);
+	fclose(fp);
+
+	//ドメインシェーダー生成
+	HRESULT hr = device->CreateComputeShader(data.get(), size, nullptr, computeShader);
+	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+	return hr;
+}
+
 // テクスチャを読み込む
 HRESULT GpuResourceUtils::LoadTexture(
 	ID3D11Device* device,
