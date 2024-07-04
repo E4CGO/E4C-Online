@@ -44,7 +44,7 @@ void PostprocessingRenderer::Render(ID3D11DeviceContext* deviceContext)
 	{
 		//	•`‰ææ‚ð•ÏX
 		T_GRAPHICS.GetFrameBuffer(FrameBufferId::Luminance)->Clear(T_GRAPHICS.GetDeviceContext(), 0.0f, 0.0f, 0.0f, 0.0f);
-		T_GRAPHICS.GetFrameBuffer(FrameBufferId::Luminance)->SetRenderTargets(T_GRAPHICS.GetDeviceContext());
+		T_GRAPHICS.GetFrameBuffer(FrameBufferId::Luminance)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
 
 		rc.deviceContext->RSSetViewports(cachedViewportCount, cachedViewports);
 
@@ -74,7 +74,7 @@ void PostprocessingRenderer::Render(ID3D11DeviceContext* deviceContext)
 	{
 		//	•`‰ææ‚ð•ÏX
 		T_GRAPHICS.GetFrameBuffer(FrameBufferId::GaussianBlur)->Clear(T_GRAPHICS.GetDeviceContext(), 0.0f, 0.0f, 0.0f, 0.0f);
-		T_GRAPHICS.GetFrameBuffer(FrameBufferId::GaussianBlur)->SetRenderTargets(T_GRAPHICS.GetDeviceContext());
+		T_GRAPHICS.GetFrameBuffer(FrameBufferId::GaussianBlur)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
 
 		rc.deviceContext->RSSetViewports(cachedViewportCount, cachedViewports);
 

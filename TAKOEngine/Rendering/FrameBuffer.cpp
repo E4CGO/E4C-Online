@@ -2,7 +2,7 @@
 #include "FrameBuffer.h"
 
 // コンストラクタ
-FrameBuffer::FrameBuffer(ID3D11Device* device, IDXGISwapChain* swapchain)
+FrameBuffer::FrameBuffer(ID3D11Device* device, IDXGISwapChain* swapchain, DXGI_FORMAT format)
 {
 	HRESULT hr = S_OK;
 	UINT width, height;
@@ -40,7 +40,7 @@ FrameBuffer::FrameBuffer(ID3D11Device* device, IDXGISwapChain* swapchain)
 		texture2dDesc.Height = height;
 		texture2dDesc.MipLevels = 1;
 		texture2dDesc.ArraySize = 1;
-		texture2dDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		texture2dDesc.Format = format;
 		texture2dDesc.SampleDesc.Count = 1;
 		texture2dDesc.SampleDesc.Quality = 0;
 		texture2dDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -67,7 +67,7 @@ FrameBuffer::FrameBuffer(ID3D11Device* device, IDXGISwapChain* swapchain)
 }
 
 // コンストラクタ
-FrameBuffer::FrameBuffer(ID3D11Device* device, UINT width, UINT height)
+FrameBuffer::FrameBuffer(ID3D11Device* device, UINT width, UINT height, DXGI_FORMAT format)
 {
 	HRESULT hr = S_OK;
 	// レンダーターゲット
@@ -79,7 +79,7 @@ FrameBuffer::FrameBuffer(ID3D11Device* device, UINT width, UINT height)
 		texture2dDesc.Height = height;
 		texture2dDesc.MipLevels = 1;
 		texture2dDesc.ArraySize = 1;
-		texture2dDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		texture2dDesc.Format = format;
 		//texture2dDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
 		texture2dDesc.SampleDesc.Count = 1;
 		texture2dDesc.SampleDesc.Quality = 0;
@@ -144,6 +144,7 @@ FrameBuffer::FrameBuffer(ID3D11Device* device, UINT width, UINT height)
 	}
 }
 
+//レンダーターゲット&デプスステンシルビュークリア
 void FrameBuffer::Clear(ID3D11DeviceContext* dc, float r, float g, float b, float a)
 {
 	float color[4]{ r,g,b,a };
@@ -151,8 +152,37 @@ void FrameBuffer::Clear(ID3D11DeviceContext* dc, float r, float g, float b, floa
 	dc->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
-void FrameBuffer::SetRenderTargets(ID3D11DeviceContext* dc)
+//複数枚のレンダーターゲット&デプスステンシルビュークリア
+void FrameBuffer::Clears(ID3D11DeviceContext* dc, int rtvNum, ID3D11RenderTargetView* rtv[], float r, float g, float b, float a)
+{
+	float color[4]{ r,g,b,a };
+	for (int i = 0; i < rtvNum; i++)
+	{
+		dc->ClearRenderTargetView(rtv[i], color);
+	}
+	dc->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+}
+
+//レンダーターゲット&ビューポート設定
+void FrameBuffer::SetRenderTarget(ID3D11DeviceContext* dc)
 {
 	dc->RSSetViewports(1, &viewport);
 	dc->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
+}
+
+//複数枚のレンダーターゲット&ビューポート設定
+void FrameBuffer::SetRenderTargets(ID3D11DeviceContext* dc, int rtvNum, ID3D11RenderTargetView* rtv[])
+{
+	dc->RSSetViewports(1, &viewport);
+	dc->OMSetRenderTargets(rtvNum, rtv, depthStencilView.Get());
+}
+
+void FrameBuffer::SetViewport(UINT width, UINT height)
+{
+	viewport.Width    = static_cast<float>(width);
+	viewport.Height   = static_cast<float>(height);
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+	viewport.TopLeftX = 0.0f;
+	viewport.TopLeftY = 0.0f;
 }

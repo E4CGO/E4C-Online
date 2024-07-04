@@ -300,7 +300,7 @@ void SceneGame::Render()
 {
 	T_TEXT.Begin();
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Scene)->Clear(T_GRAPHICS.GetDeviceContext(), 0.2f, 0.2f, 0.2f, 1);
-	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Scene)->SetRenderTargets(T_GRAPHICS.GetDeviceContext());
+	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Scene)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
 
 	// 描画コンテキスト設定
 	RenderContext rc;
@@ -334,7 +334,7 @@ void SceneGame::Render()
 	//	ポストプロセス処理を行う
 	{
 		T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->Clear(T_GRAPHICS.GetDeviceContext(), 0.0f, 0.0f, 0.0f, 1.0f);
-		T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->SetRenderTargets(T_GRAPHICS.GetDeviceContext());
+		T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
 		postprocessingRenderer->Render(T_GRAPHICS.GetDeviceContext());
 	}
 

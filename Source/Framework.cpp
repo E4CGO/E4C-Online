@@ -80,7 +80,7 @@ void Framework::Render(float elapsedTime)
 		ImGuiRenderer::NewFrame();
 
 		// レンダーターゲット設定
-		T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->SetRenderTargets(dc);
+		T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->SetRenderTarget(dc);
 
 		// シーン描画処理
 		SceneManager::Instance().Render();

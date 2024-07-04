@@ -76,6 +76,7 @@ void PostEffect::Begin(const RenderContext& rc)
 	// 定数バッファ更新
 	dc->UpdateSubresource(constantBuffer.Get(), 0, 0, &cbPostEffect, 0, 0);
 }
+
 // 輝度抽出処理
 void PostEffect::LuminanceExtraction(const RenderContext& rc, ID3D11ShaderResourceView* colorMap)
 {
@@ -92,6 +93,7 @@ void PostEffect::LuminanceExtraction(const RenderContext& rc, ID3D11ShaderResour
 	// 描画
 	dc->Draw(4, 0);
 }
+
 void PostEffect::Bloom(const RenderContext& rc, ID3D11ShaderResourceView* colorMap, ID3D11ShaderResourceView* luminanceMap)
 {
 	ID3D11DeviceContext* dc = rc.deviceContext;
@@ -107,6 +109,7 @@ void PostEffect::Bloom(const RenderContext& rc, ID3D11ShaderResourceView* colorM
 	// 描画
 	dc->Draw(4, 0);
 }
+
 // 終了処理
 void PostEffect::End(const RenderContext& rc)
 {
