@@ -7,6 +7,8 @@
 
 #define USEDX12
 
+#define ASSIMPLOADER
+
 #define COMPLETION_CHECK _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
 #if defined( DEBUG ) || defined( _DEBUG )

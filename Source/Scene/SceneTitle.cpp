@@ -22,12 +22,12 @@ void SceneTitle::Initialize()
 		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
 	}
 
-	// ƒ‚ƒfƒ‹
+	// ï¿½ï¿½ï¿½fï¿½ï¿½
 	{
-		// ”wŒi
+		// ï¿½wï¿½i
 		map = std::make_unique<ModelObject>("Data/Model/Map/TitleMap.glb");
 
-		// ƒLƒƒƒ‰
+		// ï¿½Lï¿½ï¿½ï¿½ï¿½
 		barbarian = std::make_unique<ModelObject>("Data/Model/Character/Barbarian.glb");
 		barbarian->SetAnimation(22, true, 0.0f);
 		barbarian->SetPosition({ 0.28f, 0.0f, -3.15f });
@@ -60,29 +60,29 @@ void SceneTitle::Initialize()
 		test->PlayAnimation(0, true);
 	}
 
-	// Œõ
+	// ï¿½ï¿½
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
 
-	// ƒJƒƒ‰İ’è
+	// ï¿½Jï¿½ï¿½ï¿½ï¿½ï¿½İ’ï¿½
 	camera.SetPerspectiveFov(
-		DirectX::XMConvertToRadians(45),							// ‰æŠp
-		SCREEN_W / SCREEN_H,	// ‰æ–ÊƒAƒXƒyƒNƒg”ä
-		0.1f,														// ƒjƒAƒNƒŠƒbƒv
-		10000.0f													// ƒtƒ@[ƒNƒŠƒbƒv
+		DirectX::XMConvertToRadians(45),							// ï¿½ï¿½p
+		SCREEN_W / SCREEN_H,	// ï¿½ï¿½ÊƒAï¿½Xï¿½yï¿½Nï¿½gï¿½ï¿½
+		0.1f,														// ï¿½jï¿½Aï¿½Nï¿½ï¿½ï¿½bï¿½v
+		10000.0f													// ï¿½tï¿½@ï¿½[ï¿½Nï¿½ï¿½ï¿½bï¿½v
 	);
 	camera.SetLookAt(
-		{ -5.661f, 2.5f, 5.584f },	// ‹“_
-		{ 0.0f, 2.0, 0.0f },	// ’‹“_
-		{ 0.036f, 0.999f, -0.035f } // ãƒxƒNƒgƒ‹
+		{ -5.661f, 2.5f, 5.584f },	// ï¿½ï¿½ï¿½_
+		{ 0.0f, 2.0, 0.0f },	// ï¿½ï¿½ï¿½ï¿½ï¿½_
+		{ 0.036f, 0.999f, -0.035f } // ï¿½ï¿½xï¿½Nï¿½gï¿½ï¿½
 	);
 	cameraController = std::make_unique<FreeCameraController>();
 	cameraController->SyncCameraToController(camera);
 	cameraController->SetEnable(false);
 
-	// ƒXƒe[ƒg
+	// ï¿½Xï¿½eï¿½[ï¿½g
 	stateMachine = std::make_unique<StateMachine<SceneTitle>>();
 	stateMachine->RegisterState(STATE::TITLE, new SceneTitleState::TitleState(this));
 	stateMachine->RegisterState(STATE::LOGIN_CHECK, new SceneTitleState::LoginCheckState(this));
@@ -127,7 +127,7 @@ void SceneTitle::Finalize()
 	UI.Clear();
 }
 
-// XVˆ—
+// ï¿½Xï¿½Vï¿½ï¿½ï¿½ï¿½
 void SceneTitle::Update(float elapsedTime)
 {
 	stateMachine->Update(elapsedTime);
@@ -145,7 +145,7 @@ void SceneTitle::Update(float elapsedTime)
 	}
 
 #ifdef _DEBUG
-	// ƒJƒƒ‰XV
+	// ï¿½Jï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½V
 	cameraController->Update();
 	cameraController->SyncContrllerToCamera(camera);
 #endif // _DEBUG
@@ -153,7 +153,7 @@ void SceneTitle::Update(float elapsedTime)
 	UI.Update(elapsedTime);
 }
 
-// •`‰æˆ—
+// ï¿½`ï¿½æˆï¿½ï¿½
 void SceneTitle::Render()
 {
 	T_TEXT.Begin();
@@ -161,13 +161,13 @@ void SceneTitle::Render()
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->Clear(T_GRAPHICS.GetDeviceContext(), 0.2f, 0.2f, 0.2f, 1);
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
 
-	// •`‰æƒRƒ“ƒeƒLƒXƒgİ’è
+	// ï¿½`ï¿½ï¿½Rï¿½ï¿½ï¿½eï¿½Lï¿½Xï¿½gï¿½İ’ï¿½
 	RenderContext rc;
 	rc.camera = &camera;
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
-	// ƒ‰ƒCƒg‚Ìî•ñ‚ğ‹l‚ß‚Ş
+	// ï¿½ï¿½ï¿½Cï¿½gï¿½Ìï¿½ï¿½ï¿½ï¿½lï¿½ßï¿½ï¿½ï¿½
 	LightManager::Instance().PushRenderContext(rc);
 
 	map->Render(rc);
@@ -191,19 +191,19 @@ void SceneTitle::RenderDX12()
 	{
 		Camera& camera = Camera::Instance();
 
-		// ƒV[ƒ“—p’è”ƒoƒbƒtƒ@XV
+		// ï¿½Vï¿½[ï¿½ï¿½ï¿½pï¿½è”ï¿½oï¿½bï¿½tï¿½@ï¿½Xï¿½V
 		Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
 			camera.GetView(),
 			camera.GetProjection(),
 			DirectX::XMFLOAT3(0, -1, 0)
 		);
 
-		// ƒŒƒ“ƒ_[ƒRƒ“ƒeƒLƒXƒgİ’è
+		// ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½[ï¿½Rï¿½ï¿½ï¿½eï¿½Lï¿½Xï¿½gï¿½İ’ï¿½
 		RenderContextDX12 rc;
 		rc.d3d_command_list = d3d_command_list;
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
-		// ƒ‚ƒfƒ‹•`‰æ
+		// ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½`ï¿½ï¿½
 		Shader* shader = TentacleLib::graphics.GetShader();
 		shader->Begin(rc);
 		if (test != nullptr)
@@ -225,7 +225,7 @@ void SceneTitle::DrawSceneGUI()
 	{
 		if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			// ƒJƒƒ‰
+			// ï¿½Jï¿½ï¿½ï¿½ï¿½
 			DirectX::XMFLOAT3 eye = camera.GetEye();
 			ImGui::DragFloat3("Eye", &eye.x, 0.01f, 100.0f);
 			DirectX::XMFLOAT3 focus = camera.GetFocus();
@@ -235,7 +235,7 @@ void SceneTitle::DrawSceneGUI()
 		}
 
 		float angleLimit = DirectX::XM_PI;
-		// ƒiƒCƒg
+		// ï¿½iï¿½Cï¿½g
 		if (ImGui::CollapsingHeader("Knight", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			DirectX::XMFLOAT3 position = knight->GetPosition();
@@ -246,7 +246,7 @@ void SceneTitle::DrawSceneGUI()
 			knight->SetAngle(angle);
 		}
 
-		// ƒo[ƒoƒŠƒAƒ“
+		// ï¿½oï¿½[ï¿½oï¿½ï¿½ï¿½Aï¿½ï¿½
 		if (ImGui::CollapsingHeader("Barbarian", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			DirectX::XMFLOAT3 position = barbarian->GetPosition();
@@ -257,7 +257,7 @@ void SceneTitle::DrawSceneGUI()
 			barbarian->SetAngle(angle);
 		}
 
-		// ƒŒƒ“ƒWƒƒ[
+		// ï¿½ï¿½ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[
 		if (ImGui::CollapsingHeader("Rouge", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			DirectX::XMFLOAT3 position = rouge->GetPosition();

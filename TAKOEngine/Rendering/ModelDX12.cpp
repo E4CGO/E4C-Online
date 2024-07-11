@@ -205,55 +205,59 @@ void ModelDX12::StopAnimation()
 // アニメーション計算
 void ModelDX12::UpdateAnimation(float elapsedTime)
 {
-	if (m_current_animation < 0)
-	{
-		return;
-	}
+	if (m_current_animation < 0) return;
 
-	if (m_resource->GetAnimations().empty())
-	{
-		return;
-	}
+	if (m_resource->GetAnimations().empty()) return;
+
+	if (!IsPlayAnimation()) return;
 
 	const ModelResource::Animation& animation = m_resource->GetAnimations().at(m_current_animation);
 
-	const std::vector<ModelResource::Keyframe>& keyframes = animation.keyframes;
-	int keyCount = static_cast<int>(keyframes.size());
-	for (int keyIndex = 0; keyIndex < keyCount - 1; ++keyIndex)
+	for (size_t nodeIndex = 0; nodeIndex < animation.nodeAnims.size(); nodeIndex++)
 	{
-		// 現在の時間がどのキーフレームの間にいるか判定する
-		const ModelResource::Keyframe& keyframe0 = keyframes.at(keyIndex);
-		const ModelResource::Keyframe& keyframe1 = keyframes.at(keyIndex + 1);
-		if (m_current_seconds >= keyframe0.seconds && m_current_seconds < keyframe1.seconds)
+		Node& node = m_nodes.at(nodeIndex);
+
+		const ModelResource::NodeAnim& nodeAnim = animation.nodeAnims.at(nodeIndex);
+
+		for (size_t index = 0; index < nodeAnim.positionKeyframes.size() - 1; index++)
 		{
-			float rate = (m_current_seconds - keyframe0.seconds) / (keyframe1.seconds - keyframe0.seconds);
-			assert(m_nodes.size() == keyframe0.nodeKeys.size());
-			assert(m_nodes.size() == keyframe1.nodeKeys.size());
-			int nodeCount = static_cast<int>(m_nodes.size());
-			for (int nodeIndex = 0; nodeIndex < nodeCount; ++nodeIndex)
+			const ModelResource::VectorKeyframe& keyframe0 = nodeAnim.positionKeyframes.at(index);
+			const ModelResource::VectorKeyframe& keyframe1 = nodeAnim.positionKeyframes.at(index + 1);
+			if (m_current_seconds >= keyframe0.seconds && m_current_seconds < keyframe1.seconds)
 			{
-				// ２つのキーフレーム間の補完計算
-				const ModelResource::NodeKeyData& key0 = keyframe0.nodeKeys.at(nodeIndex);
-				const ModelResource::NodeKeyData& key1 = keyframe1.nodeKeys.at(nodeIndex);
-
-				Node& node = m_nodes[nodeIndex];
-
-				DirectX::XMVECTOR S0 = DirectX::XMLoadFloat3(&key0.scale);
-				DirectX::XMVECTOR S1 = DirectX::XMLoadFloat3(&key1.scale);
-				DirectX::XMVECTOR R0 = DirectX::XMLoadFloat4(&key0.rotate);
-				DirectX::XMVECTOR R1 = DirectX::XMLoadFloat4(&key1.rotate);
-				DirectX::XMVECTOR T0 = DirectX::XMLoadFloat3(&key0.translate);
-				DirectX::XMVECTOR T1 = DirectX::XMLoadFloat3(&key1.translate);
-
-				DirectX::XMVECTOR S = DirectX::XMVectorLerp(S0, S1, rate);
-				DirectX::XMVECTOR R = DirectX::XMQuaternionSlerp(R0, R1, rate);
-				DirectX::XMVECTOR T = DirectX::XMVectorLerp(T0, T1, rate);
-
-				DirectX::XMStoreFloat3(&node.scale, S);
-				DirectX::XMStoreFloat4(&node.rotate, R);
-				DirectX::XMStoreFloat3(&node.translate, T);
+				float rate = (m_current_seconds - keyframe0.seconds) / (keyframe1.seconds - keyframe0.seconds);
+				DirectX::XMVECTOR V0 = DirectX::XMLoadFloat3(&keyframe0.value);
+				DirectX::XMVECTOR V1 = DirectX::XMLoadFloat3(&keyframe1.value);
+				DirectX::XMVECTOR V = DirectX::XMVectorLerp(V0, V1, rate);
+				DirectX::XMStoreFloat3(&node.translate, V);
 			}
-			break;
+		}
+
+		for (size_t index = 0; index < nodeAnim.rotationKeyframes.size() - 1; index++)
+		{
+			const ModelResource::QuaternionKeyframe& keyframe0 = nodeAnim.rotationKeyframes.at(index);
+			const ModelResource::QuaternionKeyframe& keyframe1 = nodeAnim.rotationKeyframes.at(index + 1);
+			if (m_current_seconds >= keyframe0.seconds && m_current_seconds < keyframe1.seconds)
+			{
+				float rate = (m_current_seconds - keyframe0.seconds) / (keyframe1.seconds - keyframe0.seconds);
+				DirectX::XMVECTOR Q0 = DirectX::XMLoadFloat4(&keyframe0.value);
+				DirectX::XMVECTOR Q1 = DirectX::XMLoadFloat4(&keyframe1.value);
+				DirectX::XMVECTOR Q = DirectX::XMQuaternionSlerp(Q0, Q1, rate);
+				DirectX::XMStoreFloat4(&node.rotate, Q);
+			}
+		}
+		for (size_t index = 0; index < nodeAnim.scaleKeyframes.size() - 1; index++)
+		{
+			const ModelResource::VectorKeyframe& keyframe0 = nodeAnim.scaleKeyframes.at(index);
+			const ModelResource::VectorKeyframe& keyframe1 = nodeAnim.scaleKeyframes.at(index + 1);
+			if (m_current_seconds >= keyframe0.seconds && m_current_seconds < keyframe1.seconds)
+			{
+				float rate = (m_current_seconds - keyframe0.seconds) / (keyframe1.seconds - keyframe0.seconds);
+				DirectX::XMVECTOR V0 = DirectX::XMLoadFloat3(&keyframe0.value);
+				DirectX::XMVECTOR V1 = DirectX::XMLoadFloat3(&keyframe1.value);
+				DirectX::XMVECTOR V = DirectX::XMVectorLerp(V0, V1, rate);
+				DirectX::XMStoreFloat3(&node.scale, V);
+			}
 		}
 	}
 
