@@ -51,6 +51,8 @@ private:
 
 	std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer = std::make_unique<PostprocessingRenderer>();;
 
+	std::unique_ptr<myRenderer::shadow::ShadowMapRender> shadowMapRenderer = std::make_unique<myRenderer::shadow::ShadowMapRender>();
+
 	std::unique_ptr<Stage> stage;
 
 	std::unique_ptr<StateMachine<SceneGame>> stateMachine;

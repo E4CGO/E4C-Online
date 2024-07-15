@@ -43,7 +43,6 @@ public:
 
 	// ライトの範囲
 	float GetRange() { return range; }
-
 	void SetRange(float range) { this->range = range; }
 
 	// インナー

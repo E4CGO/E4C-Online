@@ -8,6 +8,8 @@ set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT G
 
 set (CMAKE_CXX_STANDARD 20)
 
+set (VS_SHADER_MODEL 5_0)
+
 ################################################################################
 # Set target arch type if empty. Visual studio solution generator provides it.
 ################################################################################
@@ -429,6 +431,9 @@ set(TAKOEngine__Rendering
     "TAKOEngine/Rendering/Sprite.h"
     "TAKOEngine/Rendering/TextSprite.cpp"
     "TAKOEngine/Rendering/TextSprite.h"
+    "TAKOEngine/Rendering/MyRender.h"
+    "TAKOEngine/Rendering/ShadowMapRender.cpp"
+    "TAKOEngine/Rendering/ShadowMapRender.h"
 )
 source_group("TAKOEngine\\Rendering" FILES ${TAKOEngine__Rendering})
 
@@ -453,10 +458,13 @@ set(TAKOEngine__Rendering__HLSL
     "TAKOEngine/Rendering/HLSL/Sprite.hlsli"
     "TAKOEngine/Rendering/HLSL/Toon.hlsli"
     "TAKOEngine/Rendering/HLSL/UVScroll.hlsli"
+    "TAKOEngine/Rendering/HLSL/ShadowmapFunctions.hlsli"
+    "TAKOEngine/Rendering/HLSL/ShadowMap.hlsli"
+
 )
 source_group("TAKOEngine\\Rendering\\HLSL" FILES ${TAKOEngine__Rendering__HLSL})
 
-set(TAKOEngine__Rendering__Shader
+set(TAKOEngine__Rendering__Shaders
     "TAKOEngine/Rendering/Shaders/Shader.cpp"
     "TAKOEngine/Rendering/Shaders/Shader.h"
     "TAKOEngine/Rendering/Shaders/ColorGradingShader.cpp"
@@ -483,8 +491,10 @@ set(TAKOEngine__Rendering__Shader
     "TAKOEngine/Rendering/Shaders/ToonShader.h"
     "TAKOEngine/Rendering/Shaders/UVScrollShader.cpp"
     "TAKOEngine/Rendering/Shaders/UVScrollShader.h"
+    "TAKOEngine/Rendering/Shaders/ShadowMapShader.cpp"
+    "TAKOEngine/Rendering/Shaders/ShadowMapShader.h"
 )
-source_group("TAKOEngine\\Rendering\\Shader" FILES ${TAKOEngine__Rendering__Shader})
+source_group("TAKOEngine\\Rendering\\Shaders" FILES ${TAKOEngine__Rendering__Shaders})
 
 set(TAKOEngine__Runtime
     "TAKOEngine/Runtime/tentacle_lib.cpp"
@@ -543,7 +553,7 @@ set(ALL_FILES
     ${TAKOEngine__Physics}
     ${TAKOEngine__Rendering}
     ${TAKOEngine__Rendering__HLSL}
-    ${TAKOEngine__Rendering__Shader}
+    ${TAKOEngine__Rendering__Shaders}
     ${TAKOEngine__Runtime}
     ${TAKOEngine__Sound}
     ${TAKOEngine__Tool}

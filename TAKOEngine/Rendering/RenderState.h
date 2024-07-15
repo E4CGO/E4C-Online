@@ -10,6 +10,7 @@ enum class SamplerState
 	LinearWrap,
 	LinearClamp,
 	LinearBorder,
+	ShadowMap,
 
 	EnumCount
 };

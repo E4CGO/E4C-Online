@@ -46,6 +46,7 @@ public:
 	int Count() { return static_cast<int>(items.size()); }
 
 	std::vector<T*>& GetAll() { return items; }
+
 protected:
 	std::vector<T*> items;
 };

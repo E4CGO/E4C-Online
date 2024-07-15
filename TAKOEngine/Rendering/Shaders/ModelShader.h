@@ -25,8 +25,10 @@ public:
 protected:
 	// レンダーステート設定
 	virtual void SetRenderState(const RenderContext& rc) = 0;
+	
 	// シェーダーリソースビュー設定
 	virtual void SetShaderResourceView(const ModelResource::Mesh& mesh, ID3D11DeviceContext*& dc) = 0;
+
 protected:
 	struct CbScene
 	{
@@ -46,6 +48,7 @@ protected:
 		DirectX::XMFLOAT4 materialColor;
 		float linearGamma;								// リニア補正
 		DirectX::XMFLOAT3 dummy;
+		ShaderData shaderData;
 	};
 
 	struct CbSkeleton
@@ -53,15 +56,22 @@ protected:
 		DirectX::XMFLOAT4X4 boneTransforms[256];
 	};
 
-	Microsoft::WRL::ComPtr<ID3D11Buffer> sceneConstantBuffer;
+	struct CbShadowMap
+	{
+		DirectX::XMFLOAT4X4 lightViewProjection[myRenderer::NUM_SHADOW_MAP];  //ライトビュープロジェクション行列
+		DirectX::XMFLOAT4   shadowBias;                           //深度比較用のオフセット値
+		DirectX::XMFLOAT3   shadowColor;			              //影の色
+		float               dummy;
+	};
 
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
 
+	Microsoft::WRL::ComPtr<ID3D11Buffer> sceneConstantBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> meshConstantBuffer;
-
 	Microsoft::WRL::ComPtr<ID3D11Buffer> skeletonConstantBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> shadowMapConstantBuffer;
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> toontexture;
 };

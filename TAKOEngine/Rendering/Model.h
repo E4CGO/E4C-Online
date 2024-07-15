@@ -61,14 +61,18 @@ public:
 
 	// アニメーション再生
 	void PlayAnimation(int index, bool loop, float blendSeconds = 0.2f);
+
 	// アニメーション再生中か
 	bool IsPlayAnimation() const;
+
 	// アニメーション更新処理
 	void UpdateAnimation(float elapsedTime);
+
 	// アニメーション取得
 	int GetAnimationId() { return currentAnimationIndex; }
 
 	int GetCurrentAnimationIndex() const { return  currentAnimationIndex; }
+	
 	// 現在のアニメーション再生時間取得
 	float GetCurrentAnimationSeconds() const { return  currentAnimationSeconds; }
 	float GetAnimationRate() const { return currentAnimationSeconds / resource->GetAnimations().at(currentAnimationIndex).secondsLength; }
@@ -86,11 +90,16 @@ public:
 	// リソース取得
 	const ModelResource* GetResourceDX12() const { return m_resource.get(); }
 
+	//デバッグ情報
+	void DrawDebugGUI();
+
 private:
 	// アニメーション計算処理
 	void ComputeAnimation(float elapsedTime);
+	
 	// ブレンディング計算処理
 	void ComputeBlending(float elapsedTime);
+
 private:
 	std::shared_ptr<ModelResource>	resource;
 	std::vector<Node>				nodes;

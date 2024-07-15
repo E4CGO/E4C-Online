@@ -1,8 +1,9 @@
 #include "Toon.hlsli"
 
 Texture2D diffuseMap : register(t0);
-SamplerState diffuseMapSamplerState : register(s0);
 Texture2D toonTex : register(t1); // トゥーンテクスチャ
+
+SamplerState diffuseMapSamplerState : register(s0);
 
 float4 main(VS_OUT pin) : SV_TARGET
 {
@@ -14,10 +15,10 @@ float4 main(VS_OUT pin) : SV_TARGET
     float3 E = normalize(cameraPosition.xyz - pin.position.xyz);
 
 	// マテリアル定数
-    float3 ka = float3(1, 1, 1);
-    float3 kd = float3(1, 1, 1);
-    float3 ks = float3(1, 1, 1) * 0.3;
-    float shiness = 128;
+    float3 ka = shaderData.toonShader.ka.xyz;
+    float3 kd = shaderData.toonShader.kd.xyz;
+    float3 ks = shaderData.toonShader.ks.xyz * 0.3;
+    float shiness = shaderData.toonShader.shiness;
    
     // 環境光の計算
     float3 ambient = ka * ambientLightColor.rgb;
@@ -27,10 +28,33 @@ float4 main(VS_OUT pin) : SV_TARGET
     float3 directionalSpecular = CalcPhongSpecular(N, L, directionalLightData.color.rgb, E, shiness, ks);
     //directionalDiffuse = clamp(directionalDiffuse * 0.5 + 0.5, 0, 1);
     
+     // 平行光源の影なので、平行光源に対して影を適応
+    float3 shadow = 1;
+    for (int i = 0; i < ShadowmapCount; ++i)
+    {
+        float3 shadowRexcoord = pin.shadowTexcoord[i];
+		
+		//シャドウマップのUV範囲内か、深度値が範囲内か判定する
+        if (shadowRexcoord.z >= 0 && shadowRexcoord.z <= 1 &&
+			shadowRexcoord.x >= 0 && shadowRexcoord.x <= 1 &&
+			shadowRexcoord.y >= 0 && shadowRexcoord.y <= 1)
+        {
+			//シャドウマップから深度値取得
+            float depth = shadowMap[i].Sample(shadowSampler, shadowRexcoord.xy).r;
+
+			//深度値を比較して影かどうかを判定する
+            if (shadowRexcoord.z - depth > shadowBias[i]) //shadow = shadowColor;  
+                shadow = CalcShadowColorPCFFilter(shadowMap[i], shadowSampler, shadowRexcoord, shadowColor, shadowBias[i]);
+            break;
+        }
+    }
+    directionalDiffuse  *= shadow;
+    directionalSpecular *= shadow;
+    
     // 点光源の処理
     float3 pointDiffuse = (float3) 0;
     float3 pointSpecular = (float3) 0;
-    for (int i = 0; i < pointLightCount; ++i)
+    for (i = 0; i < pointLightCount; ++i)
     {
 		// ライトベクトルを算出
         float3 lightVector = pin.position.xyz - pointLightData[i].position.xyz;
