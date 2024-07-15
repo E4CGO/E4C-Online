@@ -1,3 +1,4 @@
+#include <cassert>
 #include "TAKOEngine/Rendering/Misc.h"
 #include "TAKOEngine/Rendering/GpuResourceUtils.h"
 #include "TAKOEngine/Rendering/Shaders/ModelShader.h"
@@ -23,33 +24,40 @@ ModelShader::ModelShader(ID3D11Device* device, const char* vs, const char* ps)
 		inputElementDesc,
 		_countof(inputElementDesc),
 		inputLayout.GetAddressOf(),
-		vertexShader.GetAddressOf()
-	);
+		vertexShader.GetAddressOf());
 
 	// ピクセルシェーダー
-	GpuResourceUtils::LoadPixelShader(
-		device,
-		ps,
-		pixelShader.GetAddressOf()
-	);
+	if (ps)
+	{
+		GpuResourceUtils::LoadPixelShader(
+			device,
+			ps,
+			pixelShader.GetAddressOf());
+	}
+
 	// シーン用定数バッファ
 	GpuResourceUtils::CreateConstantBuffer(
 		device,
 		sizeof(CbScene),
-		sceneConstantBuffer.GetAddressOf()
-	);
+		sceneConstantBuffer.GetAddressOf());
+
 	// メッシュ用定数バッファ
 	GpuResourceUtils::CreateConstantBuffer(
 		device,
 		sizeof(CbMesh),
-		meshConstantBuffer.GetAddressOf()
-	);
+		meshConstantBuffer.GetAddressOf());
+
 	// スケルトン用定数バッファ
 	GpuResourceUtils::CreateConstantBuffer(
 		device,
 		sizeof(CbSkeleton),
-		skeletonConstantBuffer.GetAddressOf()
-	);
+		skeletonConstantBuffer.GetAddressOf());
+
+	// シャドウマップ用バッファ
+	GpuResourceUtils::CreateConstantBuffer(
+		device,
+		sizeof(CbShadowMap),
+		shadowMapConstantBuffer.GetAddressOf());
 }
 
 // 描画開始
@@ -68,6 +76,7 @@ void ModelShader::Begin(const RenderContext& rc)
 		sceneConstantBuffer.Get(),
 		meshConstantBuffer.Get(),
 		skeletonConstantBuffer.Get(),
+		shadowMapConstantBuffer.Get(),
 	};
 	rc.deviceContext->VSSetConstantBuffers(0, _countof(constantBuffers), constantBuffers);
 	rc.deviceContext->PSSetConstantBuffers(0, _countof(constantBuffers), constantBuffers);
@@ -75,9 +84,12 @@ void ModelShader::Begin(const RenderContext& rc)
 	// サンプラステート
 	ID3D11SamplerState* samplerStates[] =
 	{
-		rc.renderState->GetSamplerState(SamplerState::LinearWrap)
+		rc.renderState->GetSamplerState(SamplerState::LinearWrap),
 	};
 	dc->PSSetSamplers(0, _countof(samplerStates), samplerStates);
+
+	ID3D11SamplerState* shadowSampler = rc.renderState->GetSamplerState(SamplerState::ShadowMap);
+	dc->PSSetSamplers(10, 1, &shadowSampler);
 
 	// レンダーステート設定
 	SetRenderState(rc);
@@ -110,6 +122,26 @@ void ModelShader::Begin(const RenderContext& rc)
 	cbScene.cameraPosition.y = eye.y;
 	cbScene.cameraPosition.z = eye.z;
 	dc->UpdateSubresource(sceneConstantBuffer.Get(), 0, 0, &cbScene, 0, 0);
+
+	// シャドウマップ用定数バッファ更新
+	CbShadowMap cbShadowMap;
+	cbShadowMap.shadowColor = rc.shadowMapData.shadowColor;
+	for (int i = 0; i < myRenderer::NUM_SHADOW_MAP; ++i)
+	{
+		//バイアスの処理が４枚以上は考慮していないのでアサートで止めておく
+		assert(myRenderer::NUM_SHADOW_MAP <= 4);
+		(&cbShadowMap.shadowBias.x)[i]     = rc.shadowMapData.shadowBias[i];
+		cbShadowMap.lightViewProjection[i] = rc.shadowMapData.lightViewProjection[i];
+	}
+	rc.deviceContext->UpdateSubresource(shadowMapConstantBuffer.Get(), 0, 0, &cbShadowMap, 0, 0);
+
+	// シャドウマップ設定
+	ID3D11ShaderResourceView* srvs[myRenderer::NUM_SHADOW_MAP];
+	for (int i = 0; i < myRenderer::NUM_SHADOW_MAP; i++)
+	{
+		srvs[i] = rc.shadowMapData.shadowMap[i];
+	}
+	rc.deviceContext->PSSetShaderResources(10, ARRAYSIZE(srvs), srvs);
 }
 
 void ModelShader::Begin(const RenderContextDX12& rc)
@@ -153,13 +185,12 @@ void ModelShader::Draw(const RenderContext& rc, const Model* model, DirectX::XMF
 		CbMesh cbMesh{};
 		::memset(&cbMesh, 0, sizeof(cbMesh));
 		cbMesh.materialColor = mesh.material->color;
-
 		cbMesh.materialColor.x *= color.x;
 		cbMesh.materialColor.y *= color.y;
 		cbMesh.materialColor.z *= color.z;
 		cbMesh.materialColor.w *= color.w;
-
 		cbMesh.linearGamma = model->GetLinearGamma();
+		cbMesh.shaderData  = rc.shaderData;
 		dc->UpdateSubresource(meshConstantBuffer.Get(), 0, 0, &cbMesh, 0, 0);
 
 		// スケルトン用定数バッファ更新
@@ -168,9 +199,9 @@ void ModelShader::Draw(const RenderContext& rc, const Model* model, DirectX::XMF
 		{
 			for (size_t i = 0; i < mesh.bones.size(); ++i)
 			{
-				DirectX::XMMATRIX worldTransform = DirectX::XMLoadFloat4x4(&nodes.at(mesh.bones.at(i).nodeIndex).worldTransform);
+				DirectX::XMMATRIX worldTransform  = DirectX::XMLoadFloat4x4(&nodes.at(mesh.bones.at(i).nodeIndex).worldTransform);
 				DirectX::XMMATRIX offsetTransform = DirectX::XMLoadFloat4x4(&mesh.bones.at(i).offsetTransform);
-				DirectX::XMMATRIX boneTransform = offsetTransform * worldTransform;
+				DirectX::XMMATRIX boneTransform   = offsetTransform * worldTransform;
 				DirectX::XMStoreFloat4x4(&cbSkeleton.boneTransforms[i], boneTransform);
 			}
 		}

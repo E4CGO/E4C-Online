@@ -40,8 +40,11 @@ public:
 		dc->VSSetShader(nullptr, nullptr, 0);
 		dc->PSSetShader(nullptr, nullptr, 0);
 		dc->IASetInputLayout(nullptr);
+		
 		ID3D11ShaderResourceView* srvs[] = { nullptr, nullptr };
 		dc->PSSetShaderResources(0, ARRAYSIZE(srvs), srvs);
+		ID3D11ShaderResourceView* shadowSrvs[] = { nullptr, nullptr, nullptr, nullptr };
+		dc->PSSetShaderResources(10, ARRAYSIZE(shadowSrvs), shadowSrvs);
 	}
 	virtual void End(const RenderContextDX12& rc) = 0;
 

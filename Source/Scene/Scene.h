@@ -9,6 +9,7 @@
 #include "TAKOEngine/Rendering/Sprite.h"
 #include "TAKOEngine/Rendering/Model.h"
 #include "TAKOEngine/Rendering/PostprocessingRenderer.h"
+#include "TAKOEngine/Rendering/ShadowMapRender.h"
 
 class Scene
 {

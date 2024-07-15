@@ -33,6 +33,12 @@ public:
 	//ビューポート取得
 	const D3D11_VIEWPORT& GetViewport() { return viewport; }
 
+	//テクスチャ幅取得
+	inline int GetWidth() const { return texture2dDesc.Width; }
+
+	//テクスチャの高さ取得
+	inline int GetHeight() const { return texture2dDesc.Height; }
+
 private:
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView;
 	D3D11_VIEWPORT viewport;

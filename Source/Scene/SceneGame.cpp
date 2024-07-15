@@ -57,23 +57,28 @@ void SceneGame::Initialize()
 		modelPreLoad.insert(RESOURCE.LoadModelResource(filename));
 	}
 
+	//シャドウマップレンダラ
+	shadowMapRenderer->Initialize();
+
+	//ライト情報
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
+	shadowMapRenderer->SetShadowLight(dl);
 
 	// カメラ設定
 	camera.SetPerspectiveFov(
 		DirectX::XMConvertToRadians(45),							// 画角
 		T_GRAPHICS.GetScreenWidth() / T_GRAPHICS.GetScreenHeight(),	// 画面アスペクト比
 		0.1f,														// ニアクリップ
-		10000.0f													// ファークリップ
-	);
+		10000.0f);													// ファークリップ
+	
 	camera.SetLookAt(
-		{ 0, 5.0f, 10.0f },	// 視点
-		{ 0, 0, 0 },	// 注視点
-		{ 0, 0.969f, -0.248f } // 上ベクトル
-	);
+		{ 0, 5.0f, 10.0f },	     // 視点
+		{ 0, 0, 0 },	         // 注視点
+		{ 0, 0.969f, -0.248f }); // 上ベクトル
+	
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(camera);
 	cameraController->SetEnable(false);
@@ -97,12 +102,23 @@ void SceneGame::Initialize()
 	stage = std::make_unique<TestingStage>();
 	stage->Initialize();
 
+	//	モデルをレンダラーに登録
+	Model* list[] =
+	{
+		MAPTILES.get(0)->GetModel().get(),
+	};
+	for (Model* model : list)
+	{
+		if (!model) continue;
+		shadowMapRenderer->ModelRegister(model);
+	}
+
 	stateMachine = std::make_unique<StateMachine<SceneGame>>();
 	stateMachine->RegisterState(GAME_STATE::WAITING, new SceneGameState::WaitingState(this));
-	stateMachine->RegisterState(GAME_STATE::READY, new SceneGameState::ReadyState(this));
-	stateMachine->RegisterState(GAME_STATE::GAME, new SceneGameState::GameState(this));
+	stateMachine->RegisterState(GAME_STATE::READY,   new SceneGameState::ReadyState(this));
+	stateMachine->RegisterState(GAME_STATE::GAME,    new SceneGameState::GameState(this));
 	stateMachine->RegisterState(GAME_STATE::GAME_OVER, new SceneGameState::GameOverState(this));
-	stateMachine->RegisterState(GAME_STATE::WIN, new SceneGameState::WinState(this));
+	stateMachine->RegisterState(GAME_STATE::WIN,     new SceneGameState::WinState(this));
 	stateMachine->SetState(GAME_STATE::WAITING);
 
 	WidgetText* ip = new WidgetText(host.c_str(), 0.8f);
@@ -121,6 +137,7 @@ void SceneGame::Finalize()
 {
 	modelPreLoad.clear();
 	spritePreLoad.clear();
+	shadowMapRenderer->Clear();
 	CURSOR_ON;
 	PLAYERS.Clear();
 	MAPTILES.Clear();
@@ -306,13 +323,17 @@ void SceneGame::Render()
 	RenderContext rc;
 	rc.camera = &camera;
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
-	rc.renderState = T_GRAPHICS.GetRenderState();
+	rc.renderState   = T_GRAPHICS.GetRenderState();
 
 	// 内容描画
 	{
 		// ライトの情報を詰め込む
 		LightManager::Instance().PushRenderContext(rc);
 
+		//シャドウマップ描画
+		shadowMapRenderer->Render();
+		rc.shadowMapData = shadowMapRenderer->GetShadowMapData();
+		
 		MAPTILES.Render(rc);			// マップ
 		PLAYERS.Render(rc);				// プレイヤー
 		ENEMIES.Render(rc);				// エネミー
@@ -344,5 +365,6 @@ void SceneGame::Render()
 
 #ifdef _DEBUG
 	ProfileDrawUI();
+	shadowMapRenderer->DrawDebugGUI();
 #endif // _DEBUG
 }

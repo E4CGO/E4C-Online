@@ -13,7 +13,7 @@ cbuffer CbScene : register(b0)
 
 cbuffer CbMesh : register(b1)
 {
-    row_major float4x4 boneTransforms[128];
+    row_major float4x4 boneTransforms[256];
 };
 
 cbuffer CbMaterial : register(b2)
