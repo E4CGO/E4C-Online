@@ -433,26 +433,52 @@ set(TAKOEngine__Rendering
 source_group("TAKOEngine\\Rendering" FILES ${TAKOEngine__Rendering})
 
 set(TAKOEngine__Rendering__HLSL
+    "TAKOEngine/Rendering/HLSL/BloomPS.hlsl"
     "TAKOEngine/Rendering/HLSL/ColorGrading.hlsli"
+    "TAKOEngine/Rendering/HLSL/ColorGradingPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Debug.hlsli"
+    "TAKOEngine/Rendering/HLSL/DebugVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/DebugPS.hlsl"
     "TAKOEngine/Rendering/HLSL/DefaultModel.hlsli"
+    "TAKOEngine/Rendering/HLSL/DefaultModelVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/DefaultModelPS.hlsl"
     "TAKOEngine/Rendering/HLSL/FilterFunctions.hlsli"
     "TAKOEngine/Rendering/HLSL/Finalpass.hlsli"
+    "TAKOEngine/Rendering/HLSL/FinalpassPS.hlsl"
     "TAKOEngine/Rendering/HLSL/FullScreenQuad.hlsli"
+    "TAKOEngine/Rendering/HLSL/FullScreenQuadVS.hlsl"
     "TAKOEngine/Rendering/HLSL/GaussianBlur.hlsli"
+    "TAKOEngine/Rendering/HLSL/GaussianBlurPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Gizmos.hlsli"
+    "TAKOEngine/Rendering/HLSL/GizmosVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/GizmosPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Lambert.hlsli"
+    "TAKOEngine/Rendering/HLSL/LambertVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/LambertPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Light.hlsli"
     "TAKOEngine/Rendering/HLSL/Line.hlsli"
+    "TAKOEngine/Rendering/HLSL/LineVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/LinePS.hlsl"
     "TAKOEngine/Rendering/HLSL/LuminanceExtraction.hlsli"
+    "TAKOEngine/Rendering/HLSL/LuminanceExtractionPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Mask.hlsli"
+    "TAKOEngine/Rendering/HLSL/MaskPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Phong.hlsli"
+    "TAKOEngine/Rendering/HLSL/PhongVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/PhongPS.hlsl"
     "TAKOEngine/Rendering/HLSL/PostEffect.hlsli"
     "TAKOEngine/Rendering/HLSL/Skinning.hlsli"
     "TAKOEngine/Rendering/HLSL/Skydome.hlsli"
+    "TAKOEngine/Rendering/HLSL/SkydomeVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/SkydomePS.hlsl"
     "TAKOEngine/Rendering/HLSL/Sprite.hlsli"
+    "TAKOEngine/Rendering/HLSL/SpriteVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/SpritePS.hlsl"
     "TAKOEngine/Rendering/HLSL/Toon.hlsli"
+    "TAKOEngine/Rendering/HLSL/ToonVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/ToonPS.hlsl"
     "TAKOEngine/Rendering/HLSL/UVScroll.hlsli"
+    "TAKOEngine/Rendering/HLSL/UVScrollPS.hlsl"
 )
 source_group("TAKOEngine\\Rendering\\HLSL" FILES ${TAKOEngine__Rendering__HLSL})
 
@@ -554,6 +580,58 @@ set(ALL_FILES
 ################################################################################
 add_executable(${PROJECT_NAME} ${ALL_FILES})
 
+function(set_hlsl_properties target source_file shader_model shader_type entry_point)
+    set_source_files_properties(${source_file} PROPERTIES 
+        VS_SHADER_MODEL ${shader_model}   # Set the shader model
+        VS_SHADER_TYPE ${shader_type}     # Set the shader type
+        VS_SHADER_ENTRYPOINT ${entry_point} # Set the entry point function name
+    )
+endfunction()
+
+# List of HLSL shader files
+set(HLSL_SHADERS
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/BloomPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/BloomPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/ColorGradingPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/DebugVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/DebugPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/DefaultModelVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/DefaultModelPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/FinalpassPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/FullScreenQuadVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/GaussianBlurPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/GizmosVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/GizmosPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/LambertVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/LambertPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/LineVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/LinePS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/LuminanceExtractionPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/MaskPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PhongVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PhongPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/SkydomeVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/SkydomePS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/SpriteVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/SpritePS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/ToonVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/ToonPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/UVScrollPS.hlsl,5.0,Pixel,main"
+)
+
+# Apply HLSL properties to each shader file
+foreach(shader_properties ${HLSL_SHADERS})
+
+    string(REPLACE "," ";" MY_LIST ${shader_properties})
+
+    list(GET MY_LIST 0 shader_file)
+    list(GET MY_LIST 1 shader_model)
+    list(GET MY_LIST 2 shader_type)
+    list(GET MY_LIST 3 entry_point)
+    
+    set_hlsl_properties(${PROJECT_NAME} ${shader_file} ${shader_model} ${shader_type} ${entry_point})
+endforeach()
+
 use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
 set_target_properties(${PROJECT_NAME} PROPERTIES
     VS_GLOBAL_KEYWORD "Win32Proj"
@@ -603,21 +681,21 @@ set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUN
 ################################################################################
 target_include_directories(${PROJECT_NAME} PUBLIC
     "$<$<CONFIG:Debug>:"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX;"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
         "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/include"
     ">"
     "$<$<CONFIG:Release>:"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX;"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
         "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/include"
     ">"
-    "${CMAKE_CURRENT_SOURCE_DIR}/Source;"
-    "${CMAKE_CURRENT_SOURCE_DIR}/External/imgui-docking;"
-    "${CMAKE_CURRENT_SOURCE_DIR}/External/assimp/include;"
-    "${CMAKE_CURRENT_SOURCE_DIR}/External/stb;"
-    "${CMAKE_CURRENT_SOURCE_DIR}/External/cereal/include;"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TeNTaCleLib;"
-    "${CMAKE_CURRENT_SOURCE_DIR}/External/Effekseer162a/include;"
-    "${CMAKE_CURRENT_SOURCE_DIR}/External/nlohmann;"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Source"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/imgui-docking"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/assimp/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/stb"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/cereal/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TeNTaCleLib"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/Effekseer162a/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/nlohmann"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/openssl/include"
 )
 
@@ -626,15 +704,15 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 ################################################################################
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     "$<$<CONFIG:Debug>:"
-        "_DEBUG;"
+        "_DEBUG"
         "CMAKE_INTDIR=\"Debug\""
     ">"
     "$<$<CONFIG:Release>:"
-        "NDEBUG;"
+        "NDEBUG"
         "CMAKE_INTDIR=\"Release\""
     ">"
-    "_CONSOLE;"
-    "UNICODE;"
+    "_CONSOLE"
+    "UNICODE"
     "_UNICODE"
 )
 
@@ -644,15 +722,15 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Release>:
-            /Oi;
+            /Oi
             /Gy
         >
-        /permissive-;
-        /MP;
-        /sdl;
-        /W3;
-        /Zi;
-        ${DEFAULT_CXX_EXCEPTION_HANDLING};
+        /permissive-
+        /MP
+        /sdl
+        /W3
+        /Zi
+        ${DEFAULT_CXX_EXCEPTION_HANDLING}
         /Y-
     )
     target_link_options(${PROJECT_NAME} PRIVATE
@@ -660,11 +738,11 @@ if(MSVC)
             /INCREMENTAL
         >
         $<$<CONFIG:Release>:
-            /OPT:REF;
+            /OPT:REF
             /OPT:ICF
         >
-        /MANIFEST;
-        /DEBUG;
+        /MANIFEST
+        /DEBUG
         /SUBSYSTEM:WINDOWS
     )
 endif()
@@ -734,49 +812,49 @@ endif()
 
 set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "$<$<CONFIG:Debug>:"
-        "SDL2;"
-        "DirectXTK;"
+        "SDL2"
+        "DirectXTK"
         "DirectXTex"
     ">"
     "$<$<CONFIG:Release>:"
-        "SDL2;"
-        "DirectXTK;"
+        "SDL2"
+        "DirectXTK"
         "DirectXTex"
     ">"
-    "kernel32;"
-    "user32;"
-    "gdi32;"
-    "winspool;"
-    "shell32;"
-    "ole32;"
-    "oleaut32;"
-    "uuid;"
-    "comdlg32;"
+    "kernel32"
+    "user32"
+    "gdi32"
+    "winspool"
+    "shell32"
+    "ole32"
+    "oleaut32"
+    "uuid"
+    "comdlg32"
     "advapi32"
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE "${ADDITIONAL_LIBRARY_DEPENDENCIES}")
 
 target_link_directories(${PROJECT_NAME} PRIVATE
     "$<$<CONFIG:Debug>:"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/nlohmann/$<CONFIG>;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/$<CONFIG>;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/assimp/lib/x64/$<CONFIG>;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/lib/x64;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/Effekseer162a/lib/vs2019/MD/x64/$<CONFIG>;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/openssl/x64/lib;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtk/native/lib/x64/$<CONFIG>;"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/nlohmann/$<CONFIG>"
+        "${CMAKE_CURRENT_SOURCE_DIR}/$<CONFIG>"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/assimp/lib/x64/$<CONFIG>"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/lib/x64"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/Effekseer162a/lib/vs2019/MD/x64/$<CONFIG>"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/openssl/x64/lib"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtk/native/lib/x64/$<CONFIG>"
         "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtex/native/lib/x64/$<CONFIG>"
     ">"
     "$<$<CONFIG:Release>:"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/nlohmann;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/$<CONFIG>;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/assimp/lib/x64/Release;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/Effekseer162a/lib/vs2019/MD/x64/Release;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/openssl/x64/lib;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtex/native/lib/x64/Release;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtk/native/lib/x64/Release;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX;"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/nlohmann"
+        "${CMAKE_CURRENT_SOURCE_DIR}/$<CONFIG>"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/assimp/lib/x64/Release"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/Effekseer162a/lib/vs2019/MD/x64/Release"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/openssl/x64/lib"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtex/native/lib/x64/Release"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtk/native/lib/x64/Release"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
         "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/lib/x64"
     ">"
 )
