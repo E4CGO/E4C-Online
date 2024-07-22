@@ -39,10 +39,6 @@ namespace myRenderer
 		//“o˜^Ï‚İ‚Ìƒ‰ƒCƒg‚ğ‘Síœ
 		void ShadowMapRender::Clear()
 		{
-			for (Model* model : m_models)
-			{
-				delete model;
-			}
 			m_models.clear();
 			light = nullptr;
 		}

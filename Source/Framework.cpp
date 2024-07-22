@@ -45,6 +45,8 @@ Framework::Framework(HWND hWnd)
 // デストラクタ
 Framework::~Framework()
 {
+	T_GRAPHICS.WaitIdle();
+
 	SceneManager::Instance().Clear();
 
 	// エフェクトマネージャー終了化
@@ -55,7 +57,6 @@ Framework::~Framework()
 
 	Network::Finalize();
 
-	T_GRAPHICS.WaitIdle();
 }
 
 // 更新処理
