@@ -23,16 +23,26 @@ Model::Model(ID3D11Device* device, const char* filename, float scaling) : scalin
 		auto&& src = resNodes.at(nodeIndex);
 		auto&& dst = nodes.at(nodeIndex);
 
-		dst.name = src.name.c_str();
-		dst.parent = src.parentIndex >= 0 ? &nodes.at(src.parentIndex) : nullptr;
-		dst.scale = src.scale;
+		dst.name     = src.name.c_str();
+		dst.scale    = src.scale;
 		dst.rotation = src.rotation;
 		dst.position = src.position;
 
+		dst.parent   = src.parentIndex >= 0 ? &nodes.at(src.parentIndex) : nullptr;
 		if (dst.parent != nullptr)
 		{
 			dst.parent->children.emplace_back(&dst);
 		}
+	}
+
+	//メッシュ構築
+	const std::vector<ModelResource::Mesh>& resMeshes = resource->GetMeshes();
+	m_meshes.resize(resMeshes.size());
+	for (size_t meshIndex = 0; meshIndex < m_meshes.size(); ++meshIndex)
+	{
+		const ModelResource::Mesh& resMesh = resMeshes.at(meshIndex);
+		Mesh& mesh = m_meshes.at(meshIndex);
+		mesh.mesh  = &resMesh;
 	}
 }
 
@@ -64,6 +74,7 @@ void Model::PlayAnimation(int index, bool loop, float blendSeconds)
 		dst.scale = src.scale;
 	}
 }
+
 // アニメーション再生中か
 bool Model::IsPlayAnimation() const
 {
@@ -71,12 +82,14 @@ bool Model::IsPlayAnimation() const
 	if (currentAnimationIndex > resource->GetAnimations().size()) return false;
 	return animationPlaying;
 }
+
 // アニメーション更新処理
 void Model::UpdateAnimation(float elapsedTime)
 {
 	ComputeAnimation(elapsedTime);
 	ComputeBlending(elapsedTime);
 }
+
 void Model::ComputeAnimation(float elapsedTime)
 {
 	if (!IsPlayAnimation()) return;
@@ -206,6 +219,7 @@ void Model::ComputeBlending(float elapsedTime)
 	}
 }
 
+//トランスフォーム更新処理
 void Model::UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform)
 {
 	DirectX::XMMATRIX ParentWorldTransform = DirectX::XMLoadFloat4x4(&worldTransform);
@@ -242,6 +256,21 @@ void Model::UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform)
 		DirectX::XMStoreFloat4x4(&node.localTransform, LocalTransform);
 		DirectX::XMStoreFloat4x4(&node.globalTransform, GlobalTransform);
 		DirectX::XMStoreFloat4x4(&node.worldTransform, WorldTransform);
+	}
+
+	ComputeWorldBounds();
+}
+
+// ワールドバウンディングボックス計算
+void Model::ComputeWorldBounds()
+{
+	// バウンディングボックス
+	bounds.Center = bounds.Extents = { 0, 0, 0 };
+	for (Mesh& mesh : m_meshes)
+	{
+		DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&nodes.at(mesh.mesh->nodeIndex).worldTransform);
+		mesh.mesh->localBounds.Transform(mesh.worldBounds, WorldTransform);
+		DirectX::BoundingBox::CreateMerged(bounds, bounds, mesh.worldBounds);
 	}
 }
 

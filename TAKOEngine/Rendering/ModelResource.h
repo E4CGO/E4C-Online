@@ -6,6 +6,7 @@
 #include <d3d11.h>
 #include <d3d12.h>
 #include <DirectXMath.h>
+#include <DirectXCollision.h>
 
 #include "TAKOEngine/Rendering/Descriptor.h"
 
@@ -107,8 +108,9 @@ public:
 
 		std::vector<Bone> bones;
 
-		DirectX::XMFLOAT3						boundsMin;
-		DirectX::XMFLOAT3						boundsMax;
+		DirectX::BoundingBox	localBounds;
+		DirectX::XMFLOAT3		boundsMin;
+		DirectX::XMFLOAT3		boundsMax;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_vb_resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_ib_resource;
@@ -190,6 +192,9 @@ public:
 protected:
 
 	void BuildModel(const char* dirname, const char* filename);
+
+	// バウンディングボックス計算
+	void ComputeLocalBounds();
 
 	// シリアライズ
 	void Serialize(const char* filename);

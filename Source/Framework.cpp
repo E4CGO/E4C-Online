@@ -39,7 +39,6 @@ Framework::Framework(HWND hWnd)
 
 	// シーン初期化
 	SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTitle));
-	//SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame("nagi", "192.168.0.236", "7000", new HostNetworkController)));
 }
 
 // デストラクタ

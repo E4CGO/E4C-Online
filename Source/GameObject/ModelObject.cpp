@@ -35,6 +35,7 @@ void ModelObject::Update(float elapsedTime)
 void ModelObject::Render(const RenderContext& rc)
 {
 	if (!visible) return;
+	
 	// •`‰æ
 	ModelShader* shader = T_GRAPHICS.GetModelShader(shaderId);
 	shader->Begin(rc);
