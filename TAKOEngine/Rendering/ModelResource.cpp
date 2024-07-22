@@ -77,6 +77,15 @@ namespace DirectX
 			cereal::make_nvp("_44", m._44)
 		);
 	}
+
+	template<class Archive>
+	void serialize(Archive& archive, BoundingBox& bounds)
+	{
+		archive(
+			cereal::make_nvp("Center", bounds.Center),
+			cereal::make_nvp("Extents", bounds.Extents)
+		);
+	}
 }
 
 template<class Archive>
@@ -130,7 +139,8 @@ void ModelResource::Mesh::serialize(Archive& archive)
 		CEREAL_NVP(indices),
 		CEREAL_NVP(bones),
 		CEREAL_NVP(nodeIndex),
-		CEREAL_NVP(materialIndex)
+		CEREAL_NVP(materialIndex),
+		CEREAL_NVP(localBounds)
 	);
 }
 template<class Archive>
@@ -197,6 +207,9 @@ void ModelResource::Load(ID3D11Device* device, const char* filename)
 
 		// アニメーションデート読み取り
 		importer.LoadAnimations(animations, nodes);
+
+		// バウンディングボックス計算
+		ComputeLocalBounds();
 
 		// 独自形式のモデルファイルを保存
 		Serialize(filepath.string().c_str());
@@ -584,6 +597,86 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 	}
 }
 
+// バウンディングボックス計算
+void ModelResource::ComputeLocalBounds()
+{
+	std::vector<DirectX::XMFLOAT4X4> globalTransforms(nodes.size());
+	for (size_t i = 0; i < nodes.size(); ++i)
+	{
+		const Node& node = nodes.at(i);
+		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(node.scale.x, node.scale.y, node.scale.z);
+		DirectX::XMMATRIX R = DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&node.rotation));
+		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(node.position.x, node.position.y, node.position.z);
+		DirectX::XMMATRIX LocalTransform = S * R * T;
+		if (node.parentIndex >= 0)
+		{
+			DirectX::XMMATRIX ParentGlobalTransform = DirectX::XMLoadFloat4x4(&globalTransforms.at(node.parentIndex));
+			DirectX::XMMATRIX GlobalTransform = DirectX::XMMatrixMultiply(LocalTransform, ParentGlobalTransform);
+			DirectX::XMStoreFloat4x4(&globalTransforms[i], GlobalTransform);
+		}
+		else
+		{
+			DirectX::XMStoreFloat4x4(&globalTransforms[i], LocalTransform);
+		}
+	}
+
+	for (Mesh& mesh : meshes)
+	{
+		if (mesh.bones.size() > 0)
+		{
+			std::vector<DirectX::XMFLOAT4X4> boneTransforms(mesh.bones.size());
+			for (size_t i = 0; i < mesh.bones.size(); ++i)
+			{
+				const Bone& bone = mesh.bones.at(i);
+				DirectX::XMMATRIX GlobalTransform = DirectX::XMLoadFloat4x4(&globalTransforms[bone.nodeIndex]);
+				DirectX::XMMATRIX OffsetTransform = DirectX::XMLoadFloat4x4(&bone.offsetTransform);
+				DirectX::XMMATRIX BoneTransform = OffsetTransform * GlobalTransform;
+				DirectX::XMStoreFloat4x4(&boneTransforms[i], BoneTransform);
+			}
+
+			DirectX::XMFLOAT3 boundsMin              = { FLT_MAX, FLT_MAX, FLT_MAX };
+			DirectX::XMFLOAT3 boundsMax              = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
+			DirectX::XMMATRIX GlobalTransform        = DirectX::XMLoadFloat4x4(&globalTransforms[mesh.nodeIndex]);
+			DirectX::XMMATRIX InverseGlobalTransform = DirectX::XMMatrixInverse(nullptr, GlobalTransform);
+
+			for (const ModelResource::Vertex& vertex : mesh.vertices)
+			{
+				//スキニング
+				DirectX::XMVECTOR Position = DirectX::XMLoadFloat3(&vertex.position);
+				DirectX::XMVECTOR P        = DirectX::XMVectorZero();
+				const float* weights = &vertex.boneWeight.x;
+				const UINT*  indices = &vertex.boneIndex.x;
+				for (int j = 0; j < 4; ++j)
+				{
+					DirectX::XMMATRIX BoneTransform = DirectX::XMLoadFloat4x4(&boneTransforms[indices[j]]);
+					P = DirectX::XMVectorAdd(P, DirectX::XMVectorScale(DirectX::XMVector3Transform(Position, BoneTransform), weights[j]));
+				}
+				P = DirectX::XMVector3Transform(P, InverseGlobalTransform);
+
+				DirectX::XMFLOAT3 p;
+				DirectX::XMStoreFloat3(&p, P);
+				boundsMin.x = (std::min)(boundsMin.x, p.x);
+				boundsMin.y = (std::min)(boundsMin.y, p.y);
+				boundsMin.z = (std::min)(boundsMin.z, p.z);
+				boundsMax.x = (std::max)(boundsMax.x, p.x);
+				boundsMax.y = (std::max)(boundsMax.y, p.y);
+				boundsMax.z = (std::max)(boundsMax.z, p.z);
+			}
+
+			DirectX::XMVECTOR BoundsMin = DirectX::XMLoadFloat3(&boundsMin);
+			DirectX::XMVECTOR BoundsMax = DirectX::XMLoadFloat3(&boundsMax);
+			DirectX::BoundingBox::CreateFromPoints(mesh.localBounds, BoundsMin, BoundsMax);
+		}
+		else
+		{
+			if (mesh.vertices.size() > 0)
+			{
+				DirectX::BoundingBox::CreateFromPoints(mesh.localBounds, mesh.vertices.size(), &mesh.vertices.data()->position, sizeof(ModelResource::Vertex));
+			}
+		}
+	}
+}
+
 // シリアライズ
 void ModelResource::Serialize(const char* filename)
 {
@@ -626,6 +719,7 @@ void ModelResource::Deserialize(const char* filename)
 		}
 		catch (...)
 		{
+			LOG("model deserialize failed.\n%s\n", filename);
 			_ASSERT_EXPR_A(false, "Model deserialize failed.");
 		}
 	}
