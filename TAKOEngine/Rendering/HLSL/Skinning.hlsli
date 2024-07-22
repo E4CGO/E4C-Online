@@ -1,7 +1,8 @@
+#define MAX_BONES 256
 cbuffer CbSkeleton : register(b2)
 {
-	row_major float4x4 boneTransforms[256];
-}
+    row_major float4x4 boneTransforms[MAX_BONES];
+};
 
 float4 SkinningPosition(float4 position, float4 boneWeights, uint4 boneIndices)
 {

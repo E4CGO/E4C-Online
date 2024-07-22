@@ -22,10 +22,14 @@ void SceneTitle::Initialize()
 		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
 	}
 
+	//�V���h�E�}�b�v�����_��
+	shadowMapRenderer->Initialize();
+
 	// ���f��
 	{
 		// �w�i
 		map = std::make_unique<ModelObject>("Data/Model/Map/TitleMap.glb");
+		shadowMapRenderer->ModelRegister(map->GetModel().get());
 
 		// �L����
 		barbarian = std::make_unique<ModelObject>("Data/Model/Character/Barbarian.glb");
@@ -36,6 +40,7 @@ void SceneTitle::Initialize()
 		barbarian->GetModel()->FindNode("Mug")->visible = false;
 		barbarian->GetModel()->FindNode("1H_Axe")->visible = false;
 		barbarian->GetModel()->FindNode("1H_Axe_Offhand")->visible = false;
+		shadowMapRenderer->ModelRegister(barbarian->GetModel().get());
 
 		knight = std::make_unique<ModelObject>("Data/Model/Character/Knight.glb");
 		knight->SetAnimation(22, true, 0.0f);
@@ -46,6 +51,7 @@ void SceneTitle::Initialize()
 		knight->GetModel()->FindNode("Badge_Shield")->visible = false;
 		knight->GetModel()->FindNode("Round_Shield")->visible = false;
 		knight->GetModel()->FindNode("Spike_Shield")->visible = false;
+		shadowMapRenderer->ModelRegister(knight->GetModel().get());
 
 		rouge = std::make_unique<ModelObject>("Data/Model/Character/Rogue_Hooded.glb");
 		rouge->SetAnimation(22, true, 0.0f);
@@ -55,6 +61,7 @@ void SceneTitle::Initialize()
 		rouge->GetModel()->FindNode("Knife")->visible = false;
 		rouge->GetModel()->FindNode("Knife_Offhand")->visible = false;
 		rouge->GetModel()->FindNode("Throwable")->visible = false;
+		shadowMapRenderer->ModelRegister(rouge->GetModel().get());
 
 		test = std::make_unique<ModelDX12>("Data/Model/Character/Barbarian.glb");
 		test->PlayAnimation(0, true);
@@ -65,6 +72,7 @@ void SceneTitle::Initialize()
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
+	shadowMapRenderer->SetShadowLight(dl);
 
 	// �J�����ݒ�
 	camera.SetPerspectiveFov(
@@ -125,6 +133,7 @@ void SceneTitle::Finalize()
 {
 	spritePreLoad.clear();
 	UI.Clear();
+	shadowMapRenderer->Clear();
 }
 
 // �X�V����
@@ -160,15 +169,19 @@ void SceneTitle::Render()
 
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->Clear(T_GRAPHICS.GetDeviceContext(), 0.2f, 0.2f, 0.2f, 1);
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
-
+	
 	// �`��R���e�L�X�g�ݒ�
 	RenderContext rc;
 	rc.camera = &camera;
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
-	rc.renderState = T_GRAPHICS.GetRenderState();
+	rc.renderState   = T_GRAPHICS.GetRenderState();
 
 	// ���C�g�̏����l�ߍ���
 	LightManager::Instance().PushRenderContext(rc);
+
+	//	�V���h�E�}�b�v�`��
+	shadowMapRenderer->Render();
+	rc.shadowMapData = shadowMapRenderer->GetShadowMapData();
 
 	map->Render(rc);
 	barbarian->Render(rc);
@@ -182,6 +195,7 @@ void SceneTitle::Render()
 #ifdef _DEBUG
 	// DebugIMGUI
 	//DrawSceneGUI();
+	shadowMapRenderer->DrawDebugGUI();
 #endif // _DEBUG
 }
 

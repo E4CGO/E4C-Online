@@ -2,6 +2,8 @@
 
 #define _WINSOCKAPI_
 
+#define _DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR
+
 #pragma comment( lib, "d3d11.lib" )
 #pragma comment( lib, "d3d12.lib" )
 #pragma comment( lib, "dxgi.lib" )

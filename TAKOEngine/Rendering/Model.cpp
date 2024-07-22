@@ -259,3 +259,9 @@ Model::Node* Model::FindNode(const char* name)
 	// 見つからなかった
 	return nullptr;
 }
+
+//デバッグ情報
+void Model::DrawDebugGUI()
+{
+
+}

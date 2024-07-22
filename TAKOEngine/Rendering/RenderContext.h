@@ -2,6 +2,7 @@
 
 #include "TAKOEngine/Editor/Camera/Camera.h"
 #include "TAKOEngine/Rendering/RenderState.h"
+#include "TAKOEngine/Rendering/MyRender.h"
 
 //	UVスクロール情報
 struct UVScrollData
@@ -22,6 +23,44 @@ struct DirectionalLightData
 {
 	DirectX::XMFLOAT4 direction;
 	DirectX::XMFLOAT4 color;
+};
+
+//TODO : ShaderData Set
+#pragma region シェーダー情報
+struct Default
+{
+	DirectX::XMFLOAT4 ka = DirectX::XMFLOAT4(1, 1, 1, 1);
+	DirectX::XMFLOAT4 kd = DirectX::XMFLOAT4(1, 1, 1, 1);
+	DirectX::XMFLOAT4 ks = DirectX::XMFLOAT4(0, 0, 0, 1);
+	float shiness = 128;
+	DirectX::XMFLOAT3 dummy;
+};
+
+struct Phong
+{
+	DirectX::XMFLOAT4 ka = DirectX::XMFLOAT4(1, 1, 1, 1);
+	DirectX::XMFLOAT4 kd = DirectX::XMFLOAT4(1, 1, 1, 1);
+	DirectX::XMFLOAT4 ks = DirectX::XMFLOAT4(1, 1, 1, 1);
+	float shiness = 128;
+	DirectX::XMFLOAT3 dummy;
+};
+
+struct Toon
+{
+	DirectX::XMFLOAT4 ka = DirectX::XMFLOAT4(1, 1, 1, 1);
+	DirectX::XMFLOAT4 kd = DirectX::XMFLOAT4(1, 1, 1, 1);
+	DirectX::XMFLOAT4 ks = DirectX::XMFLOAT4(1, 1, 1, 1);
+	float shiness = 128;
+	DirectX::XMFLOAT3 dummy;
+};
+
+#pragma endregion
+
+struct ShaderData
+{
+	Default defaultShader;
+	Phong   phongShader;
+	Toon    toonShader;
 };
 
 // 点光源情報
@@ -85,6 +124,22 @@ struct FinalpassnData
 	ID3D11ShaderResourceView* bloomTexture;
 };
 
+struct ShadowMapData
+{
+	DirectX::XMFLOAT4X4 view = {};
+	DirectX::XMFLOAT4X4 projection = {};
+
+	//シャドウマップ用深度ステンシルバッファ
+	ID3D11ShaderResourceView* shadowMap[myRenderer::NUM_SHADOW_MAP] = {};
+
+	//ライトビュープロジェクション行列
+	DirectX::XMFLOAT4X4 lightViewProjection[myRenderer::NUM_SHADOW_MAP] = {};
+
+	float shadowBias[myRenderer::NUM_SHADOW_MAP] = { 0.001f, 0.002f, 0.004f, 0.01f }; //深度比較用のオフセット値
+	
+	DirectX::XMFLOAT3 shadowColor = { 0.2f,0.2f,0.2f };
+};
+
 struct RenderContext
 {
 	ID3D11DeviceContext* deviceContext;
@@ -109,4 +164,8 @@ struct RenderContext
 	GaussianFilterData		gaussianFilterData;				//	ガウスフィルター情報
 	LuminanceExtractionData	luminanceExtractionData;		//	高輝度抽出用情報
 	FinalpassnData			finalpassnData;					//	最終パス情報
+	ShadowMapData           shadowMapData;                  //  シャドウマップ情報
+
+	//モデルシェーダー情報
+	ShaderData shaderData;
 };

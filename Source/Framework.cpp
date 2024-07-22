@@ -13,82 +13,84 @@
 
 #include "GameData.h"
 
-// ‚’¼“¯ŠúŠÔŠuİ’è
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÔŠuï¿½İ’ï¿½
 static const int syncInterval = 1;
 extern bool gPause;
 
-// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^
 Framework::Framework(HWND hWnd)
 	: hWnd(hWnd)
 {
 	TentacleLib::SetSyncInterval(syncInterval);
 	TentacleLib::SetShowFPS(true);
 
-	// IMGUI‰Šú‰»
+	// IMGUIï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	ImGuiRenderer::Initialize(hWnd, T_GRAPHICS.GetDevice(), T_GRAPHICS.GetDeviceContext());
 
-	// ƒlƒbƒgƒ[ƒN
+	// ï¿½lï¿½bï¿½gï¿½ï¿½ï¿½[ï¿½N
 	Network::Initialize();
-	// IP‚ğæ“¾
+	// IPï¿½ï¿½ï¿½æ“¾
 	char address[256];
 	Network::GetIpAddress(address, sizeof(address));
 	GAME_DATA.SetIp(address);
 
-	// ƒGƒtƒFƒNƒgƒ}ƒl[ƒWƒƒ[‰Šú‰»
+	// ï¿½Gï¿½tï¿½Fï¿½Nï¿½gï¿½}ï¿½lï¿½[ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	EFFECTS.Initialize();
 
-	// ƒV[ƒ“‰Šú‰»
+	// ï¿½Vï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTitle));
+	//SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame("nagi", "192.168.0.236", "7000", new HostNetworkController)));
 }
 
-// ƒfƒXƒgƒ‰ƒNƒ^
+// ï¿½fï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^
 Framework::~Framework()
 {
 	T_GRAPHICS.WaitIdle();
 
 	SceneManager::Instance().Clear();
 
-	// ƒGƒtƒFƒNƒgƒ}ƒl[ƒWƒƒ[I—¹‰»
+	// ï¿½Gï¿½tï¿½Fï¿½Nï¿½gï¿½}ï¿½lï¿½[ï¿½Wï¿½ï¿½ï¿½[ï¿½Iï¿½ï¿½ï¿½ï¿½
 	EFFECTS.Finalize();
 
-	// IMGUII—¹
+	// IMGUIï¿½Iï¿½ï¿½
 	ImGuiRenderer::Finalize();
 
 	Network::Finalize();
+
 }
 
-// XVˆ—
+// ï¿½Xï¿½Vï¿½ï¿½ï¿½ï¿½
 void Framework::Update(float elapsedTime)
 {
 	if (T_INPUT.KeyDown(VK_F1)) DX12API = !DX12API;
-	// ƒV[ƒ“XVˆ—
+	// ï¿½Vï¿½[ï¿½ï¿½ï¿½Xï¿½Vï¿½ï¿½ï¿½ï¿½
 	SceneManager::Instance().Update(elapsedTime);
 }
 
-// •`‰æˆ—
+// ï¿½`ï¿½æˆï¿½ï¿½
 void Framework::Render(float elapsedTime)
 {
-	// •ÊƒXƒŒƒbƒh’†‚ÉƒfƒoƒCƒXƒRƒ“ƒeƒLƒXƒg‚ªg‚í‚ê‚Ä‚¢‚½ê‡‚É
-	// “¯ƒAƒNƒZƒX‚µ‚È‚¢‚æ‚¤‚É”r‘¼§Œä‚·
+	// ï¿½ÊƒXï¿½ï¿½ï¿½bï¿½hï¿½ï¿½ï¿½Éƒfï¿½oï¿½Cï¿½Xï¿½Rï¿½ï¿½ï¿½eï¿½Lï¿½Xï¿½gï¿½ï¿½ï¿½gï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ê‡ï¿½ï¿½
+	// ï¿½ï¿½ï¿½ï¿½ï¿½Aï¿½Nï¿½Zï¿½Xï¿½ï¿½ï¿½È‚ï¿½ï¿½æ‚¤ï¿½É”rï¿½ï¿½ï¿½ï¿½ï¿½ä‚·
 	std::lock_guard<std::mutex> lock(T_GRAPHICS.GetMutex());
 
 	if (!DX12API)
 	{
 		ID3D11DeviceContext* dc = T_GRAPHICS.GetDeviceContext();
 
-		// IMGUIˆ—ŠJn
+		// IMGUIï¿½ï¿½ï¿½ï¿½ï¿½Jï¿½n
 		ImGuiRenderer::NewFrame();
 
-		// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒgİ’è
+		// ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½[ï¿½^ï¿½[ï¿½Qï¿½bï¿½gï¿½İ’ï¿½
 		T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->SetRenderTarget(dc);
 
-		// ƒV[ƒ“•`‰æˆ—
+		// ï¿½Vï¿½[ï¿½ï¿½ï¿½`ï¿½æˆï¿½ï¿½
 		SceneManager::Instance().Render();
 
-		// IMGUI•`‰æ
+		// IMGUIï¿½`ï¿½ï¿½
 		ImGuiRenderer::Render(dc);
 
-		// ‰æ–Ê•\¦
+		// ï¿½ï¿½Ê•\ï¿½ï¿½
 		TentacleLib::Draw();
 	}
 	else
@@ -98,7 +100,7 @@ void Framework::Render(float elapsedTime)
 	}
 }
 
-// ƒAƒvƒŠƒP[ƒVƒ‡ƒ“ƒ‹[ƒv
+// ï¿½Aï¿½vï¿½ï¿½ï¿½Pï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½v
 int Framework::Run()
 {
 	MSG msg = {};
@@ -127,7 +129,7 @@ int Framework::Run()
 	return static_cast<int>(msg.wParam);
 }
 
-// ƒƒbƒZ[ƒWƒnƒ“ƒhƒ‰
+// ï¿½ï¿½ï¿½bï¿½Zï¿½[ï¿½Wï¿½nï¿½ï¿½ï¿½hï¿½ï¿½
 LRESULT CALLBACK Framework::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	if (ImGuiRenderer::HandleMessage(hWnd, msg, wParam, lParam)) return true;
