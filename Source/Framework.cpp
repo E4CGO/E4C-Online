@@ -13,84 +13,83 @@
 
 #include "GameData.h"
 
-// ���������Ԋu�ݒ�
+// 垂直同期間隔設定
 static const int syncInterval = 1;
 extern bool gPause;
 
-// �R���X�g���N�^
+// コンストラクタ
 Framework::Framework(HWND hWnd)
 	: hWnd(hWnd)
 {
 	TentacleLib::SetSyncInterval(syncInterval);
 	TentacleLib::SetShowFPS(true);
 
-	// IMGUI������
+	// IMGUI初期化
 	ImGuiRenderer::Initialize(hWnd, T_GRAPHICS.GetDevice(), T_GRAPHICS.GetDeviceContext());
 
-	// �l�b�g���[�N
+	// ネットワーク
 	Network::Initialize();
-	// IP���擾
+	// IPを取得
 	char address[256];
 	Network::GetIpAddress(address, sizeof(address));
 	GAME_DATA.SetIp(address);
 
-	// �G�t�F�N�g�}�l�[�W���[������
+	// エフェクトマネージャー初期化
 	EFFECTS.Initialize();
 
-	// �V�[��������
+	// シーン初期化
 	SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTitle));
 	//SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame("nagi", "192.168.0.236", "7000", new HostNetworkController)));
 }
 
-// �f�X�g���N�^
+// デストラクタ
 Framework::~Framework()
 {
 	T_GRAPHICS.WaitIdle();
 
 	SceneManager::Instance().Clear();
 
-	// �G�t�F�N�g�}�l�[�W���[�I����
+	// エフェクトマネージャー終了化
 	EFFECTS.Finalize();
 
-	// IMGUI�I��
+	// IMGUI終了
 	ImGuiRenderer::Finalize();
 
 	Network::Finalize();
-
 }
 
-// �X�V����
+// 更新処理
 void Framework::Update(float elapsedTime)
 {
 	if (T_INPUT.KeyDown(VK_F1)) DX12API = !DX12API;
-	// �V�[���X�V����
+	// シーン更新処理
 	SceneManager::Instance().Update(elapsedTime);
 }
 
-// �`�揈��
+// 描画処理
 void Framework::Render(float elapsedTime)
 {
-	// �ʃX���b�h���Ƀf�o�C�X�R���e�L�X�g���g���Ă����ꍇ��
-	// �����A�N�Z�X���Ȃ��悤�ɔr�����䂷
+	// 別スレッド中にデバイスコンテキストが使われていた場合に
+	// 同時アクセスしないように排他制御す
 	std::lock_guard<std::mutex> lock(T_GRAPHICS.GetMutex());
 
 	if (!DX12API)
 	{
 		ID3D11DeviceContext* dc = T_GRAPHICS.GetDeviceContext();
 
-		// IMGUI�����J�n
+		// IMGUI処理開始
 		ImGuiRenderer::NewFrame();
 
-		// �����_�[�^�[�Q�b�g�ݒ�
+		// レンダーターゲット設定
 		T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->SetRenderTarget(dc);
 
-		// �V�[���`�揈��
+		// シーン描画処理
 		SceneManager::Instance().Render();
 
-		// IMGUI�`��
+		// IMGUI描画
 		ImGuiRenderer::Render(dc);
 
-		// ��ʕ\��
+		// 画面表示
 		TentacleLib::Draw();
 	}
 	else
@@ -100,7 +99,7 @@ void Framework::Render(float elapsedTime)
 	}
 }
 
-// �A�v���P�[�V�������[�v
+// アプリケーションループ
 int Framework::Run()
 {
 	MSG msg = {};
@@ -129,7 +128,7 @@ int Framework::Run()
 	return static_cast<int>(msg.wParam);
 }
 
-// ���b�Z�[�W�n���h��
+// メッセージハンドラ
 LRESULT CALLBACK Framework::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	if (ImGuiRenderer::HandleMessage(hWnd, msg, wParam, lParam)) return true;

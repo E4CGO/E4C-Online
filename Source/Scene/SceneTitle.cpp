@@ -22,16 +22,16 @@ void SceneTitle::Initialize()
 		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
 	}
 
-	//�V���h�E�}�b�v�����_��
+	//シャドウマップレンダラ
 	shadowMapRenderer->Initialize();
 
-	// ���f��
+	// モデル
 	{
-		// �w�i
+		// 背景
 		map = std::make_unique<ModelObject>("Data/Model/Map/TitleMap.glb");
 		shadowMapRenderer->ModelRegister(map->GetModel().get());
 
-		// �L����
+		// キャラ
 		barbarian = std::make_unique<ModelObject>("Data/Model/Character/Barbarian.glb");
 		barbarian->SetAnimation(22, true, 0.0f);
 		barbarian->SetPosition({ 0.28f, 0.0f, -3.15f });
@@ -67,30 +67,30 @@ void SceneTitle::Initialize()
 		test->PlayAnimation(0, true);
 	}
 
-	// ��
+	// 光
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
 	shadowMapRenderer->SetShadowLight(dl);
 
-	// �J�����ݒ�
+	// カメラ設定
 	camera.SetPerspectiveFov(
-		DirectX::XMConvertToRadians(45),							// ��p
-		SCREEN_W / SCREEN_H,	// ��ʃA�X�y�N�g��
-		0.1f,														// �j�A�N���b�v
-		10000.0f													// �t�@�[�N���b�v
+		DirectX::XMConvertToRadians(45),		// 画角
+		SCREEN_W / SCREEN_H,					// 画面アスペクト比
+		0.1f,									// ニアクリップ
+		10000.0f								// ファークリップ
 	);
 	camera.SetLookAt(
-		{ -5.661f, 2.5f, 5.584f },	// ���_
-		{ 0.0f, 2.0, 0.0f },	// �����_
-		{ 0.036f, 0.999f, -0.035f } // ��x�N�g��
+		{ -5.661f, 2.5f, 5.584f },				// 視点
+		{ 0.0f, 2.0, 0.0f },					// 注視点
+		{ 0.036f, 0.999f, -0.035f }				// 上ベクトル
 	);
 	cameraController = std::make_unique<FreeCameraController>();
 	cameraController->SyncCameraToController(camera);
 	cameraController->SetEnable(false);
 
-	// �X�e�[�g
+	// ステート
 	stateMachine = std::make_unique<StateMachine<SceneTitle>>();
 	stateMachine->RegisterState(STATE::TITLE, new SceneTitleState::TitleState(this));
 	stateMachine->RegisterState(STATE::LOGIN_CHECK, new SceneTitleState::LoginCheckState(this));
@@ -136,7 +136,7 @@ void SceneTitle::Finalize()
 	shadowMapRenderer->Clear();
 }
 
-// �X�V����
+// 更新処理
 void SceneTitle::Update(float elapsedTime)
 {
 	stateMachine->Update(elapsedTime);
@@ -154,7 +154,7 @@ void SceneTitle::Update(float elapsedTime)
 	}
 
 #ifdef _DEBUG
-	// �J�����X�V
+	// カメラ更新
 	cameraController->Update();
 	cameraController->SyncContrllerToCamera(camera);
 #endif // _DEBUG
@@ -162,24 +162,24 @@ void SceneTitle::Update(float elapsedTime)
 	UI.Update(elapsedTime);
 }
 
-// �`�揈��
+// 描画処理
 void SceneTitle::Render()
 {
 	T_TEXT.Begin();
 
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->Clear(T_GRAPHICS.GetDeviceContext(), 0.2f, 0.2f, 0.2f, 1);
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
-	
-	// �`��R���e�L�X�g�ݒ�
+
+	// 描画コンテキスト設定
 	RenderContext rc;
 	rc.camera = &camera;
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
-	rc.renderState   = T_GRAPHICS.GetRenderState();
+	rc.renderState = T_GRAPHICS.GetRenderState();
 
-	// ���C�g�̏����l�ߍ���
+	// ライトの情報を詰め込む
 	LightManager::Instance().PushRenderContext(rc);
 
-	//	�V���h�E�}�b�v�`��
+	//	シャドウマップ描画
 	shadowMapRenderer->Render();
 	rc.shadowMapData = shadowMapRenderer->GetShadowMapData();
 
@@ -205,19 +205,19 @@ void SceneTitle::RenderDX12()
 	{
 		Camera& camera = Camera::Instance();
 
-		// �V�[���p�萔�o�b�t�@�X�V
+		// シーン用定数バッファ更新
 		Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
 			camera.GetView(),
 			camera.GetProjection(),
 			DirectX::XMFLOAT3(0, -1, 0)
 		);
 
-		// �����_�[�R���e�L�X�g�ݒ�
+		// レンダーコンテキスト設定
 		RenderContextDX12 rc;
 		rc.d3d_command_list = d3d_command_list;
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
-		// ���f���`��
+		// モデル描画
 		Shader* shader = TentacleLib::graphics.GetShader();
 		shader->Begin(rc);
 		if (test != nullptr)
@@ -239,7 +239,7 @@ void SceneTitle::DrawSceneGUI()
 	{
 		if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			// �J����
+			// カメラ
 			DirectX::XMFLOAT3 eye = camera.GetEye();
 			ImGui::DragFloat3("Eye", &eye.x, 0.01f, 100.0f);
 			DirectX::XMFLOAT3 focus = camera.GetFocus();
@@ -249,7 +249,7 @@ void SceneTitle::DrawSceneGUI()
 		}
 
 		float angleLimit = DirectX::XM_PI;
-		// �i�C�g
+		// ナイト
 		if (ImGui::CollapsingHeader("Knight", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			DirectX::XMFLOAT3 position = knight->GetPosition();
@@ -260,7 +260,7 @@ void SceneTitle::DrawSceneGUI()
 			knight->SetAngle(angle);
 		}
 
-		// �o�[�o���A��
+		// バーバリアン
 		if (ImGui::CollapsingHeader("Barbarian", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			DirectX::XMFLOAT3 position = barbarian->GetPosition();
@@ -271,7 +271,7 @@ void SceneTitle::DrawSceneGUI()
 			barbarian->SetAngle(angle);
 		}
 
-		// �����W���[
+		// レンジャー
 		if (ImGui::CollapsingHeader("Rouge", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			DirectX::XMFLOAT3 position = rouge->GetPosition();
