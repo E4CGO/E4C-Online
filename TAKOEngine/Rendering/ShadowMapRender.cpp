@@ -9,7 +9,7 @@ namespace myRenderer
 {
 	namespace shadow
 	{
-		// ‰Šú‰»
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		void ShadowMapRender::Initialize()
 		{
 			for (int i = 0; i < NUM_SHADOW_MAP; i++)
@@ -19,10 +19,10 @@ namespace myRenderer
 			}
 		}
 
-		//ƒVƒƒƒhƒEƒ}ƒbƒv‚É•`‰æ‚·‚éƒ‚ƒfƒ‹‚ğ“o˜^
+		//ï¿½Vï¿½ï¿½ï¿½hï¿½Eï¿½}ï¿½bï¿½vï¿½É•`ï¿½æ‚·ï¿½éƒ‚ï¿½fï¿½ï¿½ï¿½ï¿½oï¿½^
 		void ShadowMapRender::ModelRegister(Model* model)
 		{
-			// ƒ‚ƒfƒ‹‚ªŠù‚É“o˜^‚³‚ê‚Ä‚¢‚é‚©’²‚×‚é
+			// ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É“oï¿½^ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½é‚©ï¿½ï¿½ï¿½×‚ï¿½
 			std::vector<Model*>::iterator it = std::find(m_models.begin(), m_models.end(), model);
 			if (it != m_models.end())
 				return;
@@ -30,24 +30,20 @@ namespace myRenderer
 			m_models.emplace_back(model);
 		}
 
-		//ƒVƒƒƒhƒEƒ}ƒbƒv‚Ég—p‚·‚éƒ‰ƒCƒg‚ğæ“¾
+		//ï¿½Vï¿½ï¿½ï¿½hï¿½Eï¿½}ï¿½bï¿½vï¿½Égï¿½pï¿½ï¿½ï¿½éƒ‰ï¿½Cï¿½gï¿½ï¿½ï¿½æ“¾
 		void ShadowMapRender::SetShadowLight(Light* light)
 		{
 			this->light = light;
 		}
 
-		//“o˜^Ï‚İ‚Ìƒ‰ƒCƒg‚ğ‘Síœ
+		//ï¿½oï¿½^ï¿½Ï‚İ‚Ìƒï¿½ï¿½Cï¿½gï¿½ï¿½Sï¿½íœ
 		void ShadowMapRender::Clear()
 		{
-			for (Model* model : m_models)
-			{
-				delete model;
-			}
 			m_models.clear();
 			light = nullptr;
 		}
 
-		//•`‰æ
+		//ï¿½`ï¿½ï¿½
 		void ShadowMapRender::Render()
 		{
 			if (!light) return;
@@ -56,7 +52,7 @@ namespace myRenderer
 			ID3D11DeviceContext* dc = graphics.GetDeviceContext();
 			Camera& camera          = Camera::Instance();
 
-			// Œ»İİ’è‚³‚ê‚Ä‚¢‚éƒoƒbƒtƒ@‚ğ‘Ş”ğ‚µ‚Ä‰Šú‰»‚µ‚Ä
+			// ï¿½ï¿½ï¿½İİ’è‚³ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½oï¿½bï¿½tï¿½@ï¿½ï¿½Ş”ï¿½ï¿½ï¿½ï¿½Äï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			UINT			cachedViewportCount{ D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE };
 			D3D11_VIEWPORT	cachedViewports[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
 			Microsoft::WRL::ComPtr<ID3D11RenderTargetView>	cachedRenderTargetView;
@@ -69,7 +65,7 @@ namespace myRenderer
 					cachedDepthStencilView.ReleaseAndGetAddressOf());
 			}
 
-			//ƒVƒƒƒhƒEƒ}ƒbƒv‚Ì•ªŠ„ƒGƒŠƒA’è‹`
+			//ï¿½Vï¿½ï¿½ï¿½hï¿½Eï¿½}ï¿½bï¿½vï¿½Ì•ï¿½ï¿½ï¿½ï¿½Gï¿½ï¿½ï¿½Aï¿½ï¿½`
 			float splitAreaTable[] =
 			{
 				Camera::Instance().GetNearZ(),
@@ -80,42 +76,42 @@ namespace myRenderer
 				Camera::Instance().GetFarZ(),
 			};
 
-			//ƒJƒƒ‰ƒpƒ‰ƒ[ƒ^‚ğæ“¾
+			//ï¿½Jï¿½ï¿½ï¿½ï¿½ï¿½pï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½^ï¿½ï¿½ï¿½æ“¾
 			DirectX::XMVECTOR cameraFront = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera.GetFront()));
 			DirectX::XMVECTOR cameraRight = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera.GetRight()));
 			DirectX::XMVECTOR cameraUp    = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera.GetUp()));
 			DirectX::XMVECTOR cameraPos   = DirectX::XMLoadFloat3(&camera.GetEye());
 
-			//ƒ‰ƒCƒgƒrƒ…[ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ‚Ìì¬
+			//ï¿½ï¿½ï¿½Cï¿½gï¿½rï¿½ï¿½ï¿½[ï¿½vï¿½ï¿½ï¿½Wï¿½Fï¿½Nï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½Ìì¬
 			DirectX::XMMATRIX viewMatrix, projectionMatrix, viewProjectionMatrix;
 			{
-				//•½sŒõŒ¹‚©‚çƒJƒƒ‰ˆÊ’u‚ğì¬‚µA‚»‚±‚©‚çŒ´“_‚ÌˆÊ’u‚ğŒ©‚é‚æ‚¤‚É‹üs—ñ‚ğ¶¬
+				//ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Jï¿½ï¿½ï¿½ï¿½ï¿½Ê’uï¿½ï¿½ï¿½ì¬ï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½çŒ´ï¿½_ï¿½ÌˆÊ’uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ‚¤ï¿½Éï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ğ¶ï¿½
 				DirectX::XMFLOAT3 lightDirection = light->GetDirection();
 				DirectX::XMVECTOR LightPosition  = DirectX::XMLoadFloat3(&lightDirection);
 				LightPosition = DirectX::XMVectorScale(LightPosition, -250.0f);
 				viewMatrix    = DirectX::XMMatrixLookAtLH(LightPosition, DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
 
-				//ƒVƒƒƒhƒEƒ}ƒbƒv‚É•`‰æ‚µ‚½‚¢”ÍˆÍ‚ÌË‰es—ñ‚ğ¶¬
+				//ï¿½Vï¿½ï¿½ï¿½hï¿½Eï¿½}ï¿½bï¿½vï¿½É•`ï¿½æ‚µï¿½ï¿½ï¿½ï¿½ï¿½ÍˆÍ‚ÌË‰eï¿½sï¿½ï¿½ğ¶ï¿½
 				projectionMatrix     = DirectX::XMMatrixOrthographicLH(10000, 10000, 1.0f, 1000.0f);
 				viewProjectionMatrix = viewMatrix * projectionMatrix;
 			}
 
-			//•`‰æˆ—
-			//ƒGƒŠƒA‚Ì‹ß•½–Ê‚Ü‚Å‚Ì‹——£
+			//ï¿½`ï¿½æˆï¿½ï¿½
+			//ï¿½Gï¿½ï¿½ï¿½Aï¿½Ì‹ß•ï¿½ï¿½Ê‚Ü‚Å‚Ì‹ï¿½ï¿½ï¿½
 			RenderContext rc;
 			for (int i = 0; i < NUM_SHADOW_MAP; ++i)
 			{
-				// ƒGƒŠƒA‚Ì‹ß•½–Ê‚Ü‚Å‚Ì‹——£
+				// ï¿½Gï¿½ï¿½ï¿½Aï¿½Ì‹ß•ï¿½ï¿½Ê‚Ü‚Å‚Ì‹ï¿½ï¿½ï¿½
 				float nearDepth = splitAreaTable[i + 0];
 
-				// ƒGƒŠƒA‚Ì‰“•½–Ê‚Ü‚Å‚Ì‹——£
+				// ï¿½Gï¿½ï¿½ï¿½Aï¿½Ì‰ï¿½ï¿½ï¿½ï¿½Ê‚Ü‚Å‚Ì‹ï¿½ï¿½ï¿½
 				float farDepth = splitAreaTable[i + 1];
 
-				//depthClear&RenderTargetİ’è&VirePortİ’è
+				//depthClear&RenderTargetï¿½İ’ï¿½&VirePortï¿½İ’ï¿½
 				ID3D11RenderTargetView* rtv = nullptr;
 				ID3D11DepthStencilView* dsv = depthStencil[i]->GetDepthStencilView().Get();
 				
-				// ‚±‚±‚ÅƒŠƒ\[ƒX‚ğƒAƒ“ƒoƒCƒ“ƒh
+				// ï¿½ï¿½ï¿½ï¿½ï¿½Åƒï¿½ï¿½\ï¿½[ï¿½Xï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½oï¿½Cï¿½ï¿½ï¿½h
 				ID3D11ShaderResourceView* nullSRV[1] = { nullptr };
 				dc->PSSetShaderResources(10 + i, 1, nullSRV);
 
@@ -129,56 +125,56 @@ namespace myRenderer
 				viewport.MaxDepth = 1.0f;
 				dc->RSSetViewports(1, &viewport);
 
-				//ƒGƒŠƒA‚Ì‚ğ“à•ï‚·‚é‹‘ä‚Ì8’¸“_‚ğZo‚·‚é
+				//ï¿½Gï¿½ï¿½ï¿½Aï¿½Ì‚ï¿½ï¿½ï¿½ï‚·ï¿½é‹ï¿½ï¿½ï¿½ï¿½ï¿½8ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½Zï¿½oï¿½ï¿½ï¿½ï¿½
 				DirectX::XMVECTOR vertex[8];
 				{
-					//ƒGƒŠƒA‚Ì‹ß•½–Ê‚Ì’†S‚©‚ç‚Ìã–Ê‚Ü‚Å‚Ì‹——£‚ğ‹‚ß‚é
+					//ï¿½Gï¿½ï¿½ï¿½Aï¿½Ì‹ß•ï¿½ï¿½Ê‚Ì’ï¿½ï¿½Sï¿½ï¿½ï¿½ï¿½Ìï¿½Ê‚Ü‚Å‚Ì‹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß‚ï¿½
 					float nearY = tanf(camera.GetFovY() / 2.0f) * nearDepth;
 
-					//ƒGƒŠƒA‚Ì‹ß•½–Ê‚Ì’†S‚©‚ç‚Ì‰E–Ê‚Ü‚Å‚Ì‹——£‚ğ‹‚ß‚é
+					//ï¿½Gï¿½ï¿½ï¿½Aï¿½Ì‹ß•ï¿½ï¿½Ê‚Ì’ï¿½ï¿½Sï¿½ï¿½ï¿½ï¿½Ì‰Eï¿½Ê‚Ü‚Å‚Ì‹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß‚ï¿½
 					float nearX = nearY * camera.GetAspect();
 
-					//ƒGƒŠƒA‚Ì‰“•½–Ê‚Ì’†S‚©‚ç‚Ìã–Ê‚Ü‚Å‚Ì‹——£‚ğ‹‚ß‚é
+					//ï¿½Gï¿½ï¿½ï¿½Aï¿½Ì‰ï¿½ï¿½ï¿½ï¿½Ê‚Ì’ï¿½ï¿½Sï¿½ï¿½ï¿½ï¿½Ìï¿½Ê‚Ü‚Å‚Ì‹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß‚ï¿½
 					float farY = tanf(camera.GetFovY() / 2.0f) * farDepth;
 
-					//ƒGƒŠƒA‚Ì‰“•½–Ê‚Ì’†S‚©‚ç‚Ì‰E–Ê‚Ü‚Å‚Ì‹——£‚ğ‹‚ß‚é
+					//ï¿½Gï¿½ï¿½ï¿½Aï¿½Ì‰ï¿½ï¿½ï¿½ï¿½Ê‚Ì’ï¿½ï¿½Sï¿½ï¿½ï¿½ï¿½Ì‰Eï¿½Ê‚Ü‚Å‚Ì‹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß‚ï¿½
 					float farX = farY * camera.GetAspect();
 
-					//ƒGƒŠƒA‚Ì‹ß•½–Ê‚Ì’†SÀ•W‚ğ‹‚ß‚é
+					//ï¿½Gï¿½ï¿½ï¿½Aï¿½Ì‹ß•ï¿½ï¿½Ê‚Ì’ï¿½ï¿½Sï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½ß‚ï¿½
 					DirectX::XMVECTOR nearPosition = DirectX::XMVectorAdd(cameraPos, DirectX::XMVectorScale(cameraFront, nearDepth));
 
-					//ƒGƒŠƒA‚Ì‰“•½–Ê‚Ì’†SÀ•W‚ğ‹‚ß‚é
+					//ï¿½Gï¿½ï¿½ï¿½Aï¿½Ì‰ï¿½ï¿½ï¿½ï¿½Ê‚Ì’ï¿½ï¿½Sï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½ß‚ï¿½
 					DirectX::XMVECTOR farPosition = DirectX::XMVectorAdd(cameraPos, DirectX::XMVectorScale(cameraFront, farDepth));
 
-					//8’¸“_‚ğ‹‚ß‚é
+					//8ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½ï¿½ï¿½ß‚ï¿½
 					{
-						//‹ß•½–Ê‚Ì‰Eã
+						//ï¿½ß•ï¿½ï¿½Ê‚Ì‰Eï¿½ï¿½
 						vertex[0] = DirectX::XMVectorAdd(nearPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, nearY), DirectX::XMVectorScale(cameraRight, nearX)));
 
-						//‹ß•½–Ê‚Ì¶ã
+						//ï¿½ß•ï¿½ï¿½Ê‚Ìï¿½ï¿½ï¿½
 						vertex[1] = DirectX::XMVectorAdd(nearPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, nearY), DirectX::XMVectorScale(cameraRight, -nearX)));
 
-						//‹ß•½–Ê‚Ì‰E‰º
+						//ï¿½ß•ï¿½ï¿½Ê‚Ì‰Eï¿½ï¿½
 						vertex[2] = DirectX::XMVectorAdd(nearPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, -nearY), DirectX::XMVectorScale(cameraRight, nearX)));
 
-						//‹ß•½–Ê‚Ì¶‰º
+						//ï¿½ß•ï¿½ï¿½Ê‚Ìï¿½ï¿½ï¿½
 						vertex[3] = DirectX::XMVectorAdd(nearPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, -nearY), DirectX::XMVectorScale(cameraRight, -nearX)));
 
-						//‰“•½–Ê‚Ì‰Eã
+						//ï¿½ï¿½ï¿½ï¿½ï¿½Ê‚Ì‰Eï¿½ï¿½
 						vertex[4] = DirectX::XMVectorAdd(farPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, farY), DirectX::XMVectorScale(cameraRight, farX)));
 
-						//‰“•½–Ê‚Ì¶ã
+						//ï¿½ï¿½ï¿½ï¿½ï¿½Ê‚Ìï¿½ï¿½ï¿½
 						vertex[5] = DirectX::XMVectorAdd(farPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, farY), DirectX::XMVectorScale(cameraRight, -farX)));
 
-						//‰“•½–Ê‚Ì‰E‰º
+						//ï¿½ï¿½ï¿½ï¿½ï¿½Ê‚Ì‰Eï¿½ï¿½
 						vertex[6] = DirectX::XMVectorAdd(farPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, -farY), DirectX::XMVectorScale(cameraRight, farX)));
 
-						//‰“•½–Ê‚Ì¶‰º
+						//ï¿½ï¿½ï¿½ï¿½ï¿½Ê‚Ìï¿½ï¿½ï¿½
 						vertex[7] = DirectX::XMVectorAdd(farPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, -farY), DirectX::XMVectorScale(cameraRight, -farX)));
 					}
 				}
 
-				//8’¸“_‚ğƒ‰ƒCƒgƒrƒ…[ƒvƒƒWƒFƒNƒVƒ‡ƒ“‹óŠÔ‚É‚µ‚ÄAÅ‘å’lAÅ¬’l‚ğ‹‚ß‚é
+				//8ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½ï¿½ï¿½Cï¿½gï¿½rï¿½ï¿½ï¿½[ï¿½vï¿½ï¿½ï¿½Wï¿½Fï¿½Nï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô‚É‚ï¿½ï¿½ÄAï¿½Å‘ï¿½lï¿½Aï¿½Åï¿½ï¿½lï¿½ï¿½ï¿½ï¿½ï¿½ß‚ï¿½
 				DirectX::XMFLOAT3 vertexMin(FLT_MAX, FLT_MAX, FLT_MAX), vertexMax(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 				for (auto& it : vertex)
 				{
@@ -192,7 +188,7 @@ namespace myRenderer
 					vertexMax.z = max(p.z, vertexMax.z);
 				}
 
-				//ƒNƒƒbƒvs—ñ‚ğ‹‚ß‚é
+				//ï¿½Nï¿½ï¿½ï¿½bï¿½vï¿½sï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß‚ï¿½
 				float xScale = 2.0f / (vertexMax.x - vertexMin.x);
 				float yScale = 2.0f / (vertexMax.y - vertexMin.y);
 				float xOffset = -0.5f * (vertexMax.x + vertexMin.x) * xScale;
@@ -205,7 +201,7 @@ namespace myRenderer
 					xOffset, yOffset, 0, 1
 				);
 
-				// ƒ‰ƒCƒgƒrƒ…[ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ‚ÉƒNƒƒbƒvs—ñ‚ğæZ
+				// ï¿½ï¿½ï¿½Cï¿½gï¿½rï¿½ï¿½ï¿½[ï¿½vï¿½ï¿½ï¿½Wï¿½Fï¿½Nï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ÉƒNï¿½ï¿½ï¿½bï¿½vï¿½sï¿½ï¿½ï¿½ï¿½ï¿½Z
 				DirectX::XMStoreFloat4x4(&lightViewProjection[i], viewProjectionMatrix * clopMatrix);
 
 				rc.camera = &camera;
@@ -216,7 +212,7 @@ namespace myRenderer
 				DirectX::XMStoreFloat4x4(&projection, projectionMatrix* clopMatrix);
 				DirectX::XMStoreFloat4x4(&rc.shadowMapData.projection, projectionMatrix* clopMatrix);
 
-				//3Dƒ‚ƒfƒ‹•`‰æ
+				//3Dï¿½ï¿½ï¿½fï¿½ï¿½ï¿½`ï¿½ï¿½
 				{
 					ModelShader* shader = graphics.GetModelShader(ModelShaderId::ShadowMap);
 					shader->Begin(rc);
@@ -228,7 +224,7 @@ namespace myRenderer
 				}
 			}
 
-			//	Œ³‚Ìƒoƒbƒtƒ@‚É–ß‚·
+			//	ï¿½ï¿½ï¿½Ìƒoï¿½bï¿½tï¿½@ï¿½É–ß‚ï¿½
 			{
 				dc->RSSetViewports(cachedViewportCount, cachedViewports);
 				dc->OMSetRenderTargets(1, cachedRenderTargetView.GetAddressOf(), cachedDepthStencilView.Get());
@@ -237,7 +233,7 @@ namespace myRenderer
 
 		void ShadowMapRender::DrawDebugGUI()
 		{
-			//ƒVƒƒƒhƒEƒ}ƒbƒv
+			//ï¿½Vï¿½ï¿½ï¿½hï¿½Eï¿½}ï¿½bï¿½v
 			if (ImGui::TreeNode("Shadowmap"))
 			{
 				ImGui::Text("texture");
@@ -250,7 +246,7 @@ namespace myRenderer
 			}
 		}
 
-		// ƒVƒƒƒhƒEƒ}ƒbƒvî•ñ‚ğRenderContext‚ÉÏ‚Ş
+		// ï¿½Vï¿½ï¿½ï¿½hï¿½Eï¿½}ï¿½bï¿½vï¿½ï¿½ï¿½ï¿½RenderContextï¿½ÉÏ‚ï¿½
 		ShadowMapData ShadowMapRender::GetShadowMapData()
 		{
 			ShadowMapData shadowMapData;
