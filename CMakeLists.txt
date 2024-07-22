@@ -8,8 +8,6 @@ set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT G
 
 set (CMAKE_CXX_STANDARD 20)
 
-set (VS_SHADER_MODEL 5_0)
-
 ################################################################################
 # Set target arch type if empty. Visual studio solution generator provides it.
 ################################################################################
@@ -472,6 +470,10 @@ set(TAKOEngine__Rendering__HLSL
     "TAKOEngine/Rendering/HLSL/PhongVS.hlsl"
     "TAKOEngine/Rendering/HLSL/PhongPS.hlsl"
     "TAKOEngine/Rendering/HLSL/PostEffect.hlsli"
+    "TAKOEngine/Rendering/HLSL/ShaderData.hlsli"
+    "TAKOEngine/Rendering/HLSL/ShadowMap.hlsli"
+    "TAKOEngine/Rendering/HLSL/ShadowmapFunctions.hlsli"
+    "TAKOEngine/Rendering/HLSL/ShadowMapVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Skinning.hlsli"
     "TAKOEngine/Rendering/HLSL/Skydome.hlsli"
     "TAKOEngine/Rendering/HLSL/SkydomeVS.hlsl"
@@ -483,8 +485,8 @@ set(TAKOEngine__Rendering__HLSL
     "TAKOEngine/Rendering/HLSL/ToonVS.hlsl"
     "TAKOEngine/Rendering/HLSL/ToonPS.hlsl"
     "TAKOEngine/Rendering/HLSL/UVScroll.hlsli"
-    "TAKOEngine/Rendering/HLSL/ShadowmapFunctions.hlsli"
-    "TAKOEngine/Rendering/HLSL/ShadowMap.hlsli"
+    "TAKOEngine/Rendering/HLSL/UVScrollPS.hlsl"
+
 
 )
 source_group("TAKOEngine\\Rendering\\HLSL" FILES ${TAKOEngine__Rendering__HLSL})
@@ -600,7 +602,6 @@ endfunction()
 # List of HLSL shader files
 set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/BloomPS.hlsl,5.0,Pixel,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/BloomPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/ColorGradingPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/DebugVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/DebugPS.hlsl,5.0,Pixel,main"
@@ -619,6 +620,7 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/MaskPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PhongVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PhongPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/ShadowMapVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/SkydomeVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/SkydomePS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/SpriteVS.hlsl,5.0,Vertex,main"
@@ -806,13 +808,40 @@ if(MSVC)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND if "$(Configuration)" == "Debug" ${CMAKE_COMMAND} -E copy_directory
 	${SOURCE_DIR_DEPENDENCY}
-    	${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/
+    ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/
 )
 endif()
 
+if(MSVC)
+file(GLOB MY_SHADERS ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/*.cso)
+foreach(CurrentShaderFile IN LISTS MY_SHADERS)
+    add_custom_command(
+                TARGET ${PROJECT_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy ${CurrentShaderFile} ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/Data/Shader/
+                COMMENT "Copying shaders: ${CurrentShaderFile}")
+endforeach()
+endif()
+
+if(MSVC)
+file(GLOB MY_SHADERS ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/*.cso)
+foreach(CurrentShaderFile IN LISTS MY_SHADERS)
+    add_custom_command(
+                TARGET ${PROJECT_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy ${CurrentShaderFile} ${CMAKE_BINARY_DIR}/Data/Shader/
+                COMMENT "Copying shaders: ${CurrentShaderFile}")
+endforeach()
+endif()
 
 
-
+if(MSVC)
+file(GLOB MY_SHADERS ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/*.cso)
+foreach(CurrentShaderFile IN LISTS MY_SHADERS)
+    add_custom_command(
+                TARGET ${PROJECT_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E remove ${CurrentShaderFile}
+                COMMENT "Removing shaders: ${CurrentShaderFile}")
+endforeach()
+endif()
 
 ################################################################################
 # Dependencies
