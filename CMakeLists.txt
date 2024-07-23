@@ -762,6 +762,44 @@ endif()
 # Post build events
 ################################################################################
 
+# URL of the ZIP file
+set(ZIP_FILE_URL "https://www.dropbox.com/scl/fi/ovb2dkjr3n1ayljdb0ftn/Data.zip?rlkey=2th7h96r3p4qsxn12oqnnp1wv&st=uywpwppu&dl=0")
+
+# Local path where the ZIP file will be downloaded
+set(ZIP_FILE_PATH "${CMAKE_SOURCE_DIR}/Data.zip")
+
+# Command to download the ZIP file
+file(DOWNLOAD ${ZIP_FILE_URL} ${ZIP_FILE_PATH}
+SHOW_PROGRESS
+STATUS status)
+
+list(GET status 0 status_code)
+list(GET status 1 status_string)
+if(NOT status_code EQUAL 0)
+    message(FATAL_ERROR "Error downloading file: ${status_string}")
+endif()
+
+message(STATUS "File downloaded and verified successfully!")
+
+set(DESTINATION_DIR "${CMAKE_SOURCE_DIR}/Data")
+
+file(MAKE_DIRECTORY ${DESTINATION_DIR})
+
+# Unzip the file
+execute_process(
+    COMMAND ${CMAKE_COMMAND} -E tar xvf ${ZIP_FILE_PATH}
+    WORKING_DIRECTORY ${DESTINATION_DIR}
+    RESULT_VARIABLE result
+)
+
+if(result)
+    message(FATAL_ERROR "Failed to unzip file")
+else()
+    message(STATUS "Successfully unzipped file")
+endif()
+
+file(REMOVE ${ZIP_FILE_PATH})
+
 set(SOURCE_DIR_DATA "${CMAKE_SOURCE_DIR}/Data")
 set(SOURCE_DIR_DEPENDENCY "${CMAKE_SOURCE_DIR}/Dependencies")
 
