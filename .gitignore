@@ -35,6 +35,9 @@ bin/*
 #Temp folders
 ToImplement*/
 
+#Data
+Data/
+
 #Cmake files
 cmake_install.cmake
 CMakeLists.txt.user
