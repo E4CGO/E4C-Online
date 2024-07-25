@@ -38,7 +38,7 @@ void ShadowMapShader::Draw(const RenderContext& rc, const Model* model, DirectX:
 
 	const ModelResource* resource = model->GetResource();
 	const std::vector<Model::Node>& nodes = model->GetNodes();
-
+	
 	for (const ModelResource::Mesh& mesh : resource->GetMeshes())
 	{
 		// 頂点バッファ設定

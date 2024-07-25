@@ -434,6 +434,9 @@ set(TAKOEngine__Rendering
     "TAKOEngine/Rendering/MyRender.h"
     "TAKOEngine/Rendering/ShadowMapRender.cpp"
     "TAKOEngine/Rendering/ShadowMapRender.h"
+    "TAKOEngine/Rendering/FrustumCulling.cpp"
+    "TAKOEngine/Rendering/FrustumCulling.h"
+
 )
 source_group("TAKOEngine\\Rendering" FILES ${TAKOEngine__Rendering})
 
