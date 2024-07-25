@@ -22,16 +22,16 @@ void SceneTitle::Initialize()
 		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
 	}
 
-	//ƒVƒƒƒhƒEƒ}ƒbƒvƒŒƒ“ƒ_ƒ‰
+	//ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ãƒ¬ãƒ³ãƒ€ãƒ©
 	shadowMapRenderer->Initialize();
 
-	// ƒ‚ƒfƒ‹
+	// ãƒ¢ãƒ‡ãƒ«
 	{
-		// ”wŒi
+		// èƒŒæ™¯
 		map = std::make_unique<ModelObject>("Data/Model/Map/TitleMap.glb");
 		shadowMapRenderer->ModelRegister(map->GetModel().get());
 
-		// ƒLƒƒƒ‰
+		// ã‚­ãƒ£ãƒ©
 		barbarian = std::make_unique<ModelObject>("Data/Model/Character/Barbarian.glb");
 		barbarian->SetAnimation(22, true, 0.0f);
 		barbarian->SetPosition({ 0.28f, 0.0f, -3.15f });
@@ -67,30 +67,30 @@ void SceneTitle::Initialize()
 		test->PlayAnimation(0, true);
 	}
 
-	// Œõ
+	// å…‰
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
 	shadowMapRenderer->SetShadowLight(dl);
 
-	// ƒJƒƒ‰İ’è
+	// ã‚«ãƒ¡ãƒ©è¨­å®š
 	camera.SetPerspectiveFov(
-		DirectX::XMConvertToRadians(45),							// ‰æŠp
-		SCREEN_W / SCREEN_H,	// ‰æ–ÊƒAƒXƒyƒNƒg”ä
-		0.1f,														// ƒjƒAƒNƒŠƒbƒv
-		10000.0f													// ƒtƒ@[ƒNƒŠƒbƒv
+		DirectX::XMConvertToRadians(45),		// ç”»è§’
+		SCREEN_W / SCREEN_H,					// ç”»é¢ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”
+		0.1f,									// ãƒ‹ã‚¢ã‚¯ãƒªãƒƒãƒ—
+		10000.0f								// ãƒ•ã‚¡ãƒ¼ã‚¯ãƒªãƒƒãƒ—
 	);
 	camera.SetLookAt(
-		{ -5.661f, 2.5f, 5.584f },	// ‹“_
-		{ 0.0f, 2.0, 0.0f },	// ’‹“_
-		{ 0.036f, 0.999f, -0.035f } // ãƒxƒNƒgƒ‹
+		{ -5.661f, 2.5f, 5.584f },				// è¦–ç‚¹
+		{ 0.0f, 2.0, 0.0f },					// æ³¨è¦–ç‚¹
+		{ 0.036f, 0.999f, -0.035f }				// ä¸Šãƒ™ã‚¯ãƒˆãƒ«
 	);
 	cameraController = std::make_unique<FreeCameraController>();
 	cameraController->SyncCameraToController(camera);
 	cameraController->SetEnable(false);
 
-	// ƒXƒe[ƒg
+	// ã‚¹ãƒ†ãƒ¼ãƒˆ
 	stateMachine = std::make_unique<StateMachine<SceneTitle>>();
 	stateMachine->RegisterState(STATE::TITLE, new SceneTitleState::TitleState(this));
 	stateMachine->RegisterState(STATE::LOGIN_CHECK, new SceneTitleState::LoginCheckState(this));
@@ -136,7 +136,7 @@ void SceneTitle::Finalize()
 	shadowMapRenderer->Clear();
 }
 
-// XVˆ—
+// æ›´æ–°å‡¦ç†
 void SceneTitle::Update(float elapsedTime)
 {
 	stateMachine->Update(elapsedTime);
@@ -154,7 +154,7 @@ void SceneTitle::Update(float elapsedTime)
 	}
 
 #ifdef _DEBUG
-	// ƒJƒƒ‰XV
+	// ã‚«ãƒ¡ãƒ©æ›´æ–°
 	cameraController->Update();
 	cameraController->SyncContrllerToCamera(camera);
 #endif // _DEBUG
@@ -162,24 +162,24 @@ void SceneTitle::Update(float elapsedTime)
 	UI.Update(elapsedTime);
 }
 
-// •`‰æˆ—
+// æç”»å‡¦ç†
 void SceneTitle::Render()
 {
 	T_TEXT.Begin();
 
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->Clear(T_GRAPHICS.GetDeviceContext(), 0.2f, 0.2f, 0.2f, 1);
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
-	
-	// •`‰æƒRƒ“ƒeƒLƒXƒgİ’è
+
+	// æç”»ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆè¨­å®š
 	RenderContext rc;
 	rc.camera = &camera;
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
-	rc.renderState   = T_GRAPHICS.GetRenderState();
+	rc.renderState = T_GRAPHICS.GetRenderState();
 
-	// ƒ‰ƒCƒg‚Ìî•ñ‚ğ‹l‚ß‚Ş
+	// ãƒ©ã‚¤ãƒˆã®æƒ…å ±ã‚’è©°ã‚è¾¼ã‚€
 	LightManager::Instance().PushRenderContext(rc);
 
-	//	ƒVƒƒƒhƒEƒ}ƒbƒv•`‰æ
+	//	ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—æç”»
 	shadowMapRenderer->Render();
 	rc.shadowMapData = shadowMapRenderer->GetShadowMapData();
 
@@ -205,19 +205,19 @@ void SceneTitle::RenderDX12()
 	{
 		Camera& camera = Camera::Instance();
 
-		// ƒV[ƒ“—p’è”ƒoƒbƒtƒ@XV
+		// ã‚·ãƒ¼ãƒ³ç”¨å®šæ•°ãƒãƒƒãƒ•ã‚¡æ›´æ–°
 		Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
 			camera.GetView(),
 			camera.GetProjection(),
 			DirectX::XMFLOAT3(0, -1, 0)
 		);
 
-		// ƒŒƒ“ƒ_[ƒRƒ“ƒeƒLƒXƒgİ’è
+		// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆè¨­å®š
 		RenderContextDX12 rc;
 		rc.d3d_command_list = d3d_command_list;
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
-		// ƒ‚ƒfƒ‹•`‰æ
+		// ãƒ¢ãƒ‡ãƒ«æç”»
 		Shader* shader = TentacleLib::graphics.GetShader();
 		shader->Begin(rc);
 		if (test != nullptr)
@@ -239,7 +239,7 @@ void SceneTitle::DrawSceneGUI()
 	{
 		if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			// ƒJƒƒ‰
+			// ã‚«ãƒ¡ãƒ©
 			DirectX::XMFLOAT3 eye = camera.GetEye();
 			ImGui::DragFloat3("Eye", &eye.x, 0.01f, 100.0f);
 			DirectX::XMFLOAT3 focus = camera.GetFocus();
@@ -249,7 +249,7 @@ void SceneTitle::DrawSceneGUI()
 		}
 
 		float angleLimit = DirectX::XM_PI;
-		// ƒiƒCƒg
+		// ãƒŠã‚¤ãƒˆ
 		if (ImGui::CollapsingHeader("Knight", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			DirectX::XMFLOAT3 position = knight->GetPosition();
@@ -260,7 +260,7 @@ void SceneTitle::DrawSceneGUI()
 			knight->SetAngle(angle);
 		}
 
-		// ƒo[ƒoƒŠƒAƒ“
+		// ãƒãƒ¼ãƒãƒªã‚¢ãƒ³
 		if (ImGui::CollapsingHeader("Barbarian", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			DirectX::XMFLOAT3 position = barbarian->GetPosition();
@@ -271,7 +271,7 @@ void SceneTitle::DrawSceneGUI()
 			barbarian->SetAngle(angle);
 		}
 
-		// ƒŒƒ“ƒWƒƒ[
+		// ãƒ¬ãƒ³ã‚¸ãƒ£ãƒ¼
 		if (ImGui::CollapsingHeader("Rouge", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			DirectX::XMFLOAT3 position = rouge->GetPosition();

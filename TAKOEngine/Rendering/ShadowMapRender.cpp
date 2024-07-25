@@ -9,7 +9,7 @@ namespace myRenderer
 {
 	namespace shadow
 	{
-		// ‰Šú‰»
+		// åˆæœŸåŒ–
 		void ShadowMapRender::Initialize()
 		{
 			for (int i = 0; i < NUM_SHADOW_MAP; i++)
@@ -19,10 +19,10 @@ namespace myRenderer
 			}
 		}
 
-		//ƒVƒƒƒhƒEƒ}ƒbƒv‚É•`‰æ‚·‚éƒ‚ƒfƒ‹‚ğ“o˜^
+		//ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ã«æç”»ã™ã‚‹ãƒ¢ãƒ‡ãƒ«ã‚’ç™»éŒ²
 		void ShadowMapRender::ModelRegister(Model* model)
 		{
-			// ƒ‚ƒfƒ‹‚ªŠù‚É“o˜^‚³‚ê‚Ä‚¢‚é‚©’²‚×‚é
+			// ãƒ¢ãƒ‡ãƒ«ãŒæ—¢ã«ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ã‹èª¿ã¹ã‚‹
 			std::vector<Model*>::iterator it = std::find(m_models.begin(), m_models.end(), model);
 			if (it != m_models.end())
 				return;
@@ -30,29 +30,29 @@ namespace myRenderer
 			m_models.emplace_back(model);
 		}
 
-		//ƒVƒƒƒhƒEƒ}ƒbƒv‚Ég—p‚·‚éƒ‰ƒCƒg‚ğæ“¾
+		//ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ã«ä½¿ç”¨ã™ã‚‹ãƒ©ã‚¤ãƒˆã‚’å–å¾—
 		void ShadowMapRender::SetShadowLight(Light* light)
 		{
 			this->light = light;
 		}
 
-		//“o˜^Ï‚İ‚Ìƒ‰ƒCƒg‚ğ‘Síœ
+		//ç™»éŒ²æ¸ˆã¿ã®ãƒ©ã‚¤ãƒˆã‚’å…¨å‰Šé™¤
 		void ShadowMapRender::Clear()
 		{
 			m_models.clear();
 			light = nullptr;
 		}
 
-		//•`‰æ
+		//æç”»
 		void ShadowMapRender::Render()
 		{
 			if (!light) return;
 
-			Graphics& graphics      = Graphics::Instance();
+			Graphics& graphics = Graphics::Instance();
 			ID3D11DeviceContext* dc = graphics.GetDeviceContext();
-			Camera& camera          = Camera::Instance();
+			Camera& camera = Camera::Instance();
 
-			// Œ»İİ’è‚³‚ê‚Ä‚¢‚éƒoƒbƒtƒ@‚ğ‘Ş”ğ‚µ‚Ä‰Šú‰»‚µ‚Ä
+			// ç¾åœ¨è¨­å®šã•ã‚Œã¦ã„ã‚‹ãƒãƒƒãƒ•ã‚¡ã‚’é€€é¿ã—ã¦åˆæœŸåŒ–ã—ã¦
 			UINT			cachedViewportCount{ D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE };
 			D3D11_VIEWPORT	cachedViewports[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
 			Microsoft::WRL::ComPtr<ID3D11RenderTargetView>	cachedRenderTargetView;
@@ -65,7 +65,7 @@ namespace myRenderer
 					cachedDepthStencilView.ReleaseAndGetAddressOf());
 			}
 
-			//ƒVƒƒƒhƒEƒ}ƒbƒv‚Ì•ªŠ„ƒGƒŠƒA’è‹`
+			//ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ã®åˆ†å‰²ã‚¨ãƒªã‚¢å®šç¾©
 			float splitAreaTable[] =
 			{
 				Camera::Instance().GetNearZ(),
@@ -76,42 +76,42 @@ namespace myRenderer
 				Camera::Instance().GetFarZ(),
 			};
 
-			//ƒJƒƒ‰ƒpƒ‰ƒ[ƒ^‚ğæ“¾
+			//ã‚«ãƒ¡ãƒ©ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’å–å¾—
 			DirectX::XMVECTOR cameraFront = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera.GetFront()));
 			DirectX::XMVECTOR cameraRight = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera.GetRight()));
-			DirectX::XMVECTOR cameraUp    = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera.GetUp()));
-			DirectX::XMVECTOR cameraPos   = DirectX::XMLoadFloat3(&camera.GetEye());
+			DirectX::XMVECTOR cameraUp = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera.GetUp()));
+			DirectX::XMVECTOR cameraPos = DirectX::XMLoadFloat3(&camera.GetEye());
 
-			//ƒ‰ƒCƒgƒrƒ…[ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ‚Ìì¬
+			//ãƒ©ã‚¤ãƒˆãƒ“ãƒ¥ãƒ¼ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—ã®ä½œæˆ
 			DirectX::XMMATRIX viewMatrix, projectionMatrix, viewProjectionMatrix;
 			{
-				//•½sŒõŒ¹‚©‚çƒJƒƒ‰ˆÊ’u‚ğì¬‚µA‚»‚±‚©‚çŒ´“_‚ÌˆÊ’u‚ğŒ©‚é‚æ‚¤‚É‹üs—ñ‚ğ¶¬
+				//å¹³è¡Œå…‰æºã‹ã‚‰ã‚«ãƒ¡ãƒ©ä½ç½®ã‚’ä½œæˆã—ã€ãã“ã‹ã‚‰åŸç‚¹ã®ä½ç½®ã‚’è¦‹ã‚‹ã‚ˆã†ã«è¦–ç·šè¡Œåˆ—ã‚’ç”Ÿæˆ
 				DirectX::XMFLOAT3 lightDirection = light->GetDirection();
-				DirectX::XMVECTOR LightPosition  = DirectX::XMLoadFloat3(&lightDirection);
+				DirectX::XMVECTOR LightPosition = DirectX::XMLoadFloat3(&lightDirection);
 				LightPosition = DirectX::XMVectorScale(LightPosition, -250.0f);
-				viewMatrix    = DirectX::XMMatrixLookAtLH(LightPosition, DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
+				viewMatrix = DirectX::XMMatrixLookAtLH(LightPosition, DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
 
-				//ƒVƒƒƒhƒEƒ}ƒbƒv‚É•`‰æ‚µ‚½‚¢”ÍˆÍ‚ÌË‰es—ñ‚ğ¶¬
-				projectionMatrix     = DirectX::XMMatrixOrthographicLH(10000, 10000, 1.0f, 1000.0f);
+				//ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ã«æç”»ã—ãŸã„ç¯„å›²ã®å°„å½±è¡Œåˆ—ã‚’ç”Ÿæˆ
+				projectionMatrix = DirectX::XMMatrixOrthographicLH(10000, 10000, 1.0f, 1000.0f);
 				viewProjectionMatrix = viewMatrix * projectionMatrix;
 			}
 
-			//•`‰æˆ—
-			//ƒGƒŠƒA‚Ì‹ß•½–Ê‚Ü‚Å‚Ì‹——£
+			//æç”»å‡¦ç†
+			//ã‚¨ãƒªã‚¢ã®è¿‘å¹³é¢ã¾ã§ã®è·é›¢
 			RenderContext rc;
 			for (int i = 0; i < NUM_SHADOW_MAP; ++i)
 			{
-				// ƒGƒŠƒA‚Ì‹ß•½–Ê‚Ü‚Å‚Ì‹——£
+				// ã‚¨ãƒªã‚¢ã®è¿‘å¹³é¢ã¾ã§ã®è·é›¢
 				float nearDepth = splitAreaTable[i + 0];
 
-				// ƒGƒŠƒA‚Ì‰“•½–Ê‚Ü‚Å‚Ì‹——£
+				// ã‚¨ãƒªã‚¢ã®é å¹³é¢ã¾ã§ã®è·é›¢
 				float farDepth = splitAreaTable[i + 1];
 
-				//depthClear&RenderTargetİ’è&VirePortİ’è
+				//depthClear&RenderTargetè¨­å®š&VirePortè¨­å®š
 				ID3D11RenderTargetView* rtv = nullptr;
 				ID3D11DepthStencilView* dsv = depthStencil[i]->GetDepthStencilView().Get();
-				
-				// ‚±‚±‚ÅƒŠƒ\[ƒX‚ğƒAƒ“ƒoƒCƒ“ƒh
+
+				// ã“ã“ã§ãƒªã‚½ãƒ¼ã‚¹ã‚’ã‚¢ãƒ³ãƒã‚¤ãƒ³ãƒ‰
 				ID3D11ShaderResourceView* nullSRV[1] = { nullptr };
 				dc->PSSetShaderResources(10 + i, 1, nullSRV);
 
@@ -119,62 +119,62 @@ namespace myRenderer
 				dc->OMSetRenderTargets(0, &rtv, dsv);
 
 				D3D11_VIEWPORT viewport = {};
-				viewport.Width    = static_cast<float>(depthStencil[i]->GetWidth());
-				viewport.Height   = static_cast<float>(depthStencil[i]->GetHeight());
+				viewport.Width = static_cast<float>(depthStencil[i]->GetWidth());
+				viewport.Height = static_cast<float>(depthStencil[i]->GetHeight());
 				viewport.MinDepth = 0.0f;
 				viewport.MaxDepth = 1.0f;
 				dc->RSSetViewports(1, &viewport);
 
-				//ƒGƒŠƒA‚Ì‚ğ“à•ï‚·‚é‹‘ä‚Ì8’¸“_‚ğZo‚·‚é
+				//ã‚¨ãƒªã‚¢ã®ã‚’å†…åŒ…ã™ã‚‹è¦–éŒå°ã®8é ‚ç‚¹ã‚’ç®—å‡ºã™ã‚‹
 				DirectX::XMVECTOR vertex[8];
 				{
-					//ƒGƒŠƒA‚Ì‹ß•½–Ê‚Ì’†S‚©‚ç‚Ìã–Ê‚Ü‚Å‚Ì‹——£‚ğ‹‚ß‚é
+					//ã‚¨ãƒªã‚¢ã®è¿‘å¹³é¢ã®ä¸­å¿ƒã‹ã‚‰ã®ä¸Šé¢ã¾ã§ã®è·é›¢ã‚’æ±‚ã‚ã‚‹
 					float nearY = tanf(camera.GetFovY() / 2.0f) * nearDepth;
 
-					//ƒGƒŠƒA‚Ì‹ß•½–Ê‚Ì’†S‚©‚ç‚Ì‰E–Ê‚Ü‚Å‚Ì‹——£‚ğ‹‚ß‚é
+					//ã‚¨ãƒªã‚¢ã®è¿‘å¹³é¢ã®ä¸­å¿ƒã‹ã‚‰ã®å³é¢ã¾ã§ã®è·é›¢ã‚’æ±‚ã‚ã‚‹
 					float nearX = nearY * camera.GetAspect();
 
-					//ƒGƒŠƒA‚Ì‰“•½–Ê‚Ì’†S‚©‚ç‚Ìã–Ê‚Ü‚Å‚Ì‹——£‚ğ‹‚ß‚é
+					//ã‚¨ãƒªã‚¢ã®é å¹³é¢ã®ä¸­å¿ƒã‹ã‚‰ã®ä¸Šé¢ã¾ã§ã®è·é›¢ã‚’æ±‚ã‚ã‚‹
 					float farY = tanf(camera.GetFovY() / 2.0f) * farDepth;
 
-					//ƒGƒŠƒA‚Ì‰“•½–Ê‚Ì’†S‚©‚ç‚Ì‰E–Ê‚Ü‚Å‚Ì‹——£‚ğ‹‚ß‚é
+					//ã‚¨ãƒªã‚¢ã®é å¹³é¢ã®ä¸­å¿ƒã‹ã‚‰ã®å³é¢ã¾ã§ã®è·é›¢ã‚’æ±‚ã‚ã‚‹
 					float farX = farY * camera.GetAspect();
 
-					//ƒGƒŠƒA‚Ì‹ß•½–Ê‚Ì’†SÀ•W‚ğ‹‚ß‚é
+					//ã‚¨ãƒªã‚¢ã®è¿‘å¹³é¢ã®ä¸­å¿ƒåº§æ¨™ã‚’æ±‚ã‚ã‚‹
 					DirectX::XMVECTOR nearPosition = DirectX::XMVectorAdd(cameraPos, DirectX::XMVectorScale(cameraFront, nearDepth));
 
-					//ƒGƒŠƒA‚Ì‰“•½–Ê‚Ì’†SÀ•W‚ğ‹‚ß‚é
+					//ã‚¨ãƒªã‚¢ã®é å¹³é¢ã®ä¸­å¿ƒåº§æ¨™ã‚’æ±‚ã‚ã‚‹
 					DirectX::XMVECTOR farPosition = DirectX::XMVectorAdd(cameraPos, DirectX::XMVectorScale(cameraFront, farDepth));
 
-					//8’¸“_‚ğ‹‚ß‚é
+					//8é ‚ç‚¹ã‚’æ±‚ã‚ã‚‹
 					{
-						//‹ß•½–Ê‚Ì‰Eã
+						//è¿‘å¹³é¢ã®å³ä¸Š
 						vertex[0] = DirectX::XMVectorAdd(nearPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, nearY), DirectX::XMVectorScale(cameraRight, nearX)));
 
-						//‹ß•½–Ê‚Ì¶ã
+						//è¿‘å¹³é¢ã®å·¦ä¸Š
 						vertex[1] = DirectX::XMVectorAdd(nearPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, nearY), DirectX::XMVectorScale(cameraRight, -nearX)));
 
-						//‹ß•½–Ê‚Ì‰E‰º
+						//è¿‘å¹³é¢ã®å³ä¸‹
 						vertex[2] = DirectX::XMVectorAdd(nearPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, -nearY), DirectX::XMVectorScale(cameraRight, nearX)));
 
-						//‹ß•½–Ê‚Ì¶‰º
+						//è¿‘å¹³é¢ã®å·¦ä¸‹
 						vertex[3] = DirectX::XMVectorAdd(nearPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, -nearY), DirectX::XMVectorScale(cameraRight, -nearX)));
 
-						//‰“•½–Ê‚Ì‰Eã
+						//é å¹³é¢ã®å³ä¸Š
 						vertex[4] = DirectX::XMVectorAdd(farPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, farY), DirectX::XMVectorScale(cameraRight, farX)));
 
-						//‰“•½–Ê‚Ì¶ã
+						//é å¹³é¢ã®å·¦ä¸Š
 						vertex[5] = DirectX::XMVectorAdd(farPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, farY), DirectX::XMVectorScale(cameraRight, -farX)));
 
-						//‰“•½–Ê‚Ì‰E‰º
+						//é å¹³é¢ã®å³ä¸‹
 						vertex[6] = DirectX::XMVectorAdd(farPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, -farY), DirectX::XMVectorScale(cameraRight, farX)));
 
-						//‰“•½–Ê‚Ì¶‰º
+						//é å¹³é¢ã®å·¦ä¸‹
 						vertex[7] = DirectX::XMVectorAdd(farPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, -farY), DirectX::XMVectorScale(cameraRight, -farX)));
 					}
 				}
 
-				//8’¸“_‚ğƒ‰ƒCƒgƒrƒ…[ƒvƒƒWƒFƒNƒVƒ‡ƒ“‹óŠÔ‚É‚µ‚ÄAÅ‘å’lAÅ¬’l‚ğ‹‚ß‚é
+				//8é ‚ç‚¹ã‚’ãƒ©ã‚¤ãƒˆãƒ“ãƒ¥ãƒ¼ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³ç©ºé–“ã«ã—ã¦ã€æœ€å¤§å€¤ã€æœ€å°å€¤ã‚’æ±‚ã‚ã‚‹
 				DirectX::XMFLOAT3 vertexMin(FLT_MAX, FLT_MAX, FLT_MAX), vertexMax(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 				for (auto& it : vertex)
 				{
@@ -188,7 +188,7 @@ namespace myRenderer
 					vertexMax.z = max(p.z, vertexMax.z);
 				}
 
-				//ƒNƒƒbƒvs—ñ‚ğ‹‚ß‚é
+				//ã‚¯ãƒ­ãƒƒãƒ—è¡Œåˆ—ã‚’æ±‚ã‚ã‚‹
 				float xScale = 2.0f / (vertexMax.x - vertexMin.x);
 				float yScale = 2.0f / (vertexMax.y - vertexMin.y);
 				float xOffset = -0.5f * (vertexMax.x + vertexMin.x) * xScale;
@@ -201,18 +201,18 @@ namespace myRenderer
 					xOffset, yOffset, 0, 1
 				);
 
-				// ƒ‰ƒCƒgƒrƒ…[ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ‚ÉƒNƒƒbƒvs—ñ‚ğæZ
+				// ãƒ©ã‚¤ãƒˆãƒ“ãƒ¥ãƒ¼ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—ã«ã‚¯ãƒ­ãƒƒãƒ—è¡Œåˆ—ã‚’ä¹—ç®—
 				DirectX::XMStoreFloat4x4(&lightViewProjection[i], viewProjectionMatrix * clopMatrix);
 
 				rc.camera = &camera;
 				rc.deviceContext = dc;
-				rc.renderState   = graphics.GetRenderState();
+				rc.renderState = graphics.GetRenderState();
 				DirectX::XMStoreFloat4x4(&view, viewMatrix);
 				DirectX::XMStoreFloat4x4(&rc.shadowMapData.view, viewMatrix);
-				DirectX::XMStoreFloat4x4(&projection, projectionMatrix* clopMatrix);
-				DirectX::XMStoreFloat4x4(&rc.shadowMapData.projection, projectionMatrix* clopMatrix);
+				DirectX::XMStoreFloat4x4(&projection, projectionMatrix * clopMatrix);
+				DirectX::XMStoreFloat4x4(&rc.shadowMapData.projection, projectionMatrix * clopMatrix);
 
-				//3Dƒ‚ƒfƒ‹•`‰æ
+				//3Dãƒ¢ãƒ‡ãƒ«æç”»
 				{
 					ModelShader* shader = graphics.GetModelShader(ModelShaderId::ShadowMap);
 					shader->Begin(rc);
@@ -224,7 +224,7 @@ namespace myRenderer
 				}
 			}
 
-			//	Œ³‚Ìƒoƒbƒtƒ@‚É–ß‚·
+			//	å…ƒã®ãƒãƒƒãƒ•ã‚¡ã«æˆ»ã™
 			{
 				dc->RSSetViewports(cachedViewportCount, cachedViewports);
 				dc->OMSetRenderTargets(1, cachedRenderTargetView.GetAddressOf(), cachedDepthStencilView.Get());
@@ -233,20 +233,20 @@ namespace myRenderer
 
 		void ShadowMapRender::DrawDebugGUI()
 		{
-			//ƒVƒƒƒhƒEƒ}ƒbƒv
+			//ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—
 			if (ImGui::TreeNode("Shadowmap"))
 			{
 				ImGui::Text("texture");
 				for (int i = 0; i < NUM_SHADOW_MAP; ++i)
 				{
-					ImGui::Image(depthStencil[i]->GetShaderResourceView().Get(), {256,256}, {0,0}, {1,1}, {1,1,1,1});
+					ImGui::Image(depthStencil[i]->GetShaderResourceView().Get(), { 256,256 }, { 0,0 }, { 1,1 }, { 1,1,1,1 });
 					ImGui::SameLine();
 				}
 				ImGui::TreePop();
 			}
 		}
 
-		// ƒVƒƒƒhƒEƒ}ƒbƒvî•ñ‚ğRenderContext‚ÉÏ‚Ş
+		// ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—æƒ…å ±ã‚’RenderContextã«ç©ã‚€
 		ShadowMapData ShadowMapRender::GetShadowMapData()
 		{
 			ShadowMapData shadowMapData;
@@ -267,17 +267,17 @@ DepthStencil::DepthStencil(UINT width, UINT height)
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 
 	texture2dDesc = {};
-	texture2dDesc.Width              = width;
-	texture2dDesc.Height             = height;
-	texture2dDesc.MipLevels          = 1;
-	texture2dDesc.ArraySize          = 1;
-	texture2dDesc.Format             = DXGI_FORMAT_R24G8_TYPELESS;
-	texture2dDesc.SampleDesc.Count   = 1;
+	texture2dDesc.Width = width;
+	texture2dDesc.Height = height;
+	texture2dDesc.MipLevels = 1;
+	texture2dDesc.ArraySize = 1;
+	texture2dDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
+	texture2dDesc.SampleDesc.Count = 1;
 	texture2dDesc.SampleDesc.Quality = 0;
-	texture2dDesc.Usage              = D3D11_USAGE_DEFAULT;
-	texture2dDesc.BindFlags          = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
-	texture2dDesc.CPUAccessFlags     = 0;
-	texture2dDesc.MiscFlags          = 0;
+	texture2dDesc.Usage = D3D11_USAGE_DEFAULT;
+	texture2dDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
+	texture2dDesc.CPUAccessFlags = 0;
+	texture2dDesc.MiscFlags = 0;
 
 	Microsoft::WRL::ComPtr<ID3D11Texture2D>	texture2d;
 	HRESULT hr = device->CreateTexture2D(&texture2dDesc, 0, texture2d.ReleaseAndGetAddressOf());
@@ -285,18 +285,18 @@ DepthStencil::DepthStencil(UINT width, UINT height)
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC shader_resource_view_desc = {};
 	ZeroMemory(&shader_resource_view_desc, sizeof(shader_resource_view_desc));
-	shader_resource_view_desc.Format                    = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-	shader_resource_view_desc.ViewDimension             = D3D11_SRV_DIMENSION_TEXTURE2D;
+	shader_resource_view_desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+	shader_resource_view_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	shader_resource_view_desc.Texture2D.MostDetailedMip = 0;
-	shader_resource_view_desc.Texture2D.MipLevels       = 1;
+	shader_resource_view_desc.Texture2D.MipLevels = 1;
 	hr = device->CreateShaderResourceView(texture2d.Get(), &shader_resource_view_desc, shaderResourceView.ReleaseAndGetAddressOf());
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
 	D3D11_DEPTH_STENCIL_VIEW_DESC depth_stencil_view_desc{};
 	ZeroMemory(&depth_stencil_view_desc, sizeof(depth_stencil_view_desc));
-	depth_stencil_view_desc.Format        = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depth_stencil_view_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	depth_stencil_view_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	depth_stencil_view_desc.Flags         = 0;
+	depth_stencil_view_desc.Flags = 0;
 	depth_stencil_view_desc.Texture2D.MipSlice = 0;
 	hr = device->CreateDepthStencilView(texture2d.Get(), &depth_stencil_view_desc, depthStencilView.ReleaseAndGetAddressOf());
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
