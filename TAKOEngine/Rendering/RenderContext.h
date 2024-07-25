@@ -126,6 +126,7 @@ struct FinalpassnData
 
 struct ShadowMapData
 {
+	//カメラ情報
 	DirectX::XMFLOAT4X4 view = {};
 	DirectX::XMFLOAT4X4 projection = {};
 
@@ -135,9 +136,11 @@ struct ShadowMapData
 	//ライトビュープロジェクション行列
 	DirectX::XMFLOAT4X4 lightViewProjection[myRenderer::NUM_SHADOW_MAP] = {};
 
+	//深度比較用のオフセット値
 	float shadowBias[myRenderer::NUM_SHADOW_MAP] = { 0.001f, 0.002f, 0.004f, 0.01f }; //深度比較用のオフセット値
 	
-	DirectX::XMFLOAT3 shadowColor = { 0.2f,0.2f,0.2f };
+	//影の色
+	DirectX::XMFLOAT3 shadowColor = { 0.5f,0.5f,0.5f };
 };
 
 struct RenderContext

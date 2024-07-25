@@ -41,18 +41,23 @@ public:
 
 	struct Mesh
 	{
-		const ModelResource::Mesh* mesh;
-		std::vector<FrameResource>				frame_resources;
+		const ModelResource::Mesh* mesh = nullptr;
+		DirectX::BoundingBox	   worldBounds;
+		std::vector<FrameResource> frame_resources;
 	};
 
-	// メッシュデータ取得
+	// ノードデータ取得
 	const std::vector<Node>& GetNodes() const { return nodes; }
+
+	// メッシュ取得
+	const std::vector<Mesh>&GetMeshes() const { return m_meshes; }
 
 	// トランスフォーム更新処理
 	void UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform);
 
 	// ルートノード取得
 	Node* GetRootNode() { return nodes.data(); }
+	
 	// ノード検索
 	Node* FindNode(const char* name);
 
@@ -100,9 +105,13 @@ private:
 	// ブレンディング計算処理
 	void ComputeBlending(float elapsedTime);
 
+	// バウンディングボックス計算
+	void ComputeWorldBounds();
+
 private:
 	std::shared_ptr<ModelResource>	resource;
 	std::vector<Node>				nodes;
+	DirectX::BoundingBox	        bounds;
 
 	int   currentAnimationIndex = -1;
 	float currentAnimationSeconds = 0.0f;

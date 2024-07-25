@@ -2,6 +2,7 @@
 #include "TAKOEngine/Rendering/Misc.h"
 #include "TAKOEngine/Rendering/GpuResourceUtils.h"
 #include "TAKOEngine/Rendering/Shaders/ModelShader.h"
+#include "TAKOEngine/Rendering/FrustumCulling.h"
 
 ModelShader::ModelShader(ID3D11Device* device, const char* vs, const char* ps)
 {
@@ -172,8 +173,17 @@ void ModelShader::Draw(const RenderContext& rc, const Model* model, DirectX::XMF
 	const ModelResource* resource = model->GetResource();
 	const std::vector<Model::Node>& nodes = model->GetNodes();
 
+	// カメラに写っている範囲のオブジェクトをフラグでマークする配列を用意
+	std::vector<bool> visibleObjects(model->GetMeshes().size(), false);
+
+	// 視錐台カリングを実行して可視オブジェクトをマーク
+	FrustumCulling::FrustumCullingFlag(Camera::Instance(), model->GetMeshes(), visibleObjects);
+	int culling = 0;
+
 	for (const ModelResource::Mesh& mesh : resource->GetMeshes())
 	{
+		if (!visibleObjects[culling++]) continue;
+
 		// 頂点バッファ設定
 		UINT stride = sizeof(ModelResource::Vertex);
 		UINT offset = 0;

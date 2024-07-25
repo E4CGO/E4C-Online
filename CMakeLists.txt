@@ -432,19 +432,19 @@ set(TAKOEngine__Rendering
     "TAKOEngine/Rendering/MyRender.h"
     "TAKOEngine/Rendering/ShadowMapRender.cpp"
     "TAKOEngine/Rendering/ShadowMapRender.h"
+    "TAKOEngine/Rendering/FrustumCulling.cpp"
+    "TAKOEngine/Rendering/FrustumCulling.h"
 )
 source_group("TAKOEngine\\Rendering" FILES ${TAKOEngine__Rendering})
 
 set(TAKOEngine__Rendering__HLSL
+)
+source_group("TAKOEngine\\Rendering\\HLSL\\" FILES ${TAKOEngine__Rendering__HLSL})
+
+set(TAKOEngine__Rendering__HLSL__PostEffect
     "TAKOEngine/Rendering/HLSL/BloomPS.hlsl"
     "TAKOEngine/Rendering/HLSL/ColorGrading.hlsli"
     "TAKOEngine/Rendering/HLSL/ColorGradingPS.hlsl"
-    "TAKOEngine/Rendering/HLSL/Debug.hlsli"
-    "TAKOEngine/Rendering/HLSL/DebugVS.hlsl"
-    "TAKOEngine/Rendering/HLSL/DebugPS.hlsl"
-    "TAKOEngine/Rendering/HLSL/DefaultModel.hlsli"
-    "TAKOEngine/Rendering/HLSL/DefaultModelVS.hlsl"
-    "TAKOEngine/Rendering/HLSL/DefaultModelPS.hlsl"
     "TAKOEngine/Rendering/HLSL/FilterFunctions.hlsli"
     "TAKOEngine/Rendering/HLSL/Finalpass.hlsli"
     "TAKOEngine/Rendering/HLSL/FinalpassPS.hlsl"
@@ -452,44 +452,78 @@ set(TAKOEngine__Rendering__HLSL
     "TAKOEngine/Rendering/HLSL/FullScreenQuadVS.hlsl"
     "TAKOEngine/Rendering/HLSL/GaussianBlur.hlsli"
     "TAKOEngine/Rendering/HLSL/GaussianBlurPS.hlsl"
-    "TAKOEngine/Rendering/HLSL/Gizmos.hlsli"
-    "TAKOEngine/Rendering/HLSL/GizmosVS.hlsl"
-    "TAKOEngine/Rendering/HLSL/GizmosPS.hlsl"
-    "TAKOEngine/Rendering/HLSL/Lambert.hlsli"
-    "TAKOEngine/Rendering/HLSL/LambertVS.hlsl"
-    "TAKOEngine/Rendering/HLSL/LambertPS.hlsl"
-    "TAKOEngine/Rendering/HLSL/Light.hlsli"
-    "TAKOEngine/Rendering/HLSL/Line.hlsli"
-    "TAKOEngine/Rendering/HLSL/LineVS.hlsl"
-    "TAKOEngine/Rendering/HLSL/LinePS.hlsl"
     "TAKOEngine/Rendering/HLSL/LuminanceExtraction.hlsli"
     "TAKOEngine/Rendering/HLSL/LuminanceExtractionPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Mask.hlsli"
     "TAKOEngine/Rendering/HLSL/MaskPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/PostEffect.hlsli"
+    "TAKOEngine/Rendering/HLSL/ShaderData.hlsli"
+)
+source_group("TAKOEngine\\Rendering\\HLSL\\PostEffect" FILES ${TAKOEngine__Rendering__HLSL__PostEffect})
+
+set(TAKOEngine__Rendering__HLSL__Debug
+    "TAKOEngine/Rendering/HLSL/Debug.hlsli"
+    "TAKOEngine/Rendering/HLSL/DebugVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/DebugPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Gizmos.hlsli"
+    "TAKOEngine/Rendering/HLSL/GizmosVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/GizmosPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/LineVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/LinePS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Line.hlsli"
+)
+source_group("TAKOEngine\\Rendering\\HLSL\\Debug" FILES ${TAKOEngine__Rendering__HLSL__Debug})
+
+set(TAKOEngine__Rendering__HLSL__Model
+    "TAKOEngine/Rendering/HLSL/Skinning.hlsli"
+    "TAKOEngine/Rendering/HLSL/DefaultModel.hlsli"
+    "TAKOEngine/Rendering/HLSL/DefaultModelVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/DefaultModelPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Lambert.hlsli"
+    "TAKOEngine/Rendering/HLSL/LambertVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/LambertPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Phong.hlsli"
     "TAKOEngine/Rendering/HLSL/PhongVS.hlsl"
     "TAKOEngine/Rendering/HLSL/PhongPS.hlsl"
-    "TAKOEngine/Rendering/HLSL/PostEffect.hlsli"
-    "TAKOEngine/Rendering/HLSL/ShaderData.hlsli"
+
+)
+source_group("TAKOEngine\\Rendering\\HLSL\\Model" FILES ${TAKOEngine__Rendering__HLSL__Model})
+
+set(TAKOEngine__Rendering__HLSL__Lightning
+    "TAKOEngine/Rendering/HLSL/Light.hlsli"
     "TAKOEngine/Rendering/HLSL/ShadowMap.hlsli"
     "TAKOEngine/Rendering/HLSL/ShadowmapFunctions.hlsli"
     "TAKOEngine/Rendering/HLSL/ShadowMapVS.hlsl"
-    "TAKOEngine/Rendering/HLSL/Skinning.hlsli"
+)
+source_group("TAKOEngine\\Rendering\\HLSL\\Lightning" FILES ${TAKOEngine__Rendering__HLSL__Lightning})
+
+set(TAKOEngine__Rendering__HLSL__Skydome
     "TAKOEngine/Rendering/HLSL/Skydome.hlsli"
     "TAKOEngine/Rendering/HLSL/SkydomeVS.hlsl"
     "TAKOEngine/Rendering/HLSL/SkydomePS.hlsl"
+)
+source_group("TAKOEngine\\Rendering\\HLSL\\Skydome" FILES ${TAKOEngine__Rendering__HLSL__Skydome})
+
+set(TAKOEngine__Rendering__HLSL__Sprite
     "TAKOEngine/Rendering/HLSL/Sprite.hlsli"
     "TAKOEngine/Rendering/HLSL/SpriteVS.hlsl"
     "TAKOEngine/Rendering/HLSL/SpritePS.hlsl"
+)
+source_group("TAKOEngine\\Rendering\\HLSL\\Sprite" FILES ${TAKOEngine__Rendering__HLSL__Sprite})
+
+set(TAKOEngine__Rendering__HLSL__Toon
     "TAKOEngine/Rendering/HLSL/Toon.hlsli"
     "TAKOEngine/Rendering/HLSL/ToonVS.hlsl"
     "TAKOEngine/Rendering/HLSL/ToonPS.hlsl"
+)
+source_group("TAKOEngine\\Rendering\\HLSL\\ToonPS" FILES ${TAKOEngine__Rendering__HLSL__Toon})
+
+
+set(TAKOEngine__Rendering__HLSL__UVScroll
     "TAKOEngine/Rendering/HLSL/UVScroll.hlsli"
     "TAKOEngine/Rendering/HLSL/UVScrollPS.hlsl"
-
-
 )
-source_group("TAKOEngine\\Rendering\\HLSL" FILES ${TAKOEngine__Rendering__HLSL})
+source_group("TAKOEngine\\Rendering\\HLSL\\UVScrollPS" FILES ${TAKOEngine__Rendering__HLSL__UVScroll})
 
 set(TAKOEngine__Rendering__Shaders
     "TAKOEngine/Rendering/Shaders/Shader.cpp"
@@ -580,6 +614,14 @@ set(ALL_FILES
     ${TAKOEngine__Physics}
     ${TAKOEngine__Rendering}
     ${TAKOEngine__Rendering__HLSL}
+    ${TAKOEngine__Rendering__HLSL__PostEffect}
+    ${TAKOEngine__Rendering__HLSL__Debug}
+    ${TAKOEngine__Rendering__HLSL__Model}
+    ${TAKOEngine__Rendering__HLSL__Lightning}
+    ${TAKOEngine__Rendering__HLSL__Skydome}
+    ${TAKOEngine__Rendering__HLSL__Sprite}
+    ${TAKOEngine__Rendering__HLSL__Toon}
+    ${TAKOEngine__Rendering__HLSL__UVScroll}
     ${TAKOEngine__Rendering__Shaders}
     ${TAKOEngine__Runtime}
     ${TAKOEngine__Sound}

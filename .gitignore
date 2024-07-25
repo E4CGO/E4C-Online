@@ -36,7 +36,7 @@ bin/*
 ToImplement*/
 
 #Data
-Data/*
+Data/**
 
 #Cmake files
 cmake_install.cmake
