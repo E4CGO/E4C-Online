@@ -4,7 +4,7 @@
 
 void SceneTest::Initialize()
 {
-	stage = std::make_unique<MapTile>("Data/Model/Stage/scene.glb", 1000);
+	stage = std::make_unique<MapTile>("Data/Model/Stage/BigMap.glb", 1000);
 	MAPTILES.Register(stage.get());
 	MAPTILES.Update(0);
 
@@ -45,7 +45,6 @@ void SceneTest::Initialize()
 	//cameraController->SetEnable(false);
 	cameraController->SetEnable(true);
 	cameraController->SetPlayer(player.get());
-
 }
 
 void SceneTest::Finalize()
@@ -84,4 +83,3 @@ void SceneTest::Render()
 	//knight->Render(rc);
 	player->Render(rc);
 }
-

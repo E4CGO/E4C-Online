@@ -254,6 +254,8 @@ set(Source__Scene
     "Source/Scene/SceneTitle.h"
     "Source/Scene/SceneTitleState.cpp"
     "Source/Scene/SceneTitleState.h"
+    "Source/Scene/SceneTest.cpp"
+    "Source/Scene/SceneTest.h"
 )
 source_group("Source\\Scene" FILES ${Source__Scene})
 
@@ -386,6 +388,9 @@ set(TAKOEngine__Physics
     "TAKOEngine/Physics/SphereCollider.h"
     "TAKOEngine/Physics/UnrotatedBoxCollider.cpp"
     "TAKOEngine/Physics/UnrotatedBoxCollider.h"
+    "TAKOEngine/Physics/Liner8TreeManager.h"
+    "TAKOEngine/Physics/MapCollider.cpp"
+    "TAKOEngine/Physics/MapCollider.h"
 )
 source_group("TAKOEngine\\Physics" FILES ${TAKOEngine__Physics})
 
@@ -603,21 +608,21 @@ set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUN
 ################################################################################
 target_include_directories(${PROJECT_NAME} PUBLIC
     "$<$<CONFIG:Debug>:"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX;"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
         "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/include"
     ">"
     "$<$<CONFIG:Release>:"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX;"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
         "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/include"
     ">"
-    "${CMAKE_CURRENT_SOURCE_DIR}/Source;"
-    "${CMAKE_CURRENT_SOURCE_DIR}/External/imgui-docking;"
-    "${CMAKE_CURRENT_SOURCE_DIR}/External/assimp/include;"
-    "${CMAKE_CURRENT_SOURCE_DIR}/External/stb;"
-    "${CMAKE_CURRENT_SOURCE_DIR}/External/cereal/include;"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TeNTaCleLib;"
-    "${CMAKE_CURRENT_SOURCE_DIR}/External/Effekseer162a/include;"
-    "${CMAKE_CURRENT_SOURCE_DIR}/External/nlohmann;"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Source"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/imgui-docking"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/assimp/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/stb"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/cereal/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TeNTaCleLib"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/Effekseer162a/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/nlohmann"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/openssl/include"
 )
 
@@ -626,15 +631,15 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 ################################################################################
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     "$<$<CONFIG:Debug>:"
-        "_DEBUG;"
+        "_DEBUG"
         "CMAKE_INTDIR=\"Debug\""
     ">"
     "$<$<CONFIG:Release>:"
-        "NDEBUG;"
+        "NDEBUG"
         "CMAKE_INTDIR=\"Release\""
     ">"
-    "_CONSOLE;"
-    "UNICODE;"
+    "_CONSOLE"
+    "UNICODE"
     "_UNICODE"
 )
 
@@ -644,15 +649,15 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Release>:
-            /Oi;
+            /Oi
             /Gy
         >
-        /permissive-;
-        /MP;
-        /sdl;
-        /W3;
-        /Zi;
-        ${DEFAULT_CXX_EXCEPTION_HANDLING};
+        /permissive-
+        /MP
+        /sdl
+        /W3
+        /Zi
+        ${DEFAULT_CXX_EXCEPTION_HANDLING}
         /Y-
     )
     target_link_options(${PROJECT_NAME} PRIVATE
@@ -660,11 +665,11 @@ if(MSVC)
             /INCREMENTAL
         >
         $<$<CONFIG:Release>:
-            /OPT:REF;
+            /OPT:REF
             /OPT:ICF
         >
-        /MANIFEST;
-        /DEBUG;
+        /MANIFEST
+        /DEBUG
         /SUBSYSTEM:WINDOWS
     )
 endif()
@@ -672,6 +677,44 @@ endif()
 ################################################################################
 # Post build events
 ################################################################################
+
+# URL of the ZIP file
+set(ZIP_FILE_URL "https://www.dropbox.com/scl/fi/ovb2dkjr3n1ayljdb0ftn/Data.zip?rlkey=2th7h96r3p4qsxn12oqnnp1wv&st=uywpwppu&dl=0")
+
+# Local path where the ZIP file will be downloaded
+set(ZIP_FILE_PATH "${CMAKE_SOURCE_DIR}/Data.zip")
+
+# Command to download the ZIP file
+file(DOWNLOAD ${ZIP_FILE_URL} ${ZIP_FILE_PATH}
+SHOW_PROGRESS
+STATUS status)
+
+list(GET status 0 status_code)
+list(GET status 1 status_string)
+if(NOT status_code EQUAL 0)
+    message(FATAL_ERROR "Error downloading file: ${status_string}")
+endif()
+
+message(STATUS "File downloaded and verified successfully!")
+
+set(DESTINATION_DIR "${CMAKE_SOURCE_DIR}/Data")
+
+file(MAKE_DIRECTORY ${DESTINATION_DIR})
+
+# Unzip the file
+execute_process(
+    COMMAND ${CMAKE_COMMAND} -E tar xvf ${ZIP_FILE_PATH}
+    WORKING_DIRECTORY ${DESTINATION_DIR}
+    RESULT_VARIABLE result
+)
+
+if(result)
+    message(FATAL_ERROR "Failed to unzip file")
+else()
+    message(STATUS "Successfully unzipped file")
+endif()
+
+file(REMOVE ${ZIP_FILE_PATH})
 
 set(SOURCE_DIR_DATA "${CMAKE_SOURCE_DIR}/Data")
 set(SOURCE_DIR_DEPENDENCY "${CMAKE_SOURCE_DIR}/Dependencies")
@@ -719,13 +762,40 @@ if(MSVC)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND if "$(Configuration)" == "Debug" ${CMAKE_COMMAND} -E copy_directory
 	${SOURCE_DIR_DEPENDENCY}
-    	${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/
+    ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/
 )
 endif()
 
+if(MSVC)
+file(GLOB MY_SHADERS ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/*.cso)
+foreach(CurrentShaderFile IN LISTS MY_SHADERS)
+    add_custom_command(
+                TARGET ${PROJECT_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy ${CurrentShaderFile} ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/Data/Shader/
+                COMMENT "Copying shaders: ${CurrentShaderFile}")
+endforeach()
+endif()
+
+if(MSVC)
+file(GLOB MY_SHADERS ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/*.cso)
+foreach(CurrentShaderFile IN LISTS MY_SHADERS)
+    add_custom_command(
+                TARGET ${PROJECT_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy ${CurrentShaderFile} ${CMAKE_BINARY_DIR}/Data/Shader/
+                COMMENT "Copying shaders: ${CurrentShaderFile}")
+endforeach()
+endif()
 
 
-
+if(MSVC)
+file(GLOB MY_SHADERS ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/*.cso)
+foreach(CurrentShaderFile IN LISTS MY_SHADERS)
+    add_custom_command(
+                TARGET ${PROJECT_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E remove ${CurrentShaderFile}
+                COMMENT "Removing shaders: ${CurrentShaderFile}")
+endforeach()
+endif()
 
 ################################################################################
 # Dependencies
@@ -734,49 +804,49 @@ endif()
 
 set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "$<$<CONFIG:Debug>:"
-        "SDL2;"
-        "DirectXTK;"
+        "SDL2"
+        "DirectXTK"
         "DirectXTex"
     ">"
     "$<$<CONFIG:Release>:"
-        "SDL2;"
-        "DirectXTK;"
+        "SDL2"
+        "DirectXTK"
         "DirectXTex"
     ">"
-    "kernel32;"
-    "user32;"
-    "gdi32;"
-    "winspool;"
-    "shell32;"
-    "ole32;"
-    "oleaut32;"
-    "uuid;"
-    "comdlg32;"
+    "kernel32"
+    "user32"
+    "gdi32"
+    "winspool"
+    "shell32"
+    "ole32"
+    "oleaut32"
+    "uuid"
+    "comdlg32"
     "advapi32"
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE "${ADDITIONAL_LIBRARY_DEPENDENCIES}")
 
 target_link_directories(${PROJECT_NAME} PRIVATE
     "$<$<CONFIG:Debug>:"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/nlohmann/$<CONFIG>;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/$<CONFIG>;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/assimp/lib/x64/$<CONFIG>;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/lib/x64;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/Effekseer162a/lib/vs2019/MD/x64/$<CONFIG>;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/openssl/x64/lib;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtk/native/lib/x64/$<CONFIG>;"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/nlohmann/$<CONFIG>"
+        "${CMAKE_CURRENT_SOURCE_DIR}/$<CONFIG>"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/assimp/lib/x64/$<CONFIG>"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/lib/x64"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/Effekseer162a/lib/vs2019/MD/x64/$<CONFIG>"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/openssl/x64/lib"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtk/native/lib/x64/$<CONFIG>"
         "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtex/native/lib/x64/$<CONFIG>"
     ">"
     "$<$<CONFIG:Release>:"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/nlohmann;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/$<CONFIG>;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/assimp/lib/x64/Release;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/Effekseer162a/lib/vs2019/MD/x64/Release;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/openssl/x64/lib;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtex/native/lib/x64/Release;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtk/native/lib/x64/Release;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX;"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/nlohmann"
+        "${CMAKE_CURRENT_SOURCE_DIR}/$<CONFIG>"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/assimp/lib/x64/Release"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/Effekseer162a/lib/vs2019/MD/x64/Release"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/openssl/x64/lib"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtex/native/lib/x64/Release"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtk/native/lib/x64/Release"
+        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
         "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/lib/x64"
     ">"
 )

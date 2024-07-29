@@ -10,6 +10,7 @@
 #include "Scene/SceneGame.h"
 #include "Scene/SceneTitle.h"
 #include "Scene/SceneManager.h"
+#include "Scene/SceneTest.h"
 
 #include "GameData.h"
 
