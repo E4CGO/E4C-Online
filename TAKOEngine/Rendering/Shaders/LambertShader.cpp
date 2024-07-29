@@ -164,7 +164,7 @@ LambertShader::LambertShader()
 		d3d_graphics_pipeline_state_desc.DepthStencilState.StencilEnable = false;
 
 		// ラスタライザーステート
-		d3d_graphics_pipeline_state_desc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+		d3d_graphics_pipeline_state_desc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
 		d3d_graphics_pipeline_state_desc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
 		d3d_graphics_pipeline_state_desc.RasterizerState.FrontCounterClockwise = true;
 		d3d_graphics_pipeline_state_desc.RasterizerState.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;

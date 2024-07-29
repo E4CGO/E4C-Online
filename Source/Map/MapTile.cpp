@@ -2,5 +2,6 @@
 
 MapTile::MapTile(const char* filename, float scaling) : ModelObject(filename, scaling)
 {
-	SetCollider(Collider::COLLIDER_TYPE::MODEL);
+	Update(0);// ƒ‚ƒfƒ‹XV
+	SetCollider(Collider::COLLIDER_TYPE::MAP);
 }

@@ -4,6 +4,7 @@
 #include "TAKOEngine/Physics/BoundingBoxCollider.h"
 #include "TAKOEngine/Physics/SphereCollider.h"
 #include "TAKOEngine/Physics/ModelCollider.h"
+#include "TAKOEngine/Physics/MapCollider.h"
 
 ModelObject::ModelObject(const char* filename, float scaling)
 {
@@ -57,6 +58,10 @@ void ModelObject::SetCollider(Collider::COLLIDER_TYPE collider)
 		break;
 	case Collider::COLLIDER_TYPE::BOUNDING_BOX:
 		this->collider = std::make_unique<BoundingBoxCollider>(model.get());
+		break;
+	case Collider::COLLIDER_TYPE ::MAP:
+		//this->collider = std::make_unique<ModelCollider>(model.get());
+		this->collider = std::make_unique<MapCollider>(model.get());
 		break;
 	default:
 		this->collider = nullptr;

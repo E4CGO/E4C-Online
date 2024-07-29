@@ -232,20 +232,20 @@ void Character::UpdateHorizontalMove(float elapsedTime)
 		if (collider != nullptr) {
 			HitResult hit;
 			Collider* col = collider.get();
-			for (ModelObject*& map : MAPTILES.GetAll())
-			{
-				DirectX::XMFLOAT3 direction = { mx, 0, mz };
-				if (map->GetCollider()->Collision(col, direction, hit))
-				{
-					hit.normal.y = 0.0f;
-					position += hit.normal * hit.distance;
-				}
-				else
-				{
+			//for (ModelObject*& map : MAPTILES.GetAll())
+			//{
+			//	DirectX::XMFLOAT3 direction = { mx, 0, mz };
+			//	if (map->GetCollider()->Collision(col, direction, hit))
+			//	{
+			//		hit.normal.y = 0.0f;
+			//		position += hit.normal * hit.distance;
+			//	}
+			//	else
+			//	{
 					position.x += mx;
 					position.z += mz;
-				}
-			}
+			//	}
+			//}
 		}
 		else
 		{

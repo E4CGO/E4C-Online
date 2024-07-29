@@ -1,5 +1,6 @@
 #include "Player.h"
 
+#include <profiler.h>
 #include <iostream>
 
 #include "TAKOEngine/Physics/SphereCollider.h"
@@ -69,10 +70,10 @@ void Player::UpdateTarget()
 	{
 		target = hit.position;
 	}
-	else if (MAPTILES.RayCast(start, end, hit))
-	{
-		target = hit.position;
-	}
+	//else if (MAPTILES.RayCast(start, end, hit))
+	//{
+	//	target = hit.position;
+	//}
 	else
 	{
 		target = end;
@@ -298,17 +299,27 @@ void Player::UpdateSkillTimers(float elapsedTime)
 
 void Player::Update(float elapsedTime)
 {
-	if (IsPlayer()) // 自機限定 ステート管理
 	{
-		input = 0;
-		UpdateTarget();
-		UpdateInput();
+		ProfileScopedSection_2("input", ImGuiControl::Profiler::Red);
+		if (IsPlayer()) // 自機限定 ステート管理
+		{
+			input = 0;
+			UpdateTarget();
+			UpdateInput();
+		}
 	}
-	stateMachine->Update(elapsedTime);
-
-	UpdateSkillTimers(elapsedTime);
-
-	Character::Update(elapsedTime);
+	{
+		ProfileScopedSection_2("stateMachine", ImGuiControl::Profiler::Blue);
+		stateMachine->Update(elapsedTime);
+	}
+	{
+		ProfileScopedSection_2("SkillTimers", ImGuiControl::Profiler::Green);
+		UpdateSkillTimers(elapsedTime);
+	}
+	{
+		ProfileScopedSection_2("character", ImGuiControl::Profiler::Purple);
+		Character::Update(elapsedTime);
+	}
 }
 
 void Player::Render(const RenderContext& rc)
@@ -359,6 +370,8 @@ void Player::Render(const RenderContext& rc)
 	}
 
 	if (IsPlayer()) T_GRAPHICS.GetDebugRenderer()->DrawSphere(target, 0.1f, { 0, 1, 0, 1 });
+
+	ProfileDrawUI();
 #endif // _DEBUG
 }
 

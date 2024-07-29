@@ -15,7 +15,7 @@ void ToonShader::SetRenderState(const RenderContext& rc)
 	const float blend_factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	dc->OMSetBlendState(rc.renderState->GetBlendState(BlendState::OIT), blend_factor, 0xFFFFFFFF);
 	dc->OMSetDepthStencilState(rc.renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
-	dc->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullNone));
+	dc->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullBack));
 }
 
 // •`‰æ
