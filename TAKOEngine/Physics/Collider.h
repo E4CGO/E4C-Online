@@ -1,5 +1,6 @@
 #pragma once
 
+// writer Matsumura
 #include <DirectXMath.h>
 
 struct HitResult
@@ -21,12 +22,13 @@ public:
 		MODEL,					// モデル
 		SPHERE,					// 球体
 		BOUNDING_BOX,			// バウンディングボックス
+		MAP,					// マップ
 
 		enum_count
 	};
 public:
 	Collider() = default;
-	~Collider() = default;
+	virtual ~Collider() = default;
 
 	bool Collision(
 		Collider*& other,

@@ -32,7 +32,9 @@ bool ModelCollider::CollisionVsShpere(
 		DirectX::XMVECTOR SphereCenter = DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat3(&sphereCenter), InverseWorldTransform);
 		DirectX::XMVECTOR SphereCenterOri = DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat3(&sphereCenterOri), InverseWorldTransform);
 		float sphereRadius = other->GetScale().x; // 球体半径
-
+		DirectX::XMVECTOR SphereRadius = DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat(&sphereRadius), InverseWorldTransform);
+		DirectX::XMStoreFloat(&sphereRadius, SphereRadius);
+		
 		// 三角形（面）との交差判定
 		const std::vector<ModelResource::Vertex>& vertices = mesh.vertices;
 		const std::vector<UINT> indices = mesh.indices;

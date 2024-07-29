@@ -254,6 +254,8 @@ set(Source__Scene
     "Source/Scene/SceneTitle.h"
     "Source/Scene/SceneTitleState.cpp"
     "Source/Scene/SceneTitleState.h"
+    "Source/Scene/SceneTest.cpp"
+    "Source/Scene/SceneTest.h"
 )
 source_group("Source\\Scene" FILES ${Source__Scene})
 
@@ -386,6 +388,9 @@ set(TAKOEngine__Physics
     "TAKOEngine/Physics/SphereCollider.h"
     "TAKOEngine/Physics/UnrotatedBoxCollider.cpp"
     "TAKOEngine/Physics/UnrotatedBoxCollider.h"
+    "TAKOEngine/Physics/Liner8TreeManager.h"
+    "TAKOEngine/Physics/MapCollider.cpp"
+    "TAKOEngine/Physics/MapCollider.h"
 )
 source_group("TAKOEngine\\Physics" FILES ${TAKOEngine__Physics})
 
