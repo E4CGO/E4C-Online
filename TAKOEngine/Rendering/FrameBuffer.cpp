@@ -74,7 +74,7 @@ FrameBuffer::FrameBuffer(ID3D11Device* device, UINT width, UINT height, DXGI_FOR
 	{
 		// テクスチャ生成
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> renderTargetBuffer;
-		D3D11_TEXTURE2D_DESC texture2dDesc{};
+		texture2dDesc = {};
 		texture2dDesc.Width              = width;
 		texture2dDesc.Height             = height;
 		texture2dDesc.MipLevels          = 1;
@@ -110,7 +110,7 @@ FrameBuffer::FrameBuffer(ID3D11Device* device, UINT width, UINT height, DXGI_FOR
 	{
 		// テクスチャ生成
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> depthStencilBuffer;
-		D3D11_TEXTURE2D_DESC texture2dDesc{};
+		texture2dDesc = {};
 		texture2dDesc.Width              = width;
 		texture2dDesc.Height             = height;
 		texture2dDesc.MipLevels          = 1;
@@ -153,17 +153,6 @@ void FrameBuffer::Clear(ID3D11DeviceContext* dc, float r, float g, float b, floa
 	dc->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
-//複数枚のレンダーターゲット&デプスステンシルビュークリア
-void FrameBuffer::Clears(ID3D11DeviceContext* dc, int rtvNum, ID3D11RenderTargetView* rtv[], float r, float g, float b, float a)
-{
-	float color[4]{ r,g,b,a };
-	for (int i = 0; i < rtvNum; i++)
-	{
-		dc->ClearRenderTargetView(rtv[i], color);
-	}
-	dc->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-}
-
 //レンダーターゲット&ビューポート設定
 void FrameBuffer::SetRenderTarget(ID3D11DeviceContext* dc)
 {
@@ -171,14 +160,21 @@ void FrameBuffer::SetRenderTarget(ID3D11DeviceContext* dc)
 	dc->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 }
 
-//複数枚のレンダーターゲット&ビューポート設定
-void FrameBuffer::SetRenderTargets(ID3D11DeviceContext* dc, int rtvNum, ID3D11RenderTargetView* rtv[])
+//G-Buffer用
+void FrameBuffer::SetRenderTargets(ID3D11DeviceContext* dc, int number, ID3D11RenderTargetView* rtv[])
 {
+	ID3D11RenderTargetView* m_rtv[] =
+	{
+		renderTargetView.Get(),
+		rtv[static_cast<int>(DeferredRTV::Normal)],
+		rtv[static_cast<int>(DeferredRTV::Position)],
+	};
+
 	dc->RSSetViewports(1, &viewport);
-	dc->OMSetRenderTargets(rtvNum, rtv, depthStencilView.Get());
+	dc->OMSetRenderTargets(number, m_rtv, depthStencilView.Get());
 }
 
-void FrameBuffer::SetViewport(UINT width, UINT height)
+void FrameBuffer::SetViewport(ID3D11DeviceContext* dc, UINT width, UINT height)
 {
 	viewport.Width    = static_cast<float>(width);
 	viewport.Height   = static_cast<float>(height);
@@ -186,4 +182,5 @@ void FrameBuffer::SetViewport(UINT width, UINT height)
 	viewport.MaxDepth = 1.0f;
 	viewport.TopLeftX = 0.0f;
 	viewport.TopLeftY = 0.0f;
+	dc->RSSetViewports(1, &viewport);
 }

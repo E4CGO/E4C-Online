@@ -87,7 +87,5 @@ float4 main(VS_OUT pin) : SV_TARGET
 	//	リムライティング
     color.rgb += CalcRimLight(N, E, L, directionalLightData.color.rgb);
 
-    
-	
     return color;
 }

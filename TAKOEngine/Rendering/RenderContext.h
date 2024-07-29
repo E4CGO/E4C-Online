@@ -25,6 +25,13 @@ struct DirectionalLightData
 	DirectX::XMFLOAT4 color;
 };
 
+//Deferred Rendering用SRV
+struct DeferredData
+{
+	ID3D11ShaderResourceView* normal;
+	ID3D11ShaderResourceView* position;
+};
+
 //TODO : ShaderData Set
 #pragma region シェーダー情報
 struct Default
@@ -171,4 +178,7 @@ struct RenderContext
 
 	//モデルシェーダー情報
 	ShaderData shaderData;
+
+	//Deferred Rendering用SRV
+	DeferredData deferredData;
 };

@@ -57,6 +57,9 @@ void SceneGame::Initialize()
 		modelPreLoad.insert(RESOURCE.LoadModelResource(filename));
 	}
 
+	//DeferredRendering
+	deferredRendering->Initialize();
+
 	//シャドウマップレンダラ
 	shadowMapRenderer->Initialize();
 
@@ -325,15 +328,19 @@ void SceneGame::Render()
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState   = T_GRAPHICS.GetRenderState();
 
+	// ライトの情報を詰め込む
+	LightManager::Instance().PushRenderContext(rc);
+
+	//シャドウマップ描画
+	shadowMapRenderer->Render();
+	rc.shadowMapData = shadowMapRenderer->GetShadowMapData();
+	
 	// 内容描画
 	{
-		// ライトの情報を詰め込む
-		LightManager::Instance().PushRenderContext(rc);
-
-		//シャドウマップ描画
-		shadowMapRenderer->Render();
-		rc.shadowMapData = shadowMapRenderer->GetShadowMapData();
+		//Deferred Rendering
+		deferredRendering->SetDeferredRTV();
 		
+		//オブジェクト描画
 		MAPTILES.Render(rc);			// マップ
 		PLAYERS.Render(rc);				// プレイヤー
 		ENEMIES.Render(rc);				// エネミー
@@ -349,6 +356,7 @@ void SceneGame::Render()
 
 	// ラインレンダラ描画実行
 	T_GRAPHICS.GetLineRenderer()->Render(T_GRAPHICS.GetDeviceContext(), camera.GetView(), camera.GetProjection());
+	
 	// デバッグレンダラ描画実行
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), camera.GetView(), camera.GetProjection());
 
@@ -359,6 +367,9 @@ void SceneGame::Render()
 		postprocessingRenderer->Render(T_GRAPHICS.GetDeviceContext());
 	}
 
+	//DeferredRendering
+	deferredRendering->Render();
+
 	UI.Render(rc);						// インターフェース
 
 	T_TEXT.End();
@@ -366,5 +377,6 @@ void SceneGame::Render()
 #ifdef _DEBUG
 	ProfileDrawUI();
 	shadowMapRenderer->DrawDebugGUI();
+	deferredRendering->DrawDebugGUI();
 #endif // _DEBUG
 }

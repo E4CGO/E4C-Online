@@ -10,6 +10,7 @@
 
 #include "Scene/Scene.h"
 #include "Scene/Stage/Stage.h"
+#include "TAKOEngine/Rendering/DeferredRendering.h"
 
 #define START_TIME 3.0f
 
@@ -56,6 +57,9 @@ private:
 	std::unique_ptr<Stage> stage;
 
 	std::unique_ptr<StateMachine<SceneGame>> stateMachine;
+
+	//DeferredRendering
+	std::unique_ptr<DeferredRendering> deferredRendering = std::make_unique<DeferredRendering>();
 
 	WidgetMenu* menu;
 

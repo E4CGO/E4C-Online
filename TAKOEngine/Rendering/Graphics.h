@@ -36,16 +36,21 @@ enum class SpriteShaderId
 	GaussianBlur,
 	LuminanceExtraction,
 	Finalpass,
+	Deferred,
 
 	EnumCount
 };
 
 enum class FrameBufferId
 {
-	Display,
-	Scene,
+	Display,      //ポストエフェクト等
+	Scene,        //シーン描画
 	Luminance,
 	GaussianBlur,
+	
+	//Deferred Rendering用
+	Normal,       //法線
+	Position,     //座標系
 
 	EnumCount
 };
@@ -149,6 +154,9 @@ public:
 
 	Shader* GetShader() const { return m_shader.get(); }
 	
+	// スプライトシェーダー取得
+	SpriteShader* GetShader(SpriteShaderId id) const { return spriteShaders[static_cast<int>(id)].get(); }
+
 	// テクスチャ読み込み
 	HRESULT LoadTexture(const char* filename, ID3D12Resource** d3d_resource);
 
