@@ -370,8 +370,6 @@ void Player::Render(const RenderContext& rc)
 	}
 
 	if (IsPlayer()) T_GRAPHICS.GetDebugRenderer()->DrawSphere(target, 0.1f, { 0, 1, 0, 1 });
-
-	ProfileDrawUI();
 #endif // _DEBUG
 }
 

@@ -4,11 +4,13 @@
 
 void SceneTest::Initialize()
 {
-	stage = std::make_unique<MapTile>("Data/Model/Stage/BigMap.glb", 1000);
-	MAPTILES.Register(stage.get());
-	MAPTILES.Update(0);
+	stage = new MapTile("Data/Model/Stage/BigMap.glb", 1000);
+	stage->Update(0);
+	MAPTILES.Register(stage);
 
 	player = std::make_unique<Knight>();
+	player->SetPosition({ 5, -50, 5 });
+	player->GetStateMachine()->ChangeState(static_cast<int>(Player::State::Idle));
 	//knight = std::make_unique<ModelObject>("Data/Model/Character/Knight.glb");
 	//knight->SetAnimation(22, true, 0.0f);
 	//knight->SetPosition({ 1.08f, 0.0f, 2.12f });
@@ -18,8 +20,6 @@ void SceneTest::Initialize()
 	//knight->GetModel()->FindNode("Badge_Shield")->visible = false;
 	//knight->GetModel()->FindNode("Round_Shield")->visible = false;
 	//knight->GetModel()->FindNode("Spike_Shield")->visible = false;
-	player->SetPosition({ 5, -50, 5 });
-	player->GetStateMachine()->ChangeState(static_cast<int>(Player::State::Idle));
 
 	// 光
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
@@ -50,6 +50,7 @@ void SceneTest::Initialize()
 void SceneTest::Finalize()
 {
 	LightManager::Instance().Clear();
+	MAPTILES.Clear();
 }
 
 // 更新処理
@@ -58,7 +59,7 @@ void SceneTest::Update(float elapsedTime)
 	cameraController->Update(elapsedTime);
 	cameraController->SyncContrllerToCamera(camera);
 
-	stage->Update(elapsedTime);
+	MAPTILES.Update(elapsedTime);
 
 	player->Update(elapsedTime);
 }
@@ -67,7 +68,7 @@ void SceneTest::Update(float elapsedTime)
 void SceneTest::Render()
 {
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->Clear(T_GRAPHICS.GetDeviceContext(), 0.2f, 0.2f, 0.2f, 1);
-	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->SetRenderTargets(T_GRAPHICS.GetDeviceContext());
+	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
 
 	// 描画コンテキスト設定
 	RenderContext rc;
@@ -79,7 +80,9 @@ void SceneTest::Render()
 	LightManager::Instance().PushRenderContext(rc);
 
 	// 描画
-	stage->Render(rc);
 	//knight->Render(rc);
 	player->Render(rc);
+	MAPTILES.Render(rc);
+
+	ProfileDrawUI();
 }

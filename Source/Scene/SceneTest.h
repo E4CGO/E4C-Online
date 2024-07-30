@@ -2,6 +2,7 @@
 #include "Scene/Scene.h"
 #include "GameObject/ModelObject.h"
 #include "GameObject/Character/Player/Knight.h"
+#include "GameObject/Character/Player/Barbarian.h"
 #include "Map/MapTile.h"
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 
@@ -25,8 +26,33 @@ private:
 	//std::unique_ptr<FreeCameraController> cameraController;
 	std::unique_ptr<ThridPersonCameraController> cameraController;
 
-	std::unique_ptr<MapTile> stage;
+	MapTile* stage;
 	//std::unique_ptr<ModelObject> knight;
 
 	std::unique_ptr<Player> player;
+};
+
+class EmptyScene : public Scene
+{
+public:
+	EmptyScene() {}
+	~EmptyScene() {}
+
+	// èâä˙âª
+	void Initialize() override {
+		player = new Barbarian;
+	};
+	// èIóπâª
+	void Finalize() override {
+		delete player;
+	};
+
+	// çXêVèàóù
+	void Update(float elapsedTime) override {
+		player->Update(elapsedTime);
+	};
+	// ï`âÊèàóù
+	void Render() override {};
+private:
+	Player* player;
 };

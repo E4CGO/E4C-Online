@@ -27,7 +27,12 @@ class HierarchicalState : public State<T>
 public:
 	// コンストラクタ
 	HierarchicalState(T* owner) : State<T>(owner) {};
-	virtual ~HierarchicalState() {}
+	virtual ~HierarchicalState() {
+		for (std::pair<int, State<T>*> state : statePool)
+		{
+			delete state.second;
+		}
+	}
 	// 全て継承先で実装させる必要があるため純粋仮想関数で実装
 	// ステートに入った時のメソッド
 	virtual void Enter() = 0;

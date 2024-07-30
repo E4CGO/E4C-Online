@@ -7,6 +7,7 @@
 #include <windows.h>
 #include <filesystem>
 
+//TODO
 wchar_t* Encode::char_to_wchar(const char* text)
 {
 	setlocale(LC_ALL, "Japanese_Japan.932");

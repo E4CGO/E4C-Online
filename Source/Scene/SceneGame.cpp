@@ -73,12 +73,12 @@ void SceneGame::Initialize()
 		T_GRAPHICS.GetScreenWidth() / T_GRAPHICS.GetScreenHeight(),	// 画面アスペクト比
 		0.1f,														// ニアクリップ
 		10000.0f);													// ファークリップ
-	
+
 	camera.SetLookAt(
 		{ 0, 5.0f, 10.0f },	     // 視点
 		{ 0, 0, 0 },	         // 注視点
 		{ 0, 0.969f, -0.248f }); // 上ベクトル
-	
+
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(camera);
 	cameraController->SetEnable(false);
@@ -115,10 +115,10 @@ void SceneGame::Initialize()
 
 	stateMachine = std::make_unique<StateMachine<SceneGame>>();
 	stateMachine->RegisterState(GAME_STATE::WAITING, new SceneGameState::WaitingState(this));
-	stateMachine->RegisterState(GAME_STATE::READY,   new SceneGameState::ReadyState(this));
-	stateMachine->RegisterState(GAME_STATE::GAME,    new SceneGameState::GameState(this));
+	stateMachine->RegisterState(GAME_STATE::READY, new SceneGameState::ReadyState(this));
+	stateMachine->RegisterState(GAME_STATE::GAME, new SceneGameState::GameState(this));
 	stateMachine->RegisterState(GAME_STATE::GAME_OVER, new SceneGameState::GameOverState(this));
-	stateMachine->RegisterState(GAME_STATE::WIN,     new SceneGameState::WinState(this));
+	stateMachine->RegisterState(GAME_STATE::WIN, new SceneGameState::WinState(this));
 	stateMachine->SetState(GAME_STATE::WAITING);
 
 	WidgetText* ip = new WidgetText(host.c_str(), 0.8f);
@@ -323,7 +323,7 @@ void SceneGame::Render()
 	RenderContext rc;
 	rc.camera = &camera;
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
-	rc.renderState   = T_GRAPHICS.GetRenderState();
+	rc.renderState = T_GRAPHICS.GetRenderState();
 
 	// 内容描画
 	{
@@ -333,7 +333,7 @@ void SceneGame::Render()
 		//シャドウマップ描画
 		shadowMapRenderer->Render();
 		rc.shadowMapData = shadowMapRenderer->GetShadowMapData();
-		
+
 		MAPTILES.Render(rc);			// マップ
 		PLAYERS.Render(rc);				// プレイヤー
 		ENEMIES.Render(rc);				// エネミー
