@@ -5,6 +5,9 @@
 HttpRequest::HttpRequest(const char* url)
 {
 	SetUrl(url);
+
+	std::string version = OpenSSL_version(0);
+	char* test = version.data();
 }
 HttpRequest::~HttpRequest()
 {
@@ -14,26 +17,32 @@ HttpRequest::~HttpRequest()
 		delete thread;
 		thread = nullptr;
 	}
+
+	this->Release();
 }
 
 void HttpRequest::Release()
 {
 	closesocket(sock);
 
-	if (ssl)
+	if (port == PORT::HTTPS)
 	{
-		if (!SSL_in_init(ssl))
+		OPENSSL_cleanup();
+		if (ssl)
 		{
-			if (SSL_shutdown(ssl) != 1) {
-				ERR_print_errors_fp(stderr);
+			if (!SSL_in_init(ssl))
+			{
+				if (SSL_shutdown(ssl) != 1) {
+					ERR_print_errors_fp(stderr);
+				}
 			}
+			SSL_free(ssl);
 		}
-		SSL_free(ssl);
-	}
-	if (ctx)
-	{
-		SSL_CTX_free(ctx);
-		ERR_free_strings();
+		if (ctx)
+		{
+			SSL_CTX_free(ctx);
+			ERR_free_strings();
+		}
 	}
 }
 
@@ -85,6 +94,7 @@ void HttpRequest::Send()
 	}
 
 	state = STATE::SENDED;
+
 	// 送信待ち
 	thread = new std::thread(&HttpRequest::Request, this);
 }
@@ -183,16 +193,20 @@ bool HttpRequest::SendRequest(const char* buffer, size_t size)
 	{
 		// SSL
 		// OpenSSLのエラー文言を読み込み
-		SSL_load_error_strings();
+		//SSL_load_error_strings();
+
 		// OpenSSLライブラリ初期化。
-		SSL_library_init();
+		//SSL_library_init();
+		OPENSSL_init_ssl(OPENSSL_INIT_NO_LOAD_CRYPTO_STRINGS, nullptr);
 		// SSL通信構造体のインスタンス
 		// TLS通信でセキュア通信を設定(TLS_client_method()を使用する。)
 		ctx = SSL_CTX_new(TLS_client_method());
+
 		// SSL通信構造体からsslの生成を行う
 		ssl = SSL_new(ctx);
 		// SSLにソケットを関連付ける
 		SSL_set_fd(ssl, static_cast<int>(sock));
+
 		// SSL接続
 		if (SSL_connect(ssl) != 1)
 		{
@@ -261,6 +275,8 @@ std::string HttpRequest::ResponseData()
 			memcpy_s(responseData + iApend, sizeof(responseData), recvData, iResult);
 		} while (iResult > 0);
 
+		OPENSSL_cleanup();
+
 		// BYTEを文字に
 		char str[(sizeof responseData) + 1];
 		memcpy(str, responseData, sizeof responseData);
@@ -278,7 +294,7 @@ void HttpRequest::Request()
 	{
 		// 送信エラー
 		state = STATE::FAIL;
-		Release();
+		//Release();
 		return;
 	}
 
@@ -288,6 +304,13 @@ void HttpRequest::Request()
 	size_t position = 0; // 分断用
 	position = responseText.find("HTTP/") + strlen("HTTP/1.1 ");
 	response.status = std::stoi(responseText.substr(position, responseText.find(" ", position) - position));
+
+	if (response.status != 200)
+	{
+		state = STATE::FAIL;
+		//Release();
+		return;
+	}
 
 	switch (responseType)
 	{
@@ -301,6 +324,6 @@ void HttpRequest::Request()
 		break;
 	}
 
-	Release();
+	//Release();
 	state = STATE::RESPONSE;
 }

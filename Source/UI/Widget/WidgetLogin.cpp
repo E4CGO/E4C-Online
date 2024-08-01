@@ -117,7 +117,7 @@ void WidgetLogin::Render(const RenderContext& rc)
 			ImGui::SameLine();
 			if (ImGui::Button((char*)u8"サインアップ"))
 			{
-				ShellExecute(0, 0, Encode::char_to_wchar(URL(Url::REGISTER_PAGE)), 0, 0, SW_SHOW);
+				ShellExecute(0, 0, Encode::string_to_wstring(URL(Url::REGISTER_PAGE)).c_str(), 0, 0, SW_SHOW);
 			}
 			ImGui::End();
 		}

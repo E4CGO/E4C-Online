@@ -23,7 +23,7 @@ WidgetGem::WidgetGem() : WidgetButtonImage("", "Data/Sprites/barmid_ready.png", 
 	})
 {
 	chargeBtn = new WidgetButtonText("É`ÉÉÅ[ÉW", [&](Widget*) {
-		ShellExecute(0, 0, Encode::char_to_wchar(URL(Url::CHARGE_PAGE)), 0, 0, SW_SHOW);
+		ShellExecute(0, 0, Encode::string_to_wstring(URL(Url::CHARGE_PAGE)).c_str(), 0, 0, SW_SHOW);
 		});
 	size = { 300.0f, 150.0f };
 	gem = RESOURCE.LoadSpriteResource("Data/Sprites/gem.png");
