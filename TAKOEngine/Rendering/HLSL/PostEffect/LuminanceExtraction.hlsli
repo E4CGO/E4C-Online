@@ -1,5 +1,5 @@
 #include "FilterFunctions.hlsli"
-#include "Sprite.hlsli"
+#include "../Sprite/Sprite.hlsli"
 
 cbuffer CBLuminanceExtraction : register(b0)
 {

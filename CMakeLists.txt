@@ -109,14 +109,11 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 
 
-
-
-
+################################################################################
+# Target
+################################################################################
 set(PROJECT_NAME Game)
 
-################################################################################
-# Source groups
-################################################################################
 set(External__DirectXTex
     "External/DirectX/WICTextureLoader12.cpp"
     "External/DirectX/WICTextureLoader12.h"
@@ -146,6 +143,10 @@ set(External__imgui-docking
 )
 source_group("External\\imgui-docking" FILES ${External__imgui-docking})
 
+#####################################################################
+# SOURCE_GROUPS_START
+#####################################################################
+
 set(Source
     "Source/Framework.cpp"
     "Source/Framework.h"
@@ -165,11 +166,59 @@ set(Source__GameObject
 )
 source_group("Source\\GameObject" FILES ${Source__GameObject})
 
+set(Source__Map
+    "Source/Map/Map001.cpp"
+    "Source/Map/Map001.h"
+    "Source/Map/Map001BossRoomTeleport.cpp"
+    "Source/Map/Map001BossRoomTeleport.h"
+    "Source/Map/Map001Key.cpp"
+    "Source/Map/Map001Key.h"
+    "Source/Map/MapTile.cpp"
+    "Source/Map/MapTile.h"
+    "Source/Map/MapTileManager.cpp"
+    "Source/Map/MapTileManager.h"
+)
+source_group("Source\\Map" FILES ${Source__Map})
+
+set(Source__Scene
+    "Source/Scene/EventScene.cpp"
+    "Source/Scene/EventScene.h"
+    "Source/Scene/Scene.cpp"
+    "Source/Scene/Scene.h"
+    "Source/Scene/SceneGame.cpp"
+    "Source/Scene/SceneGame.h"
+    "Source/Scene/SceneGameState.cpp"
+    "Source/Scene/SceneGameState.h"
+    "Source/Scene/SceneLoading.cpp"
+    "Source/Scene/SceneManager.cpp"
+    "Source/Scene/SceneManager.h"
+    "Source/Scene/SceneTest.cpp"
+    "Source/Scene/SceneTest.h"
+    "Source/Scene/SceneTitle.cpp"
+    "Source/Scene/SceneTitle.h"
+    "Source/Scene/SceneTitleState.cpp"
+    "Source/Scene/SceneTitleState.h"
+)
+source_group("Source\\Scene" FILES ${Source__Scene})
+
 set(Source__GameObject__Character
     "Source/GameObject/Character/Character.cpp"
     "Source/GameObject/Character/Character.h"
 )
 source_group("Source\\GameObject\\Character" FILES ${Source__GameObject__Character})
+
+set(Source__GameObject__Projectile
+    "Source/GameObject/Projectile/Arrow.cpp"
+    "Source/GameObject/Projectile/Arrow.h"
+    "Source/GameObject/Projectile/Grenade.cpp"
+    "Source/GameObject/Projectile/Grenade.h"
+    "Source/GameObject/Projectile/Projectile.cpp"
+    "Source/GameObject/Projectile/Projectile.h"
+    "Source/GameObject/Projectile/ProjectileManager.h"
+    "Source/GameObject/Projectile/TwoHandedAxe.cpp"
+    "Source/GameObject/Projectile/TwoHandedAxe.h"
+)
+source_group("Source\\GameObject\\Projectile" FILES ${Source__GameObject__Projectile})
 
 set(Source__GameObject__Character__Enemy
     "Source/GameObject/Character/Enemy/Chest.cpp"
@@ -198,8 +247,12 @@ set(Source__GameObject__Character__Player
     "Source/GameObject/Character/Player/Knight.h"
     "Source/GameObject/Character/Player/KnightState.cpp"
     "Source/GameObject/Character/Player/KnightState.h"
+    "Source/GameObject/Character/Player/LuiG.cpp"
+    "Source/GameObject/Character/Player/LuiG.h"
     "Source/GameObject/Character/Player/Mage.cpp"
     "Source/GameObject/Character/Player/Mage.h"
+    "Source/GameObject/Character/Player/MariO.cpp"
+    "Source/GameObject/Character/Player/MariO.h"
     "Source/GameObject/Character/Player/Player.cpp"
     "Source/GameObject/Character/Player/Player.h"
     "Source/GameObject/Character/Player/PlayerManager.cpp"
@@ -213,57 +266,11 @@ set(Source__GameObject__Character__Player
 )
 source_group("Source\\GameObject\\Character\\Player" FILES ${Source__GameObject__Character__Player})
 
-set(Source__GameObject__Projectile
-    "Source/GameObject/Projectile/Arrow.cpp"
-    "Source/GameObject/Projectile/Arrow.h"
-    "Source/GameObject/Projectile/Grenade.cpp"
-    "Source/GameObject/Projectile/Grenade.h"
-    "Source/GameObject/Projectile/Projectile.cpp"
-    "Source/GameObject/Projectile/Projectile.h"
-    "Source/GameObject/Projectile/ProjectileManager.h"
-    "Source/GameObject/Projectile/TwoHandedAxe.cpp"
-    "Source/GameObject/Projectile/TwoHandedAxe.h"
-)
-source_group("Source\\GameObject\\Projectile" FILES ${Source__GameObject__Projectile})
-
-set(Source__Map
-    "Source/Map/Map001.cpp"
-    "Source/Map/Map001.h"
-    "Source/Map/Map001Key.cpp"
-    "Source/Map/Map001Key.h"
-    "Source/Map/MapTile.cpp"
-    "Source/Map/MapTile.h"
-    "Source/Map/MapTileManager.cpp"
-    "Source/Map/MapTileManager.h"
-    "Source/Map/Map001BossRoomTeleport.cpp"
-    "Source/Map/Map001BossRoomTeleport.h"
-)
-source_group("Source\\Map" FILES ${Source__Map})
-
-set(Source__Scene
-    "Source/Scene/Scene.cpp"
-    "Source/Scene/Scene.h"
-    "Source/Scene/SceneGame.cpp"
-    "Source/Scene/SceneGame.h"
-    "Source/Scene/SceneGameState.cpp"
-    "Source/Scene/SceneGameState.h"
-    "Source/Scene/SceneLoading.cpp"
-    "Source/Scene/SceneManager.cpp"
-    "Source/Scene/SceneManager.h"
-    "Source/Scene/SceneTitle.cpp"
-    "Source/Scene/SceneTitle.h"
-    "Source/Scene/SceneTitleState.cpp"
-    "Source/Scene/SceneTitleState.h"
-    "Source/Scene/SceneTest.cpp"
-    "Source/Scene/SceneTest.h"
-)
-source_group("Source\\Scene" FILES ${Source__Scene})
-
 set(Source__Scene__Stage
-    "Source/Scene/Stage/StageManager.cpp"
-    "Source/Scene/Stage/StageManager.h"
     "Source/Scene/Stage/Stage.cpp"
     "Source/Scene/Stage/Stage.h"
+    "Source/Scene/Stage/StageManager.cpp"
+    "Source/Scene/Stage/StageManager.h"
     "Source/Scene/Stage/TestingStage.cpp"
     "Source/Scene/Stage/TestingStage.h"
 )
@@ -314,25 +321,6 @@ set(TAKOEngine__AI
 )
 source_group("TAKOEngine\\AI" FILES ${TAKOEngine__AI})
 
-set(TAKOEngine__Editor__Camera
-    "TAKOEngine/Editor/Camera/Camera.cpp"
-    "TAKOEngine/Editor/Camera/Camera.h"
-    "TAKOEngine/Editor/Camera/CameraController.cpp"
-    "TAKOEngine/Editor/Camera/CameraController.h"
-    "TAKOEngine/Editor/Camera/FreeCameraController.cpp"
-    "TAKOEngine/Editor/Camera/FreeCameraController.h"
-    "TAKOEngine/Editor/Camera/ThridPersonCameraController.cpp"
-    "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
-)
-source_group("TAKOEngine\\Editor\\Camera" FILES ${TAKOEngine__Editor__Camera})
-
-set(TAKOEngine__Editor__Input
-    "TAKOEngine/Editor/Input/InputMap.h"
-    "TAKOEngine/Editor/Input/Input.cpp"
-    "TAKOEngine/Editor/Input/Input.h"
-)
-source_group("TAKOEngine\\Editor\\Input" FILES ${TAKOEngine__Editor__Input})
-
 set(TAKOEngine__Effects
     "TAKOEngine/Effects/Effect.cpp"
     "TAKOEngine/Effects/Effect.h"
@@ -353,19 +341,20 @@ source_group("TAKOEngine\\GUI" FILES ${TAKOEngine__GUI})
 set(TAKOEngine__Network
     "TAKOEngine/Network/ClientNetworkController.cpp"
     "TAKOEngine/Network/HostNetworkController.cpp"
-    "TAKOEngine/Network/NetworkController.h"
-    "TAKOEngine/Network/url.cpp"
-    "TAKOEngine/Network/url.h"
     "TAKOEngine/Network/HttpRequest.cpp"
     "TAKOEngine/Network/HttpRequest.h"
     "TAKOEngine/Network/Network.cpp"
     "TAKOEngine/Network/Network.h"
+    "TAKOEngine/Network/NetworkController.h"
     "TAKOEngine/Network/Socket.cpp"
     "TAKOEngine/Network/Socket.h"
     "TAKOEngine/Network/TCPSocket.cpp"
     "TAKOEngine/Network/TCPSocket.h"
     "TAKOEngine/Network/UDPSocket.cpp"
     "TAKOEngine/Network/UDPSocket.h"
+    "TAKOEngine/Network/url.cpp"
+    "TAKOEngine/Network/url.h"
+    "TAKOEngine/Network/WinSock2Wrapper.h"
 )
 source_group("TAKOEngine\\Network" FILES ${TAKOEngine__Network})
 
@@ -378,6 +367,9 @@ set(TAKOEngine__Physics
     "TAKOEngine/Physics/Collision.h"
     "TAKOEngine/Physics/CollisionDataManager.cpp"
     "TAKOEngine/Physics/CollisionDataManager.h"
+    "TAKOEngine/Physics/Liner8TreeManager.h"
+    "TAKOEngine/Physics/MapCollider.cpp"
+    "TAKOEngine/Physics/MapCollider.h"
     "TAKOEngine/Physics/MapCollisionManager.cpp"
     "TAKOEngine/Physics/MapCollisionManager.h"
     "TAKOEngine/Physics/ModelCollider.cpp"
@@ -388,9 +380,6 @@ set(TAKOEngine__Physics
     "TAKOEngine/Physics/SphereCollider.h"
     "TAKOEngine/Physics/UnrotatedBoxCollider.cpp"
     "TAKOEngine/Physics/UnrotatedBoxCollider.h"
-    "TAKOEngine/Physics/Liner8TreeManager.h"
-    "TAKOEngine/Physics/MapCollider.cpp"
-    "TAKOEngine/Physics/MapCollider.h"
 )
 source_group("TAKOEngine\\Physics" FILES ${TAKOEngine__Physics})
 
@@ -402,6 +391,8 @@ set(TAKOEngine__Rendering
     "TAKOEngine/Rendering/Descriptor.h"
     "TAKOEngine/Rendering/FrameBuffer.cpp"
     "TAKOEngine/Rendering/FrameBuffer.h"
+    "TAKOEngine/Rendering/FrustumCulling.cpp"
+    "TAKOEngine/Rendering/FrustumCulling.h"
     "TAKOEngine/Rendering/Gizmos.cpp"
     "TAKOEngine/Rendering/Gizmos.h"
     "TAKOEngine/Rendering/GpuResourceUtils.cpp"
@@ -421,6 +412,7 @@ set(TAKOEngine__Rendering
     "TAKOEngine/Rendering/ModelDX12.h"
     "TAKOEngine/Rendering/ModelResource.cpp"
     "TAKOEngine/Rendering/ModelResource.h"
+    "TAKOEngine/Rendering/MyRender.h"
     "TAKOEngine/Rendering/PostEffect.cpp"
     "TAKOEngine/Rendering/PostEffect.h"
     "TAKOEngine/Rendering/PostprocessingRenderer.cpp"
@@ -430,109 +422,71 @@ set(TAKOEngine__Rendering
     "TAKOEngine/Rendering/RenderState.h"
     "TAKOEngine/Rendering/ResourceManager.cpp"
     "TAKOEngine/Rendering/ResourceManager.h"
+    "TAKOEngine/Rendering/ShadowMapRender.cpp"
+    "TAKOEngine/Rendering/ShadowMapRender.h"
     "TAKOEngine/Rendering/Sprite.cpp"
     "TAKOEngine/Rendering/Sprite.h"
     "TAKOEngine/Rendering/TextSprite.cpp"
     "TAKOEngine/Rendering/TextSprite.h"
-    "TAKOEngine/Rendering/MyRender.h"
-    "TAKOEngine/Rendering/ShadowMapRender.cpp"
-    "TAKOEngine/Rendering/ShadowMapRender.h"
-    "TAKOEngine/Rendering/FrustumCulling.cpp"
-    "TAKOEngine/Rendering/FrustumCulling.h"
 )
 source_group("TAKOEngine\\Rendering" FILES ${TAKOEngine__Rendering})
 
-set(TAKOEngine__Rendering__HLSL
+set(TAKOEngine__Runtime
+    "TAKOEngine/Runtime/tentacle_lib.cpp"
+    "TAKOEngine/Runtime/tentacle_lib.h"
 )
-source_group("TAKOEngine\\Rendering\\HLSL\\" FILES ${TAKOEngine__Rendering__HLSL})
+source_group("TAKOEngine\\Runtime" FILES ${TAKOEngine__Runtime})
 
-set(TAKOEngine__Rendering__HLSL__PostEffect
-    "TAKOEngine/Rendering/HLSL/BloomPS.hlsl"
-    "TAKOEngine/Rendering/HLSL/ColorGrading.hlsli"
-    "TAKOEngine/Rendering/HLSL/ColorGradingPS.hlsl"
-    "TAKOEngine/Rendering/HLSL/FilterFunctions.hlsli"
-    "TAKOEngine/Rendering/HLSL/Finalpass.hlsli"
-    "TAKOEngine/Rendering/HLSL/FinalpassPS.hlsl"
-    "TAKOEngine/Rendering/HLSL/FullScreenQuad.hlsli"
-    "TAKOEngine/Rendering/HLSL/FullScreenQuadVS.hlsl"
-    "TAKOEngine/Rendering/HLSL/GaussianBlur.hlsli"
-    "TAKOEngine/Rendering/HLSL/GaussianBlurPS.hlsl"
-    "TAKOEngine/Rendering/HLSL/LuminanceExtraction.hlsli"
-    "TAKOEngine/Rendering/HLSL/LuminanceExtractionPS.hlsl"
-    "TAKOEngine/Rendering/HLSL/Mask.hlsli"
-    "TAKOEngine/Rendering/HLSL/MaskPS.hlsl"
-    "TAKOEngine/Rendering/HLSL/PostEffect.hlsli"
-    "TAKOEngine/Rendering/HLSL/ShaderData.hlsli"
+set(TAKOEngine__Sound
+    "TAKOEngine/Sound/Audio.cpp"
+    "TAKOEngine/Sound/Audio.h"
 )
-source_group("TAKOEngine\\Rendering\\HLSL\\PostEffect" FILES ${TAKOEngine__Rendering__HLSL__PostEffect})
+source_group("TAKOEngine\\Sound" FILES ${TAKOEngine__Sound})
 
-set(TAKOEngine__Rendering__HLSL__Debug
-    "TAKOEngine/Rendering/HLSL/Debug.hlsli"
-    "TAKOEngine/Rendering/HLSL/DebugVS.hlsl"
-    "TAKOEngine/Rendering/HLSL/DebugPS.hlsl"
-    "TAKOEngine/Rendering/HLSL/Gizmos.hlsli"
-    "TAKOEngine/Rendering/HLSL/GizmosVS.hlsl"
-    "TAKOEngine/Rendering/HLSL/GizmosPS.hlsl"
-    "TAKOEngine/Rendering/HLSL/LineVS.hlsl"
-    "TAKOEngine/Rendering/HLSL/LinePS.hlsl"
-    "TAKOEngine/Rendering/HLSL/Line.hlsli"
+set(TAKOEngine__Tool
+    "TAKOEngine/Tool/AssimpImporter.cpp"
+    "TAKOEngine/Tool/AssimpImporter.h"
+    "TAKOEngine/Tool/Console.cpp"
+    "TAKOEngine/Tool/Console.h"
+    "TAKOEngine/Tool/Encode.cpp"
+    "TAKOEngine/Tool/Encode.h"
+    "TAKOEngine/Tool/EventOpening.cpp"
+    "TAKOEngine/Tool/EventOpening.h"
+    "TAKOEngine/Tool/ImGuiRenderer.cpp"
+    "TAKOEngine/Tool/ImGuiRenderer.h"
+    "TAKOEngine/Tool/Logger.cpp"
+    "TAKOEngine/Tool/Logger.h"
+    "TAKOEngine/Tool/Mathf.cpp"
+    "TAKOEngine/Tool/Mathf.h"
+    "TAKOEngine/Tool/Singleton.h"
+    "TAKOEngine/Tool/Timer.cpp"
+    "TAKOEngine/Tool/Timer.h"
+    "TAKOEngine/Tool/TransformUtils.cpp"
+    "TAKOEngine/Tool/TransformUtils.h"
+    "TAKOEngine/Tool/XMFLOAT.h"
 )
-source_group("TAKOEngine\\Rendering\\HLSL\\Debug" FILES ${TAKOEngine__Rendering__HLSL__Debug})
+source_group("TAKOEngine\\Tool" FILES ${TAKOEngine__Tool})
 
-set(TAKOEngine__Rendering__HLSL__Model
-    "TAKOEngine/Rendering/HLSL/Skinning.hlsli"
-    "TAKOEngine/Rendering/HLSL/DefaultModel.hlsli"
-    "TAKOEngine/Rendering/HLSL/DefaultModelVS.hlsl"
-    "TAKOEngine/Rendering/HLSL/DefaultModelPS.hlsl"
-    "TAKOEngine/Rendering/HLSL/Lambert.hlsli"
-    "TAKOEngine/Rendering/HLSL/LambertVS.hlsl"
-    "TAKOEngine/Rendering/HLSL/LambertPS.hlsl"
-    "TAKOEngine/Rendering/HLSL/Phong.hlsli"
-    "TAKOEngine/Rendering/HLSL/PhongVS.hlsl"
-    "TAKOEngine/Rendering/HLSL/PhongPS.hlsl"
-
+set(TAKOEngine__Editor__Camera
+    "TAKOEngine/Editor/Camera/Camera.cpp"
+    "TAKOEngine/Editor/Camera/Camera.h"
+    "TAKOEngine/Editor/Camera/CameraController.cpp"
+    "TAKOEngine/Editor/Camera/CameraController.h"
+    "TAKOEngine/Editor/Camera/FreeCameraController.cpp"
+    "TAKOEngine/Editor/Camera/FreeCameraController.h"
+    "TAKOEngine/Editor/Camera/ThridPersonCameraController.cpp"
+    "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 )
-source_group("TAKOEngine\\Rendering\\HLSL\\Model" FILES ${TAKOEngine__Rendering__HLSL__Model})
+source_group("TAKOEngine\\Editor\\Camera" FILES ${TAKOEngine__Editor__Camera})
 
-set(TAKOEngine__Rendering__HLSL__Lightning
-    "TAKOEngine/Rendering/HLSL/Light.hlsli"
-    "TAKOEngine/Rendering/HLSL/ShadowMap.hlsli"
-    "TAKOEngine/Rendering/HLSL/ShadowmapFunctions.hlsli"
-    "TAKOEngine/Rendering/HLSL/ShadowMapVS.hlsl"
+set(TAKOEngine__Editor__Input
+    "TAKOEngine/Editor/Input/Input.cpp"
+    "TAKOEngine/Editor/Input/Input.h"
+    "TAKOEngine/Editor/Input/InputMap.h"
 )
-source_group("TAKOEngine\\Rendering\\HLSL\\Lightning" FILES ${TAKOEngine__Rendering__HLSL__Lightning})
-
-set(TAKOEngine__Rendering__HLSL__Skydome
-    "TAKOEngine/Rendering/HLSL/Skydome.hlsli"
-    "TAKOEngine/Rendering/HLSL/SkydomeVS.hlsl"
-    "TAKOEngine/Rendering/HLSL/SkydomePS.hlsl"
-)
-source_group("TAKOEngine\\Rendering\\HLSL\\Skydome" FILES ${TAKOEngine__Rendering__HLSL__Skydome})
-
-set(TAKOEngine__Rendering__HLSL__Sprite
-    "TAKOEngine/Rendering/HLSL/Sprite.hlsli"
-    "TAKOEngine/Rendering/HLSL/SpriteVS.hlsl"
-    "TAKOEngine/Rendering/HLSL/SpritePS.hlsl"
-)
-source_group("TAKOEngine\\Rendering\\HLSL\\Sprite" FILES ${TAKOEngine__Rendering__HLSL__Sprite})
-
-set(TAKOEngine__Rendering__HLSL__Toon
-    "TAKOEngine/Rendering/HLSL/Toon.hlsli"
-    "TAKOEngine/Rendering/HLSL/ToonVS.hlsl"
-    "TAKOEngine/Rendering/HLSL/ToonPS.hlsl"
-)
-source_group("TAKOEngine\\Rendering\\HLSL\\ToonPS" FILES ${TAKOEngine__Rendering__HLSL__Toon})
-
-
-set(TAKOEngine__Rendering__HLSL__UVScroll
-    "TAKOEngine/Rendering/HLSL/UVScroll.hlsli"
-    "TAKOEngine/Rendering/HLSL/UVScrollPS.hlsl"
-)
-source_group("TAKOEngine\\Rendering\\HLSL\\UVScrollPS" FILES ${TAKOEngine__Rendering__HLSL__UVScroll})
+source_group("TAKOEngine\\Editor\\Input" FILES ${TAKOEngine__Editor__Input})
 
 set(TAKOEngine__Rendering__Shaders
-    "TAKOEngine/Rendering/Shaders/Shader.cpp"
-    "TAKOEngine/Rendering/Shaders/Shader.h"
     "TAKOEngine/Rendering/Shaders/ColorGradingShader.cpp"
     "TAKOEngine/Rendering/Shaders/ColorGradingShader.h"
     "TAKOEngine/Rendering/Shaders/FinalpassShader.cpp"
@@ -549,6 +503,10 @@ set(TAKOEngine__Rendering__Shaders
     "TAKOEngine/Rendering/Shaders/ModelShader.h"
     "TAKOEngine/Rendering/Shaders/PhongShader.cpp"
     "TAKOEngine/Rendering/Shaders/PhongShader.h"
+    "TAKOEngine/Rendering/Shaders/Shader.cpp"
+    "TAKOEngine/Rendering/Shaders/Shader.h"
+    "TAKOEngine/Rendering/Shaders/ShadowMapShader.cpp"
+    "TAKOEngine/Rendering/Shaders/ShadowMapShader.h"
     "TAKOEngine/Rendering/Shaders/SkydomeShader.cpp"
     "TAKOEngine/Rendering/Shaders/SkydomeShader.h"
     "TAKOEngine/Rendering/Shaders/SpriteShader.cpp"
@@ -557,84 +515,141 @@ set(TAKOEngine__Rendering__Shaders
     "TAKOEngine/Rendering/Shaders/ToonShader.h"
     "TAKOEngine/Rendering/Shaders/UVScrollShader.cpp"
     "TAKOEngine/Rendering/Shaders/UVScrollShader.h"
-    "TAKOEngine/Rendering/Shaders/ShadowMapShader.cpp"
-    "TAKOEngine/Rendering/Shaders/ShadowMapShader.h"
 )
 source_group("TAKOEngine\\Rendering\\Shaders" FILES ${TAKOEngine__Rendering__Shaders})
 
-set(TAKOEngine__Runtime
-    "TAKOEngine/Runtime/tentacle_lib.cpp"
-    "TAKOEngine/Runtime/tentacle_lib.h"
+set(TAKOEngine__Rendering__Texture
+    "TAKOEngine/Rendering/Texture/ramp.png"
+    "TAKOEngine/Rendering/Texture/ramp3.png"
+    "TAKOEngine/Rendering/Texture/RampTexture-1.jpg"
 )
-source_group("TAKOEngine\\Runtime" FILES ${TAKOEngine__Runtime})
+source_group("TAKOEngine\\Rendering\\Texture" FILES ${TAKOEngine__Rendering__Texture})
 
-set(TAKOEngine__Sound
-    "TAKOEngine/Sound/Audio.cpp"
-    "TAKOEngine/Sound/Audio.h"
+set(TAKOEngine__Rendering__HLSL__Debug
+    "TAKOEngine/Rendering/HLSL/Debug/Debug.hlsli"
+    "TAKOEngine/Rendering/HLSL/Debug/DebugPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Debug/DebugVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Debug/Gizmos.hlsli"
+    "TAKOEngine/Rendering/HLSL/Debug/GizmosPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Debug/GizmosVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Debug/Line.hlsli"
+    "TAKOEngine/Rendering/HLSL/Debug/LinePS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Debug/LineVS.hlsl"
 )
-source_group("TAKOEngine\\Sound" FILES ${TAKOEngine__Sound})
+source_group("TAKOEngine\\Rendering\\HLSL\\Debug" FILES ${TAKOEngine__Rendering__HLSL__Debug})
 
-set(TAKOEngine__Tool
-    "TAKOEngine/Tool/ImGuiRenderer.cpp"
-    "TAKOEngine/Tool/ImGuiRenderer.h"
-    "TAKOEngine/Tool/Console.cpp"
-    "TAKOEngine/Tool/Console.h"
-    "TAKOEngine/Tool/Encode.cpp"
-    "TAKOEngine/Tool/Encode.h"
-    "TAKOEngine/Tool/Logger.cpp"
-    "TAKOEngine/Tool/Logger.h"
-    "TAKOEngine/Tool/Mathf.cpp"
-    "TAKOEngine/Tool/Mathf.h"
-    "TAKOEngine/Tool/Singleton.h"
-    "TAKOEngine/Tool/Timer.cpp"
-    "TAKOEngine/Tool/Timer.h"
-    "TAKOEngine/Tool/TransformUtils.cpp"
-    "TAKOEngine/Tool/TransformUtils.h"
-    "TAKOEngine/Tool/XMFLOAT.h"
-    "TAKOEngine/Tool/AssimpImporter.cpp"
-    "TAKOEngine/Tool/AssimpImporter.h"
+set(TAKOEngine__Rendering__HLSL__Lighting
+    "TAKOEngine/Rendering/HLSL/Lighting/Light.hlsli"
+    "TAKOEngine/Rendering/HLSL/Lighting/ShadowMap.hlsli"
+    "TAKOEngine/Rendering/HLSL/Lighting/ShadowmapFunctions.hlsli"
+    "TAKOEngine/Rendering/HLSL/Lighting/ShadowMapVS.hlsl"
 )
-source_group("TAKOEngine\\Tool" FILES ${TAKOEngine__Tool})
+source_group("TAKOEngine\\Rendering\\HLSL\\Lighting" FILES ${TAKOEngine__Rendering__HLSL__Lighting})
+
+set(TAKOEngine__Rendering__HLSL__Model
+    "TAKOEngine/Rendering/HLSL/Model/DefaultModel.hlsli"
+    "TAKOEngine/Rendering/HLSL/Model/DefaultModelPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Model/DefaultModelVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Model/Lambert.hlsli"
+    "TAKOEngine/Rendering/HLSL/Model/LambertPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Model/LambertVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Model/Phong.hlsli"
+    "TAKOEngine/Rendering/HLSL/Model/PhongPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Model/PhongVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Model/Skinning.hlsli"
+    "TAKOEngine/Rendering/HLSL/Model/Toon.hlsli"
+    "TAKOEngine/Rendering/HLSL/Model/ToonPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Model/ToonVS.hlsl"
+)
+source_group("TAKOEngine\\Rendering\\HLSL\\Model" FILES ${TAKOEngine__Rendering__HLSL__Model})
+
+set(TAKOEngine__Rendering__HLSL__PostEffect
+    "TAKOEngine/Rendering/HLSL/PostEffect/BloomPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/PostEffect/ColorGrading.hlsli"
+    "TAKOEngine/Rendering/HLSL/PostEffect/ColorGradingPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/PostEffect/FilterFunctions.hlsli"
+    "TAKOEngine/Rendering/HLSL/PostEffect/Finalpass.hlsli"
+    "TAKOEngine/Rendering/HLSL/PostEffect/FinalpassPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/PostEffect/FullScreenQuad.hlsli"
+    "TAKOEngine/Rendering/HLSL/PostEffect/FullScreenQuadVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/PostEffect/GaussianBlur.hlsli"
+    "TAKOEngine/Rendering/HLSL/PostEffect/GaussianBlurPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/PostEffect/LuminanceExtraction.hlsli"
+    "TAKOEngine/Rendering/HLSL/PostEffect/LuminanceExtractionPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/PostEffect/Mask.hlsli"
+    "TAKOEngine/Rendering/HLSL/PostEffect/MaskPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/PostEffect/PostEffect.hlsli"
+    "TAKOEngine/Rendering/HLSL/PostEffect/ShaderData.hlsli"
+)
+source_group("TAKOEngine\\Rendering\\HLSL\\PostEffect" FILES ${TAKOEngine__Rendering__HLSL__PostEffect})
+
+set(TAKOEngine__Rendering__HLSL__Skydome
+    "TAKOEngine/Rendering/HLSL/Skydome/Skydome.hlsli"
+    "TAKOEngine/Rendering/HLSL/Skydome/SkydomePS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Skydome/SkydomeVS.hlsl"
+)
+source_group("TAKOEngine\\Rendering\\HLSL\\Skydome" FILES ${TAKOEngine__Rendering__HLSL__Skydome})
+
+set(TAKOEngine__Rendering__HLSL__Sprite
+    "TAKOEngine/Rendering/HLSL/Sprite/Sprite.hlsli"
+    "TAKOEngine/Rendering/HLSL/Sprite/SpritePS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Sprite/SpriteVS.hlsl"
+)
+source_group("TAKOEngine\\Rendering\\HLSL\\Sprite" FILES ${TAKOEngine__Rendering__HLSL__Sprite})
+
+set(TAKOEngine__Rendering__HLSL__UVScroll
+    "TAKOEngine/Rendering/HLSL/UVScroll/UVScroll.hlsli"
+    "TAKOEngine/Rendering/HLSL/UVScroll/UVScrollPS.hlsl"
+)
+source_group("TAKOEngine\\Rendering\\HLSL\\UVScroll" FILES ${TAKOEngine__Rendering__HLSL__UVScroll})
 
 set(ALL_FILES
     ${no_group_source_files}
     ${External__DirectXTex}
     ${External__imgui-docking}
     ${Source}
+    ${TAKOEngine}
     ${Source__GameObject}
-    ${Source__GameObject__Character}
-    ${Source__GameObject__Character__Enemy}
-    ${Source__GameObject__Character__Player}
-    ${Source__GameObject__Projectile}
     ${Source__Map}
     ${Source__Scene}
+    ${Source__UI}
+    ${Source__GameObject__Character}
+    ${Source__GameObject__Projectile}
+    ${Source__GameObject__Character__Enemy}
+    ${Source__GameObject__Character__Player}
     ${Source__Scene__Stage}
     ${Source__UI__Widget}
     ${TAKOEngine__AI}
-    ${TAKOEngine__Editor__Camera}
-    ${TAKOEngine__Editor__Input}
+    ${TAKOEngine__Editor}
     ${TAKOEngine__Effects}
     ${TAKOEngine__GUI}
     ${TAKOEngine__Network}
     ${TAKOEngine__Physics}
     ${TAKOEngine__Rendering}
-    ${TAKOEngine__Rendering__HLSL}
-    ${TAKOEngine__Rendering__HLSL__PostEffect}
-    ${TAKOEngine__Rendering__HLSL__Debug}
-    ${TAKOEngine__Rendering__HLSL__Model}
-    ${TAKOEngine__Rendering__HLSL__Lightning}
-    ${TAKOEngine__Rendering__HLSL__Skydome}
-    ${TAKOEngine__Rendering__HLSL__Sprite}
-    ${TAKOEngine__Rendering__HLSL__Toon}
-    ${TAKOEngine__Rendering__HLSL__UVScroll}
-    ${TAKOEngine__Rendering__Shaders}
     ${TAKOEngine__Runtime}
     ${TAKOEngine__Sound}
     ${TAKOEngine__Tool}
+    ${TAKOEngine__Editor__Camera}
+    ${TAKOEngine__Editor__Input}
+    ${TAKOEngine__Rendering__HLSL}
+    ${TAKOEngine__Rendering__Shaders}
+    ${TAKOEngine__Rendering__Texture}
+    ${TAKOEngine__Rendering__HLSL__Debug}
+    ${TAKOEngine__Rendering__HLSL__Lighting}
+    ${TAKOEngine__Rendering__HLSL__Model}
+    ${TAKOEngine__Rendering__HLSL__PostEffect}
+    ${TAKOEngine__Rendering__HLSL__Skydome}
+    ${TAKOEngine__Rendering__HLSL__Sprite}
+    ${TAKOEngine__Rendering__HLSL__UVScroll}
 )
 
+#####################################################################
+# SOURCE_GROUPS_END
+#####################################################################
+
+
 ################################################################################
-# Target
+# SHADERS_START
 ################################################################################
 add_executable(${PROJECT_NAME} ${ALL_FILES})
 
@@ -646,36 +661,75 @@ function(set_hlsl_properties target source_file shader_model shader_type entry_p
     )
 endfunction()
 
-# List of HLSL shader files
-set(HLSL_SHADERS
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/BloomPS.hlsl,5.0,Pixel,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/ColorGradingPS.hlsl,5.0,Pixel,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/DebugVS.hlsl,5.0,Vertex,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/DebugPS.hlsl,5.0,Pixel,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/DefaultModelVS.hlsl,5.0,Vertex,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/DefaultModelPS.hlsl,5.0,Pixel,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/FinalpassPS.hlsl,5.0,Pixel,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/FullScreenQuadVS.hlsl,5.0,Vertex,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/GaussianBlurPS.hlsl,5.0,Pixel,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/GizmosVS.hlsl,5.0,Vertex,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/GizmosPS.hlsl,5.0,Pixel,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/LambertVS.hlsl,5.0,Vertex,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/LambertPS.hlsl,5.0,Pixel,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/LineVS.hlsl,5.0,Vertex,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/LinePS.hlsl,5.0,Pixel,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/LuminanceExtractionPS.hlsl,5.0,Pixel,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/MaskPS.hlsl,5.0,Pixel,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PhongVS.hlsl,5.0,Vertex,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PhongPS.hlsl,5.0,Pixel,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/ShadowMapVS.hlsl,5.0,Vertex,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/SkydomeVS.hlsl,5.0,Vertex,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/SkydomePS.hlsl,5.0,Pixel,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/SpriteVS.hlsl,5.0,Vertex,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/SpritePS.hlsl,5.0,Pixel,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/ToonVS.hlsl,5.0,Vertex,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/ToonPS.hlsl,5.0,Pixel,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/UVScrollPS.hlsl,5.0,Pixel,main"
+#####################################################################
+# SHADERS_FILES_START
+#####################################################################
+
+#List of HLSL shaders
+set(SHADER_NAMES
+    "DebugPS.cso"
+    "DebugVS.cso"
+    "GizmosPS.cso"
+    "GizmosVS.cso"
+    "LinePS.cso"
+    "LineVS.cso"
+    "ShadowMapVS.cso"
+    "DefaultModelPS.cso"
+    "DefaultModelVS.cso"
+    "LambertPS.cso"
+    "LambertVS.cso"
+    "PhongPS.cso"
+    "PhongVS.cso"
+    "ToonPS.cso"
+    "ToonVS.cso"
+    "BloomPS.cso"
+    "ColorGradingPS.cso"
+    "FinalpassPS.cso"
+    "FullScreenQuadVS.cso"
+    "GaussianBlurPS.cso"
+    "LuminanceExtractionPS.cso"
+    "MaskPS.cso"
+    "SkydomePS.cso"
+    "SkydomeVS.cso"
+    "SpritePS.cso"
+    "SpriteVS.cso"
+    "UVScrollPS.cso"
 )
+
+# List of shader settings
+set(HLSL_SHADERS
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/DebugPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/DebugVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/GizmosPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/GizmosVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/LinePS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/LineVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Lighting/ShadowMapVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/DefaultModelPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/DefaultModelVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/LambertPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/LambertVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/PhongPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/PhongVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/ToonPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/ToonVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/BloomPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/ColorGradingPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/FinalpassPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/FullScreenQuadVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/GaussianBlurPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/LuminanceExtractionPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/MaskPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Skydome/SkydomePS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Skydome/SkydomeVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Sprite/SpritePS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Sprite/SpriteVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/UVScroll/UVScrollPS.hlsl,5.0,Pixel,main"
+)
+
+#####################################################################
+# SHADERS_FILES_END
+#####################################################################
 
 # Apply HLSL properties to each shader file
 foreach(shader_properties ${HLSL_SHADERS})
@@ -689,6 +743,14 @@ foreach(shader_properties ${HLSL_SHADERS})
     
     set_hlsl_properties(${PROJECT_NAME} ${shader_file} ${shader_model} ${shader_type} ${entry_point})
 endforeach()
+
+################################################################################
+# SHADERS_END
+################################################################################
+
+################################################################################
+# Target
+################################################################################
 
 use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
 set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -864,7 +926,6 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMENT "Copying dependency filest to build folder"
 )
 
-
 if(MSVC)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND if "$(Configuration)" == "Release" ${CMAKE_COMMAND} -E copy_directory
@@ -898,33 +959,13 @@ if(MSVC)
 endif()
 
 if(MSVC)
-file(GLOB MY_SHADERS ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/*.cso)
-foreach(CurrentShaderFile IN LISTS MY_SHADERS)
+foreach(CurrentShaderFile IN LISTS SHADER_NAMES)
     add_custom_command(
                 TARGET ${PROJECT_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy ${CurrentShaderFile} ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/Data/Shader/
-                COMMENT "Copying shaders: ${CurrentShaderFile}")
-endforeach()
-endif()
-
-if(MSVC)
-file(GLOB MY_SHADERS ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/*.cso)
-foreach(CurrentShaderFile IN LISTS MY_SHADERS)
-    add_custom_command(
-                TARGET ${PROJECT_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy ${CurrentShaderFile} ${CMAKE_BINARY_DIR}/Data/Shader/
-                COMMENT "Copying shaders: ${CurrentShaderFile}")
-endforeach()
-endif()
-
-
-if(MSVC)
-file(GLOB MY_SHADERS ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/*.cso)
-foreach(CurrentShaderFile IN LISTS MY_SHADERS)
-    add_custom_command(
-                TARGET ${PROJECT_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E remove ${CurrentShaderFile}
-                COMMENT "Removing shaders: ${CurrentShaderFile}")
+                COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/${CurrentShaderFile} ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/Data/Shader/
+                COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/${CurrentShaderFile} ${CMAKE_BINARY_DIR}/Data/Shader
+                COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/${CurrentShaderFile}
+                COMMENT "Copying shaders")
 endforeach()
 endif()
 

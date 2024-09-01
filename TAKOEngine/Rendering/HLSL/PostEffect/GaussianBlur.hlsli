@@ -1,4 +1,4 @@
-#include "Sprite.hlsli"
+#include "../Sprite/Sprite.hlsli"
 
 #define	KERNEL_MAX 16
 cbuffer CBFilter : register(b0)

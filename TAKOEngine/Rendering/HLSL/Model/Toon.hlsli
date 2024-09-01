@@ -1,5 +1,5 @@
-#include "Light.hlsli"
-#include "ShaderData.hlsli"
+#include "../Lighting/Light.hlsli"
+#include "../PostEffect/ShaderData.hlsli"
 
 struct VS_OUT
 {

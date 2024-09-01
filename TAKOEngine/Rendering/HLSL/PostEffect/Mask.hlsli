@@ -1,4 +1,4 @@
-#include "Sprite.hlsli"
+#include "../Sprite/Sprite.hlsli"
 
 //	スプライト描画単位で指定するパラメーター
 cbuffer CbMask : register(b0)	// 0番にある定数バッファをこれで利用する

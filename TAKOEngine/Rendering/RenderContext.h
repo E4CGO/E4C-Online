@@ -26,7 +26,7 @@ struct DirectionalLightData
 };
 
 //TODO : ShaderData Set
-#pragma region シェーダー情報
+#pragma region Shader Information
 struct Default
 {
 	DirectX::XMFLOAT4 ka = DirectX::XMFLOAT4(1, 1, 1, 1);
@@ -138,7 +138,7 @@ struct ShadowMapData
 
 	//深度比較用のオフセット値
 	float shadowBias[myRenderer::NUM_SHADOW_MAP] = { 0.001f, 0.002f, 0.004f, 0.01f }; //深度比較用のオフセット値
-	
+
 	//影の色
 	DirectX::XMFLOAT3 shadowColor = { 0.5f,0.5f,0.5f };
 };

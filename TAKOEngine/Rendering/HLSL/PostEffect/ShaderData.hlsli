@@ -1,4 +1,4 @@
-#include "ShadowMap.hlsli"
+#include "../Lighting/ShadowMap.hlsli"
 
 struct Default
 {

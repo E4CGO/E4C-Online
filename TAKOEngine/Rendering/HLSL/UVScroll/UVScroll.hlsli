@@ -1,4 +1,4 @@
-#include "Sprite.hlsli"
+#include "../Sprite/Sprite.hlsli"
 
 //	スプライト描画単位で指定するパラメーター
 cbuffer CbScene : register(b0)
