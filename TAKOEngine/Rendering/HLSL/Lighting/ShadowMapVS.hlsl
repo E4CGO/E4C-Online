@@ -1,4 +1,4 @@
-#include "Skinning.hlsli"
+#include "../Model/Skinning.hlsli"
 
 cbuffer CbScene : register(b0)
 {

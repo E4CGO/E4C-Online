@@ -1,4 +1,4 @@
-#include	"Light.hlsli"
+#include	"../Lighting/Light.hlsli"
 
 struct VS_OUT
 {

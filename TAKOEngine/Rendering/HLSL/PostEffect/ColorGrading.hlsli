@@ -1,9 +1,9 @@
 #include "FilterFunctions.hlsli"
-#include "Sprite.hlsli"
+#include "../Sprite/Sprite.hlsli"
 
-cbuffer CBFinalpass : register(b0)
+//	スプライト描画単位で指定するパラメーター
+cbuffer CBColorGrading : register(b0)
 {
-	//	色調補正
     float hueShift; // 色相調整
     float saturation; // 彩度調整
     float brightness; // 明度調整
