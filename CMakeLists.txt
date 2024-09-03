@@ -181,8 +181,6 @@ set(Source__Map
 source_group("Source\\Map" FILES ${Source__Map})
 
 set(Source__Scene
-    "Source/Scene/EventScene.cpp"
-    "Source/Scene/EventScene.h"
     "Source/Scene/Scene.cpp"
     "Source/Scene/Scene.h"
     "Source/Scene/SceneGame.cpp"
@@ -247,12 +245,8 @@ set(Source__GameObject__Character__Player
     "Source/GameObject/Character/Player/Knight.h"
     "Source/GameObject/Character/Player/KnightState.cpp"
     "Source/GameObject/Character/Player/KnightState.h"
-    "Source/GameObject/Character/Player/LuiG.cpp"
-    "Source/GameObject/Character/Player/LuiG.h"
     "Source/GameObject/Character/Player/Mage.cpp"
     "Source/GameObject/Character/Player/Mage.h"
-    "Source/GameObject/Character/Player/MariO.cpp"
-    "Source/GameObject/Character/Player/MariO.h"
     "Source/GameObject/Character/Player/Player.cpp"
     "Source/GameObject/Character/Player/Player.h"
     "Source/GameObject/Character/Player/PlayerManager.cpp"
@@ -450,8 +444,8 @@ set(TAKOEngine__Tool
     "TAKOEngine/Tool/Console.h"
     "TAKOEngine/Tool/Encode.cpp"
     "TAKOEngine/Tool/Encode.h"
-    "TAKOEngine/Tool/EventOpening.cpp"
-    "TAKOEngine/Tool/EventOpening.h"
+    "TAKOEngine/Tool/GLTFImporter.cpp"
+    "TAKOEngine/Tool/GLTFImporter.h"
     "TAKOEngine/Tool/ImGuiRenderer.cpp"
     "TAKOEngine/Tool/ImGuiRenderer.h"
     "TAKOEngine/Tool/Logger.cpp"
@@ -525,6 +519,12 @@ set(TAKOEngine__Rendering__Texture
 )
 source_group("TAKOEngine\\Rendering\\Texture" FILES ${TAKOEngine__Rendering__Texture})
 
+set(TAKOEngine__Rendering__HLSL__Common
+    "TAKOEngine/Rendering/HLSL/Common/bidirectional_reflectance_distribution_function.hlsli"
+    "TAKOEngine/Rendering/HLSL/Common/image_based_lighting.hlsli"
+)
+source_group("TAKOEngine\\Rendering\\HLSL\\Common" FILES ${TAKOEngine__Rendering__HLSL__Common})
+
 set(TAKOEngine__Rendering__HLSL__Debug
     "TAKOEngine/Rendering/HLSL/Debug/Debug.hlsli"
     "TAKOEngine/Rendering/HLSL/Debug/DebugPS.hlsl"
@@ -551,6 +551,9 @@ set(TAKOEngine__Rendering__HLSL__Model
     "TAKOEngine/Rendering/HLSL/Model/DefaultModelPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/DefaultModelVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/Lambert.hlsli"
+    "TAKOEngine/Rendering/HLSL/Model/LambertDX12.hlsli"
+    "TAKOEngine/Rendering/HLSL/Model/LambertDX12PS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Model/LambertDX12VS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/LambertPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/LambertVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/Phong.hlsli"
@@ -634,6 +637,7 @@ set(ALL_FILES
     ${TAKOEngine__Rendering__HLSL}
     ${TAKOEngine__Rendering__Shaders}
     ${TAKOEngine__Rendering__Texture}
+    ${TAKOEngine__Rendering__HLSL__Common}
     ${TAKOEngine__Rendering__HLSL__Debug}
     ${TAKOEngine__Rendering__HLSL__Lighting}
     ${TAKOEngine__Rendering__HLSL__Model}
@@ -676,6 +680,8 @@ set(SHADER_NAMES
     "ShadowMapVS.cso"
     "DefaultModelPS.cso"
     "DefaultModelVS.cso"
+    "LambertDX12PS.cso"
+    "LambertDX12VS.cso"
     "LambertPS.cso"
     "LambertVS.cso"
     "PhongPS.cso"
@@ -707,6 +713,8 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Lighting/ShadowMapVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/DefaultModelPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/DefaultModelVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/LambertDX12PS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/LambertDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/LambertPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/LambertVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/PhongPS.hlsl,5.0,Pixel,main"
@@ -815,8 +823,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/External/cereal/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/TeNTaCleLib"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/Effekseer162a/include"
-    "${CMAKE_CURRENT_SOURCE_DIR}/External/nlohmann"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/openssl/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/tinygltf"
 )
 
 ################################################################################

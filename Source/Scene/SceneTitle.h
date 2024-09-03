@@ -1,6 +1,7 @@
 #pragma once
 
 #include "TAKOEngine/Rendering/ModelDX12.h"
+#include "TAKOEngine/Tool/GLTFImporter.h"
 #include "TAKOEngine/Editor/Camera/FreeCameraController.h"
 #include "TAKOEngine/AI/StateMachine.h"
 
@@ -74,4 +75,8 @@ private:
 
 	// テスト用
 	std::unique_ptr<ModelDX12> test;
+
+	std::unique_ptr<gltf_model> krak;
+	static float time;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> constant_buffers[8];
 };

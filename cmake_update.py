@@ -48,7 +48,7 @@ def update_shaders():
                                                    #or ('hlsli' in file) 
                                                      )]
 
-    with open('result.txt', "w") as the_file:
+    with open('update_shaders.txt', "w") as the_file:
 
         the_file.write("#" * 69 + "\n" + "# SHADERS_FILES_START\n" + "#" * 69 + "\n")
 
@@ -86,6 +86,7 @@ def update_shaders():
         the_file.write(f")\n")
 
         the_file.write("\n" + "#" * 69 + "\n" + "# SHADERS_FILES_END\n" + "#" * 69 + "\n")
+        the_file.write("\n")
 
 
     return
@@ -95,12 +96,13 @@ def update_folder_structure():
 
     result = get_all_directory_pathes()
 
-    resut_filtered =  [file for file in result if not (('build' in file) 
+    resut_filtered =  [file for file in result if (('Source' in file)
+                                                   or  ('TAKOEngine' in file) 
                                                      )]
 
-    with open('result2.txt', "w") as the_file:
+    with open('update_folder_structure.txt', "w") as the_file:
  
-        the_file.write("\n" + "#" * 69 + "\n" + "# SOURCE_GROUPS_START\n" + "#" * 69 + "\n")
+        the_file.write("#" * 69 + "\n" + "# SOURCE_GROUPS_START\n" + "#" * 69 + "\n")
 
         # Real folders
         for line in resut_filtered:
@@ -151,8 +153,40 @@ def update_folder_structure():
         the_file.write(")" + "\n")
 
         the_file.write("\n" + "#" * 69 + "\n" + "# SOURCE_GROUPS_END\n" + "#" * 69 + "\n")
+        the_file.write("\n")
 
     return
+
+def update_cmake_file(filename, start_line, end_line):
+    
+    root_dir = os.getcwd() + "\\\\" + "CMakeLists.txt"
+    
+    new_lines = []
+
+    start_line_num = 0
+    end_line_num = 0
+
+    with open(filename + ".txt", 'r') as source_file:
+        new_lines = source_file.readlines()
+
+    with open(root_dir, 'r') as file:
+
+        lines = file.readlines()
+        
+        for line_number, line in enumerate(lines, start=1):
+            if start_line in line:
+                start_line_num = line_number
+            if end_line in line:
+                end_line_num = line_number
+
+        del lines[start_line_num - 2 : end_line_num + 2]
+        lines[start_line_num - 2 : start_line_num - 2] = new_lines
+
+    with open(root_dir, 'w') as file:
+        file.writelines(lines)
+
+    os.remove(filename + ".txt")
+        
 
 def main():
     print("1. Update shaders")
@@ -165,11 +199,15 @@ def main():
     choose_script = input()
     if(choose_script == '1'):
         update_shaders()
+        update_cmake_file("update_shaders", "SHADERS_FILES_START", "SHADERS_FILES_END")
     if(choose_script == '2'):
         update_folder_structure()
+        update_cmake_file("update_folder_structure", "SOURCE_GROUPS_START", "SOURCE_GROUPS_END")
     if(choose_script == '3'):
         update_shaders()
+        update_cmake_file("update_shaders", "SHADERS_FILES_START", "SHADERS_FILES_END")
         update_folder_structure()
+        update_cmake_file("update_folder_structure", "SOURCE_GROUPS_START", "SOURCE_GROUPS_END")
     if(choose_script == '4'):
         return
 
