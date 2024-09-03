@@ -122,8 +122,8 @@ LambertShader::LambertShader()
 
 		// シェーダー
 		std::vector<BYTE> vsData, psData;
-		LoadShaderFile("Data/Shader/LambertVS.cso", vsData);
-		LoadShaderFile("Data/Shader/LambertPS.cso", psData);
+		LoadShaderFile("Data/Shader/LambertDX12VS.cso", vsData);
+		LoadShaderFile("Data/Shader/LambertDX12PS.cso", psData);
 
 		d3d_graphics_pipeline_state_desc.VS.pShaderBytecode = vsData.data();
 		d3d_graphics_pipeline_state_desc.VS.BytecodeLength = vsData.size();

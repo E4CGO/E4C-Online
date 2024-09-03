@@ -5,7 +5,7 @@
 #include <functional>
 #include <thread>
 #include "TAKOEngine/Network/WinSock2Wrapper.h"
-#include <nlohmann/json.hpp>
+#include "External/tinygltf/json.hpp"
 #include <openssl/crypto.h>	// opensslの暗号化ヘッダ
 #include <openssl/ssl.h>	// opensslのssl通信ヘッダ
 #include <openssl/err.h>	// opensslのエラーヘッダ

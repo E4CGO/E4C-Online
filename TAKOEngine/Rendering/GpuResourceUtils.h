@@ -1,7 +1,12 @@
 #pragma once
 
+#include <map>
+#include <wrl.h>
+#include <string>
 #include <d3d11.h>
 #include "DirectXTex.h"
+#include <WICTextureLoader.h>
+#include <DDSTextureLoader.h>
 
 // GPUリソースユーティリティ
 class GpuResourceUtils
@@ -56,6 +61,20 @@ public:
 		D3D11_TEXTURE2D_DESC* texture2dDesc = nullptr
 	);
 
+	static HRESULT load_texture_from_memory(ID3D11Device* device,
+		const void* data,
+		size_t size,
+		ID3D11ShaderResourceView** shader_resource_view,
+		bool generate_mips,
+		size_t mip_levels
+	);
+
+	static HRESULT load_texture_from_file(ID3D11Device* device,
+		const wchar_t* filename,
+		ID3D11ShaderResourceView** shader_resource_view,
+		D3D11_TEXTURE2D_DESC* texture2d_desc
+	);
+
 	// ダミーテクスチャ作成
 	static HRESULT CreateDummyTexture(
 		ID3D11Device* device,
@@ -74,3 +93,5 @@ public:
 private:
 	static HRESULT GetMetadataFromGLBFile(const wchar_t* szFile, DirectX::TexMetadata& metadata);
 };
+
+static std::map<std::wstring, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> resources;
