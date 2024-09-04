@@ -879,43 +879,63 @@ endif()
 # Post build events
 ################################################################################
 
-# URL of the ZIP file
-set(ZIP_FILE_URL "https://www.dropbox.com/scl/fi/ovb2dkjr3n1ayljdb0ftn/Data.zip?rlkey=2th7h96r3p4qsxn12oqnnp1wv&st=uywpwppu&dl=0")
-
-# Local path where the ZIP file will be downloaded
-set(ZIP_FILE_PATH "${CMAKE_SOURCE_DIR}/Data.zip")
-
-# Command to download the ZIP file
-file(DOWNLOAD ${ZIP_FILE_URL} ${ZIP_FILE_PATH}
-SHOW_PROGRESS
-STATUS status)
-
-list(GET status 0 status_code)
-list(GET status 1 status_string)
-if(NOT status_code EQUAL 0)
-    message(FATAL_ERROR "Error downloading file: ${status_string}")
-endif()
-
-message(STATUS "File downloaded and verified successfully!")
-
-set(DESTINATION_DIR "${CMAKE_SOURCE_DIR}/Data")
-
-file(MAKE_DIRECTORY ${DESTINATION_DIR})
-
-# Unzip the file
-execute_process(
-    COMMAND ${CMAKE_COMMAND} -E tar xvf ${ZIP_FILE_PATH}
-    WORKING_DIRECTORY ${DESTINATION_DIR}
-    RESULT_VARIABLE result
+# URL of the ZIP files
+set(ZIP_FILE_URLS 
+    "https://www.dropbox.com/scl/fi/ovb2dkjr3n1ayljdb0ftn/Data.zip?rlkey=2th7h96r3p4qsxn12oqnnp1wv&st=uywpwppu&dl=0"
+    "https://www.dropbox.com/scl/fi/nm7h69ap66e62978butip/Dependencies.zip?rlkey=9icgfv9xwc9is1hziwhk5kjjs&st=gv2qvxdg&dl=0"
+    "https://www.dropbox.com/scl/fi/1nbbetvdxp4dthu45kayx/External.zip?rlkey=ndtf9xh27fhaiuhnwnn4btf26&st=16hvp0yp&dl=0"
 )
 
-if(result)
-    message(FATAL_ERROR "Failed to unzip file")
-else()
-    message(STATUS "Successfully unzipped file")
-endif()
+# Local path where the ZIP file will be downloaded
+set(ZIP_FILE_PATHS 
+    "${CMAKE_SOURCE_DIR}/Data.zip"
+    "${CMAKE_SOURCE_DIR}/Dependencies.zip"
+    "${CMAKE_SOURCE_DIR}/External.zip")
 
-file(REMOVE ${ZIP_FILE_PATH})
+# Local path where ZIP file will be unarchived
+set(DESTINATION_DIRS 
+    "${CMAKE_SOURCE_DIR}/Data"
+    "${CMAKE_SOURCE_DIR}/Dependencies"
+    "${CMAKE_SOURCE_DIR}/External"
+)
+
+foreach(i RANGE 0 2)
+
+    list(GET ZIP_FILE_URLS ${i} ZIP_FILE_URL)
+    list(GET ZIP_FILE_PATHS ${i} ZIP_FILE_PATH)
+    list(GET DESTINATION_DIRS ${i} DESTINATION_DIR)
+
+    # Command to download the ZIP file
+    file(DOWNLOAD ${ZIP_FILE_URL} ${ZIP_FILE_PATH}
+    SHOW_PROGRESS
+    STATUS status)
+
+    list(GET status 0 status_code)
+    list(GET status 1 status_string)
+    if(NOT status_code EQUAL 0)
+        message(FATAL_ERROR "Error downloading file: ${status_string}")
+    endif()
+
+    message(STATUS "File downloaded and verified successfully!")
+
+    file(MAKE_DIRECTORY ${DESTINATION_DIR})
+
+    # Unzip the file
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -E tar xvf ${ZIP_FILE_PATH}
+        WORKING_DIRECTORY ${DESTINATION_DIR}
+        RESULT_VARIABLE result
+    )
+
+    if(result)
+        message(FATAL_ERROR "Failed to unzip file")
+    else()
+        message(STATUS "Successfully unzipped file")
+    endif()
+
+    file(REMOVE ${ZIP_FILE_PATH})
+
+endforeach()
 
 set(SOURCE_DIR_DATA "${CMAKE_SOURCE_DIR}/Data")
 set(SOURCE_DIR_DEPENDENCY "${CMAKE_SOURCE_DIR}/Dependencies")
