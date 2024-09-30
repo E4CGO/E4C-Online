@@ -9,15 +9,15 @@ public:
 	SpriteShader(ID3D11Device* device, const char* vs, const char* ps);
 	virtual ~SpriteShader() override = default;
 
-	// •`‰æŠJn
+	// æç”»é–‹å§‹
 	virtual void Begin(const RenderContext& rc) override;
 	void Begin(const RenderContextDX12& rc) override;
-	void Draw(const RenderContextDX12& rc, Model* model) override;
+	void Draw(const RenderContextDX12& rc, iModel* model) override;
 	void Draw(const RenderContextDX12& rc, ModelDX12* model) override;
 	void End(const RenderContext& rc) override;
 	void End(const RenderContextDX12& rc) override;
 
-	// ƒ‚ƒfƒ‹•`‰æ
+	// ãƒ¢ãƒ‡ãƒ«æç”»
 	virtual void Draw(const RenderContext& rc, const Sprite* sprite);
 
 protected:

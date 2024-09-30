@@ -13,13 +13,15 @@
 #include "External/tinygltf/tiny_gltf.h"
 
 #include "TAKOEngine/Rendering/RenderContext.h"
+#include "TAKOEngine/Rendering/Model/Model.h"
 
-class gltf_model
+class gltf_model : iModel
 {
 	std::string filename;
 public:
+	gltf_model() {};
 	gltf_model(ID3D11Device* device, const std::string& filename);
-	virtual ~gltf_model() = default;
+	~gltf_model() {};
 
 	struct scene
 	{
@@ -212,4 +214,12 @@ public:
 
 	void render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world, const std::vector<node>& animated_nodes);
 	void renderDX12(ID3D11DeviceContext* immediate_context, const DirectX::XMFLOAT4X4 world, const std::vector<node>& animated_nodes);
+
+	void UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform) = 0;
+	void PlayAnimation(int index, bool loop, float blendSeconds = 0.2f) = 0;
+	bool IsPlayAnimation() const = 0;
+	void UpdateAnimation(float elapsedTime) = 0;
+	void ComputeAnimation(float elapsedTime);
+	void ComputeBlending(float elapsedTime);
+	void ComputeWorldBounds();
 };

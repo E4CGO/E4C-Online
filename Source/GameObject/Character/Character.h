@@ -24,46 +24,46 @@ public:
 	virtual void AttackCollision() {}
 
 protected:
-	// ˆÚ“®
+	// ç§»å‹•
 	void Move(float vx, float vz, float speed);
 	void Jump(float speed);
 
-	// ‘¬—Í
+	// é€ŸåŠ›
 	virtual void UpdateVelocity(float elapsedTime);
-	// ‚’¼‘¬—ÍXVˆ—
+	// å‚ç›´é€ŸåŠ›æ›´æ–°å‡¦ç†
 	void UpdateVerticalVelocity(float elapsedFrame);
-	// ‚’¼ˆÚ“®XVˆ—
+	// å‚ç›´ç§»å‹•æ›´æ–°å‡¦ç†
 	void UpdateVerticalMove(float elapsedTime);
-	// …•½‘¬—ÍXVˆ—
+	// æ°´å¹³é€ŸåŠ›æ›´æ–°å‡¦ç†
 	void UpdateHorizontalVelocity(float elapsedFrame);
-	// …•½ˆÚ“®XVˆ—
+	// æ°´å¹³ç§»å‹•æ›´æ–°å‡¦ç†
 	virtual void UpdateHorizontalMove(float elapsedTime);
 
 	virtual void OnLanding() {};
 	virtual void OnWall() {};
 public:
-	// ‰e‹¿
+	// å½±éŸ¿
 	void AddImpulse(const DirectX::XMFLOAT3& impulse);
 
-	// ƒAƒNƒZƒT
-	// ˆÊ’uæ“¾
+	// ã‚¢ã‚¯ã‚»ã‚µ
+	// ä½ç½®å–å¾—
 	const DirectX::XMFLOAT3& GetPosition() const { return position; }
-	// ˆÊ’uİ’è
+	// ä½ç½®è¨­å®š
 	void SetPosition(const DirectX::XMFLOAT3& position) { this->position = position; }
-	// ‰ñ“]æ“¾
+	// å›è»¢å–å¾—
 	const DirectX::XMFLOAT3& GetAngle() const { return angle; }
-	// ‰ñ“]İ’è
+	// å›è»¢è¨­å®š
 	void SetAngle(const DirectX::XMFLOAT3& angle) { this->angle = angle; }
-	// ƒXƒP[ƒ‹æ“¾
+	// ã‚¹ã‚±ãƒ¼ãƒ«å–å¾—
 	const DirectX::XMFLOAT3& GetScale() const { return scale; }
-	// ƒXƒP[ƒ‹İ’è
+	// ã‚¹ã‚±ãƒ¼ãƒ«è¨­å®š
 	void SetScale(const DirectX::XMFLOAT3& scale) { this->scale = scale; }
 
 	const float GetMaxMoveSpeed() { return maxMoveSpeed; }
 
 	float GetHeight() { return height; }
 
-	// ’n–Ê”»’è
+	// åœ°é¢åˆ¤å®š
 	bool IsGround() const { return isGround; }
 
 	float GetHurtCoolTime() { return hurtCoolTime; }
@@ -76,7 +76,7 @@ public:
 protected:
 	virtual void UpdateColliders() {};
 protected:
-	// ƒŒƒCƒLƒƒƒXƒg—p
+	// ãƒ¬ã‚¤ã‚­ãƒ£ã‚¹ãƒˆç”¨
 	float stepOffset = 0.5f;
 	float height = 2.0f;
 

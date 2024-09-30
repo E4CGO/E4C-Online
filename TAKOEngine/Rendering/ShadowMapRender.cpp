@@ -20,10 +20,10 @@ namespace myRenderer
 		}
 
 		//シャドウマップに描画するモデルを登録
-		void ShadowMapRender::ModelRegister(Model* model)
+		void ShadowMapRender::ModelRegister(iModel* model)
 		{
 			// モデルが既に登録されているか調べる
-			std::vector<Model*>::iterator it = std::find(m_models.begin(), m_models.end(), model);
+			std::vector<iModel*>::iterator it = std::find(m_models.begin(), m_models.end(), model);
 			if (it != m_models.end())
 				return;
 

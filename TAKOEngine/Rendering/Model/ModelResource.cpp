@@ -10,7 +10,7 @@
 
 #include "TAKOEngine/Rendering/Misc.h"
 #include "TAKOEngine/Rendering/Graphics.h"
-#include "TAKOEngine/Rendering/ModelResource.h"
+#include "TAKOEngine/Rendering/Model/ModelResource.h"
 #include "TAKOEngine/Rendering/ResourceManager.h"
 #include "TAKOEngine/Rendering/GpuResourceUtils.h"
 #include "TAKOEngine/Tool/AssimpImporter.h"
@@ -178,49 +178,49 @@ void ModelResource::Animation::serialize(Archive& archive)
 	);
 }
 
-// “Ç‚İ‚İ
+// èª­ã¿è¾¼ã¿
 void ModelResource::Load(ID3D11Device* device, const char* filename)
 {
 	std::filesystem::path filepath(filename);
 	std::filesystem::path dirpath(filepath.parent_path());
 
-	// “Æ©Œ`®‚Ìƒ‚ƒfƒ‹ƒtƒ@ƒCƒ‹‚Ì‘¶İŠm”F
+	// ç‹¬è‡ªå½¢å¼ã®ãƒ¢ãƒ‡ãƒ«ãƒ•ã‚¡ã‚¤ãƒ«ã®å­˜åœ¨ç¢ºèª
 	filepath.replace_extension(".cereal");
 	if (std::filesystem::exists(filepath))
 	{
-		// “Æ©Œ`®‚Ìƒ‚ƒfƒ‹ƒtƒ@ƒCƒ‹‚Ì“Ç‚İ‚İ
+		// ç‹¬è‡ªå½¢å¼ã®ãƒ¢ãƒ‡ãƒ«ãƒ•ã‚¡ã‚¤ãƒ«ã®èª­ã¿è¾¼ã¿
 		Deserialize(filepath.string().c_str());
 	}
 	else
 	{
-		// ”Ä—pƒ‚ƒfƒ‹ƒtƒ@ƒCƒ‹“Ç‚İ‚Ş
+		// æ±ç”¨ãƒ¢ãƒ‡ãƒ«ãƒ•ã‚¡ã‚¤ãƒ«èª­ã¿è¾¼ã‚€
 		AssimpImporter importer(filename);
 
-		// ƒ}ƒeƒŠƒAƒ‹ƒf[ƒ^“Ç‚İæ‚è
+		// ãƒãƒ†ãƒªã‚¢ãƒ«ãƒ‡ãƒ¼ã‚¿èª­ã¿å–ã‚Š
 		importer.LoadMaterials(materials);
 
-		// ƒm[ƒhƒf[ƒ^“Ç‚İæ‚è
+		// ãƒãƒ¼ãƒ‰ãƒ‡ãƒ¼ã‚¿èª­ã¿å–ã‚Š
 		importer.LoadNodes(nodes);
 
-		// ƒƒbƒVƒ…ƒf[ƒ^“Ç‚İæ‚è
+		// ãƒ¡ãƒƒã‚·ãƒ¥ãƒ‡ãƒ¼ã‚¿èª­ã¿å–ã‚Š
 		importer.LoadMeshes(meshes, nodes);
 
-		// ƒAƒjƒ[ƒVƒ‡ƒ“ƒf[ƒg“Ç‚İæ‚è
+		// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ãƒ‡ãƒ¼ãƒˆèª­ã¿å–ã‚Š
 		importer.LoadAnimations(animations, nodes);
 
-		// ƒoƒEƒ“ƒfƒBƒ“ƒOƒ{ƒbƒNƒXŒvZ
+		// ãƒã‚¦ãƒ³ãƒ‡ã‚£ãƒ³ã‚°ãƒœãƒƒã‚¯ã‚¹è¨ˆç®—
 		ComputeLocalBounds();
 
-		// “Æ©Œ`®‚Ìƒ‚ƒfƒ‹ƒtƒ@ƒCƒ‹‚ğ•Û‘¶
+		// ç‹¬è‡ªå½¢å¼ã®ãƒ¢ãƒ‡ãƒ«ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä¿å­˜
 		Serialize(filepath.string().c_str());
 	}
 
-	//// ƒm[ƒh\’z
+	//// ãƒãƒ¼ãƒ‰æ§‹ç¯‰
 	//for (size_t nodeIndex = 0; nodeIndex < nodes.size(); nodeIndex++)
 	//{
 	//	Node& node = nodes.at(nodeIndex);
 
-	//	//// eqŠÖŒW‚ğ\’z
+	//	//// è¦ªå­é–¢ä¿‚ã‚’æ§‹ç¯‰
 	//	//node.parent = node.parentIndex >= 0 ? &nodes.at(node.parentIndex) : nullptr;
 	//	//if (node.parent != nullptr)
 	//	//{
@@ -228,18 +228,18 @@ void ModelResource::Load(ID3D11Device* device, const char* filename)
 	//	//}
 	//}
 
-	// ƒ}ƒeƒŠƒAƒ‹\’z
+	// ãƒãƒ†ãƒªã‚¢ãƒ«æ§‹ç¯‰
 	for (Material& material : materials)
 	{
 		if (material.diffuseTextureFileName.empty())
 		{
-			// ƒ_ƒ~[ƒeƒNƒXƒ`ƒƒì¬
+			// ãƒ€ãƒŸãƒ¼ãƒ†ã‚¯ã‚¹ãƒãƒ£ä½œæˆ
 			HRESULT hr = GpuResourceUtils::CreateDummyTexture(device, 0xFFFFFFFF, material.diffuseMap.GetAddressOf());
 			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 		}
 		else
 		{
-			// ƒfƒBƒtƒ…[ƒYƒeƒNƒXƒ`ƒƒ“Ç‚İ‚İ
+			// ãƒ‡ã‚£ãƒ•ãƒ¥ãƒ¼ã‚ºãƒ†ã‚¯ã‚¹ãƒãƒ£èª­ã¿è¾¼ã¿
 			std::filesystem::path diffuseTexturePath(dirpath / material.diffuseTextureFileName);
 			HRESULT hr = GpuResourceUtils::LoadTexture(device, diffuseTexturePath.string().c_str(), material.diffuseMap.GetAddressOf());
 
@@ -247,29 +247,29 @@ void ModelResource::Load(ID3D11Device* device, const char* filename)
 		}
 		if (material.normalTextureFileName.empty())
 		{
-			// –@üƒ_ƒ~[ƒeƒNƒXƒ`ƒƒì¬
+			// æ³•ç·šãƒ€ãƒŸãƒ¼ãƒ†ã‚¯ã‚¹ãƒãƒ£ä½œæˆ
 			HRESULT hr = GpuResourceUtils::CreateDummyTexture(device, 0xFFFF7F7F, material.normalMap.GetAddressOf());
 
 			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 		}
 		else
 		{
-			// –@üƒeƒNƒXƒ`ƒƒ“Ç‚İ‚İ
+			// æ³•ç·šãƒ†ã‚¯ã‚¹ãƒãƒ£èª­ã¿è¾¼ã¿
 			std::filesystem::path texturePath(dirpath / material.normalTextureFileName);
 			HRESULT hr = GpuResourceUtils::LoadTexture(device, texturePath.string().c_str(), material.normalMap.GetAddressOf());
 		}
 	}
 
-	// ƒƒbƒVƒ…\’z
+	// ãƒ¡ãƒƒã‚·ãƒ¥æ§‹ç¯‰
 	for (Mesh& mesh : meshes)
 	{
-		// QÆƒm[ƒhİ’è
+		// å‚ç…§ãƒãƒ¼ãƒ‰è¨­å®š
 		mesh.node = &nodes.at(mesh.nodeIndex);
 
-		// QÆƒ}ƒeƒŠƒAƒ‹İ’è
+		// å‚ç…§ãƒãƒ†ãƒªã‚¢ãƒ«è¨­å®š
 		mesh.material = &materials.at(mesh.materialIndex);
 
-		// ’¸“_ƒoƒbƒtƒ@
+		// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡
 		{
 			D3D11_BUFFER_DESC bufferDesc = {};
 			D3D11_SUBRESOURCE_DATA subresourceData = {};
@@ -288,7 +288,7 @@ void ModelResource::Load(ID3D11Device* device, const char* filename)
 			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 		}
 
-		// ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@
+		// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡
 		{
 			D3D11_BUFFER_DESC bufferDesc = {};
 			D3D11_SUBRESOURCE_DATA subresourceData = {};
@@ -307,10 +307,10 @@ void ModelResource::Load(ID3D11Device* device, const char* filename)
 			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 		}
 
-		// ƒ{[ƒ“\’z
+		// ãƒœãƒ¼ãƒ³æ§‹ç¯‰
 		for (Bone& bone : mesh.bones)
 		{
-			// QÆƒm[ƒhİ’è
+			// å‚ç…§ãƒãƒ¼ãƒ‰è¨­å®š
 			bone.node = &nodes.at(bone.nodeIndex);
 		}
 	}
@@ -318,15 +318,15 @@ void ModelResource::Load(ID3D11Device* device, const char* filename)
 
 void ModelResource::Load(const char* filename)
 {
-	// ƒfƒBƒŒƒNƒgƒŠƒpƒXæ“¾
+	// ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªãƒ‘ã‚¹å–å¾—
 	char drive[32], dir[256], dirname[256];
 	::_splitpath_s(filename, drive, sizeof(drive), dir, sizeof(dir), nullptr, 0, nullptr, 0);
 	::_makepath_s(dirname, sizeof(dirname), drive, dir, nullptr, nullptr);
 
-	// ƒfƒVƒŠƒAƒ‰ƒCƒY
+	// ãƒ‡ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚º
 	//Deserialize(filename);
 
-	// ƒ‚ƒfƒ‹\’z
+	// ãƒ¢ãƒ‡ãƒ«æ§‹ç¯‰
 	BuildModel(dirname, filename);
 }
 
@@ -338,48 +338,48 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 
 	HRESULT hr = S_OK;
 
-	// ”Ä—pƒ‚ƒfƒ‹ƒtƒ@ƒCƒ‹“Ç‚İ‚Ş
+	// æ±ç”¨ãƒ¢ãƒ‡ãƒ«ãƒ•ã‚¡ã‚¤ãƒ«èª­ã¿è¾¼ã‚€
 	AssimpImporter importer(filename);
 
-	// ƒ}ƒeƒŠƒAƒ‹ƒf[ƒ^“Ç‚İæ‚è
+	// ãƒãƒ†ãƒªã‚¢ãƒ«ãƒ‡ãƒ¼ã‚¿èª­ã¿å–ã‚Š
 	importer.LoadMaterials(materials);
 
-	// ƒm[ƒhƒf[ƒ^“Ç‚İæ‚è
+	// ãƒãƒ¼ãƒ‰ãƒ‡ãƒ¼ã‚¿èª­ã¿å–ã‚Š
 	importer.LoadNodes(nodes);
 
-	// ƒƒbƒVƒ…ƒf[ƒ^“Ç‚İæ‚è
+	// ãƒ¡ãƒƒã‚·ãƒ¥ãƒ‡ãƒ¼ã‚¿èª­ã¿å–ã‚Š
 	importer.LoadMeshes(meshes, nodes);
 
-	// ƒAƒjƒ[ƒVƒ‡ƒ“ƒf[ƒg“Ç‚İæ‚è
+	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ãƒ‡ãƒ¼ãƒˆèª­ã¿å–ã‚Š
 	importer.LoadAnimations(animations, nodes);
 
-	// ƒ}ƒeƒŠƒAƒ‹
+	// ãƒãƒ†ãƒªã‚¢ãƒ«
 	for (Material& material : materials)
 	{
-		// ‘Š‘ÎƒpƒX‚Ì‰ğŒˆ
+		// ç›¸å¯¾ãƒ‘ã‚¹ã®è§£æ±º
 		char filename[256];
 		::_makepath_s(filename, 256, nullptr, dirname, material.diffuseTextureFileName.c_str(), nullptr);
 
-		// ƒ}ƒ‹ƒ`ƒoƒCƒg•¶š‚©‚çƒƒCƒh•¶š‚Ö•ÏŠ·
+		// ãƒãƒ«ãƒãƒã‚¤ãƒˆæ–‡å­—ã‹ã‚‰ãƒ¯ã‚¤ãƒ‰æ–‡å­—ã¸å¤‰æ›
 		wchar_t wfilename[256];
 		::MultiByteToWideChar(CP_ACP, 0, filename, -1, wfilename, 256);
 
-		// ƒeƒNƒXƒ`ƒƒ“Ç‚İ‚İ
+		// ãƒ†ã‚¯ã‚¹ãƒãƒ£èª­ã¿è¾¼ã¿
 		hr = graphics.LoadTexture(filename, material.d3d_srv_resource.GetAddressOf());
 		if (FAILED(hr))
 		{
-			// “Ç‚İ‚İ¸”s‚µ‚½‚çƒ_ƒ~[ƒeƒNƒXƒ`ƒƒ‚ğì‚é
+			// èª­ã¿è¾¼ã¿å¤±æ•—ã—ãŸã‚‰ãƒ€ãƒŸãƒ¼ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œã‚‹
 			LOG("load failed : %s\n", filename);
 
 			hr = graphics.CreateDummyTexture(material.d3d_srv_resource.GetAddressOf());
 			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 		}
 
-		// ƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[‚Ì¶¬
+		// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼ã®ç”Ÿæˆ
 		{
 			D3D12_RESOURCE_DESC d3d_resource_desc = material.d3d_srv_resource->GetDesc();
 
-			// ƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[‚Ìİ’è
+			// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼ã®è¨­å®š
 			D3D12_SHADER_RESOURCE_VIEW_DESC d3d_srv_desc = {};
 			d3d_srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 			d3d_srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -387,10 +387,10 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 			d3d_srv_desc.Texture2D.MipLevels = d3d_resource_desc.MipLevels;
 			d3d_srv_desc.Texture2D.MostDetailedMip = 0;
 
-			// ƒfƒBƒXƒNƒŠƒvƒ^æ“¾
+			// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿å–å¾—
 			material.srv_descriptor = graphics.GetShaderResourceDescriptorHeap()->PopDescriptor();
 
-			// ƒVƒF[ƒ_ƒŠƒ\[ƒXƒrƒ…[‚ğ¶¬.
+			// ã‚·ã‚§ãƒ¼ãƒ€ãƒªã‚½ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼ã‚’ç”Ÿæˆ.
 			d3d_device->CreateShaderResourceView(
 				material.d3d_srv_resource.Get(),
 				&d3d_srv_desc,
@@ -398,9 +398,9 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 			);
 		}
 
-		// ’è”ƒoƒbƒtƒ@‚Ì¶¬
+		// å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®ç”Ÿæˆ
 		{
-			// ƒq[ƒvƒvƒƒpƒeƒB‚Ìİ’è
+			// ãƒ’ãƒ¼ãƒ—ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã®è¨­å®š
 			D3D12_HEAP_PROPERTIES d3d_heap_props{};
 			d3d_heap_props.Type = D3D12_HEAP_TYPE_UPLOAD;
 			d3d_heap_props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
@@ -408,11 +408,11 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 			d3d_heap_props.CreationNodeMask = 1;
 			d3d_heap_props.VisibleNodeMask = 1;
 
-			// ƒŠƒ\[ƒX‚Ìİ’è
+			// ãƒªã‚½ãƒ¼ã‚¹ã®è¨­å®š
 			D3D12_RESOURCE_DESC d3d_resource_desc{};
 			d3d_resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 			d3d_resource_desc.Alignment = 0;
-			d3d_resource_desc.Width = ((sizeof(CbLambertMaterial)) + 255) & ~255;	// 256ƒoƒCƒgƒAƒ‰ƒCƒƒ“ƒg‚É‚·‚é
+			d3d_resource_desc.Width = ((sizeof(CbLambertMaterial)) + 255) & ~255;	// 256ãƒã‚¤ãƒˆã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆã«ã™ã‚‹
 			d3d_resource_desc.Height = 1;
 			d3d_resource_desc.DepthOrArraySize = 1;
 			d3d_resource_desc.MipLevels = 1;
@@ -422,7 +422,7 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 			d3d_resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 			d3d_resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-			// ’è”ƒoƒbƒtƒ@‚Ì¶¬
+			// å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®ç”Ÿæˆ
 			hr = d3d_device->CreateCommittedResource(
 				&d3d_heap_props,
 				D3D12_HEAP_FLAG_NONE,
@@ -434,10 +434,10 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 			material.d3d_cbv_resource->SetName(L"ModelResourceMaterialConstantBuffer");
 
-			// ƒfƒBƒXƒNƒŠƒvƒ^æ“¾
+			// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿å–å¾—
 			material.cbv_descriptor = graphics.GetShaderResourceDescriptorHeap()->PopDescriptor();
 
-			// ’è”ƒoƒbƒtƒ@ƒrƒ…[‚Ì¶¬
+			// å®šæ•°ãƒãƒƒãƒ•ã‚¡ãƒ“ãƒ¥ãƒ¼ã®ç”Ÿæˆ
 			D3D12_CONSTANT_BUFFER_VIEW_DESC d3d_cbv_desc;
 			d3d_cbv_desc.BufferLocation = material.d3d_cbv_resource->GetGPUVirtualAddress();
 			d3d_cbv_desc.SizeInBytes = static_cast<UINT>(d3d_resource_desc.Width);
@@ -446,7 +446,7 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 				material.cbv_descriptor->GetCpuHandle()
 			);
 
-			// ƒf[ƒ^İ’è
+			// ãƒ‡ãƒ¼ã‚¿è¨­å®š
 			CbLambertMaterial* cb_data;
 			hr = material.d3d_cbv_resource->Map(0, nullptr, reinterpret_cast<void**>(&cb_data));
 			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
@@ -457,17 +457,17 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 		}
 	}
 
-	// ƒƒbƒVƒ…
+	// ãƒ¡ãƒƒã‚·ãƒ¥
 	for (Mesh& mesh : meshes)
 	{
 		mesh.node = &nodes.at(mesh.nodeIndex);
 
-		// QÆƒ}ƒeƒŠƒAƒ‹İ’è
+		// å‚ç…§ãƒãƒ†ãƒªã‚¢ãƒ«è¨­å®š
 		mesh.material = &materials.at(mesh.materialIndex);
 
-		// ’¸“_ƒoƒbƒtƒ@
+		// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡
 		{
-			// ƒq[ƒvƒvƒƒpƒeƒB‚Ìİ’è
+			// ãƒ’ãƒ¼ãƒ—ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã®è¨­å®š
 			D3D12_HEAP_PROPERTIES d3d_heap_props{};
 			d3d_heap_props.Type = D3D12_HEAP_TYPE_UPLOAD;
 			d3d_heap_props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
@@ -475,7 +475,7 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 			d3d_heap_props.CreationNodeMask = 1;
 			d3d_heap_props.VisibleNodeMask = 1;
 
-			// ƒŠƒ\[ƒX‚Ìİ’è
+			// ãƒªã‚½ãƒ¼ã‚¹ã®è¨­å®š
 			D3D12_RESOURCE_DESC d3d_resource_desc{};
 			d3d_resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 			d3d_resource_desc.Alignment = 0;
@@ -489,7 +489,7 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 			d3d_resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 			d3d_resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-			// ƒAƒbƒvƒ[ƒh—p’¸“_ƒoƒbƒtƒ@¶¬
+			// ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ç”¨é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ç”Ÿæˆ
 			Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_upload_resource;
 			hr = d3d_device->CreateCommittedResource(
 				&d3d_heap_props,
@@ -501,14 +501,14 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 			);
 			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
-			// ƒAƒbƒvƒ[ƒh—p’¸“_ƒoƒbƒtƒ@‚Éƒf[ƒ^“à—e‚ğƒRƒs[
+			// ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ç”¨é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã«ãƒ‡ãƒ¼ã‚¿å†…å®¹ã‚’ã‚³ãƒ”ãƒ¼
 			void* vb = nullptr;
 			hr = d3d_upload_resource->Map(0, nullptr, &vb);
 			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 			::memcpy(vb, mesh.vertices.data(), sizeof(Vertex) * mesh.vertices.size());
 			d3d_upload_resource->Unmap(0, nullptr);
 
-			// •`‰æ—p’¸“_ƒoƒbƒtƒ@¶¬
+			// æç”»ç”¨é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ç”Ÿæˆ
 			d3d_heap_props.Type = D3D12_HEAP_TYPE_DEFAULT;
 			hr = d3d_device->CreateCommittedResource(
 				&d3d_heap_props,
@@ -521,18 +521,18 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 			mesh.d3d_vb_resource->SetName(L"ModelResourceVertexBuffer");
 
-			// ’¸“_ƒoƒbƒtƒ@ƒrƒ…[İ’è
+			// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ãƒ“ãƒ¥ãƒ¼è¨­å®š
 			mesh.d3d_vbv.BufferLocation = mesh.d3d_vb_resource->GetGPUVirtualAddress();
 			mesh.d3d_vbv.SizeInBytes = static_cast<UINT>(sizeof(Vertex) * mesh.vertices.size());
 			mesh.d3d_vbv.StrideInBytes = sizeof(Vertex);
 
-			// ƒAƒbƒvƒ[ƒh—pƒoƒbƒtƒ@‚ğ•`‰æ—pƒoƒbƒtƒ@‚ÉƒRƒs[
+			// ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ç”¨ãƒãƒƒãƒ•ã‚¡ã‚’æç”»ç”¨ãƒãƒƒãƒ•ã‚¡ã«ã‚³ãƒ”ãƒ¼
 			graphics.CopyBuffer(d3d_upload_resource.Get(), mesh.d3d_vb_resource.Get());
 		}
 
-		// ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@
+		// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡
 		{
-			// ƒq[ƒvƒvƒƒpƒeƒB‚Ìİ’è
+			// ãƒ’ãƒ¼ãƒ—ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã®è¨­å®š
 			D3D12_HEAP_PROPERTIES d3d_heap_props{};
 			d3d_heap_props.Type = D3D12_HEAP_TYPE_UPLOAD;
 			d3d_heap_props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
@@ -540,7 +540,7 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 			d3d_heap_props.CreationNodeMask = 1;
 			d3d_heap_props.VisibleNodeMask = 1;
 
-			// ƒŠƒ\[ƒX‚Ìİ’è
+			// ãƒªã‚½ãƒ¼ã‚¹ã®è¨­å®š
 			D3D12_RESOURCE_DESC d3d_resource_desc{};
 			d3d_resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 			d3d_resource_desc.Alignment = 0;
@@ -554,7 +554,7 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 			d3d_resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 			d3d_resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-			// ƒAƒbƒvƒ[ƒh—p’¸“_ƒoƒbƒtƒ@¶¬
+			// ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ç”¨é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ç”Ÿæˆ
 			Microsoft::WRL::ComPtr<ID3D12Resource> d3d_upload_resource;
 			hr = d3d_device->CreateCommittedResource(
 				&d3d_heap_props,
@@ -566,14 +566,14 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 			);
 			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
-			// ƒAƒbƒvƒ[ƒh—pƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚Éƒf[ƒ^“à—e‚ğƒRƒs[
+			// ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ç”¨ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ã«ãƒ‡ãƒ¼ã‚¿å†…å®¹ã‚’ã‚³ãƒ”ãƒ¼
 			void* ib = nullptr;
 			hr = d3d_upload_resource->Map(0, nullptr, &ib);
 			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 			::memcpy(ib, mesh.indices.data(), sizeof(UINT) * mesh.indices.size());
 			d3d_upload_resource->Unmap(0, nullptr);
 
-			// •`‰æ—pƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@¶¬
+			// æç”»ç”¨ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ç”Ÿæˆ
 			d3d_heap_props.Type = D3D12_HEAP_TYPE_DEFAULT;
 			hr = d3d_device->CreateCommittedResource(
 				&d3d_heap_props,
@@ -586,18 +586,18 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 			mesh.d3d_vb_resource->SetName(L"ModelResourceIndexBuffer");
 
-			// ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@ƒrƒ…[İ’è
+			// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ãƒ“ãƒ¥ãƒ¼è¨­å®š
 			mesh.d3d_ibv.BufferLocation = mesh.d3d_ib_resource->GetGPUVirtualAddress();
 			mesh.d3d_ibv.SizeInBytes = static_cast<UINT>(sizeof(UINT) * mesh.indices.size());
 			mesh.d3d_ibv.Format = DXGI_FORMAT_R32_UINT;
 
-			// ƒAƒbƒvƒ[ƒh—pƒoƒbƒtƒ@‚ğ•`‰æ—pƒoƒbƒtƒ@‚ÉƒRƒs[
+			// ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ç”¨ãƒãƒƒãƒ•ã‚¡ã‚’æç”»ç”¨ãƒãƒƒãƒ•ã‚¡ã«ã‚³ãƒ”ãƒ¼
 			graphics.CopyBuffer(d3d_upload_resource.Get(), mesh.d3d_ib_resource.Get());
 		}
 	}
 }
 
-// ƒoƒEƒ“ƒfƒBƒ“ƒOƒ{ƒbƒNƒXŒvZ
+// ãƒã‚¦ãƒ³ãƒ‡ã‚£ãƒ³ã‚°ãƒœãƒƒã‚¯ã‚¹è¨ˆç®—
 void ModelResource::ComputeLocalBounds()
 {
 	std::vector<DirectX::XMFLOAT4X4> globalTransforms(nodes.size());
@@ -641,7 +641,7 @@ void ModelResource::ComputeLocalBounds()
 
 			for (const ModelResource::Vertex& vertex : mesh.vertices)
 			{
-				//ƒXƒLƒjƒ“ƒO
+				//ã‚¹ã‚­ãƒ‹ãƒ³ã‚°
 				DirectX::XMVECTOR Position = DirectX::XMLoadFloat3(&vertex.position);
 				DirectX::XMVECTOR P        = DirectX::XMVectorZero();
 				const float* weights = &vertex.boneWeight.x;
@@ -677,7 +677,7 @@ void ModelResource::ComputeLocalBounds()
 	}
 }
 
-// ƒVƒŠƒAƒ‰ƒCƒY
+// ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚º
 void ModelResource::Serialize(const char* filename)
 {
 	std::ofstream ostream(filename, std::ios::binary);
@@ -701,7 +701,7 @@ void ModelResource::Serialize(const char* filename)
 	}
 }
 
-// ƒfƒVƒŠƒAƒ‰ƒCƒY
+// ãƒ‡ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚º
 void ModelResource::Deserialize(const char* filename)
 {
 	std::ifstream istream(filename, std::ios::binary);

@@ -10,5 +10,5 @@ public:
 
 	virtual void Update(float elapsedTime) override;
 private:
-	std::unique_ptr<Model> mapCollider;
+	std::unique_ptr<iModel> mapCollider;
 };

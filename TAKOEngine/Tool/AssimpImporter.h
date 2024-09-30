@@ -7,7 +7,7 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
-#include "TAKOEngine/Rendering/ModelResource.h"
+#include "TAKOEngine/Rendering/Model/ModelResource.h"
 
 class AssimpImporter
 {
@@ -20,41 +20,41 @@ private:
 public:
 	AssimpImporter(const char* filename);
 
-	// ƒm[ƒhƒf[ƒ^‚ğ“Ç‚İ‚İ
+	// ãƒãƒ¼ãƒ‰ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã¿
 	void LoadNodes(NodeList& nodes);
 
-	// ƒƒbƒVƒ…ƒf[ƒ^‚ğ“Ç‚İ‚İ
+	// ãƒ¡ãƒƒã‚·ãƒ¥ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã¿
 	void LoadMeshes(MeshList& meshes, const NodeList& nodes);
 
-	// ƒ}ƒeƒŠƒAƒ‹ƒf[ƒ^‚ğ“Ç‚İ‚İ
+	// ãƒãƒ†ãƒªã‚¢ãƒ«ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã¿
 	void LoadMaterials(MaterialList& materials);
 
-	// ƒAƒjƒ[ƒVƒ‡ƒ“ƒf[ƒ^‚ğ“Ç‚İ‚İ
+	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã¿
 	void LoadAnimations(AnimationList& animations, const NodeList& nodes);
 
 private:
-	// ƒm[ƒhƒf[ƒ^‚ğÄ‹A“Ç‚İ‚İ
+	// ãƒãƒ¼ãƒ‰ãƒ‡ãƒ¼ã‚¿ã‚’å†å¸°èª­ã¿è¾¼ã¿
 	void LoadNodes(NodeList& nodes, const aiNode* aNode, int parentIndex);
 
-	// ƒƒbƒVƒ…ƒf[ƒ^‚ğ“Ç‚İ‚İ
+	// ãƒ¡ãƒƒã‚·ãƒ¥ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã¿
 	void LoadMeshes(MeshList& meshes, const NodeList& nodes, const aiNode* aNode);
 
-	// ƒm[ƒhƒCƒ“ƒfƒbƒNƒXæ“¾
+	// ãƒãƒ¼ãƒ‰ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹å–å¾—
 	static int GetNodeIndex(const NodeList& nodes, const char* name);
 
-	// aiVector3D ¨ XMFLOAT2
+	// aiVector3D â†’ XMFLOAT2
 	static DirectX::XMFLOAT2 aiVector3DToXMFLOAT2(const aiVector3D& aValue);
 
-	// aiVector3D ¨ XMFLOAT3
+	// aiVector3D â†’ XMFLOAT3
 	static DirectX::XMFLOAT3 aiVector3DToXMFLOAT3(const aiVector3D& aValue);
 
-	// aiColor3D ¨ XMFLOAT4
+	// aiColor3D â†’ XMFLOAT4
 	static DirectX::XMFLOAT4 aiColor3DToXMFLOAT4(const aiColor3D& aValue);
 
-	// aiQuaternion ¨ XMFLOAT4
+	// aiQuaternion â†’ XMFLOAT4
 	static DirectX::XMFLOAT4 aiQuaternionToXMFLOAT4(const aiQuaternion& aValue);
 
-	// aiMatrix4x4 ¨ XMFLOAT4X4
+	// aiMatrix4x4 â†’ XMFLOAT4X4
 	static DirectX::XMFLOAT4X4 aiMatrix4x4ToXMFLOAT4X4(const aiMatrix4x4& aValue);
 
 private:

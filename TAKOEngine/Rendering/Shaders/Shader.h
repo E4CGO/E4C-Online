@@ -6,11 +6,11 @@
 
 #include "TAKOEngine/Rendering/Descriptor.h"
 #include "TAKOEngine/Rendering/RenderContext.h"
-#include "TAKOEngine/Rendering/Model.h"
-#include "TAKOEngine/Rendering/ModelDX12.h"
+#include "TAKOEngine/Rendering/Model/Model.h"
+#include "TAKOEngine/Rendering/Model/ModelDX12.h"
 #include "TAKOEngine/Rendering/Sprite.h"
 
-// ƒŒƒ“ƒ_[ƒRƒ“ƒeƒLƒXƒg
+// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆ
 struct RenderContextDX12
 {
 	ID3D12GraphicsCommandList* d3d_command_list = nullptr;
@@ -27,13 +27,13 @@ public:
 	Shader() {}
 	virtual ~Shader() {}
 
-	// •`‰æŠJn
+	// æç”»é–‹å§‹
 	virtual void Begin(const RenderContext& rc) = 0;
 	virtual void Begin(const RenderContextDX12& rc) = 0;
-	virtual void Draw(const RenderContextDX12& rc, Model* model) = 0;
+	virtual void Draw(const RenderContextDX12& rc, iModel* model) = 0;
 	virtual void Draw(const RenderContextDX12& rc, ModelDX12* model) = 0;
 
-	// •`‰æI—¹
+	// æç”»çµ‚äº†
 	virtual void End(const RenderContext& rc)
 	{
 		ID3D11DeviceContext* dc = rc.deviceContext;

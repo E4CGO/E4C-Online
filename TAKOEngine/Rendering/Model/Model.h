@@ -5,13 +5,15 @@
 #include <DirectXMath.h>
 #include <wrl.h>
 #include <d3d11.h>
+
 #include "ModelResource.h"
 
-class Model
+class iModel
 {
 public:
-	Model(ID3D11Device* device, const char* filename, float scaling = 1.0f);
-	~Model();
+	iModel() = default;
+	iModel(ID3D11Device* device, const char* filename, float scaling = 1.0f) {};
+	virtual ~iModel() {};
 
 	struct Node
 	{
@@ -46,39 +48,39 @@ public:
 		std::vector<FrameResource> frame_resources;
 	};
 
-	// ƒm[ƒhƒf[ƒ^æ“¾
+	// ãƒãƒ¼ãƒ‰ãƒ‡ãƒ¼ã‚¿å–å¾—
 	const std::vector<Node>& GetNodes() const { return nodes; }
 
-	// ƒƒbƒVƒ…æ“¾
-	const std::vector<Mesh>&GetMeshes() const { return m_meshes; }
+	// ãƒ¡ãƒƒã‚·ãƒ¥å–å¾—
+	const std::vector<Mesh>& GetMeshes() const { return m_meshes; }
 
-	// ƒgƒ‰ƒ“ƒXƒtƒH[ƒ€XVˆ—
-	void UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform);
+	// ãƒˆãƒ©ãƒ³ã‚¹ãƒ•ã‚©ãƒ¼ãƒ æ›´æ–°å‡¦ç†
+	virtual void UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform) = 0;
 
-	// ƒ‹[ƒgƒm[ƒhæ“¾
+	// ãƒ«ãƒ¼ãƒˆãƒãƒ¼ãƒ‰å–å¾—
 	Node* GetRootNode() { return nodes.data(); }
-	
-	// ƒm[ƒhŒŸõ
-	Node* FindNode(const char* name);
 
-	// ƒŠƒ\[ƒXæ“¾
+	// ãƒãƒ¼ãƒ‰æ¤œç´¢
+	virtual Node* FindNode(const char* name) = 0;
+
+	// ãƒªã‚½ãƒ¼ã‚¹å–å¾—
 	const ModelResource* GetResource() const { return resource.get(); }
 
-	// ƒAƒjƒ[ƒVƒ‡ƒ“Ä¶
-	void PlayAnimation(int index, bool loop, float blendSeconds = 0.2f);
+	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å†ç”Ÿ
+	virtual void PlayAnimation(int index, bool loop, float blendSeconds = 0.2f) = 0;
 
-	// ƒAƒjƒ[ƒVƒ‡ƒ“Ä¶’†‚©
-	bool IsPlayAnimation() const;
+	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å†ç”Ÿä¸­ã‹
+	virtual bool IsPlayAnimation() const = 0;
 
-	// ƒAƒjƒ[ƒVƒ‡ƒ“XVˆ—
-	void UpdateAnimation(float elapsedTime);
+	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³æ›´æ–°å‡¦ç†
+	virtual void UpdateAnimation(float elapsedTime) = 0;
 
-	// ƒAƒjƒ[ƒVƒ‡ƒ“æ“¾
+	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å–å¾—
 	int GetAnimationId() { return currentAnimationIndex; }
 
 	int GetCurrentAnimationIndex() const { return  currentAnimationIndex; }
-	
-	// Œ»İ‚ÌƒAƒjƒ[ƒVƒ‡ƒ“Ä¶ŠÔæ“¾
+
+	// ç¾åœ¨ã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å†ç”Ÿæ™‚é–“å–å¾—
 	float GetCurrentAnimationSeconds() const { return  currentAnimationSeconds; }
 	float GetAnimationRate() const { return currentAnimationSeconds / resource->GetAnimations().at(currentAnimationIndex).secondsLength; }
 	void SetAnimationRate(float rate) { currentAnimationSeconds = resource->GetAnimations().at(currentAnimationIndex).secondsLength * rate; }
@@ -89,26 +91,25 @@ public:
 	const std::vector<Node>& GetNodesDX12() const { return m_nodes; }
 	std::vector<Node>& GetNodesDX12() { return m_nodes; }
 
-	// ƒƒbƒVƒ…ƒŠƒXƒgæ“¾
+	// ãƒ¡ãƒƒã‚·ãƒ¥ãƒªã‚¹ãƒˆå–å¾—
 	std::vector<Mesh>& GetMeshes() { return m_meshes; }
 
-	// ƒŠƒ\[ƒXæ“¾
+	// ãƒªã‚½ãƒ¼ã‚¹å–å¾—
 	const ModelResource* GetResourceDX12() const { return m_resource.get(); }
 
-	//ƒfƒoƒbƒOî•ñ
-	void DrawDebugGUI();
+	//ãƒ‡ãƒãƒƒã‚°æƒ…å ±
+	virtual void DrawDebugGUI() = 0;
 
-private:
-	// ƒAƒjƒ[ƒVƒ‡ƒ“ŒvZˆ—
-	void ComputeAnimation(float elapsedTime);
-	
-	// ƒuƒŒƒ“ƒfƒBƒ“ƒOŒvZˆ—
-	void ComputeBlending(float elapsedTime);
+	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³è¨ˆç®—å‡¦ç†
+	virtual void ComputeAnimation(float elapsedTime) = 0;
 
-	// ƒoƒEƒ“ƒfƒBƒ“ƒOƒ{ƒbƒNƒXŒvZ
-	void ComputeWorldBounds();
+	// ãƒ–ãƒ¬ãƒ³ãƒ‡ã‚£ãƒ³ã‚°è¨ˆç®—å‡¦ç†
+	virtual void ComputeBlending(float elapsedTime) = 0;
 
-private:
+	// ãƒã‚¦ãƒ³ãƒ‡ã‚£ãƒ³ã‚°ãƒœãƒƒã‚¯ã‚¹è¨ˆç®—
+	virtual void ComputeWorldBounds() = 0;
+
+protected:
 	std::shared_ptr<ModelResource>	resource;
 	std::vector<Node>				nodes;
 	DirectX::BoundingBox	        bounds;

@@ -4,10 +4,10 @@
 #include <vector>
 #include <DirectXMath.h>
 
-#include "TAKOEngine/Rendering/ModelResource.h"
+#include "TAKOEngine/Rendering/Model/ModelResource.h"
 
-// ƒ‚ƒfƒ‹
-class ModelDX12
+// ãƒ¢ãƒ‡ãƒ«
+class ModelDX12 //: public iModel
 {
 public:
 	ModelDX12(const char* filename);
@@ -39,23 +39,27 @@ public:
 		std::vector<FrameResource>				frame_resources;
 	};
 
-	// s—ñŒvZ
+	// è¡Œåˆ—è¨ˆç®—
 	void UpdateTransform(const DirectX::XMFLOAT4X4& transform);
 
-	// ƒAƒjƒ[ƒVƒ‡ƒ“
+	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³
 	bool IsPlayAnimation() const { return m_current_animation >= 0; }
 	void PlayAnimation(int animationIndex, bool loop = false);
 	void StopAnimation();
 	void UpdateAnimation(float elapsedTime);
 
-	// ƒm[ƒhƒŠƒXƒgæ“¾
+	void ComputeAnimation(float elapsedTime);
+	void ComputeBlending(float elapsedTime);
+	void ComputeWorldBounds();
+
+	// ãƒãƒ¼ãƒ‰ãƒªã‚¹ãƒˆå–å¾—
 	const std::vector<Node>& GetNodes() const { return m_nodes; }
 	std::vector<Node>& GetNodes() { return m_nodes; }
 
-	// ƒƒbƒVƒ…ƒŠƒXƒgæ“¾
+	// ãƒ¡ãƒƒã‚·ãƒ¥ãƒªã‚¹ãƒˆå–å¾—
 	std::vector<Mesh>& GetMeshes() { return m_meshes; }
 
-	// ƒŠƒ\[ƒXæ“¾
+	// ãƒªã‚½ãƒ¼ã‚¹å–å¾—
 	const ModelResource* GetResource() const { return m_resource.get(); }
 
 private:

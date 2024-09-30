@@ -2,25 +2,25 @@
 
 #include <DirectXCollision.h>
 #include <vector>
-#include "Model.h"
-#include "TAKOEngine\Editor\Camera\Camera.h"
+#include "TAKOEngine/Rendering/Model/Model.h"
+#include "TAKOEngine/Editor/Camera/Camera.h"
 
 struct Frustum
 {
-    DirectX::XMFLOAT4 planes[6]; // 6‚Â‚Ì•½–Êi¶A‰EAãA‰ºA‹ßA‰“j
+	DirectX::XMFLOAT4 planes[6]; // 6ã¤ã®å¹³é¢ï¼ˆå·¦ã€å³ã€ä¸Šã€ä¸‹ã€è¿‘ã€é ï¼‰
 };
 
 class FrustumCulling
 {
 public:
-    //‹‘äƒJƒŠƒ“ƒO‚ğs‚¤ŠÖ”
-    static void FrustumCullingFlag(const Camera& camera, const std::vector<Model::Mesh>& meshes, std::vector<bool>& visibleObjects);
+	//è¦–éŒå°ã‚«ãƒªãƒ³ã‚°ã‚’è¡Œã†é–¢æ•°
+	static void FrustumCullingFlag(const Camera& camera, const std::vector<iModel::Mesh>& meshes, std::vector<bool>& visibleObjects);
 
 private:
 
-    // ƒtƒ‰ƒXƒ^ƒ€‚ğŒvZ‚·‚éŠÖ”
-    static void CalculateFrustumFromViewProjection(Frustum& frustum, const DirectX::XMFLOAT4X4& viewMatrix, const DirectX::XMFLOAT4X4& projectionMatrix);
+	// ãƒ•ãƒ©ã‚¹ã‚¿ãƒ ã‚’è¨ˆç®—ã™ã‚‹é–¢æ•°
+	static void CalculateFrustumFromViewProjection(Frustum& frustum, const DirectX::XMFLOAT4X4& viewMatrix, const DirectX::XMFLOAT4X4& projectionMatrix);
 
-    // ƒtƒ‰ƒXƒ^ƒ€‚Æ‚ÌÕ“Ë”»’è‚ğs‚¤ŠÖ”
-    static bool IsObjectInFrustum(const Frustum& frustum, const DirectX::BoundingBox& objectBounds);
+	// ãƒ•ãƒ©ã‚¹ã‚¿ãƒ ã¨ã®è¡çªåˆ¤å®šã‚’è¡Œã†é–¢æ•°
+	static bool IsObjectInFrustum(const Frustum& frustum, const DirectX::BoundingBox& objectBounds);
 };

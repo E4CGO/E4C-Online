@@ -4,24 +4,24 @@
 #include <string>
 #include <unordered_map>
 
-#include "TAKOEngine/Rendering/ModelResource.h"
+#include "TAKOEngine/Rendering/Model/ModelResource.h"
 #include "TAKOEngine/Rendering/Sprite.h"
 
-// ƒŠƒ\[ƒXƒ}ƒl[ƒWƒƒ[
+// ãƒªã‚½ãƒ¼ã‚¹ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼
 class ResourceManager
 {
 private:
 	ResourceManager() {}
 	~ResourceManager() {}
 public:
-	// —Bˆê‚ÌƒCƒ“ƒXƒ^ƒ“ƒXæ“¾
+	// å”¯ä¸€ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹å–å¾—
 	static ResourceManager& Instance()
 	{
 		static ResourceManager instance;
 		return instance;
 	}
 
-	// ƒ‚ƒfƒ‹ƒŠƒ\[ƒX“Ç‚İ‚İ
+	// ãƒ¢ãƒ‡ãƒ«ãƒªã‚½ãƒ¼ã‚¹èª­ã¿è¾¼ã¿
 	std::shared_ptr<ModelResource> LoadModelResource(const char* filename);
 	std::shared_ptr<Sprite> LoadSpriteResource(const char* filename);
 

@@ -21,6 +21,11 @@ Graphics* Graphics::s_instance = nullptr;
 
 Graphics::~Graphics()
 {
+	FinishDX12();
+}
+
+void Graphics::FinishDX12()
+{
 	CommandQueue* command_queues[] =
 	{
 		&m_graphics_queue,
@@ -75,8 +80,6 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	m_buffer_count = buffer_count;
 
 #ifdef USEDX12
-
-	//m_buffer_count = buffer_count;
 
 	UINT dxgi_factory_flags = 0;
 

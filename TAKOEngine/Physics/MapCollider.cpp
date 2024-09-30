@@ -2,19 +2,19 @@
 
 #include "TAKOEngine/Tool/XMFLOAT.h"
 
-MapCollider::MapCollider(Model* model)
+MapCollider::MapCollider(iModel* model)
 {
 	this->model = model;
 
 	type = COLLIDER_TYPE::MAP;
 
-	// 8•ª–Øì¬
+	// 8åˆ†æœ¨ä½œæˆ
 	XMFLOAT3 minPos, maxPos;
 	CalcMapArea(minPos, maxPos);
 	tree.Initialize(7,
 		minPos.x - 1.0f, maxPos.x + 1.0f,
 		minPos.y - 50.0f, maxPos.y + 10.0f,
-		minPos.z - 1.0f, maxPos.z + 1.0f);// ƒGƒŠƒA‚ğ­‚µ‘å‚«‚ß‚Éì¬
+		minPos.z - 1.0f, maxPos.z + 1.0f);// ã‚¨ãƒªã‚¢ã‚’å°‘ã—å¤§ãã‚ã«ä½œæˆ
 	RegisterPorigons();
 }
 
@@ -36,20 +36,20 @@ bool MapCollider::CollisionVsShpere(
 	const ModelResource* resource = model->GetResource();
 	for (const ModelResource::Mesh& mesh : resource->GetMeshes())
 	{
-		// ƒƒbƒVƒ…ƒm[ƒhæ“¾
-		const Model::Node& node = model->GetNodes().at(mesh.nodeIndex);
+		// ãƒ¡ãƒƒã‚·ãƒ¥ãƒãƒ¼ãƒ‰å–å¾—
+		const iModel::Node& node = model->GetNodes().at(mesh.nodeIndex);
 
-		// ‹…‘Ì‚ğƒ[ƒ‹ƒh‹óŠÔ‚©‚çƒ[ƒJƒ‹‹óŠÔ‚Ö•ÏŠ·
+		// çƒä½“ã‚’ãƒ¯ãƒ¼ãƒ«ãƒ‰ç©ºé–“ã‹ã‚‰ãƒ­ãƒ¼ã‚«ãƒ«ç©ºé–“ã¸å¤‰æ›
 		DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&node.worldTransform);
 		DirectX::XMMATRIX InverseWorldTransform = DirectX::XMMatrixInverse(nullptr, WorldTransform);
 
 		DirectX::XMVECTOR SphereCenter = DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat3(&sphereCenter), InverseWorldTransform);
 		DirectX::XMVECTOR SphereCenterOri = DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat3(&sphereCenterOri), InverseWorldTransform);
-		float sphereRadius = other->GetScale().x; // ‹…‘Ì”¼Œa
+		float sphereRadius = other->GetScale().x; // çƒä½“åŠå¾„
 		DirectX::XMVECTOR SphereRadius = DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat(&sphereRadius), InverseWorldTransform);
 		DirectX::XMStoreFloat(&sphereRadius, SphereRadius);
 
-		// OŠpŒ`i–Êj‚Æ‚ÌŒğ·”»’è
+		// ä¸‰è§’å½¢ï¼ˆé¢ï¼‰ã¨ã®äº¤å·®åˆ¤å®š
 		const std::vector<ModelResource::Vertex>& vertices = mesh.vertices;
 		const std::vector<UINT> indices = mesh.indices;
 
@@ -57,21 +57,21 @@ bool MapCollider::CollisionVsShpere(
 
 		for (UINT i = 0; i < indices.size(); i += 3)
 		{
-			// OŠpŒ`‚Ì’¸“_‚ğ’Šo
+			// ä¸‰è§’å½¢ã®é ‚ç‚¹ã‚’æŠ½å‡º
 			//const ModelResource::Vertex& a = vertices.at(indices.at(i));
 			//const ModelResource::Vertex& b = vertices.at(indices.at(i + 1));
 			//const ModelResource::Vertex& c = vertices.at(indices.at(i + 2));
 			const ModelResource::Vertex& a = vertices.at(indices.at(i + 2));
 			const ModelResource::Vertex& b = vertices.at(indices.at(i + 1));
 			const ModelResource::Vertex& c = vertices.at(indices.at(i));
-			// OŠpŒ`’¸“_
+			// ä¸‰è§’å½¢é ‚ç‚¹
 			DirectX::XMVECTOR TriangleVertex[3] =
 			{
 				DirectX::XMLoadFloat3(&a.position),
 				DirectX::XMLoadFloat3(&b.position),
 				DirectX::XMLoadFloat3(&c.position),
 			};
-			// –Ê–@ü
+			// é¢æ³•ç·š
 			DirectX::XMVECTOR Edge[3] =
 			{
 				DirectX::XMVectorSubtract(TriangleVertex[1], TriangleVertex[0]),
@@ -88,10 +88,10 @@ bool MapCollider::CollisionVsShpere(
 			float distance = DirectX::XMVectorGetX(Distance);
 			float distanceOri = DirectX::XMVectorGetX(DistanceOri);
 
-			// ‹…‚Ì’†S‚ª–Ê‚ÉÚ‚µ‚Ä‚¢‚é‚©A•‰‚Ì•ûŒü‚É‚ ‚éê‡‚Í“–‚½‚ç‚È‚¢
+			// çƒã®ä¸­å¿ƒãŒé¢ã«æ¥ã—ã¦ã„ã‚‹ã‹ã€è² ã®æ–¹å‘ã«ã‚ã‚‹å ´åˆã¯å½“ãŸã‚‰ãªã„
 			if (distance < 0 && distanceOri < 0) continue;
 
-			// ‹…‚ªOŠpŒ`“à•”‚É‘¶İ‚·‚é‚©
+			// çƒãŒä¸‰è§’å½¢å†…éƒ¨ã«å­˜åœ¨ã™ã‚‹ã‹
 			if (distance > sphereRadius) continue;
 
 			bool outside = false;
@@ -106,7 +106,7 @@ bool MapCollider::CollisionVsShpere(
 					outside = true;
 				}
 			}
-			// OŠpŒ`‚Ì“à‘¤‚È‚Ì‚ÅŒğ·‚·‚é
+			// ä¸‰è§’å½¢ã®å†…å´ãªã®ã§äº¤å·®ã™ã‚‹
 			if (!outside)
 			{
 				materialIndex = mesh.materialIndex;
@@ -117,17 +117,17 @@ bool MapCollider::CollisionVsShpere(
 
 				continue;
 			}
-			// ŠO‘¤
-			// ƒGƒbƒW‚Æ‚Ì”»’è
+			// å¤–å´
+			// ã‚¨ãƒƒã‚¸ã¨ã®åˆ¤å®š
 			const float radiusSq = sphereRadius * sphereRadius;
 			for (int i = 0; i < 3; ++i)
 			{
-				// •Ó‚ÌË‰e’l‚ğ‹‚ß‚é
+				// è¾ºã®å°„å½±å€¤ã‚’æ±‚ã‚ã‚‹
 				float t = DirectX::XMVectorGetX(DirectX::XMVector3Dot(Vec[i], Edge[i]));
 				if (t > 0.0f)
 				{
-					// •Ó‚Ìn“_‚©‚çI“_‚Ü‚Å‚ÌƒxƒNƒgƒ‹‚Æx“X‚©‚ç‹…‚Ü‚Å‚ÌƒxƒNƒgƒ‹‚ª“¯ˆê‚Ìê‡A
-					// “àÏ’l‚ª•Ó‚Ì’·‚³‚Ì2æ‚É‚È‚é«¿‚ğ—˜—p‚µ‚Ä•Ó‚©‚ç‹…‚Ü‚Å‚ÌÅ’ZƒxƒNƒgƒ‹‚ğ‹‚ß‚é
+					// è¾ºã®å§‹ç‚¹ã‹ã‚‰çµ‚ç‚¹ã¾ã§ã®ãƒ™ã‚¯ãƒˆãƒ«ã¨æ”¯åº—ã‹ã‚‰çƒã¾ã§ã®ãƒ™ã‚¯ãƒˆãƒ«ãŒåŒä¸€ã®å ´åˆã€
+					// å†…ç©å€¤ãŒè¾ºã®é•·ã•ã®2ä¹—ã«ãªã‚‹æ€§è³ªã‚’åˆ©ç”¨ã—ã¦è¾ºã‹ã‚‰çƒã¾ã§ã®æœ€çŸ­ãƒ™ã‚¯ãƒˆãƒ«ã‚’æ±‚ã‚ã‚‹
 					float edgeLengthSq = DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(Edge[i]));
 					if (t > edgeLengthSq)
 					{
@@ -139,14 +139,14 @@ bool MapCollider::CollisionVsShpere(
 						Vec[i] = DirectX::XMVectorSubtract(Vec[i], DirectX::XMVectorScale(Edge[i], t));
 					}
 				}
-				// •Ó‚©‚ç‹…‚Ü‚Å‚ÌÅ’ZƒxƒNƒgƒ‹‚Ì‹——£‚ª”¼ŒaˆÈ‰º‚È‚ç‚ß‚è‚ñ‚Å‚¢‚é
+				// è¾ºã‹ã‚‰çƒã¾ã§ã®æœ€çŸ­ãƒ™ã‚¯ãƒˆãƒ«ã®è·é›¢ãŒåŠå¾„ä»¥ä¸‹ãªã‚‰ã‚ã‚Šè¾¼ã‚“ã§ã„ã‚‹
 				float lengthSq = DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(Vec[i]));
 				if (lengthSq < radiusSq)
 				{
 					materialIndex = mesh.materialIndex;
-					// ‚ß‚è‚İ—ÊZo
+					// ã‚ã‚Šè¾¼ã¿é‡ç®—å‡º
 					float depth = sphereRadius - sqrtf(lengthSq);
-					// ‚ß‚è‚İ•ª‰Ÿ‚µo‚µˆ—
+					// ã‚ã‚Šè¾¼ã¿åˆ†æŠ¼ã—å‡ºã—å‡¦ç†
 					DirectX::XMVECTOR Reflection = DirectX::XMVector3Normalize(Vec[i]);
 					Reflection = DirectX::XMVectorScale(Reflection, depth);
 					SphereCenter = DirectX::XMVectorAdd(SphereCenter, Reflection);
@@ -160,7 +160,7 @@ bool MapCollider::CollisionVsShpere(
 			hit = true;
 			result.materialIndex = materialIndex;
 
-			// ƒ[ƒJƒ‹‹óŠÔ‚©‚çƒ[ƒ‹ƒh‹óŠÔ‚Ö•ÏŠ·
+			// ãƒ­ãƒ¼ã‚«ãƒ«ç©ºé–“ã‹ã‚‰ãƒ¯ãƒ¼ãƒ«ãƒ‰ç©ºé–“ã¸å¤‰æ›
 			DirectX::XMVECTOR WorldPosition = DirectX::XMVector3TransformCoord(SphereCenter, WorldTransform);
 
 			DirectX::XMStoreFloat3(&sphereCenter, WorldPosition);
@@ -187,7 +187,7 @@ bool MapCollider::RayCast(
 	HitResult& result
 )
 {
-	// Å¬’lÅ‘å’l
+	// æœ€å°å€¤æœ€å¤§å€¤
 	float minX, maxX;
 	if (start.x < end.x)
 	{
@@ -224,7 +224,7 @@ bool MapCollider::RayCast(
 		maxZ = start.z;
 	}
 
-	// ƒŒƒC‚ª’Ê‚é‹óŠÔ‚Ì”z—ñ”Ô†Zo
+	// ãƒ¬ã‚¤ãŒé€šã‚‹ç©ºé–“ã®é…åˆ—ç•ªå·ç®—å‡º
 	int Elem = tree.GetLinerIndex(minX, maxX, minY, maxY, minZ, maxZ);
 
 	bool hit = false;
@@ -244,7 +244,7 @@ void MapCollider::CalcMapArea(
 	const ModelResource* resource = model->GetResource();
 	for (const ModelResource::Mesh& mesh : resource->GetMeshes())
 	{
-		// ’¸“_ƒf[ƒ^æ“¾
+		// é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿å–å¾—
 		const std::vector<ModelResource::Vertex>& vertices = mesh.vertices;
 
 		XMFLOAT3 tmp_minPos = vertices.at(0).position;
@@ -280,19 +280,19 @@ void MapCollider::CalcMapArea(
 			}
 		}
 
-		// ƒƒbƒVƒ…ƒm[ƒhæ“¾
-		const Model::Node& node = model->GetNodes().at(mesh.nodeIndex);
-		// ƒ[ƒ‹ƒhs—ñ
+		// ãƒ¡ãƒƒã‚·ãƒ¥ãƒãƒ¼ãƒ‰å–å¾—
+		const iModel::Node& node = model->GetNodes().at(mesh.nodeIndex);
+		// ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—
 		XMMATRIX WorldTransform = XMLoadFloat4x4(&node.worldTransform);
 
-		// ’¸“_‚ğƒ[ƒJƒ‹‹óŠÔ‚©‚çƒ[ƒ‹ƒh‹óŠÔ‚Ö•ÏŠ·
+		// é ‚ç‚¹ã‚’ãƒ­ãƒ¼ã‚«ãƒ«ç©ºé–“ã‹ã‚‰ãƒ¯ãƒ¼ãƒ«ãƒ‰ç©ºé–“ã¸å¤‰æ›
 		XMVECTOR MinP = XMLoadFloat3(&tmp_minPos);
 		XMVECTOR MaxP = XMLoadFloat3(&tmp_maxPos);
 		MinP = XMVector3TransformCoord(MinP, WorldTransform);
 		MaxP = XMVector3TransformCoord(MaxP, WorldTransform);
 		XMStoreFloat3(&tmp_minPos, MinP);
 		XMStoreFloat3(&tmp_maxPos, MaxP);
-		// ‚±‚±‚Å’l‚Ì‘å¬‚ª‹t‚É‚È‚Á‚Ä‚é‰Â”\«‚ª‚ ‚é‚Ì‚Å‚à‚¤ˆê“x”äŠr
+		// ã“ã“ã§å€¤ã®å¤§å°ãŒé€†ã«ãªã£ã¦ã‚‹å¯èƒ½æ€§ãŒã‚ã‚‹ã®ã§ã‚‚ã†ä¸€åº¦æ¯”è¼ƒ
 		if (tmp_minPos.x > tmp_maxPos.x)
 		{
 			float tmp = tmp_maxPos.x;
@@ -312,7 +312,7 @@ void MapCollider::CalcMapArea(
 			tmp_minPos.z = tmp;
 		}
 
-		// ‚±‚ê‚Ü‚Å‚ÉŒ©‚Â‚¯‚½‚à‚Ì‚Æ”äŠr
+		// ã“ã‚Œã¾ã§ã«è¦‹ã¤ã‘ãŸã‚‚ã®ã¨æ¯”è¼ƒ
 		if (minPos.x > tmp_minPos.x)
 		{
 			minPos.x = tmp_minPos.x;
@@ -347,19 +347,19 @@ void MapCollider::RegisterPorigons()
 	const ModelResource* resource = model->GetResource();
 	for (const ModelResource::Mesh& mesh : resource->GetMeshes())
 	{
-		// ƒƒbƒVƒ…ƒm[ƒhæ“¾
-		const Model::Node& node = model->GetNodes().at(mesh.nodeIndex);
+		// ãƒ¡ãƒƒã‚·ãƒ¥ãƒãƒ¼ãƒ‰å–å¾—
+		const iModel::Node& node = model->GetNodes().at(mesh.nodeIndex);
 		
-		// ƒ[ƒ‹ƒhs—ñæ“¾
+		// ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—å–å¾—
 		XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&node.worldTransform);
 
-		// ’¸“_ƒf[ƒ^æ“¾
+		// é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿å–å¾—
 		const std::vector<ModelResource::Vertex>& vertices = mesh.vertices;
 		const std::vector<UINT> indices = mesh.indices;
 
 		for (UINT i = 0; i < indices.size(); i += 3)//102837
 		{
-			// OŠpŒ`‚Ì’¸“_‚ğ’Šo
+			// ä¸‰è§’å½¢ã®é ‚ç‚¹ã‚’æŠ½å‡º
 			//const ModelResource::Vertex& a = vertices.at(indices.at(i));
 			//const ModelResource::Vertex& b = vertices.at(indices.at(i + 1));
 			//const ModelResource::Vertex& c = vertices.at(indices.at(i + 2));
@@ -371,26 +371,26 @@ void MapCollider::RegisterPorigons()
 			XMVECTOR B = XMLoadFloat3(&b.position);
 			XMVECTOR C = XMLoadFloat3(&c.position);
 
-			// OŠpŒ`‚ÌO•ÓƒxƒNƒgƒ‹‚ğZo
+			// ä¸‰è§’å½¢ã®ä¸‰è¾ºãƒ™ã‚¯ãƒˆãƒ«ã‚’ç®—å‡º
 			XMVECTOR AB = XMVectorSubtract(B, A);
 			XMVECTOR BC = XMVectorSubtract(C, B);
 			XMVECTOR CA = XMVectorSubtract(A, C);
 
-			// OŠpŒ`‚Ì–@üƒxƒNƒgƒ‹‚ğZo
+			// ä¸‰è§’å½¢ã®æ³•ç·šãƒ™ã‚¯ãƒˆãƒ«ã‚’ç®—å‡º
 			XMVECTOR N = XMVector3Cross(AB, BC);
 
-			// ’¸“_‚Æ–@ü‚ğƒ[ƒJƒ‹‹óŠÔ‚©‚çƒ[ƒ‹ƒh‹óŠÔ‚Ö•ÏŠ·
+			// é ‚ç‚¹ã¨æ³•ç·šã‚’ãƒ­ãƒ¼ã‚«ãƒ«ç©ºé–“ã‹ã‚‰ãƒ¯ãƒ¼ãƒ«ãƒ‰ç©ºé–“ã¸å¤‰æ›
 			A = XMVector3TransformCoord(A, WorldTransform);
 			B = XMVector3TransformCoord(B, WorldTransform);
 			C = XMVector3TransformCoord(C, WorldTransform);
 			N = XMVector3TransformNormal(N, WorldTransform);
 			N = XMVector3Normalize(N);
 
-			// Porigon\‘¢‘Ì‚ÉŠi”[
+			// Porigonæ§‹é€ ä½“ã«æ ¼ç´
 			Porigon* porigon = new Porigon;
 			XMStoreFloat3(&porigon->position[0], A);
 
-			//// ’¸“_‚Ì‡”Ô‚ğ•â³
+			//// é ‚ç‚¹ã®é †ç•ªã‚’è£œæ­£
 			XMVECTOR WorldAB = XMVectorSubtract(B, A);
 			XMVECTOR WorldAC = XMVectorSubtract(C, A);
 			if (XMVectorGetX(XMVector3Dot(N, XMVector3Cross(WorldAB, WorldAC))) > 0)
@@ -408,8 +408,8 @@ void MapCollider::RegisterPorigons()
 			porigon->materialIndex = mesh.materialIndex;
 
 
-			/////////// 8•ª–Ø‚É“o˜^ ////////////
-			// ’¸“_ˆÊ’u‚ÌÅ¬’lÅ‘å’l
+			/////////// 8åˆ†æœ¨ã«ç™»éŒ² ////////////
+			// é ‚ç‚¹ä½ç½®ã®æœ€å°å€¤æœ€å¤§å€¤
 			float minX, maxX;
 			if (porigon->position[0].x < porigon->position[1].x)
 			{
@@ -500,7 +500,7 @@ void MapCollider::RegisterPorigons()
 				}
 			}
 
-			// “o˜^
+			// ç™»éŒ²
 			tree.Regist(minX, maxX, minY, maxY, minZ, maxZ, porigon);
 		}
 	}
@@ -527,10 +527,10 @@ bool MapCollider::ShpereVsPorigon(
 		XMVectorSubtract(Vertex[0], Vertex[2])
 	};
 
-	// –Ê–@ü
+	// é¢æ³•ç·š
 	XMVECTOR Normal = XMLoadFloat3(&porigon->normal);
 
-	// •½–Ê‚ÆˆÚ“®‘OŒã‚Ì‹…‚Ì‹——£‚ğ‹‚ß‚é
+	// å¹³é¢ã¨ç§»å‹•å‰å¾Œã®çƒã®è·é›¢ã‚’æ±‚ã‚ã‚‹
 	XMFLOAT3 sphereCenter = other->GetPosition();
 	XMFLOAT3 sphereCenterOri = other->GetPosition() + direction;
 	XMVECTOR  SphereCenter = XMLoadFloat3(&sphereCenter);
@@ -543,14 +543,14 @@ bool MapCollider::ShpereVsPorigon(
 	float distance = XMVectorGetX(Distance);
 	float distanceOri = XMVectorGetX(DistanceOri);
 
-	// ˆÚ“®‘O‚Ì‹…‚ª–Ê‚Ì— ‘¤‚È‚ç“–‚½‚ç‚È‚¢
+	// ç§»å‹•å‰ã®çƒãŒé¢ã®è£å´ãªã‚‰å½“ãŸã‚‰ãªã„
 	if (distance < 0)	return false;
 
-	// ˆÚ“®Œã‚Ì‹…‚à–Ê‚Ì•\‘¤‚Å‚»‚Ì‹——£‚ª”¼ŒaˆÈã‚È‚ç“–‚½‚ç‚È‚¢
-	float sphereRadius = other->GetScale().x; // ‹…‘Ì”¼Œa
+	// ç§»å‹•å¾Œã®çƒã‚‚é¢ã®è¡¨å´ã§ãã®è·é›¢ãŒåŠå¾„ä»¥ä¸Šãªã‚‰å½“ãŸã‚‰ãªã„
+	float sphereRadius = other->GetScale().x; // çƒä½“åŠå¾„
 	if (distanceOri > sphereRadius)	return false;
 
-	// ‹…‚ªOŠpŒ`“à•”‚É‚ ‚é‚©
+	// çƒãŒä¸‰è§’å½¢å†…éƒ¨ã«ã‚ã‚‹ã‹
 	bool outside = false;
 	XMVECTOR Vec[3];
 	for (int i = 0; i < 3; ++i)
@@ -591,12 +591,12 @@ bool MapCollider::RayVsPorigon(
 	XMVECTOR rayVec = XMVectorSubtract(End, Start);
 	float length = XMVectorGetX(XMVector3Length(rayVec));
 
-	// “àÏ‚ÌŒ‹‰Ê‚ªƒvƒ‰ƒX‚È‚ç‚Î— Œü‚«
+	// å†…ç©ã®çµæœãŒãƒ—ãƒ©ã‚¹ãªã‚‰ã°è£å‘ã
 	XMVECTOR N = XMLoadFloat3(&porigon->normal);
 	float dot = XMVectorGetX(XMVector3Dot(rayVec, N));
 	if (dot >= 0.0f)	return false;
 
-	// ƒŒƒC‚Ìn“_‚©‚ç•½–Ê‚ÌŒğ“_‚Ü‚Å‚Ì‹——£‚ğZo
+	// ãƒ¬ã‚¤ã®å§‹ç‚¹ã‹ã‚‰å¹³é¢ã®äº¤ç‚¹ã¾ã§ã®è·é›¢ã‚’ç®—å‡º
 	XMVECTOR A = XMLoadFloat3(&porigon->position[0]);
 	XMVECTOR B = XMLoadFloat3(&porigon->position[1]);
 	XMVECTOR C = XMLoadFloat3(&porigon->position[2]);
@@ -604,28 +604,28 @@ bool MapCollider::RayVsPorigon(
 	float x = XMVectorGetX(XMVector3Dot(SA, N)) / dot;
 	float distance = length * x;
 
-	// Œğ“_‚Ü‚Å‚Ì‹——£‚ª¡‚Ü‚Å‚ÉŒvZ‚µ‚½Å‹ß‹——£‚æ‚è
-	// ‘å‚«‚¢‚ÍƒXƒLƒbƒv
+	// äº¤ç‚¹ã¾ã§ã®è·é›¢ãŒä»Šã¾ã§ã«è¨ˆç®—ã—ãŸæœ€è¿‘è·é›¢ã‚ˆã‚Š
+	// å¤§ãã„æ™‚ã¯ã‚¹ã‚­ãƒƒãƒ—
 	if (distance < 0.0f || distance > result.distance) return false;
 
-	// •½–Êã‚ÌŒğ“_P
+	// å¹³é¢ä¸Šã®äº¤ç‚¹P
 	XMVECTOR P = XMVectorAdd(Start, XMVectorScale(rayVec, x));
 
-	// Œğ“_‚ªOŠpŒ`‚Ì“à‘¤‚É‚ ‚é‚©”»’è
-	// ‚P‚Â‚ß
+	// äº¤ç‚¹ãŒä¸‰è§’å½¢ã®å†…å´ã«ã‚ã‚‹ã‹åˆ¤å®š
+	// ï¼‘ã¤ã‚
 	XMVECTOR Cross1 = XMVector3Cross(XMVectorSubtract(A, P), XMVectorSubtract(B, A));
 	float Dot1 = XMVectorGetX(XMVector3Dot(rayVec, Cross1));
 	if (Dot1 > 0.0f) return false;
-	// ‚Q‚Â‚ß
+	// ï¼’ã¤ã‚
 	XMVECTOR Cross2 = XMVector3Cross(XMVectorSubtract(B, P), XMVectorSubtract(C, B));
 	float Dot2 = XMVectorGetX(XMVector3Dot(rayVec, Cross2));
 	if (Dot2 > 0.0f) return false;
-	// ‚R‚Â‚ß
+	// ï¼“ã¤ã‚
 	XMVECTOR Cross3 = XMVector3Cross(XMVectorSubtract(C, P), XMVectorSubtract(A, C));
 	float Dot3 = XMVectorGetX(XMVector3Dot(rayVec, Cross3));
 	if (Dot3 > 0.0f) return false;
 
-	// ƒqƒbƒgî•ñ•Û‘¶
+	// ãƒ’ãƒƒãƒˆæƒ…å ±ä¿å­˜
 	XMStoreFloat3(&result.position, P);
 	result.normal = porigon->normal;
 	result.distance = distance;
@@ -634,7 +634,7 @@ bool MapCollider::RayVsPorigon(
 	return true;
 }
 
-bool MapCollider::SearchChildren(	// q‹óŠÔ’Tõ
+bool MapCollider::SearchChildren(	// å­ç©ºé–“æ¢ç´¢
 	int Elem,
 	const DirectX::XMFLOAT3& start,
 	const DirectX::XMFLOAT3& end,
@@ -642,10 +642,10 @@ bool MapCollider::SearchChildren(	// q‹óŠÔ’Tõ
 	bool& hit
 )
 {
-	// ‹óŠÔŠO‚È‚çreturn
+	// ç©ºé–“å¤–ãªã‚‰return
 	if (Elem < 0) return hit;
 
-	// q‹óŠÔ‚ª‘¶İ‚·‚é‚È‚çq‹óŠÔ‚ğ’Tõ
+	// å­ç©ºé–“ãŒå­˜åœ¨ã™ã‚‹ãªã‚‰å­ç©ºé–“ã‚’æ¢ç´¢
 	if ((Elem + 1) << 3 < tree.m_iCellNum)
 	{
 		int childElem = (Elem << 3) + 1;
@@ -657,10 +657,10 @@ bool MapCollider::SearchChildren(	// q‹óŠÔ’Tõ
 		}
 	}
 
-	// ‚±‚Ì‹óŠÔ‚ª‘¶İ‚µ‚È‚¢‚È‚çreturn
+	// ã“ã®ç©ºé–“ãŒå­˜åœ¨ã—ãªã„ãªã‚‰return
 	if (!tree.ppCellAry[Elem])	return hit;
 
-	// ‚±‚Ì‹óŠÔ‚É“o˜^‚³‚ê‚Ä‚¢‚éƒ|ƒŠƒSƒ“‚Æ‚Ì“–‚½‚è”»’è
+	// ã“ã®ç©ºé–“ã«ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ãƒãƒªã‚´ãƒ³ã¨ã®å½“ãŸã‚Šåˆ¤å®š
 	Liner8TreeManager<Porigon>::OFT<Porigon>* oft = tree.ppCellAry[Elem]->pLatest;
 	while (oft)
 	{
@@ -675,7 +675,7 @@ bool MapCollider::SearchChildren(	// q‹óŠÔ’Tõ
 	return hit;
 }
 
-bool MapCollider::SearchParent(		// e‹óŠÔ’Tõ
+bool MapCollider::SearchParent(		// è¦ªç©ºé–“æ¢ç´¢
 	int Elem,
 	const DirectX::XMFLOAT3& start,
 	const DirectX::XMFLOAT3& end,
@@ -683,16 +683,16 @@ bool MapCollider::SearchParent(		// e‹óŠÔ’Tõ
 	bool& hit
 )
 {
-	// ‹óŠÔŠO‚È‚çreturn
+	// ç©ºé–“å¤–ãªã‚‰return
 	if (Elem <= 0) return hit;
 	
 	int parentElem = (Elem - 1) >> 3;
 	while (1)
 	{
-		// ‚±‚Ì‹óŠÔ‚ª‘¶İ‚µ‚È‚¢‚È‚çe‹óŠÔ‚ÉˆÚ“®
+		// ã“ã®ç©ºé–“ãŒå­˜åœ¨ã—ãªã„ãªã‚‰è¦ªç©ºé–“ã«ç§»å‹•
 		if (!tree.ppCellAry[parentElem])
 		{
-			// ƒ‹[ƒg‹óŠÔ‚È‚çbreak
+			// ãƒ«ãƒ¼ãƒˆç©ºé–“ãªã‚‰break
 			if (parentElem == 0)	break;
 			parentElem = (parentElem - 1) >> 3;
 			continue;
@@ -709,10 +709,10 @@ bool MapCollider::SearchParent(		// e‹óŠÔ’Tõ
 			oft = oft->m_pNext;
 		}
 
-		// ƒ‹[ƒg‹óŠÔ‚È‚çbreak
+		// ãƒ«ãƒ¼ãƒˆç©ºé–“ãªã‚‰break
 		if (parentElem == 0)	break;
 
-		// e‹óŠÔ‚ÉˆÚ“®
+		// è¦ªç©ºé–“ã«ç§»å‹•
 		parentElem = (parentElem - 1) >> 3;
 	}
 

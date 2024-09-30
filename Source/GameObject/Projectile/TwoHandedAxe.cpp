@@ -14,7 +14,7 @@ TwoHandedAxe::TwoHandedAxe(Character* owner) : Projectile("Data/Model/Object/axe
 	power = true;
 	force = 8.0f;
 
-	// Õ“Ë”»’è
+	// è¡çªåˆ¤å®š
 	SetCollider(Collider::COLLIDER_TYPE::SPHERE);
 	collider->SetScale({ 0.5f, 0.5f, 0.5f });
 }
@@ -23,7 +23,7 @@ void TwoHandedAxe::Update(float elapsedTime)
 {
 	float Angle = rotateAngle * elapsedTime;
 
-	Model::Node* node = model->GetRootNode();
+	iModel::Node* node = model->GetRootNode();
 	DirectX::XMVECTOR Q = DirectX::XMLoadFloat4(&node->rotation);
 	DirectX::XMVECTOR R = DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(0, 0, 1, 0), Angle);
 	Q = DirectX::XMQuaternionMultiply(R, Q);

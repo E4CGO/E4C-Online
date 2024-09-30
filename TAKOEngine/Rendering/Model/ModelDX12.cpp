@@ -3,7 +3,7 @@
 #include "TAKOEngine/Rendering/Misc.h"
 #include "TAKOEngine/Rendering/Graphics.h"
 
-// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 ModelDX12::ModelDX12(const char* filename)
 {
 	Graphics& graphics = Graphics::Instance();
@@ -12,11 +12,11 @@ ModelDX12::ModelDX12(const char* filename)
 
 	HRESULT hr = S_OK;
 
-	// ƒŠƒ\[ƒX“Ç‚İ‚İ
+	// ãƒªã‚½ãƒ¼ã‚¹èª­ã¿è¾¼ã¿
 	m_resource = std::make_shared<ModelResource>();
 	m_resource->Load(filename);
 
-	// ƒm[ƒh
+	// ãƒãƒ¼ãƒ‰
 	const std::vector<ModelResource::Node>& res_nodes = m_resource->GetNodes();
 
 	m_nodes.resize(res_nodes.size());
@@ -37,7 +37,7 @@ ModelDX12::ModelDX12(const char* filename)
 		}
 	}
 
-	// ƒƒbƒVƒ…
+	// ãƒ¡ãƒƒã‚·ãƒ¥
 	const std::vector<ModelResource::Mesh>& res_meshes = m_resource->GetMeshes();
 
 	m_meshes.resize(res_meshes.size());
@@ -50,13 +50,13 @@ ModelDX12::ModelDX12(const char* filename)
 		dst_mesh.mesh = &src_mesh;
 		dst_mesh.frame_resources.resize(graphics.GetBufferCount());
 
-		// ƒtƒŒ[ƒ€ƒŠƒ\[ƒX
+		// ãƒ•ãƒ¬ãƒ¼ãƒ ãƒªã‚½ãƒ¼ã‚¹
 		for (FrameResource& frame_resource : dst_mesh.frame_resources)
 		{
 			UINT bone_num = static_cast<UINT>(src_mesh.bones.size());
 			if (bone_num == 0) bone_num = 1;
 
-			// ƒq[ƒvƒvƒƒpƒeƒB‚Ìİ’è
+			// ãƒ’ãƒ¼ãƒ—ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã®è¨­å®š
 			D3D12_HEAP_PROPERTIES d3d_heap_props{};
 			d3d_heap_props.Type = D3D12_HEAP_TYPE_UPLOAD;
 			d3d_heap_props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
@@ -64,11 +64,11 @@ ModelDX12::ModelDX12(const char* filename)
 			d3d_heap_props.CreationNodeMask = 1;
 			d3d_heap_props.VisibleNodeMask = 1;
 
-			// ƒŠƒ\[ƒX‚Ìİ’è
+			// ãƒªã‚½ãƒ¼ã‚¹ã®è¨­å®š
 			D3D12_RESOURCE_DESC d3d_resource_desc{};
 			d3d_resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 			d3d_resource_desc.Alignment = 0;
-			d3d_resource_desc.Width = ((sizeof(DirectX::XMFLOAT4X4) * bone_num) + 255) & ~255;	// 256ƒoƒCƒgƒAƒ‰ƒCƒƒ“ƒg‚É‚·‚é
+			d3d_resource_desc.Width = ((sizeof(DirectX::XMFLOAT4X4) * bone_num) + 255) & ~255;	// 256ãƒã‚¤ãƒˆã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆã«ã™ã‚‹
 			d3d_resource_desc.Height = 1;
 			d3d_resource_desc.DepthOrArraySize = 1;
 			d3d_resource_desc.MipLevels = 1;
@@ -78,7 +78,7 @@ ModelDX12::ModelDX12(const char* filename)
 			d3d_resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 			d3d_resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-			// ’è”ƒoƒbƒtƒ@‚Ì¶¬
+			// å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®ç”Ÿæˆ
 			hr = d3d_device->CreateCommittedResource(
 				&d3d_heap_props,
 				D3D12_HEAP_FLAG_NONE,
@@ -90,10 +90,10 @@ ModelDX12::ModelDX12(const char* filename)
 			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 			frame_resource.d3d_cbv_resource->SetName(L"ModelConstantBuffer");
 
-			// ƒfƒBƒXƒNƒŠƒvƒ^æ“¾
+			// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿å–å¾—
 			frame_resource.cbv_descriptor = graphics.GetShaderResourceDescriptorHeap()->PopDescriptor();
 
-			// ’è”ƒoƒbƒtƒ@ƒrƒ…[‚Ì¶¬
+			// å®šæ•°ãƒãƒƒãƒ•ã‚¡ãƒ“ãƒ¥ãƒ¼ã®ç”Ÿæˆ
 			D3D12_CONSTANT_BUFFER_VIEW_DESC d3d_cbv_desc;
 			d3d_cbv_desc.BufferLocation = frame_resource.d3d_cbv_resource->GetGPUVirtualAddress();
 			d3d_cbv_desc.SizeInBytes = static_cast<UINT>(d3d_resource_desc.Width);
@@ -102,13 +102,13 @@ ModelDX12::ModelDX12(const char* filename)
 				frame_resource.cbv_descriptor->GetCpuHandle()
 			);
 
-			// ƒ}ƒbƒv‚µ‚Ä‚¨‚­
+			// ãƒãƒƒãƒ—ã—ã¦ãŠã
 			hr = frame_resource.d3d_cbv_resource->Map(0, nullptr, reinterpret_cast<void**>(&frame_resource.cbv_data));
 			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 		}
 	}
 
-	// s—ñŒvZ
+	// è¡Œåˆ—è¨ˆç®—
 	const DirectX::XMFLOAT4X4 transform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 	UpdateTransform(transform);
 }
@@ -134,20 +134,20 @@ ModelDX12::~ModelDX12()
 	}
 }
 
-// •ÏŠ·s—ñŒvZ
+// å¤‰æ›è¡Œåˆ—è¨ˆç®—
 void ModelDX12::UpdateTransform(const DirectX::XMFLOAT4X4& transform)
 {
 	DirectX::XMMATRIX Transform = DirectX::XMLoadFloat4x4(&transform);
 
 	for (Node& node : m_nodes)
 	{
-		// ƒ[ƒJƒ‹s—ñZo
+		// ãƒ­ãƒ¼ã‚«ãƒ«è¡Œåˆ—ç®—å‡º
 		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(node.scale.x, node.scale.y, node.scale.z);
 		DirectX::XMMATRIX R = DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&node.rotate));
 		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(node.translate.x, node.translate.y, node.translate.z);
 		DirectX::XMMATRIX LocalTransform = S * R * T;
 
-		// ƒ[ƒ‹ƒhs—ñZo
+		// ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—ç®—å‡º
 		DirectX::XMMATRIX ParentTransform;
 		if (node.parent != nullptr)
 		{
@@ -159,7 +159,7 @@ void ModelDX12::UpdateTransform(const DirectX::XMFLOAT4X4& transform)
 		}
 		DirectX::XMMATRIX WorldTransform = LocalTransform * ParentTransform;
 
-		// ŒvZŒ‹‰Ê‚ğŠi”[
+		// è¨ˆç®—çµæœã‚’æ ¼ç´
 		DirectX::XMStoreFloat4x4(&node.local_transform, LocalTransform);
 		DirectX::XMStoreFloat4x4(&node.world_transform, WorldTransform);
 	}
@@ -187,7 +187,7 @@ void ModelDX12::UpdateTransform(const DirectX::XMFLOAT4X4& transform)
 	}
 }
 
-// ƒAƒjƒ[ƒVƒ‡ƒ“Ä¶
+// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å†ç”Ÿ
 void ModelDX12::PlayAnimation(int animationIndex, bool loop)
 {
 	m_current_animation = animationIndex;
@@ -196,13 +196,13 @@ void ModelDX12::PlayAnimation(int animationIndex, bool loop)
 	m_current_seconds = 0.0f;
 }
 
-// ƒAƒjƒ[ƒVƒ‡ƒ“’â~
+// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³åœæ­¢
 void ModelDX12::StopAnimation()
 {
 	m_current_animation = -1;
 }
 
-// ƒAƒjƒ[ƒVƒ‡ƒ“ŒvZ
+// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³è¨ˆç®—
 void ModelDX12::UpdateAnimation(float elapsedTime)
 {
 	if (m_current_animation < 0) return;
@@ -261,7 +261,7 @@ void ModelDX12::UpdateAnimation(float elapsedTime)
 		}
 	}
 
-	// ÅIƒtƒŒ[ƒ€ˆ—
+	// æœ€çµ‚ãƒ•ãƒ¬ãƒ¼ãƒ å‡¦ç†
 	if (m_end_animation)
 	{
 		m_end_animation = false;
@@ -269,7 +269,7 @@ void ModelDX12::UpdateAnimation(float elapsedTime)
 		return;
 	}
 
-	// ŠÔŒo‰ß
+	// æ™‚é–“çµŒé
 	m_current_seconds += elapsedTime;
 	if (m_current_seconds >= animation.secondsLength)
 	{
@@ -283,4 +283,16 @@ void ModelDX12::UpdateAnimation(float elapsedTime)
 			m_end_animation = true;
 		}
 	}
+}
+
+void ModelDX12::ComputeAnimation(float elapsedTime)
+{
+}
+
+void ModelDX12::ComputeBlending(float elapsedTime)
+{
+}
+
+void ModelDX12::ComputeWorldBounds()
+{
 }

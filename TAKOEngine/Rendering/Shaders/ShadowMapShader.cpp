@@ -6,12 +6,12 @@ void ShadowMapShader::Begin(const RenderContext& rc)
 {
 	ID3D11DeviceContext* dc = rc.deviceContext;
 
-	// ƒVƒF[ƒ_[Ý’è
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼è¨­å®š
 	dc->VSSetShader(vertexShader.Get(), nullptr, 0);
 	dc->PSSetShader(nullptr, nullptr, 0);
 	dc->IASetInputLayout(inputLayout.Get());
 
-	// ’è”ƒoƒbƒtƒ@Ý’è
+	// å®šæ•°ãƒãƒƒãƒ•ã‚¡è¨­å®š
 	ID3D11Buffer* constantBuffers[] =
 	{
 		sceneConstantBuffer.Get(),
@@ -21,10 +21,10 @@ void ShadowMapShader::Begin(const RenderContext& rc)
 	};
 	dc->VSSetConstantBuffers(0, _countof(constantBuffers), constantBuffers);
 
-	//ƒŒƒ“ƒ_[ƒXƒe[ƒgÝ’è
+	//ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆè¨­å®š
 	SetRenderState(rc);
 
-	// ƒV[ƒ“—p’è”ƒoƒbƒtƒ@XV
+	// ã‚·ãƒ¼ãƒ³ç”¨å®šæ•°ãƒãƒƒãƒ•ã‚¡æ›´æ–°
 	CbScene cbScene{};
 	DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&rc.shadowMapData.view);
 	DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&rc.shadowMapData.projection);
@@ -32,23 +32,23 @@ void ShadowMapShader::Begin(const RenderContext& rc)
 	dc->UpdateSubresource(sceneConstantBuffer.Get(), 0, 0, &cbScene, 0, 0);
 }
 
-void ShadowMapShader::Draw(const RenderContext& rc, const Model* model, DirectX::XMFLOAT4 color)
+void ShadowMapShader::Draw(const RenderContext& rc, const iModel* model, DirectX::XMFLOAT4 color)
 {
 	ID3D11DeviceContext* dc = rc.deviceContext;
 
 	const ModelResource* resource = model->GetResource();
-	const std::vector<Model::Node>& nodes = model->GetNodes();
+	const std::vector<iModel::Node>& nodes = model->GetNodes();
 
 	for (const ModelResource::Mesh& mesh : resource->GetMeshes())
 	{
-		// ’¸“_ƒoƒbƒtƒ@Ý’è
+		// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡è¨­å®š
 		UINT stride = sizeof(ModelResource::Vertex);
 		UINT offset = 0;
 		dc->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
 		dc->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 		dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		// ƒXƒPƒ‹ƒgƒ“—p’è”ƒoƒbƒtƒ@XV
+		// ã‚¹ã‚±ãƒ«ãƒˆãƒ³ç”¨å®šæ•°ãƒãƒƒãƒ•ã‚¡æ›´æ–°
 		CbSkeleton cbSkeleton{};
 		if (mesh.bones.size() > 0)
 		{
@@ -66,17 +66,17 @@ void ShadowMapShader::Draw(const RenderContext& rc, const Model* model, DirectX:
 		}
 		rc.deviceContext->UpdateSubresource(skeletonConstantBuffer.Get(), 0, 0, &cbSkeleton, 0, 0);
 
-		// •`‰æ
+		// æç”»
 		dc->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
 	}
 }
 
-// ƒŒƒ“ƒ_[ƒXƒe[ƒgÝ’è
+// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆè¨­å®š
 void ShadowMapShader::SetRenderState(const RenderContext& rc)
 {
 	ID3D11DeviceContext* dc = rc.deviceContext;
 
-	// ƒŒƒ“ƒ_[ƒXƒe[ƒgÝ’è
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆè¨­å®š
 	const float blend_factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	dc->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Transparency), blend_factor, 0xFFFFFFFF);
 	dc->OMSetDepthStencilState(nullptr, 0);

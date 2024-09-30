@@ -3,32 +3,32 @@
 #include <memory>
 #include <vector>
 
-#include "TAKOEngine\Rendering\MyRender.h"
-#include "TAKOEngine\Rendering\RenderContext.h"
-#include "TAKOEngine\Rendering\FrameBuffer.h"
-#include "TAKOEngine\Rendering\Model.h"
-#include "TAKOEngine\Rendering\Light.h"
+#include "TAKOEngine/Rendering/MyRender.h"
+#include "TAKOEngine/Rendering/RenderContext.h"
+#include "TAKOEngine/Rendering/FrameBuffer.h"
+#include "TAKOEngine/Rendering/Model/Model.h"
+#include "TAKOEngine/Rendering/Light.h"
 
-// [“xƒXƒeƒ“ƒVƒ‹ƒoƒbƒtƒ@
+// æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒãƒƒãƒ•ã‚¡
 class DepthStencil
 {
 public:
 	DepthStencil(UINT width, UINT height);
 	~DepthStencil() {}
 
-	// ƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[æ“¾
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼å–å¾—
 	const Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& GetShaderResourceView() { return shaderResourceView; }
 
-	// [“xƒXƒeƒ“ƒVƒ‹ƒrƒ…[æ“¾
+	// æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒ“ãƒ¥ãƒ¼å–å¾—
 	const Microsoft::WRL::ComPtr<ID3D11DepthStencilView>& GetDepthStencilView() { return depthStencilView; }
 
-	// ƒeƒNƒXƒ`ƒƒ‚Ìî•ñæ“¾
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®æƒ…å ±å–å¾—
 	D3D11_TEXTURE2D_DESC GetTexture2dDesc() { return texture2dDesc; }
 
-	// ƒeƒNƒXƒ`ƒƒ•æ“¾
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£å¹…å–å¾—
 	inline int GetWidth() const { return texture2dDesc.Width; }
 
-	// ƒeƒNƒXƒ`ƒƒ‚‚³æ“¾
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£é«˜ã•å–å¾—
 	inline int GetHeight() const { return texture2dDesc.Height; }
 
 private:
@@ -44,39 +44,39 @@ namespace myRenderer
 		class ShadowMapRender
 		{
 		public:
-			//‰Šú‰»
+			//åˆæœŸåŒ–
 			void Initialize();
 
-			//ƒVƒƒƒhƒEƒ}ƒbƒv‚É•`‰æ‚·‚éƒ‚ƒfƒ‹‚ğ“o˜^
-			void ModelRegister(Model* model);
+			//ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ã«æç”»ã™ã‚‹ãƒ¢ãƒ‡ãƒ«ã‚’ç™»éŒ²
+			void ModelRegister(iModel* model);
 
-			//ƒVƒƒƒhƒEƒ}ƒbƒv‚Ég—p‚·‚éƒ‰ƒCƒg‚ğæ“¾
+			//ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ã«ä½¿ç”¨ã™ã‚‹ãƒ©ã‚¤ãƒˆã‚’å–å¾—
 			void SetShadowLight(Light* light);
 
-			//‘Síœ
+			//å…¨å‰Šé™¤
 			void Clear();
 
-			//•`‰æ
+			//æç”»
 			void Render();
 
 			//GUI
 			void DrawDebugGUI();
 
-			// ƒVƒƒƒhƒEƒ}ƒbƒvî•ñ‚ğRenderContext‚ÉÏ‚Ş
+			// ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—æƒ…å ±ã‚’RenderContextã«ç©ã‚€
 			ShadowMapData GetShadowMapData();
 
 		private:
-			std::unique_ptr<DepthStencil>	depthStencil[NUM_SHADOW_MAP];	// ƒVƒƒƒhƒEƒ}ƒbƒv—p[“xƒoƒbƒtƒ@
-			std::vector<Model*> m_models;
+			std::unique_ptr<DepthStencil>	depthStencil[NUM_SHADOW_MAP];	// ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ç”¨æ·±åº¦ãƒãƒƒãƒ•ã‚¡
+			std::vector<iModel*> m_models;
 			Light* light = nullptr;
 
-			//ƒ‰ƒCƒgƒrƒ…[ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ
+			//ãƒ©ã‚¤ãƒˆãƒ“ãƒ¥ãƒ¼ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—
 			DirectX::XMFLOAT4X4 lightViewProjection[NUM_SHADOW_MAP] = {};
 
 			DirectX::XMFLOAT4X4 view = {};
 			DirectX::XMFLOAT4X4 projection = {};
 
-			//[“xƒXƒeƒ“ƒVƒ‹İ’è—p
+			//æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«è¨­å®šç”¨
 			D3D11_TEXTURE2D_DESC texture2dDesc;
 			UINT width = 1024;
 		};
