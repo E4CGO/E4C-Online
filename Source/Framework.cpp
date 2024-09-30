@@ -39,7 +39,7 @@ Framework::Framework(HWND hWnd)
 	EFFECTS.Initialize();
 
 	// シーン初期化
-	SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTest));
+	SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTitle));
 }
 
 // デストラクタ
