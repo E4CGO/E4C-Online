@@ -1,12 +1,12 @@
 #pragma once
 
-#include "TAKOEngine/Rendering/Model.h"
+#include "TAKOEngine/Rendering/Model/Model.h"
 #include "TAKOEngine/Physics/Collider.h"
 
 class ModelCollider : public Collider
 {
 public:
-	ModelCollider(Model* model);
+	ModelCollider(iModel* model);
 	~ModelCollider() = default;
 
 	bool CollisionVsShpere(
@@ -21,5 +21,5 @@ public:
 		HitResult& result
 	) override;
 protected:
-	Model* model;
+	iModel* model;
 };

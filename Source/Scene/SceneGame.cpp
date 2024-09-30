@@ -57,27 +57,27 @@ void SceneGame::Initialize()
 		modelPreLoad.insert(RESOURCE.LoadModelResource(filename));
 	}
 
-	//ƒVƒƒƒhƒEƒ}ƒbƒvƒŒƒ“ƒ_ƒ‰
+	//ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ãƒ¬ãƒ³ãƒ€ãƒ©
 	shadowMapRenderer->Initialize();
 
-	//ƒ‰ƒCƒgî•ñ
+	//ãƒ©ã‚¤ãƒˆæƒ…å ±
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
 	shadowMapRenderer->SetShadowLight(dl);
 
-	// ƒJƒƒ‰İ’è
+	// ã‚«ãƒ¡ãƒ©è¨­å®š
 	camera.SetPerspectiveFov(
-		DirectX::XMConvertToRadians(45),							// ‰æŠp
-		T_GRAPHICS.GetScreenWidth() / T_GRAPHICS.GetScreenHeight(),	// ‰æ–ÊƒAƒXƒyƒNƒg”ä
-		0.1f,														// ƒjƒAƒNƒŠƒbƒv
-		10000.0f);													// ƒtƒ@[ƒNƒŠƒbƒv
+		DirectX::XMConvertToRadians(45),							// ç”»è§’
+		T_GRAPHICS.GetScreenWidth() / T_GRAPHICS.GetScreenHeight(),	// ç”»é¢ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”
+		0.1f,														// ãƒ‹ã‚¢ã‚¯ãƒªãƒƒãƒ—
+		10000.0f);													// ãƒ•ã‚¡ãƒ¼ã‚¯ãƒªãƒƒãƒ—
 
 	camera.SetLookAt(
-		{ 0, 5.0f, 10.0f },	     // ‹“_
-		{ 0, 0, 0 },	         // ’‹“_
-		{ 0, 0.969f, -0.248f }); // ãƒxƒNƒgƒ‹
+		{ 0, 5.0f, 10.0f },	     // è¦–ç‚¹
+		{ 0, 0, 0 },	         // æ³¨è¦–ç‚¹
+		{ 0, 0.969f, -0.248f }); // ä¸Šãƒ™ã‚¯ãƒˆãƒ«
 
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(camera);
@@ -98,16 +98,16 @@ void SceneGame::Initialize()
 		}
 	}
 
-	//ƒXƒe[ƒW
+	//ã‚¹ãƒ†ãƒ¼ã‚¸
 	stage = std::make_unique<TestingStage>();
 	stage->Initialize();
 
-	//	ƒ‚ƒfƒ‹‚ğƒŒƒ“ƒ_ƒ‰[‚É“o˜^
-	Model* list[] =
+	//	ãƒ¢ãƒ‡ãƒ«ã‚’ãƒ¬ãƒ³ãƒ€ãƒ©ãƒ¼ã«ç™»éŒ²
+	iModel* list[] =
 	{
 		MAPTILES.get(0)->GetModel().get(),
 	};
-	for (Model* model : list)
+	for (iModel* model : list)
 	{
 		if (!model) continue;
 		shadowMapRenderer->ModelRegister(model);
@@ -148,7 +148,7 @@ void SceneGame::Finalize()
 	UI.Clear();
 	T_CONSOLE.Close();
 
-	// ’†’fÚ‘±
+	// ä¸­æ–­æ¥ç¶š
 	switch (stateMachine->GetStateIndex())
 	{
 	case GAME_STATE::GAME:
@@ -161,7 +161,7 @@ void SceneGame::Finalize()
 	networkController->Finalize();
 }
 
-// XVˆ—
+// æ›´æ–°å‡¦ç†
 void SceneGame::Update(float elapsedTime)
 {
 	if (stateMachine->GetStateIndex() != networkController->GetGameState())
@@ -173,54 +173,54 @@ void SceneGame::Update(float elapsedTime)
 
 	{
 		ProfileScopedSection_2("Map", ImGuiControl::Profiler::Dark);
-		// ƒ}ƒbƒvXV
+		// ãƒãƒƒãƒ—æ›´æ–°
 		MAPTILES.Update(elapsedTime);
 	}
 
 	{
 		ProfileScopedSection_2("Player", ImGuiControl::Profiler::Yellow);
-		// ƒvƒŒƒCƒ„[XV
+		// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼æ›´æ–°
 		PLAYERS.Update(elapsedTime);
 	}
 
 	{
 		ProfileScopedSection_2("Enemy", ImGuiControl::Profiler::Red);
-		// ƒGƒlƒ~[XV
+		// ã‚¨ãƒãƒŸãƒ¼æ›´æ–°
 		ENEMIES.Update(elapsedTime);
 	}
 
 	{
 		ProfileScopedSection_2("Projectiles", ImGuiControl::Profiler::Purple);
-		// ”­Ë•¨XV
+		// ç™ºå°„ç‰©æ›´æ–°
 		PROJECTILES.Update(elapsedTime);
 	}
 
 	{
 		ProfileScopedSection_2("Collision", ImGuiControl::Profiler::Yellow);
-		// ƒIƒuƒWƒFƒNƒgŠÔÕ“Ë”»’è
+		// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆé–“è¡çªåˆ¤å®š
 		COLLISION.Update(elapsedTime);
 	}
 
 	{
 		ProfileScopedSection_2("Stages", ImGuiControl::Profiler::Green);
-		// ƒXƒe[ƒWƒIƒuƒWƒFƒNƒgXV
+		// ã‚¹ãƒ†ãƒ¼ã‚¸ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆæ›´æ–°
 		STAGES.Update(elapsedTime);
 	}
 
 	{
 		ProfileScopedSection_2("Effect", ImGuiControl::Profiler::Dark);
-		// ƒGƒtƒFƒNƒgXV
+		// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆæ›´æ–°
 		EFFECTS.Update(elapsedTime);
 	}
 
-	// ƒJƒƒ‰XV
+	// ã‚«ãƒ¡ãƒ©æ›´æ–°
 	cameraController->Update(elapsedTime);
 	cameraController->SyncContrllerToCamera(camera);
 
 	{
 		ProfileScopedSection_2("Effect", ImGuiControl::Profiler::Purple);
 
-		// ƒƒjƒ…[
+		// ãƒ¡ãƒ‹ãƒ¥ãƒ¼
 		if (T_INPUT.KeyDown(VK_ESCAPE) || T_INPUT.GamePadKeyDown(GAME_PAD_BTN::BACK))
 		{
 			if (menu->IsShow())
@@ -234,7 +234,7 @@ void SceneGame::Update(float elapsedTime)
 		}
 
 		UI.MoveToEnd(menu);
-		// ƒCƒ“ƒ^[ƒtƒF[ƒXXV
+		// ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ãƒ¼ã‚¹æ›´æ–°
 		UI.Update(elapsedTime);
 	}
 }
@@ -275,7 +275,7 @@ void SceneGame::UpdateConnection()
 		if (colorIdx != networkController->GetColorIndex()) networkController->SetColorIndex(colorIdx);
 	}
 	networkController->UpdateConnection();
-	// ˆÊ’u
+	// ä½ç½®
 	PLAYERS.InitializePosition();
 }
 
@@ -284,7 +284,7 @@ bool SceneGame::UpdateGame(float elapsedTime)
 	ProfileScopedSection_2("Network", ImGuiControl::Profiler::Blue);
 	if (networkController->IsHost())
 	{
-		stage->Update(elapsedTime); // ƒzƒXƒgE“G¶¬
+		stage->Update(elapsedTime); // ãƒ›ã‚¹ãƒˆãƒ»æ•µç”Ÿæˆ
 
 		if (stage->IsFinish())
 		{
@@ -312,34 +312,34 @@ bool SceneGame::UpdateGame(float elapsedTime)
 	return true;
 }
 
-// •`‰æˆ—
+// æç”»å‡¦ç†
 void SceneGame::Render()
 {
 	T_TEXT.Begin();
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Scene)->Clear(T_GRAPHICS.GetDeviceContext(), 0.2f, 0.2f, 0.2f, 1);
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Scene)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
 
-	// •`‰æƒRƒ“ƒeƒLƒXƒgİ’è
+	// æç”»ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆè¨­å®š
 	RenderContext rc;
 	rc.camera = &camera;
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
-	// “à—e•`‰æ
+	// å†…å®¹æç”»
 	{
-		// ƒ‰ƒCƒg‚Ìî•ñ‚ğ‹l‚ß‚Ş
+		// ãƒ©ã‚¤ãƒˆã®æƒ…å ±ã‚’è©°ã‚è¾¼ã‚€
 		LightManager::Instance().PushRenderContext(rc);
 
-		//ƒVƒƒƒhƒEƒ}ƒbƒv•`‰æ
+		//ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—æç”»
 		shadowMapRenderer->Render();
 		rc.shadowMapData = shadowMapRenderer->GetShadowMapData();
 
-		MAPTILES.Render(rc);			// ƒ}ƒbƒv
-		PLAYERS.Render(rc);				// ƒvƒŒƒCƒ„[
-		ENEMIES.Render(rc);				// ƒGƒlƒ~[
-		PROJECTILES.Render(rc);			// ”­Ë•¨
-		STAGES.Render(rc);				// ƒXƒe[ƒWƒIƒuƒWƒFƒNƒg
-		EFFECTS.Render(camera.GetView(), camera.GetProjection()); // ƒGƒtƒFƒNƒg
+		MAPTILES.Render(rc);			// ãƒãƒƒãƒ—
+		PLAYERS.Render(rc);				// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼
+		ENEMIES.Render(rc);				// ã‚¨ãƒãƒŸãƒ¼
+		PROJECTILES.Render(rc);			// ç™ºå°„ç‰©
+		STAGES.Render(rc);				// ã‚¹ãƒ†ãƒ¼ã‚¸ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+		EFFECTS.Render(camera.GetView(), camera.GetProjection()); // ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
 	}
 #ifdef _DEBUG
 	{
@@ -347,19 +347,19 @@ void SceneGame::Render()
 	}
 #endif // _DEBUG
 
-	// ƒ‰ƒCƒ“ƒŒƒ“ƒ_ƒ‰•`‰æÀs
+	// ãƒ©ã‚¤ãƒ³ãƒ¬ãƒ³ãƒ€ãƒ©æç”»å®Ÿè¡Œ
 	T_GRAPHICS.GetLineRenderer()->Render(T_GRAPHICS.GetDeviceContext(), camera.GetView(), camera.GetProjection());
-	// ƒfƒoƒbƒOƒŒƒ“ƒ_ƒ‰•`‰æÀs
+	// ãƒ‡ãƒãƒƒã‚°ãƒ¬ãƒ³ãƒ€ãƒ©æç”»å®Ÿè¡Œ
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), camera.GetView(), camera.GetProjection());
 
-	//	ƒ|ƒXƒgƒvƒƒZƒXˆ—‚ğs‚¤
+	//	ãƒã‚¹ãƒˆãƒ—ãƒ­ã‚»ã‚¹å‡¦ç†ã‚’è¡Œã†
 	{
 		T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->Clear(T_GRAPHICS.GetDeviceContext(), 0.0f, 0.0f, 0.0f, 1.0f);
 		T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
 		postprocessingRenderer->Render(T_GRAPHICS.GetDeviceContext());
 	}
 
-	UI.Render(rc);						// ƒCƒ“ƒ^[ƒtƒF[ƒX
+	UI.Render(rc);						// ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ãƒ¼ã‚¹
 
 	T_TEXT.End();
 

@@ -50,67 +50,70 @@ enum class FrameBufferId
 	EnumCount
 };
 
-// ‚’¼“¯ŠúŠÔŠuİ’è
+// å‚ç›´åŒæœŸé–“éš”è¨­å®š
 static const int SyncInterval = 0;
 
-// ƒtƒH[ƒ}ƒbƒg
+// ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ
 static const DXGI_FORMAT RenderTargetFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 static const DXGI_FORMAT DepthStencilFormat = DXGI_FORMAT_D32_FLOAT;
 
-// ƒOƒ‰ƒtƒBƒbƒNƒX
+// ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¹
 class Graphics
 {
 public:
 	Graphics() = default;
 	~Graphics();
 
-	// ƒCƒ“ƒXƒ^ƒ“ƒX
+	// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
 	static Graphics& Instance()
 	{
 		static Graphics instance;
 		return instance;
 	}
 
-	// ‰Šú‰»
+	bool isDX12Active = false;
+	bool isDX11Active = true;
+
+	// åˆæœŸåŒ–
 	void Initalize(HWND hWnd, UINT buffer_count);
-	// ‰æ–Ê•\¦
+	// ç”»é¢è¡¨ç¤º
 	void Present(UINT syncInterval);
-	// ƒfƒoƒCƒXæ“¾
+	// ãƒ‡ãƒã‚¤ã‚¹å–å¾—
 	ID3D11Device* GetDevice() { return device.Get(); };
-	// ƒfƒoƒCƒXƒRƒ“ƒeƒLƒXƒgæ“¾
+	// ãƒ‡ãƒã‚¤ã‚¹ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆå–å¾—
 	ID3D11DeviceContext* GetDeviceContext() { return immediateContext.Get(); }
-	// ƒXƒNƒŠ[ƒ“•æ“¾
+	// ã‚¹ã‚¯ãƒªãƒ¼ãƒ³å¹…å–å¾—
 	float GetScreenWidth() const { return screenWidth; }
-	// ƒXƒNƒŠ[ƒ“‚‚³æ“¾
+	// ã‚¹ã‚¯ãƒªãƒ¼ãƒ³é«˜ã•å–å¾—
 	float GetScreenHeight() const { return screenHeight; }
-	// ƒtƒŒ[ƒ€ƒoƒbƒtƒ@æ“¾
+	// ãƒ•ãƒ¬ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡å–å¾—
 	FrameBuffer* GetFrameBuffer(FrameBufferId frameBufferId) { return frameBuffers[static_cast<int>(frameBufferId)].get(); }
-	// ƒŒƒ“ƒ_[ƒXƒe[ƒgæ“¾
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆå–å¾—
 	RenderState* GetRenderState() { return renderState.get(); }
-	// ƒMƒYƒ‚æ“¾
+	// ã‚®ã‚ºãƒ¢å–å¾—
 	Gizmos* GetGizmos() { return gizmos.get(); }
-	// ƒ~ƒ…[ƒeƒbƒNƒXæ“¾
+	// ãƒŸãƒ¥ãƒ¼ãƒ†ãƒƒã‚¯ã‚¹å–å¾—
 	std::mutex& GetMutex() { return mutex; }
 
-	// ƒ‚ƒfƒ‹ƒVƒF[ƒ_[æ“¾
+	// ãƒ¢ãƒ‡ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼å–å¾—
 	ModelShader* GetModelShader(ModelShaderId shaderId) { return modelShaders[static_cast<int>(shaderId)].get(); }
-	// ƒXƒvƒ‰ƒCƒgƒVƒF[ƒ_[æ“¾
+	// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚·ã‚§ãƒ¼ãƒ€ãƒ¼å–å¾—
 	SpriteShader* GetSpriteShader(SpriteShaderId shaderId) { return spriteShaders[static_cast<int>(shaderId)].get(); }
-	// ƒfƒoƒbƒOƒŒƒ“ƒ_ƒ‰æ“¾
+	// ãƒ‡ãƒãƒƒã‚°ãƒ¬ãƒ³ãƒ€ãƒ©å–å¾—
 	DebugRenderer* GetDebugRenderer() const { return debugRenderer.get(); }
-	// ƒ‰ƒCƒ“ƒŒƒ“ƒ_ƒ‰æ“¾
+	// ãƒ©ã‚¤ãƒ³ãƒ¬ãƒ³ãƒ€ãƒ©å–å¾—
 	LineRenderer* GetLineRenderer() const { return lineRenderer.get(); }
 
-	// ƒoƒbƒtƒ@”æ“¾
+	// ãƒãƒƒãƒ•ã‚¡æ•°å–å¾—
 	UINT GetBufferCount() const { return m_buffer_count; }
 
-	// ƒoƒbƒtƒ@ƒCƒ“ƒfƒbƒNƒXæ“¾
+	// ãƒãƒƒãƒ•ã‚¡ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹å–å¾—
 	UINT GetCurrentBufferIndex() const { return m_dxgi_swap_chain->GetCurrentBackBufferIndex(); }
 
-	// ƒfƒoƒCƒXæ“¾
+	// ãƒ‡ãƒã‚¤ã‚¹å–å¾—
 	ID3D12Device* GetDeviceDX12() const { return m_d3d_device.Get(); }
 
-	// ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒvæ“¾
+	// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—å–å¾—
 	DescriptorHeap* GetShaderResourceDescriptorHeap() const { return m_shader_resource_descriptor_heap.get(); }
 	DescriptorHeap* GetSamplerDescriptorHeap() const { return m_sampler_descriptor_heap.get(); }
 
@@ -133,36 +136,38 @@ public:
 
 	void WaitIdle();
 
-	// •`‰æƒRƒ}ƒ“ƒhÀsŠ®—¹‚Ü‚Å‘Ò‚Â
+	// æç”»ã‚³ãƒãƒ³ãƒ‰å®Ÿè¡Œå®Œäº†ã¾ã§å¾…ã¤
 	void WaitIdle(CommandQueue& command_queue);
 
-	// •`‰æÀs
+	// æç”»å®Ÿè¡Œ
 	void Execute();
 
-	// •`‰æŠJn
+	// æç”»é–‹å§‹
 	ID3D12GraphicsCommandList* Begin();
 
-	// •`‰æI—¹
+	// æç”»çµ‚äº†
 	void End();
+
+	void FinishDX12();
 
 	Descriptor* UpdateSceneConstantBuffer(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection, const DirectX::XMFLOAT3& light_direction);
 
 	Shader* GetShader() const { return m_shader.get(); }
-	
-	// ƒeƒNƒXƒ`ƒƒ“Ç‚İ‚İ
+
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£èª­ã¿è¾¼ã¿
 	HRESULT LoadTexture(const char* filename, ID3D12Resource** d3d_resource);
 
-	// ƒeƒNƒXƒ`ƒƒì¬
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ä½œæˆ
 	HRESULT CreateTexture(const BYTE* pixels, UINT width, UINT height, DXGI_FORMAT format, ID3D12Resource** d3d_resource);
 
-	// ƒ_ƒ~[ƒeƒNƒXƒ`ƒƒ¶¬
+	// ãƒ€ãƒŸãƒ¼ãƒ†ã‚¯ã‚¹ãƒãƒ£ç”Ÿæˆ
 	HRESULT CreateDummyTexture(ID3D12Resource** d3d_resource);
 
-	// ƒoƒbƒtƒ@ƒRƒs[
+	// ãƒãƒƒãƒ•ã‚¡ã‚³ãƒ”ãƒ¼
 	HRESULT CopyBuffer(ID3D12Resource* d3d_src_resource, ID3D12Resource* d3d_dst_resource);
 
 private:
-	// ƒCƒ[ƒWƒRƒs[
+	// ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚³ãƒ”ãƒ¼
 	HRESULT CopyImage(const BYTE* pixels, UINT width, UINT height, DXGI_FORMAT format, ID3D12Resource* resource);
 
 	static UINT BitsPerPixel(DXGI_FORMAT fmt);
@@ -184,7 +189,7 @@ private:
 	std::unique_ptr<DebugRenderer>					debugRenderer;
 	std::unique_ptr<LineRenderer>					lineRenderer;
 
-	std::mutex mutex;	// ƒ~ƒ…[ƒeƒbƒNƒX
+	std::mutex mutex;	// ãƒŸãƒ¥ãƒ¼ãƒ†ãƒƒã‚¯ã‚¹
 
 	static Graphics* s_instance;
 

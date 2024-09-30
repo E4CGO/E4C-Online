@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "TAKOEngine/Rendering/ModelResource.h"
+#include "TAKOEngine/Rendering/Model/ModelResource.h"
 #include "TAKOEngine/Rendering/Shaders/Shader.h"
 
 class ModelShader : public Shader
@@ -11,22 +11,22 @@ public:
 	ModelShader(ID3D11Device* device, const char* vs, const char* ps);
 	virtual ~ModelShader() override = default;
 
-	// •`‰æŠJn
+	// æç”»é–‹å§‹
 	virtual void Begin(const RenderContext& rc) override;
 	void Begin(const RenderContextDX12& rc) override;
-	void Draw(const RenderContextDX12& rc, Model* model) override;
+	void Draw(const RenderContextDX12& rc, iModel* model) override;
 	void Draw(const RenderContextDX12& rc, ModelDX12* model) override;
 	void End(const RenderContext& rc) override;
 	void End(const RenderContextDX12& rc) override;
 
-	// ƒ‚ƒfƒ‹•`‰æ
-	virtual void Draw(const RenderContext& rc, const Model* model, DirectX::XMFLOAT4 color = { 1, 1, 1, 1 });
+	// ãƒ¢ãƒ‡ãƒ«æç”»
+	virtual void Draw(const RenderContext& rc, const iModel* model, DirectX::XMFLOAT4 color = { 1, 1, 1, 1 });
 
 protected:
-	// ƒŒƒ“ƒ_[ƒXƒe[ƒgİ’è
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆè¨­å®š
 	virtual void SetRenderState(const RenderContext& rc) = 0;
 	
-	// ƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[İ’è
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼è¨­å®š
 	virtual void SetShaderResourceView(const ModelResource::Mesh& mesh, ID3D11DeviceContext*& dc) = 0;
 
 protected:
@@ -36,17 +36,17 @@ protected:
 		DirectX::XMFLOAT4X4		viewProjection;
 		DirectX::XMFLOAT4		ambientLightColor;
 		DirectionalLightData	directionalLightData;
-		PointLightData			pointLightData[PointLightMax];	// “_ŒõŒ¹
-		SpotLightData			spotLightData[SpotLightMax];	// ƒXƒ|ƒbƒgƒ‰ƒCƒg
-		int						pointLightCount;				// “_ŒõŒ¹”
-		int						spotLightCount;					// ƒXƒ|ƒbƒgƒ‰ƒCƒg”
+		PointLightData			pointLightData[PointLightMax];	// ç‚¹å…‰æº
+		SpotLightData			spotLightData[SpotLightMax];	// ã‚¹ãƒãƒƒãƒˆãƒ©ã‚¤ãƒˆ
+		int						pointLightCount;				// ç‚¹å…‰æºæ•°
+		int						spotLightCount;					// ã‚¹ãƒãƒƒãƒˆãƒ©ã‚¤ãƒˆæ•°
 		DirectX::XMFLOAT2		dummy;
 	};
 
 	struct CbMesh
 	{
 		DirectX::XMFLOAT4 materialColor;
-		float linearGamma;								// ƒŠƒjƒA•â³
+		float linearGamma;								// ãƒªãƒ‹ã‚¢è£œæ­£
 		DirectX::XMFLOAT3 dummy;
 		ShaderData shaderData;
 	};
@@ -58,9 +58,9 @@ protected:
 
 	struct CbShadowMap
 	{
-		DirectX::XMFLOAT4X4 lightViewProjection[myRenderer::NUM_SHADOW_MAP];  //ƒ‰ƒCƒgƒrƒ…[ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ
-		DirectX::XMFLOAT4   shadowBias;                           //[“x”äŠr—p‚ÌƒIƒtƒZƒbƒg’l
-		DirectX::XMFLOAT3   shadowColor;			              //‰e‚ÌF
+		DirectX::XMFLOAT4X4 lightViewProjection[myRenderer::NUM_SHADOW_MAP];  //ãƒ©ã‚¤ãƒˆãƒ“ãƒ¥ãƒ¼ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—
+		DirectX::XMFLOAT4   shadowBias;                           //æ·±åº¦æ¯”è¼ƒç”¨ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆå€¤
+		DirectX::XMFLOAT3   shadowColor;			              //å½±ã®è‰²
 		float               dummy;
 	};
 

@@ -5,7 +5,7 @@
 
 #include <DirectXMath.h>
 
-// ƒ‚ƒfƒ‹—pƒIƒuƒWƒFƒNƒg
+// ãƒ¢ãƒ‡ãƒ«ç”¨ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 class GameObject
 {
 public:
@@ -13,9 +13,9 @@ public:
 	virtual ~GameObject() = default;
 
 	void UpdateTransform();
-	// XVˆ—
+	// æ›´æ–°å‡¦ç†
 	virtual void Update(float elapsedTime) = 0;
-	// •`‰æˆ—
+	// æç”»å‡¦ç†
 	virtual void Render(const RenderContext& rc) = 0;
 
 	DirectX::XMFLOAT3 LocalPositiontoWorld(DirectX::XMFLOAT3 v);
@@ -30,20 +30,20 @@ public:
 	virtual void DrawDebugPrimitive() {}
 	virtual void DrawDebugGUI() {};
 public:
-	// ƒAƒNƒZƒT
-	// ˆÊ’uŽæ“¾
+	// ã‚¢ã‚¯ã‚»ã‚µ
+	// ä½ç½®å–å¾—
 	const DirectX::XMFLOAT3& GetPosition() const { return position; }
-	// ˆÊ’uÝ’è
+	// ä½ç½®è¨­å®š
 	virtual void SetPosition(const DirectX::XMFLOAT3& position) { this->position = position; }
-	// ‰ñ“]Žæ“¾
+	// å›žè»¢å–å¾—
 	const DirectX::XMFLOAT3& GetAngle() const { return angle; }
-	// ‰ñ“]Ý’è
+	// å›žè»¢è¨­å®š
 	void SetAngle(const DirectX::XMFLOAT3& angle) { this->angle = angle; }
-	// Ž²‰ñ“]
+	// è»¸å›žè»¢
 	void RotateAxis(const DirectX::XMFLOAT3 Axis, float Angle);
-	// ƒXƒP[ƒ‹Žæ“¾
+	// ã‚¹ã‚±ãƒ¼ãƒ«å–å¾—
 	const DirectX::XMFLOAT3& GetScale() const { return scale; }
-	// ƒXƒP[ƒ‹Ý’è
+	// ã‚¹ã‚±ãƒ¼ãƒ«è¨­å®š
 	void SetScale(const DirectX::XMFLOAT3& scale) { this->scale = scale; }
 
 	const DirectX::XMFLOAT3 GetFront() const { return { transform._31, transform._32, transform._33 }; }

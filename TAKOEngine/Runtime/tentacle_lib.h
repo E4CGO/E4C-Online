@@ -33,6 +33,7 @@
 #include "TAKOEngine/Tool/Timer.h"
 #include "TAKOEngine/Tool/Console.h"
 #include "TAKOEngine/Tool/XMFLOAT.h"
+#include "TAKOEngine/Rendering/Misc.h"
 
 #include <windows.h>
 

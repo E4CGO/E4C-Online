@@ -1,13 +1,13 @@
 #pragma once
 
-#include "TAKOEngine/Rendering/Model.h"
+#include "TAKOEngine/Rendering/Model/Model.h"
 #include "TAKOEngine/Physics/Collider.h"
 #include "Liner8TreeManager.h"
 
 class MapCollider : public Collider
 {
 public:
-	MapCollider(Model* model);
+	MapCollider(iModel* model);
 	~MapCollider();
 
 	bool CollisionVsShpere(
@@ -22,7 +22,7 @@ public:
 		HitResult& result
 	) override;
 protected:
-	Model* model;
+	iModel* model;
 
 	struct Porigon
 	{
@@ -48,19 +48,19 @@ protected:
 		Porigon* porigon,
 		HitResult& result
 	);
-	bool SearchChildren(	// q‹óŠÔ’Tõ
+	bool SearchChildren(	// å­ç©ºé–“æ¢ç´¢
 		int Elem,
 		const DirectX::XMFLOAT3& start,
 		const DirectX::XMFLOAT3& end,
 		HitResult& result,
 		bool& hit
 	);
-	//bool SearchChildren(	// q‹óŠÔ’Tõ
+	//bool SearchChildren(	// å­ç©ºé–“æ¢ç´¢
 	//	
 	//	int Elem,
 	//	bool& hit
 	//);
-	bool SearchParent(	// e‹óŠÔ’Tõ
+	bool SearchParent(	// è¦ªç©ºé–“æ¢ç´¢
 		int Elem,
 		const DirectX::XMFLOAT3& start,
 		const DirectX::XMFLOAT3& end,

@@ -179,13 +179,13 @@ public:
 		void serialize(Archive& archive);
 	};
 
-	// Šeíƒf[ƒ^æ“¾
+	// å„ç¨®ãƒ‡ãƒ¼ã‚¿å–å¾—
 	const std::vector<Mesh>& GetMeshes() const { return meshes; }
 	const std::vector<Node>& GetNodes() const { return nodes; }
 	const std::vector<Animation>& GetAnimations() const { return animations; }
 	const std::vector<Material>& GetMaterials() const { return materials; }
 
-	// “Ç‚İ‚İ
+	// èª­ã¿è¾¼ã¿
 	void Load(ID3D11Device* device, const char* filename);
 	void Load(const char* filename);
 
@@ -193,19 +193,19 @@ protected:
 
 	void BuildModel(const char* dirname, const char* filename);
 
-	// ƒoƒEƒ“ƒfƒBƒ“ƒOƒ{ƒbƒNƒXŒvZ
+	// ãƒã‚¦ãƒ³ãƒ‡ã‚£ãƒ³ã‚°ãƒœãƒƒã‚¯ã‚¹è¨ˆç®—
 	void ComputeLocalBounds();
 
-	// ƒVƒŠƒAƒ‰ƒCƒY
+	// ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚º
 	void Serialize(const char* filename);
 
-	// ƒfƒVƒŠƒAƒ‰ƒCƒY
+	// ãƒ‡ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚º
 	void Deserialize(const char* filename);
 
-	// ƒm[ƒhƒCƒ“ƒfƒbƒNƒX‚ğæ“¾‚·‚é
+	// ãƒãƒ¼ãƒ‰ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’å–å¾—ã™ã‚‹
 	int FindNodeIndex(NodeId nodeId) const;
 public:
-	// ƒRƒs[ƒAƒjƒ[ƒVƒ‡ƒ“
+	// ã‚³ãƒ”ãƒ¼ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³
 	void ImportAnimations(const char* filename);
 protected:
 	std::vector<Node>		nodes;

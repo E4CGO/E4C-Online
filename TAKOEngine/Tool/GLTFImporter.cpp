@@ -168,6 +168,10 @@ gltf_model::buffer_view gltf_model::make_buffer_view(const tinygltf::Accessor& a
 	case TINYGLTF_TYPE_SCALAR:
 		switch (accessor.componentType)
 		{
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+			buffer_view.format = DXGI_FORMAT_R8_UINT;
+			buffer_view.stride_in_bytes = sizeof(BYTE);
+			break;
 		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
 			buffer_view.format = DXGI_FORMAT_R16_UINT;
 			buffer_view.stride_in_bytes = sizeof(USHORT);
@@ -651,6 +655,10 @@ void gltf_model::animate(size_t animation_index, float time, std::vector<node>& 
 
 		cumulate_transforms(animated_nodes);
 	}
+	else
+	{
+		animated_nodes = nodes;
+	}
 }
 
 void gltf_model::render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world, const std::vector<node>& animated_nodes)
@@ -853,4 +861,16 @@ void gltf_model::renderDX12(ID3D11DeviceContext* immediate_context, const Direct
 	{
 		traverse(node_index);
 	}
+}
+
+void gltf_model::ComputeAnimation(float elapsedTime)
+{
+}
+
+void gltf_model::ComputeBlending(float elapsedTime)
+{
+}
+
+void gltf_model::ComputeWorldBounds()
+{
 }

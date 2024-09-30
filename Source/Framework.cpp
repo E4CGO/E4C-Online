@@ -39,7 +39,7 @@ Framework::Framework(HWND hWnd)
 	EFFECTS.Initialize();
 
 	// シーン初期化
-	SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTitle));
+	SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTest));
 }
 
 // デストラクタ
@@ -61,7 +61,11 @@ Framework::~Framework()
 // 更新処理
 void Framework::Update(float elapsedTime)
 {
-	if (T_INPUT.KeyDown(VK_F1)) DX12API = !DX12API;
+	if (T_INPUT.KeyDown(VK_F1))
+	{
+		T_GRAPHICS.isDX12Active = !T_GRAPHICS.isDX12Active;
+		T_GRAPHICS.isDX11Active = !T_GRAPHICS.isDX11Active;
+	}
 	// シーン更新処理
 	SceneManager::Instance().Update(elapsedTime);
 }
@@ -73,7 +77,7 @@ void Framework::Render(float elapsedTime)
 	// 同時アクセスしないように排他制御す
 	std::lock_guard<std::mutex> lock(T_GRAPHICS.GetMutex());
 
-	if (!DX12API)
+	if (T_GRAPHICS.isDX11Active)
 	{
 		ID3D11DeviceContext* dc = T_GRAPHICS.GetDeviceContext();
 
@@ -92,7 +96,7 @@ void Framework::Render(float elapsedTime)
 		// 画面表示
 		TentacleLib::Draw();
 	}
-	else
+	if (T_GRAPHICS.isDX12Active)
 	{
 		T_GRAPHICS.Execute();
 		SceneManager::Instance().RenderDX12();

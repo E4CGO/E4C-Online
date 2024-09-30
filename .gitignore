@@ -26,6 +26,7 @@
 
 # Visual Studio user specific files
 .vs/
+.vscode/
 Level.code-workspace
 
 # Builds
@@ -39,6 +40,7 @@ ToImplement*/
 Data/**
 Dependencies/**
 External/**
+docs/**
 
 #Cmake files
 cmake_install.cmake

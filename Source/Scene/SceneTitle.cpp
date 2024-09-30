@@ -68,8 +68,6 @@ void SceneTitle::Initialize()
 
 		test = std::make_unique<ModelDX12>("Data/Model/Character/Barbarian.glb");
 		test->PlayAnimation(0, true);
-
-		krak = std::make_unique<gltf_model>(T_GRAPHICS.GetDevice(), "Data/Model/Enemy/Goblin.glb");
 	}
 
 	// 光
@@ -144,7 +142,7 @@ void SceneTitle::Initialize()
 		buffer_desc.MiscFlags = 0;
 		buffer_desc.StructureByteStride = 0;
 		hr = T_GRAPHICS.GetDevice()->CreateBuffer(&buffer_desc, nullptr, constant_buffers[1].GetAddressOf());
-		//_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+		COMPLETION_CHECK
 	}
 }
 
@@ -167,9 +165,9 @@ void SceneTitle::Update(float elapsedTime)
 	knight->Update(elapsedTime);
 	rouge->Update(elapsedTime);
 
-	if (test != nullptr)
+	if (test != nullptr && T_GRAPHICS.isDX12Active)
 	{
-		const DirectX::XMFLOAT4X4 w = { 1.f,0.f,0.f,0.f, 0.f,1.f,0.f,0.f, 0.f,0.f,1.f,0.f, 0.f,0.f,0.f,1.f };
+		const DirectX::XMFLOAT4X4 w = { 2.5f,0.f,0.f,0.f, 0.f,2.5f,0.f,0.f, 0.f,0.f,2.5f,0.f, 0.f,0.f,0.f,1.f };
 		test->UpdateAnimation(elapsedTime);
 		test->UpdateTransform(w);
 	}
@@ -208,74 +206,6 @@ void SceneTitle::Render()
 	barbarian->Render(rc);
 	knight->Render(rc);
 	rouge->Render(rc);
-
-	{
-		static std::vector<gltf_model::node> animated_nodes{ krak->nodes };
-
-		krak->animate(0/*animation index*/, time, animated_nodes);
-		if (krak->animations.at(0/*animation index*/).duration < time)
-		{
-			time = 0; // Repeat playback
-		}
-
-		const DirectX::XMFLOAT4X4 coordinate_system_transforms[]
-		{
-			{-1, 0, 0, 0,
-			  0, 1, 0, 0,
-			  0, 0, 1, 0,
-			  0, 0, 0, 1}, // 0:RHS Y-UP
-
-			{ 1, 0, 0, 0,
-			  0, 1, 0, 0,
-			  0, 0, 1, 0,
-			  0, 0, 0, 1}, // 1:LHS Y-UP
-
-			{-1, 0, 0, 0,
-			  0, 0,-1, 0,
-			  0, 1, 0, 0,
-			  0, 0, 0, 1}, // 2:RHS Z-UP
-
-			{ 1, 0, 0, 0,
-			  0, 0, 1, 0,
-			  0, 1, 0, 0,
-			  0, 0, 0, 1}, //3:LHS Z - UP
-		};
-
-		float scale_factor = 1.3f;
-
-		DirectX::XMMATRIX C{ DirectX::XMLoadFloat4x4(&coordinate_system_transforms[0]) * DirectX::XMMatrixScaling(scale_factor, scale_factor, scale_factor) };
-		DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(1.0, 1.0f, 1.0f) };
-		DirectX::XMMATRIX R{ DirectX::XMMatrixRotationRollPitchYaw(0.0f, 0.0f, 0.0f) };
-		DirectX::XMMATRIX T{ DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f) };
-
-		DirectX::XMFLOAT4X4 world;
-		DirectX::XMStoreFloat4x4(&world, C * S * R * T);
-
-		// シーン用定数バッファ更新
-		CbScene cbScene{};
-		DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&rc.camera->GetView());
-		DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&rc.camera->GetProjection());
-		DirectX::XMStoreFloat4x4(&cbScene.view_projection, V * P);
-
-		cbScene.light_direction = rc.directionalLightData.direction;
-
-		const DirectX::XMFLOAT3& eye = rc.camera->GetEye();
-		cbScene.camera_position.x = eye.x;
-		cbScene.camera_position.y = eye.y;
-		cbScene.camera_position.z = eye.z;
-
-		// レンダーステート設定
-		const float blend_factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		rc.deviceContext->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Opaque), blend_factor, 0xFFFFFFFF);
-		rc.deviceContext->OMSetDepthStencilState(rc.renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
-		rc.deviceContext->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullNone));
-
-		rc.deviceContext->UpdateSubresource(constant_buffers[1].Get(), 0, 0, &cbScene, 0, 0);
-		rc.deviceContext->VSSetConstantBuffers(1, 1, constant_buffers[1].GetAddressOf());
-		rc.deviceContext->PSSetConstantBuffers(1, 1, constant_buffers[1].GetAddressOf());
-
-		krak->render(rc, world, animated_nodes);
-	}
 
 	UI.Render(rc);
 

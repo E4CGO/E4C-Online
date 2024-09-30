@@ -2,18 +2,22 @@
 
 #include "GameObject.h"
 
+#include "TAKOEngine/Rendering/Model/ModelDX11.h"
+#include "TAKOEngine/Rendering/Model/NewModelDX11.h"
+#include "TAKOEngine/Rendering/Model/ModelDX12.h"
+
 class ModelObject : public GameObject
 {
 public:
-	ModelObject(const char* filename, float scaling = 1.0f);
+	ModelObject(const char* filename, float scaling = 1.0f, std::string renderMode = "DX11");
 	virtual ~ModelObject() = default;
 
-	// XVˆ—
+	// æ›´æ–°å‡¦ç†
 	virtual void Update(float elapsedTime) override;
-	// •`‰æˆ—
+	// æç”»å‡¦ç†
 	virtual void Render(const RenderContext& rc) override;
 
-	std::unique_ptr<Model>& GetModel() { return model; }
+	std::unique_ptr<iModel>& GetModel() { return model; }
 
 	void Show() { visible = true; }
 	void Hide() { visible = false; }
@@ -23,7 +27,7 @@ public:
 
 	void SetColor(DirectX::XMFLOAT4 color) { this->color = color; }
 
-	// Õ“Ë”»’è
+	// è¡çªåˆ¤å®š
 	Collider* GetCollider() { return collider.get(); }
 	void SetCollider(Collider::COLLIDER_TYPE collider);
 
@@ -35,11 +39,11 @@ public:
 protected:
 	DirectX::XMFLOAT4 color = { 1, 1, 1, 1 };
 
-	// Õ“Ë”»’è
+	// è¡çªåˆ¤å®š
 	std::unique_ptr<Collider> collider = nullptr;
 
 	ModelShaderId shaderId = ModelShaderId::Toon;
-	std::unique_ptr<Model> model;
+	std::unique_ptr<iModel> model;
 
 	bool visible = true;
 

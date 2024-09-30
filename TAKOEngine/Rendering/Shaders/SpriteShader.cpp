@@ -4,14 +4,14 @@
 
 SpriteShader::SpriteShader(ID3D11Device* device, const char* vs, const char* ps)
 {
-	// “ü—ÍƒŒƒCƒAƒEƒg
+	// ï¿½ï¿½ï¿½Íƒï¿½ï¿½Cï¿½Aï¿½Eï¿½g
 	D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
-	// ’¸“_ƒVƒF[ƒ_[
+	// ï¿½ï¿½ï¿½_ï¿½Vï¿½Fï¿½[ï¿½_ï¿½[
 	GpuResourceUtils::LoadVertexShader(
 		device,
 		vs,
@@ -20,7 +20,7 @@ SpriteShader::SpriteShader(ID3D11Device* device, const char* vs, const char* ps)
 		inputLayout.GetAddressOf(),
 		vertexShader.GetAddressOf()
 	);
-	// ƒsƒNƒZƒ‹ƒVƒF[ƒ_[
+	// ï¿½sï¿½Nï¿½Zï¿½ï¿½ï¿½Vï¿½Fï¿½[ï¿½_ï¿½[
 	GpuResourceUtils::LoadPixelShader(
 		device,
 		ps,
@@ -28,7 +28,7 @@ SpriteShader::SpriteShader(ID3D11Device* device, const char* vs, const char* ps)
 	);
 }
 
-// •`‰æŠJŽn
+// ï¿½`ï¿½ï¿½Jï¿½n
 void SpriteShader::Begin(const RenderContext& rc)
 {
 	rc.deviceContext->VSSetShader(vertexShader.Get(), nullptr, 0);
@@ -50,7 +50,7 @@ void SpriteShader::Begin(const RenderContext& rc)
 	rc.deviceContext->OMSetDepthStencilState(rc.renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
 	rc.deviceContext->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullBack));
 
-	// ƒTƒ“ƒvƒ‰ƒXƒe[ƒg
+	// ï¿½Tï¿½ï¿½ï¿½vï¿½ï¿½ï¿½Xï¿½eï¿½[ï¿½g
 	ID3D11SamplerState* samplerStates[] =
 	{
 		rc.renderState->GetSamplerState(SamplerState::LinearClamp)
@@ -62,7 +62,7 @@ void SpriteShader::Begin(const RenderContextDX12& rc)
 {
 }
 
-void SpriteShader::Draw(const RenderContextDX12& rc, Model* model)
+void SpriteShader::Draw(const RenderContextDX12& rc, iModel* model)
 {
 }
 

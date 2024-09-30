@@ -1,69 +1,69 @@
 #include "FrustumCulling.h"
 
-// ‹‘äƒJƒŠƒ“ƒO‚ğs‚¤ŠÖ”
-void FrustumCulling::FrustumCullingFlag(const Camera & camera, const std::vector<Model::Mesh>&meshes, std::vector<bool>&visibleObjects)
+// è¦–éŒå°ã‚«ãƒªãƒ³ã‚°ã‚’è¡Œã†é–¢æ•°
+void FrustumCulling::FrustumCullingFlag(const Camera & camera, const std::vector<iModel::Mesh>&meshes, std::vector<bool>&visibleObjects)
 {
-    // ƒJƒƒ‰‚Ìƒrƒ…[s—ñ‚ÆË‰es—ñ‚ğæ“¾
+    // ã‚«ãƒ¡ãƒ©ã®ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã¨å°„å½±è¡Œåˆ—ã‚’å–å¾—
     DirectX::XMFLOAT4X4 viewMatrix       = camera.GetView();
     DirectX::XMFLOAT4X4 projectionMatrix = camera.GetProjection();
 
-    // ƒJƒƒ‰‚Ì‹‘äiƒtƒ‰ƒXƒ^ƒ€j‚ğŒvZ
+    // ã‚«ãƒ¡ãƒ©ã®è¦–éŒå°ï¼ˆãƒ•ãƒ©ã‚¹ã‚¿ãƒ ï¼‰ã‚’è¨ˆç®—
     Frustum frustum;
     CalculateFrustumFromViewProjection(frustum, viewMatrix, projectionMatrix);
 
-    // ŠeƒƒbƒVƒ…‚É‘Î‚µ‚Äƒtƒ‰ƒXƒ^ƒ€“à‚Éû‚Ü‚é‚©”»’è‚µ‚Äƒtƒ‰ƒO‚ğƒZƒbƒg
+    // å„ãƒ¡ãƒƒã‚·ãƒ¥ã«å¯¾ã—ã¦ãƒ•ãƒ©ã‚¹ã‚¿ãƒ å†…ã«åã¾ã‚‹ã‹åˆ¤å®šã—ã¦ãƒ•ãƒ©ã‚°ã‚’ã‚»ãƒƒãƒˆ
     for (size_t i = 0; i < meshes.size(); ++i)
     {
-        const Model::Mesh&   mesh       = meshes[i];
+        const iModel::Mesh&   mesh       = meshes[i];
         DirectX::BoundingBox meshBounds = mesh.worldBounds;
         visibleObjects[i] = IsObjectInFrustum(frustum, meshBounds);
     }
 }
 
-// ƒtƒ‰ƒXƒ^ƒ€‚ğŒvZ‚·‚éŠÖ”
+// ãƒ•ãƒ©ã‚¹ã‚¿ãƒ ã‚’è¨ˆç®—ã™ã‚‹é–¢æ•°
 void FrustumCulling::CalculateFrustumFromViewProjection(Frustum& frustum, const DirectX::XMFLOAT4X4& viewMatrix, const DirectX::XMFLOAT4X4& projectionMatrix)
 {
-    // ƒrƒ…[s—ñ‚ÆË‰es—ñ‚ğ‘g‚İ‡‚í‚¹‚½s—ñ‚ğŒvZ
+    // ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã¨å°„å½±è¡Œåˆ—ã‚’çµ„ã¿åˆã‚ã›ãŸè¡Œåˆ—ã‚’è¨ˆç®—
     DirectX::XMFLOAT4X4 viewProjectionMatrix;
     DirectX::XMStoreFloat4x4(&viewProjectionMatrix, DirectX::XMMatrixMultiply(DirectX::XMLoadFloat4x4(&viewMatrix), DirectX::XMLoadFloat4x4(&projectionMatrix)));
 
-    // ¶•½–Ê
+    // å·¦å¹³é¢
     frustum.planes[0].x = viewProjectionMatrix._14 + viewProjectionMatrix._11;
     frustum.planes[0].y = viewProjectionMatrix._24 + viewProjectionMatrix._21;
     frustum.planes[0].z = viewProjectionMatrix._34 + viewProjectionMatrix._31;
     frustum.planes[0].w = viewProjectionMatrix._44 + viewProjectionMatrix._41;
 
-    // ‰E•½–Ê
+    // å³å¹³é¢
     frustum.planes[1].x = viewProjectionMatrix._14 - viewProjectionMatrix._11;
     frustum.planes[1].y = viewProjectionMatrix._24 - viewProjectionMatrix._21;
     frustum.planes[1].z = viewProjectionMatrix._34 - viewProjectionMatrix._31;
     frustum.planes[1].w = viewProjectionMatrix._44 - viewProjectionMatrix._41;
 
-    // ã•½–Ê
+    // ä¸Šå¹³é¢
     frustum.planes[2].x = viewProjectionMatrix._14 - viewProjectionMatrix._12;
     frustum.planes[2].y = viewProjectionMatrix._24 - viewProjectionMatrix._22;
     frustum.planes[2].z = viewProjectionMatrix._34 - viewProjectionMatrix._32;
     frustum.planes[2].w = viewProjectionMatrix._44 - viewProjectionMatrix._42;
 
-    // ‰º•½–Ê
+    // ä¸‹å¹³é¢
     frustum.planes[3].x = viewProjectionMatrix._14 + viewProjectionMatrix._12;
     frustum.planes[3].y = viewProjectionMatrix._24 + viewProjectionMatrix._22;
     frustum.planes[3].z = viewProjectionMatrix._34 + viewProjectionMatrix._32;
     frustum.planes[3].w = viewProjectionMatrix._44 + viewProjectionMatrix._42;
 
-    // ‹ß•½–Ê
+    // è¿‘å¹³é¢
     frustum.planes[4].x = viewProjectionMatrix._13;
     frustum.planes[4].y = viewProjectionMatrix._23;
     frustum.planes[4].z = viewProjectionMatrix._33;
     frustum.planes[4].w = viewProjectionMatrix._43;
 
-    // ‰“•½–Ê
+    // é å¹³é¢
     frustum.planes[5].x = viewProjectionMatrix._14 - viewProjectionMatrix._13;
     frustum.planes[5].y = viewProjectionMatrix._24 - viewProjectionMatrix._23;
     frustum.planes[5].z = viewProjectionMatrix._34 - viewProjectionMatrix._33;
     frustum.planes[5].w = viewProjectionMatrix._44 - viewProjectionMatrix._43;
 
-    // •½–Ê‚ğ³‹K‰»
+    // å¹³é¢ã‚’æ­£è¦åŒ–
     for (int i = 0; i < 6; ++i)
     {
         DirectX::XMVECTOR planeVec = DirectX::XMVectorSet(frustum.planes[i].x, frustum.planes[i].y, frustum.planes[i].z, frustum.planes[i].w);
@@ -72,21 +72,21 @@ void FrustumCulling::CalculateFrustumFromViewProjection(Frustum& frustum, const 
     }
 }
 
-// ƒtƒ‰ƒXƒ^ƒ€‚Æ‚ÌÕ“Ë”»’è‚ğs‚¤ŠÖ”
+// ãƒ•ãƒ©ã‚¹ã‚¿ãƒ ã¨ã®è¡çªåˆ¤å®šã‚’è¡Œã†é–¢æ•°
 bool FrustumCulling::IsObjectInFrustum(const Frustum& frustum, const DirectX::BoundingBox& objectBounds)
 {
-    // ƒIƒuƒWƒFƒNƒg‚Ì‹«ŠEƒ{ƒbƒNƒX‚Ì’¸“_‚ğæ“¾
+    // ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å¢ƒç•Œãƒœãƒƒã‚¯ã‚¹ã®é ‚ç‚¹ã‚’å–å¾—
     DirectX::XMFLOAT3 corners[8];
     objectBounds.GetCorners(corners);
 
-    // ƒtƒ‰ƒXƒ^ƒ€‚ÌŠe•½–Ê‚Æ‚Ì”äŠr‚ğs‚¤
+    // ãƒ•ãƒ©ã‚¹ã‚¿ãƒ ã®å„å¹³é¢ã¨ã®æ¯”è¼ƒã‚’è¡Œã†
     for (int i = 0; i < 6; ++i)
     {
         DirectX::XMFLOAT4 plane  = frustum.planes[i];
         DirectX::XMVECTOR normal = DirectX::XMVectorSet(plane.x, plane.y, plane.z, 0.0f);
         DirectX::XMVECTOR origin = DirectX::XMVectorScale(normal, -plane.w);
 
-        // ƒIƒuƒWƒFƒNƒg‚Ì’¸“_‚ğƒtƒ‰ƒXƒ^ƒ€‚Ì•½–Ê‚Æ”äŠr
+        // ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®é ‚ç‚¹ã‚’ãƒ•ãƒ©ã‚¹ã‚¿ãƒ ã®å¹³é¢ã¨æ¯”è¼ƒ
         bool allOutside = true;
         for (int j = 0; j < 8; ++j)
         {
@@ -99,13 +99,13 @@ bool FrustumCulling::IsObjectInFrustum(const Frustum& frustum, const DirectX::Bo
             }
         }
 
-        // ƒIƒuƒWƒFƒNƒg‚ªƒtƒ‰ƒXƒ^ƒ€‚ÌŠO‘¤‚É‚ ‚ê‚Î”ñ•\¦‚Æ”»’è
+        // ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒãƒ•ãƒ©ã‚¹ã‚¿ãƒ ã®å¤–å´ã«ã‚ã‚Œã°éè¡¨ç¤ºã¨åˆ¤å®š
         if (allOutside)
         {
             return false;
         }
     }
 
-    // ‚·‚×‚Ä‚Ì•½–Ê‚Æ‚Ì”äŠr‚ğ’Ê‰ß‚µ‚½ê‡AƒIƒuƒWƒFƒNƒg‚Íƒtƒ‰ƒXƒ^ƒ€“à‚É‚ ‚é
+    // ã™ã¹ã¦ã®å¹³é¢ã¨ã®æ¯”è¼ƒã‚’é€šéã—ãŸå ´åˆã€ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¯ãƒ•ãƒ©ã‚¹ã‚¿ãƒ å†…ã«ã‚ã‚‹
     return true;
 }

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.26.0 FATAL_ERROR)
 
 set(CMAKE_SYSTEM_VERSION 10.0.22621.0 CACHE STRING "" FORCE)
 
@@ -6,32 +6,35 @@ project(E4COnline CXX)
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Game)
 
-set (CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 20)
 
-################################################################################
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /source-charset:.932")
+
+# ###############################################################################
 # Set target arch type if empty. Visual studio solution generator provides it.
-################################################################################
+# ###############################################################################
 if(NOT CMAKE_VS_PLATFORM_NAME)
     set(CMAKE_VS_PLATFORM_NAME "x64")
 endif()
+
 message("${CMAKE_VS_PLATFORM_NAME} architecture in use")
 
-if(NOT ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64"))
+if(NOT("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64"))
     message(FATAL_ERROR "${CMAKE_VS_PLATFORM_NAME} arch is not supported!")
 endif()
 
-################################################################################
+# ###############################################################################
 # Global configuration types
-################################################################################
+# ###############################################################################
 set(CMAKE_CONFIGURATION_TYPES
     "Debug"
     "Release"
     CACHE STRING "" FORCE
 )
 
-################################################################################
+# ###############################################################################
 # Global compiler options
-################################################################################
+# ###############################################################################
 if(MSVC)
     # remove default flags provided with CMake for MSVC
     set(CMAKE_CXX_FLAGS "")
@@ -39,9 +42,9 @@ if(MSVC)
     set(CMAKE_CXX_FLAGS_RELEASE "")
 endif()
 
-################################################################################
+# ###############################################################################
 # Global linker options
-################################################################################
+# ###############################################################################
 if(MSVC)
     # remove default flags provided with CMake for MSVC
     set(CMAKE_EXE_LINKER_FLAGS "")
@@ -58,60 +61,37 @@ if(MSVC)
     set(CMAKE_STATIC_LINKER_FLAGS_RELEASE "${CMAKE_STATIC_LINKER_FLAGS}")
 endif()
 
-################################################################################
+# ###############################################################################
 # Nuget packages function stub.
-################################################################################
+# ###############################################################################
 function(use_package TARGET PACKAGE VERSION)
     message(WARNING "No implementation of use_package. Create yours. "
-                    "Package \"${PACKAGE}\" with version \"${VERSION}\" "
-                    "for target \"${TARGET}\" is ignored!")
+        "Package \"${PACKAGE}\" with version \"${VERSION}\" "
+        "for target \"${TARGET}\" is ignored!")
 endfunction()
 
-################################################################################
+# ###############################################################################
 # Common utils
-################################################################################
+# ###############################################################################
 include(CMake/Utils.cmake)
 
-################################################################################
+# ###############################################################################
 # Additional Global Settings(add specific info there)
-################################################################################
+# ###############################################################################
 include(CMake/GlobalSettingsInclude.cmake OPTIONAL)
 
-################################################################################
+# ###############################################################################
 # Use solution folders feature
-################################################################################
+# ###############################################################################
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-################################################################################
+# ###############################################################################
 # Sub-projects
-################################################################################
+# ###############################################################################
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-################################################################################
+# ###############################################################################
 # Target
-################################################################################
+# ###############################################################################
 set(PROJECT_NAME Game)
 
 set(External__DirectXTex
@@ -400,12 +380,6 @@ set(TAKOEngine__Rendering
     "TAKOEngine/Rendering/LineRenderer.cpp"
     "TAKOEngine/Rendering/LineRenderer.h"
     "TAKOEngine/Rendering/Misc.h"
-    "TAKOEngine/Rendering/Model.cpp"
-    "TAKOEngine/Rendering/Model.h"
-    "TAKOEngine/Rendering/ModelDX12.cpp"
-    "TAKOEngine/Rendering/ModelDX12.h"
-    "TAKOEngine/Rendering/ModelResource.cpp"
-    "TAKOEngine/Rendering/ModelResource.h"
     "TAKOEngine/Rendering/MyRender.h"
     "TAKOEngine/Rendering/PostEffect.cpp"
     "TAKOEngine/Rendering/PostEffect.h"
@@ -479,6 +453,19 @@ set(TAKOEngine__Editor__Input
     "TAKOEngine/Editor/Input/InputMap.h"
 )
 source_group("TAKOEngine\\Editor\\Input" FILES ${TAKOEngine__Editor__Input})
+
+set(TAKOEngine__Rendering__Model
+    "TAKOEngine/Rendering/Model/Model.h"
+    "TAKOEngine/Rendering/Model/ModelDX11.cpp"
+    "TAKOEngine/Rendering/Model/ModelDX11.h"
+    "TAKOEngine/Rendering/Model/ModelDX12.cpp"
+    "TAKOEngine/Rendering/Model/ModelDX12.h"
+    "TAKOEngine/Rendering/Model/ModelResource.cpp"
+    "TAKOEngine/Rendering/Model/ModelResource.h"
+    "TAKOEngine/Rendering/Model/NewModelDX11.cpp"
+    "TAKOEngine/Rendering/Model/NewModelDX11.h"
+)
+source_group("TAKOEngine\\Rendering\\Model" FILES ${TAKOEngine__Rendering__Model})
 
 set(TAKOEngine__Rendering__Shaders
     "TAKOEngine/Rendering/Shaders/ColorGradingShader.cpp"
@@ -635,6 +622,7 @@ set(ALL_FILES
     ${TAKOEngine__Editor__Camera}
     ${TAKOEngine__Editor__Input}
     ${TAKOEngine__Rendering__HLSL}
+    ${TAKOEngine__Rendering__Model}
     ${TAKOEngine__Rendering__Shaders}
     ${TAKOEngine__Rendering__Texture}
     ${TAKOEngine__Rendering__HLSL__Common}
@@ -651,25 +639,24 @@ set(ALL_FILES
 # SOURCE_GROUPS_END
 #####################################################################
 
-
-################################################################################
+# ###############################################################################
 # SHADERS_START
-################################################################################
+# ###############################################################################
 add_executable(${PROJECT_NAME} ${ALL_FILES})
 
 function(set_hlsl_properties target source_file shader_model shader_type entry_point)
-    set_source_files_properties(${source_file} PROPERTIES 
-        VS_SHADER_MODEL ${shader_model}   # Set the shader model
-        VS_SHADER_TYPE ${shader_type}     # Set the shader type
+    set_source_files_properties(${source_file} PROPERTIES
+        VS_SHADER_MODEL ${shader_model} # Set the shader model
+        VS_SHADER_TYPE ${shader_type} # Set the shader type
         VS_SHADER_ENTRYPOINT ${entry_point} # Set the entry point function name
     )
 endfunction()
 
-#####################################################################
+# ####################################################################
 # SHADERS_FILES_START
-#####################################################################
+# ####################################################################
 
-#List of HLSL shaders
+# List of HLSL shaders
 set(SHADER_NAMES
     "DebugPS.cso"
     "DebugVS.cso"
@@ -735,86 +722,88 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/UVScroll/UVScrollPS.hlsl,5.0,Pixel,main"
 )
 
-#####################################################################
+# ####################################################################
 # SHADERS_FILES_END
-#####################################################################
+# ####################################################################
 
 # Apply HLSL properties to each shader file
 foreach(shader_properties ${HLSL_SHADERS})
-
     string(REPLACE "," ";" MY_LIST ${shader_properties})
 
     list(GET MY_LIST 0 shader_file)
     list(GET MY_LIST 1 shader_model)
     list(GET MY_LIST 2 shader_type)
     list(GET MY_LIST 3 entry_point)
-    
+
     set_hlsl_properties(${PROJECT_NAME} ${shader_file} ${shader_model} ${shader_type} ${entry_point})
 endforeach()
 
-################################################################################
+# ###############################################################################
 # SHADERS_END
-################################################################################
+# ###############################################################################
 
-################################################################################
+# ###############################################################################
 # Target
-################################################################################
-
+# ###############################################################################
 use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
 set_target_properties(${PROJECT_NAME} PROPERTIES
     VS_GLOBAL_KEYWORD "Win32Proj"
 )
-################################################################################
+
+# ###############################################################################
 # Target name
-################################################################################
+# ###############################################################################
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    TARGET_NAME_DEBUG     "Game"
-    TARGET_NAME_RELEASE   "Game"
+    TARGET_NAME_DEBUG "Game"
+    TARGET_NAME_RELEASE "Game"
 )
-################################################################################
+
+# ###############################################################################
 # Output directory
-################################################################################
+# ###############################################################################
 if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
     set_target_properties(${PROJECT_NAME} PROPERTIES
-        OUTPUT_DIRECTORY_DEBUG     "${CMAKE_CURRENT_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/"
-        OUTPUT_DIRECTORY_RELEASE   "${CMAKE_CURRENT_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/"
+        OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/"
+        OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/"
     )
 endif()
+
 if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
     set_target_properties(${PROJECT_NAME} PROPERTIES
-        INTERPROCEDURAL_OPTIMIZATION_RELEASE   "TRUE"
+        INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"
     )
 elseif("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x86")
     set_target_properties(${PROJECT_NAME} PROPERTIES
-        INTERPROCEDURAL_OPTIMIZATION_RELEASE   "TRUE"
+        INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"
     )
 endif()
-################################################################################
+
+# ###############################################################################
 # MSVC runtime library
-################################################################################
+# ###############################################################################
 get_property(MSVC_RUNTIME_LIBRARY_DEFAULT TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY)
 string(CONCAT "MSVC_RUNTIME_LIBRARY_STR"
     $<$<CONFIG:Debug>:
-        MultiThreadedDebugDLL
+    MultiThreadedDebugDLL
     >
     $<$<CONFIG:Release>:
-        MultiThreadedDLL
+    MultiThreadedDLL
     >
     $<$<NOT:$<OR:$<CONFIG:Debug>,$<CONFIG:Release>>>:${MSVC_RUNTIME_LIBRARY_DEFAULT}>
 )
 set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUNTIME_LIBRARY_STR})
 
-################################################################################
+# ###############################################################################
 # Include directories
-################################################################################
+# ###############################################################################
 target_include_directories(${PROJECT_NAME} PUBLIC
     "$<$<CONFIG:Debug>:"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/include"
     ">"
     "$<$<CONFIG:Release>:"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/include"
     ">"
     "${CMAKE_CURRENT_SOURCE_DIR}/Source"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/imgui-docking"
@@ -827,31 +816,31 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/External/tinygltf"
 )
 
-################################################################################
+# ###############################################################################
 # Compile definitions
-################################################################################
+# ###############################################################################
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     "$<$<CONFIG:Debug>:"
-        "_DEBUG"
-        "CMAKE_INTDIR=\"Debug\""
+    "_DEBUG"
+    "CMAKE_INTDIR=\"Debug\""
     ">"
     "$<$<CONFIG:Release>:"
-        "NDEBUG"
-        "CMAKE_INTDIR=\"Release\""
+    "NDEBUG"
+    "CMAKE_INTDIR=\"Release\""
     ">"
     "_CONSOLE"
     "UNICODE"
     "_UNICODE"
 )
 
-################################################################################
+# ###############################################################################
 # Compile and link options
-################################################################################
+# ###############################################################################
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Release>:
-            /Oi
-            /Gy
+        /Oi
+        /Gy
         >
         /permissive-
         /MP
@@ -860,58 +849,62 @@ if(MSVC)
         /Zi
         ${DEFAULT_CXX_EXCEPTION_HANDLING}
         /Y-
+        /wd4819
+        /wd4099
     )
     target_link_options(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:
-            /INCREMENTAL
+        /INCREMENTAL
         >
         $<$<CONFIG:Release>:
-            /OPT:REF
-            /OPT:ICF
+        /OPT:REF
+        /OPT:ICF
         >
         /MANIFEST
         /DEBUG
         /SUBSYSTEM:WINDOWS
+        /wd4819
+        /wd4099
     )
 endif()
 
-################################################################################
+# ###############################################################################
 # Post build events
-################################################################################
+# ###############################################################################
 
 # URL of the ZIP files
-set(ZIP_FILE_URLS 
+set(ZIP_FILE_URLS
     "https://www.dropbox.com/scl/fi/ovb2dkjr3n1ayljdb0ftn/Data.zip?rlkey=2th7h96r3p4qsxn12oqnnp1wv&st=uywpwppu&dl=0"
     "https://www.dropbox.com/scl/fi/nm7h69ap66e62978butip/Dependencies.zip?rlkey=9icgfv9xwc9is1hziwhk5kjjs&st=gv2qvxdg&dl=0"
     "https://www.dropbox.com/scl/fi/1nbbetvdxp4dthu45kayx/External.zip?rlkey=ndtf9xh27fhaiuhnwnn4btf26&st=16hvp0yp&dl=0"
 )
 
 # Local path where the ZIP file will be downloaded
-set(ZIP_FILE_PATHS 
+set(ZIP_FILE_PATHS
     "${CMAKE_SOURCE_DIR}/Data.zip"
     "${CMAKE_SOURCE_DIR}/Dependencies.zip"
     "${CMAKE_SOURCE_DIR}/External.zip")
 
 # Local path where ZIP file will be unarchived
-set(DESTINATION_DIRS 
+set(DESTINATION_DIRS
     "${CMAKE_SOURCE_DIR}/Data"
     "${CMAKE_SOURCE_DIR}/Dependencies"
     "${CMAKE_SOURCE_DIR}/External"
 )
 
 foreach(i RANGE 0 2)
-
     list(GET ZIP_FILE_URLS ${i} ZIP_FILE_URL)
     list(GET ZIP_FILE_PATHS ${i} ZIP_FILE_PATH)
     list(GET DESTINATION_DIRS ${i} DESTINATION_DIR)
 
     # Command to download the ZIP file
     file(DOWNLOAD ${ZIP_FILE_URL} ${ZIP_FILE_PATH}
-    SHOW_PROGRESS
-    STATUS status)
+        SHOW_PROGRESS
+        STATUS status)
 
     list(GET status 0 status_code)
     list(GET status 1 status_string)
+
     if(NOT status_code EQUAL 0)
         message(FATAL_ERROR "Error downloading file: ${status_string}")
     endif()
@@ -934,21 +927,20 @@ foreach(i RANGE 0 2)
     endif()
 
     file(REMOVE ${ZIP_FILE_PATH})
-
 endforeach()
 
 set(SOURCE_DIR_DATA "${CMAKE_SOURCE_DIR}/Data")
 set(SOURCE_DIR_DEPENDENCY "${CMAKE_SOURCE_DIR}/Dependencies")
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${SOURCE_DIR_DATA} 
+    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
+    ${SOURCE_DIR_DATA}
     ${CMAKE_BINARY_DIR}/Data
     COMMENT "Copying data directory to build folder"
 )
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
     ${SOURCE_DIR_DEPENDENCY}
     ${CMAKE_BINARY_DIR}
     COMMENT "Copying dependency filest to build folder"
@@ -956,62 +948,61 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 
 if(MSVC)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND if "$(Configuration)" == "Release" ${CMAKE_COMMAND} -E copy_directory
-	${SOURCE_DIR_DATA}
-    	${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/Data
-)
+        COMMAND if "$(Configuration)" == "Release" ${CMAKE_COMMAND} -E copy_directory_if_different
+        ${SOURCE_DIR_DATA}
+        ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/Data
+    )
 endif()
 
 if(MSVC)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND if "$(Configuration)" == "Debug" ${CMAKE_COMMAND} -E copy_directory
-	${SOURCE_DIR_DATA}
-    	${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/Data
-)
+        COMMAND if "$(Configuration)" == "Debug" ${CMAKE_COMMAND} -E copy_directory_if_different
+        ${SOURCE_DIR_DATA}
+        ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/Data
+    )
 endif()
 
 if(MSVC)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND if "$(Configuration)" == "Release" ${CMAKE_COMMAND} -E copy_directory
-	${SOURCE_DIR_DEPENDENCY}
-    	${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/
-)
+        COMMAND if "$(Configuration)" == "Release" ${CMAKE_COMMAND} -E copy_directory_if_different
+        ${SOURCE_DIR_DEPENDENCY}
+        ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/
+    )
 endif()
 
 if(MSVC)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND if "$(Configuration)" == "Debug" ${CMAKE_COMMAND} -E copy_directory
-	${SOURCE_DIR_DEPENDENCY}
-    ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/
-)
+        COMMAND if "$(Configuration)" == "Debug" ${CMAKE_COMMAND} -E copy_directory_if_different
+        ${SOURCE_DIR_DEPENDENCY}
+        ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/
+    )
 endif()
 
 if(MSVC)
-foreach(CurrentShaderFile IN LISTS SHADER_NAMES)
-    add_custom_command(
-                TARGET ${PROJECT_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/${CurrentShaderFile} ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/Data/Shader/
-                COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/${CurrentShaderFile} ${CMAKE_BINARY_DIR}/Data/Shader
-                COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/${CurrentShaderFile}
-                COMMENT "Copying shaders")
-endforeach()
+    foreach(CurrentShaderFile IN LISTS SHADER_NAMES)
+        add_custom_command(
+            TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/${CurrentShaderFile} ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/Data/Shader/
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/${CurrentShaderFile} ${CMAKE_BINARY_DIR}/Data/Shader
+            COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/${CurrentShaderFile}
+            COMMENT "Copying shaders ${CurrentShaderFile}")
+    endforeach()
 endif()
 
-################################################################################
+# ###############################################################################
 # Dependencies
-################################################################################
+# ###############################################################################
 # Link with other targets.
-
 set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "$<$<CONFIG:Debug>:"
-        "SDL2"
-        "DirectXTK"
-        "DirectXTex"
+    "SDL2"
+    "DirectXTK"
+    "DirectXTex"
     ">"
     "$<$<CONFIG:Release>:"
-        "SDL2"
-        "DirectXTK"
-        "DirectXTex"
+    "SDL2"
+    "DirectXTK"
+    "DirectXTex"
     ">"
     "kernel32"
     "user32"
@@ -1028,27 +1019,25 @@ target_link_libraries(${PROJECT_NAME} PRIVATE "${ADDITIONAL_LIBRARY_DEPENDENCIES
 
 target_link_directories(${PROJECT_NAME} PRIVATE
     "$<$<CONFIG:Debug>:"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/nlohmann/$<CONFIG>"
-        "${CMAKE_CURRENT_SOURCE_DIR}/$<CONFIG>"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/assimp/lib/x64/$<CONFIG>"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/lib/x64"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/Effekseer162a/lib/vs2019/MD/x64/$<CONFIG>"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/openssl/x64/lib"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtk/native/lib/x64/$<CONFIG>"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtex/native/lib/x64/$<CONFIG>"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/nlohmann/$<CONFIG>"
+    "${CMAKE_CURRENT_SOURCE_DIR}/$<CONFIG>"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/assimp/lib/x64/$<CONFIG>"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/lib/x64"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/Effekseer162a/lib/vs2019/MD/x64/$<CONFIG>"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/openssl/x64/lib"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtk/native/lib/x64/$<CONFIG>"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtex/native/lib/x64/$<CONFIG>"
     ">"
     "$<$<CONFIG:Release>:"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/nlohmann"
-        "${CMAKE_CURRENT_SOURCE_DIR}/$<CONFIG>"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/assimp/lib/x64/Release"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/Effekseer162a/lib/vs2019/MD/x64/Release"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/openssl/x64/lib"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtex/native/lib/x64/Release"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtk/native/lib/x64/Release"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
-        "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/lib/x64"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/nlohmann"
+    "${CMAKE_CURRENT_SOURCE_DIR}/$<CONFIG>"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/assimp/lib/x64/Release"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/Effekseer162a/lib/vs2019/MD/x64/Release"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/openssl/x64/lib"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtex/native/lib/x64/Release"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtk/native/lib/x64/Release"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/lib/x64"
     ">"
 )
-
-

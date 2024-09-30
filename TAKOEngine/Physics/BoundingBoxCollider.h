@@ -3,12 +3,12 @@
 #include <DirectXCollision.h>
 
 #include "TAKOEngine/Physics/Collider.h"
-#include "TAKOEngine/Rendering/Model.h"
+#include "TAKOEngine/Rendering/Model/Model.h"
 
 class BoundingBoxCollider : public Collider
 {
 public:
-	BoundingBoxCollider(Model* model);
+	BoundingBoxCollider(iModel* model);
 	~BoundingBoxCollider() = default;
 
 	virtual bool RayCast(
@@ -22,7 +22,7 @@ public:
 private:
 	void UpdateCollider();
 protected:
-	Model* model;
+	iModel* model;
 
 	DirectX::BoundingBox boundingBox;
 	DirectX::XMFLOAT3 center = {};
