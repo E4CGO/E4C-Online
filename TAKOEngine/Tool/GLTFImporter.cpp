@@ -12,7 +12,7 @@ bool null_load_image_data(tinygltf::Image*, const int, std::string*, std::string
 	return true;
 }
 
-gltf_model::gltf_model(ID3D11Device* device, const std::string& filename)
+gltf_model::gltf_model(ID3D11Device* device, const std::string& filename, float scaling)
 {
 	tinygltf::TinyGLTF tiny_gltf;
 	tiny_gltf.SetImageLoader(null_load_image_data, nullptr);
@@ -78,15 +78,19 @@ gltf_model::gltf_model(ID3D11Device* device, const std::string& filename)
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 }
 
+gltf_model::~gltf_model()
+{
+}
+
 void gltf_model::fetch_nodes(const tinygltf::Model& gltf_model)
 {
 	for (std::vector<tinygltf::Node>::const_reference gltf_node : gltf_model.nodes)
 	{
-		node& node{ nodes.emplace_back() };
+		Node& node{ nodes.emplace_back() };
 		node.name = gltf_node.name;
 		node.skin = gltf_node.skin;
 		node.mesh = gltf_node.mesh;
-		node.children = gltf_node.children;
+		node.ichildren = gltf_node.children;
 
 		if (!gltf_node.matrix.empty())
 		{
@@ -135,19 +139,19 @@ void gltf_model::fetch_nodes(const tinygltf::Model& gltf_model)
 	cumulate_transforms(nodes);
 }
 
-void gltf_model::cumulate_transforms(std::vector<node>& nodes)
+void gltf_model::cumulate_transforms(std::vector<Node>& nodes)
 {
 	std::stack<DirectX::XMFLOAT4X4> parent_global_transforms;
 	std::function<void(int)> traverse{ [&](int node_index)->void
 	{
-			node& node{nodes.at(node_index)};
+			Node& node{nodes.at(node_index)};
 			DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(node.scale.x, node.scale.y, node.scale.z) };
 			DirectX::XMMATRIX R{ DirectX::XMMatrixRotationQuaternion(DirectX::XMVectorSet(node.rotation.x, node.rotation.y, node.rotation.z, node.rotation.w)) };
 			DirectX::XMMATRIX T{ DirectX::XMMatrixTranslation(node.translation.x, node.translation.y, node.translation.z) };
-			DirectX::XMStoreFloat4x4(&node.global_transform , S * R * T * DirectX::XMLoadFloat4x4(&parent_global_transforms.top()));
-			for (int child_index : node.children)
+			DirectX::XMStoreFloat4x4(&node.globalTransform, S * R * T * DirectX::XMLoadFloat4x4(&parent_global_transforms.top()));
+			for (int child_index : node.ichildren)
 			{
-				parent_global_transforms.push(node.global_transform);
+				parent_global_transforms.push(node.globalTransform);
 				traverse(child_index);
 				parent_global_transforms.pop();
 			}
@@ -584,7 +588,7 @@ void gltf_model::fetch_animations(const tinygltf::Model& gltf_model)
 	}
 }
 
-void gltf_model::animate(size_t animation_index, float time, std::vector<node>& animated_nodes)
+void gltf_model::animate(size_t animation_index, float time, std::vector<Node>& animated_nodes)
 {
 	std::function<size_t(const std::vector<float>&, float, float&)> indexof
 	{
@@ -661,11 +665,11 @@ void gltf_model::animate(size_t animation_index, float time, std::vector<node>& 
 	}
 }
 
-void gltf_model::render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world, const std::vector<node>& animated_nodes)
+void gltf_model::render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world, const std::vector<Node>& animated_nodes)
 {
 	ID3D11DeviceContext* immediate_context = rc.deviceContext;
 
-	const std::vector<node>& nodes{ animated_nodes.size() > 0 ? animated_nodes : gltf_model::nodes };
+	const std::vector<Node>& nodes{ animated_nodes.size() > 0 ? animated_nodes : gltf_model::nodes };
 
 	immediate_context->VSSetShader(vertex_shader.Get(), nullptr, 0);
 	immediate_context->PSSetShader(pixel_shader.Get(), nullptr, 0);
@@ -673,7 +677,7 @@ void gltf_model::render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world
 	immediate_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	std::function<void(int)> traverse{ [&](int node_index)->void {
-		const node& node {nodes.at(node_index)};
+		const Node& node {nodes.at(node_index)};
 		if (node.skin > -1)
 		{
 			const skin& skin{ skins.at(node.skin) };
@@ -682,8 +686,8 @@ void gltf_model::render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world
 			{
 				XMStoreFloat4x4(&primitive_joint_data.matrices[joint_index],
 					XMLoadFloat4x4(&skin.inverse_bind_matrices.at(joint_index)) *
-					XMLoadFloat4x4(&nodes.at(skin.joints.at(joint_index)).global_transform) *
-					XMMatrixInverse(NULL, XMLoadFloat4x4(&node.global_transform))
+					XMLoadFloat4x4(&nodes.at(skin.joints.at(joint_index)).globalTransform) *
+					XMMatrixInverse(NULL, XMLoadFloat4x4(&node.globalTransform))
 				);
 			}
 			immediate_context->UpdateSubresource(primitive_joint_cbuffer.Get(), 0, 0, &primitive_joint_data, 0, 0);
@@ -720,7 +724,7 @@ void gltf_model::render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world
 				primitive_data.has_tangent = primitive.vertex_buffer_views.at("TANGENT").buffer != NULL;
 				primitive_data.skin = node.skin;
 
-				DirectX::XMStoreFloat4x4(&primitive_data.world, DirectX::XMLoadFloat4x4(&node.global_transform) * DirectX::XMLoadFloat4x4(&world));
+				DirectX::XMStoreFloat4x4(&primitive_data.world, DirectX::XMLoadFloat4x4(&node.globalTransform) * DirectX::XMLoadFloat4x4(&world));
 
 				immediate_context->UpdateSubresource(primitive_cbuffer.Get(), 0, 0, &primitive_data, 0, 0);
 				immediate_context->VSSetConstantBuffers(0, 1, primitive_cbuffer.GetAddressOf());
@@ -751,7 +755,7 @@ void gltf_model::render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world
 			}
 		}
 
-		for (std::vector<int>::value_type child_index : node.children)
+		for (std::vector<int>::value_type child_index : node.ichildren)
 		{
 			traverse(child_index);
 		}
@@ -763,9 +767,9 @@ void gltf_model::render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world
 	}
 }
 
-void gltf_model::renderDX12(ID3D11DeviceContext* immediate_context, const DirectX::XMFLOAT4X4 world, const std::vector<node>& animated_nodes)
+void gltf_model::renderDX12(ID3D11DeviceContext* immediate_context, const DirectX::XMFLOAT4X4 world, const std::vector<Node>& animated_nodes)
 {
-	const std::vector<node>& nodes{ animated_nodes.size() > 0 ? animated_nodes : gltf_model::nodes };
+	const std::vector<Node>& nodes{ animated_nodes.size() > 0 ? animated_nodes : this->nodes };
 
 	immediate_context->VSSetShader(vertex_shader.Get(), nullptr, 0);
 	immediate_context->PSSetShader(pixel_shader.Get(), nullptr, 0);
@@ -773,7 +777,7 @@ void gltf_model::renderDX12(ID3D11DeviceContext* immediate_context, const Direct
 	immediate_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	std::function<void(int)> traverse{ [&](int node_index)->void {
-		const node& node {nodes.at(node_index)};
+		const Node& node {nodes.at(node_index)};
 		if (node.skin > -1)
 		{
 			const skin& skin{ skins.at(node.skin) };
@@ -782,8 +786,8 @@ void gltf_model::renderDX12(ID3D11DeviceContext* immediate_context, const Direct
 			{
 				XMStoreFloat4x4(&primitive_joint_data.matrices[joint_index],
 					XMLoadFloat4x4(&skin.inverse_bind_matrices.at(joint_index)) *
-					XMLoadFloat4x4(&nodes.at(skin.joints.at(joint_index)).global_transform) *
-					XMMatrixInverse(NULL, XMLoadFloat4x4(&node.global_transform))
+					XMLoadFloat4x4(&nodes.at(skin.joints.at(joint_index)).globalTransform) *
+					XMMatrixInverse(NULL, XMLoadFloat4x4(&node.globalTransform))
 				);
 			}
 			immediate_context->UpdateSubresource(primitive_joint_cbuffer.Get(), 0, 0, &primitive_joint_data, 0, 0);
@@ -820,7 +824,7 @@ void gltf_model::renderDX12(ID3D11DeviceContext* immediate_context, const Direct
 				primitive_data.has_tangent = primitive.vertex_buffer_views.at("TANGENT").buffer != NULL;
 				primitive_data.skin = node.skin;
 
-				DirectX::XMStoreFloat4x4(&primitive_data.world, DirectX::XMLoadFloat4x4(&node.global_transform) * DirectX::XMLoadFloat4x4(&world));
+				DirectX::XMStoreFloat4x4(&primitive_data.world, DirectX::XMLoadFloat4x4(&node.globalTransform) * DirectX::XMLoadFloat4x4(&world));
 
 				immediate_context->UpdateSubresource(primitive_cbuffer.Get(), 0, 0, &primitive_data, 0, 0);
 				immediate_context->VSSetConstantBuffers(0, 1, primitive_cbuffer.GetAddressOf());
@@ -851,7 +855,7 @@ void gltf_model::renderDX12(ID3D11DeviceContext* immediate_context, const Direct
 			}
 		}
 
-		for (std::vector<int>::value_type child_index : node.children)
+		for (std::vector<int>::value_type child_index : node.ichildren)
 		{
 			traverse(child_index);
 		}
@@ -861,6 +865,27 @@ void gltf_model::renderDX12(ID3D11DeviceContext* immediate_context, const Direct
 	{
 		traverse(node_index);
 	}
+}
+
+void gltf_model::UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform)
+{
+}
+
+void gltf_model::PlayAnimation(int index, bool loop, float blendSeconds)
+{
+}
+
+bool gltf_model::IsPlayAnimation() const
+{
+	return false;
+}
+
+void gltf_model::UpdateAnimation(float elapsedTime)
+{
+}
+
+void gltf_model::DrawDebugGUI()
+{
 }
 
 void gltf_model::ComputeAnimation(float elapsedTime)
@@ -873,4 +898,9 @@ void gltf_model::ComputeBlending(float elapsedTime)
 
 void gltf_model::ComputeWorldBounds()
 {
+}
+
+iModel::Node* gltf_model::FindNode(const char* name)
+{
+	return nullptr;
 }

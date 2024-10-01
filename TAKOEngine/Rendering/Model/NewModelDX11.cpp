@@ -23,12 +23,12 @@ NewModelDX11::NewModelDX11(ID3D11Device* device, const char* filename, float sca
 		auto&& src = resNodes.at(nodeIndex);
 		auto&& dst = nodes.at(nodeIndex);
 
-		dst.name     = src.name.c_str();
-		dst.scale    = src.scale;
+		dst.name = src.name.c_str();
+		dst.scale = src.scale;
 		dst.rotation = src.rotation;
 		dst.position = src.position;
 
-		dst.parent   = src.parentIndex >= 0 ? &nodes.at(src.parentIndex) : nullptr;
+		dst.parent = src.parentIndex >= 0 ? &nodes.at(src.parentIndex) : nullptr;
 		if (dst.parent != nullptr)
 		{
 			dst.parent->children.emplace_back(&dst);
@@ -42,7 +42,7 @@ NewModelDX11::NewModelDX11(ID3D11Device* device, const char* filename, float sca
 	{
 		const ModelResource::Mesh& resMesh = resMeshes.at(meshIndex);
 		Mesh& mesh = m_meshes.at(meshIndex);
-		mesh.mesh  = &resMesh;
+		mesh.mesh = &resMesh;
 	}
 }
 
@@ -292,5 +292,24 @@ NewModelDX11::Node* NewModelDX11::FindNode(const char* name)
 //デバッグ情報
 void NewModelDX11::DrawDebugGUI()
 {
+}
 
+void NewModelDX11::animate(size_t animation_index, float time, std::vector<Node>& animated_nodes)
+{
+}
+
+std::vector<iModel::animation>& NewModelDX11::GetAnimations()
+{
+	std::vector<iModel::animation> newVec;
+	return newVec;
+}
+
+void NewModelDX11::render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world, const std::vector<Node>& animated_nodes)
+{
+}
+
+const std::vector<iModel::Node>& NewModelDX11::GetLocalNodes() const
+{
+	std::vector<iModel::Node> newVec;
+	return newVec;
 }

@@ -81,6 +81,11 @@ public:
 	//デバッグ情報
 	void DrawDebugGUI();
 
+	void animate(size_t animation_index, float time, std::vector<Node>& animated_nodes);
+	std::vector<animation>& GetAnimations();
+	void render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world, const std::vector<Node>& animated_nodes);
+	const std::vector<Node>& GetLocalNodes() const;
+
 private:
 	// アニメーション計算処理
 	void ComputeAnimation(float elapsedTime);

@@ -76,5 +76,10 @@ public:
 	// バウンディングボックス計算
 	void ComputeWorldBounds();
 
+	void animate(size_t animation_index, float time, std::vector<Node>& animated_nodes);
+	std::vector<animation>& GetAnimations();
+	void render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world, const std::vector<Node>& animated_nodes);
+	const std::vector<Node>& GetLocalNodes() const;
+
 	float scaling = 1.0f;
 };

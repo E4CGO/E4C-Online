@@ -72,6 +72,7 @@ private:
 	std::unique_ptr<ModelObject> knight;
 	std::unique_ptr<ModelObject> rouge;
 	std::unique_ptr<ModelObject> barbarian;
+	std::unique_ptr<ModelObject> krak;
 
 	// テスト用
 	std::unique_ptr<ModelDX12> test;
