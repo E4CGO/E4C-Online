@@ -15,13 +15,12 @@
 #include "TAKOEngine/Rendering/RenderContext.h"
 #include "TAKOEngine/Rendering/Model/Model.h"
 
-class gltf_model : iModel
+class gltf_model : public iModel
 {
 	std::string filename;
 public:
-	gltf_model() {};
-	gltf_model(ID3D11Device* device, const std::string& filename);
-	~gltf_model() {};
+	gltf_model(ID3D11Device* device, const std::string& filename, float scaling = 1.0f);
+	~gltf_model();
 
 	struct scene
 	{
@@ -30,21 +29,7 @@ public:
 	};
 	std::vector<scene> scenes;
 
-	struct node
-	{
-		std::string name;
-		int skin{ -1 };
-		int mesh{ -1 };
-
-		std::vector<int> children;
-
-		DirectX::XMFLOAT4 rotation{ 0, 0, 0, 1 };
-		DirectX::XMFLOAT3 scale{ 1, 1, 1 };
-		DirectX::XMFLOAT3 translation{ 0, 0, 0 };
-
-		DirectX::XMFLOAT4X4 global_transform{ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
-	};
-	std::vector<node> nodes;
+	std::vector<Node> nodes;
 
 	struct  buffer_view
 	{
@@ -164,32 +149,6 @@ public:
 	};
 	std::vector<skin> skins;
 
-	struct animation
-	{
-		std::string name;
-		float duration{ 0.0f };
-
-		struct channel
-		{
-			int sampler{ -1 };
-			int target_node{ -1 };
-			std::string target_path;
-		};
-		std::vector<channel> channels;
-
-		struct sampler
-		{
-			int input{ -1 };
-			int output{ -1 };
-			std::string interpolation;
-		};
-		std::vector<sampler> samplers;
-
-		std::unordered_map<int/*sampler.input*/, std::vector<float>> timelines;
-		std::unordered_map<int/*sampler.output*/, std::vector<DirectX::XMFLOAT3>> scales;
-		std::unordered_map<int/*sampler.output*/, std::vector<DirectX::XMFLOAT4>> rotations;
-		std::unordered_map<int/*sampler.output*/, std::vector<DirectX::XMFLOAT3>> translations;
-	};
 	std::vector<animation> animations;
 
 	static const size_t PRIMITIVE_MAX_JOINTS = 512;
@@ -200,7 +159,7 @@ public:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> primitive_joint_cbuffer;
 
 	void fetch_nodes(const tinygltf::Model& gltf_model);
-	void cumulate_transforms(std::vector<node>& nodes);
+	void cumulate_transforms(std::vector<Node>& nodes);
 
 	buffer_view make_buffer_view(const tinygltf::Accessor& accessor);
 	void fetch_meshes(ID3D11Device* device, const tinygltf::Model& gltf_model);
@@ -210,16 +169,61 @@ public:
 	void fetch_textures(ID3D11Device* device, const tinygltf::Model& gltf_model);
 
 	void fetch_animations(const tinygltf::Model& gltf_model);
-	void animate(size_t animation_index, float time, std::vector<node>& animated_nodes);
+	void animate(size_t animation_index, float time, std::vector<Node>& animated_nodes);
 
-	void render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world, const std::vector<node>& animated_nodes);
-	void renderDX12(ID3D11DeviceContext* immediate_context, const DirectX::XMFLOAT4X4 world, const std::vector<node>& animated_nodes);
+	void render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world, const std::vector<Node>& animated_nodes);
+	void renderDX12(ID3D11DeviceContext* immediate_context, const DirectX::XMFLOAT4X4 world, const std::vector<Node>& animated_nodes);
 
-	void UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform) = 0;
-	void PlayAnimation(int index, bool loop, float blendSeconds = 0.2f) = 0;
-	bool IsPlayAnimation() const = 0;
-	void UpdateAnimation(float elapsedTime) = 0;
+	void UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform);
+	void PlayAnimation(int index, bool loop, float blendSeconds = 0.2f);
+	bool IsPlayAnimation() const;
+	void UpdateAnimation(float elapsedTime);
 	void ComputeAnimation(float elapsedTime);
 	void ComputeBlending(float elapsedTime);
 	void ComputeWorldBounds();
+
+	//////
+
+	// ノードデータ取得
+	const std::vector<Node>& GetNodes() const { return nodes; }
+	const std::vector<Node>& GetLocalNodes() const { return this->nodes; }
+
+	std::vector<animation>& GetAnimations() { return animations; }
+
+	// メッシュ取得
+	const std::vector<Mesh>& GetMeshes() const { return m_meshes; }
+
+	// ルートノード取得
+	Node* GetRootNode() { return m_nodes.data(); }
+
+	// ノード検索
+	Node* FindNode(const char* name);
+
+	// リソース取得
+	const ModelResource* GetResource() const { return resource.get(); }
+
+	// アニメーション取得
+	int GetAnimationId() { return currentAnimationIndex; }
+
+	int GetCurrentAnimationIndex() const { return  currentAnimationIndex; }
+
+	// 現在のアニメーション再生時間取得
+	float GetCurrentAnimationSeconds() const { return  currentAnimationSeconds; }
+	float GetAnimationRate() const { return currentAnimationSeconds / resource->GetAnimations().at(currentAnimationIndex).secondsLength; }
+	void SetAnimationRate(float rate) { currentAnimationSeconds = resource->GetAnimations().at(currentAnimationIndex).secondsLength * rate; }
+
+	void SetLinearGamma(float g) { linearGamma = g; }
+	float GetLinearGamma() const { return linearGamma; }
+
+	const std::vector<Node>& GetNodesDX12() const { return m_nodes; }
+	std::vector<Node>& GetNodesDX12() { return m_nodes; }
+
+	// メッシュリスト取得
+	std::vector<Mesh>& GetMeshes() { return m_meshes; }
+
+	// リソース取得
+	const ModelResource* GetResourceDX12() const { return m_resource.get(); }
+
+	//デバッグ情報
+	void DrawDebugGUI();
 };

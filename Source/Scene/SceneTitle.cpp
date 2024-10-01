@@ -68,6 +68,9 @@ void SceneTitle::Initialize()
 
 		test = std::make_unique<ModelDX12>("Data/Model/Character/Barbarian.glb");
 		test->PlayAnimation(0, true);
+
+		krak = std::make_unique<ModelObject>("Data/Model/Enemy/KRAKEN.glb", 0.3f, "DX11GLTF");
+		krak->SetScale({ 0.3f, 0.3f, 0.3f });
 	}
 
 	// 光
@@ -206,6 +209,74 @@ void SceneTitle::Render()
 	barbarian->Render(rc);
 	knight->Render(rc);
 	rouge->Render(rc);
+
+	{
+		static std::vector<iModel::Node> animated_nodes{ krak->GetModel()->GetLocalNodes() };
+
+		krak->GetModel()->animate(0/*animation index*/, time, animated_nodes);
+		if (krak->GetModel()->GetAnimations().at(0/*animation index*/).duration < time)
+		{
+			time = 0; // Repeat playback
+		}
+
+		const DirectX::XMFLOAT4X4 coordinate_system_transforms[]
+		{
+			{-1, 0, 0, 0,
+			  0, 1, 0, 0,
+			  0, 0, 1, 0,
+			  0, 0, 0, 1}, // 0:RHS Y-UP
+
+			{ 1, 0, 0, 0,
+			  0, 1, 0, 0,
+			  0, 0, 1, 0,
+			  0, 0, 0, 1}, // 1:LHS Y-UP
+
+			{-1, 0, 0, 0,
+			  0, 0,-1, 0,
+			  0, 1, 0, 0,
+			  0, 0, 0, 1}, // 2:RHS Z-UP
+
+			{ 1, 0, 0, 0,
+			  0, 0, 1, 0,
+			  0, 1, 0, 0,
+			  0, 0, 0, 1}, //3:LHS Z - UP
+		};
+
+		float scale_factor = 1.3f;
+
+		DirectX::XMMATRIX C{ DirectX::XMLoadFloat4x4(&coordinate_system_transforms[0]) * DirectX::XMMatrixScaling(scale_factor, scale_factor, scale_factor) };
+		DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(krak->GetScale().x, krak->GetScale().y, krak->GetScale().z) };
+		DirectX::XMMATRIX R{ DirectX::XMMatrixRotationRollPitchYaw(0.0f, 0.0f, 0.0f) };
+		DirectX::XMMATRIX T{ DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f) };
+
+		DirectX::XMFLOAT4X4 world;
+		DirectX::XMStoreFloat4x4(&world, C * S * R * T);
+
+		// シーン用定数バッファ更新
+		CbScene cbScene{};
+		DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&rc.camera->GetView());
+		DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&rc.camera->GetProjection());
+		DirectX::XMStoreFloat4x4(&cbScene.view_projection, V * P);
+
+		cbScene.light_direction = rc.directionalLightData.direction;
+
+		const DirectX::XMFLOAT3& eye = rc.camera->GetEye();
+		cbScene.camera_position.x = eye.x;
+		cbScene.camera_position.y = eye.y;
+		cbScene.camera_position.z = eye.z;
+
+		// レンダーステート設定
+		const float blend_factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		rc.deviceContext->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Opaque), blend_factor, 0xFFFFFFFF);
+		rc.deviceContext->OMSetDepthStencilState(rc.renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
+		rc.deviceContext->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullNone));
+
+		rc.deviceContext->UpdateSubresource(constant_buffers[1].Get(), 0, 0, &cbScene, 0, 0);
+		rc.deviceContext->VSSetConstantBuffers(1, 1, constant_buffers[1].GetAddressOf());
+		rc.deviceContext->PSSetConstantBuffers(1, 1, constant_buffers[1].GetAddressOf());
+
+		krak->GetModel()->render(rc, world, animated_nodes);
+	}
 
 	UI.Render(rc);
 

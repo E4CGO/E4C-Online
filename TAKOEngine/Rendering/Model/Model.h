@@ -2,11 +2,13 @@
 
 #include <memory>
 #include <vector>
+#include <unordered_map>
 #include <DirectXMath.h>
 #include <wrl.h>
 #include <d3d11.h>
 
 #include "ModelResource.h"
+#include "TAKOEngine/Rendering/RenderContext.h"
 
 class iModel
 {
@@ -20,16 +22,21 @@ public:
 		std::string name;
 		std::string path;
 		int parentIndex;
-		DirectX::XMFLOAT3 position;
-		DirectX::XMFLOAT4 rotation;
-		DirectX::XMFLOAT3 scale;
+		DirectX::XMFLOAT3 position{ 0, 0, 0 };
+		DirectX::XMFLOAT3 translation{ 0, 0, 0 };
+		DirectX::XMFLOAT4 rotation{ 0, 0, 0, 1 };
+		DirectX::XMFLOAT3 scale{ 1, 1, 1 };
 
 		Node* parent = nullptr;
 		std::vector<Node*> children;
+		std::vector<int> ichildren;
 
 		DirectX::XMFLOAT4X4 localTransform;
-		DirectX::XMFLOAT4X4 globalTransform;
+		DirectX::XMFLOAT4X4 globalTransform{ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 		DirectX::XMFLOAT4X4 worldTransform;
+
+		int skin{ -1 };
+		int mesh{ -1 };
 
 		bool visible = true;
 	};
@@ -46,6 +53,33 @@ public:
 		const ModelResource::Mesh* mesh = nullptr;
 		DirectX::BoundingBox	   worldBounds;
 		std::vector<FrameResource> frame_resources;
+	};
+
+	struct animation
+	{
+		std::string name;
+		float duration{ 0.0f };
+
+		struct channel
+		{
+			int sampler{ -1 };
+			int target_node{ -1 };
+			std::string target_path;
+		};
+		std::vector<channel> channels;
+
+		struct sampler
+		{
+			int input{ -1 };
+			int output{ -1 };
+			std::string interpolation;
+		};
+		std::vector<sampler> samplers;
+
+		std::unordered_map<int/*sampler.input*/, std::vector<float>> timelines;
+		std::unordered_map<int/*sampler.output*/, std::vector<DirectX::XMFLOAT3>> scales;
+		std::unordered_map<int/*sampler.output*/, std::vector<DirectX::XMFLOAT4>> rotations;
+		std::unordered_map<int/*sampler.output*/, std::vector<DirectX::XMFLOAT3>> translations;
 	};
 
 	// ノードデータ取得
@@ -108,6 +142,11 @@ public:
 
 	// バウンディングボックス計算
 	virtual void ComputeWorldBounds() = 0;
+
+	virtual void animate(size_t animation_index, float time, std::vector<Node>& animated_nodes) = 0;
+	virtual std::vector<animation>& GetAnimations() = 0;
+	virtual void render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world, const std::vector<Node>& animated_nodes) = 0;
+	virtual const std::vector<Node>& GetLocalNodes() const = 0;
 
 protected:
 	std::shared_ptr<ModelResource>	resource;
