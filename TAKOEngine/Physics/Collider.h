@@ -1,14 +1,15 @@
 #pragma once
 
+// writer Matsumura
 #include <DirectXMath.h>
 
 struct HitResult
 {
-	DirectX::XMFLOAT3 position = { 0, 0, 0 };	// ƒŒƒC‚Æƒ|ƒŠƒSƒ“‚ÌŒğ“_
-	DirectX::XMFLOAT3 normal = { 0, 0, 0 };		// Õ“Ë‚µ‚½ƒ|ƒŠƒSƒ“‚Ì–@üƒxƒNƒgƒ‹
-	DirectX::XMFLOAT3 rotation = { 0, 0, 0 };	// ‰ñ“]—Ê
-	float distance = FLT_MAX;						// ƒŒƒC‚Ìn“_‚©‚çŒğ“_‚Ü‚Å‚Ì‹——£
-	int materialIndex = -1;						// Õ“Ë‚µ‚½ƒ|ƒŠƒSƒ“‚Ìƒ}ƒeƒŠƒAƒ‹”Ô†
+	DirectX::XMFLOAT3 position = { 0, 0, 0 };	// ãƒ¬ã‚¤ã¨ãƒãƒªã‚´ãƒ³ã®äº¤ç‚¹
+	DirectX::XMFLOAT3 normal = { 0, 0, 0 };		// è¡çªã—ãŸãƒãƒªã‚´ãƒ³ã®æ³•ç·šãƒ™ã‚¯ãƒˆãƒ«
+	DirectX::XMFLOAT3 rotation = { 0, 0, 0 };	// å›è»¢é‡
+	float distance = FLT_MAX;						// ãƒ¬ã‚¤ã®å§‹ç‚¹ã‹ã‚‰äº¤ç‚¹ã¾ã§ã®è·é›¢
+	int materialIndex = -1;						// è¡çªã—ãŸãƒãƒªã‚´ãƒ³ã®ãƒãƒ†ãƒªã‚¢ãƒ«ç•ªå·
 };
 
 class Collider
@@ -17,16 +18,17 @@ public:
 	enum class COLLIDER_TYPE
 	{
 		DEFAULT,
-		UNROTATED_BOX,			// ‰ñ‚ç‚È‚¢ƒ{ƒbƒNƒX
-		MODEL,					// ƒ‚ƒfƒ‹
-		SPHERE,					// ‹…‘Ì
-		BOUNDING_BOX,			// ƒoƒEƒ“ƒfƒBƒ“ƒOƒ{ƒbƒNƒX
+		UNROTATED_BOX,			// å›ã‚‰ãªã„ãƒœãƒƒã‚¯ã‚¹
+		MODEL,					// ãƒ¢ãƒ‡ãƒ«
+		SPHERE,					// çƒä½“
+		BOUNDING_BOX,			// ãƒã‚¦ãƒ³ãƒ‡ã‚£ãƒ³ã‚°ãƒœãƒƒã‚¯ã‚¹
+		MAP,					// ãƒãƒƒãƒ—
 
 		enum_count
 	};
 public:
 	Collider() = default;
-	~Collider() = default;
+	virtual ~Collider() = default;
 
 	bool Collision(
 		Collider*& other,
@@ -87,8 +89,8 @@ public:
 protected:
 	COLLIDER_TYPE type = COLLIDER_TYPE::DEFAULT;
 
-	DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f }; // ƒ[ƒ‹ƒhˆÊ’u
-	DirectX::XMFLOAT3 rotation = { 0.0f, 0.0f, 0.0f }; // ƒ[ƒ‹ƒhƒ[ƒe[ƒVƒ‡ƒ“
+	DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f }; // ãƒ¯ãƒ¼ãƒ«ãƒ‰ä½ç½®
+	DirectX::XMFLOAT3 rotation = { 0.0f, 0.0f, 0.0f }; // ãƒ¯ãƒ¼ãƒ«ãƒ‰ãƒ­ãƒ¼ãƒ†ãƒ¼ã‚·ãƒ§ãƒ³
 	DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f };
 
 	bool enable = true;

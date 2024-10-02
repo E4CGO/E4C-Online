@@ -17,6 +17,4 @@ public:
 
 private:
 	const HWND				hWnd;
-
-	bool DX12API = false;
 };

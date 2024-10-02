@@ -1,11 +1,12 @@
 #pragma once
 
-#include "TAKOEngine/Rendering/ModelDX12.h"
+#include "TAKOEngine/Rendering/Model/ModelDX12.h"
+#include "TAKOEngine/Tool/GLTFImporter.h"
 #include "TAKOEngine/Editor/Camera/FreeCameraController.h"
 #include "TAKOEngine/AI/StateMachine.h"
 
 #include <unordered_set>
-// ƒeƒXƒg—p
+// ãƒ†ã‚¹ãƒˆç”¨
 
 #include "GameObject/ModelObject.h"
 #include "Scene/Scene.h"
@@ -16,21 +17,21 @@ public:
 	SceneTitle() = default;
 	~SceneTitle() = default;
 
-	// ‰Šú‰»
+	// åˆæœŸåŒ–
 	void Initialize() override;
-	// I—¹‰»
+	// çµ‚äº†åŒ–
 	void Finalize() override;
 
-	// XVˆ—
+	// æ›´æ–°å‡¦ç†
 	void Update(float elapsedTime) override;
-	// •`‰æˆ—
+	// æç”»å‡¦ç†
 	void Render() override;
 
 	void RenderDX12() override;
 
 	StateMachine<SceneTitle>* GetStateMachine() { return stateMachine.get(); }
 private:
-	// ƒV[ƒ“GUI•`‰æ
+	// ã‚·ãƒ¼ãƒ³GUIæç”»
 	void DrawSceneGUI();
 public:
 	enum STATE
@@ -51,7 +52,7 @@ private:
 
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {
-		"",											// ƒ}ƒXƒN
+		"",											// ãƒã‚¹ã‚¯
 		// Setting UI
 		"Data/Sprites/bar_ready.png",
 		"Data/Sprites/button_frame.png",
@@ -66,12 +67,15 @@ private:
 	};
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
 
-	// ”wŒi—pƒ‚ƒfƒ‹
+	// èƒŒæ™¯ç”¨ãƒ¢ãƒ‡ãƒ«
 	std::unique_ptr<ModelObject> map;
 	std::unique_ptr<ModelObject> knight;
 	std::unique_ptr<ModelObject> rouge;
 	std::unique_ptr<ModelObject> barbarian;
 
-	// ƒeƒXƒg—p
+	// ãƒ†ã‚¹ãƒˆç”¨
 	std::unique_ptr<ModelDX12> test;
+	
+	static float time;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> constant_buffers[8];
 };

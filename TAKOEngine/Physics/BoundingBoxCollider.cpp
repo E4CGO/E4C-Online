@@ -2,14 +2,14 @@
 
 #include "BoundingBoxCollider.h"
 
-BoundingBoxCollider::BoundingBoxCollider(Model* model)
+BoundingBoxCollider::BoundingBoxCollider(iModel* model)
 {
 	this->model = model;
 
 	type = COLLIDER_TYPE::BOUNDING_BOX;
 
-	// DirectX バウンディングボックス
-	// 頂点
+	// DirectX 繝舌え繝ｳ繝�繧｣繝ｳ繧ｰ繝懊ャ繧ｯ繧ｹ
+	// 鬆らせ
 	DirectX::XMFLOAT3 highest = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
 	DirectX::XMFLOAT3 lowest = { FLT_MAX, FLT_MAX, FLT_MAX };
 	for (const ModelResource::Mesh& mesh : model->GetResource()->GetMeshes())

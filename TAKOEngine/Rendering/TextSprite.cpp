@@ -122,7 +122,7 @@ void TextSprite::Render(
 	const DirectX::XMFLOAT4& borderColor
 )
 {
-	Render(font, Encode::char_to_wchar(text), x, y, r, g, b, a, angle, align, scale, border, borderColor);
+	Render(font, Encode::string_to_wstring(text), x, y, r, g, b, a, angle, align, scale, border, borderColor);
 }
 
 void TextSprite::TextBox(

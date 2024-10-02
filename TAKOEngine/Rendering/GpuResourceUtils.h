@@ -1,13 +1,18 @@
 #pragma once
 
+#include <map>
+#include <wrl.h>
+#include <string>
 #include <d3d11.h>
 #include "DirectXTex.h"
+#include <WICTextureLoader.h>
+#include <DDSTextureLoader.h>
 
-// GPUƒŠƒ\[ƒXƒ†[ƒeƒBƒŠƒeƒB
+// GPUãƒªã‚½ãƒ¼ã‚¹ãƒ¦ãƒ¼ãƒ†ã‚£ãƒªãƒ†ã‚£
 class GpuResourceUtils
 {
 public:
-	// ’¸“_ƒVƒF[ƒ_[“Ç‚Ýž‚Ý
+	// é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼èª­ã¿è¾¼ã¿
 	static HRESULT LoadVertexShader(
 		ID3D11Device* device,
 		const char* filename,
@@ -17,38 +22,38 @@ public:
 		ID3D11VertexShader** vertexShader
 	);
 
-	// ƒsƒNƒZƒ‹ƒVƒF[ƒ_[“Ç‚Ýž‚Ý
+	// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼èª­ã¿è¾¼ã¿
 	static HRESULT LoadPixelShader(
 		ID3D11Device* device,
 		const char* filename,
 		ID3D11PixelShader** pixelShader
 	);
 
-	//ƒWƒIƒƒgƒŠƒVƒF[ƒ_[
+	//ã‚¸ã‚ªãƒ¡ãƒˆãƒªã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 	static HRESULT LoadGeometryShader(
 		ID3D11Device* device,
 		const char* filename,
 		ID3D11GeometryShader** geometryShader);
 
-	//ƒnƒ‹ƒVƒF[ƒ_[
+	//ãƒãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 	static HRESULT LoadHullShader(
 		ID3D11Device* device,
 		const char* filename,
 		ID3D11HullShader** hullShader);
 
-	//ƒhƒƒCƒ“ƒVƒF[ƒ_[
+	//ãƒ‰ãƒ¡ã‚¤ãƒ³ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 	static HRESULT LoadDomainShader(
 		ID3D11Device* device,
 		const char* filename,
 		ID3D11DomainShader** domainShader);
 
-	//ƒRƒ“ƒsƒ…[ƒgƒVƒF[ƒ_[
+	//ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ãƒˆã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 	static HRESULT LoadComputeShader(
 		ID3D11Device* device,
 		const char* filename,
 		ID3D11ComputeShader** computeShader);
 
-	// ƒeƒNƒXƒ`ƒƒ“Ç‚Ýž‚Ý
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£èª­ã¿è¾¼ã¿
 	static HRESULT LoadTexture(
 		ID3D11Device* device,
 		const char* filename,
@@ -56,7 +61,21 @@ public:
 		D3D11_TEXTURE2D_DESC* texture2dDesc = nullptr
 	);
 
-	// ƒ_ƒ~[ƒeƒNƒXƒ`ƒƒì¬
+	static HRESULT load_texture_from_memory(ID3D11Device* device,
+		const void* data,
+		size_t size,
+		ID3D11ShaderResourceView** shader_resource_view,
+		bool generate_mips,
+		size_t mip_levels
+	);
+
+	static HRESULT load_texture_from_file(ID3D11Device* device,
+		const wchar_t* filename,
+		ID3D11ShaderResourceView** shader_resource_view,
+		D3D11_TEXTURE2D_DESC* texture2d_desc
+	);
+
+	// ãƒ€ãƒŸãƒ¼ãƒ†ã‚¯ã‚¹ãƒãƒ£ä½œæˆ
 	static HRESULT CreateDummyTexture(
 		ID3D11Device* device,
 		UINT color,
@@ -64,7 +83,7 @@ public:
 		D3D11_TEXTURE2D_DESC* texture2dDesc = nullptr
 	);
 
-	// ’è”ƒoƒbƒtƒ@ì¬
+	// å®šæ•°ãƒãƒƒãƒ•ã‚¡ä½œæˆ
 	static HRESULT CreateConstantBuffer(
 		ID3D11Device* device,
 		UINT bufferSize,
@@ -74,3 +93,5 @@ public:
 private:
 	static HRESULT GetMetadataFromGLBFile(const wchar_t* szFile, DirectX::TexMetadata& metadata);
 };
+
+static std::map<std::wstring, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> resources;

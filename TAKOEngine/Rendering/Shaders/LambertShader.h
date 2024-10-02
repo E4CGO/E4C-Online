@@ -14,7 +14,7 @@ public:
 
 	void Begin(const RenderContext& rc) override;
 	void Begin(const RenderContextDX12& rc) override;
-	void Draw(const RenderContextDX12& rc, Model* model) override;
+	void Draw(const RenderContextDX12& rc, iModel* model) override;
 	void Draw(const RenderContextDX12& rc, ModelDX12* model) override;
 	void End(const RenderContext& rc) override;
 	void End(const RenderContextDX12& rc) override;

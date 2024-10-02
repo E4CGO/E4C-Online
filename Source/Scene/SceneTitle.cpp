@@ -14,6 +14,9 @@
 
 #include "GameData.h"
 
+//テスト用
+float SceneTitle::time = { 0 };
+
 void SceneTitle::Initialize()
 {
 	// Sprite Resource Preload
@@ -127,6 +130,20 @@ void SceneTitle::Initialize()
 		}
 		delete xhr;
 	}
+
+	{
+		HRESULT hr;
+
+		D3D11_BUFFER_DESC buffer_desc{};
+		buffer_desc.ByteWidth = sizeof(CbScene);
+		buffer_desc.Usage = D3D11_USAGE_DEFAULT;
+		buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		buffer_desc.CPUAccessFlags = 0;
+		buffer_desc.MiscFlags = 0;
+		buffer_desc.StructureByteStride = 0;
+		hr = T_GRAPHICS.GetDevice()->CreateBuffer(&buffer_desc, nullptr, constant_buffers[1].GetAddressOf());
+		COMPLETION_CHECK
+	}
 }
 
 void SceneTitle::Finalize()
@@ -139,6 +156,8 @@ void SceneTitle::Finalize()
 // 更新処理
 void SceneTitle::Update(float elapsedTime)
 {
+	time += elapsedTime;
+
 	stateMachine->Update(elapsedTime);
 
 	map->Update(elapsedTime);
@@ -146,9 +165,9 @@ void SceneTitle::Update(float elapsedTime)
 	knight->Update(elapsedTime);
 	rouge->Update(elapsedTime);
 
-	if (test != nullptr)
+	if (test != nullptr && T_GRAPHICS.isDX12Active)
 	{
-		const DirectX::XMFLOAT4X4 w = { 1.f,0.f,0.f,0.f, 0.f,1.f,0.f,0.f, 0.f,0.f,1.f,0.f, 0.f,0.f,0.f,1.f };
+		const DirectX::XMFLOAT4X4 w = { 2.5f,0.f,0.f,0.f, 0.f,2.5f,0.f,0.f, 0.f,0.f,2.5f,0.f, 0.f,0.f,0.f,1.f };
 		test->UpdateAnimation(elapsedTime);
 		test->UpdateTransform(w);
 	}

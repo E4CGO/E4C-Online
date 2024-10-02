@@ -4,10 +4,21 @@
 #include "TAKOEngine/Physics/BoundingBoxCollider.h"
 #include "TAKOEngine/Physics/SphereCollider.h"
 #include "TAKOEngine/Physics/ModelCollider.h"
+#include "TAKOEngine/Physics/MapCollider.h"
 
-ModelObject::ModelObject(const char* filename, float scaling)
+#include "TAKOEngine/Rendering/Model/ModelDX11.h"
+#include "TAKOEngine/Rendering/Model/NewModelDX11.h"
+#include "TAKOEngine/Rendering/Model/ModelDX12.h"
+
+ModelObject::ModelObject(const char* filename, float scaling, std::string renderMode)
 {
-	model = std::make_unique<Model>(T_GRAPHICS.GetDevice(), filename, scaling);
+	if(renderMode == "DX11")
+	model = std::make_unique<ModelDX11>(T_GRAPHICS.GetDevice(), filename, scaling);
+
+	if(renderMode == "DX11GLTF")
+	//model = std::make_unique<gltf_model>(T_GRAPHICS.GetDevice(), filename);
+
+	if(renderMode == "DX12");
 }
 
 void ModelObject::SetShader(ModelShaderId id)
@@ -22,13 +33,13 @@ void ModelObject::SetAnimation(int index, bool loop, float blendSeconds)
 
 void ModelObject::Update(float elapsedTime)
 {
-	// 行列更新
+	// 陦悟�玲峩譁ｰ
 	UpdateTransform();
 
-	// アニメーション更新
+	// 繧｢繝九Γ繝ｼ繧ｷ繝ｧ繝ｳ譖ｴ譁ｰ
 	model->UpdateAnimation(elapsedTime * animationSpeed);
 
-	// トランスフォーム更新
+	// 繝医Λ繝ｳ繧ｹ繝輔か繝ｼ繝譖ｴ譁ｰ
 	model->UpdateTransform(transform);
 }
 
@@ -36,7 +47,7 @@ void ModelObject::Render(const RenderContext& rc)
 {
 	if (!visible) return;
 	
-	// 描画
+	// 謠冗判
 	ModelShader* shader = T_GRAPHICS.GetModelShader(shaderId);
 	shader->Begin(rc);
 	shader->Draw(rc, model.get(), color);
@@ -59,6 +70,10 @@ void ModelObject::SetCollider(Collider::COLLIDER_TYPE collider)
 	case Collider::COLLIDER_TYPE::BOUNDING_BOX:
 		this->collider = std::make_unique<BoundingBoxCollider>(model.get());
 		break;
+	case Collider::COLLIDER_TYPE ::MAP:
+		//this->collider = std::make_unique<ModelCollider>(model.get());
+		this->collider = std::make_unique<MapCollider>(model.get());
+		break;
 	default:
 		this->collider = nullptr;
 		break;
@@ -68,7 +83,7 @@ void ModelObject::SetCollider(Collider::COLLIDER_TYPE collider)
 DirectX::XMFLOAT3 ModelObject::GetNodePosition(const char* nodeName, const DirectX::XMFLOAT3& offset)
 {
 	DirectX::XMFLOAT3 pos = {};
-	Model::Node* node = model->FindNode(nodeName);
+	iModel::Node* node = model->FindNode(nodeName);
 	if (node == nullptr) return pos;
 
 	DirectX::XMVECTOR Offset = DirectX::XMLoadFloat3(&offset);
@@ -81,7 +96,7 @@ DirectX::XMFLOAT3 ModelObject::GetNodePosition(const char* nodeName, const Direc
 DirectX::XMFLOAT3 ModelObject::GetNodePosition(const DirectX::XMFLOAT3& offset)
 {
 	DirectX::XMFLOAT3 pos = {};
-	Model::Node* node = model->GetRootNode();
+	iModel::Node* node = model->GetRootNode();
 
 	DirectX::XMVECTOR Offset = DirectX::XMLoadFloat3(&offset);
 	DirectX::XMMATRIX W = DirectX::XMLoadFloat4x4(&node->worldTransform);

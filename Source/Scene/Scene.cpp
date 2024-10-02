@@ -2,35 +2,35 @@
 #include <functional>
 
 #include "TAKOEngine/Runtime/tentacle_lib.h"
-#include "TAKOEngine/Rendering/ModelResource.h"
+#include "TAKOEngine/Rendering/Model/ModelResource.h"
 #include "TAKOEngine/Tool/TransformUtils.h"
 
 #include "Scene/Scene.h"
 
-// ‰Šú‰»
+// åˆæœŸåŒ–
 void ModelTestScene::Initialize()
 {
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 	float screenWidth = Graphics::Instance().GetScreenWidth();
 	float screenHeight = Graphics::Instance().GetScreenHeight();
 
-	// ƒJƒƒ‰İ’è
+	// ã‚«ãƒ¡ãƒ©è¨­å®š
 	camera.SetPerspectiveFov(
-		DirectX::XMConvertToRadians(45),	// ‰æŠp
-		screenWidth / screenHeight,			// ‰æ–ÊƒAƒXƒyƒNƒg”ä
-		0.1f,								// ƒjƒAƒNƒŠƒbƒv
-		10000.0f							// ƒtƒ@[ƒNƒŠƒbƒv
+		DirectX::XMConvertToRadians(45),	// ç”»è§’
+		screenWidth / screenHeight,			// ç”»é¢ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”
+		0.1f,								// ãƒ‹ã‚¢ã‚¯ãƒªãƒƒãƒ—
+		10000.0f							// ãƒ•ã‚¡ãƒ¼ã‚¯ãƒªãƒƒãƒ—
 	);
 	camera.SetLookAt(
-		{ 0, 8, 15 },	// ‹“_
-		{ 0, 2, 0 },	// ’‹“_
-		{ 0, 1, 0 }		// ãƒxƒNƒgƒ‹
+		{ 0, 8, 15 },	// è¦–ç‚¹
+		{ 0, 2, 0 },	// æ³¨è¦–ç‚¹
+		{ 0, 1, 0 }		// ä¸Šãƒ™ã‚¯ãƒˆãƒ«
 	);
 
-	// ƒ‚ƒfƒ‹ì¬
+	// ãƒ¢ãƒ‡ãƒ«ä½œæˆ
 	//model = std::make_unique<Model>(device, "Data/Model/Slime/Slime.fbx", 1.0f);
 	//model = std::make_unique<Model>(device, "Data/Model/Mari.O/Mari-O.fbx", 1.0f);
-	model = std::make_unique<Model>(device, "Data/Model/Cube/testCubes.glb", 1.0f);
+	//model = std::make_unique<Model>(device, "Data/Model/Cube/testCubes.glb", 1.0f);
 	//model->PlayAnimation(1, true);
 	//model = std::make_unique<Model>(device, "Data/Model/MariLuiHouse/MariLuiHouse.fbx", 1.0f);
 	//model->SetLinearGamma(2.2f);
@@ -42,7 +42,7 @@ void ModelTestScene::Initialize()
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
 
-	// “_ŒõŒ¹‚ğ’Ç‰Á
+	// ç‚¹å…‰æºã‚’è¿½åŠ 
 	{
 		Light* light = new Light(LightType::Point);
 		light->SetPosition(DirectX::XMFLOAT3(0, 0, 0));
@@ -50,7 +50,7 @@ void ModelTestScene::Initialize()
 		LightManager::Instance().Register(light);
 	}
 
-	// ƒ|ƒXƒgƒvƒƒZƒX•`‰æƒNƒ‰ƒX¶¬
+	// ãƒã‚¹ãƒˆãƒ—ãƒ­ã‚»ã‚¹æç”»ã‚¯ãƒ©ã‚¹ç”Ÿæˆ
 	{
 		postprocessingRenderer = std::make_unique<PostprocessingRenderer>();
 		//postprocessingRenderer->SetBloom
@@ -71,72 +71,72 @@ void ModelTestScene::Initialize()
 	}
 }
 
-// XVˆ—
+// æ›´æ–°å‡¦ç†
 void ModelTestScene::Update(float elapsedTime)
 {
-	// ƒJƒƒ‰ˆ—XV
+	// ã‚«ãƒ¡ãƒ©å‡¦ç†æ›´æ–°
 	cameraController.Update();
 	cameraController.SyncContrllerToCamera(camera);
 
-	// ƒ[ƒ‹ƒhs—ñŒvZ
+	// ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—è¨ˆç®—
 	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
 	DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(angle.x, angle.y, angle.z);
 	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 	DirectX::XMFLOAT4X4 worldTransform;
 	DirectX::XMStoreFloat4x4(&worldTransform, S * R * T);
 
-	// ƒAƒjƒ[ƒVƒ‡ƒ“XV
+	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³æ›´æ–°
 	model->UpdateAnimation(elapsedTime);
 
-	// ƒgƒ‰ƒ“ƒXƒtƒH[ƒ€XV
+	// ãƒˆãƒ©ãƒ³ã‚¹ãƒ•ã‚©ãƒ¼ãƒ æ›´æ–°
 	model->UpdateTransform(worldTransform);
 }
 
-// •`‰æˆ—
+// æç”»å‡¦ç†
 void ModelTestScene::Render()
 {
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Scene)->Clear(T_GRAPHICS.GetDeviceContext(), 0.5f, 0.5f, 0.5f, 1);
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Scene)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
 
-	// •`‰æƒRƒ“ƒeƒLƒXƒgİ’è
+	// æç”»ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆè¨­å®š
 	RenderContext rc;
 	rc.camera = &camera;
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
-	// ƒ‰ƒCƒg‚Ìî•ñ‚ğ‹l‚ß‚Ş
+	// ãƒ©ã‚¤ãƒˆã®æƒ…å ±ã‚’è©°ã‚è¾¼ã‚€
 	LightManager::Instance().PushRenderContext(rc);
 
-	// •`‰æ
+	// æç”»
 	ModelShader* shader = T_GRAPHICS.GetModelShader(ModelShaderId::Phong);
 	shader->Begin(rc);
 	shader->Draw(rc, model.get());
 	shader->End(rc);
 
-	// ƒ‰ƒCƒg‚ÌƒfƒoƒbƒOƒvƒŠƒ~ƒeƒBƒu‚Ì•`‰æ
+	// ãƒ©ã‚¤ãƒˆã®ãƒ‡ãƒãƒƒã‚°ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–ã®æç”»
 	LightManager::Instance().DrawDebugPrimitive();
 	postprocessingRenderer->DrawDebugGUI();
 
-	// ƒ‰ƒCƒg‚ÌƒfƒoƒbƒOƒvƒŠƒ~ƒeƒBƒu‚Ì•`‰æ
+	// ãƒ©ã‚¤ãƒˆã®ãƒ‡ãƒãƒƒã‚°ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–ã®æç”»
 	LightManager::Instance().DrawDebugGUI();
-	// ƒ‰ƒCƒ“ƒŒƒ“ƒ_ƒ‰•`‰æÀs
+	// ãƒ©ã‚¤ãƒ³ãƒ¬ãƒ³ãƒ€ãƒ©æç”»å®Ÿè¡Œ
 	T_GRAPHICS.GetLineRenderer()->Render(T_GRAPHICS.GetDeviceContext(), camera.GetView(), camera.GetProjection());
-	// ƒfƒoƒbƒOƒŒƒ“ƒ_ƒ‰•`‰æÀs
+	// ãƒ‡ãƒãƒƒã‚°ãƒ¬ãƒ³ãƒ€ãƒ©æç”»å®Ÿè¡Œ
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), camera.GetView(), camera.GetProjection());
 
-	// ‘‚«‚İæ‚ğƒoƒbƒNƒoƒbƒtƒ@‚É•Ï‚¦‚ÄƒIƒtƒXƒNƒŠ[ƒ“ƒŒƒ“ƒ_ƒŠƒ“ƒO‚ÌŒ‹‰Ê‚ğ•`‰æ‚·‚é
+	// æ›¸ãè¾¼ã¿å…ˆã‚’ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ã«å¤‰ãˆã¦ã‚ªãƒ•ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã®çµæœã‚’æç”»ã™ã‚‹
 	{
 		T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->Clear(T_GRAPHICS.GetDeviceContext(), 0.0f, 0.0f, 0.5f, 1.0f);
 		T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
 
-		//	ƒ|ƒXƒgƒvƒƒZƒXˆ—‚ğs‚¤
+		//	ãƒã‚¹ãƒˆãƒ—ãƒ­ã‚»ã‚¹å‡¦ç†ã‚’è¡Œã†
 		postprocessingRenderer->Render(T_GRAPHICS.GetDeviceContext());
 	}
 	T_TEXT.Begin();
 
 	T_TEXT.TextBox(
 		FONT_ID::HGpop,
-		std::string("ƒ}ƒŠ[EZ•ƒ‹ƒC[E‚f@‚q‚o‚f@ƒ}ƒŠ[EZ•ƒ‹ƒC[E‚f@‚q‚o‚f@ƒ}ƒŠ[EZ•ƒ‹ƒC[E‚f@‚q‚o‚f@ƒ}ƒŠ[EZ•ƒ‹ƒC[E‚f@‚q‚o‚f@ƒ}ƒŠ[EZ•ƒ‹ƒC[E‚f@‚q‚o‚f@ƒ}ƒŠ[EZ•ƒ‹ƒC[E‚f@‚q‚o‚f"),
+		std::string("ãƒãƒªãƒ¼ãƒ»ã€‡ï¼†ãƒ«ã‚¤ãƒ¼ãƒ»ï¼§ã€€ï¼²ï¼°ï¼§ã€€ãƒãƒªãƒ¼ãƒ»ã€‡ï¼†ãƒ«ã‚¤ãƒ¼ãƒ»ï¼§ã€€ï¼²ï¼°ï¼§ã€€ãƒãƒªãƒ¼ãƒ»ã€‡ï¼†ãƒ«ã‚¤ãƒ¼ãƒ»ï¼§ã€€ï¼²ï¼°ï¼§ã€€ãƒãƒªãƒ¼ãƒ»ã€‡ï¼†ãƒ«ã‚¤ãƒ¼ãƒ»ï¼§ã€€ï¼²ï¼°ï¼§ã€€ãƒãƒªãƒ¼ãƒ»ã€‡ï¼†ãƒ«ã‚¤ãƒ¼ãƒ»ï¼§ã€€ï¼²ï¼°ï¼§ã€€ãƒãƒªãƒ¼ãƒ»ã€‡ï¼†ãƒ«ã‚¤ãƒ¼ãƒ»ï¼§ã€€ï¼²ï¼°ï¼§"),
 		10,
 		0, 0,
 		1, 1, 1, 1,
@@ -144,13 +144,13 @@ void ModelTestScene::Render()
 	);
 	T_TEXT.End();
 
-	// ƒfƒoƒbƒOƒƒjƒ…[•`‰æ
+	// ãƒ‡ãƒãƒƒã‚°ãƒ¡ãƒ‹ãƒ¥ãƒ¼æç”»
 	DrawSceneGUI();
 	DrawPropertyGUI();
 	DrawAnimationGUI();
 }
 
-// ƒV[ƒ“GUI•`‰æ
+// ã‚·ãƒ¼ãƒ³GUIæç”»
 void ModelTestScene::DrawSceneGUI()
 {
 	ImVec2 pos = ImGui::GetMainViewport()->Pos;
@@ -164,10 +164,10 @@ void ModelTestScene::DrawSceneGUI()
 
 		if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			// ˆÊ’u
+			// ä½ç½®
 			ImGui::DragFloat3("Position", &position.x, 0.1f);
 
-			// ‰ñ“]
+			// å›è»¢
 			DirectX::XMFLOAT3 a;
 			a.x = DirectX::XMConvertToDegrees(angle.x);
 			a.y = DirectX::XMConvertToDegrees(angle.y);
@@ -177,51 +177,51 @@ void ModelTestScene::DrawSceneGUI()
 			angle.y = DirectX::XMConvertToRadians(a.y);
 			angle.z = DirectX::XMConvertToRadians(a.z);
 
-			// ƒXƒP[ƒ‹
+			// ã‚¹ã‚±ãƒ¼ãƒ«
 			ImGui::DragFloat3("Scale", &scale.x, 0.01f);
 		}
 
 		if (ImGui::CollapsingHeader("Hierarchy", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			// ƒm[ƒhƒcƒŠ[‚ğÄ‹A“I‚É•`‰æ‚·‚éŠÖ”
-			std::function<void(Model::Node*)> drawNodeTree = [&](Model::Node* node)
+			// ãƒãƒ¼ãƒ‰ãƒ„ãƒªãƒ¼ã‚’å†å¸°çš„ã«æç”»ã™ã‚‹é–¢æ•°
+			std::function<void(iModel::Node*)> drawNodeTree = [&](iModel::Node* node)
 				{
-					// –îˆó‚ğƒNƒŠƒbƒNA‚Ü‚½‚Íƒm[ƒh‚ğƒ_ƒuƒ‹ƒNƒŠƒbƒN‚ÅŠK‘w‚ğŠJ‚­
+					// çŸ¢å°ã‚’ã‚¯ãƒªãƒƒã‚¯ã€ã¾ãŸã¯ãƒãƒ¼ãƒ‰ã‚’ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯ã§éšå±¤ã‚’é–‹ã
 					ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
 
-					// q‚ª‚¢‚È‚¢ê‡‚Í–îˆó‚ğ‚Â‚¯‚È‚¢
+					// å­ãŒã„ãªã„å ´åˆã¯çŸ¢å°ã‚’ã¤ã‘ãªã„
 					size_t childCount = node->children.size();
 					if (childCount == 0)
 					{
 						nodeFlags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
 					}
 
-					// ‘I‘ğƒtƒ‰ƒO
+					// é¸æŠãƒ•ãƒ©ã‚°
 					if (selectionNode == node)
 					{
 						nodeFlags |= ImGuiTreeNodeFlags_Selected;
 					}
 
-					// ƒcƒŠ[ƒm[ƒh‚ğ•\¦
+					// ãƒ„ãƒªãƒ¼ãƒãƒ¼ãƒ‰ã‚’è¡¨ç¤º
 					bool opened = ImGui::TreeNodeEx(node, nodeFlags, node->name.c_str());
 
-					// ƒtƒH[ƒJƒX‚³‚ê‚½ƒm[ƒh‚ğ‘I‘ğ‚·‚é
+					// ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã•ã‚ŒãŸãƒãƒ¼ãƒ‰ã‚’é¸æŠã™ã‚‹
 					if (ImGui::IsItemFocused())
 					{
 						selectionNode = node;
 					}
 
-					// ŠJ‚©‚ê‚Ä‚¢‚éê‡AqŠK‘w‚à“¯‚¶Ÿ—˜‚ğs‚¤
+					// é–‹ã‹ã‚Œã¦ã„ã‚‹å ´åˆã€å­éšå±¤ã‚‚åŒã˜å‹åˆ©ã‚’è¡Œã†
 					if (opened && childCount > 0)
 					{
-						for (Model::Node* child : node->children)
+						for (iModel::Node* child : node->children)
 						{
 							drawNodeTree(child);
 						}
 						ImGui::TreePop();
 					}
 				};
-			// Ä‹A“I‚Éƒm[ƒh‚ğ•`‰æ
+			// å†å¸°çš„ã«ãƒãƒ¼ãƒ‰ã‚’æç”»
 			drawNodeTree(model->GetRootNode());
 		}
 
@@ -229,7 +229,7 @@ void ModelTestScene::DrawSceneGUI()
 	}
 }
 
-// ƒvƒƒpƒeƒBGUI•`‰æ
+// ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£GUIæç”»
 void ModelTestScene::DrawPropertyGUI()
 {
 	ImVec2 pos = ImGui::GetMainViewport()->Pos;
@@ -242,10 +242,10 @@ void ModelTestScene::DrawPropertyGUI()
 	{
 		if (ImGui::CollapsingHeader("Node", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			// ˆÊ’u
+			// ä½ç½®
 			ImGui::DragFloat3("Position", &selectionNode->position.x, 0.1f);
 
-			// ‰ñ“]
+			// å›è»¢
 			DirectX::XMFLOAT3 angle;
 			TransformUtils::QuaternionToRollPitchYaw(selectionNode->rotation, angle.x, angle.y, angle.z);
 			angle.x = DirectX::XMConvertToDegrees(angle.x);
@@ -259,14 +259,14 @@ void ModelTestScene::DrawPropertyGUI()
 				DirectX::XMVECTOR Rotation = DirectX::XMQuaternionRotationRollPitchYaw(angle.x, angle.y, angle.z);
 				DirectX::XMStoreFloat4(&selectionNode->rotation, Rotation);
 			}
-			// ƒXƒP[ƒ‹
+			// ã‚¹ã‚±ãƒ¼ãƒ«
 			ImGui::DragFloat3("Scale", &selectionNode->scale.x, 0.01f);
 		}
 	}
 	ImGui::End();
 }
 
-// ƒAƒjƒ[ƒVƒ‡ƒ“GUI•`‰æ
+// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³GUIæç”»
 void ModelTestScene::DrawAnimationGUI()
 {
 	ImGui::SetNextWindowPos(ImVec2(10, 350), ImGuiCond_FirstUseEver);
@@ -286,7 +286,7 @@ void ModelTestScene::DrawAnimationGUI()
 
 		ImGui::TreeNodeEx(&animation, nodeFlags, animation.name.c_str());
 
-		// ƒ_ƒuƒ‹ƒNƒŠƒbƒN‚ÅƒAƒjƒ[ƒVƒ‡ƒ“Ä¶
+		// ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯ã§ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å†ç”Ÿ
 		if (ImGui::IsItemClicked())
 		{
 			if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))

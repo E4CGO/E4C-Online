@@ -5,10 +5,10 @@
 #include <functional>
 #include <thread>
 #include "TAKOEngine/Network/WinSock2Wrapper.h"
-#include <nlohmann/json.hpp>
-#include <openssl/crypto.h>	// openssl‚ÌˆÃ†‰»ƒwƒbƒ_
-#include <openssl/ssl.h>	// openssl‚Ìssl’ÊMƒwƒbƒ_
-#include <openssl/err.h>	// openssl‚ÌƒGƒ‰[ƒwƒbƒ_
+#include "External/tinygltf/json.hpp"
+#include <openssl/crypto.h>	// opensslã®æš—å·åŒ–ãƒ˜ãƒƒãƒ€
+#include <openssl/ssl.h>	// opensslã®sslé€šä¿¡ãƒ˜ãƒƒãƒ€
+#include <openssl/err.h>	// opensslã®ã‚¨ãƒ©ãƒ¼ãƒ˜ãƒƒãƒ€
 
 struct HttpResponse
 {
@@ -39,7 +39,7 @@ private:
 	std::string RequestHeader();
 	std::string ResponseData();
 	bool SendRequest(const char* buffer, size_t size);
-	// Thread—p
+	// Threadç”¨
 	void Request();
 public:
 	enum METHOD
@@ -94,8 +94,8 @@ private:
 	int connection = CONNECTION::CLOSE;
 
 	std::thread* thread = nullptr;
-	std::function<void()> OnDone = nullptr; // ¬Œ÷
-	std::function<void()> OnFail = nullptr; // ¸”s
+	std::function<void()> OnDone = nullptr; // æˆåŠŸ
+	std::function<void()> OnFail = nullptr; // å¤±æ•—
 
 	// SSL
 	SSL* ssl; // ssl

@@ -7,7 +7,7 @@
 #include "TAKOEngine/Editor/Camera/FreeCameraController.h"
 #include "TAKOEngine/Rendering/LightManager.h"
 #include "TAKOEngine/Rendering/Sprite.h"
-#include "TAKOEngine/Rendering/Model.h"
+#include "TAKOEngine/Rendering/Model/Model.h"
 #include "TAKOEngine/Rendering/PostprocessingRenderer.h"
 #include "TAKOEngine/Rendering/ShadowMapRender.h"
 
@@ -17,84 +17,84 @@ public:
 	Scene() = default;
 	virtual ~Scene() = default;
 
-	// ‰Šú‰»
+	// åˆæœŸåŒ–
 	virtual void Initialize() = 0;
-	// I—¹‰»
+	// çµ‚äº†åŒ–
 	virtual void Finalize() = 0;
 
-	// XVˆ—
+	// æ›´æ–°å‡¦ç†
 	virtual void Update(float elapsedTime) {};
-	// •`‰æˆ—
+	// æç”»å‡¦ç†
 	virtual void Render() {};
 	virtual void RenderDX12() {};
 
-	// €”õŠm”F
+	// æº–å‚™ç¢ºèª
 	bool IsReady() const { return ready; }
-	// €”õŠ®—¹
+	// æº–å‚™å®Œäº†
 	void SetReady() { ready = true; }
 
 protected:
 	bool ready = false;
 };
 
-// ƒ‚ƒfƒ‹ƒeƒXƒgƒV[ƒ“
+// ãƒ¢ãƒ‡ãƒ«ãƒ†ã‚¹ãƒˆã‚·ãƒ¼ãƒ³
 class ModelTestScene : public Scene
 {
 public:
 	ModelTestScene() {};
 	~ModelTestScene() override {};
 
-	// ‰Šú‰»
+	// åˆæœŸåŒ–
 	void Initialize() override;
-	// I—¹‰»
+	// çµ‚äº†åŒ–
 	void Finalize() override {};
 
-	// XVˆ—
+	// æ›´æ–°å‡¦ç†
 	void Update(float elapsedTime) override;
-	// •`‰æˆ—
+	// æç”»å‡¦ç†
 	void Render() override;
 private:
 
 	Camera& camera = Camera::Instance();
-	// ƒV[ƒ“GUI•`‰æ
+	// ã‚·ãƒ¼ãƒ³GUIæç”»
 	void DrawSceneGUI();
-	// ƒvƒƒpƒeƒBGUI•`‰æ
+	// ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£GUIæç”»
 	void DrawPropertyGUI();
-	// ƒAƒjƒ[ƒVƒ‡ƒ“GUI•`‰æ
+	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³GUIæç”»
 	void DrawAnimationGUI();
 
-	std::unique_ptr<Model> model;
+	std::unique_ptr<iModel> model;
 
 	DirectX::XMFLOAT3 position = { 0, 0, 0 };
 	DirectX::XMFLOAT3 angle = { 0, 0, 0 };
 	DirectX::XMFLOAT3 scale = { 1, 1, 1 };
 
-	Model::Node* selectionNode = nullptr;
+	iModel::Node* selectionNode = nullptr;
 
 	FreeCameraController cameraController;
 
 	bool animationLoop = false;
 	float animationBlendSeconds = 0;
 
-	std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer; //	ƒ|ƒXƒgƒvƒƒZƒX
+	std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer; //	ãƒã‚¹ãƒˆãƒ—ãƒ­ã‚»ã‚¹
 };
 
-// ƒ[ƒhƒV[ƒ“
+// ãƒ­ãƒ¼ãƒ‰ã‚·ãƒ¼ãƒ³
 class SceneLoading : public Scene
 {
 public:
 	SceneLoading(Scene* nextScene) : nextScene(nextScene) {}
 	~SceneLoading() override {}
-	// ‰Šú‰»
+	// åˆæœŸåŒ–
 	void Initialize() override;
-	// I—¹‰»
+	// çµ‚äº†åŒ–
 	void Finalize() override;
-	// XVˆ—
+	// æ›´æ–°å‡¦ç†
 	void Update(float elapsedTime) override;
-	// •`‰æˆ—
+	// æç”»å‡¦ç†
 	void Render() override;
 private:
-	// ƒ[ƒfƒBƒ“ƒOƒXƒŒƒbƒh
+	// ãƒ­ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ã‚¹ãƒ¬ãƒƒãƒ‰
 	static void LoadingThread(SceneLoading* scene);
 private:
 	Scene* nextScene = nullptr;

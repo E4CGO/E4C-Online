@@ -94,7 +94,7 @@ void ImGuiRenderer::NewFrame()
 
 	ProfileNewFrame();
 
-#if 0
+#if 1
 	// Docking
 	const ImGuiWindowFlags window_flags = ImGuiWindowFlags_None
 		| ImGuiWindowFlags_NoTitleBar

@@ -9,12 +9,12 @@ public:
 	State(T* owner) : owner(owner) {}
 	virtual ~State() = default;
 
-	// ‘S‚ÄŒp³æ‚ÅÀ‘•‚³‚¹‚é•K—v‚ª‚ ‚é‚½‚ßƒˆ‰¼‘zŠÖ”‚ÅÀ‘•
-	// ƒXƒe[ƒg‚É“ü‚Á‚½‚Ìƒƒ\ƒbƒh
+	// å…¨ã¦ç¶™æ‰¿å…ˆã§å®Ÿè£…ã•ã›ã‚‹å¿…è¦ãŒã‚ã‚‹ãŸã‚ç´”ç²‹ä»®æƒ³é–¢æ•°ã§å®Ÿè£…
+	// ã‚¹ãƒ†ãƒ¼ãƒˆã«å…¥ã£ãŸæ™‚ã®ãƒ¡ã‚½ãƒƒãƒ‰
 	virtual void Enter() = 0;
-	// ƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+	// ã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 	virtual void Execute(float elapsedTime) = 0;
-	// ƒXƒe[ƒg‚©‚ço‚Ä‚¢‚­‚Æ‚«‚Ìƒƒ\ƒbƒh
+	// ã‚¹ãƒ†ãƒ¼ãƒˆã‹ã‚‰å‡ºã¦ã„ãã¨ãã®ãƒ¡ã‚½ãƒƒãƒ‰
 	virtual void Exit() = 0;
 
 protected:
@@ -25,53 +25,58 @@ template<typename T>
 class HierarchicalState : public State<T>
 {
 public:
-	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	HierarchicalState(T* owner) : State<T>(owner) {};
-	virtual ~HierarchicalState() {}
-	// ‘S‚ÄŒp³æ‚ÅÀ‘•‚³‚¹‚é•K—v‚ª‚ ‚é‚½‚ßƒˆ‰¼‘zŠÖ”‚ÅÀ‘•
-	// ƒXƒe[ƒg‚É“ü‚Á‚½‚Ìƒƒ\ƒbƒh
+	virtual ~HierarchicalState() {
+		for (std::pair<int, State<T>*> state : statePool)
+		{
+			delete state.second;
+		}
+	}
+	// å…¨ã¦ç¶™æ‰¿å…ˆã§å®Ÿè£…ã•ã›ã‚‹å¿…è¦ãŒã‚ã‚‹ãŸã‚ç´”ç²‹ä»®æƒ³é–¢æ•°ã§å®Ÿè£…
+	// ã‚¹ãƒ†ãƒ¼ãƒˆã«å…¥ã£ãŸæ™‚ã®ãƒ¡ã‚½ãƒƒãƒ‰
 	virtual void Enter() = 0;
-	// ƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+	// ã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 	virtual void Execute(float elapsedTime) = 0;
-	// ƒXƒe[ƒg‚©‚ço‚Ä‚¢‚­‚Æ‚«‚Ìƒƒ\ƒbƒh
+	// ã‚¹ãƒ†ãƒ¼ãƒˆã‹ã‚‰å‡ºã¦ã„ãã¨ãã®ãƒ¡ã‚½ãƒƒãƒ‰
 	virtual void Exit() = 0;
-	// ƒTƒuƒXƒe[ƒg“o˜^
+	// ã‚µãƒ–ã‚¹ãƒ†ãƒ¼ãƒˆç™»éŒ²
 	virtual void SetSubState(int newState)
 	{
 		if (statePool.find(newState) == statePool.end()) return;
 		subState = statePool[newState];
 		subState->Enter();
 	}
-	// ƒTƒuƒXƒe[ƒg•ÏX
+	// ã‚µãƒ–ã‚¹ãƒ†ãƒ¼ãƒˆå¤‰æ›´
 	virtual void ChangeSubState(int newState)
 	{
 		if (statePool.find(newState) == statePool.end()) return;
-		// Œ»İ‚ÌƒXƒe[ƒg‚ÌExitŠÖ”‚ğÀsAV‚µ‚¢ƒXƒe[ƒg‚ğƒZƒbƒgAV‚µ‚¢ƒXƒe[ƒg‚ÌEnterŠÖ”‚ğŒÄ‚Ño‚·B
+		// ç¾åœ¨ã®ã‚¹ãƒ†ãƒ¼ãƒˆã®Exité–¢æ•°ã‚’å®Ÿè¡Œã€æ–°ã—ã„ã‚¹ãƒ†ãƒ¼ãƒˆã‚’ã‚»ãƒƒãƒˆã€æ–°ã—ã„ã‚¹ãƒ†ãƒ¼ãƒˆã®Enteré–¢æ•°ã‚’å‘¼ã³å‡ºã™ã€‚
 		subState->Exit();
 
 		SetSubState(newState);
 	}
-	// ƒTƒuƒXƒe[ƒg“o˜^
+	// ã‚µãƒ–ã‚¹ãƒ†ãƒ¼ãƒˆç™»éŒ²
 	virtual void RegisterSubState(int id, State<T>* state)
 	{
 		if (statePool.find(id) == statePool.end()) delete statePool[id];
-		// eƒXƒe[ƒg“o˜^
+		// è¦ªã‚¹ãƒ†ãƒ¼ãƒˆç™»éŒ²
 		statePool[id] = state;
 	}
-	// ƒTƒuƒXƒe[ƒgæ“¾
+	// ã‚µãƒ–ã‚¹ãƒ†ãƒ¼ãƒˆå–å¾—
 	virtual State<T>* GetSubState() { return subState; }
-	// ƒTƒuƒXƒe[ƒg”Ô†æ“¾
+	// ã‚µãƒ–ã‚¹ãƒ†ãƒ¼ãƒˆç•ªå·å–å¾—
 	virtual int GetSubStateIndex() {
 		for (std::pair<int, State<T>*> state : statePool)
 		{
 			if (state.second == subState)
 			{
-				// i”Ô†–Ú‚ÌƒXƒe[ƒg‚ğƒŠƒ^[ƒ“
+				// iç•ªå·ç›®ã®ã‚¹ãƒ†ãƒ¼ãƒˆã‚’ãƒªã‚¿ãƒ¼ãƒ³
 				return state.first;
 			}
 		}
 
-		// ƒXƒe[ƒg‚ªŒ©‚Â‚©‚ç‚È‚©‚Á‚½
+		// ã‚¹ãƒ†ãƒ¼ãƒˆãŒè¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸæ™‚
 		return -1;
 	};
 protected:

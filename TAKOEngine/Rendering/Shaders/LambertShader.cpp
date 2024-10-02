@@ -1,7 +1,7 @@
 #include "TAKOEngine/Rendering/Misc.h"
 #include "TAKOEngine/Rendering/Graphics.h"
-#include "TAKOEngine/Rendering/Model.h"
-#include "TAKOEngine/Rendering/ModelDX12.h"
+#include "TAKOEngine/Rendering/Model/Model.h"
+#include "TAKOEngine/Rendering/Model/ModelDX12.h"
 #include "TAKOEngine/Rendering/Shaders/LambertShader.h"
 
 LambertShader::LambertShader()
@@ -10,62 +10,62 @@ LambertShader::LambertShader()
 
 	HRESULT hr = S_OK;
 
-	// ƒ‹[ƒgƒVƒOƒlƒ`ƒƒ‚Ì¶¬
+	// ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒãƒãƒ£ã®ç”Ÿæˆ
 	{
-		// ƒfƒBƒXƒNƒŠƒvƒ^ƒŒƒ“ƒW‚Ìİ’è
+		// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ¬ãƒ³ã‚¸ã®è¨­å®š
 		D3D12_DESCRIPTOR_RANGE d3d_descriptor_ranges[4] = {};
 		{
 			// b0
-			d3d_descriptor_ranges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;	// ƒŒƒ“ƒWí•Ê
-			d3d_descriptor_ranges[0].NumDescriptors = 1;							// ƒfƒBƒXƒNƒŠƒvƒ^”
-			d3d_descriptor_ranges[0].BaseShaderRegister = 0;						// æ“ªƒŒƒWƒXƒ^”Ô†
-			d3d_descriptor_ranges[0].RegisterSpace = 0;								// ‚Â‚¶‚Â‚Ü‚ğ‡‚í‚¹‚é‚½‚ß‚ÌƒXƒy[ƒX
+			d3d_descriptor_ranges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;	// ãƒ¬ãƒ³ã‚¸ç¨®åˆ¥
+			d3d_descriptor_ranges[0].NumDescriptors = 1;							// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿æ•°
+			d3d_descriptor_ranges[0].BaseShaderRegister = 0;						// å…ˆé ­ãƒ¬ã‚¸ã‚¹ã‚¿ç•ªå·
+			d3d_descriptor_ranges[0].RegisterSpace = 0;								// ã¤ã˜ã¤ã¾ã‚’åˆã‚ã›ã‚‹ãŸã‚ã®ã‚¹ãƒšãƒ¼ã‚¹
 			d3d_descriptor_ranges[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 			// b1
-			d3d_descriptor_ranges[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;	// ƒŒƒ“ƒWí•Ê
-			d3d_descriptor_ranges[1].NumDescriptors = 1;							// ƒfƒBƒXƒNƒŠƒvƒ^”
-			d3d_descriptor_ranges[1].BaseShaderRegister = 1;						// æ“ªƒŒƒWƒXƒ^”Ô†
-			d3d_descriptor_ranges[1].RegisterSpace = 0;								// ‚Â‚¶‚Â‚Ü‚ğ‡‚í‚¹‚é‚½‚ß‚ÌƒXƒy[ƒX
+			d3d_descriptor_ranges[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;	// ãƒ¬ãƒ³ã‚¸ç¨®åˆ¥
+			d3d_descriptor_ranges[1].NumDescriptors = 1;							// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿æ•°
+			d3d_descriptor_ranges[1].BaseShaderRegister = 1;						// å…ˆé ­ãƒ¬ã‚¸ã‚¹ã‚¿ç•ªå·
+			d3d_descriptor_ranges[1].RegisterSpace = 0;								// ã¤ã˜ã¤ã¾ã‚’åˆã‚ã›ã‚‹ãŸã‚ã®ã‚¹ãƒšãƒ¼ã‚¹
 			d3d_descriptor_ranges[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 			// b2
-			d3d_descriptor_ranges[2].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;	// ƒŒƒ“ƒWí•Ê
-			d3d_descriptor_ranges[2].NumDescriptors = 1;							// ƒfƒBƒXƒNƒŠƒvƒ^”
-			d3d_descriptor_ranges[2].BaseShaderRegister = 2;						// æ“ªƒŒƒWƒXƒ^”Ô†
-			d3d_descriptor_ranges[2].RegisterSpace = 0;								// ‚Â‚¶‚Â‚Ü‚ğ‡‚í‚¹‚é‚½‚ß‚ÌƒXƒy[ƒX
+			d3d_descriptor_ranges[2].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;	// ãƒ¬ãƒ³ã‚¸ç¨®åˆ¥
+			d3d_descriptor_ranges[2].NumDescriptors = 1;							// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿æ•°
+			d3d_descriptor_ranges[2].BaseShaderRegister = 2;						// å…ˆé ­ãƒ¬ã‚¸ã‚¹ã‚¿ç•ªå·
+			d3d_descriptor_ranges[2].RegisterSpace = 0;								// ã¤ã˜ã¤ã¾ã‚’åˆã‚ã›ã‚‹ãŸã‚ã®ã‚¹ãƒšãƒ¼ã‚¹
 			d3d_descriptor_ranges[2].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 			// t0
-			d3d_descriptor_ranges[3].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;	// ƒŒƒ“ƒWí•Ê
-			d3d_descriptor_ranges[3].NumDescriptors = 1;							// ƒfƒBƒXƒNƒŠƒvƒ^”
-			d3d_descriptor_ranges[3].BaseShaderRegister = 0;						// æ“ªƒŒƒWƒXƒ^”Ô†
-			d3d_descriptor_ranges[3].RegisterSpace = 0;								// ‚Â‚¶‚Â‚Ü‚ğ‡‚í‚¹‚é‚½‚ß‚ÌƒXƒy[ƒX
+			d3d_descriptor_ranges[3].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;	// ãƒ¬ãƒ³ã‚¸ç¨®åˆ¥
+			d3d_descriptor_ranges[3].NumDescriptors = 1;							// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿æ•°
+			d3d_descriptor_ranges[3].BaseShaderRegister = 0;						// å…ˆé ­ãƒ¬ã‚¸ã‚¹ã‚¿ç•ªå·
+			d3d_descriptor_ranges[3].RegisterSpace = 0;								// ã¤ã˜ã¤ã¾ã‚’åˆã‚ã›ã‚‹ãŸã‚ã®ã‚¹ãƒšãƒ¼ã‚¹
 			d3d_descriptor_ranges[3].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 		}
 
-		// ƒ‹[ƒgƒpƒ‰ƒ[ƒ^‚Ìİ’è
+		// ãƒ«ãƒ¼ãƒˆãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®è¨­å®š
 		D3D12_ROOT_PARAMETER d3d_root_parameters[4] = {};
 		{
-			d3d_root_parameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;		// ƒpƒ‰ƒ[ƒ^í•Ê
-			d3d_root_parameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;				// ‚Ç‚ÌƒVƒF[ƒ_[‚©‚ç—˜—p‰Â”\‚©
-			d3d_root_parameters[0].DescriptorTable.NumDescriptorRanges = 1;							// ƒfƒBƒXƒNƒŠƒvƒ^ƒŒƒ“ƒW”
-			d3d_root_parameters[0].DescriptorTable.pDescriptorRanges = &d3d_descriptor_ranges[0];	// ƒfƒBƒXƒNƒŠƒvƒ^ƒŒƒ“ƒW‚ÌƒAƒhƒŒƒX
+			d3d_root_parameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ç¨®åˆ¥
+			d3d_root_parameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;				// ã©ã®ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‹ã‚‰åˆ©ç”¨å¯èƒ½ã‹
+			d3d_root_parameters[0].DescriptorTable.NumDescriptorRanges = 1;							// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ¬ãƒ³ã‚¸æ•°
+			d3d_root_parameters[0].DescriptorTable.pDescriptorRanges = &d3d_descriptor_ranges[0];	// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ¬ãƒ³ã‚¸ã®ã‚¢ãƒ‰ãƒ¬ã‚¹
 
-			d3d_root_parameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;		// ƒpƒ‰ƒ[ƒ^í•Ê
-			d3d_root_parameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;				// ‚Ç‚ÌƒVƒF[ƒ_[‚©‚ç—˜—p‰Â”\‚©
-			d3d_root_parameters[1].DescriptorTable.NumDescriptorRanges = 1;							// ƒfƒBƒXƒNƒŠƒvƒ^ƒŒƒ“ƒW”
-			d3d_root_parameters[1].DescriptorTable.pDescriptorRanges = &d3d_descriptor_ranges[1];	// ƒfƒBƒXƒNƒŠƒvƒ^ƒŒƒ“ƒW‚ÌƒAƒhƒŒƒX
+			d3d_root_parameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ç¨®åˆ¥
+			d3d_root_parameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;				// ã©ã®ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‹ã‚‰åˆ©ç”¨å¯èƒ½ã‹
+			d3d_root_parameters[1].DescriptorTable.NumDescriptorRanges = 1;							// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ¬ãƒ³ã‚¸æ•°
+			d3d_root_parameters[1].DescriptorTable.pDescriptorRanges = &d3d_descriptor_ranges[1];	// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ¬ãƒ³ã‚¸ã®ã‚¢ãƒ‰ãƒ¬ã‚¹
 
-			d3d_root_parameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;		// ƒpƒ‰ƒ[ƒ^í•Ê
-			d3d_root_parameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;				// ‚Ç‚ÌƒVƒF[ƒ_[‚©‚ç—˜—p‰Â”\‚©
-			d3d_root_parameters[2].DescriptorTable.NumDescriptorRanges = 1;							// ƒfƒBƒXƒNƒŠƒvƒ^ƒŒƒ“ƒW”
-			d3d_root_parameters[2].DescriptorTable.pDescriptorRanges = &d3d_descriptor_ranges[2];	// ƒfƒBƒXƒNƒŠƒvƒ^ƒŒƒ“ƒW‚ÌƒAƒhƒŒƒX
+			d3d_root_parameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ç¨®åˆ¥
+			d3d_root_parameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;				// ã©ã®ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‹ã‚‰åˆ©ç”¨å¯èƒ½ã‹
+			d3d_root_parameters[2].DescriptorTable.NumDescriptorRanges = 1;							// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ¬ãƒ³ã‚¸æ•°
+			d3d_root_parameters[2].DescriptorTable.pDescriptorRanges = &d3d_descriptor_ranges[2];	// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ¬ãƒ³ã‚¸ã®ã‚¢ãƒ‰ãƒ¬ã‚¹
 
-			d3d_root_parameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;		// ƒpƒ‰ƒ[ƒ^í•Ê
-			d3d_root_parameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;				// ‚Ç‚ÌƒVƒF[ƒ_[‚©‚ç—˜—p‰Â”\‚©
-			d3d_root_parameters[3].DescriptorTable.NumDescriptorRanges = 1;							// ƒfƒBƒXƒNƒŠƒvƒ^ƒŒƒ“ƒW”
-			d3d_root_parameters[3].DescriptorTable.pDescriptorRanges = &d3d_descriptor_ranges[3];	// ƒfƒBƒXƒNƒŠƒvƒ^ƒŒƒ“ƒW‚ÌƒAƒhƒŒƒX
+			d3d_root_parameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ç¨®åˆ¥
+			d3d_root_parameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;				// ã©ã®ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‹ã‚‰åˆ©ç”¨å¯èƒ½ã‹
+			d3d_root_parameters[3].DescriptorTable.NumDescriptorRanges = 1;							// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ¬ãƒ³ã‚¸æ•°
+			d3d_root_parameters[3].DescriptorTable.pDescriptorRanges = &d3d_descriptor_ranges[3];	// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ¬ãƒ³ã‚¸ã®ã‚¢ãƒ‰ãƒ¬ã‚¹
 		}
 
-		// Ã“IƒTƒ“ƒvƒ‰[‚Ìİ’è.
+		// é™çš„ã‚µãƒ³ãƒ—ãƒ©ãƒ¼ã®è¨­å®š.
 		D3D12_STATIC_SAMPLER_DESC d3d_static_sampler_descs[1] = {};
 		{
 			d3d_static_sampler_descs[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
@@ -83,7 +83,7 @@ LambertShader::LambertShader()
 			d3d_static_sampler_descs[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 		}
 
-		// ƒ‹[ƒgƒVƒOƒlƒ`ƒƒ‚Ìİ’è
+		// ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒãƒãƒ£ã®è¨­å®š
 		D3D12_ROOT_SIGNATURE_DESC d3d_root_signature_desc = {};
 		d3d_root_signature_desc.NumParameters = _countof(d3d_root_parameters);
 		d3d_root_signature_desc.pParameters = d3d_root_parameters;
@@ -91,7 +91,7 @@ LambertShader::LambertShader()
 		d3d_root_signature_desc.pStaticSamplers = d3d_static_sampler_descs;
 		d3d_root_signature_desc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-		// ƒVƒŠƒAƒ‰ƒCƒY
+		// ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚º
 		Microsoft::WRL::ComPtr<ID3DBlob> d3d_signature_blob;
 		Microsoft::WRL::ComPtr<ID3DBlob> d3d_error_blob;
 		hr = D3D12SerializeRootSignature(
@@ -102,7 +102,7 @@ LambertShader::LambertShader()
 		);
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
-		// ƒ‹[ƒgƒVƒOƒlƒ`ƒƒ¶¬
+		// ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒãƒãƒ£ç”Ÿæˆ
 		hr = device->CreateRootSignature(
 			0,
 			d3d_signature_blob->GetBufferPointer(),
@@ -113,24 +113,24 @@ LambertShader::LambertShader()
 		m_d3d_root_signature->SetName(L"LambertShaderRootSignature");
 	}
 
-	// ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg‚Ì¶¬
+	// ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã®ç”Ÿæˆ
 	{
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC d3d_graphics_pipeline_state_desc = {};
 
-		// ƒ‹[ƒgƒVƒOƒlƒ`ƒƒ
+		// ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒãƒãƒ£
 		d3d_graphics_pipeline_state_desc.pRootSignature = m_d3d_root_signature.Get();
 
-		// ƒVƒF[ƒ_[
+		// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 		std::vector<BYTE> vsData, psData;
-		LoadShaderFile("Data/Shader/LambertVS.cso", vsData);
-		LoadShaderFile("Data/Shader/LambertPS.cso", psData);
+		LoadShaderFile("Data/Shader/LambertDX12VS.cso", vsData);
+		LoadShaderFile("Data/Shader/LambertDX12PS.cso", psData);
 
 		d3d_graphics_pipeline_state_desc.VS.pShaderBytecode = vsData.data();
 		d3d_graphics_pipeline_state_desc.VS.BytecodeLength = vsData.size();
 		d3d_graphics_pipeline_state_desc.PS.pShaderBytecode = psData.data();
 		d3d_graphics_pipeline_state_desc.PS.BytecodeLength = psData.size();
 
-		// “ü—ÍƒŒƒCƒAƒEƒg
+		// å…¥åŠ›ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆ
 		D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
@@ -144,7 +144,7 @@ LambertShader::LambertShader()
 		d3d_graphics_pipeline_state_desc.InputLayout.pInputElementDescs = inputElementDescs;
 		d3d_graphics_pipeline_state_desc.InputLayout.NumElements = _countof(inputElementDescs);
 
-		// ƒuƒŒƒ“ƒhƒXƒe[ƒg
+		// ãƒ–ãƒ¬ãƒ³ãƒ‰ã‚¹ãƒ†ãƒ¼ãƒˆ
 		d3d_graphics_pipeline_state_desc.BlendState.AlphaToCoverageEnable = false;
 		d3d_graphics_pipeline_state_desc.BlendState.IndependentBlendEnable = false;
 		d3d_graphics_pipeline_state_desc.BlendState.RenderTarget[0].BlendEnable = true;
@@ -157,13 +157,13 @@ LambertShader::LambertShader()
 		d3d_graphics_pipeline_state_desc.BlendState.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 		d3d_graphics_pipeline_state_desc.BlendState.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
-		// [“xƒXƒeƒ“ƒVƒ‹ƒXƒe[ƒg
+		// æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ã‚¹ãƒ†ãƒ¼ãƒˆ
 		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthEnable = true;
 		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 		d3d_graphics_pipeline_state_desc.DepthStencilState.StencilEnable = false;
 
-		// ƒ‰ƒXƒ^ƒ‰ƒCƒU[ƒXƒe[ƒg
+		// ãƒ©ã‚¹ã‚¿ãƒ©ã‚¤ã‚¶ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆ
 		d3d_graphics_pipeline_state_desc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
 		d3d_graphics_pipeline_state_desc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
 		d3d_graphics_pipeline_state_desc.RasterizerState.FrontCounterClockwise = true;
@@ -176,26 +176,26 @@ LambertShader::LambertShader()
 		d3d_graphics_pipeline_state_desc.RasterizerState.ForcedSampleCount = 0;
 		d3d_graphics_pipeline_state_desc.RasterizerState.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
 
-		// ƒvƒŠƒ~ƒeƒBƒuƒgƒ|ƒƒW[
+		// ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–ãƒˆãƒãƒ­ã‚¸ãƒ¼
 		d3d_graphics_pipeline_state_desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
-		// ƒXƒgƒŠƒbƒv‚ÌƒJƒbƒg’l
+		// ã‚¹ãƒˆãƒªãƒƒãƒ—æ™‚ã®ã‚«ãƒƒãƒˆå€¤
 		d3d_graphics_pipeline_state_desc.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
 
-		// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg”
+		// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆæ•°
 		d3d_graphics_pipeline_state_desc.NumRenderTargets = 1;
 		d3d_graphics_pipeline_state_desc.RTVFormats[0] = RenderTargetFormat;
 		d3d_graphics_pipeline_state_desc.DSVFormat = DepthStencilFormat;
 
-		// ƒ}ƒ‹ƒ`ƒTƒ“ƒvƒŠƒ“ƒO
+		// ãƒãƒ«ãƒã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°
 		d3d_graphics_pipeline_state_desc.SampleDesc.Count = 1;
 		d3d_graphics_pipeline_state_desc.SampleDesc.Quality = 0;
 
-		// ƒAƒ_ƒvƒ^
+		// ã‚¢ãƒ€ãƒ—ã‚¿
 		d3d_graphics_pipeline_state_desc.NodeMask = 0;
 		d3d_graphics_pipeline_state_desc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
-		// ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg¶¬
+		// ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆç”Ÿæˆ
 		hr = device->CreateGraphicsPipelineState(
 			&d3d_graphics_pipeline_state_desc,
 			IID_PPV_ARGS(&m_d3d_pipeline_state)
@@ -213,22 +213,22 @@ void LambertShader::Begin(const RenderContext& rc)
 {
 }
 
-// •`‰æŠJn
+// æç”»é–‹å§‹
 void LambertShader::Begin(const RenderContextDX12& rc)
 {
-	// ƒpƒCƒvƒ‰ƒCƒ“İ’è
+	// ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³è¨­å®š
 	rc.d3d_command_list->SetGraphicsRootSignature(m_d3d_root_signature.Get());
 	rc.d3d_command_list->SetPipelineState(m_d3d_pipeline_state.Get());
 
-	// ƒV[ƒ“’è”ƒoƒbƒtƒ@İ’è
+	// ã‚·ãƒ¼ãƒ³å®šæ•°ãƒãƒƒãƒ•ã‚¡è¨­å®š
 	rc.d3d_command_list->SetGraphicsRootDescriptorTable(0, rc.scene_cbv_descriptor->GetGpuHandle());
 }
 
-void LambertShader::Draw(const RenderContextDX12& rc, Model* model)
+void LambertShader::Draw(const RenderContextDX12& rc, iModel* model)
 {
 }
 
-// •`‰æ
+// æç”»
 void LambertShader::Draw(const RenderContextDX12& rc, ModelDX12* model)
 {
 	Graphics& graphics = Graphics::Instance();
@@ -245,10 +245,10 @@ void LambertShader::Draw(const RenderContextDX12& rc, ModelDX12* model)
 		const ModelResource::Mesh* res_mesh = mesh.mesh;
 		ModelDX12::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
 
-		// ƒƒbƒVƒ…’è”ƒoƒbƒtƒ@İ’è
+		// ãƒ¡ãƒƒã‚·ãƒ¥å®šæ•°ãƒãƒƒãƒ•ã‚¡è¨­å®š
 		rc.d3d_command_list->SetGraphicsRootDescriptorTable(1, frame_resource.cbv_descriptor->GetGpuHandle());
 
-		// ƒXƒPƒ‹ƒgƒ“—p’è”ƒoƒbƒtƒ@XV
+		// ã‚¹ã‚±ãƒ«ãƒˆãƒ³ç”¨å®šæ•°ãƒãƒƒãƒ•ã‚¡æ›´æ–°
 		CbSkeleton* cbSkeleton = reinterpret_cast<CbSkeleton*>(frame_resource.cbv_data);
 		if (res_mesh->bones.size() > 0)
 		{
@@ -265,22 +265,22 @@ void LambertShader::Draw(const RenderContextDX12& rc, ModelDX12* model)
 			cbSkeleton->boneTransforms[0] = nodes.at(res_mesh->nodeIndex).world_transform;
 		}
 
-		// ’¸“_ƒoƒbƒtƒ@İ’è
+		// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡è¨­å®š
 		rc.d3d_command_list->IASetVertexBuffers(0, 1, &res_mesh->d3d_vbv);
 		rc.d3d_command_list->IASetIndexBuffer(&res_mesh->d3d_ibv);
 		rc.d3d_command_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		// ƒTƒuƒZƒbƒg
+		// ã‚µãƒ–ã‚»ãƒƒãƒˆ
 
 		const ModelResource::Material* material = res_mesh->material;
 
-		// ƒ}ƒeƒŠƒAƒ‹’è”ƒoƒbƒtƒ@İ’è
+		// ãƒãƒ†ãƒªã‚¢ãƒ«å®šæ•°ãƒãƒƒãƒ•ã‚¡è¨­å®š
 		rc.d3d_command_list->SetGraphicsRootDescriptorTable(2, material->cbv_descriptor->GetGpuHandle());
 
-		// ƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[İ’è
+		// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼è¨­å®š
 		rc.d3d_command_list->SetGraphicsRootDescriptorTable(3, material->srv_descriptor->GetGpuHandle());
 
-		// •`‰æ
+		// æç”»
 		rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), 1, 0, 0, 0);
 	}
 }
@@ -289,7 +289,7 @@ void LambertShader::End(const RenderContext& rc)
 {
 }
 
-// •`‰æI—¹
+// æç”»çµ‚äº†
 void LambertShader::End(const RenderContextDX12& rc)
 {
 }

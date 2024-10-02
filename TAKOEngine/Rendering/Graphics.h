@@ -43,79 +43,82 @@ enum class SpriteShaderId
 
 enum class FrameBufferId
 {
-	Display,      //ƒ|ƒXƒgƒGƒtƒFƒNƒg“™
-	Scene,        //ƒV[ƒ“•`‰æ
+	Display,      //ãƒã‚¹ãƒˆã‚¨ãƒ•ã‚§ã‚¯ãƒˆç­‰
+	Scene,        //ã‚·ãƒ¼ãƒ³æç”»
 	Luminance,
 	GaussianBlur,
 	
-	//Deferred Rendering—p
-	Normal,       //–@ü
-	Position,     //À•WŒn
+	//Deferred Renderingç”¨
+	Normal,       //æ³•ç·š
+	Position,     //åº§æ¨™ç³»
 
 	EnumCount
 };
 
-// ‚’¼“¯ŠúŠÔŠuİ’è
+// è™ã‚‰å³©èœ·æ¢§æ‚„é«¢é¦´å›ˆéšªï½­è³ï¿½
 static const int SyncInterval = 0;
 
-// ƒtƒH[ƒ}ƒbƒg
+// ç¹è¼”ã‹ç¹ï½¼ç¹æ§­ãƒ£ç¹ï¿½
 static const DXGI_FORMAT RenderTargetFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 static const DXGI_FORMAT DepthStencilFormat = DXGI_FORMAT_D32_FLOAT;
 
-// ƒOƒ‰ƒtƒBƒbƒNƒX
+// ç¹§ï½°ç¹ï½©ç¹è¼”ã…ç¹ï¿½ç¹§ï½¯ç¹§ï½¹
 class Graphics
 {
 public:
 	Graphics() = default;
 	~Graphics();
 
-	// ƒCƒ“ƒXƒ^ƒ“ƒX
+	// ç¹§ï½¤ç¹ï½³ç¹§ï½¹ç¹§ï½¿ç¹ï½³ç¹§ï½¹
 	static Graphics& Instance()
 	{
 		static Graphics instance;
 		return instance;
 	}
 
-	// ‰Šú‰»
+	bool isDX12Active = false;
+	bool isDX11Active = true;
+
+	// è›»æ™„æ‚„è›¹ï¿½
 	void Initalize(HWND hWnd, UINT buffer_count);
-	// ‰æ–Ê•\¦
+	// é€•ï½»é«±ï½¢é™¦ï½¨é‰ï½º
 	void Present(UINT syncInterval);
-	// ƒfƒoƒCƒXæ“¾
+	// ç¹ï¿½ç¹èˆŒã†ç¹§ï½¹èœ¿é–€ï½¾ï¿½
 	ID3D11Device* GetDevice() { return device.Get(); };
-	// ƒfƒoƒCƒXƒRƒ“ƒeƒLƒXƒgæ“¾
+	// ç¹ï¿½ç¹èˆŒã†ç¹§ï½¹ç¹§ï½³ç¹ï½³ç¹ï¿½ç¹§ï½­ç¹§ï½¹ç¹äº¥å™è •ï¿½
 	ID3D11DeviceContext* GetDeviceContext() { return immediateContext.Get(); }
-	// ƒXƒNƒŠ[ƒ“•æ“¾
+	// ç¹§ï½¹ç¹§ï½¯ç¹ï½ªç¹ï½¼ç¹ï½³èŸ·ï¿½èœ¿é–€ï½¾ï¿½
 	float GetScreenWidth() const { return screenWidth; }
-	// ƒXƒNƒŠ[ƒ“‚‚³æ“¾
+	// ç¹§ï½¹ç¹§ï½¯ç¹ï½ªç¹ï½¼ç¹ï½³é¬®å€¥ï¼†èœ¿é–€ï½¾ï¿½
 	float GetScreenHeight() const { return screenHeight; }
-	// ƒtƒŒ[ƒ€ƒoƒbƒtƒ@æ“¾
+	// ç¹è¼”Îç¹ï½¼ç¹ï¿½ç¹èˆŒãƒ£ç¹è¼”ãƒèœ¿é–€ï½¾ï¿½
 	FrameBuffer* GetFrameBuffer(FrameBufferId frameBufferId) { return frameBuffers[static_cast<int>(frameBufferId)].get(); }
-	// ƒŒƒ“ƒ_[ƒXƒe[ƒgæ“¾
+	// ç¹ï½¬ç¹ï½³ç¹Â€ç¹ï½¼ç¹§ï½¹ç¹ï¿½ç¹ï½¼ç¹äº¥å™è •ï¿½
 	RenderState* GetRenderState() { return renderState.get(); }
-	// ƒMƒYƒ‚æ“¾
+	// ç¹§ï½®ç¹§ï½ºç¹ï½¢èœ¿é–€ï½¾ï¿½
 	Gizmos* GetGizmos() { return gizmos.get(); }
-	// ƒ~ƒ…[ƒeƒbƒNƒXæ“¾
+	// ç¹æº˜Î—ç¹ï½¼ç¹ï¿½ç¹ï¿½ç¹§ï½¯ç¹§ï½¹èœ¿é–€ï½¾ï¿½
 	std::mutex& GetMutex() { return mutex; }
 
-	// ƒ‚ƒfƒ‹ƒVƒF[ƒ_[æ“¾
+	// ç¹ï½¢ç¹ï¿½ç¹ï½«ç¹§ï½·ç¹§ï½§ç¹ï½¼ç¹Â€ç¹ï½¼èœ¿é–€ï½¾ï¿½
 	ModelShader* GetModelShader(ModelShaderId shaderId) { return modelShaders[static_cast<int>(shaderId)].get(); }
-	// ƒXƒvƒ‰ƒCƒgƒVƒF[ƒ_[æ“¾
+	// ç¹§ï½¹ç¹åŠ±Î›ç¹§ï½¤ç¹åŒ»ã™ç¹§ï½§ç¹ï½¼ç¹Â€ç¹ï½¼èœ¿é–€ï½¾ï¿½
 	SpriteShader* GetSpriteShader(SpriteShaderId shaderId) { return spriteShaders[static_cast<int>(shaderId)].get(); }
-	// ƒfƒoƒbƒOƒŒƒ“ƒ_ƒ‰æ“¾
+	// ç¹ï¿½ç¹èˆŒãƒ£ç¹§ï½°ç¹ï½¬ç¹ï½³ç¹Â€ç¹ï½©èœ¿é–€ï½¾ï¿½
 	DebugRenderer* GetDebugRenderer() const { return debugRenderer.get(); }
-	// ƒ‰ƒCƒ“ƒŒƒ“ƒ_ƒ‰æ“¾
+	// ç¹ï½©ç¹§ï½¤ç¹ï½³ç¹ï½¬ç¹ï½³ç¹Â€ç¹ï½©èœ¿é–€ï½¾ï¿½
 	LineRenderer* GetLineRenderer() const { return lineRenderer.get(); }
 
-	// ƒoƒbƒtƒ@”æ“¾
+	// ç¹èˆŒãƒ£ç¹è¼”ãƒè¬¨ï½°èœ¿é–€ï½¾ï¿½
 	UINT GetBufferCount() const { return m_buffer_count; }
 
-	// ƒoƒbƒtƒ@ƒCƒ“ƒfƒbƒNƒXæ“¾
+	// ç¹èˆŒãƒ£ç¹è¼”ãƒç¹§ï½¤ç¹ï½³ç¹ï¿½ç¹ï¿½ç¹§ï½¯ç¹§ï½¹èœ¿é–€ï½¾ï¿½
 	UINT GetCurrentBufferIndex() const { return m_dxgi_swap_chain->GetCurrentBackBufferIndex(); }
 
-	// ƒfƒoƒCƒXæ“¾
+	// ç¹ï¿½ç¹èˆŒã†ç¹§ï½¹èœ¿é–€ï½¾ï¿½
 	ID3D12Device* GetDeviceDX12() const { return m_d3d_device.Get(); }
 
-	// ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒvæ“¾
+	// ç¹ï¿½ç¹§ï½£ç¹§ï½¹ç¹§ï½¯ç¹ï½ªç¹åŠ±ã¡ç¹åµï¿½ï½¼ç¹æ€œå™è •ï¿½
 	DescriptorHeap* GetShaderResourceDescriptorHeap() const { return m_shader_resource_descriptor_heap.get(); }
 	DescriptorHeap* GetSamplerDescriptorHeap() const { return m_sampler_descriptor_heap.get(); }
 
@@ -138,36 +141,38 @@ public:
 
 	void WaitIdle();
 
-	// •`‰æƒRƒ}ƒ“ƒhÀsŠ®—¹‚Ü‚Å‘Ò‚Â
+	// è¬ å†—åˆ¤ç¹§ï½³ç¹æ§­Î¦ç¹ç‰™ï½®æº¯ï½¡æ‚Ÿï½®å¾¡ï½ºï¿½ç¸ºï½¾ç¸ºï½§è •ï¿½ç¸ºï½¤
 	void WaitIdle(CommandQueue& command_queue);
 
-	// •`‰æÀs
+	// è¬ å†—åˆ¤è³æº¯ï½¡ï¿½
 	void Execute();
 
-	// •`‰æŠJn
+	// è¬ å†—åˆ¤é«¢å¥ï½§ï¿½
 	ID3D12GraphicsCommandList* Begin();
 
-	// •`‰æI—¹
+	// è¬ å†—åˆ¤é‚¨ã‚†ï½ºï¿½
 	void End();
+
+	void FinishDX12();
 
 	Descriptor* UpdateSceneConstantBuffer(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection, const DirectX::XMFLOAT3& light_direction);
 
 	Shader* GetShader() const { return m_shader.get(); }
-	
-	// ƒeƒNƒXƒ`ƒƒ“Ç‚İ‚İ
+
+	// ç¹ï¿½ç¹§ï½¯ç¹§ï½¹ç¹âˆšÎ•éš±ï½­ç¸ºï½¿éœï½¼ç¸ºï½¿
 	HRESULT LoadTexture(const char* filename, ID3D12Resource** d3d_resource);
 
-	// ƒeƒNƒXƒ`ƒƒì¬
+	// ç¹ï¿½ç¹§ï½¯ç¹§ï½¹ç¹âˆšÎ•è´æ‡ˆï¿½ï¿½
 	HRESULT CreateTexture(const BYTE* pixels, UINT width, UINT height, DXGI_FORMAT format, ID3D12Resource** d3d_resource);
 
-	// ƒ_ƒ~[ƒeƒNƒXƒ`ƒƒ¶¬
+	// ç¹Â€ç¹æº˜ï¿½ï½¼ç¹ï¿½ç¹§ï½¯ç¹§ï½¹ç¹âˆšÎ•é€•æ»“ï¿½ï¿½
 	HRESULT CreateDummyTexture(ID3D12Resource** d3d_resource);
 
-	// ƒoƒbƒtƒ@ƒRƒs[
+	// ç¹èˆŒãƒ£ç¹è¼”ãƒç¹§ï½³ç¹æ–ï¿½ï½¼
 	HRESULT CopyBuffer(ID3D12Resource* d3d_src_resource, ID3D12Resource* d3d_dst_resource);
 
 private:
-	// ƒCƒ[ƒWƒRƒs[
+	// ç¹§ï½¤ç¹ï½¡ç¹ï½¼ç¹§ï½¸ç¹§ï½³ç¹æ–ï¿½ï½¼
 	HRESULT CopyImage(const BYTE* pixels, UINT width, UINT height, DXGI_FORMAT format, ID3D12Resource* resource);
 
 	static UINT BitsPerPixel(DXGI_FORMAT fmt);
@@ -189,7 +194,7 @@ private:
 	std::unique_ptr<DebugRenderer>					debugRenderer;
 	std::unique_ptr<LineRenderer>					lineRenderer;
 
-	std::mutex mutex;	// ƒ~ƒ…[ƒeƒbƒNƒX
+	std::mutex mutex;	// ç¹æº˜Î—ç¹ï½¼ç¹ï¿½ç¹ï¿½ç¹§ï½¯ç¹§ï½¹
 
 	static Graphics* s_instance;
 

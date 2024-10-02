@@ -6,37 +6,37 @@
 
 namespace ChestState
 {
-	// ŠW•Â‚ß
+	// è“‹é–‰ã‚
 	class ChestCloseState : public HierarchicalState<Enemy>
 	{
 	public:
-		// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+		// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		ChestCloseState(Enemy* enemy) : HierarchicalState<Enemy>(enemy) {};
-		// ƒfƒXƒgƒ‰ƒNƒ^
+		// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		~ChestCloseState() {};
-		// ƒXƒe[ƒg‚É“ü‚Á‚½‚Ìƒƒ\ƒbƒh
+		// ã‚¹ãƒ†ãƒ¼ãƒˆã«å…¥ã£ãŸæ™‚ã®ãƒ¡ã‚½ãƒƒãƒ‰
 		void Enter() override {};
-		// ƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+		// ã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 		void Execute(float elapsedTime) override {};
-		// ƒXƒe[ƒg‚©‚ço‚Ä‚¢‚­‚Æ‚«‚Ìƒƒ\ƒbƒh
+		// ã‚¹ãƒ†ãƒ¼ãƒˆã‹ã‚‰å‡ºã¦ã„ãã¨ãã®ãƒ¡ã‚½ãƒƒãƒ‰
 		void Exit() override {};
 	};
-	// ŠWŠJ‚­
+	// è“‹é–‹ã
 	class ChestOpenState : public HierarchicalState<Enemy>
 	{
 	public:
-		// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-		ChestOpenState(Enemy* enemy, Model::Node* coverNode, std::function<void(Enemy*)> OnOpen = nullptr) : HierarchicalState<Enemy>(enemy), coverNode(coverNode), OnOpen(OnOpen) {};
-		// ƒfƒXƒgƒ‰ƒNƒ^
+		// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+		ChestOpenState(Enemy* enemy, iModel::Node* coverNode, std::function<void(Enemy*)> OnOpen = nullptr) : HierarchicalState<Enemy>(enemy), coverNode(coverNode), OnOpen(OnOpen) {};
+		// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		~ChestOpenState() {};
-		// ƒXƒe[ƒg‚É“ü‚Á‚½‚Ìƒƒ\ƒbƒh
+		// ã‚¹ãƒ†ãƒ¼ãƒˆã«å…¥ã£ãŸæ™‚ã®ãƒ¡ã‚½ãƒƒãƒ‰
 		void Enter() override;
-		// ƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+		// ã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 		void Execute(float elapsedTime) override;
-		// ƒXƒe[ƒg‚©‚ço‚Ä‚¢‚­‚Æ‚«‚Ìƒƒ\ƒbƒh
+		// ã‚¹ãƒ†ãƒ¼ãƒˆã‹ã‚‰å‡ºã¦ã„ãã¨ãã®ãƒ¡ã‚½ãƒƒãƒ‰
 		void Exit() override {};
 	protected:
-		Model::Node* coverNode; // ŠWƒm[ƒh
+		iModel::Node* coverNode; // è“‹ãƒãƒ¼ãƒ‰
 		std::function<void(Enemy*)> OnOpen = nullptr;
 		float timer;
 		float openAngle = DirectX::XMConvertToRadians(-120.0f);

@@ -6,7 +6,7 @@
 
 ModelShader::ModelShader(ID3D11Device* device, const char* vs, const char* ps)
 {
-	// “ü—ÍƒŒƒCƒAƒEƒg
+	// å…¥åŠ›ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆ
 	D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -18,7 +18,7 @@ ModelShader::ModelShader(ID3D11Device* device, const char* vs, const char* ps)
 		{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
-	// ’¸“_ƒVƒF[ƒ_[
+	// é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 	GpuResourceUtils::LoadVertexShader(
 		device,
 		vs,
@@ -27,7 +27,7 @@ ModelShader::ModelShader(ID3D11Device* device, const char* vs, const char* ps)
 		inputLayout.GetAddressOf(),
 		vertexShader.GetAddressOf());
 
-	// ƒsƒNƒZƒ‹ƒVƒF[ƒ_[
+	// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 	if (ps)
 	{
 		GpuResourceUtils::LoadPixelShader(
@@ -36,42 +36,42 @@ ModelShader::ModelShader(ID3D11Device* device, const char* vs, const char* ps)
 			pixelShader.GetAddressOf());
 	}
 
-	// ƒV[ƒ“—p’è”ƒoƒbƒtƒ@
+	// ã‚·ãƒ¼ãƒ³ç”¨å®šæ•°ãƒãƒƒãƒ•ã‚¡
 	GpuResourceUtils::CreateConstantBuffer(
 		device,
 		sizeof(CbScene),
 		sceneConstantBuffer.GetAddressOf());
 
-	// ƒƒbƒVƒ…—p’è”ƒoƒbƒtƒ@
+	// ãƒ¡ãƒƒã‚·ãƒ¥ç”¨å®šæ•°ãƒãƒƒãƒ•ã‚¡
 	GpuResourceUtils::CreateConstantBuffer(
 		device,
 		sizeof(CbMesh),
 		meshConstantBuffer.GetAddressOf());
 
-	// ƒXƒPƒ‹ƒgƒ“—p’è”ƒoƒbƒtƒ@
+	// ã‚¹ã‚±ãƒ«ãƒˆãƒ³ç”¨å®šæ•°ãƒãƒƒãƒ•ã‚¡
 	GpuResourceUtils::CreateConstantBuffer(
 		device,
 		sizeof(CbSkeleton),
 		skeletonConstantBuffer.GetAddressOf());
 
-	// ƒVƒƒƒhƒEƒ}ƒbƒv—pƒoƒbƒtƒ@
+	// ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ç”¨ãƒãƒƒãƒ•ã‚¡
 	GpuResourceUtils::CreateConstantBuffer(
 		device,
 		sizeof(CbShadowMap),
 		shadowMapConstantBuffer.GetAddressOf());
 }
 
-// •`‰æŠJn
+// æç”»é–‹å§‹
 void ModelShader::Begin(const RenderContext& rc)
 {
 	ID3D11DeviceContext* dc = rc.deviceContext;
 
-	// ƒVƒF[ƒ_[İ’è
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼è¨­å®š
 	dc->IASetInputLayout(inputLayout.Get());
 	rc.deviceContext->VSSetShader(vertexShader.Get(), nullptr, 0);
 	rc.deviceContext->PSSetShader(pixelShader.Get(), nullptr, 0);
 
-	// ’è”ƒoƒbƒtƒ@İ’è
+	// å®šæ•°ãƒãƒƒãƒ•ã‚¡è¨­å®š
 	ID3D11Buffer* constantBuffers[] =
 	{
 		sceneConstantBuffer.Get(),
@@ -82,7 +82,7 @@ void ModelShader::Begin(const RenderContext& rc)
 	rc.deviceContext->VSSetConstantBuffers(0, _countof(constantBuffers), constantBuffers);
 	rc.deviceContext->PSSetConstantBuffers(0, _countof(constantBuffers), constantBuffers);
 
-	// ƒTƒ“ƒvƒ‰ƒXƒe[ƒg
+	// ã‚µãƒ³ãƒ—ãƒ©ã‚¹ãƒ†ãƒ¼ãƒˆ
 	ID3D11SamplerState* samplerStates[] =
 	{
 		rc.renderState->GetSamplerState(SamplerState::LinearWrap),
@@ -92,10 +92,10 @@ void ModelShader::Begin(const RenderContext& rc)
 	ID3D11SamplerState* shadowSampler = rc.renderState->GetSamplerState(SamplerState::ShadowMap);
 	dc->PSSetSamplers(10, 1, &shadowSampler);
 
-	// ƒŒƒ“ƒ_[ƒXƒe[ƒgİ’è
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆè¨­å®š
 	SetRenderState(rc);
 
-	// ƒV[ƒ“—p’è”ƒoƒbƒtƒ@XV
+	// ã‚·ãƒ¼ãƒ³ç”¨å®šæ•°ãƒãƒƒãƒ•ã‚¡æ›´æ–°
 	CbScene cbScene{};
 	DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&rc.camera->GetView());
 	DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&rc.camera->GetProjection());
@@ -124,19 +124,19 @@ void ModelShader::Begin(const RenderContext& rc)
 	cbScene.cameraPosition.z = eye.z;
 	dc->UpdateSubresource(sceneConstantBuffer.Get(), 0, 0, &cbScene, 0, 0);
 
-	// ƒVƒƒƒhƒEƒ}ƒbƒv—p’è”ƒoƒbƒtƒ@XV
+	// ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ç”¨å®šæ•°ãƒãƒƒãƒ•ã‚¡æ›´æ–°
 	CbShadowMap cbShadowMap;
 	cbShadowMap.shadowColor = rc.shadowMapData.shadowColor;
 	for (int i = 0; i < myRenderer::NUM_SHADOW_MAP; ++i)
 	{
-		//ƒoƒCƒAƒX‚Ìˆ—‚ª‚S–‡ˆÈã‚Íl—¶‚µ‚Ä‚¢‚È‚¢‚Ì‚ÅƒAƒT[ƒg‚Å~‚ß‚Ä‚¨‚­
+		//ãƒã‚¤ã‚¢ã‚¹ã®å‡¦ç†ãŒï¼”æšä»¥ä¸Šã¯è€ƒæ…®ã—ã¦ã„ãªã„ã®ã§ã‚¢ã‚µãƒ¼ãƒˆã§æ­¢ã‚ã¦ãŠã
 		assert(myRenderer::NUM_SHADOW_MAP <= 4);
 		(&cbShadowMap.shadowBias.x)[i]     = rc.shadowMapData.shadowBias[i];
 		cbShadowMap.lightViewProjection[i] = rc.shadowMapData.lightViewProjection[i];
 	}
 	rc.deviceContext->UpdateSubresource(shadowMapConstantBuffer.Get(), 0, 0, &cbShadowMap, 0, 0);
 
-	// ƒVƒƒƒhƒEƒ}ƒbƒvİ’è
+	// ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—è¨­å®š
 	ID3D11ShaderResourceView* srvs[myRenderer::NUM_SHADOW_MAP];
 	for (int i = 0; i < myRenderer::NUM_SHADOW_MAP; i++)
 	{
@@ -149,7 +149,7 @@ void ModelShader::Begin(const RenderContextDX12& rc)
 {
 }
 
-void ModelShader::Draw(const RenderContextDX12& rc, Model* model)
+void ModelShader::Draw(const RenderContextDX12& rc, iModel* model)
 {
 }
 
@@ -165,18 +165,18 @@ void ModelShader::End(const RenderContextDX12& rc)
 {
 }
 
-// ƒ‚ƒfƒ‹•`‰æ
-void ModelShader::Draw(const RenderContext& rc, const Model* model, DirectX::XMFLOAT4 color)
+// ãƒ¢ãƒ‡ãƒ«æç”»
+void ModelShader::Draw(const RenderContext& rc, const iModel* model, DirectX::XMFLOAT4 color)
 {
 	ID3D11DeviceContext* dc = rc.deviceContext;
 
 	const ModelResource* resource = model->GetResource();
-	const std::vector<Model::Node>& nodes = model->GetNodes();
+	const std::vector<iModel::Node>& nodes = model->GetNodes();
 
-	// ƒJƒƒ‰‚ÉÊ‚Á‚Ä‚¢‚é”ÍˆÍ‚ÌƒIƒuƒWƒFƒNƒg‚ğƒtƒ‰ƒO‚Åƒ}[ƒN‚·‚é”z—ñ‚ğ—pˆÓ
+	// ã‚«ãƒ¡ãƒ©ã«å†™ã£ã¦ã„ã‚‹ç¯„å›²ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ãƒ•ãƒ©ã‚°ã§ãƒãƒ¼ã‚¯ã™ã‚‹é…åˆ—ã‚’ç”¨æ„
 	std::vector<bool> visibleObjects(model->GetMeshes().size(), false);
 
-	// ‹‘äƒJƒŠƒ“ƒO‚ğÀs‚µ‚Ä‰Â‹ƒIƒuƒWƒFƒNƒg‚ğƒ}[ƒN
+	// è¦–éŒå°ã‚«ãƒªãƒ³ã‚°ã‚’å®Ÿè¡Œã—ã¦å¯è¦–ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ãƒãƒ¼ã‚¯
 	FrustumCulling::FrustumCullingFlag(Camera::Instance(), model->GetMeshes(), visibleObjects);
 	int culling = 0;
 
@@ -184,14 +184,14 @@ void ModelShader::Draw(const RenderContext& rc, const Model* model, DirectX::XMF
 	{
 		if (!visibleObjects[culling++]) continue;
 
-		// ’¸“_ƒoƒbƒtƒ@İ’è
+		// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡è¨­å®š
 		UINT stride = sizeof(ModelResource::Vertex);
 		UINT offset = 0;
 		dc->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
 		dc->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 		dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		// ƒƒbƒVƒ…—p’è”ƒoƒbƒtƒ@XV
+		// ãƒ¡ãƒƒã‚·ãƒ¥ç”¨å®šæ•°ãƒãƒƒãƒ•ã‚¡æ›´æ–°
 		CbMesh cbMesh{};
 		::memset(&cbMesh, 0, sizeof(cbMesh));
 		cbMesh.materialColor = mesh.material->color;
@@ -203,7 +203,7 @@ void ModelShader::Draw(const RenderContext& rc, const Model* model, DirectX::XMF
 		cbMesh.shaderData  = rc.shaderData;
 		dc->UpdateSubresource(meshConstantBuffer.Get(), 0, 0, &cbMesh, 0, 0);
 
-		// ƒXƒPƒ‹ƒgƒ“—p’è”ƒoƒbƒtƒ@XV
+		// ã‚¹ã‚±ãƒ«ãƒˆãƒ³ç”¨å®šæ•°ãƒãƒƒãƒ•ã‚¡æ›´æ–°
 		CbSkeleton cbSkeleton{};
 		if (mesh.bones.size() > 0)
 		{
@@ -221,10 +221,10 @@ void ModelShader::Draw(const RenderContext& rc, const Model* model, DirectX::XMF
 		}
 		rc.deviceContext->UpdateSubresource(skeletonConstantBuffer.Get(), 0, 0, &cbSkeleton, 0, 0);
 
-		// ƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[İ’è
+		// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼è¨­å®š
 		SetShaderResourceView(mesh, dc);
 
-		// •`‰æ
+		// æç”»
 		dc->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
 	}
 }

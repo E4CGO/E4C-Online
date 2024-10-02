@@ -10,13 +10,13 @@ public:
 	~ShadowMapShader() override = default;
 
 	void Begin(const RenderContext& rc) override;
-	void Draw(const RenderContext& rc, const Model* model, DirectX::XMFLOAT4 color = { 1, 1, 1, 1 }) override;
+	void Draw(const RenderContext& rc, const iModel* model, DirectX::XMFLOAT4 color = { 1, 1, 1, 1 }) override;
 
 private:
-	// ƒŒƒ“ƒ_[ƒXƒe[ƒgİ’è
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆè¨­å®š
 	void SetRenderState(const RenderContext& rc) override;
 
-	// ƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[İ’è
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼è¨­å®š
 	void SetShaderResourceView(const ModelResource::Mesh& mesh, ID3D11DeviceContext*& dc) override {}
 
 	struct CbScene

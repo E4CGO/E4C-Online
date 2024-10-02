@@ -2,7 +2,7 @@
 
 #include "TAKOEngine/Tool/XMFLOAT.h"
 
-ModelCollider::ModelCollider(Model* model)
+ModelCollider::ModelCollider(iModel* model)
 {
 	this->model = model;
 
@@ -22,18 +22,20 @@ bool ModelCollider::CollisionVsShpere(
 	const ModelResource* resource = model->GetResource();
 	for (const ModelResource::Mesh& mesh : resource->GetMeshes())
 	{
-		// ƒƒbƒVƒ…ƒm[ƒhæ“¾
-		const Model::Node& node = model->GetNodes().at(mesh.nodeIndex);
+		// ãƒ¡ãƒƒã‚·ãƒ¥ãƒãƒ¼ãƒ‰å–å¾—
+		const iModel::Node& node = model->GetNodes().at(mesh.nodeIndex);
 
-		// ‹…‘Ì‚ğƒ[ƒ‹ƒh‹óŠÔ‚©‚çƒ[ƒJƒ‹‹óŠÔ‚Ö•ÏŠ·
+		// çƒä½“ã‚’ãƒ¯ãƒ¼ãƒ«ãƒ‰ç©ºé–“ã‹ã‚‰ãƒ­ãƒ¼ã‚«ãƒ«ç©ºé–“ã¸å¤‰æ›
 		DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&node.worldTransform);
 		DirectX::XMMATRIX InverseWorldTransform = DirectX::XMMatrixInverse(nullptr, WorldTransform);
 
 		DirectX::XMVECTOR SphereCenter = DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat3(&sphereCenter), InverseWorldTransform);
 		DirectX::XMVECTOR SphereCenterOri = DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat3(&sphereCenterOri), InverseWorldTransform);
-		float sphereRadius = other->GetScale().x; // ‹…‘Ì”¼Œa
-
-		// OŠpŒ`i–Êj‚Æ‚ÌŒğ·”»’è
+		float sphereRadius = other->GetScale().x; // çƒä½“åŠå¾„
+		DirectX::XMVECTOR SphereRadius = DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat(&sphereRadius), InverseWorldTransform);
+		DirectX::XMStoreFloat(&sphereRadius, SphereRadius);
+		
+		// ä¸‰è§’å½¢ï¼ˆé¢ï¼‰ã¨ã®äº¤å·®åˆ¤å®š
 		const std::vector<ModelResource::Vertex>& vertices = mesh.vertices;
 		const std::vector<UINT> indices = mesh.indices;
 
@@ -41,18 +43,18 @@ bool ModelCollider::CollisionVsShpere(
 
 		for (UINT i = 0; i < indices.size(); i += 3)
 		{
-			// OŠpŒ`‚Ì’¸“_‚ğ’Šo
+			// ä¸‰è§’å½¢ã®é ‚ç‚¹ã‚’æŠ½å‡º
 			const ModelResource::Vertex& a = vertices.at(indices.at(i + 2));
 			const ModelResource::Vertex& b = vertices.at(indices.at(i + 1));
 			const ModelResource::Vertex& c = vertices.at(indices.at(i));
-			// OŠpŒ`’¸“_
+			// ä¸‰è§’å½¢é ‚ç‚¹
 			DirectX::XMVECTOR TriangleVertex[3] =
 			{
 				DirectX::XMLoadFloat3(&a.position),
 				DirectX::XMLoadFloat3(&b.position),
 				DirectX::XMLoadFloat3(&c.position),
 			};
-			// –Ê–@ü
+			// é¢æ³•ç·š
 			DirectX::XMVECTOR Edge[3] =
 			{
 				DirectX::XMVectorSubtract(TriangleVertex[1], TriangleVertex[0]),
@@ -69,10 +71,10 @@ bool ModelCollider::CollisionVsShpere(
 			float distance = DirectX::XMVectorGetX(Distance);
 			float distanceOri = DirectX::XMVectorGetX(DistanceOri);
 
-			// ‹…‚Ì’†S‚ª–Ê‚ÉÚ‚µ‚Ä‚¢‚é‚©A•‰‚Ì•ûŒü‚É‚ ‚éê‡‚Í“–‚½‚ç‚È‚¢
+			// çƒã®ä¸­å¿ƒãŒé¢ã«æ¥ã—ã¦ã„ã‚‹ã‹ã€è² ã®æ–¹å‘ã«ã‚ã‚‹å ´åˆã¯å½“ãŸã‚‰ãªã„
 			if (distance < 0 && distanceOri < 0) continue;
 
-			// ‹…‚ªOŠpŒ`“à•”‚É‘¶İ‚·‚é‚©
+			// çƒãŒä¸‰è§’å½¢å†…éƒ¨ã«å­˜åœ¨ã™ã‚‹ã‹
 			if (distance > sphereRadius) continue;
 
 			bool outside = false;
@@ -87,7 +89,7 @@ bool ModelCollider::CollisionVsShpere(
 					outside = true;
 				}
 			}
-			// OŠpŒ`‚Ì“à‘¤‚È‚Ì‚ÅŒğ·‚·‚é
+			// ä¸‰è§’å½¢ã®å†…å´ãªã®ã§äº¤å·®ã™ã‚‹
 			if (!outside)
 			{
 				materialIndex = mesh.materialIndex;
@@ -98,17 +100,17 @@ bool ModelCollider::CollisionVsShpere(
 
 				continue;
 			}
-			// ŠO‘¤
-			// ƒGƒbƒW‚Æ‚Ì”»’è
+			// å¤–å´
+			// ã‚¨ãƒƒã‚¸ã¨ã®åˆ¤å®š
 			const float radiusSq = sphereRadius * sphereRadius;
 			for (int i = 0; i < 3; ++i)
 			{
-				// •Ó‚ÌË‰e’l‚ğ‹‚ß‚é
+				// è¾ºã®å°„å½±å€¤ã‚’æ±‚ã‚ã‚‹
 				float t = DirectX::XMVectorGetX(DirectX::XMVector3Dot(Vec[i], Edge[i]));
 				if (t > 0.0f)
 				{
-					// •Ó‚Ìn“_‚©‚çI“_‚Ü‚Å‚ÌƒxƒNƒgƒ‹‚Æx“X‚©‚ç‹…‚Ü‚Å‚ÌƒxƒNƒgƒ‹‚ª“¯ˆê‚Ìê‡A
-					// “àÏ’l‚ª•Ó‚Ì’·‚³‚Ì2æ‚É‚È‚é«¿‚ğ—˜—p‚µ‚Ä•Ó‚©‚ç‹…‚Ü‚Å‚ÌÅ’ZƒxƒNƒgƒ‹‚ğ‹‚ß‚é
+					// è¾ºã®å§‹ç‚¹ã‹ã‚‰çµ‚ç‚¹ã¾ã§ã®ãƒ™ã‚¯ãƒˆãƒ«ã¨æ”¯åº—ã‹ã‚‰çƒã¾ã§ã®ãƒ™ã‚¯ãƒˆãƒ«ãŒåŒä¸€ã®å ´åˆã€
+					// å†…ç©å€¤ãŒè¾ºã®é•·ã•ã®2ä¹—ã«ãªã‚‹æ€§è³ªã‚’åˆ©ç”¨ã—ã¦è¾ºã‹ã‚‰çƒã¾ã§ã®æœ€çŸ­ãƒ™ã‚¯ãƒˆãƒ«ã‚’æ±‚ã‚ã‚‹
 					float edgeLengthSq = DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(Edge[i]));
 					if (t > edgeLengthSq)
 					{
@@ -120,14 +122,14 @@ bool ModelCollider::CollisionVsShpere(
 						Vec[i] = DirectX::XMVectorSubtract(Vec[i], DirectX::XMVectorScale(Edge[i], t));
 					}
 				}
-				// •Ó‚©‚ç‹…‚Ü‚Å‚ÌÅ’ZƒxƒNƒgƒ‹‚Ì‹——£‚ª”¼ŒaˆÈ‰º‚È‚ç‚ß‚è‚ñ‚Å‚¢‚é
+				// è¾ºã‹ã‚‰çƒã¾ã§ã®æœ€çŸ­ãƒ™ã‚¯ãƒˆãƒ«ã®è·é›¢ãŒåŠå¾„ä»¥ä¸‹ãªã‚‰ã‚ã‚Šè¾¼ã‚“ã§ã„ã‚‹
 				float lengthSq = DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(Vec[i]));
 				if (lengthSq < radiusSq)
 				{
 					materialIndex = mesh.materialIndex;
-					// ‚ß‚è‚İ—ÊZo
+					// ã‚ã‚Šè¾¼ã¿é‡ç®—å‡º
 					float depth = sphereRadius - sqrtf(lengthSq);
-					// ‚ß‚è‚İ•ª‰Ÿ‚µo‚µˆ—
+					// ã‚ã‚Šè¾¼ã¿åˆ†æŠ¼ã—å‡ºã—å‡¦ç†
 					DirectX::XMVECTOR Reflection = DirectX::XMVector3Normalize(Vec[i]);
 					Reflection = DirectX::XMVectorScale(Reflection, depth);
 					SphereCenter = DirectX::XMVectorAdd(SphereCenter, Reflection);
@@ -141,7 +143,7 @@ bool ModelCollider::CollisionVsShpere(
 			hit = true;
 			result.materialIndex = materialIndex;
 
-			// ƒ[ƒJƒ‹‹óŠÔ‚©‚çƒ[ƒ‹ƒh‹óŠÔ‚Ö•ÏŠ·
+			// ãƒ­ãƒ¼ã‚«ãƒ«ç©ºé–“ã‹ã‚‰ãƒ¯ãƒ¼ãƒ«ãƒ‰ç©ºé–“ã¸å¤‰æ›
 			DirectX::XMVECTOR WorldPosition = DirectX::XMVector3TransformCoord(SphereCenter, WorldTransform);
 
 			DirectX::XMStoreFloat3(&sphereCenter, WorldPosition);
@@ -172,7 +174,7 @@ bool ModelCollider::RayCast(
 	DirectX::XMVECTOR WorldEnd = DirectX::XMLoadFloat3(&end);
 	DirectX::XMVECTOR WorldRayVec = DirectX::XMVectorSubtract(WorldEnd, WorldStart);
 	DirectX::XMVECTOR WorldRayLength = DirectX::XMVector3Length(WorldRayVec);
-	// ƒ[ƒ‹ƒh‹óŠÔ‚ÌƒŒƒC‚Ì’·‚³
+	// ãƒ¯ãƒ¼ãƒ«ãƒ‰ç©ºé–“ã®ãƒ¬ã‚¤ã®é•·ã•
 	DirectX::XMStoreFloat(&result.distance, WorldRayLength);
 
 	bool hit = false;
@@ -180,10 +182,10 @@ bool ModelCollider::RayCast(
 	const ModelResource* resource = model->GetResource();
 	for (const ModelResource::Mesh& mesh : resource->GetMeshes())
 	{
-		// ƒƒbƒVƒ…ƒm[ƒhæ“¾
-		const Model::Node& node = model->GetNodes().at(mesh.nodeIndex);
+		// ãƒ¡ãƒƒã‚·ãƒ¥ãƒãƒ¼ãƒ‰å–å¾—
+		const iModel::Node& node = model->GetNodes().at(mesh.nodeIndex);
 
-		// ƒŒƒC‚ğƒ[ƒ‹ƒh‹óŠÔ‚©‚çƒ[ƒJƒ‹‹óŠÔ‚Ö•ÏŠ·
+		// ãƒ¬ã‚¤ã‚’ãƒ¯ãƒ¼ãƒ«ãƒ‰ç©ºé–“ã‹ã‚‰ãƒ­ãƒ¼ã‚«ãƒ«ç©ºé–“ã¸å¤‰æ›
 		DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&node.worldTransform);
 		DirectX::XMMATRIX InverseWorldTransform = DirectX::XMMatrixInverse(nullptr, WorldTransform);
 		DirectX::XMVECTOR S = DirectX::XMVector3TransformCoord(WorldStart, InverseWorldTransform);
@@ -192,11 +194,11 @@ bool ModelCollider::RayCast(
 		DirectX::XMVECTOR V = DirectX::XMVector3Normalize(SE);
 		DirectX::XMVECTOR Length = DirectX::XMVector3Length(SE);
 
-		// ƒŒƒC‚Ì’·‚³
+		// ãƒ¬ã‚¤ã®é•·ã•
 		float neart;
 		DirectX::XMStoreFloat(&neart, Length);
 
-		// OŠpŒ`i–Êj‚Æ‚ÌŒğ·”»’è
+		// ä¸‰è§’å½¢ï¼ˆé¢ï¼‰ã¨ã®äº¤å·®åˆ¤å®š
 		const std::vector<ModelResource::Vertex>& vertices = mesh.vertices;
 		const std::vector<UINT> indices = mesh.indices;
 
@@ -206,7 +208,7 @@ bool ModelCollider::RayCast(
 
 		for (UINT i = 0; i < indices.size(); i += 3)
 		{
-			// OŠpŒ`‚Ì’¸“_‚ğ’Šo
+			// ä¸‰è§’å½¢ã®é ‚ç‚¹ã‚’æŠ½å‡º
 			const ModelResource::Vertex& a = vertices.at(indices.at(i + 2));
 			const ModelResource::Vertex& b = vertices.at(indices.at(i + 1));
 			const ModelResource::Vertex& c = vertices.at(indices.at(i));
@@ -215,49 +217,49 @@ bool ModelCollider::RayCast(
 			DirectX::XMVECTOR B = DirectX::XMLoadFloat3(&b.position);
 			DirectX::XMVECTOR C = DirectX::XMLoadFloat3(&c.position);
 
-			// OŠpŒ`‚ÌO•ÓƒxƒNƒgƒ‹‚ğZo
+			// ä¸‰è§’å½¢ã®ä¸‰è¾ºãƒ™ã‚¯ãƒˆãƒ«ã‚’ç®—å‡º
 			DirectX::XMVECTOR AB = DirectX::XMVectorSubtract(B, A);
 			DirectX::XMVECTOR BC = DirectX::XMVectorSubtract(C, B);
 			DirectX::XMVECTOR CA = DirectX::XMVectorSubtract(A, C);
 
-			// OŠpŒ`‚Ì–@üƒxƒNƒgƒ‹‚ğZo
+			// ä¸‰è§’å½¢ã®æ³•ç·šãƒ™ã‚¯ãƒˆãƒ«ã‚’ç®—å‡º
 			DirectX::XMVECTOR N = DirectX::XMVector3Cross(AB, BC);
 
-			// “àÏ‚ÌŒ‹‰Ê‚ªƒvƒ‰ƒX‚È‚ç‚Î— Œü‚«
+			// å†…ç©ã®çµæœãŒãƒ—ãƒ©ã‚¹ãªã‚‰ã°è£å‘ã
 			DirectX::XMVECTOR Dot = DirectX::XMVector3Dot(V, N);
 			if (DirectX::XMVectorGetX(Dot) >= 0.0f) continue;
 
-			// ƒŒƒC‚Æ•½–Ê‚ÌŒğ“_‚ğZo
+			// ãƒ¬ã‚¤ã¨å¹³é¢ã®äº¤ç‚¹ã‚’ç®—å‡º
 			DirectX::XMVECTOR SA = DirectX::XMVectorSubtract(A, S);
 			DirectX::XMVECTOR X = DirectX::XMVectorDivide(DirectX::XMVector3Dot(SA, N), Dot);
 			float x;
 			DirectX::XMStoreFloat(&x, X);
-			// Œğ“_‚Ü‚Å‚Ì‹——£‚ª¡‚Ü‚Å‚ÉŒvZ‚µ‚½Å‹ß‹——£‚æ‚è
-			// ‘å‚«‚¢‚ÍƒXƒLƒbƒv
+			// äº¤ç‚¹ã¾ã§ã®è·é›¢ãŒä»Šã¾ã§ã«è¨ˆç®—ã—ãŸæœ€è¿‘è·é›¢ã‚ˆã‚Š
+			// å¤§ãã„æ™‚ã¯ã‚¹ã‚­ãƒƒãƒ—
 			if (x < 0.0f || x > neart) continue;
 
 			DirectX::XMVECTOR P = DirectX::XMVectorAdd(S, DirectX::XMVectorScale(V, x));
 
-			// Œğ“_‚ªOŠpŒ`‚Ì“à‘¤‚É‚ ‚é‚©”»’è
-			// ‚P‚Â‚ß
+			// äº¤ç‚¹ãŒä¸‰è§’å½¢ã®å†…å´ã«ã‚ã‚‹ã‹åˆ¤å®š
+			// ï¼‘ã¤ã‚
 			DirectX::XMVECTOR PA = DirectX::XMVectorSubtract(A, P);
 			DirectX::XMVECTOR Cross1 = DirectX::XMVector3Cross(PA, AB);
 			DirectX::XMVECTOR Dot1 = DirectX::XMVector3Dot(V, Cross1);
 			if (DirectX::XMVectorGetX(Dot1) > 0.0f) continue;
-			// ‚Q‚Â‚ß
+			// ï¼’ã¤ã‚
 			DirectX::XMVECTOR PB = DirectX::XMVectorSubtract(B, P);
 			DirectX::XMVECTOR Cross2 = DirectX::XMVector3Cross(PB, BC);
 			DirectX::XMVECTOR Dot2 = DirectX::XMVector3Dot(V, Cross2);
 			if (DirectX::XMVectorGetX(Dot2) > 0.0f) continue;
-			// ‚R‚Â‚ß
+			// ï¼“ã¤ã‚
 			DirectX::XMVECTOR PC = DirectX::XMVectorSubtract(C, P);
 			DirectX::XMVECTOR Cross3 = DirectX::XMVector3Cross(PC, CA);
 			DirectX::XMVECTOR Dot3 = DirectX::XMVector3Dot(V, Cross3);
 			if (DirectX::XMVectorGetX(Dot3) > 0.0f) continue;
 
-			// Å‹ß‹——£‚ğXV
+			// æœ€è¿‘è·é›¢ã‚’æ›´æ–°
 			neart = x;
-			// Œğ“_‚Æ–@ü‚ğXV
+			// äº¤ç‚¹ã¨æ³•ç·šã‚’æ›´æ–°
 			HitPosition = P;
 			HitNormal = N;
 			materialIndex = mesh.materialIndex;
@@ -265,13 +267,13 @@ bool ModelCollider::RayCast(
 
 		if (materialIndex >= 0)
 		{
-			// ƒ[ƒJƒ‹‹óŠÔ‚©‚çƒ[ƒ‹ƒh‹óŠÔ‚Ö•ÏŠ·
+			// ãƒ­ãƒ¼ã‚«ãƒ«ç©ºé–“ã‹ã‚‰ãƒ¯ãƒ¼ãƒ«ãƒ‰ç©ºé–“ã¸å¤‰æ›
 			DirectX::XMVECTOR WorldPosition = DirectX::XMVector3TransformCoord(HitPosition, WorldTransform);
 			DirectX::XMVECTOR WorldCrossVec = DirectX::XMVectorSubtract(WorldPosition, WorldStart);
 			DirectX::XMVECTOR WorldCrossLength = DirectX::XMVector3Length(WorldCrossVec);
 			float distance;
 			DirectX::XMStoreFloat(&distance, WorldCrossLength);
-			// ƒqƒbƒgî•ñ•Û‘¶
+			// ãƒ’ãƒƒãƒˆæƒ…å ±ä¿å­˜
 			if (result.distance > distance)
 			{
 				DirectX::XMVECTOR WorldNormal = DirectX::XMVector3TransformNormal(HitNormal, WorldTransform);
