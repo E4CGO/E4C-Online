@@ -5,7 +5,7 @@ Texture2D toonTex : register(t1); // トゥーンテクスチャ
 
 SamplerState diffuseMapSamplerState : register(s0);
 
-float4 main(VS_OUT pin) : SV_TARGET
+PSOutput main(VS_OUT pin)
 {
     float4 diffuseColor = diffuseMap.Sample(diffuseMapSamplerState, pin.texcoord) * pin.color;
     if (linearGamma != 1.0f) diffuseColor.rgb = pow(diffuseColor, 1.0f / linearGamma);
@@ -52,60 +52,66 @@ float4 main(VS_OUT pin) : SV_TARGET
     directionalSpecular *= shadow;
     
     // 点光源の処理
-    float3 pointDiffuse = (float3) 0;
-    float3 pointSpecular = (float3) 0;
-    for (i = 0; i < pointLightCount; ++i)
-    {
-		// ライトベクトルを算出
-        float3 lightVector = pin.position.xyz - pointLightData[i].position.xyz;
+ //   float3 pointDiffuse = (float3) 0;
+ //   float3 pointSpecular = (float3) 0;
+ //   for (i = 0; i < pointLightCount; ++i)
+ //   {
+	//	// ライトベクトルを算出
+ //       float3 lightVector = pin.position.xyz - pointLightData[i].position.xyz;
 
-		// ライトベクトルの長さを算出
-        float lightLength = length(lightVector);
+	//	// ライトベクトルの長さを算出
+ //       float lightLength = length(lightVector);
 
-		// ライトの影響範囲外なら後の計算をしない。
-        if (lightLength >= pointLightData[i].range) continue;
+	//	// ライトの影響範囲外なら後の計算をしない。
+ //       if (lightLength >= pointLightData[i].range) continue;
 
-		// 距離減衰を算出する
-        float attenuate = saturate(1.0f - lightLength / pointLightData[i].range);
+	//	// 距離減衰を算出する
+ //       float attenuate = saturate(1.0f - lightLength / pointLightData[i].range);
 
-        lightVector = lightVector / lightLength;
-        pointDiffuse += CalcToonDiffuse(toonTex, diffuseMapSamplerState, N, lightVector, pointLightData[i].color.rgb, kd.rgb) * attenuate;
-        pointSpecular += CalcPhongSpecular(N, lightVector, pointLightData[i].color.rgb, E, shiness, ks.rgb) * attenuate;
-    }
+ //       lightVector = lightVector / lightLength;
+ //       pointDiffuse += CalcToonDiffuse(toonTex, diffuseMapSamplerState, N, lightVector, pointLightData[i].color.rgb, kd.rgb) * attenuate;
+ //       pointSpecular += CalcPhongSpecular(N, lightVector, pointLightData[i].color.rgb, E, shiness, ks.rgb) * attenuate;
+ //   }
     
+	//// スポットライトの処理
+ //   float3 spotDiffuse = (float3) 0;
+ //   float3 spotSpecular = (float3) 0;
+ //   for (i = 0; i < spotLightCount; ++i)
+ //   {
+	//	// ライトベクトルを算出
+ //       float3 lightVector = pin.position.xyz - spotLightData[i].position.xyz;
 
-	// スポットライトの処理
-    float3 spotDiffuse = (float3) 0;
-    float3 spotSpecular = (float3) 0;
-    for (i = 0; i < spotLightCount; ++i)
-    {
-		// ライトベクトルを算出
-        float3 lightVector = pin.position.xyz - spotLightData[i].position.xyz;
+	//	// ライトベクトルの長さを算出
+ //       float lightLength = length(lightVector);
 
-		// ライトベクトルの長さを算出
-        float lightLength = length(lightVector);
+ //       if (lightLength >= spotLightData[i].range)
+ //           continue;
 
-        if (lightLength >= spotLightData[i].range)
-            continue;
+	//	// 距離減衰を算出する
+ //       float attenuate = saturate(1.0f - lightLength / spotLightData[i].range);
 
-		// 距離減衰を算出する
-        float attenuate = saturate(1.0f - lightLength / spotLightData[i].range);
+ //       lightVector = normalize(lightVector);
 
-        lightVector = normalize(lightVector);
+	//	// 角度減衰を算出してattenuateに乗算する
+ //       float3 spotDirection = normalize(spotLightData[i].direction.xyz);
+ //       float angle = dot(spotDirection, lightVector);
+ //       float area = spotLightData[i].innerCorn - spotLightData[i].outerCorn;
+ //       attenuate *= saturate(1.0f - (spotLightData[i].innerCorn - angle) / area);
 
-		// 角度減衰を算出してattenuateに乗算する
-        float3 spotDirection = normalize(spotLightData[i].direction.xyz);
-        float angle = dot(spotDirection, lightVector);
-        float area = spotLightData[i].innerCorn - spotLightData[i].outerCorn;
-        attenuate *= saturate(1.0f - (spotLightData[i].innerCorn - angle) / area);
-
-        spotDiffuse += CalcToonDiffuse(toonTex, diffuseMapSamplerState, N, lightVector, spotLightData[i].color.rgb, kd.rgb) * attenuate;
-        spotSpecular += CalcPhongSpecular(N, lightVector, spotLightData[i].color.rgb, E, shiness, ks.rgb) * attenuate;
-    }
+ //       spotDiffuse += CalcToonDiffuse(toonTex, diffuseMapSamplerState, N, lightVector, spotLightData[i].color.rgb, kd.rgb) * attenuate;
+ //       spotSpecular += CalcPhongSpecular(N, lightVector, spotLightData[i].color.rgb, E, shiness, ks.rgb) * attenuate;
+ //   }
     
-    float4 color = float4(ambient, diffuseColor.a);
-    color.rgb += diffuseColor.rgb * (directionalDiffuse + pointDiffuse + spotDiffuse);
-    color.rgb += directionalSpecular + pointSpecular + spotSpecular;
+    float4 color = diffuseColor * float4(shadow, 1.0f); //float4(ambient, diffuseColor.a);
+    //color.rgb += diffuseColor.rgb * (directionalDiffuse + pointDiffuse + spotDiffuse);
+    //color.rgb += directionalSpecular + pointSpecular + spotSpecular;
     
-    return color * materialColor;
+    PSOutput output = (PSOutput) 0;
+    output.Color      = color * materialColor;
+    output.Normal.xyz = (N / 2.0f) + 0.5f;
+    output.Normal.w   = 1.0f;
+    output.Pos.xyz    = pin.position;
+    output.Pos.w      = 1.0f;
+    
+    return output;
 }

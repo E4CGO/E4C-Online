@@ -36,35 +36,40 @@ enum class SpriteShaderId
 	GaussianBlur,
 	LuminanceExtraction,
 	Finalpass,
+	Deferred,
 
 	EnumCount
 };
 
 enum class FrameBufferId
 {
-	Display,
-	Scene,
+	Display,      //ポストエフェクト等
+	Scene,        //シーン描画
 	Luminance,
 	GaussianBlur,
+	
+	//Deferred Rendering用
+	Normal,       //法線
+	Position,     //座標系
 
 	EnumCount
 };
 
-// 垂直同期間隔設定
+// 蝙ら峩蜷梧悄髢馴囈險ｭ螳�
 static const int SyncInterval = 0;
 
-// フォーマット
+// 繝輔か繝ｼ繝槭ャ繝�
 static const DXGI_FORMAT RenderTargetFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 static const DXGI_FORMAT DepthStencilFormat = DXGI_FORMAT_D32_FLOAT;
 
-// グラフィックス
+// 繧ｰ繝ｩ繝輔ぅ繝�繧ｯ繧ｹ
 class Graphics
 {
 public:
 	Graphics() = default;
 	~Graphics();
 
-	// インスタンス
+	// 繧､繝ｳ繧ｹ繧ｿ繝ｳ繧ｹ
 	static Graphics& Instance()
 	{
 		static Graphics instance;
@@ -74,46 +79,46 @@ public:
 	bool isDX12Active = false;
 	bool isDX11Active = true;
 
-	// 初期化
+	// 蛻晄悄蛹�
 	void Initalize(HWND hWnd, UINT buffer_count);
-	// 画面表示
+	// 逕ｻ髱｢陦ｨ遉ｺ
 	void Present(UINT syncInterval);
-	// デバイス取得
+	// 繝�繝舌う繧ｹ蜿門ｾ�
 	ID3D11Device* GetDevice() { return device.Get(); };
-	// デバイスコンテキスト取得
+	// 繝�繝舌う繧ｹ繧ｳ繝ｳ繝�繧ｭ繧ｹ繝亥叙蠕�
 	ID3D11DeviceContext* GetDeviceContext() { return immediateContext.Get(); }
-	// スクリーン幅取得
+	// 繧ｹ繧ｯ繝ｪ繝ｼ繝ｳ蟷�蜿門ｾ�
 	float GetScreenWidth() const { return screenWidth; }
-	// スクリーン高さ取得
+	// 繧ｹ繧ｯ繝ｪ繝ｼ繝ｳ鬮倥＆蜿門ｾ�
 	float GetScreenHeight() const { return screenHeight; }
-	// フレームバッファ取得
+	// 繝輔Ξ繝ｼ繝�繝舌ャ繝輔ぃ蜿門ｾ�
 	FrameBuffer* GetFrameBuffer(FrameBufferId frameBufferId) { return frameBuffers[static_cast<int>(frameBufferId)].get(); }
-	// レンダーステート取得
+	// 繝ｬ繝ｳ繝繝ｼ繧ｹ繝�繝ｼ繝亥叙蠕�
 	RenderState* GetRenderState() { return renderState.get(); }
-	// ギズモ取得
+	// 繧ｮ繧ｺ繝｢蜿門ｾ�
 	Gizmos* GetGizmos() { return gizmos.get(); }
-	// ミューテックス取得
+	// 繝溘Η繝ｼ繝�繝�繧ｯ繧ｹ蜿門ｾ�
 	std::mutex& GetMutex() { return mutex; }
 
-	// モデルシェーダー取得
+	// 繝｢繝�繝ｫ繧ｷ繧ｧ繝ｼ繝繝ｼ蜿門ｾ�
 	ModelShader* GetModelShader(ModelShaderId shaderId) { return modelShaders[static_cast<int>(shaderId)].get(); }
-	// スプライトシェーダー取得
+	// 繧ｹ繝励Λ繧､繝医す繧ｧ繝ｼ繝繝ｼ蜿門ｾ�
 	SpriteShader* GetSpriteShader(SpriteShaderId shaderId) { return spriteShaders[static_cast<int>(shaderId)].get(); }
-	// デバッグレンダラ取得
+	// 繝�繝舌ャ繧ｰ繝ｬ繝ｳ繝繝ｩ蜿門ｾ�
 	DebugRenderer* GetDebugRenderer() const { return debugRenderer.get(); }
-	// ラインレンダラ取得
+	// 繝ｩ繧､繝ｳ繝ｬ繝ｳ繝繝ｩ蜿門ｾ�
 	LineRenderer* GetLineRenderer() const { return lineRenderer.get(); }
 
-	// バッファ数取得
+	// 繝舌ャ繝輔ぃ謨ｰ蜿門ｾ�
 	UINT GetBufferCount() const { return m_buffer_count; }
 
-	// バッファインデックス取得
+	// 繝舌ャ繝輔ぃ繧､繝ｳ繝�繝�繧ｯ繧ｹ蜿門ｾ�
 	UINT GetCurrentBufferIndex() const { return m_dxgi_swap_chain->GetCurrentBackBufferIndex(); }
 
-	// デバイス取得
+	// 繝�繝舌う繧ｹ蜿門ｾ�
 	ID3D12Device* GetDeviceDX12() const { return m_d3d_device.Get(); }
 
-	// ディスクリプタヒープ取得
+	// 繝�繧｣繧ｹ繧ｯ繝ｪ繝励ち繝偵�ｼ繝怜叙蠕�
 	DescriptorHeap* GetShaderResourceDescriptorHeap() const { return m_shader_resource_descriptor_heap.get(); }
 	DescriptorHeap* GetSamplerDescriptorHeap() const { return m_sampler_descriptor_heap.get(); }
 
@@ -136,16 +141,16 @@ public:
 
 	void WaitIdle();
 
-	// 描画コマンド実行完了まで待つ
+	// 謠冗判繧ｳ繝槭Φ繝牙ｮ溯｡悟ｮ御ｺ�縺ｾ縺ｧ蠕�縺､
 	void WaitIdle(CommandQueue& command_queue);
 
-	// 描画実行
+	// 謠冗判螳溯｡�
 	void Execute();
 
-	// 描画開始
+	// 謠冗判髢句ｧ�
 	ID3D12GraphicsCommandList* Begin();
 
-	// 描画終了
+	// 謠冗判邨ゆｺ�
 	void End();
 
 	void FinishDX12();
@@ -154,20 +159,20 @@ public:
 
 	Shader* GetShader() const { return m_shader.get(); }
 
-	// テクスチャ読み込み
+	// 繝�繧ｯ繧ｹ繝√Ε隱ｭ縺ｿ霎ｼ縺ｿ
 	HRESULT LoadTexture(const char* filename, ID3D12Resource** d3d_resource);
 
-	// テクスチャ作成
+	// 繝�繧ｯ繧ｹ繝√Ε菴懈��
 	HRESULT CreateTexture(const BYTE* pixels, UINT width, UINT height, DXGI_FORMAT format, ID3D12Resource** d3d_resource);
 
-	// ダミーテクスチャ生成
+	// 繝繝溘�ｼ繝�繧ｯ繧ｹ繝√Ε逕滓��
 	HRESULT CreateDummyTexture(ID3D12Resource** d3d_resource);
 
-	// バッファコピー
+	// 繝舌ャ繝輔ぃ繧ｳ繝斐�ｼ
 	HRESULT CopyBuffer(ID3D12Resource* d3d_src_resource, ID3D12Resource* d3d_dst_resource);
 
 private:
-	// イメージコピー
+	// 繧､繝｡繝ｼ繧ｸ繧ｳ繝斐�ｼ
 	HRESULT CopyImage(const BYTE* pixels, UINT width, UINT height, DXGI_FORMAT format, ID3D12Resource* resource);
 
 	static UINT BitsPerPixel(DXGI_FORMAT fmt);
@@ -189,7 +194,7 @@ private:
 	std::unique_ptr<DebugRenderer>					debugRenderer;
 	std::unique_ptr<LineRenderer>					lineRenderer;
 
-	std::mutex mutex;	// ミューテックス
+	std::mutex mutex;	// 繝溘Η繝ｼ繝�繝�繧ｯ繧ｹ
 
 	static Graphics* s_instance;
 

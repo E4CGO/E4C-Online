@@ -13,7 +13,6 @@ VS_OUT main(
 {
 	VS_OUT vout = (VS_OUT)0;
 
-
 	position = SkinningPosition(position, boneWeights, boneIndices);
 	vout.vertex = mul(position, viewProjection);
 	vout.texcoord = texcoord;

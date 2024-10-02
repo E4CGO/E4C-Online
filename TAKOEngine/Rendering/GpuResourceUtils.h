@@ -8,11 +8,11 @@
 #include <WICTextureLoader.h>
 #include <DDSTextureLoader.h>
 
-// GPUƒŠƒ\[ƒXƒ†[ƒeƒBƒŠƒeƒB
+// GPUãƒªã‚½ãƒ¼ã‚¹ãƒ¦ãƒ¼ãƒ†ã‚£ãƒªãƒ†ã‚£
 class GpuResourceUtils
 {
 public:
-	// ’¸“_ƒVƒF[ƒ_[“Ç‚Ýž‚Ý
+	// é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼èª­ã¿è¾¼ã¿
 	static HRESULT LoadVertexShader(
 		ID3D11Device* device,
 		const char* filename,
@@ -22,38 +22,38 @@ public:
 		ID3D11VertexShader** vertexShader
 	);
 
-	// ƒsƒNƒZƒ‹ƒVƒF[ƒ_[“Ç‚Ýž‚Ý
+	// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼èª­ã¿è¾¼ã¿
 	static HRESULT LoadPixelShader(
 		ID3D11Device* device,
 		const char* filename,
 		ID3D11PixelShader** pixelShader
 	);
 
-	//ƒWƒIƒƒgƒŠƒVƒF[ƒ_[
+	//ã‚¸ã‚ªãƒ¡ãƒˆãƒªã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 	static HRESULT LoadGeometryShader(
 		ID3D11Device* device,
 		const char* filename,
 		ID3D11GeometryShader** geometryShader);
 
-	//ƒnƒ‹ƒVƒF[ƒ_[
+	//ãƒãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 	static HRESULT LoadHullShader(
 		ID3D11Device* device,
 		const char* filename,
 		ID3D11HullShader** hullShader);
 
-	//ƒhƒƒCƒ“ƒVƒF[ƒ_[
+	//ãƒ‰ãƒ¡ã‚¤ãƒ³ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 	static HRESULT LoadDomainShader(
 		ID3D11Device* device,
 		const char* filename,
 		ID3D11DomainShader** domainShader);
 
-	//ƒRƒ“ƒsƒ…[ƒgƒVƒF[ƒ_[
+	//ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ãƒˆã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 	static HRESULT LoadComputeShader(
 		ID3D11Device* device,
 		const char* filename,
 		ID3D11ComputeShader** computeShader);
 
-	// ƒeƒNƒXƒ`ƒƒ“Ç‚Ýž‚Ý
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£èª­ã¿è¾¼ã¿
 	static HRESULT LoadTexture(
 		ID3D11Device* device,
 		const char* filename,
@@ -75,7 +75,7 @@ public:
 		D3D11_TEXTURE2D_DESC* texture2d_desc
 	);
 
-	// ƒ_ƒ~[ƒeƒNƒXƒ`ƒƒì¬
+	// ãƒ€ãƒŸãƒ¼ãƒ†ã‚¯ã‚¹ãƒãƒ£ä½œæˆ
 	static HRESULT CreateDummyTexture(
 		ID3D11Device* device,
 		UINT color,
@@ -83,7 +83,7 @@ public:
 		D3D11_TEXTURE2D_DESC* texture2dDesc = nullptr
 	);
 
-	// ’è”ƒoƒbƒtƒ@ì¬
+	// å®šæ•°ãƒãƒƒãƒ•ã‚¡ä½œæˆ
 	static HRESULT CreateConstantBuffer(
 		ID3D11Device* device,
 		UINT bufferSize,

@@ -16,6 +16,7 @@
 #include "TAKOEngine/Rendering/Shaders/LuminanceExtractionShader.h"
 #include "TAKOEngine/Rendering/Shaders/FinalpassShader.h"
 #include "TAKOEngine/Rendering/Shaders/LambertShader.h"
+#include "TAKOEngine/Rendering/Shaders/DeferredLightingShader.h"
 
 Graphics* Graphics::s_instance = nullptr;
 
@@ -61,14 +62,14 @@ void Graphics::FinishDX12()
 	}
 }
 
-// ‰Šú‰»
+// åˆæœŸåŒ–
 void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 {
 	_ASSERT_EXPR(s_instance == nullptr, "already instantiated");
 	s_instance = this;
 
 	HRESULT hr = S_OK;
-	// ‰æ–ÊƒTƒCƒY
+	// ç”»é¢ã‚µã‚¤ã‚º
 	RECT rc;
 	GetClientRect(hWnd, &rc);
 	UINT screenWidth = rc.right - rc.left;
@@ -473,7 +474,7 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	}
 	factory->Release();
 
-	// ƒfƒoƒCƒX&ƒXƒƒbƒvƒ`ƒF[ƒ“¶¬
+	// ãƒ‡ãƒã‚¤ã‚¹&ã‚¹ãƒ¯ãƒƒãƒ—ãƒã‚§ãƒ¼ãƒ³ç”Ÿæˆ
 	{
 		UINT createDeviceFlags = 0;
 #ifdef _DEBUG
@@ -490,7 +491,7 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 			D3D_FEATURE_LEVEL_9_1,
 		};
 
-		// ƒXƒƒbƒvƒ`ƒF[ƒ“İ’è
+		// ã‚¹ãƒ¯ãƒƒãƒ—ãƒã‚§ãƒ¼ãƒ³è¨­å®š
 		DXGI_SWAP_CHAIN_DESC swapchainDesc;
 		{
 			swapchainDesc.BufferDesc.Width = screenWidth;
@@ -513,7 +514,7 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 
 		D3D_FEATURE_LEVEL featureLevel;
 
-		// ƒfƒoƒCƒX&ƒXƒƒbƒvƒ`ƒF[ƒ“¶¬
+		// ãƒ‡ãƒã‚¤ã‚¹&ã‚¹ãƒ¯ãƒƒãƒ—ãƒã‚§ãƒ¼ãƒ³ç”Ÿæˆ
 		hr = D3D11CreateDeviceAndSwapChain(
 			// nullptr,l/
 			adapter,
@@ -535,34 +536,37 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	}
 	adapter->Release();
 
-	// ƒtƒŒ[ƒ€ƒoƒbƒtƒ@ì¬
+	// ãƒ•ãƒ¬ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ä½œæˆ
 	frameBuffers[static_cast<int>(FrameBufferId::Display)] = std::make_unique<FrameBuffer>(device.Get(), swapchain.Get());
 	frameBuffers[static_cast<int>(FrameBufferId::Scene)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight);
 	frameBuffers[static_cast<int>(FrameBufferId::Luminance)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth / 2, screenHeight / 2);
 	frameBuffers[static_cast<int>(FrameBufferId::GaussianBlur)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth / 2, screenHeight / 2);
+	frameBuffers[static_cast<int>(FrameBufferId::Normal)]       = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
+	frameBuffers[static_cast<int>(FrameBufferId::Position)]     = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT);
 
-	// ƒŒƒ“ƒ_[ƒXƒe[ƒgì¬
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆä½œæˆ
 	renderState = std::make_unique<RenderState>(device.Get());
 
-	// ƒMƒYƒ‚¶¬
+	// ã‚®ã‚ºãƒ¢ç”Ÿæˆ
 	gizmos = std::make_unique<Gizmos>(device.Get());
 
-	// ƒ‚ƒfƒ‹ƒVƒF[ƒ_[¶¬
+	// ãƒ¢ãƒ‡ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ç”Ÿæˆ
 	modelShaders[static_cast<int>(ModelShaderId::Phong)] = std::make_unique<PhongShader>(device.Get());
 	modelShaders[static_cast<int>(ModelShaderId::Toon)] = std::make_unique<ToonShader>(device.Get());
 	modelShaders[static_cast<int>(ModelShaderId::Skydome)] = std::make_unique<SkydomeShader>(device.Get());
 	modelShaders[static_cast<int>(ModelShaderId::ShadowMap)] = std::make_unique<ShadowMapShader>(device.Get());
 
-	// ƒXƒvƒ‰ƒCƒgƒVƒF[ƒ_[¶¬
+	// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ç”Ÿæˆ
 	spriteShaders[static_cast<int>(SpriteShaderId::Default)] = std::make_unique<DefaultSpriteShader>(device.Get());
 	spriteShaders[static_cast<int>(SpriteShaderId::UVScroll)] = std::make_unique<UVScrollShader>(device.Get());
 	spriteShaders[static_cast<int>(SpriteShaderId::Mask)] = std::make_unique<MaskShader>(device.Get());
 	spriteShaders[static_cast<int>(SpriteShaderId::ColorGrading)] = std::make_unique<ColorGradingShader>(device.Get());
 	spriteShaders[static_cast<int>(SpriteShaderId::GaussianBlur)] = std::make_unique<GaussianBlurShader>(device.Get());
 	spriteShaders[static_cast<int>(SpriteShaderId::LuminanceExtraction)] = std::make_unique<LuminanceExtractionShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::Finalpass)] = std::make_unique<FinalpassShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::Finalpass)]           = std::make_unique<FinalpassShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::Deferred)]            = std::make_unique<DeferredLightingShader>(device.Get());
 
-	// ƒŒƒ“ƒ_ƒ‰
+	// ãƒ¬ãƒ³ãƒ€ãƒ©
 	debugRenderer = std::make_unique<DebugRenderer>(device.Get());
 	lineRenderer = std::make_unique<LineRenderer>(device.Get(), 1024);
 }
@@ -598,12 +602,12 @@ DirectX::XMFLOAT3 Graphics::GetScreenPosition(
 }
 DirectX::XMFLOAT3 Graphics::GetScreenPosition(const DirectX::XMFLOAT3 worldPosition)
 {
-	// ƒrƒ…[ƒ{[ƒh
+	// ãƒ“ãƒ¥ãƒ¼ãƒœãƒ¼ãƒ‰
 	D3D11_VIEWPORT viewport;
 	UINT numViewports = 1;
 	immediateContext.Get()->RSGetViewports(&numViewports, &viewport);
 
-	// •ÏŠ·s—ñ
+	// å¤‰æ›è¡Œåˆ—
 	DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&Camera::Instance().GetView());
 	DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&Camera::Instance().GetProjection());
 	DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
@@ -622,30 +626,30 @@ void Graphics::WaitIdle(CommandQueue& command_queue)
 	command_queue.d3d_command_queue->Signal(command_queue.d3d_fence.Get(), ++command_queue.fence_value);
 	if (command_queue.d3d_fence->GetCompletedValue() < command_queue.fence_value)
 	{
-		// ƒRƒ}ƒ“ƒhŠ®—¹‚ÉƒCƒxƒ“ƒg‚ª”­¶‚·‚é‚æ‚¤‚Éİ’è
+		// ã‚³ãƒãƒ³ãƒ‰å®Œäº†æ™‚ã«ã‚¤ãƒ™ãƒ³ãƒˆãŒç™ºç”Ÿã™ã‚‹ã‚ˆã†ã«è¨­å®š
 		command_queue.d3d_fence->SetEventOnCompletion(command_queue.fence_value, command_queue.fence_event);
 
-		// ƒCƒxƒ“ƒg‚ª”­¶‚·‚é‚Ü‚Å‘Ò‚Â
+		// ã‚¤ãƒ™ãƒ³ãƒˆãŒç™ºç”Ÿã™ã‚‹ã¾ã§å¾…ã¤
 		WaitForSingleObject(command_queue.fence_event, INFINITE);
 	}
 }
 
 void Graphics::Execute()
 {
-	// ƒRƒ}ƒ“ƒhI—¹‚Ü‚Å‘Ò‚Â
+	// ã‚³ãƒãƒ³ãƒ‰çµ‚äº†ã¾ã§å¾…ã¤
 	WaitIdle(m_graphics_queue);
 
 	UINT frame_buffer_index = m_dxgi_swap_chain->GetCurrentBackBufferIndex();
 	FrameResource& frame_resource = m_frame_resources.at(frame_buffer_index);
 
-	// ƒRƒ}ƒ“ƒhÀs
+	// ã‚³ãƒãƒ³ãƒ‰å®Ÿè¡Œ
 	ID3D12CommandList* d3d_command_lists[] =
 	{
 		frame_resource.d3d_command_list.Get()
 	};
 	m_graphics_queue.d3d_command_queue->ExecuteCommandLists(_countof(d3d_command_lists), d3d_command_lists);
 
-	// ‰æ–Ê•\¦
+	// ç”»é¢è¡¨ç¤º
 	m_dxgi_swap_chain->Present(SyncInterval, SyncInterval == 0 ? DXGI_PRESENT_ALLOW_TEARING : 0);
 }
 
@@ -654,11 +658,11 @@ ID3D12GraphicsCommandList* Graphics::Begin()
 	UINT frame_buffer_index = m_dxgi_swap_chain->GetCurrentBackBufferIndex();
 	FrameResource& frame_resource = m_frame_resources.at(frame_buffer_index);
 
-	// ƒRƒ}ƒ“ƒh‚ÌƒŠƒZƒbƒg
+	// ã‚³ãƒãƒ³ãƒ‰ã®ãƒªã‚»ãƒƒãƒˆ
 	frame_resource.d3d_command_allocator->Reset();
 	frame_resource.d3d_command_list->Reset(frame_resource.d3d_command_allocator.Get(), nullptr);
 
-	// ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ğ‚ ‚ç‚©‚¶‚ßİ’è
+	// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã‚’ã‚ã‚‰ã‹ã˜ã‚è¨­å®š
 	ID3D12DescriptorHeap* d3d_descriptor_heaps[] =
 	{
 		m_shader_resource_descriptor_heap->GetD3DDescriptorHeap(),
@@ -666,9 +670,9 @@ ID3D12GraphicsCommandList* Graphics::Begin()
 	};
 	frame_resource.d3d_command_list->SetDescriptorHeaps(_countof(d3d_descriptor_heaps), d3d_descriptor_heaps);
 
-	// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒgİ’è
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆè¨­å®š
 	{
-		// ƒrƒ…[ƒ|[ƒg‚Ìİ’è
+		// ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆã®è¨­å®š
 		D3D12_VIEWPORT d3d_viewport;
 		d3d_viewport.TopLeftX = 0;
 		d3d_viewport.TopLeftY = 0;
@@ -678,7 +682,7 @@ ID3D12GraphicsCommandList* Graphics::Begin()
 		d3d_viewport.MaxDepth = 1.0f;
 		frame_resource.d3d_command_list->RSSetViewports(1, &d3d_viewport);
 
-		// ƒVƒU[‚Ìİ’è
+		// ã‚·ã‚¶ãƒ¼ã®è¨­å®š
 		D3D12_RECT scissor_rect;
 		scissor_rect.left = 0;
 		scissor_rect.top = 0;
@@ -686,7 +690,7 @@ ID3D12GraphicsCommandList* Graphics::Begin()
 		scissor_rect.bottom = static_cast<LONG>(this->screenHeight);
 		frame_resource.d3d_command_list->RSSetScissorRects(1, &scissor_rect);
 
-		// ó‘Ô‘JˆÚƒoƒŠƒA‚ğ’£‚é
+		// çŠ¶æ…‹é·ç§»ãƒãƒªã‚¢ã‚’å¼µã‚‹
 		D3D12_RESOURCE_BARRIER d3d_resource_barrier{};
 		d3d_resource_barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		d3d_resource_barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
@@ -696,7 +700,7 @@ ID3D12GraphicsCommandList* Graphics::Begin()
 		d3d_resource_barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 		frame_resource.d3d_command_list->ResourceBarrier(1, &d3d_resource_barrier);
 
-		// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒgİ’è
+		// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆè¨­å®š
 		FLOAT clear_color[4] = { 0, 0, 1, 1 };
 		D3D12_CPU_DESCRIPTOR_HANDLE d3d_rtv_handle = frame_resource.rtv_descriptor->GetCpuHandle();
 		D3D12_CPU_DESCRIPTOR_HANDLE d3d_dsv_handle = frame_resource.dsv_descriptor->GetCpuHandle();
@@ -712,7 +716,7 @@ void Graphics::End()
 	UINT frame_buffer_index = m_dxgi_swap_chain->GetCurrentBackBufferIndex();
 	FrameResource& frame_resource = m_frame_resources.at(frame_buffer_index);
 
-	// ó‘Ô‘JˆÚƒoƒŠƒA‚ğ’£‚é
+	// çŠ¶æ…‹é·ç§»ãƒãƒªã‚¢ã‚’å¼µã‚‹
 	{
 		D3D12_RESOURCE_BARRIER d3d_resource_barrier{};
 		d3d_resource_barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -747,11 +751,11 @@ Descriptor* Graphics::UpdateSceneConstantBuffer(const DirectX::XMFLOAT4X4& view,
 
 HRESULT Graphics::LoadTexture(const char* filename, ID3D12Resource** d3d_resource)
 {
-	// ƒ}ƒ‹ƒ`ƒoƒCƒg•¶š‚©‚çƒƒCƒh•¶š‚Ö•ÏŠ·
+	// ãƒãƒ«ãƒãƒã‚¤ãƒˆæ–‡å­—ã‹ã‚‰ãƒ¯ã‚¤ãƒ‰æ–‡å­—ã¸å¤‰æ›
 	wchar_t wfilename[256];
 	::MultiByteToWideChar(CP_ACP, 0, filename, -1, wfilename, 256);
 
-	// ƒeƒNƒXƒ`ƒƒƒtƒ@ƒCƒ‹“Ç‚İ‚İ
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ•ã‚¡ã‚¤ãƒ«èª­ã¿è¾¼ã¿
 	std::unique_ptr<uint8_t[]> image;
 	D3D12_SUBRESOURCE_DATA d3d_subresource_data;
 	HRESULT hr = DirectX::LoadWICTextureFromFile(
@@ -765,7 +769,7 @@ HRESULT Graphics::LoadTexture(const char* filename, ID3D12Resource** d3d_resourc
 		return hr;
 	}
 
-	// “Ç‚İ‚ñ‚¾‰æ‘œ‚ğƒŠƒ\[ƒX‚ÉƒRƒs[
+	// èª­ã¿è¾¼ã‚“ã ç”»åƒã‚’ãƒªã‚½ãƒ¼ã‚¹ã«ã‚³ãƒ”ãƒ¼
 	D3D12_RESOURCE_DESC d3d_resource_desc = (*d3d_resource)->GetDesc();
 	hr = CopyImage(
 		reinterpret_cast<const BYTE*>(d3d_subresource_data.pData),
@@ -823,7 +827,7 @@ HRESULT Graphics::CreateDummyTexture(ID3D12Resource** d3d_resource)
 	UINT pixels[width * height];
 	::memset(pixels, 0xFF, sizeof(pixels));
 
-	// ƒq[ƒvƒvƒƒpƒeƒB‚Ìİ’è
+	// ãƒ’ãƒ¼ãƒ—ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã®è¨­å®š
 	D3D12_HEAP_PROPERTIES d3d_heap_props = {};
 	d3d_heap_props.Type = D3D12_HEAP_TYPE_CUSTOM;
 	d3d_heap_props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
@@ -831,7 +835,7 @@ HRESULT Graphics::CreateDummyTexture(ID3D12Resource** d3d_resource)
 	d3d_heap_props.CreationNodeMask = 1;
 	d3d_heap_props.VisibleNodeMask = 1;
 
-	// ƒŠƒ\[ƒX‚Ìİ’è
+	// ãƒªã‚½ãƒ¼ã‚¹ã®è¨­å®š
 	D3D12_RESOURCE_DESC d3d_resource_desc = {};
 	d3d_resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 	d3d_resource_desc.Alignment = 0;
@@ -845,7 +849,7 @@ HRESULT Graphics::CreateDummyTexture(ID3D12Resource** d3d_resource)
 	d3d_resource_desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 	d3d_resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-	// ƒŠƒ\[ƒX‚Ì¶¬
+	// ãƒªã‚½ãƒ¼ã‚¹ã®ç”Ÿæˆ
 	HRESULT hr = m_d3d_device->CreateCommittedResource(
 		&d3d_heap_props,
 		D3D12_HEAP_FLAG_NONE,
@@ -859,7 +863,7 @@ HRESULT Graphics::CreateDummyTexture(ID3D12Resource** d3d_resource)
 		return hr;
 	}
 
-	// ƒCƒ[ƒW‚ğƒeƒNƒXƒ`ƒƒ‚É‘‚«‚İ
+	// ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’ãƒ†ã‚¯ã‚¹ãƒãƒ£ã«æ›¸ãè¾¼ã¿
 	return (*d3d_resource)->WriteToSubresource(
 		0,
 		nullptr,
@@ -906,13 +910,13 @@ HRESULT Graphics::CopyImage(const BYTE* pixels, UINT width, UINT height, DXGI_FO
 {
 	HRESULT hr = S_OK;
 
-	// ƒAƒbƒvƒ[ƒh—pƒeƒNƒXƒ`ƒƒ‚ğì¬
+	// ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ç”¨ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆ
 	UINT bpp = BitsPerPixel(format);
 	UINT rowPitch = (width * bpp) >> 3;
 	UINT uploadPitch = (rowPitch + D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u) & ~(D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u);
 	UINT uploadSize = height * uploadPitch;
 
-	// ƒq[ƒvƒvƒƒpƒeƒB‚Ìİ’è
+	// ãƒ’ãƒ¼ãƒ—ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã®è¨­å®š
 	D3D12_HEAP_PROPERTIES d3d_heap_props = {};
 	d3d_heap_props.Type = D3D12_HEAP_TYPE_UPLOAD;
 	d3d_heap_props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
@@ -920,7 +924,7 @@ HRESULT Graphics::CopyImage(const BYTE* pixels, UINT width, UINT height, DXGI_FO
 	d3d_heap_props.CreationNodeMask = 1;
 	d3d_heap_props.VisibleNodeMask = 1;
 
-	// ƒŠƒ\[ƒX‚Ìİ’è
+	// ãƒªã‚½ãƒ¼ã‚¹ã®è¨­å®š
 	D3D12_RESOURCE_DESC d3d_resource_desc = {};
 	d3d_resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 	d3d_resource_desc.Alignment = 0;
@@ -934,7 +938,7 @@ HRESULT Graphics::CopyImage(const BYTE* pixels, UINT width, UINT height, DXGI_FO
 	d3d_resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 	d3d_resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-	// ƒŠƒ\[ƒX‚Ì¶¬
+	// ãƒªã‚½ãƒ¼ã‚¹ã®ç”Ÿæˆ
 	Microsoft::WRL::ComPtr<ID3D12Resource> d3d_upload_resource;
 	hr = m_d3d_device->CreateCommittedResource(
 		&d3d_heap_props,
@@ -949,7 +953,7 @@ HRESULT Graphics::CopyImage(const BYTE* pixels, UINT width, UINT height, DXGI_FO
 		return hr;
 	}
 
-	// ƒAƒbƒvƒ[ƒh—pƒoƒbƒtƒ@‚ÉƒCƒ[ƒW‚ğƒRƒs[
+	// ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ç”¨ãƒãƒƒãƒ•ã‚¡ã«ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’ã‚³ãƒ”ãƒ¼
 	void* mapped = nullptr;
 	D3D12_RANGE d3d_range = {};
 	d3d_range.Begin = 0;
@@ -965,7 +969,7 @@ HRESULT Graphics::CopyImage(const BYTE* pixels, UINT width, UINT height, DXGI_FO
 	}
 	d3d_upload_resource->Unmap(0, &d3d_range);
 
-	// ƒAƒbƒvƒ[ƒh—pƒoƒbƒtƒ@‚©‚çƒeƒNƒXƒ`ƒƒƒŠƒ\[ƒX‚ÉƒCƒ[ƒW‚ğƒRƒs[
+	// ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ç”¨ãƒãƒƒãƒ•ã‚¡ã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒªã‚½ãƒ¼ã‚¹ã«ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’ã‚³ãƒ”ãƒ¼
 	D3D12_TEXTURE_COPY_LOCATION d3d_src_texture_copy_location = {};
 	d3d_src_texture_copy_location.pResource = d3d_upload_resource.Get();
 	d3d_src_texture_copy_location.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
@@ -992,17 +996,17 @@ HRESULT Graphics::CopyImage(const BYTE* pixels, UINT width, UINT height, DXGI_FO
 	m_d3d_resource_command_list->ResourceBarrier(1, &d3d_resource_barrier);
 	m_d3d_resource_command_list->Close();
 
-	// ƒRƒ}ƒ“ƒhÀs
+	// ã‚³ãƒãƒ³ãƒ‰å®Ÿè¡Œ
 	ID3D12CommandList* d3d_command_lists[] =
 	{
 		m_d3d_resource_command_list.Get()
 	};
 	m_resource_queue.d3d_command_queue->ExecuteCommandLists(_countof(d3d_command_lists), d3d_command_lists);
 
-	// ƒRƒ}ƒ“ƒhI—¹‚Ü‚Å‘Ò‚Â
+	// ã‚³ãƒãƒ³ãƒ‰çµ‚äº†ã¾ã§å¾…ã¤
 	WaitIdle(m_resource_queue);
 
-	// ƒRƒ}ƒ“ƒhƒŠƒXƒgƒNƒŠƒA
+	// ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã‚¯ãƒªã‚¢
 	m_d3d_resource_command_allocator->Reset();
 	m_d3d_resource_command_list->Reset(m_d3d_resource_command_allocator.Get(), nullptr);
 

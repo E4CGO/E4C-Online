@@ -12,14 +12,14 @@ public:
 	SceneTest() = default;
 	~SceneTest() = default;
 
-	// ‰Šú‰»
+	// åˆæœŸåŒ–
 	void Initialize() override;
-	// I—¹‰»
+	// çµ‚äº†åŒ–
 	void Finalize() override;
 
-	// XVˆ—
+	// æ›´æ–°å‡¦ç†
 	void Update(float elapsedTime) override;
-	// •`‰æˆ—
+	// æç”»å‡¦ç†
 	void Render() override;
 private:
 	Camera& camera = Camera::Instance();
@@ -38,20 +38,20 @@ public:
 	EmptyScene() {}
 	~EmptyScene() {}
 
-	// ‰Šú‰»
+	// åˆæœŸåŒ–
 	void Initialize() override {
 		player = new Barbarian;
 	};
-	// I—¹‰»
+	// çµ‚äº†åŒ–
 	void Finalize() override {
 		delete player;
 	};
 
-	// XVˆ—
+	// æ›´æ–°å‡¦ç†
 	void Update(float elapsedTime) override {
 		player->Update(elapsedTime);
 	};
-	// •`‰æˆ—
+	// æç”»å‡¦ç†
 	void Render() override {};
 private:
 	Player* player;

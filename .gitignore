@@ -30,17 +30,17 @@
 Level.code-workspace
 
 # Builds
-build/**
-bin/**
+build/*
+bin/*
 
 #Temp folders
-ToImplement*/
+ToImplement/*
 
 #Folders
-Data/**
-Dependencies/**
-External/**
-docs/**
+Data/*
+Dependencies/*
+External/*
+docs/*
 
 #Cmake files
 cmake_install.cmake

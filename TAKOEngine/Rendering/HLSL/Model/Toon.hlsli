@@ -11,6 +11,13 @@ struct VS_OUT
     float3 shadowTexcoord[ShadowmapCount] : TEXCOORD1; 
 };
 
+struct PSOutput
+{
+    float4 Color  : SV_TARGET0;
+    float4 Normal : SV_TARGET1;
+    float4 Pos    : SV_TARGET2;
+};
+
 cbuffer CbScene : register(b0)
 {
     float4               cameraPosition;

@@ -361,6 +361,8 @@ set(TAKOEngine__Rendering
     "TAKOEngine/Rendering/ConstantBuffer.h"
     "TAKOEngine/Rendering/DebugRenderer.cpp"
     "TAKOEngine/Rendering/DebugRenderer.h"
+    "TAKOEngine/Rendering/DeferredRendering.cpp"
+    "TAKOEngine/Rendering/DeferredRendering.h"
     "TAKOEngine/Rendering/Descriptor.cpp"
     "TAKOEngine/Rendering/Descriptor.h"
     "TAKOEngine/Rendering/FrameBuffer.cpp"
@@ -470,6 +472,8 @@ source_group("TAKOEngine\\Rendering\\Model" FILES ${TAKOEngine__Rendering__Model
 set(TAKOEngine__Rendering__Shaders
     "TAKOEngine/Rendering/Shaders/ColorGradingShader.cpp"
     "TAKOEngine/Rendering/Shaders/ColorGradingShader.h"
+    "TAKOEngine/Rendering/Shaders/DeferredLightingShader.cpp"
+    "TAKOEngine/Rendering/Shaders/DeferredLightingShader.h"
     "TAKOEngine/Rendering/Shaders/FinalpassShader.cpp"
     "TAKOEngine/Rendering/Shaders/FinalpassShader.h"
     "TAKOEngine/Rendering/Shaders/GaussianBlurShader.cpp"
@@ -526,6 +530,9 @@ set(TAKOEngine__Rendering__HLSL__Debug
 source_group("TAKOEngine\\Rendering\\HLSL\\Debug" FILES ${TAKOEngine__Rendering__HLSL__Debug})
 
 set(TAKOEngine__Rendering__HLSL__Lighting
+    "TAKOEngine/Rendering/HLSL/Lighting/Deferred.hlsli"
+    "TAKOEngine/Rendering/HLSL/Lighting/DeferredPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Lighting/DeferredVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Lighting/Light.hlsli"
     "TAKOEngine/Rendering/HLSL/Lighting/ShadowMap.hlsli"
     "TAKOEngine/Rendering/HLSL/Lighting/ShadowmapFunctions.hlsli"
@@ -652,11 +659,11 @@ function(set_hlsl_properties target source_file shader_model shader_type entry_p
     )
 endfunction()
 
-# ####################################################################
+#####################################################################
 # SHADERS_FILES_START
-# ####################################################################
+#####################################################################
 
-# List of HLSL shaders
+#List of HLSL shaders
 set(SHADER_NAMES
     "DebugPS.cso"
     "DebugVS.cso"
@@ -664,6 +671,8 @@ set(SHADER_NAMES
     "GizmosVS.cso"
     "LinePS.cso"
     "LineVS.cso"
+    "DeferredPS.cso"
+    "DeferredVS.cso"
     "ShadowMapVS.cso"
     "DefaultModelPS.cso"
     "DefaultModelVS.cso"
@@ -697,6 +706,8 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/GizmosVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/LinePS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/LineVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Lighting/DeferredPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Lighting/DeferredVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Lighting/ShadowMapVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/DefaultModelPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/DefaultModelVS.hlsl,5.0,Vertex,main"
@@ -722,9 +733,9 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/UVScroll/UVScrollPS.hlsl,5.0,Pixel,main"
 )
 
-# ####################################################################
+#####################################################################
 # SHADERS_FILES_END
-# ####################################################################
+#####################################################################
 
 # Apply HLSL properties to each shader file
 foreach(shader_properties ${HLSL_SHADERS})

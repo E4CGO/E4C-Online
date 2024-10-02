@@ -21,23 +21,23 @@ void SceneTest::Initialize()
 	//knight->GetModel()->FindNode("Round_Shield")->visible = false;
 	//knight->GetModel()->FindNode("Spike_Shield")->visible = false;
 
-	// Œõ
+	// å…‰
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
 
-	// ƒJƒƒ‰İ’è
+	// ã‚«ãƒ¡ãƒ©è¨­å®š
 	camera.SetPerspectiveFov(
-		DirectX::XMConvertToRadians(45),							// ‰æŠp
-		T_GRAPHICS.GetScreenWidth() / T_GRAPHICS.GetScreenHeight(),	// ‰æ–ÊƒAƒXƒyƒNƒg”ä
-		0.1f,														// ƒjƒAƒNƒŠƒbƒv
-		10000.0f													// ƒtƒ@[ƒNƒŠƒbƒv
+		DirectX::XMConvertToRadians(45),							// ç”»è§’
+		T_GRAPHICS.GetScreenWidth() / T_GRAPHICS.GetScreenHeight(),	// ç”»é¢ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”
+		0.1f,														// ãƒ‹ã‚¢ã‚¯ãƒªãƒƒãƒ—
+		10000.0f													// ãƒ•ã‚¡ãƒ¼ã‚¯ãƒªãƒƒãƒ—
 	);
 	camera.SetLookAt(
-		{ 0, 5.0f, 10.0f },	// ‹“_
-		{ 0, 0, 0 },	// ’‹“_
-		{ 0, 0.969f, -0.248f } // ãƒxƒNƒgƒ‹
+		{ 0, 5.0f, 10.0f },	// è¦–ç‚¹
+		{ 0, 0, 0 },	// æ³¨è¦–ç‚¹
+		{ 0, 0.969f, -0.248f } // ä¸Šãƒ™ã‚¯ãƒˆãƒ«
 	);
 
 	cameraController = std::make_unique<ThridPersonCameraController>();
@@ -53,7 +53,7 @@ void SceneTest::Finalize()
 	MAPTILES.Clear();
 }
 
-// XVˆ—
+// æ›´æ–°å‡¦ç†
 void SceneTest::Update(float elapsedTime)
 {
 	cameraController->Update(elapsedTime);
@@ -64,22 +64,22 @@ void SceneTest::Update(float elapsedTime)
 	player->Update(elapsedTime);
 }
 
-// •`‰æˆ—
+// æç”»å‡¦ç†
 void SceneTest::Render()
 {
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->Clear(T_GRAPHICS.GetDeviceContext(), 0.2f, 0.2f, 0.2f, 1);
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
 
-	// •`‰æƒRƒ“ƒeƒLƒXƒgİ’è
+	// æç”»ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆè¨­å®š
 	RenderContext rc;
 	rc.camera = &camera;
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
-	// ƒ‰ƒCƒg‚Ìî•ñ‚ğ‹l‚ß‚Ş
+	// ãƒ©ã‚¤ãƒˆã®æƒ…å ±ã‚’è©°ã‚è¾¼ã‚€
 	LightManager::Instance().PushRenderContext(rc);
 
-	// •`‰æ
+	// æç”»
 	//knight->Render(rc);
 	player->Render(rc);
 	MAPTILES.Render(rc);

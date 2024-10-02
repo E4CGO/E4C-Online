@@ -3,31 +3,31 @@
 // writer Matsumura
 
 template< class T>
-class Liner8TreeManager		// üŒ`8•ª–Ø”z—ñ
+class Liner8TreeManager		// ç·šå½¢8åˆ†æœ¨é…åˆ—
 {
 public:
 	template< class T>
 	struct Cell;
 
 	template< class T>
-	struct OFT	//OBJECT_FOR_TREE\‘¢‘Ì
+	struct OFT	//OBJECT_FOR_TREEæ§‹é€ ä½“
 	{
-		Cell<T>* m_pCell = nullptr;//“o˜^‹óŠÔ
-		T* m_pObject = nullptr;//”»’è‘ÎÛƒIƒuƒWƒFƒNƒg
-		OFT<T>* m_pPre = nullptr;//‘O‚ÌOFTƒIƒuƒWƒFƒNƒg
-		OFT<T>* m_pNext = nullptr;//Ÿ‚ÌOFTƒIƒuƒWƒFƒNƒg
-		bool Remove()//ƒŠƒXƒg‚©‚çœŠO
+		Cell<T>* m_pCell = nullptr;//ç™»éŒ²ç©ºé–“
+		T* m_pObject = nullptr;//åˆ¤å®šå¯¾è±¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+		OFT<T>* m_pPre = nullptr;//å‰ã®OFTã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+		OFT<T>* m_pNext = nullptr;//æ¬¡ã®OFTã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+		bool Remove()//ãƒªã‚¹ãƒˆã‹ã‚‰é™¤å¤–
 		{
-			// ‚·‚Å‚Éˆí’E‚µ‚Ä‚¢‚é‚Íˆ—I—¹
+			// ã™ã§ã«é€¸è„±ã—ã¦ã„ã‚‹æ™‚ã¯å‡¦ç†çµ‚äº†
 			if (!m_pCell)
 				return false;
 
-			// ©•ª‚ğ“o˜^‚µ‚Ä‚¢‚é‹óŠÔ‚É©g‚ğ’Ê’m
+			// è‡ªåˆ†ã‚’ç™»éŒ²ã—ã¦ã„ã‚‹ç©ºé–“ã«è‡ªèº«ã‚’é€šçŸ¥
 			if (!m_pCell->OnRemove(this))
 				return false;
 
-			// ˆí’Eˆ—
-			// ‘OŒã‚ÌƒIƒuƒWƒFƒNƒg‚ğŒ‹‚Ñ‚Â‚¯‚é
+			// é€¸è„±å‡¦ç†
+			// å‰å¾Œã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’çµã³ã¤ã‘ã‚‹
 			if (m_pPre != nullptr)
 			{
 				m_pPre->m_pNext = m_pNext;
@@ -42,71 +42,71 @@ public:
 			m_pCell = nullptr;
 			return true;
 		}
-		bool Clear();//’Pƒíœ
+		bool Clear();//å˜ç´”å‰Šé™¤
 	};
 
 	template< class T>
 	struct Cell
 	{
-		OFT<T>* pLatest = nullptr;//ÅVOFTƒIƒuƒWƒFƒNƒg‚ÌƒAƒhƒŒƒX
-		int m_iIndex = 0;//‚±‚Ì‹óŠÔ‚Ì”z—ñ”Ô†
-		bool Push(OFT<T>* pOFT)//OFTƒIƒuƒWƒFƒNƒg“o˜^
+		OFT<T>* pLatest = nullptr;//æœ€æ–°OFTã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚¢ãƒ‰ãƒ¬ã‚¹
+		int m_iIndex = 0;//ã“ã®ç©ºé–“ã®é…åˆ—ç•ªå·
+		bool Push(OFT<T>* pOFT)//OFTã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç™»éŒ²
 		{
 			if (!pOFT)
 				return false;
 
-			if (pOFT->m_pCell == this)	// ‚Qd“o˜^ƒ`ƒFƒbƒN
+			if (pOFT->m_pCell == this)	// ï¼’é‡ç™»éŒ²ãƒã‚§ãƒƒã‚¯
 				return false;
 
 			if (!pLatest)
 			{
-				pLatest = pOFT;	// ‹óŠÔ‚ÉV‹K“o˜^
+				pLatest = pOFT;	// ç©ºé–“ã«æ–°è¦ç™»éŒ²
 			}
 			else
 			{
-				// ÅVOFTƒIƒuƒWƒFƒNƒg‚ğXV
+				// æœ€æ–°OFTã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æ›´æ–°
 				pOFT->m_pNext = pLatest;
 				pLatest->m_pPre = pOFT;
 				pLatest = pOFT;
 			}
 
-			// “o˜^‚µ‚½OFTƒIƒuƒWƒFƒNƒg‚É‚±‚Ì‹óŠÔ‚ğ“o˜^
+			// ç™»éŒ²ã—ãŸOFTã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«ã“ã®ç©ºé–“ã‚’ç™»éŒ²
 			pOFT->m_pCell = this;
 			return true;
 		}
-		bool OnRemove(OFT<T>* pOFT)//ÅVOFTƒIƒuƒWƒFƒNƒg‚ğœŠO
+		bool OnRemove(OFT<T>* pOFT)//æœ€æ–°OFTã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’é™¤å¤–
 		{
 			if (!pOFT)
 				return false;
 
 			if (pOFT == pLatest)
 			{
-				pLatest = pOFT->m_pNext;	// ÅVOFTƒIƒuƒWƒFƒNƒg‚ğ‚¸‚ç‚·
+				pLatest = pOFT->m_pNext;	// æœ€æ–°OFTã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ãšã‚‰ã™
 			}
 			return true;
 		}
 	};
 
-	//üŒ`8•ª–Ø”z—ñ‚ğ\’z
+	//ç·šå½¢8åˆ†æœ¨é…åˆ—ã‚’æ§‹ç¯‰
 	bool Initialize(unsigned int Level, float minX, float maxX, float minY, float maxY, float minZ, float maxZ)
 	{
-		// İ’èÅ‚ƒŒƒxƒ‹ˆÈã‚Ì‹óŠÔ‚Íì‚ê‚È‚¢
+		// è¨­å®šæœ€é«˜ãƒ¬ãƒ™ãƒ«ä»¥ä¸Šã®ç©ºé–“ã¯ä½œã‚Œãªã„
 		if (Level > MAXLEVEL)
 			return false;
 
-		// ŠeƒŒƒxƒ‹‚Å‚Ì‹óŠÔ”‚ğZo
+		// å„ãƒ¬ãƒ™ãƒ«ã§ã®ç©ºé–“æ•°ã‚’ç®—å‡º
 		m_iPow[0] = 1;
 		for (int i = 1; i < MAXLEVEL + 1; i++)
 		{
 			m_iPow[i] = m_iPow[i - 1] * 8;
 		}
 
-		// Level‰ñ•ªŠ„i0Šî“_j‚Ì”z—ñì¬
+		// Levelå›åˆ†å‰²ï¼ˆ0åŸºç‚¹ï¼‰ã®é…åˆ—ä½œæˆ
 		m_iCellNum = (m_iPow[Level] * 8 - 1) / 7;
 		ppCellAry = new Cell<T>*[m_iCellNum];
 		ZeroMemory(ppCellAry, sizeof(Cell<T>*) * m_iCellNum);
 
-		// —LŒø—Ìˆæ‚ğ“o˜^
+		// æœ‰åŠ¹é ˜åŸŸã‚’ç™»éŒ²
 		m_fLeft = minX;
 		m_fBottom = minY;
 		m_fFront = minZ;
@@ -121,7 +121,7 @@ public:
 		return true;
 	}
 
-	//I—¹‰»
+	//çµ‚äº†åŒ–
 	void Finalize()
 	{		
 		for (int i = 0; i < m_iCellNum; i++)
@@ -132,40 +132,40 @@ public:
 				while (pOFT != nullptr)
 				{
 					OFT<T>* next_pOFT = pOFT->m_pNext;
-					delete pOFT->m_pObject; // OFT“à‚ÌƒIƒuƒWƒFƒNƒg‚ğíœ
-					delete pOFT; // ¶¬‚µ‚½OFTƒIƒuƒWƒFƒNƒg‚ğíœ
+					delete pOFT->m_pObject; // OFTå†…ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å‰Šé™¤
+					delete pOFT; // ç”Ÿæˆã—ãŸOFTã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å‰Šé™¤
 					pOFT = next_pOFT;
 				}
 
-				delete ppCellAry[i]; // ¶¬‚µ‚½‹óŠÔ‚ğíœ
+				delete ppCellAry[i]; // ç”Ÿæˆã—ãŸç©ºé–“ã‚’å‰Šé™¤
 			}
 		}
 
-		delete[] ppCellAry;	// üŒ`‹óŠÔ”z—ñíœ
+		delete[] ppCellAry;	// ç·šå½¢ç©ºé–“é…åˆ—å‰Šé™¤
 	}
 
-	//ƒIƒuƒWƒFƒNƒg“o˜^
+	//ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç™»éŒ²
 	bool Regist(float pos_minX, float pos_maxX, float pos_minY, float pos_maxY, float pos_minZ, float pos_maxZ, T* pObj)
 	{
-		// ƒIƒuƒWƒFƒNƒg‚Ì‹«ŠE”ÍˆÍ‚©‚ç“o˜^ƒ‚[ƒgƒ“”Ô†‚ğZo
+		// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å¢ƒç•Œç¯„å›²ã‹ã‚‰ç™»éŒ²ãƒ¢ãƒ¼ãƒˆãƒ³ç•ªå·ã‚’ç®—å‡º
 		int Elem = GetLinerIndex(pos_minX, pos_maxX, pos_minY, pos_maxY, pos_minZ, pos_maxZ);
 
 		if (Elem < 0)
-			return false;// “o˜^¸”s
+			return false;// ç™»éŒ²å¤±æ•—
 
 		OFT<T>* pOFT = new OFT<T>;
 		pOFT->m_pObject = pObj;
 
 		if (Elem < m_iCellNum) {
-			// ‹óŠÔ‚ª–³‚¢ê‡‚ÍV‹Kì¬
+			// ç©ºé–“ãŒç„¡ã„å ´åˆã¯æ–°è¦ä½œæˆ
 			if (!ppCellAry[Elem])
 				CreateNewCell(Elem);
 			return ppCellAry[Elem]->Push(pOFT);
 		}
-		return false; // “o˜^¸”s
+		return false; // ç™»éŒ²å¤±æ•—
 	}
 
-	//‘Síœ
+	//å…¨å‰Šé™¤
 	void Clear()
 	{
 		for (int i = 0; i < m_iCellNum; i++)
@@ -176,16 +176,16 @@ public:
 			while (pOFT != nullptr)
 			{
 				OFT<T>* next_pOFT = pOFT->m_pNext;
-				delete pOFT; // ¶¬‚µ‚½OFTƒIƒuƒWƒFƒNƒg‚ğíœ
+				delete pOFT; // ç”Ÿæˆã—ãŸOFTã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å‰Šé™¤
 				pOFT = next_pOFT;
 			}
 		}
 	}
 
-	//‚ ‚é‹óŠÔ‚Ìe‹óŠÔ‚ğæ“¾
+	//ã‚ã‚‹ç©ºé–“ã®è¦ªç©ºé–“ã‚’å–å¾—
 	Cell<T>* GetParentCell(Cell<T>* cell)
 	{
-		// ƒ‹[ƒg‹óŠÔ‚È‚çnullptr‚Åreturn
+		// ãƒ«ãƒ¼ãƒˆç©ºé–“ãªã‚‰nullptrã§return
 		if (cell->m_iIndex == 0)
 			return nullptr;
 
@@ -193,65 +193,65 @@ public:
 		return ppCellAry[parentIndex];
 	}
 
-	//‚ ‚é“_‚ª‘®‚·‚éÅ¬‹óŠÔ‚Ìƒ‚[ƒgƒ“”Ô†
+	//ã‚ã‚‹ç‚¹ãŒå±ã™ã‚‹æœ€å°ç©ºé–“ã®ãƒ¢ãƒ¼ãƒˆãƒ³ç•ªå·
 	int Get3DMortonNumber(float x, float y, float z)
 	{
-		// “_‚ÌÀ•W‚ğ8•ª–Ø‹óŠÔ“à‚ÌÀ•W‚É•ÏŠ·
+		// ç‚¹ã®åº§æ¨™ã‚’8åˆ†æœ¨ç©ºé–“å†…ã®åº§æ¨™ã«å¤‰æ›
 		x = x - m_fLeft;
 		y = y - m_fBottom;
 		z = z - m_fFront;
 
-		// ‹óŠÔŠO‚Ìê‡‚Í-1‚Åreturn
+		// ç©ºé–“å¤–ã®å ´åˆã¯-1ã§return
 		if (x < 0 || m_fW < x)	return -1;
 		//if (y < 0 || m_fH < y)	return -1;
 		if (z < 0 || m_fD < z)	return -1;
 		
-		// y‚Í‹óŠÔ“à‚É
+		// yã¯ç©ºé–“å†…ã«
 		if (y < 0)	y = 0;
 		if (y > m_fH) y = m_fH;
 
-		// ‹óŠÔ“à‚ÌÀ•W‚ğÅ¬‹óŠÔ‚Ì•Ó‚Ì’·‚³‚ÅŠ„‚é
+		// ç©ºé–“å†…ã®åº§æ¨™ã‚’æœ€å°ç©ºé–“ã®è¾ºã®é•·ã•ã§å‰²ã‚‹
 		x = x / m_fUnit_W;
 		y = y / m_fUnit_H;
 		z = z / m_fUnit_D;
 
-		// À•W‚ğintŒ^‚ÉƒLƒƒƒXƒg‚µ‚Äƒ‚[ƒgƒ“”Ô†‚ğZo
+		// åº§æ¨™ã‚’intå‹ã«ã‚­ãƒ£ã‚¹ãƒˆã—ã¦ãƒ¢ãƒ¼ãƒˆãƒ³ç•ªå·ã‚’ç®—å‡º
 		return Get3DMortonOrder(static_cast<int>(x), static_cast<int>(y), static_cast<int>(z));
 	}
 
-	//“o˜^‹óŠÔ‚Ì”z—ñ”Ô†Zo
+	//ç™»éŒ²ç©ºé–“ã®é…åˆ—ç•ªå·ç®—å‡º
 	int GetLinerIndex(float pos_minX, float pos_maxX, float pos_minY, float pos_maxY, float pos_minZ, float pos_maxZ)
 	{
-		// ƒIƒuƒWƒFƒNƒg‚ğ•ï‚Şƒ{ƒbƒNƒX2“_‚Ìƒ‚[ƒgƒ“”Ô†
+		// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’åŒ…ã‚€ãƒœãƒƒã‚¯ã‚¹2ç‚¹ã®ãƒ¢ãƒ¼ãƒˆãƒ³ç•ªå·
 		int minMortonNomber = Get3DMortonNumber(pos_minX, pos_minY, pos_minZ);
 		int maxMortonNomber = Get3DMortonNumber(pos_maxX, pos_maxY, pos_maxZ);
 
 		if (minMortonNomber < 0 || maxMortonNomber < 0)
 			return -1;
 
-		int XOR = minMortonNomber ^ maxMortonNomber;	// 2“_‚Ìxor
+		int XOR = minMortonNomber ^ maxMortonNomber;	// 2ç‚¹ã®xor
 
-		int level = m_uiLevel;	// ‰‚ß‚ÍÅ¬‹óŠÔƒŒƒxƒ‹‚©‚ç
-		int shift = 0;	// ‰E‚É“®‚©‚·ƒVƒtƒg”
+		int level = m_uiLevel;	// åˆã‚ã¯æœ€å°ç©ºé–“ãƒ¬ãƒ™ãƒ«ã‹ã‚‰
+		int shift = 0;	// å³ã«å‹•ã‹ã™ã‚·ãƒ•ãƒˆæ•°
 
 		while (XOR != 0)
 		{
-			level--;	// •ªŠ„ƒŒƒxƒ‹‚ğ1‚Â‰º‚°‚é
-			shift += 3; // 3bit•ª‘‚â‚·
-			XOR >>= 3;	// 3bitƒVƒtƒg‚³‚¹‚ÄÄƒ`ƒFƒbƒN
+			level--;	// åˆ†å‰²ãƒ¬ãƒ™ãƒ«ã‚’1ã¤ä¸‹ã’ã‚‹
+			shift += 3; // 3bitåˆ†å¢—ã‚„ã™
+			XOR >>= 3;	// 3bitã‚·ãƒ•ãƒˆã•ã›ã¦å†ãƒã‚§ãƒƒã‚¯
 		}
 		
-		// •ªŠ„ƒŒƒxƒ‹ = level ‚Å‚Ìƒ‚[ƒgƒ“”Ô†
+		// åˆ†å‰²ãƒ¬ãƒ™ãƒ« = level ã§ã®ãƒ¢ãƒ¼ãƒˆãƒ³ç•ªå·
 		int mortonNomber = minMortonNomber >> shift;
 
-		// üŒ`‹óŠÔ”z—ñ‚Ì”z—ñ”Ô†
+		// ç·šå½¢ç©ºé–“é…åˆ—ã®é…åˆ—ç•ªå·
 		int index = (m_iPow[level] - 1) / 7 + mortonNomber;
 		return index;
 		//return (m_iPow[level] - 1) / 7 + mortonNomber;
 	}
 
 private:
-	//3bit‚²‚Æ‚Ì•ªŠ„ŠÖ”
+	//3bitã”ã¨ã®åˆ†å‰²é–¢æ•°
 	int BitSeparateFor3D(int n)
 	{
 		n = (n | n << 8) & 0x0000f00f;
@@ -260,32 +260,32 @@ private:
 		return n;
 	}
 
-	//8•ª–Øƒ‚[ƒgƒ“‡˜ZoŠÖ”
+	//8åˆ†æœ¨ãƒ¢ãƒ¼ãƒˆãƒ³é †åºç®—å‡ºé–¢æ•°
 	int Get3DMortonOrder(int x, int y, int z)
 	{
 		return BitSeparateFor3D(x) | BitSeparateFor3D(y) << 1 | BitSeparateFor3D(z) << 2;
 	}
 
-	//‹óŠÔ¶¬
+	//ç©ºé–“ç”Ÿæˆ
 	void CreateNewCell(int Elem)
 	{
-		// ˆø”‚Ì—v‘f”Ô†
+		// å¼•æ•°ã®è¦ç´ ç•ªå·
 		while (!ppCellAry[Elem])
 		{
-			// w’è‚Ì—v‘f”Ô†‚É‹óŠÔ‚ğV‹Kì¬
+			// æŒ‡å®šã®è¦ç´ ç•ªå·ã«ç©ºé–“ã‚’æ–°è¦ä½œæˆ
 			ppCellAry[Elem] = new Cell<T>;
 			ppCellAry[Elem]->m_iIndex = Elem;
-			// e‹óŠÔ‚ÉƒWƒƒƒ“ƒv
+			// è¦ªç©ºé–“ã«ã‚¸ãƒ£ãƒ³ãƒ—
 			Elem = (Elem - 1) >> 3;
 			if (Elem >= m_iCellNum) break;
 		}
 	}
 
 public:
-	static const unsigned int MAXLEVEL = 8;//•ªŠ„ƒŒƒxƒ‹Å‘å’l
-	int m_iPow[MAXLEVEL + 1] = {};//ŠeƒŒƒxƒ‹‚Å‚Ì‹óŠÔ”
-	int m_iCellNum = 0;//‡Œv‹óŠÔ”
-	Cell<T>** ppCellAry = nullptr;//üŒ`‹óŠÔ”z—ñ
+	static const unsigned int MAXLEVEL = 8;//åˆ†å‰²ãƒ¬ãƒ™ãƒ«æœ€å¤§å€¤
+	int m_iPow[MAXLEVEL + 1] = {};//å„ãƒ¬ãƒ™ãƒ«ã§ã®ç©ºé–“æ•°
+	int m_iCellNum = 0;//åˆè¨ˆç©ºé–“æ•°
+	Cell<T>** ppCellAry = nullptr;//ç·šå½¢ç©ºé–“é…åˆ—
 
 	float m_fLeft = 0;
 	float m_fBottom = 0;

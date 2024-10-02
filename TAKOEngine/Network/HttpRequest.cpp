@@ -85,7 +85,7 @@ void HttpRequest::SetUrl(const char* url)
 void HttpRequest::Send()
 {
 	if (state == STATE::FAIL) return;
-	// ƒ\ƒPƒbƒg‚Ì¶¬
+	// ã‚½ã‚±ãƒƒãƒˆã®ç”Ÿæˆ
 	sock = socket(addr->ai_family, addr->ai_socktype, addr->ai_protocol);
 	if (sock == INVALID_SOCKET)
 	{
@@ -95,7 +95,7 @@ void HttpRequest::Send()
 
 	state = STATE::SENDED;
 
-	// ‘—M‘Ò‚¿
+	// é€ä¿¡å¾…ã¡
 	thread = new std::thread(&HttpRequest::Request, this);
 }
 std::string HttpRequest::RequestHeader()
@@ -183,7 +183,7 @@ std::string HttpRequest::RequestHeader()
 
 bool HttpRequest::SendRequest(const char* buffer, size_t size)
 {
-	// ƒT[ƒo[‚ÖÚ‘±
+	// ã‚µãƒ¼ãƒãƒ¼ã¸æ¥ç¶š
 	if (connect(sock, addr->ai_addr, static_cast<int>(addr->ai_addrlen)) == SOCKET_ERROR)
 	{
 		return false;
@@ -192,22 +192,22 @@ bool HttpRequest::SendRequest(const char* buffer, size_t size)
 	if (port == PORT::HTTPS)
 	{
 		// SSL
-		// OpenSSL‚ÌƒGƒ‰[•¶Œ¾‚ğ“Ç‚İ‚İ
+		// OpenSSLã®ã‚¨ãƒ©ãƒ¼æ–‡è¨€ã‚’èª­ã¿è¾¼ã¿
 		//SSL_load_error_strings();
 
-		// OpenSSLƒ‰ƒCƒuƒ‰ƒŠ‰Šú‰»B
+		// OpenSSLãƒ©ã‚¤ãƒ–ãƒ©ãƒªåˆæœŸåŒ–ã€‚
 		//SSL_library_init();
 		OPENSSL_init_ssl(OPENSSL_INIT_NO_LOAD_CRYPTO_STRINGS, nullptr);
-		// SSL’ÊM\‘¢‘Ì‚ÌƒCƒ“ƒXƒ^ƒ“ƒX
-		// TLS’ÊM‚ÅƒZƒLƒ…ƒA’ÊM‚ğİ’è(TLS_client_method()‚ğg—p‚·‚éB)
+		// SSLé€šä¿¡æ§‹é€ ä½“ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
+		// TLSé€šä¿¡ã§ã‚»ã‚­ãƒ¥ã‚¢é€šä¿¡ã‚’è¨­å®š(TLS_client_method()ã‚’ä½¿ç”¨ã™ã‚‹ã€‚)
 		ctx = SSL_CTX_new(TLS_client_method());
 
-		// SSL’ÊM\‘¢‘Ì‚©‚çssl‚Ì¶¬‚ğs‚¤
+		// SSLé€šä¿¡æ§‹é€ ä½“ã‹ã‚‰sslã®ç”Ÿæˆã‚’è¡Œã†
 		ssl = SSL_new(ctx);
-		// SSL‚Éƒ\ƒPƒbƒg‚ğŠÖ˜A•t‚¯‚é
+		// SSLã«ã‚½ã‚±ãƒƒãƒˆã‚’é–¢é€£ä»˜ã‘ã‚‹
 		SSL_set_fd(ssl, static_cast<int>(sock));
 
-		// SSLÚ‘±
+		// SSLæ¥ç¶š
 		if (SSL_connect(ssl) != 1)
 		{
 			return false;
@@ -215,7 +215,7 @@ bool HttpRequest::SendRequest(const char* buffer, size_t size)
 
 		if (SSL_write(ssl, buffer, static_cast<int>(size)) < 1)
 		{
-			// ‘—M¸”s
+			// é€ä¿¡å¤±æ•—
 			return false;
 		}
 	}
@@ -224,7 +224,7 @@ bool HttpRequest::SendRequest(const char* buffer, size_t size)
 		// 80
 		if (send(sock, buffer, static_cast<int>(size), 0) < 0)
 		{
-			// ‘—M¸”s
+			// é€ä¿¡å¤±æ•—
 			return false;
 		}
 	}
@@ -277,7 +277,7 @@ std::string HttpRequest::ResponseData()
 
 		OPENSSL_cleanup();
 
-		// BYTE‚ğ•¶š‚É
+		// BYTEã‚’æ–‡å­—ã«
 		char str[(sizeof responseData) + 1];
 		memcpy(str, responseData, sizeof responseData);
 		str[sizeof responseData] = 0; // End Flag
@@ -292,7 +292,7 @@ void HttpRequest::Request()
 	std::string header = RequestHeader();
 	if (!SendRequest(header.c_str(), header.size()))
 	{
-		// ‘—MƒGƒ‰[
+		// é€ä¿¡ã‚¨ãƒ©ãƒ¼
 		state = STATE::FAIL;
 		//Release();
 		return;
@@ -301,7 +301,7 @@ void HttpRequest::Request()
 	std::string responseText = ResponseData();
 
 	// Response
-	size_t position = 0; // •ª’f—p
+	size_t position = 0; // åˆ†æ–­ç”¨
 	position = responseText.find("HTTP/") + strlen("HTTP/1.1 ");
 	response.status = std::stoi(responseText.substr(position, responseText.find(" ", position) - position));
 

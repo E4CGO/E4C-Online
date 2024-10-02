@@ -54,9 +54,9 @@ void ShadowMapShader::Draw(const RenderContext& rc, const iModel* model, DirectX
 		{
 			for (size_t i = 0; i < mesh.bones.size(); ++i)
 			{
-				DirectX::XMMATRIX worldTransform  = DirectX::XMLoadFloat4x4(&nodes.at(mesh.bones.at(i).nodeIndex).worldTransform);
+				DirectX::XMMATRIX worldTransform = DirectX::XMLoadFloat4x4(&nodes.at(mesh.bones.at(i).nodeIndex).worldTransform);
 				DirectX::XMMATRIX offsetTransform = DirectX::XMLoadFloat4x4(&mesh.bones.at(i).offsetTransform);
-				DirectX::XMMATRIX boneTransform   = offsetTransform * worldTransform;
+				DirectX::XMMATRIX boneTransform = offsetTransform * worldTransform;
 				DirectX::XMStoreFloat4x4(&cbSkeleton.boneTransforms[i], boneTransform);
 			}
 		}

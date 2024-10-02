@@ -10,6 +10,7 @@
 
 #include "Scene/Scene.h"
 #include "Scene/Stage/Stage.h"
+#include "TAKOEngine/Rendering/DeferredRendering.h"
 
 #define START_TIME 3.0f
 
@@ -19,14 +20,14 @@ public:
 	SceneGame(const char* name, const char* host, const char* port, NetworkController* networkController = nullptr);
 	~SceneGame() override {};
 
-	// ‰Šú‰»
+	// åˆæœŸåŒ–
 	void Initialize() override;
-	// I—¹‰»
+	// çµ‚äº†åŒ–
 	void Finalize() override;
 
-	// XVˆ—
+	// æ›´æ–°å‡¦ç†
 	void Update(float elapsedTime) override;
-	// •`‰æˆ—
+	// æç”»å‡¦ç†
 	void Render() override;
 
 	void UpdateConnection();
@@ -57,11 +58,14 @@ private:
 
 	std::unique_ptr<StateMachine<SceneGame>> stateMachine;
 
+	//DeferredRendering
+	std::unique_ptr<DeferredRendering> deferredRendering = std::make_unique<DeferredRendering>();
+
 	WidgetMenu* menu;
 
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {
-		"",											// ƒ}ƒXƒN
+		"",											// ãƒã‚¹ã‚¯
 		"Data/Sprites/crosshair122.png",
 		"Data/Sprites/skill_icon.png",
 		"Data/Sprites/big_background.png",

@@ -4,25 +4,32 @@
 #include "TAKOEngine/Rendering/RenderState.h"
 #include "TAKOEngine/Rendering/MyRender.h"
 
-//	UVƒXƒNƒ[ƒ‹î•ñ
+//	UVã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«æƒ…å ±
 struct UVScrollData
 {
-	DirectX::XMFLOAT2	uvScrollValue;	// UVƒXƒNƒ[ƒ‹’l
+	DirectX::XMFLOAT2	uvScrollValue;	// UVã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«å€¤
 };
 
-// ƒ}ƒXƒNƒf[ƒ^
+// ãƒã‚¹ã‚¯ãƒ‡ãƒ¼ã‚¿
 struct MaskData
 {
 	ID3D11ShaderResourceView* maskTexture;
 	float dissolveThreshold;
-	float edgeThreshold; 			// ‰‚Ìè‡’l
-	DirectX::XMFLOAT4 edgeColor;	// ‰‚ÌF
+	float edgeThreshold; 			// ç¸ã®é–¾å€¤
+	DirectX::XMFLOAT4 edgeColor;	// ç¸ã®è‰²
 };
 
 struct DirectionalLightData
 {
 	DirectX::XMFLOAT4 direction;
 	DirectX::XMFLOAT4 color;
+};
+
+//Deferred Renderingç”¨SRV
+struct DeferredData
+{
+	ID3D11ShaderResourceView* normal;
+	ID3D11ShaderResourceView* position;
 };
 
 //TODO : ShaderData Set
@@ -63,83 +70,83 @@ struct ShaderData
 	Toon    toonShader;
 };
 
-// “_ŒõŒ¹î•ñ
+// ç‚¹å…‰æºæƒ…å ±
 struct PointLightData
 {
-	DirectX::XMFLOAT4 position;		// À•W
-	DirectX::XMFLOAT4 color;		// F
-	float range;					// ”ÍˆÍ
+	DirectX::XMFLOAT4 position;		// åº§æ¨™
+	DirectX::XMFLOAT4 color;		// è‰²
+	float range;					// ç¯„å›²
 	DirectX::XMFLOAT3 dummy;
 };
 
-// “_ŒõŒ¹‚ÌÅ‘å”
+// ç‚¹å…‰æºã®æœ€å¤§æ•°
 static constexpr int PointLightMax = 8;
-// ƒXƒ|ƒbƒgƒ‰ƒCƒgî•ñ
+// ã‚¹ãƒãƒƒãƒˆãƒ©ã‚¤ãƒˆæƒ…å ±
 struct SpotLightData
 {
-	DirectX::XMFLOAT4	position;	// À•W
-	DirectX::XMFLOAT4	direction;	// Œü‚«
-	DirectX::XMFLOAT4	color;		// F
-	float				range;		// ”ÍˆÍ
-	float				innerCorn; 	// ƒCƒ“ƒi[Šp“x”ÍˆÍ
-	float				outerCorn; 	// ƒAƒEƒ^[Šp“x”ÍˆÍ
+	DirectX::XMFLOAT4	position;	// åº§æ¨™
+	DirectX::XMFLOAT4	direction;	// å‘ã
+	DirectX::XMFLOAT4	color;		// è‰²
+	float				range;		// ç¯„å›²
+	float				innerCorn; 	// ã‚¤ãƒ³ãƒŠãƒ¼è§’åº¦ç¯„å›²
+	float				outerCorn; 	// ã‚¢ã‚¦ã‚¿ãƒ¼è§’åº¦ç¯„å›²
 	float				dummy;
 };
 
-// ƒXƒ|ƒbƒgƒ‰ƒCƒg‚ÌÅ‘å”
+// ã‚¹ãƒãƒƒãƒˆãƒ©ã‚¤ãƒˆã®æœ€å¤§æ•°
 static	constexpr	int	SpotLightMax = 8;
 
-// F’²•â³î•ñ
+// è‰²èª¿è£œæ­£æƒ…å ±
 struct ColorGradingData
 {
-	float	hueShift = 0;	// F‘Š’²®
-	float	saturation = 1;	// Ê“x’²®
-	float	brightness = 1;	// –¾“x’²®
+	float	hueShift = 0;	// è‰²ç›¸èª¿æ•´
+	float	saturation = 1;	// å½©åº¦èª¿æ•´
+	float	brightness = 1;	// æ˜åº¦èª¿æ•´
 	float	dummy;
 };
 
-// ƒKƒEƒXƒtƒBƒ‹ƒ^[ŒvZî•ñ
+// ã‚¬ã‚¦ã‚¹ãƒ•ã‚£ãƒ«ã‚¿ãƒ¼è¨ˆç®—æƒ…å ±
 struct GaussianFilterData
 {
-	int					kernelSize = 8;		// ƒJ[ƒlƒ‹ƒTƒCƒY
-	float				deviation = 10.0f;	// •W€•Î·
-	DirectX::XMFLOAT2	textureSize;			// ò‚·ƒeƒNƒXƒ`ƒƒ‚ÌƒTƒCƒY
+	int					kernelSize = 8;		// ã‚«ãƒ¼ãƒãƒ«ã‚µã‚¤ã‚º
+	float				deviation = 10.0f;	// æ¨™æº–åå·®
+	DirectX::XMFLOAT2	textureSize;			// æšˆã™ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ã‚µã‚¤ã‚º
 };
 
-// ƒKƒEƒXƒtƒBƒ‹ƒ^[‚ÌÅ‘åƒJ[ƒlƒ‹ƒTƒCƒY
+// ã‚¬ã‚¦ã‚¹ãƒ•ã‚£ãƒ«ã‚¿ãƒ¼ã®æœ€å¤§ã‚«ãƒ¼ãƒãƒ«ã‚µã‚¤ã‚º
 static const int MaxKernelSize = 16;
 
-// ‚‹P“x’Šo—pî•ñ
+// é«˜è¼åº¦æŠ½å‡ºç”¨æƒ…å ±
 struct LuminanceExtractionData
 {
-	float				threshold = 0.5f;	// è‡’l
-	float				intensity = 1.0f;	// ƒuƒ‹[ƒ€‚Ì‹­“x
+	float				threshold = 0.5f;	// é–¾å€¤
+	float				intensity = 1.0f;	// ãƒ–ãƒ«ãƒ¼ãƒ ã®å¼·åº¦
 	DirectX::XMFLOAT2	dummy2;
 };
 
-// ƒ|ƒXƒgƒGƒtƒFƒNƒg‚ÌÅIƒpƒX—pî•ñ
+// ãƒã‚¹ãƒˆã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®æœ€çµ‚ãƒ‘ã‚¹ç”¨æƒ…å ±
 struct FinalpassnData
 {
-	//	ƒuƒ‹[ƒ€ƒeƒNƒXƒ`ƒƒ
+	//	ãƒ–ãƒ«ãƒ¼ãƒ ãƒ†ã‚¯ã‚¹ãƒãƒ£
 	ID3D11ShaderResourceView* bloomTexture;
 };
 
 struct ShadowMapData
 {
-	//ƒJƒƒ‰î•ñ
+	//ã‚«ãƒ¡ãƒ©æƒ…å ±
 	DirectX::XMFLOAT4X4 view = {};
 	DirectX::XMFLOAT4X4 projection = {};
 
-	//ƒVƒƒƒhƒEƒ}ƒbƒv—p[“xƒXƒeƒ“ƒVƒ‹ƒoƒbƒtƒ@
+	//ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ç”¨æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒãƒƒãƒ•ã‚¡
 	ID3D11ShaderResourceView* shadowMap[myRenderer::NUM_SHADOW_MAP] = {};
 
-	//ƒ‰ƒCƒgƒrƒ…[ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ
+	//ãƒ©ã‚¤ãƒˆãƒ“ãƒ¥ãƒ¼ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—
 	DirectX::XMFLOAT4X4 lightViewProjection[myRenderer::NUM_SHADOW_MAP] = {};
 
-	//[“x”äŠr—p‚ÌƒIƒtƒZƒbƒg’l
-	float shadowBias[myRenderer::NUM_SHADOW_MAP] = { 0.001f, 0.002f, 0.004f, 0.01f }; //[“x”äŠr—p‚ÌƒIƒtƒZƒbƒg’l
+	//æ·±åº¦æ¯”è¼ƒç”¨ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆå€¤
+	float shadowBias[myRenderer::NUM_SHADOW_MAP] = { 0.001f, 0.002f, 0.004f, 0.01f }; //æ·±åº¦æ¯”è¼ƒç”¨ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆå€¤
 
-	//‰e‚ÌF
+	//å½±ã®è‰²
 	DirectX::XMFLOAT3 shadowColor = { 0.5f,0.5f,0.5f };
 };
 
@@ -149,26 +156,29 @@ struct RenderContext
 	const RenderState* renderState;
 	const Camera* camera;
 
-	//	ƒXƒNƒ[ƒ‹ƒf[ƒ^
+	//	ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ãƒ‡ãƒ¼ã‚¿
 	UVScrollData			uvScrollData;
 
-	// ƒ}ƒXƒNƒf[ƒ^
+	// ãƒã‚¹ã‚¯ãƒ‡ãƒ¼ã‚¿
 	MaskData				maskData;
 
-	//	ƒ‰ƒCƒgî•ñ
+	//	ãƒ©ã‚¤ãƒˆæƒ…å ±
 	DirectX::XMFLOAT4		ambientLightColor;
 	DirectionalLightData	directionalLightData;
-	PointLightData			pointLightData[PointLightMax];	// “_ŒõŒ¹î•ñ
-	SpotLightData			spotLightData[SpotLightMax];	// ƒXƒ|ƒbƒgƒ‰ƒCƒgî•ñ
-	int						pointLightCount = 0;			// “_ŒõŒ¹”
-	int						spotLightCount = 0;				// ƒXƒ|ƒbƒgƒ‰ƒCƒg”
+	PointLightData			pointLightData[PointLightMax];	// ç‚¹å…‰æºæƒ…å ±
+	SpotLightData			spotLightData[SpotLightMax];	// ã‚¹ãƒãƒƒãƒˆãƒ©ã‚¤ãƒˆæƒ…å ±
+	int						pointLightCount = 0;			// ç‚¹å…‰æºæ•°
+	int						spotLightCount = 0;				// ã‚¹ãƒãƒƒãƒˆãƒ©ã‚¤ãƒˆæ•°
 
-	ColorGradingData		colorGradingData;				//	F’²•â³î•ñ
-	GaussianFilterData		gaussianFilterData;				//	ƒKƒEƒXƒtƒBƒ‹ƒ^[î•ñ
-	LuminanceExtractionData	luminanceExtractionData;		//	‚‹P“x’Šo—pî•ñ
-	FinalpassnData			finalpassnData;					//	ÅIƒpƒXî•ñ
-	ShadowMapData           shadowMapData;                  //  ƒVƒƒƒhƒEƒ}ƒbƒvî•ñ
+	ColorGradingData		colorGradingData;				//	è‰²èª¿è£œæ­£æƒ…å ±
+	GaussianFilterData		gaussianFilterData;				//	ã‚¬ã‚¦ã‚¹ãƒ•ã‚£ãƒ«ã‚¿ãƒ¼æƒ…å ±
+	LuminanceExtractionData	luminanceExtractionData;		//	é«˜è¼åº¦æŠ½å‡ºç”¨æƒ…å ±
+	FinalpassnData			finalpassnData;					//	æœ€çµ‚ãƒ‘ã‚¹æƒ…å ±
+	ShadowMapData           shadowMapData;                  //  ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—æƒ…å ±
 
-	//ƒ‚ƒfƒ‹ƒVƒF[ƒ_[î•ñ
+	//ãƒ¢ãƒ‡ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼æƒ…å ±
 	ShaderData shaderData;
+
+	//Deferred Renderingç”¨SRV
+	DeferredData deferredData;
 };

@@ -19,21 +19,21 @@ HRESULT GpuResourceUtils::LoadVertexShader(
 	fopen_s(&fp, filename, "rb");
 	_ASSERT_EXPR_A(fp, "Vertex Shader File not found");
 
-	// ƒtƒ@ƒCƒ‹ƒTƒCƒY‚ğ‹‚ß‚é
+	// ãƒ•ã‚¡ã‚¤ãƒ«ã‚µã‚¤ã‚ºã‚’æ±‚ã‚ã‚‹
 	fseek(fp, 0, SEEK_END);
 	long  size = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
-	// ƒƒ‚ƒŠã‚É’¸“_ƒVƒF[ƒ_[ƒf[ƒ^‚ğŠi”[‚·‚é—Ìˆæ‚ğ—pˆÓ‚·‚é
+	// ãƒ¡ãƒ¢ãƒªä¸Šã«é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´ã™ã‚‹é ˜åŸŸã‚’ç”¨æ„ã™ã‚‹
 	std::unique_ptr<u_char[]> data = std::make_unique<u_char[]>(size);
 	fread(data.get(), size, 1, fp);
 	fclose(fp);
 
-	// ’¸“_ƒVƒF[ƒ_[¶¬
+	// é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ç”Ÿæˆ
 	HRESULT hr = device->CreateVertexShader(data.get(), size, nullptr, vertexShader);
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
-	// “ü—ÍƒŒƒCƒAƒEƒg
+	// å…¥åŠ›ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆ
 	if (inputLayout != nullptr)
 	{
 		hr = device->CreateInputLayout(inputElementDescs, inputElementCount, data.get(), size, inputLayout);
@@ -43,148 +43,148 @@ HRESULT GpuResourceUtils::LoadVertexShader(
 	return hr;
 }
 
-// ƒsƒNƒZƒ‹ƒVƒF[ƒ_[“Ç‚İ‚Ş
+// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼èª­ã¿è¾¼ã‚€
 HRESULT GpuResourceUtils::LoadPixelShader(
 	ID3D11Device* device,
 	const char* filename,
 	ID3D11PixelShader** pixelShader
 )
 {
-	// ƒtƒ@ƒCƒ‹‚ğŠJ‚­
+	// ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ã
 	FILE* fp = nullptr;
 	fopen_s(&fp, filename, "rb");
 	_ASSERT_EXPR_A(fp, "Pixel Shader File not found");
 
-	// ƒtƒ@ƒCƒ‹ƒTƒCƒY‚ğ‹‚ß‚é
+	// ãƒ•ã‚¡ã‚¤ãƒ«ã‚µã‚¤ã‚ºã‚’æ±‚ã‚ã‚‹
 	fseek(fp, 0, SEEK_END);
 	long  size = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
-	// ƒƒ‚ƒŠã‚É’¸“_ƒVƒF[ƒ_[ƒf[ƒ^‚ğŠi”[‚·‚é—Ìˆæ‚ğ—pˆÓ‚·‚é
+	// ãƒ¡ãƒ¢ãƒªä¸Šã«é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´ã™ã‚‹é ˜åŸŸã‚’ç”¨æ„ã™ã‚‹
 	std::unique_ptr<u_char[]> data = std::make_unique<u_char[]>(size);
 	fread(data.get(), size, 1, fp);
 	fclose(fp);
 
-	// ƒsƒNƒZƒ‹ƒVƒF[ƒ_[¶¬
+	// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ç”Ÿæˆ
 	HRESULT hr = device->CreatePixelShader(data.get(), size, nullptr, pixelShader);
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
 	return hr;
 }
 
-//ƒWƒIƒƒgƒŠƒVƒF[ƒ_[
+//ã‚¸ã‚ªãƒ¡ãƒˆãƒªã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 HRESULT GpuResourceUtils::LoadGeometryShader(
 	ID3D11Device* device,
 	const char* filename,
 	ID3D11GeometryShader** geometryShader)
 {
-	//ƒtƒ@ƒCƒ‹‚ğŠJ‚­
+	//ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ã
 	FILE* fp = nullptr;
 	fopen_s(&fp, filename, "rb");
 	_ASSERT_EXPR_A(fp, "Geometry Shader File not found");
 
-	//ƒtƒ@ƒCƒ‹‚ÌƒTƒCƒY‚ğ‹‚ß‚é
+	//ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚µã‚¤ã‚ºã‚’æ±‚ã‚ã‚‹
 	fseek(fp, 0, SEEK_END);
 	long size = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
-	//ƒƒ‚ƒŠã‚É’¸“_ƒVƒF[ƒ_[ƒf[ƒ^‚ğŠi”[‚·‚é—Ìˆæ‚ğ—pˆÓ‚·‚é
+	//ãƒ¡ãƒ¢ãƒªä¸Šã«é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´ã™ã‚‹é ˜åŸŸã‚’ç”¨æ„ã™ã‚‹
 	std::unique_ptr<u_char[]> data = std::make_unique<u_char[]>(size);
 	fread(data.get(), size, 1, fp);
 	fclose(fp);
 
-	//ƒWƒIƒƒgƒŠƒVƒF[ƒ_[¶¬
+	//ã‚¸ã‚ªãƒ¡ãƒˆãƒªã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ç”Ÿæˆ
 	HRESULT hr = device->CreateGeometryShader(data.get(), size, nullptr, geometryShader);
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
 	return hr;
 }
 
-//ƒnƒ‹ƒVƒF[ƒ_[
+//ãƒãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 HRESULT GpuResourceUtils::LoadHullShader(
 	ID3D11Device* device,
 	const char* filename,
 	ID3D11HullShader** hullShader)
 {
-	//ƒtƒ@ƒCƒ‹‚ğŠJ‚­
+	//ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ã
 	FILE* fp = nullptr;
 	fopen_s(&fp, filename, "rb");
 	_ASSERT_EXPR_A(fp, "hull Shader File not found");
 
-	//ƒtƒ@ƒCƒ‹‚ÌƒTƒCƒY‚ğ‹‚ß‚é
+	//ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚µã‚¤ã‚ºã‚’æ±‚ã‚ã‚‹
 	fseek(fp, 0, SEEK_END);
 	long size = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
-	//ƒƒ‚ƒŠã‚É’¸“_ƒVƒF[ƒ_[ƒf[ƒ^‚ğŠi”[‚·‚é—Ìˆæ‚ğ—pˆÓ‚·‚é
+	//ãƒ¡ãƒ¢ãƒªä¸Šã«é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´ã™ã‚‹é ˜åŸŸã‚’ç”¨æ„ã™ã‚‹
 	std::unique_ptr<u_char[]> data = std::make_unique<u_char[]>(size);
 	fread(data.get(), size, 1, fp);
 	fclose(fp);
 
-	//ƒnƒ‹ƒVƒF[ƒ_[¶¬
+	//ãƒãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ç”Ÿæˆ
 	HRESULT hr = device->CreateHullShader(data.get(), size, nullptr, hullShader);
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
 	return hr;
 }
 
-//ƒhƒƒCƒ“ƒVƒF[ƒ_[
+//ãƒ‰ãƒ¡ã‚¤ãƒ³ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 HRESULT GpuResourceUtils::LoadDomainShader(
 	ID3D11Device* device,
 	const char* filename,
 	ID3D11DomainShader** domainShader)
 {
-	//ƒtƒ@ƒCƒ‹‚ğŠJ‚­
+	//ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ã
 	FILE* fp = nullptr;
 	fopen_s(&fp, filename, "rb");
-	_ASSERT_EXPR_A(fp, "domain@Shader File not found");
+	_ASSERT_EXPR_A(fp, "domainã€€Shader File not found");
 
-	//ƒtƒ@ƒCƒ‹‚ÌƒTƒCƒY‚ğ‹‚ß‚é
+	//ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚µã‚¤ã‚ºã‚’æ±‚ã‚ã‚‹
 	fseek(fp, 0, SEEK_END);
 	long size = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
-	//ƒƒ‚ƒŠã‚É’¸“_ƒVƒF[ƒ_[ƒf[ƒ^‚ğŠi”[‚·‚é—Ìˆæ‚ğ—pˆÓ‚·‚é
+	//ãƒ¡ãƒ¢ãƒªä¸Šã«é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´ã™ã‚‹é ˜åŸŸã‚’ç”¨æ„ã™ã‚‹
 	std::unique_ptr<u_char[]> data = std::make_unique<u_char[]>(size);
 	fread(data.get(), size, 1, fp);
 	fclose(fp);
 
-	//ƒhƒƒCƒ“ƒVƒF[ƒ_[¶¬
+	//ãƒ‰ãƒ¡ã‚¤ãƒ³ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ç”Ÿæˆ
 	HRESULT hr = device->CreateDomainShader(data.get(), size, nullptr, domainShader);
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
 	return hr;
 }
 
-//ƒRƒ“ƒsƒ…[ƒgƒVƒF[ƒ_[
+//ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ãƒˆã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 HRESULT GpuResourceUtils::LoadComputeShader(
 	ID3D11Device* device,
 	const char* filename,
 	ID3D11ComputeShader** computeShader)
 {
-	//ƒtƒ@ƒCƒ‹‚ğŠJ‚­
+	//ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ã
 	FILE* fp = nullptr;
 	fopen_s(&fp, filename, "rb");
-	_ASSERT_EXPR_A(fp, "domain@Shader File not found");
+	_ASSERT_EXPR_A(fp, "domainã€€Shader File not found");
 
-	//ƒtƒ@ƒCƒ‹‚ÌƒTƒCƒY‚ğ‹‚ß‚é
+	//ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚µã‚¤ã‚ºã‚’æ±‚ã‚ã‚‹
 	fseek(fp, 0, SEEK_END);
 	long size = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
-	//ƒƒ‚ƒŠã‚É’¸“_ƒVƒF[ƒ_[ƒf[ƒ^‚ğŠi”[‚·‚é—Ìˆæ‚ğ—pˆÓ‚·‚é
+	//ãƒ¡ãƒ¢ãƒªä¸Šã«é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´ã™ã‚‹é ˜åŸŸã‚’ç”¨æ„ã™ã‚‹
 	std::unique_ptr<u_char[]> data = std::make_unique<u_char[]>(size);
 	fread(data.get(), size, 1, fp);
 	fclose(fp);
 
-	//ƒhƒƒCƒ“ƒVƒF[ƒ_[¶¬
+	//ãƒ‰ãƒ¡ã‚¤ãƒ³ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ç”Ÿæˆ
 	HRESULT hr = device->CreateComputeShader(data.get(), size, nullptr, computeShader);
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
 	return hr;
 }
 
-// ƒeƒNƒXƒ`ƒƒ‚ğ“Ç‚İ‚Ş
+// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’èª­ã¿è¾¼ã‚€
 HRESULT GpuResourceUtils::LoadTexture(
 	ID3D11Device* device,
 	const char* filename,
@@ -192,15 +192,15 @@ HRESULT GpuResourceUtils::LoadTexture(
 	D3D11_TEXTURE2D_DESC* texture2dDesc
 )
 {
-	// Šg’£q‚ğæ“¾
+	// æ‹¡å¼µå­ã‚’å–å¾—
 	std::filesystem::path filepath(filename);
 	std::string extension = filepath.extension().string();
-	std::transform(extension.begin(), extension.end(), extension.begin(), tolower); // ¬•¶š‰»
+	std::transform(extension.begin(), extension.end(), extension.begin(), tolower); // å°æ–‡å­—åŒ–
 
-	// ƒƒCƒh•¶š‚É•ÏŠ·
+	// ãƒ¯ã‚¤ãƒ‰æ–‡å­—ã«å¤‰æ›
 	std::wstring wfilename = filepath.wstring();
 
-	// ƒtƒH[ƒ}ƒbƒg–ˆ‚É‰æ‘œ“Ç‚İ‚İˆ—
+	// ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆæ¯ã«ç”»åƒèª­ã¿è¾¼ã¿å‡¦ç†
 	HRESULT hr;
 
 	DirectX::TexMetadata metadata;
@@ -244,7 +244,7 @@ HRESULT GpuResourceUtils::LoadTexture(
 		scratch_image = std::move(scratch_image_mip);
 	}
 
-	// ƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[ì¬
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼ä½œæˆ
 	hr = DirectX::CreateShaderResourceView(device, scratch_image.GetImages(), scratch_image.GetImageCount(), metadata, shaderResourceView);
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
@@ -335,7 +335,7 @@ HRESULT GpuResourceUtils::CreateDummyTexture(
 	hr = device->CreateShaderResourceView(texture.Get(), nullptr, shaderResourceView);
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
-	// ƒeƒNƒXƒ`ƒƒî•ñæ“¾
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£æƒ…å ±å–å¾—
 	if (texture2dDesc != nullptr)
 	{
 		Microsoft::WRL::ComPtr<ID3D11Resource> resource;
@@ -349,7 +349,7 @@ HRESULT GpuResourceUtils::CreateDummyTexture(
 	return hr;
 }
 
-// ’è”ƒoƒbƒtƒ@ì¬
+// å®šæ•°ãƒãƒƒãƒ•ã‚¡ä½œæˆ
 HRESULT GpuResourceUtils::CreateConstantBuffer(
 	ID3D11Device* device,
 	UINT bufferSize,
@@ -375,29 +375,29 @@ HRESULT GpuResourceUtils::CreateConstantBuffer(
 //{
 //	HRESULT hr = S_OK;
 //
-//	// GLBƒtƒ@ƒCƒ‹‚ğŠJ‚­
+//	// GLBãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ã
 //	std::ifstream file(szFile, std::ios::binary | std::ios::ate);
 //	if (!file.is_open())
 //	{
-//		return E_FAIL; // ƒtƒ@ƒCƒ‹‚ÌƒI[ƒvƒ“‚É¸”s‚µ‚½ê‡‚ÍƒGƒ‰[‚ğ•Ô‚·
+//		return E_FAIL; // ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚ªãƒ¼ãƒ—ãƒ³ã«å¤±æ•—ã—ãŸå ´åˆã¯ã‚¨ãƒ©ãƒ¼ã‚’è¿”ã™
 //	}
 //
-//	// ƒtƒ@ƒCƒ‹ƒTƒCƒY‚ğæ“¾
+//	// ãƒ•ã‚¡ã‚¤ãƒ«ã‚µã‚¤ã‚ºã‚’å–å¾—
 //	std::streamsize fileSize = file.tellg();
 //	file.seekg(0, std::ios::beg);
 //
-//	// ƒtƒ@ƒCƒ‹ƒf[ƒ^‚ğŠi”[‚·‚éƒoƒbƒtƒ@‚ğì¬
+//	// ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´ã™ã‚‹ãƒãƒƒãƒ•ã‚¡ã‚’ä½œæˆ
 //	std::vector<uint8_t> buffer(fileSize);
 //	if (!file.read(reinterpret_cast<char*>(buffer.data()), fileSize))
 //	{
-//		return E_FAIL; // ƒtƒ@ƒCƒ‹‚Ì“Ç‚İ‚İ‚É¸”s‚µ‚½ê‡‚ÍƒGƒ‰[‚ğ•Ô‚·
+//		return E_FAIL; // ãƒ•ã‚¡ã‚¤ãƒ«ã®èª­ã¿è¾¼ã¿ã«å¤±æ•—ã—ãŸå ´åˆã¯ã‚¨ãƒ©ãƒ¼ã‚’è¿”ã™
 //	}
 //
-//	// DirectX::TexMetadata‚ğg—p‚µ‚ÄGLBƒtƒ@ƒCƒ‹‚Ìƒƒ^ƒf[ƒ^‚ğæ“¾
+//	// DirectX::TexMetadataã‚’ä½¿ç”¨ã—ã¦GLBãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ¡ã‚¿ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—
 //	//hr = DirectX::GetMetadataFromGltf(reinterpret_cast<const uint8_t*>(buffer.data()), buffer.size(), DirectX::DDS_FLAGS_NONE, metadata);
 //	//if (FAILED(hr))
 //	//{
-//	//	return hr; // ƒƒ^ƒf[ƒ^‚Ìæ“¾‚É¸”s‚µ‚½ê‡‚ÍƒGƒ‰[ƒR[ƒh‚ğ•Ô‚·
+//	//	return hr; // ãƒ¡ã‚¿ãƒ‡ãƒ¼ã‚¿ã®å–å¾—ã«å¤±æ•—ã—ãŸå ´åˆã¯ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰ã‚’è¿”ã™
 //	//}
 //
 //	return S_OK;
