@@ -154,9 +154,6 @@ public:
 
 	Shader* GetShader() const { return m_shader.get(); }
 	
-	// スプライトシェーダー取得
-	SpriteShader* GetShader(SpriteShaderId id) const { return spriteShaders[static_cast<int>(id)].get(); }
-
 	// テクスチャ読み込み
 	HRESULT LoadTexture(const char* filename, ID3D12Resource** d3d_resource);
 

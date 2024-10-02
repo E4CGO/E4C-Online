@@ -18,6 +18,8 @@ public:
 
 	//レンダーターゲット設定	
 	void SetRenderTarget(ID3D11DeviceContext* dc);
+
+	//G-Buffer用レンダーターゲット設定	
 	void SetRenderTargets(ID3D11DeviceContext* dc, int number, ID3D11RenderTargetView* rtv[]);
 
 	//ビューポート設定

@@ -6,6 +6,7 @@ class DeferredLightingShader : public SpriteShader
 {
 public:
 	DeferredLightingShader(ID3D11Device* device);
+	~DeferredLightingShader() override = default;
 
 	void Draw(const RenderContext& rc, const Sprite* sprite) override;
 	void End(const RenderContext& rc) override;

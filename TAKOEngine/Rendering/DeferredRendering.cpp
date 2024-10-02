@@ -46,7 +46,7 @@ void DeferredRendering::Render()
 	rc.deferredData.position = T_GRAPHICS.GetFrameBuffer(FrameBufferId::Position)->GetShaderResourceView().Get();
 
 	//•`‰æ
-	SpriteShader* shader = T_GRAPHICS.GetShader(SpriteShaderId::Deferred);
+	SpriteShader* shader = T_GRAPHICS.GetSpriteShader(SpriteShaderId::Deferred);
 	shader->Begin(rc);
 
 	sprite->SetShaderResourceView(
