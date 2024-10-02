@@ -60,7 +60,7 @@ void SceneGame::Initialize()
 	//DeferredRendering
 	deferredRendering->Initialize();
 
-	//�V���h�E�}�b�v�����_��
+	//シャドウマップレンダラ
 	shadowMapRenderer->Initialize();
 
 	//ライト情報
@@ -328,25 +328,25 @@ void SceneGame::Render()
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
-	// ���C�g�̏����l�ߍ���
+	// ライトの情報を詰め込む
 	LightManager::Instance().PushRenderContext(rc);
 
-	//�V���h�E�}�b�v�`��
+	//シャドウマップ描画
 	shadowMapRenderer->Render();
 	rc.shadowMapData = shadowMapRenderer->GetShadowMapData();
 	
-	// ���e�`��
+	// 内容描画
 	{
 		//Deferred Rendering
 		deferredRendering->SetDeferredRTV();
 		
-		//�I�u�W�F�N�g�`��
-		MAPTILES.Render(rc);			// �}�b�v
-		PLAYERS.Render(rc);				// �v���C���[
-		ENEMIES.Render(rc);				// �G�l�~�[
-		PROJECTILES.Render(rc);			// ���˕�
-		STAGES.Render(rc);				// �X�e�[�W�I�u�W�F�N�g
-		EFFECTS.Render(camera.GetView(), camera.GetProjection()); // �G�t�F�N�g
+		//オブジェクト描画
+		MAPTILES.Render(rc);						// マップ
+		PLAYERS.Render(rc);						// プレイヤー
+		ENEMIES.Render(rc);						// エネミー
+		PROJECTILES.Render(rc);						// 発射物
+		STAGES.Render(rc);						// ステージオブジェクト
+		EFFECTS.Render(camera.GetView(), camera.GetProjection()); 	// エフェクト
 	}
 #ifdef _DEBUG
 	{
@@ -369,7 +369,7 @@ void SceneGame::Render()
 	//DeferredRendering
 	deferredRendering->Render();
 
-	UI.Render(rc);						// �C���^�[�t�F�[�X
+	UI.Render(rc);						// インターフェース
 
 	T_TEXT.End();
 
