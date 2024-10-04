@@ -66,6 +66,8 @@ void SceneTitle::Initialize()
 		rouge->GetModel()->FindNode("Throwable")->visible = false;
 		shadowMapRenderer->ModelRegister(rouge->GetModel().get());
 
+		ID3D12Device* d3d_device = T_GRAPHICS.GetDeviceDX12();
+		m_skinning_pipeline = std::make_unique<SkinningPipeline>(d3d_device);
 		test = std::make_unique<ModelDX12>("Data/Model/Character/Barbarian.glb");
 		test->PlayAnimation(0, true);
 	}
@@ -235,6 +237,8 @@ void SceneTitle::RenderDX12()
 		RenderContextDX12 rc;
 		rc.d3d_command_list = d3d_command_list;
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
+		rc.buffer_index = TentacleLib::graphics.GetCurrentBufferIndex();
+		m_skinning_pipeline->Compute(rc, test.get());
 
 		// モデル描画
 		Shader* shader = TentacleLib::graphics.GetShader();

@@ -10,7 +10,7 @@ VS_OUT main(
 	uint4 boneIndices : BONES
 )
 {
-#if 1
+#if 0
     float3 p = { 0, 0, 0 };
     float3 n = { 0, 0, 0 };
     for (int i = 0; i < 4; i++)

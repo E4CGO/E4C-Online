@@ -225,6 +225,7 @@ private:
 	std::unique_ptr<DescriptorHeap>						m_sampler_descriptor_heap;
 
 	std::unique_ptr<Shader>								m_shader;
+	std::unique_ptr<SkinningPipeline>					m_skinning_pipeline;
 
 	UINT	m_buffer_count = 0;
 

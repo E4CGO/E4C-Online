@@ -118,7 +118,6 @@ public:
 
 		D3D12_VERTEX_BUFFER_VIEW				d3d_vbv;
 		D3D12_INDEX_BUFFER_VIEW					d3d_ibv;
-		Descriptor* cbv_descriptor = nullptr;
 
 		template<class Archive>
 		void serialize(Archive& archive);

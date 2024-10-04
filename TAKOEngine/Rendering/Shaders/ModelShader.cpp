@@ -272,7 +272,7 @@ SkinningPipeline::SkinningPipeline(ID3D12Device* device)
 			cs_data.size(),
 			IID_PPV_ARGS(m_d3d_root_signature.GetAddressOf()));
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-		m_d3d_pipeline_state->SetName(L"SkinningRootSignature");
+		m_d3d_root_signature->SetName(L"SkinningRootSignature");
 	}
 
 	//パイプラインステートの生成
@@ -321,7 +321,7 @@ void SkinningPipeline::Compute(const RenderContextDX12& rc, ModelDX12* model)
 		const ModelDX12::Mesh::FrameResource& mesh_fram_resource = mesh.frame_resources[rc.buffer_index];
 
 		//ディスクリプタ設定
-		rc.d3d_command_list->SetComputeRootDescriptorTable(0, mesh.mesh->cbv_descriptor->GetGpuHandle());
+		rc.d3d_command_list->SetComputeRootDescriptorTable(0, mesh.mesh->material->srv_descriptor->GetGpuHandle());
 		rc.d3d_command_list->SetComputeRootDescriptorTable(1, mesh_fram_resource.uav_descriptor->GetGpuHandle());
 		rc.d3d_command_list->SetComputeRootDescriptorTable(2, mesh_fram_resource.cbv_descriptor->GetGpuHandle());
 

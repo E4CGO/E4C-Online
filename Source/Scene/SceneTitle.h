@@ -75,6 +75,7 @@ private:
 
 	// テスト用
 	std::unique_ptr<ModelDX12> test;
+	std::unique_ptr<SkinningPipeline>	m_skinning_pipeline;
 	
 	static float time;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constant_buffers[8];
