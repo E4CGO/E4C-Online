@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <d3d12.h>
 
 #include "TAKOEngine/Rendering/Model/ModelResource.h"
 #include "TAKOEngine/Rendering/Shaders/Shader.h"
@@ -9,6 +10,7 @@ class ModelShader : public Shader
 {
 public:
 	ModelShader(ID3D11Device* device, const char* vs, const char* ps);
+
 	virtual ~ModelShader() override = default;
 
 	// 描画開始
@@ -74,4 +76,28 @@ protected:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> shadowMapConstantBuffer;
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> toontexture;
+
+	Microsoft::WRL::ComPtr<ID3D12PipelineState>		m_d3d_pipeline_state;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature>		m_d3d_root_signature;
+
+	PipelineState m_pipelineState;
+};
+
+//******************************************************************
+//  @class  SkinningPipeline
+//  @brief  スキニングパイプライン
+//  @par    コンピュートシェーダーを使用して最適化を行う
+//******************************************************************
+class SkinningPipeline
+{
+public:
+	SkinningPipeline(ID3D12Device* device);
+	~SkinningPipeline();
+
+	//計算
+	void Compute(const RenderContextDX12& rc, ModelDX12* model);
+
+private:
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> m_d3d_pipeline_state;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> m_d3d_root_signature;
 };

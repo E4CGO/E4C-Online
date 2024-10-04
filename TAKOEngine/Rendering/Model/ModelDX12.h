@@ -5,6 +5,7 @@
 #include <DirectXMath.h>
 
 #include "TAKOEngine/Rendering/Model/ModelResource.h"
+#include "TAKOEngine/Rendering/Constant.h"
 
 // モデル
 class ModelDX12 //: public iModel
@@ -26,17 +27,30 @@ public:
 		std::vector<Node*>	children;
 	};
 
-	struct FrameResource
-	{
-		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cbv_resource;
-		Descriptor* cbv_descriptor = nullptr;
-		DirectX::XMFLOAT4X4* cbv_data = nullptr;
-	};
-
 	struct Mesh
 	{
-		const ModelResource::Mesh* mesh;
+		struct Constants
+		{
+			DirectX::XMFLOAT4X4	world_transform;
+			DirectX::XMFLOAT4X4	bone_transforms[255];
+		};
+
+		struct FrameResource
+		{
+			Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_vbv_uav_resource;
+			D3D12_VERTEX_BUFFER_VIEW				d3d_vbv;
+			Descriptor* uav_descriptor = nullptr;
+
+			Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cbv_resource;
+			Descriptor* cbv_descriptor = nullptr;
+			Constants* cbv_data = nullptr;
+		};
 		std::vector<FrameResource>				frame_resources;
+
+		const ModelResource::Mesh* mesh = nullptr;
+
+		Node* node = nullptr;
+		UINT				vertex_count;
 	};
 
 	// 行列計算

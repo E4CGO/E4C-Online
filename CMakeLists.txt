@@ -358,6 +358,7 @@ set(TAKOEngine__Physics
 source_group("TAKOEngine\\Physics" FILES ${TAKOEngine__Physics})
 
 set(TAKOEngine__Rendering
+    "TAKOEngine/Rendering/Constant.h"
     "TAKOEngine/Rendering/ConstantBuffer.h"
     "TAKOEngine/Rendering/DebugRenderer.cpp"
     "TAKOEngine/Rendering/DebugRenderer.h"
@@ -383,6 +384,8 @@ set(TAKOEngine__Rendering
     "TAKOEngine/Rendering/LineRenderer.h"
     "TAKOEngine/Rendering/Misc.h"
     "TAKOEngine/Rendering/MyRender.h"
+    "TAKOEngine/Rendering/PipelineState.cpp"
+    "TAKOEngine/Rendering/PipelineState.h"
     "TAKOEngine/Rendering/PostEffect.cpp"
     "TAKOEngine/Rendering/PostEffect.h"
     "TAKOEngine/Rendering/PostprocessingRenderer.cpp"
@@ -554,6 +557,7 @@ set(TAKOEngine__Rendering__HLSL__Model
     "TAKOEngine/Rendering/HLSL/Model/PhongPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/PhongVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/Skinning.hlsli"
+    "TAKOEngine/Rendering/HLSL/Model/SkinningCS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/Toon.hlsli"
     "TAKOEngine/Rendering/HLSL/Model/ToonPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/ToonVS.hlsl"
@@ -682,6 +686,7 @@ set(SHADER_NAMES
     "LambertVS.cso"
     "PhongPS.cso"
     "PhongVS.cso"
+    "SkinningCS.cso"
     "ToonPS.cso"
     "ToonVS.cso"
     "BloomPS.cso"
@@ -717,6 +722,7 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/LambertVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/PhongPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/PhongVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/SkinningCS.hlsl,5.0,Compute,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/ToonPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/ToonVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/BloomPS.hlsl,5.0,Pixel,main"

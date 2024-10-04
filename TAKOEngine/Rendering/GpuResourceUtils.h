@@ -53,6 +53,9 @@ public:
 		const char* filename,
 		ID3D11ComputeShader** computeShader);
 
+	//シェーダー読み込み
+	static void LoadShaderFile(const char* filename, std::vector<BYTE>& data);
+
 	// テクスチャ読み込み
 	static HRESULT LoadTexture(
 		ID3D11Device* device,

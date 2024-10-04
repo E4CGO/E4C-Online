@@ -243,7 +243,7 @@ void LambertShader::Draw(const RenderContextDX12& rc, ModelDX12* model)
 	for (ModelDX12::Mesh& mesh : model->GetMeshes())
 	{
 		const ModelResource::Mesh* res_mesh = mesh.mesh;
-		ModelDX12::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
+		ModelDX12::Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
 
 		// メッシュ定数バッファ設定
 		rc.d3d_command_list->SetGraphicsRootDescriptorTable(1, frame_resource.cbv_descriptor->GetGpuHandle());
