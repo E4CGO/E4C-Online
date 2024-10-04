@@ -2,12 +2,12 @@
 
 #include <d3d12.h>
 
-// ƒoƒbƒtƒ@ƒJƒEƒ“ƒg
+// ãƒãƒƒãƒ•ã‚¡ã‚«ã‚¦ãƒ³ãƒˆ
 static const UINT BufferCount = 2;
 
 static const UINT SkinningCSThreadNum = 8;
 
-// ’á‘¬ n Ø‚èã‚°
+// ä½é€Ÿ n åˆ‡ã‚Šä¸Šã’
 template<class T>
 inline T RoundUp(const T& n, const T& v)
 {

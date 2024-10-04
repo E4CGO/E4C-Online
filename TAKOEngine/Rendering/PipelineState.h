@@ -10,7 +10,7 @@ public:
 		if (m_pipelineState) m_pipelineState->Release();
 	}
 
-	//‰Šú‰»
+	//åˆæœŸåŒ–
 	void Init(ID3D12Device* device, D3D12_GRAPHICS_PIPELINE_STATE_DESC desc);
 	void Init(ID3D12Device* device, D3D12_COMPUTE_PIPELINE_STATE_DESC desc);
 

@@ -1,5 +1,5 @@
 //--------------------------
-// NOTE:①ルートシグネチャの設定⑤
+// NOTE:竭繝ｫ繝ｼ繝医す繧ｰ繝阪メ繝｣縺ｮ險ｭ螳壺側
 //--------------------------
 #define ROOT_SIG "DescriptorTable(SRV(t0)), \
                   DescriptorTable(UAV(u0)), \
@@ -28,7 +28,7 @@ RWStructuredBuffer<Vertex>	dst_vertices : register(u0);
 #define CS_THREAD_NUM 8
 
 //--------------------------
-// NOTE:①ルートシグネチャの設定⑥
+// NOTE:竭繝ｫ繝ｼ繝医す繧ｰ繝阪メ繝｣縺ｮ險ｭ螳壺則
 //--------------------------
 [RootSignature(ROOT_SIG)]
 [numthreads(CS_THREAD_NUM, 1, 1)]
