@@ -177,11 +177,29 @@ HRESULT GpuResourceUtils::LoadComputeShader(
 	fread(data.get(), size, 1, fp);
 	fclose(fp);
 
-	//ドメインシェーダー生成
+	//コンピュートシェーダー生成
 	HRESULT hr = device->CreateComputeShader(data.get(), size, nullptr, computeShader);
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
 	return hr;
+}
+
+void GpuResourceUtils::LoadShaderFile(const char* filename, std::vector<BYTE>& data)
+{
+	// ファイルを開く
+	FILE* fp = nullptr;
+	fopen_s(&fp, filename, "rb");
+	_ASSERT_EXPR_A(fp, "CSO File not found");
+
+	// ファイルのサイズを求める
+	fseek(fp, 0, SEEK_END);
+	long size = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+
+	// メモリ上に頂点シェーダーデータを格納する領域を用意する
+	data.resize(size);
+	fread(data.data(), size, 1, fp);
+	fclose(fp);
 }
 
 // テクスチャを読み込む

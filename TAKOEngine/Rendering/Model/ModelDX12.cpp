@@ -48,10 +48,11 @@ ModelDX12::ModelDX12(const char* filename)
 		auto&& dst_mesh = m_meshes.at(mesh_index);
 
 		dst_mesh.mesh = &src_mesh;
+		dst_mesh.vertex_count = RoundUp(SkinningCSThreadNum, static_cast<UINT>(src_mesh.vertices.size()));
 		dst_mesh.frame_resources.resize(graphics.GetBufferCount());
 
 		// フレームリソース
-		for (FrameResource& frame_resource : dst_mesh.frame_resources)
+		for (Mesh::FrameResource& frame_resource : dst_mesh.frame_resources)
 		{
 			UINT bone_num = static_cast<UINT>(src_mesh.bones.size());
 			if (bone_num == 0) bone_num = 1;
@@ -120,7 +121,7 @@ ModelDX12::~ModelDX12()
 
 	for (Mesh& mesh : m_meshes)
 	{
-		for (FrameResource& frame_resource : mesh.frame_resources)
+		for (Mesh::FrameResource& frame_resource : mesh.frame_resources)
 		{
 			if (frame_resource.cbv_descriptor != nullptr)
 			{
@@ -168,7 +169,7 @@ void ModelDX12::UpdateTransform(const DirectX::XMFLOAT4X4& transform)
 	for (Mesh& mesh : m_meshes)
 	{
 		const ModelResource::Mesh* res_mesh = mesh.mesh;
-		FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
+		Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
 
 		if (res_mesh->nodeIndices.size() > 0)
 		{
@@ -177,12 +178,12 @@ void ModelDX12::UpdateTransform(const DirectX::XMFLOAT4X4& transform)
 				DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&m_nodes.at(res_mesh->nodeIndices.at(i)).world_transform);
 				DirectX::XMMATRIX OffsetTransform = DirectX::XMLoadFloat4x4(&res_mesh->offsetTransforms.at(i));
 				DirectX::XMMATRIX BoneTransform = OffsetTransform * WorldTransform;
-				DirectX::XMStoreFloat4x4(&frame_resource.cbv_data[i], BoneTransform);
+				DirectX::XMStoreFloat4x4(&frame_resource.cbv_data[i].bone_transforms[i], BoneTransform);
 			}
 		}
 		else
 		{
-			frame_resource.cbv_data[0] = m_nodes.at(res_mesh->nodeIndex).world_transform;
+			frame_resource.cbv_data[0].world_transform = m_nodes.at(res_mesh->nodeIndex).world_transform;
 		}
 	}
 }
