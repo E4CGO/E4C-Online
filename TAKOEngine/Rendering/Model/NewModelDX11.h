@@ -15,13 +15,6 @@ public:
 	NewModelDX11(ID3D11Device* device, const char* filename, float scaling = 1.0f);
 	~NewModelDX11();
 
-	struct FrameResource
-	{
-		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cbv_resource;
-		Descriptor* cbv_descriptor = nullptr;
-		DirectX::XMFLOAT4X4* cbv_data = nullptr;
-	};
-
 	struct Mesh
 	{
 		const ModelResource::Mesh* mesh = nullptr;
@@ -30,7 +23,7 @@ public:
 	};
 
 	// ノードデータ取得
-	const std::vector<Node>& GetNodes() const { return nodes; }
+	const std::vector<ModelResource::Node>& GetNodes() const { return nodes; }
 
 	// メッシュ取得
 	const std::vector<Mesh>& GetMeshes() const { return m_meshes; }
@@ -39,10 +32,10 @@ public:
 	void UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform);
 
 	// ルートノード取得
-	Node* GetRootNode() { return nodes.data(); }
+	ModelResource::Node* GetRootNode() { return nodes.data(); }
 
 	// ノード検索
-	Node* FindNode(const char* name);
+	ModelResource::Node* FindNode(const char* name);
 
 	// リソース取得
 	const ModelResource* GetResource() const { return resource.get(); }
@@ -69,8 +62,8 @@ public:
 	void SetLinearGamma(float g) { linearGamma = g; }
 	float GetLinearGamma() const { return linearGamma; }
 
-	const std::vector<Node>& GetNodesDX12() const { return m_nodes; }
-	std::vector<Node>& GetNodesDX12() { return m_nodes; }
+	const std::vector<ModelResource::Node>& GetNodesDX12() const { return m_nodes; }
+	std::vector<ModelResource::Node>& GetNodesDX12() { return m_nodes; }
 
 	// メッシュリスト取得
 	std::vector<Mesh>& GetMeshes() { return m_meshes; }
@@ -81,10 +74,10 @@ public:
 	//デバッグ情報
 	void DrawDebugGUI();
 
-	void animate(size_t animation_index, float time, std::vector<Node>& animated_nodes);
+	void animate(size_t animation_index, float time, std::vector<ModelResource::Node>& animated_nodes);
 	std::vector<animation>& GetAnimations();
-	void render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world, const std::vector<Node>& animated_nodes);
-	const std::vector<Node>& GetLocalNodes() const;
+	void render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world, const std::vector<ModelResource::Node>& animated_nodes);
+	const std::vector<ModelResource::Node>& GetLocalNodes() const;
 
 private:
 	// アニメーション計算処理
@@ -97,9 +90,9 @@ private:
 	void ComputeWorldBounds();
 
 private:
-	std::shared_ptr<ModelResource>	resource;
-	std::vector<Node>				nodes;
-	DirectX::BoundingBox	        bounds;
+	std::shared_ptr<ModelResource>					resource;
+	std::vector<ModelResource::Node>				nodes;
+	DirectX::BoundingBox							bounds;
 
 	int   currentAnimationIndex = -1;
 	float currentAnimationSeconds = 0.0f;
@@ -122,9 +115,9 @@ private:
 
 	float linearGamma = 1.0f;
 
-	std::shared_ptr<ModelResource>			m_resource;
-	std::vector<Node>						m_nodes;
-	std::vector<Mesh>						m_meshes;
+	std::shared_ptr<ModelResource>							m_resource;
+	std::vector<ModelResource::Node>						m_nodes;
+	std::vector<Mesh>										m_meshes;
 
 	int								m_current_animation = -1;
 	float							m_current_seconds = 0.0f;

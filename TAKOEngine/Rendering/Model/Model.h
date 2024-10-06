@@ -17,30 +17,6 @@ public:
 	iModel(ID3D11Device* device, const char* filename, float scaling = 1.0f) {};
 	virtual ~iModel() {};
 
-	struct Node
-	{
-		std::string name;
-		std::string path;
-		int parentIndex;
-		DirectX::XMFLOAT3 position{ 0, 0, 0 };
-		DirectX::XMFLOAT3 translation{ 0, 0, 0 };
-		DirectX::XMFLOAT4 rotation{ 0, 0, 0, 1 };
-		DirectX::XMFLOAT3 scale{ 1, 1, 1 };
-
-		Node* parent = nullptr;
-		std::vector<Node*> children;
-		std::vector<int> ichildren;
-
-		DirectX::XMFLOAT4X4 localTransform;
-		DirectX::XMFLOAT4X4 globalTransform{ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
-		DirectX::XMFLOAT4X4 worldTransform;
-
-		int skin{ -1 };
-		int mesh{ -1 };
-
-		bool visible = true;
-	};
-
 	struct FrameResource
 	{
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cbv_resource;
@@ -83,7 +59,7 @@ public:
 	};
 
 	// ノードデータ取得
-	const std::vector<Node>& GetNodes() const { return nodes; }
+	const std::vector<ModelResource::Node>& GetNodes() const { return nodes; }
 
 	// メッシュ取得
 	const std::vector<Mesh>& GetMeshes() const { return m_meshes; }
@@ -92,10 +68,10 @@ public:
 	virtual void UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform) = 0;
 
 	// ルートノード取得
-	Node* GetRootNode() { return nodes.data(); }
+	ModelResource::Node* GetRootNode() { return nodes.data(); }
 
 	// ノード検索
-	virtual Node* FindNode(const char* name) = 0;
+	virtual ModelResource::Node* FindNode(const char* name) = 0;
 
 	// リソース取得
 	const ModelResource* GetResource() const { return resource.get(); }
@@ -122,8 +98,8 @@ public:
 	void SetLinearGamma(float g) { linearGamma = g; }
 	float GetLinearGamma() const { return linearGamma; }
 
-	const std::vector<Node>& GetNodesDX12() const { return m_nodes; }
-	std::vector<Node>& GetNodesDX12() { return m_nodes; }
+	const std::vector<ModelResource::Node>& GetNodesDX12() const { return m_nodes; }
+	std::vector<ModelResource::Node>& GetNodesDX12() { return m_nodes; }
 
 	// メッシュリスト取得
 	std::vector<Mesh>& GetMeshes() { return m_meshes; }
@@ -143,15 +119,15 @@ public:
 	// バウンディングボックス計算
 	virtual void ComputeWorldBounds() = 0;
 
-	virtual void animate(size_t animation_index, float time, std::vector<Node>& animated_nodes) = 0;
+	virtual void animate(size_t animation_index, float time, std::vector<ModelResource::Node>& animated_nodes) = 0;
 	virtual std::vector<animation>& GetAnimations() = 0;
-	virtual void render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world, const std::vector<Node>& animated_nodes) = 0;
-	virtual const std::vector<Node>& GetLocalNodes() const = 0;
+	virtual void render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world, const std::vector<ModelResource::Node>& animated_nodes) = 0;
+	virtual const std::vector<ModelResource::Node>& GetLocalNodes() const = 0;
 
 protected:
-	std::shared_ptr<ModelResource>	resource;
-	std::vector<Node>				nodes;
-	DirectX::BoundingBox	        bounds;
+	std::shared_ptr<ModelResource>					resource;
+	std::vector<ModelResource::Node>				nodes;
+	DirectX::BoundingBox							bounds;
 
 	int   currentAnimationIndex = -1;
 	float currentAnimationSeconds = 0.0f;
@@ -174,9 +150,9 @@ protected:
 
 	float linearGamma = 1.0f;
 
-	std::shared_ptr<ModelResource>			m_resource;
-	std::vector<Node>						m_nodes;
-	std::vector<Mesh>						m_meshes;
+	std::shared_ptr<ModelResource>							m_resource;
+	std::vector<ModelResource::Node>						m_nodes;
+	std::vector<Mesh>										m_meshes;
 
 	int								m_current_animation = -1;
 	float							m_current_seconds = 0.0f;

@@ -179,155 +179,166 @@ void ModelResource::Animation::serialize(Archive& archive)
 }
 
 // 読み込み
-void ModelResource::Load(ID3D11Device* device, const char* filename)
+void ModelResource::Load(const char* filename, std::string modelRenderType)
 {
+	Graphics& graphics = Graphics::Instance();
+
 	std::filesystem::path filepath(filename);
 	std::filesystem::path dirpath(filepath.parent_path());
 
-	// 独自形式のモデルファイルの存在確認
-	filepath.replace_extension(".cereal");
-	if (std::filesystem::exists(filepath))
+	if (modelRenderType == "DX11")
 	{
-		// 独自形式のモデルファイルの読み込み
-		Deserialize(filepath.string().c_str());
-	}
-	else
-	{
-		// 汎用モデルファイル読み込む
-		AssimpImporter importer(filename);
+		ID3D11Device* device = graphics.GetDeviceDX11();
 
-		// マテリアルデータ読み取り
-		importer.LoadMaterials(materials);
-
-		// ノードデータ読み取り
-		importer.LoadNodes(nodes);
-
-		// メッシュデータ読み取り
-		importer.LoadMeshes(meshes, nodes);
-
-		// アニメーションデート読み取り
-		importer.LoadAnimations(animations, nodes);
-
-		// バウンディングボックス計算
-		ComputeLocalBounds();
-
-		// 独自形式のモデルファイルを保存
-		Serialize(filepath.string().c_str());
-	}
-
-	//// ノード構築
-	//for (size_t nodeIndex = 0; nodeIndex < nodes.size(); nodeIndex++)
-	//{
-	//	Node& node = nodes.at(nodeIndex);
-
-	//	//// 親子関係を構築
-	//	//node.parent = node.parentIndex >= 0 ? &nodes.at(node.parentIndex) : nullptr;
-	//	//if (node.parent != nullptr)
-	//	//{
-	//	//	node.parent->children.emplace_back(&node);
-	//	//}
-	//}
-
-	// マテリアル構築
-	for (Material& material : materials)
-	{
-		if (material.diffuseTextureFileName.empty())
+		// 独自形式のモデルファイルの存在確認
+		filepath.replace_extension(".cereal");
+		if (std::filesystem::exists(filepath))
 		{
-			// ダミーテクスチャ作成
-			HRESULT hr = GpuResourceUtils::CreateDummyTexture(device, 0xFFFFFFFF, material.diffuseMap.GetAddressOf());
-			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+			// 独自形式のモデルファイルの読み込み
+			Deserialize(filepath.string().c_str());
 		}
 		else
 		{
-			// ディフューズテクスチャ読み込み
-			std::filesystem::path diffuseTexturePath(dirpath / material.diffuseTextureFileName);
-			HRESULT hr = GpuResourceUtils::LoadTexture(device, diffuseTexturePath.string().c_str(), material.diffuseMap.GetAddressOf());
+			// 汎用モデルファイル読み込む
+			AssimpImporter importer(filename);
 
-			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+			// マテリアルデータ読み取り
+			importer.LoadMaterials(materials);
+
+			// ノードデータ読み取り
+			importer.LoadNodes(nodes);
+
+			// メッシュデータ読み取り
+			importer.LoadMeshes(meshes, nodes);
+
+			// アニメーションデート読み取り
+			importer.LoadAnimations(animations, nodes);
+
+			// バウンディングボックス計算
+			ComputeLocalBounds();
+
+			// 独自形式のモデルファイルを保存
+			Serialize(filepath.string().c_str());
 		}
-		if (material.normalTextureFileName.empty())
+
+		//// ノード構築
+		//for (size_t nodeIndex = 0; nodeIndex < nodes.size(); nodeIndex++)
+		//{
+		//	Node& node = nodes.at(nodeIndex);
+
+		//	//// 親子関係を構築
+		//	//node.parent = node.parentIndex >= 0 ? &nodes.at(node.parentIndex) : nullptr;
+		//	//if (node.parent != nullptr)
+		//	//{
+		//	//	node.parent->children.emplace_back(&node);
+		//	//}
+		//}
+
+		// マテリアル構築
+		for (Material& material : materials)
 		{
-			// 法線ダミーテクスチャ作成
-			HRESULT hr = GpuResourceUtils::CreateDummyTexture(device, 0xFFFF7F7F, material.normalMap.GetAddressOf());
+			if (material.diffuseTextureFileName.empty())
+			{
+				// ダミーテクスチャ作成
+				HRESULT hr = GpuResourceUtils::CreateDummyTexture(device, 0xFFFFFFFF, material.diffuseMap.GetAddressOf());
+				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+			}
+			else
+			{
+				// ディフューズテクスチャ読み込み
+				std::filesystem::path diffuseTexturePath(dirpath / material.diffuseTextureFileName);
+				HRESULT hr = GpuResourceUtils::LoadTexture(device, diffuseTexturePath.string().c_str(), material.diffuseMap.GetAddressOf());
 
-			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-		}
-		else
-		{
-			// 法線テクスチャ読み込み
-			std::filesystem::path texturePath(dirpath / material.normalTextureFileName);
-			HRESULT hr = GpuResourceUtils::LoadTexture(device, texturePath.string().c_str(), material.normalMap.GetAddressOf());
-		}
-	}
+				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+			}
+			if (material.normalTextureFileName.empty())
+			{
+				// 法線ダミーテクスチャ作成
+				HRESULT hr = GpuResourceUtils::CreateDummyTexture(device, 0xFFFF7F7F, material.normalMap.GetAddressOf());
 
-	// メッシュ構築
-	for (Mesh& mesh : meshes)
-	{
-		// 参照ノード設定
-		mesh.node = &nodes.at(mesh.nodeIndex);
-
-		// 参照マテリアル設定
-		mesh.material = &materials.at(mesh.materialIndex);
-
-		// 頂点バッファ
-		{
-			D3D11_BUFFER_DESC bufferDesc = {};
-			D3D11_SUBRESOURCE_DATA subresourceData = {};
-
-			bufferDesc.ByteWidth = static_cast<UINT>(sizeof(Vertex) * mesh.vertices.size());
-			bufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
-			bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-			bufferDesc.CPUAccessFlags = 0;
-			bufferDesc.MiscFlags = 0;
-			bufferDesc.StructureByteStride = 0;
-			subresourceData.pSysMem = mesh.vertices.data();
-			subresourceData.SysMemPitch = 0;
-			subresourceData.SysMemSlicePitch = 0;
-
-			HRESULT hr = device->CreateBuffer(&bufferDesc, &subresourceData, mesh.vertexBuffer.GetAddressOf());
-			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+			}
+			else
+			{
+				// 法線テクスチャ読み込み
+				std::filesystem::path texturePath(dirpath / material.normalTextureFileName);
+				HRESULT hr = GpuResourceUtils::LoadTexture(device, texturePath.string().c_str(), material.normalMap.GetAddressOf());
+			}
 		}
 
-		// インデックスバッファ
-		{
-			D3D11_BUFFER_DESC bufferDesc = {};
-			D3D11_SUBRESOURCE_DATA subresourceData = {};
-
-			bufferDesc.ByteWidth = static_cast<UINT>(sizeof(uint32_t) * mesh.indices.size());
-			bufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
-			bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-			bufferDesc.CPUAccessFlags = 0;
-			bufferDesc.MiscFlags = 0;
-			bufferDesc.StructureByteStride = 0;
-			subresourceData.pSysMem = mesh.indices.data();
-			subresourceData.SysMemPitch = 0;
-			subresourceData.SysMemSlicePitch = 0;
-
-			HRESULT hr = device->CreateBuffer(&bufferDesc, &subresourceData, mesh.indexBuffer.GetAddressOf());
-			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-		}
-
-		// ボーン構築
-		for (Bone& bone : mesh.bones)
+		// メッシュ構築
+		for (Mesh& mesh : meshes)
 		{
 			// 参照ノード設定
-			bone.node = &nodes.at(bone.nodeIndex);
+			mesh.node = &nodes.at(mesh.nodeIndex);
+
+			// 参照マテリアル設定
+			mesh.material = &materials.at(mesh.materialIndex);
+
+			// 頂点バッファ
+			{
+				D3D11_BUFFER_DESC bufferDesc = {};
+				D3D11_SUBRESOURCE_DATA subresourceData = {};
+
+				bufferDesc.ByteWidth = static_cast<UINT>(sizeof(Vertex) * mesh.vertices.size());
+				bufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+				bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+				bufferDesc.CPUAccessFlags = 0;
+				bufferDesc.MiscFlags = 0;
+				bufferDesc.StructureByteStride = 0;
+				subresourceData.pSysMem = mesh.vertices.data();
+				subresourceData.SysMemPitch = 0;
+				subresourceData.SysMemSlicePitch = 0;
+
+				HRESULT hr = device->CreateBuffer(&bufferDesc, &subresourceData, mesh.vertexBuffer.GetAddressOf());
+				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+			}
+
+			// インデックスバッファ
+			{
+				D3D11_BUFFER_DESC bufferDesc = {};
+				D3D11_SUBRESOURCE_DATA subresourceData = {};
+
+				bufferDesc.ByteWidth = static_cast<UINT>(sizeof(uint32_t) * mesh.indices.size());
+				bufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+				bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+				bufferDesc.CPUAccessFlags = 0;
+				bufferDesc.MiscFlags = 0;
+				bufferDesc.StructureByteStride = 0;
+				subresourceData.pSysMem = mesh.indices.data();
+				subresourceData.SysMemPitch = 0;
+				subresourceData.SysMemSlicePitch = 0;
+
+				HRESULT hr = device->CreateBuffer(&bufferDesc, &subresourceData, mesh.indexBuffer.GetAddressOf());
+				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+			}
+
+			// ボーン構築
+			for (Bone& bone : mesh.bones)
+			{
+				// 参照ノード設定
+				bone.node = &nodes.at(bone.nodeIndex);
+			}
 		}
 	}
-}
 
-void ModelResource::Load(const char* filename)
-{
-	// ディレクトリパス取得
-	char drive[32], dir[256], dirname[256];
-	::_splitpath_s(filename, drive, sizeof(drive), dir, sizeof(dir), nullptr, 0, nullptr, 0);
-	::_makepath_s(dirname, sizeof(dirname), drive, dir, nullptr, nullptr);
+	if (modelRenderType == "NEWDX11")
+	{
+	}
 
-	// デシリアライズ
-	//Deserialize(filename);
+	if (modelRenderType == "DX12")
+	{
+		// ディレクトリパス取得
+		char drive[32], dir[256], dirname[256];
+		::_splitpath_s(filename, drive, sizeof(drive), dir, sizeof(dir), nullptr, 0, nullptr, 0);
+		::_makepath_s(dirname, sizeof(dirname), drive, dir, nullptr, nullptr);
 
-	// モデル構築
-	BuildModel(dirname, filename);
+		// デシリアライズ
+		//Deserialize(filename);
+
+		// モデル構築
+		BuildModel(dirname, filename);
+	}
 }
 
 void ModelResource::BuildModel(const char* dirname, const char* filename)
@@ -634,18 +645,18 @@ void ModelResource::ComputeLocalBounds()
 				DirectX::XMStoreFloat4x4(&boneTransforms[i], BoneTransform);
 			}
 
-			DirectX::XMFLOAT3 boundsMin              = { FLT_MAX, FLT_MAX, FLT_MAX };
-			DirectX::XMFLOAT3 boundsMax              = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
-			DirectX::XMMATRIX GlobalTransform        = DirectX::XMLoadFloat4x4(&globalTransforms[mesh.nodeIndex]);
+			DirectX::XMFLOAT3 boundsMin = { FLT_MAX, FLT_MAX, FLT_MAX };
+			DirectX::XMFLOAT3 boundsMax = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
+			DirectX::XMMATRIX GlobalTransform = DirectX::XMLoadFloat4x4(&globalTransforms[mesh.nodeIndex]);
 			DirectX::XMMATRIX InverseGlobalTransform = DirectX::XMMatrixInverse(nullptr, GlobalTransform);
 
 			for (const ModelResource::Vertex& vertex : mesh.vertices)
 			{
 				//スキニング
 				DirectX::XMVECTOR Position = DirectX::XMLoadFloat3(&vertex.position);
-				DirectX::XMVECTOR P        = DirectX::XMVectorZero();
+				DirectX::XMVECTOR P = DirectX::XMVectorZero();
 				const float* weights = &vertex.boneWeight.x;
-				const UINT*  indices = &vertex.boneIndex.x;
+				const UINT* indices = &vertex.boneIndex.x;
 				for (int j = 0; j < 4; ++j)
 				{
 					DirectX::XMMATRIX BoneTransform = DirectX::XMLoadFloat4x4(&boneTransforms[indices[j]]);
@@ -729,9 +740,9 @@ void ModelResource::Deserialize(const char* filename)
 	}
 }
 
-void ModelResource::ImportAnimations(const char* filename)
+void ModelResource::ImportAnimations(const char* filename, std::string modelRenderType)
 {
-	animations = ResourceManager::Instance().LoadModelResource(filename)->animations;
+	animations = ResourceManager::Instance().LoadModelResource(filename, modelRenderType)->animations;
 }
 
 int ModelResource::FindNodeIndex(NodeId nodeId) const

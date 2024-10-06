@@ -54,7 +54,8 @@ void SceneGame::Initialize()
 	// Model Resource Preload
 	for (auto& filename : modelList)
 	{
-		modelPreLoad.insert(RESOURCE.LoadModelResource(filename));
+		// TODO fix loading
+		modelPreLoad.insert(RESOURCE.LoadModelResource(filename, "DX11"));
 	}
 
 	//DeferredRendering
@@ -334,12 +335,12 @@ void SceneGame::Render()
 	//シャドウマップ描画
 	shadowMapRenderer->Render();
 	rc.shadowMapData = shadowMapRenderer->GetShadowMapData();
-	
+
 	// 内容描画
 	{
 		//Deferred Rendering
 		deferredRendering->SetDeferredRTV();
-		
+
 		//オブジェクト描画
 		MAPTILES.Render(rc);						// マップ
 		PLAYERS.Render(rc);						// プレイヤー

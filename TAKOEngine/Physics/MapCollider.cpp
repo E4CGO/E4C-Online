@@ -37,7 +37,7 @@ bool MapCollider::CollisionVsShpere(
 	for (const ModelResource::Mesh& mesh : resource->GetMeshes())
 	{
 		// メッシュノード取得
-		const iModel::Node& node = model->GetNodes().at(mesh.nodeIndex);
+		const ModelResource::Node& node = model->GetNodes().at(mesh.nodeIndex);
 
 		// 球体をワールド空間からローカル空間へ変換
 		DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&node.worldTransform);
@@ -199,7 +199,7 @@ bool MapCollider::RayCast(
 		minX = end.x;
 		maxX = start.x;
 	}
-	
+
 	float minY, maxY;
 	if (start.y < end.y)
 	{
@@ -281,7 +281,7 @@ void MapCollider::CalcMapArea(
 		}
 
 		// メッシュノード取得
-		const iModel::Node& node = model->GetNodes().at(mesh.nodeIndex);
+		const ModelResource::Node& node = model->GetNodes().at(mesh.nodeIndex);
 		// ワールド行列
 		XMMATRIX WorldTransform = XMLoadFloat4x4(&node.worldTransform);
 
@@ -348,8 +348,8 @@ void MapCollider::RegisterPorigons()
 	for (const ModelResource::Mesh& mesh : resource->GetMeshes())
 	{
 		// メッシュノード取得
-		const iModel::Node& node = model->GetNodes().at(mesh.nodeIndex);
-		
+		const ModelResource::Node& node = model->GetNodes().at(mesh.nodeIndex);
+
 		// ワールド行列取得
 		XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&node.worldTransform);
 
@@ -403,10 +403,9 @@ void MapCollider::RegisterPorigons()
 				XMStoreFloat3(&porigon->position[1], C);
 				XMStoreFloat3(&porigon->position[2], B);
 			}
-			
+
 			XMStoreFloat3(&porigon->normal, N);
 			porigon->materialIndex = mesh.materialIndex;
-
 
 			/////////// 8分木に登録 ////////////
 			// 頂点位置の最小値最大値
@@ -534,7 +533,7 @@ bool MapCollider::ShpereVsPorigon(
 	XMFLOAT3 sphereCenter = other->GetPosition();
 	XMFLOAT3 sphereCenterOri = other->GetPosition() + direction;
 	XMVECTOR  SphereCenter = XMLoadFloat3(&sphereCenter);
-	XMVECTOR  SphereCenterOri =  XMLoadFloat3(&sphereCenterOri);
+	XMVECTOR  SphereCenterOri = XMLoadFloat3(&sphereCenterOri);
 	XMVECTOR  Dot1 = XMVector3Dot(Normal, SphereCenter);
 	XMVECTOR  Dot2 = XMVector3Dot(Normal, SphereCenterOri);
 	XMVECTOR  Dot3 = XMVector3Dot(Normal, Vertex[0]);
@@ -685,7 +684,7 @@ bool MapCollider::SearchParent(		// 親空間探索
 {
 	// 空間外ならreturn
 	if (Elem <= 0) return hit;
-	
+
 	int parentElem = (Elem - 1) >> 3;
 	while (1)
 	{

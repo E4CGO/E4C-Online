@@ -37,7 +37,7 @@ void ShadowMapShader::Draw(const RenderContext& rc, const iModel* model, DirectX
 	ID3D11DeviceContext* dc = rc.deviceContext;
 
 	const ModelResource* resource = model->GetResource();
-	const std::vector<iModel::Node>& nodes = model->GetNodes();
+	const std::vector<ModelResource::Node>& nodes = model->GetNodes();
 
 	for (const ModelResource::Mesh& mesh : resource->GetMeshes())
 	{

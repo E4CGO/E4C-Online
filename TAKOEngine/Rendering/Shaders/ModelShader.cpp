@@ -132,7 +132,7 @@ void ModelShader::Begin(const RenderContext& rc)
 	{
 		//バイアスの処理が４枚以上は考慮していないのでアサートで止めておく
 		assert(myRenderer::NUM_SHADOW_MAP <= 4);
-		(&cbShadowMap.shadowBias.x)[i]     = rc.shadowMapData.shadowBias[i];
+		(&cbShadowMap.shadowBias.x)[i] = rc.shadowMapData.shadowBias[i];
 		cbShadowMap.lightViewProjection[i] = rc.shadowMapData.lightViewProjection[i];
 	}
 	rc.deviceContext->UpdateSubresource(shadowMapConstantBuffer.Get(), 0, 0, &cbShadowMap, 0, 0);
@@ -164,8 +164,6 @@ void ModelShader::Begin(const RenderContextDX12& rc)
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = { 0 };
 	desc.InputLayout = { inputElementDesc, _countof(inputElementDesc) };
 
-
-
 	m_pipelineState.Init(device, desc);
 }
 
@@ -191,7 +189,7 @@ void ModelShader::Draw(const RenderContext& rc, const iModel* model, DirectX::XM
 	ID3D11DeviceContext* dc = rc.deviceContext;
 
 	const ModelResource* resource = model->GetResource();
-	const std::vector<iModel::Node>& nodes = model->GetNodes();
+	const std::vector<ModelResource::Node>& nodes = model->GetNodes();
 
 	// カメラに写っている範囲のオブジェクトをフラグでマークする配列を用意
 	std::vector<bool> visibleObjects(model->GetMeshes().size(), false);
@@ -220,7 +218,7 @@ void ModelShader::Draw(const RenderContext& rc, const iModel* model, DirectX::XM
 		cbMesh.materialColor.z *= color.z;
 		cbMesh.materialColor.w *= color.w;
 		cbMesh.linearGamma = model->GetLinearGamma();
-		cbMesh.shaderData  = rc.shaderData;
+		cbMesh.shaderData = rc.shaderData;
 		dc->UpdateSubresource(meshConstantBuffer.Get(), 0, 0, &cbMesh, 0, 0);
 
 		// スケルトン用定数バッファ更新
@@ -229,9 +227,9 @@ void ModelShader::Draw(const RenderContext& rc, const iModel* model, DirectX::XM
 		{
 			for (size_t i = 0; i < mesh.bones.size(); ++i)
 			{
-				DirectX::XMMATRIX worldTransform  = DirectX::XMLoadFloat4x4(&nodes.at(mesh.bones.at(i).nodeIndex).worldTransform);
+				DirectX::XMMATRIX worldTransform = DirectX::XMLoadFloat4x4(&nodes.at(mesh.bones.at(i).nodeIndex).worldTransform);
 				DirectX::XMMATRIX offsetTransform = DirectX::XMLoadFloat4x4(&mesh.bones.at(i).offsetTransform);
-				DirectX::XMMATRIX boneTransform   = offsetTransform * worldTransform;
+				DirectX::XMMATRIX boneTransform = offsetTransform * worldTransform;
 				DirectX::XMStoreFloat4x4(&cbSkeleton.boneTransforms[i], boneTransform);
 			}
 		}

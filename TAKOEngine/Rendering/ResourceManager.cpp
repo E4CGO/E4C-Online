@@ -2,7 +2,7 @@
 #include "ResourceManager.h"
 
 // モデルリソース読み込み
-std::shared_ptr<ModelResource> ResourceManager::LoadModelResource(const char* filename)
+std::shared_ptr<ModelResource> ResourceManager::LoadModelResource(const char* filename, std::string modelRenderType)
 {
 	// モデル検索
 	ModelMap::iterator it = models.find(filename);
@@ -18,7 +18,7 @@ std::shared_ptr<ModelResource> ResourceManager::LoadModelResource(const char* fi
 
 	// 新規モデルリソース作成&読み込み
 	std::shared_ptr<ModelResource> model = std::make_shared<ModelResource>();
-	model->Load(Graphics::Instance().GetDevice(), filename);
+	model->Load(filename, modelRenderType);
 
 	// マップに登録
 	models[filename] = model;

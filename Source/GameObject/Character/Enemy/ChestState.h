@@ -26,7 +26,7 @@ namespace ChestState
 	{
 	public:
 		// コンストラクタ
-		ChestOpenState(Enemy* enemy, iModel::Node* coverNode, std::function<void(Enemy*)> OnOpen = nullptr) : HierarchicalState<Enemy>(enemy), coverNode(coverNode), OnOpen(OnOpen) {};
+		ChestOpenState(Enemy* enemy, ModelResource::Node* coverNode, std::function<void(Enemy*)> OnOpen = nullptr) : HierarchicalState<Enemy>(enemy), coverNode(coverNode), OnOpen(OnOpen) {};
 		// デストラクタ
 		~ChestOpenState() {};
 		// ステートに入った時のメソッド
@@ -36,7 +36,7 @@ namespace ChestState
 		// ステートから出ていくときのメソッド
 		void Exit() override {};
 	protected:
-		iModel::Node* coverNode; // 蓋ノード
+		ModelResource::Node* coverNode; // 蓋ノード
 		std::function<void(Enemy*)> OnOpen = nullptr;
 		float timer;
 		float openAngle = DirectX::XMConvertToRadians(-120.0f);

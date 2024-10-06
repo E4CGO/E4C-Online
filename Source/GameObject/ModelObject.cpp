@@ -14,11 +14,14 @@
 ModelObject::ModelObject(const char* filename, float scaling, std::string renderMode)
 {
 	if (renderMode == "DX11")
+	{
 		model = std::make_unique<ModelDX11>(T_GRAPHICS.GetDevice(), filename, scaling);
+	}
 
-	if (renderMode == "DX11GLTF")
-		model = std::make_unique<gltf_model>(T_GRAPHICS.GetDevice(), filename, scaling);
-
+	if (renderMode == "NEWDX11")
+	{
+		model = std::make_unique<NewModelDX11>(T_GRAPHICS.GetDevice(), filename, scaling);
+	}
 	if (renderMode == "DX12");
 }
 
@@ -84,7 +87,7 @@ void ModelObject::SetCollider(Collider::COLLIDER_TYPE collider)
 DirectX::XMFLOAT3 ModelObject::GetNodePosition(const char* nodeName, const DirectX::XMFLOAT3& offset)
 {
 	DirectX::XMFLOAT3 pos = {};
-	iModel::Node* node = model->FindNode(nodeName);
+	ModelResource::Node* node = model->FindNode(nodeName);
 	if (node == nullptr) return pos;
 
 	DirectX::XMVECTOR Offset = DirectX::XMLoadFloat3(&offset);
@@ -97,7 +100,7 @@ DirectX::XMFLOAT3 ModelObject::GetNodePosition(const char* nodeName, const Direc
 DirectX::XMFLOAT3 ModelObject::GetNodePosition(const DirectX::XMFLOAT3& offset)
 {
 	DirectX::XMFLOAT3 pos = {};
-	iModel::Node* node = model->GetRootNode();
+	ModelResource::Node* node = model->GetRootNode();
 
 	DirectX::XMVECTOR Offset = DirectX::XMLoadFloat3(&offset);
 	DirectX::XMMATRIX W = DirectX::XMLoadFloat4x4(&node->worldTransform);

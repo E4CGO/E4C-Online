@@ -69,7 +69,7 @@ private:
 	DirectX::XMFLOAT3 angle = { 0, 0, 0 };
 	DirectX::XMFLOAT3 scale = { 1, 1, 1 };
 
-	iModel::Node* selectionNode = nullptr;
+	ModelResource::Node* selectionNode = nullptr;
 
 	FreeCameraController cameraController;
 

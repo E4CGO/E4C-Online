@@ -29,7 +29,7 @@ public:
 	};
 	std::vector<scene> scenes;
 
-	std::vector<Node> nodes;
+	std::vector<ModelResource::Node> nodes;
 
 	struct  buffer_view
 	{
@@ -159,7 +159,7 @@ public:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> primitive_joint_cbuffer;
 
 	void fetch_nodes(const tinygltf::Model& gltf_model);
-	void cumulate_transforms(std::vector<Node>& nodes);
+	void cumulate_transforms(std::vector<ModelResource::Node>& nodes);
 
 	buffer_view make_buffer_view(const tinygltf::Accessor& accessor);
 	void fetch_meshes(ID3D11Device* device, const tinygltf::Model& gltf_model);
@@ -169,10 +169,9 @@ public:
 	void fetch_textures(ID3D11Device* device, const tinygltf::Model& gltf_model);
 
 	void fetch_animations(const tinygltf::Model& gltf_model);
-	void animate(size_t animation_index, float time, std::vector<Node>& animated_nodes);
+	void animate(size_t animation_index, float time, std::vector<ModelResource::Node>& animated_nodes);
 
-	void render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world, const std::vector<Node>& animated_nodes);
-	void renderDX12(ID3D11DeviceContext* immediate_context, const DirectX::XMFLOAT4X4 world, const std::vector<Node>& animated_nodes);
+	void render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world, const std::vector<ModelResource::Node>& animated_nodes);
 
 	void UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform);
 	void PlayAnimation(int index, bool loop, float blendSeconds = 0.2f);
@@ -185,8 +184,8 @@ public:
 	//////
 
 	// ノードデータ取得
-	const std::vector<Node>& GetNodes() const { return nodes; }
-	const std::vector<Node>& GetLocalNodes() const { return this->nodes; }
+	const std::vector<ModelResource::Node>& GetNodes() const { return nodes; }
+	const std::vector<ModelResource::Node>& GetLocalNodes() const { return this->nodes; }
 
 	std::vector<animation>& GetAnimations() { return animations; }
 
@@ -194,10 +193,10 @@ public:
 	const std::vector<Mesh>& GetMeshes() const { return m_meshes; }
 
 	// ルートノード取得
-	Node* GetRootNode() { return m_nodes.data(); }
+	ModelResource::Node* GetRootNode() { return m_nodes.data(); }
 
 	// ノード検索
-	Node* FindNode(const char* name);
+	ModelResource::Node* FindNode(const char* name);
 
 	// リソース取得
 	const ModelResource* GetResource() const { return resource.get(); }
@@ -215,8 +214,8 @@ public:
 	void SetLinearGamma(float g) { linearGamma = g; }
 	float GetLinearGamma() const { return linearGamma; }
 
-	const std::vector<Node>& GetNodesDX12() const { return m_nodes; }
-	std::vector<Node>& GetNodesDX12() { return m_nodes; }
+	const std::vector<ModelResource::Node>& GetNodesDX12() const { return m_nodes; }
+	std::vector<ModelResource::Node>& GetNodesDX12() { return m_nodes; }
 
 	// メッシュリスト取得
 	std::vector<Mesh>& GetMeshes() { return m_meshes; }

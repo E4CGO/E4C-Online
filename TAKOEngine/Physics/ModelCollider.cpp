@@ -23,7 +23,7 @@ bool ModelCollider::CollisionVsShpere(
 	for (const ModelResource::Mesh& mesh : resource->GetMeshes())
 	{
 		// メッシュノード取得
-		const iModel::Node& node = model->GetNodes().at(mesh.nodeIndex);
+		const ModelResource::Node& node = model->GetNodes().at(mesh.nodeIndex);
 
 		// 球体をワールド空間からローカル空間へ変換
 		DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&node.worldTransform);
@@ -34,7 +34,7 @@ bool ModelCollider::CollisionVsShpere(
 		float sphereRadius = other->GetScale().x; // 球体半径
 		DirectX::XMVECTOR SphereRadius = DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat(&sphereRadius), InverseWorldTransform);
 		DirectX::XMStoreFloat(&sphereRadius, SphereRadius);
-		
+
 		// 三角形（面）との交差判定
 		const std::vector<ModelResource::Vertex>& vertices = mesh.vertices;
 		const std::vector<UINT> indices = mesh.indices;
@@ -183,7 +183,7 @@ bool ModelCollider::RayCast(
 	for (const ModelResource::Mesh& mesh : resource->GetMeshes())
 	{
 		// メッシュノード取得
-		const iModel::Node& node = model->GetNodes().at(mesh.nodeIndex);
+		const ModelResource::Node& node = model->GetNodes().at(mesh.nodeIndex);
 
 		// レイをワールド空間からローカル空間へ変換
 		DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&node.worldTransform);

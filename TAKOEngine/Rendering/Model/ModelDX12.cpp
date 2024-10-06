@@ -14,7 +14,7 @@ ModelDX12::ModelDX12(const char* filename)
 
 	// リソース読み込み
 	m_resource = std::make_shared<ModelResource>();
-	m_resource->Load(filename);
+	m_resource->Load(filename, "DX12");
 
 	// ノード
 	const std::vector<ModelResource::Node>& res_nodes = m_resource->GetNodes();

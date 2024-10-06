@@ -12,7 +12,7 @@
 // コンストラクタ
 ModelDX11::ModelDX11(ID3D11Device* device, const char* filename, float scaling) : scaling(scaling)
 {
-	resource = ResourceManager::Instance().LoadModelResource(filename);
+	resource = ResourceManager::Instance().LoadModelResource(filename, "DX11");
 
 	// ノードキャッシュ
 	const std::vector<ModelResource::Node>& resNodes = resource->GetNodes();
@@ -66,7 +66,7 @@ void ModelDX11::PlayAnimation(int index, bool loop, float blendSeconds)
 	// 現在の姿勢をキャッシュする
 	for (size_t i = 0; i < nodes.size(); ++i)
 	{
-		const ModelDX11::Node& src = nodes.at(i);
+		const ModelResource::Node& src = nodes.at(i);
 		NodeCache& dst = nodeCaches.at(i);
 
 		dst.position = src.position;
@@ -100,7 +100,7 @@ void ModelDX11::ComputeAnimation(float elapsedTime)
 	// ノード毎のアニメーションデータ処理
 	for (size_t nodeIndex = 0; nodeIndex < animation.nodeAnims.size(); nodeIndex++)
 	{
-		Node& node = nodes.at(nodeIndex);
+		ModelResource::Node& node = nodes.at(nodeIndex);
 
 		const ModelResource::NodeAnim& nodeAnim = animation.nodeAnims.at(nodeIndex);
 
@@ -192,7 +192,7 @@ void ModelDX11::ComputeBlending(float elapsedTime)
 	for (int i = 0; i < count; i++)
 	{
 		const NodeCache& cache = nodeCaches.at(i);
-		Node& node = nodes.at(i);
+		ModelResource::Node& node = nodes.at(i);
 
 		DirectX::XMVECTOR S0 = DirectX::XMLoadFloat3(&cache.scale);
 		DirectX::XMVECTOR S1 = DirectX::XMLoadFloat3(&node.scale);
@@ -227,7 +227,7 @@ void ModelDX11::UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform)
 	// 右手座標系から左手座標系へ変換する行列
 	DirectX::XMMATRIX CoordinateSystemTransform = DirectX::XMMatrixScaling(-scaling, scaling, scaling);
 
-	for (Node& node : nodes)
+	for (ModelResource::Node& node : nodes)
 	{
 		if (!node.visible) node.scale = {};
 
@@ -274,7 +274,7 @@ void ModelDX11::ComputeWorldBounds()
 	}
 }
 
-void ModelDX11::animate(size_t animation_index, float time, std::vector<Node>& animated_nodes)
+void ModelDX11::animate(size_t animation_index, float time, std::vector<ModelResource::Node>& animated_nodes)
 {
 }
 
@@ -284,21 +284,21 @@ std::vector<iModel::animation>& ModelDX11::GetAnimations()
 	return newVec;
 }
 
-void ModelDX11::render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world, const std::vector<Node>& animated_nodes)
+void ModelDX11::render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world, const std::vector<ModelResource::Node>& animated_nodes)
 {
 }
 
-const std::vector<iModel::Node>& ModelDX11::GetLocalNodes() const
+const std::vector<ModelResource::Node>& ModelDX11::GetLocalNodes() const
 {
-	std::vector<iModel::Node> newVec;
+	std::vector<ModelResource::Node> newVec;
 	return newVec;
 }
 
-ModelDX11::Node* ModelDX11::FindNode(const char* name)
+ModelResource::Node* ModelDX11::FindNode(const char* name)
 {
 	// 全てのノードを総当たりで名前比較する
 	int nodeCount = static_cast<int>(nodes.size());
-	for (Node& node : nodes)
+	for (ModelResource::Node& node : nodes)
 	{
 		if (node.name == name)
 		{

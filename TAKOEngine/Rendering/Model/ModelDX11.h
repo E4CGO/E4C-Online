@@ -16,7 +16,7 @@ public:
 	~ModelDX11();
 
 	// ノードデータ取得
-	const std::vector<Node>& GetNodes() const { return nodes; }
+	const std::vector<ModelResource::Node>& GetNodes() const { return nodes; }
 
 	// メッシュ取得
 	const std::vector<Mesh>& GetMeshes() const { return m_meshes; }
@@ -25,10 +25,10 @@ public:
 	void UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform);
 
 	// ルートノード取得
-	Node* GetRootNode() { return nodes.data(); }
+	ModelResource::Node* GetRootNode() { return nodes.data(); }
 
 	// ノード検索
-	Node* FindNode(const char* name);
+	ModelResource::Node* FindNode(const char* name);
 
 	// リソース取得
 	const ModelResource* GetResource() const { return resource.get(); }
@@ -55,8 +55,8 @@ public:
 	void SetLinearGamma(float g) { linearGamma = g; }
 	float GetLinearGamma() const { return linearGamma; }
 
-	const std::vector<Node>& GetNodesDX12() const { return m_nodes; }
-	std::vector<Node>& GetNodesDX12() { return m_nodes; }
+	const std::vector<ModelResource::Node>& GetNodesDX12() const { return m_nodes; }
+	std::vector<ModelResource::Node>& GetNodesDX12() { return m_nodes; }
 
 	// メッシュリスト取得
 	std::vector<Mesh>& GetMeshes() { return m_meshes; }
@@ -76,10 +76,10 @@ public:
 	// バウンディングボックス計算
 	void ComputeWorldBounds();
 
-	void animate(size_t animation_index, float time, std::vector<Node>& animated_nodes);
+	void animate(size_t animation_index, float time, std::vector<ModelResource::Node>& animated_nodes);
 	std::vector<animation>& GetAnimations();
-	void render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world, const std::vector<Node>& animated_nodes);
-	const std::vector<Node>& GetLocalNodes() const;
+	void render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world, const std::vector<ModelResource::Node>& animated_nodes);
+	const std::vector<ModelResource::Node>& GetLocalNodes() const;
 
 	float scaling = 1.0f;
 };

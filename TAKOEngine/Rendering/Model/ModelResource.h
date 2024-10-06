@@ -25,12 +25,26 @@ public:
 		std::string path;
 		int parentIndex;
 
-		DirectX::XMFLOAT3 position;
-		DirectX::XMFLOAT4 rotation;
-		DirectX::XMFLOAT3 scale;
+		DirectX::XMFLOAT3 position{ 0, 0, 0 };
+		DirectX::XMFLOAT3 translation{ 0, 0, 0 };
+		DirectX::XMFLOAT4 rotation{ 0, 0, 0, 1 };
+		DirectX::XMFLOAT3 scale{ 1, 1, 1 };
 
 		template<class Archive>
 		void serialize(Archive& archive);
+
+		Node* parent = nullptr;
+		std::vector<Node*> children;
+		std::vector<int> ichildren;
+
+		DirectX::XMFLOAT4X4 localTransform;
+		DirectX::XMFLOAT4X4 globalTransform{ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+		DirectX::XMFLOAT4X4 worldTransform;
+
+		int skin{ -1 };
+		int mesh{ -1 };
+
+		bool visible = true;
 	};
 
 	struct Material
@@ -186,8 +200,7 @@ public:
 	const std::vector<Material>& GetMaterials() const { return materials; }
 
 	// 読み込み
-	void Load(ID3D11Device* device, const char* filename);
-	void Load(const char* filename);
+	void Load(const char* filename, std::string modelRenderType);
 
 protected:
 
@@ -206,7 +219,7 @@ protected:
 	int FindNodeIndex(NodeId nodeId) const;
 public:
 	// コピーアニメーション
-	void ImportAnimations(const char* filename);
+	void ImportAnimations(const char* filename, std::string modelRenderType);
 protected:
 	std::vector<Node>		nodes;
 	std::vector<Material>	materials;

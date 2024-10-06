@@ -86,7 +86,7 @@ void gltf_model::fetch_nodes(const tinygltf::Model& gltf_model)
 {
 	for (std::vector<tinygltf::Node>::const_reference gltf_node : gltf_model.nodes)
 	{
-		Node& node{ nodes.emplace_back() };
+		ModelResource::Node& node{ nodes.emplace_back() };
 		node.name = gltf_node.name;
 		node.skin = gltf_node.skin;
 		node.mesh = gltf_node.mesh;
@@ -139,12 +139,12 @@ void gltf_model::fetch_nodes(const tinygltf::Model& gltf_model)
 	cumulate_transforms(nodes);
 }
 
-void gltf_model::cumulate_transforms(std::vector<Node>& nodes)
+void gltf_model::cumulate_transforms(std::vector<ModelResource::Node>& nodes)
 {
 	std::stack<DirectX::XMFLOAT4X4> parent_global_transforms;
 	std::function<void(int)> traverse{ [&](int node_index)->void
 	{
-			Node& node{nodes.at(node_index)};
+			ModelResource::Node& node{nodes.at(node_index)};
 			DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(node.scale.x, node.scale.y, node.scale.z) };
 			DirectX::XMMATRIX R{ DirectX::XMMatrixRotationQuaternion(DirectX::XMVectorSet(node.rotation.x, node.rotation.y, node.rotation.z, node.rotation.w)) };
 			DirectX::XMMATRIX T{ DirectX::XMMatrixTranslation(node.translation.x, node.translation.y, node.translation.z) };
@@ -588,7 +588,7 @@ void gltf_model::fetch_animations(const tinygltf::Model& gltf_model)
 	}
 }
 
-void gltf_model::animate(size_t animation_index, float time, std::vector<Node>& animated_nodes)
+void gltf_model::animate(size_t animation_index, float time, std::vector<ModelResource::Node>& animated_nodes)
 {
 	std::function<size_t(const std::vector<float>&, float, float&)> indexof
 	{
@@ -665,11 +665,11 @@ void gltf_model::animate(size_t animation_index, float time, std::vector<Node>& 
 	}
 }
 
-void gltf_model::render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world, const std::vector<Node>& animated_nodes)
+void gltf_model::render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world, const std::vector<ModelResource::Node>& animated_nodes)
 {
 	ID3D11DeviceContext* immediate_context = rc.deviceContext;
 
-	const std::vector<Node>& nodes{ animated_nodes.size() > 0 ? animated_nodes : gltf_model::nodes };
+	const std::vector<ModelResource::Node>& nodes{ animated_nodes.size() > 0 ? animated_nodes : gltf_model::nodes };
 
 	immediate_context->VSSetShader(vertex_shader.Get(), nullptr, 0);
 	immediate_context->PSSetShader(pixel_shader.Get(), nullptr, 0);
@@ -677,107 +677,7 @@ void gltf_model::render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world
 	immediate_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	std::function<void(int)> traverse{ [&](int node_index)->void {
-		const Node& node {nodes.at(node_index)};
-		if (node.skin > -1)
-		{
-			const skin& skin{ skins.at(node.skin) };
-			primitive_joint_constants primitive_joint_data{};
-			for (size_t joint_index = 0; joint_index < skin.joints.size(); ++joint_index)
-			{
-				XMStoreFloat4x4(&primitive_joint_data.matrices[joint_index],
-					XMLoadFloat4x4(&skin.inverse_bind_matrices.at(joint_index)) *
-					XMLoadFloat4x4(&nodes.at(skin.joints.at(joint_index)).globalTransform) *
-					XMMatrixInverse(NULL, XMLoadFloat4x4(&node.globalTransform))
-				);
-			}
-			immediate_context->UpdateSubresource(primitive_joint_cbuffer.Get(), 0, 0, &primitive_joint_data, 0, 0);
-			immediate_context->VSSetConstantBuffers(2, 1, primitive_joint_cbuffer.GetAddressOf());
-		}
-		if (node.mesh > -1)
-		{
-			const mesh& mesh{ meshes.at(node.mesh) };
-			for (std::vector<mesh::primitive>::const_reference primitive : mesh.primitives)
-			{
-				ID3D11Buffer* vertex_buffers[]
-				{
-					primitive.vertex_buffer_views.at("POSITION").buffer.Get(),
-					primitive.vertex_buffer_views.at("NORMAL").buffer.Get(),
-					primitive.vertex_buffer_views.at("TANGENT").buffer.Get(),
-					primitive.vertex_buffer_views.at("TEXCOORD_0").buffer.Get(),
-					primitive.vertex_buffer_views.at("JOINTS_0").buffer.Get(),
-					primitive.vertex_buffer_views.at("WEIGHTS_0").buffer.Get(),
-				};
-				UINT strides[]{
-					static_cast<UINT>(primitive.vertex_buffer_views.at("POSITION").stride_in_bytes),
-					static_cast<UINT>(primitive.vertex_buffer_views.at("NORMAL").stride_in_bytes),
-					static_cast<UINT>(primitive.vertex_buffer_views.at("TANGENT").stride_in_bytes),
-					static_cast<UINT>(primitive.vertex_buffer_views.at("TEXCOORD_0").stride_in_bytes),
-					static_cast<UINT>(primitive.vertex_buffer_views.at("JOINTS_0").stride_in_bytes),
-					static_cast<UINT>(primitive.vertex_buffer_views.at("WEIGHTS_0").stride_in_bytes),
-				};
-				UINT offsets[_countof(vertex_buffers)]{ 0 };
-				immediate_context->IASetVertexBuffers(0, _countof(vertex_buffers), vertex_buffers, strides, offsets);
-				immediate_context->IASetIndexBuffer(primitive.index_buffer_view.buffer.Get(), primitive.index_buffer_view.format, 0);
-
-				primitive_constants primitive_data{};
-				primitive_data.material = primitive.material;
-				primitive_data.has_tangent = primitive.vertex_buffer_views.at("TANGENT").buffer != NULL;
-				primitive_data.skin = node.skin;
-
-				DirectX::XMStoreFloat4x4(&primitive_data.world, DirectX::XMLoadFloat4x4(&node.globalTransform) * DirectX::XMLoadFloat4x4(&world));
-
-				immediate_context->UpdateSubresource(primitive_cbuffer.Get(), 0, 0, &primitive_data, 0, 0);
-				immediate_context->VSSetConstantBuffers(0, 1, primitive_cbuffer.GetAddressOf());
-				immediate_context->PSSetConstantBuffers(0, 1, primitive_cbuffer.GetAddressOf());
-
-				immediate_context->PSSetShaderResources(0, 1, material_resource_view.GetAddressOf());
-
-				const material& material{ materials.at(primitive.material) };
-				const int texture_indices[]
-				{
-					material.data.pbr_metallic_roughness.basecolor_texture.index,
-					material.data.pbr_metallic_roughness.metallic_roughness_texture.index,
-					material.data.normal_texture.index,
-					material.data.emissive_texture.index,
-					material.data.occlusion_texture.index,
-				};
-				ID3D11ShaderResourceView* null_shader_resource_view{};
-				std::vector<ID3D11ShaderResourceView*> shader_resource_views(_countof(texture_indices));
-				for (int texture_index = 0; texture_index < shader_resource_views.size(); ++texture_index)
-				{
-					shader_resource_views.at(texture_index) = texture_indices[texture_index] > -1 ?
-						texture_resource_views.at(textures.at(texture_indices[texture_index]).source).Get() :
-						null_shader_resource_view;
-				}
-				immediate_context->PSSetShaderResources(1, static_cast<UINT>(shader_resource_views.size()), shader_resource_views.data());
-
-				immediate_context->DrawIndexed(static_cast<UINT>(primitive.index_buffer_view.count()), 0, 0);
-			}
-		}
-
-		for (std::vector<int>::value_type child_index : node.ichildren)
-		{
-			traverse(child_index);
-		}
-		} };
-
-	for (std::vector<int>::value_type node_index : scenes.at(0).nodes)
-	{
-		traverse(node_index);
-	}
-}
-
-void gltf_model::renderDX12(ID3D11DeviceContext* immediate_context, const DirectX::XMFLOAT4X4 world, const std::vector<Node>& animated_nodes)
-{
-	const std::vector<Node>& nodes{ animated_nodes.size() > 0 ? animated_nodes : this->nodes };
-
-	immediate_context->VSSetShader(vertex_shader.Get(), nullptr, 0);
-	immediate_context->PSSetShader(pixel_shader.Get(), nullptr, 0);
-	immediate_context->IASetInputLayout(input_layout.Get());
-	immediate_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	std::function<void(int)> traverse{ [&](int node_index)->void {
-		const Node& node {nodes.at(node_index)};
+		const ModelResource::Node& node {nodes.at(node_index)};
 		if (node.skin > -1)
 		{
 			const skin& skin{ skins.at(node.skin) };
@@ -900,7 +800,7 @@ void gltf_model::ComputeWorldBounds()
 {
 }
 
-iModel::Node* gltf_model::FindNode(const char* name)
+ModelResource::Node* gltf_model::FindNode(const char* name)
 {
 	return nullptr;
 }

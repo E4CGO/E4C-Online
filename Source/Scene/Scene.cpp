@@ -184,7 +184,7 @@ void ModelTestScene::DrawSceneGUI()
 		if (ImGui::CollapsingHeader("Hierarchy", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			// ノードツリーを再帰的に描画する関数
-			std::function<void(iModel::Node*)> drawNodeTree = [&](iModel::Node* node)
+			std::function<void(ModelResource::Node*)> drawNodeTree = [&](ModelResource::Node* node)
 				{
 					// 矢印をクリック、またはノードをダブルクリックで階層を開く
 					ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
@@ -214,7 +214,7 @@ void ModelTestScene::DrawSceneGUI()
 					// 開かれている場合、子階層も同じ勝利を行う
 					if (opened && childCount > 0)
 					{
-						for (iModel::Node* child : node->children)
+						for (ModelResource::Node* child : node->children)
 						{
 							drawNodeTree(child);
 						}
