@@ -55,7 +55,8 @@ void SceneGame::Initialize()
 	for (auto& filename : modelList)
 	{
 		// TODO fix loading
-		modelPreLoad.insert(RESOURCE.LoadModelResource(filename, "DX11"));
+		modelPreLoad.second = "DX11";
+		modelPreLoad.first.insert(RESOURCE.LoadModelResource(filename, modelPreLoad.second));
 	}
 
 	//DeferredRendering
@@ -139,7 +140,7 @@ void SceneGame::Initialize()
 
 void SceneGame::Finalize()
 {
-	modelPreLoad.clear();
+	modelPreLoad.first.clear();
 	spritePreLoad.clear();
 	shadowMapRenderer->Clear();
 	CURSOR_ON;

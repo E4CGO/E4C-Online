@@ -14,6 +14,7 @@
 #include "TAKOEngine/Rendering/ResourceManager.h"
 #include "TAKOEngine/Rendering/GpuResourceUtils.h"
 #include "TAKOEngine/Tool/AssimpImporter.h"
+#include "TAKOEngine/Tool/GLTFImporter.h"
 #include "TAKOEngine/Tool/Logger.h"
 
 namespace DirectX
@@ -324,6 +325,40 @@ void ModelResource::Load(const char* filename, std::string modelRenderType)
 
 	if (modelRenderType == "NEWDX11")
 	{
+		ID3D11Device* device = graphics.GetDeviceDX11();
+
+		// 独自形式のモデルファイルの存在確認
+		// TODO fix cereal
+		//filepath.replace_extension(".cereal");
+		//if (std::filesystem::exists(filepath))
+		if (false)
+		{
+			// 独自形式のモデルファイルの読み込み
+			Deserialize(filepath.string().c_str());
+		}
+		else
+		{
+			// 汎用モデルファイル読み込む
+			GLTFImporter importer(filename);
+
+			// マテリアルデータ読み取り
+			importer.LoadMaterials(materials);
+
+			// ノードデータ読み取り
+			importer.LoadNodes(nodes);
+
+			// メッシュデータ読み取り
+			importer.LoadMeshes(meshes, nodes);
+
+			// アニメーションデート読み取り
+			importer.LoadAnimations(animations, nodes);
+
+			// バウンディングボックス計算
+			ComputeLocalBounds();
+
+			// 独自形式のモデルファイルを保存
+			Serialize(filepath.string().c_str());
+		}
 	}
 
 	if (modelRenderType == "DX12")

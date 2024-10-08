@@ -12,7 +12,7 @@ bool null_load_image_data(tinygltf::Image*, const int, std::string*, std::string
 	return true;
 }
 
-gltf_model::gltf_model(ID3D11Device* device, const std::string& filename, float scaling)
+GLTFImporter::GLTFImporter(ID3D11Device* device, const std::string& filename)
 {
 	tinygltf::TinyGLTF tiny_gltf;
 	tiny_gltf.SetImageLoader(null_load_image_data, nullptr);
@@ -78,11 +78,11 @@ gltf_model::gltf_model(ID3D11Device* device, const std::string& filename, float 
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 }
 
-gltf_model::~gltf_model()
+GLTFImporter::~GLTFImporter()
 {
 }
 
-void gltf_model::fetch_nodes(const tinygltf::Model& gltf_model)
+void GLTFImporter::fetch_nodes(const tinygltf::Model& gltf_model)
 {
 	for (std::vector<tinygltf::Node>::const_reference gltf_node : gltf_model.nodes)
 	{
@@ -139,7 +139,7 @@ void gltf_model::fetch_nodes(const tinygltf::Model& gltf_model)
 	cumulate_transforms(nodes);
 }
 
-void gltf_model::cumulate_transforms(std::vector<ModelResource::Node>& nodes)
+void GLTFImporter::cumulate_transforms(std::vector<ModelResource::Node>& nodes)
 {
 	std::stack<DirectX::XMFLOAT4X4> parent_global_transforms;
 	std::function<void(int)> traverse{ [&](int node_index)->void
@@ -164,7 +164,7 @@ void gltf_model::cumulate_transforms(std::vector<ModelResource::Node>& nodes)
 	}
 }
 
-gltf_model::buffer_view gltf_model::make_buffer_view(const tinygltf::Accessor& accessor)
+GLTFImporter::buffer_view gltf_model::make_buffer_view(const tinygltf::Accessor& accessor)
 {
 	buffer_view buffer_view;
 	switch (accessor.type)
@@ -296,7 +296,7 @@ gltf_model::buffer_view gltf_model::make_buffer_view(const tinygltf::Accessor& a
 	return buffer_view;
 }
 
-void gltf_model::fetch_meshes(ID3D11Device* device, const tinygltf::Model& gltf_model)
+void GLTFImporter::fetch_meshes(ID3D11Device* device, const tinygltf::Model& gltf_model)
 {
 	HRESULT hr;
 	for (std::vector<tinygltf::Mesh>::const_reference gltf_mesh : gltf_model.meshes)
@@ -361,7 +361,7 @@ void gltf_model::fetch_meshes(ID3D11Device* device, const tinygltf::Model& gltf_
 	}
 }
 
-void gltf_model::fetch_materials(ID3D11Device* device, const tinygltf::Model& gltf_model)
+void GLTFImporter::fetch_materials(ID3D11Device* device, const tinygltf::Model& gltf_model)
 {
 	for (std::vector<tinygltf::Material>::const_reference gltf_material : gltf_model.materials)
 	{
@@ -428,7 +428,7 @@ void gltf_model::fetch_materials(ID3D11Device* device, const tinygltf::Model& gl
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 }
 
-void gltf_model::fetch_textures(ID3D11Device* device, const tinygltf::Model& gltf_model)
+void GLTFImporter::fetch_textures(ID3D11Device* device, const tinygltf::Model& gltf_model)
 {
 	HRESULT hr{ S_OK };
 	for (const tinygltf::Texture& gltf_texture : gltf_model.textures)
@@ -495,7 +495,7 @@ void gltf_model::fetch_textures(ID3D11Device* device, const tinygltf::Model& glt
 	}
 }
 
-void gltf_model::fetch_animations(const tinygltf::Model& gltf_model)
+void GLTFImporter::fetch_animations(const tinygltf::Model& gltf_model)
 {
 	for (std::vector<tinygltf::Skin>::const_reference transmission_skin : gltf_model.skins)
 	{
@@ -588,7 +588,7 @@ void gltf_model::fetch_animations(const tinygltf::Model& gltf_model)
 	}
 }
 
-void gltf_model::animate(size_t animation_index, float time, std::vector<ModelResource::Node>& animated_nodes)
+void GLTFImporter::animate(size_t animation_index, float time, std::vector<ModelResource::Node>& animated_nodes)
 {
 	std::function<size_t(const std::vector<float>&, float, float&)> indexof
 	{
@@ -665,7 +665,7 @@ void gltf_model::animate(size_t animation_index, float time, std::vector<ModelRe
 	}
 }
 
-void gltf_model::render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world, const std::vector<ModelResource::Node>& animated_nodes)
+void GLTFImporter::render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world, const std::vector<ModelResource::Node>& animated_nodes)
 {
 	ID3D11DeviceContext* immediate_context = rc.deviceContext;
 
@@ -765,42 +765,4 @@ void gltf_model::render(const RenderContext& rc, const DirectX::XMFLOAT4X4 world
 	{
 		traverse(node_index);
 	}
-}
-
-void gltf_model::UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform)
-{
-}
-
-void gltf_model::PlayAnimation(int index, bool loop, float blendSeconds)
-{
-}
-
-bool gltf_model::IsPlayAnimation() const
-{
-	return false;
-}
-
-void gltf_model::UpdateAnimation(float elapsedTime)
-{
-}
-
-void gltf_model::DrawDebugGUI()
-{
-}
-
-void gltf_model::ComputeAnimation(float elapsedTime)
-{
-}
-
-void gltf_model::ComputeBlending(float elapsedTime)
-{
-}
-
-void gltf_model::ComputeWorldBounds()
-{
-}
-
-ModelResource::Node* gltf_model::FindNode(const char* name)
-{
-	return nullptr;
 }

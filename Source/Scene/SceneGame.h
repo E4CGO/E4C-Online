@@ -5,6 +5,7 @@
 
 #include <string>
 #include <unordered_set>
+#include <tuple>
 
 #include "UI/Widget/WidgetMenu.h"
 
@@ -101,5 +102,5 @@ private:
 		"Data/Model/Enemy/character_skeleton_minion.gltf",
 		//"Data/Model/Enemy/character_skeleton_warrior.gltf",
 	};
-	std::unordered_set<std::shared_ptr<ModelResource>> modelPreLoad;
+	std::pair<std::unordered_set<std::shared_ptr<ModelResource>>, std::string> modelPreLoad;
 };
