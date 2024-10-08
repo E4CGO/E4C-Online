@@ -171,7 +171,7 @@ void SceneTitle::Update(float elapsedTime)
 	{
 		const DirectX::XMFLOAT4X4 w = { 2.5f,0.f,0.f,0.f, 0.f,2.5f,0.f,0.f, 0.f,0.f,2.5f,0.f, 0.f,0.f,0.f,1.f };
 		test->UpdateAnimation(elapsedTime);
-		test->UpdateTransform(w);
+		test->UpdateTransform();
 	}
 
 #ifdef _DEBUG
@@ -230,14 +230,15 @@ void SceneTitle::RenderDX12()
 		Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
 			camera.GetView(),
 			camera.GetProjection(),
-			DirectX::XMFLOAT3(0, -1, 0)
-		);
+			DirectX::XMFLOAT3(0, -1, 0));
 
 		// レンダーコンテキスト設定
 		RenderContextDX12 rc;
-		rc.d3d_command_list = d3d_command_list;
+		rc.d3d_command_list     = d3d_command_list;
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
-		rc.buffer_index = TentacleLib::graphics.GetCurrentBufferIndex();
+		
+		//スキニング
+		test->UpdateFrameResource();
 		m_skinning_pipeline->Compute(rc, test.get());
 
 		// モデル描画

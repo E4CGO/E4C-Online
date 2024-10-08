@@ -98,8 +98,7 @@ LambertShader::LambertShader()
 			&d3d_root_signature_desc,
 			D3D_ROOT_SIGNATURE_VERSION_1,
 			d3d_signature_blob.GetAddressOf(),
-			d3d_error_blob.GetAddressOf()
-		);
+			d3d_error_blob.GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
 		// ルートシグネチャ生成
@@ -107,8 +106,7 @@ LambertShader::LambertShader()
 			0,
 			d3d_signature_blob->GetBufferPointer(),
 			d3d_signature_blob->GetBufferSize(),
-			IID_PPV_ARGS(m_d3d_root_signature.GetAddressOf())
-		);
+			IID_PPV_ARGS(m_d3d_root_signature.GetAddressOf()));
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 		m_d3d_root_signature->SetName(L"LambertShaderRootSignature");
 	}
@@ -133,13 +131,13 @@ LambertShader::LambertShader()
 		// 入力レイアウト
 		D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
 		{
-			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-			{ "WEIGHTS",  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-			{ "BONES",    0, DXGI_FORMAT_R32G32B32A32_UINT,  0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-			{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-			{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-			{ "TANGENT",  0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ "POSITION",     0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ "BONE_WEIGHTS", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ "BONE_INDICES", 0, DXGI_FORMAT_R32G32B32A32_UINT,  0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ "TEXCOORD",     0, DXGI_FORMAT_R32G32_FLOAT,       0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ "COLOR",        0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ "NORMAL",       0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ "TANGENT",      0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 		};
 		d3d_graphics_pipeline_state_desc.InputLayout.pInputElementDescs = inputElementDescs;
 		d3d_graphics_pipeline_state_desc.InputLayout.NumElements = _countof(inputElementDescs);
@@ -198,8 +196,7 @@ LambertShader::LambertShader()
 		// パイプラインステート生成
 		hr = device->CreateGraphicsPipelineState(
 			&d3d_graphics_pipeline_state_desc,
-			IID_PPV_ARGS(&m_d3d_pipeline_state)
-		);
+			IID_PPV_ARGS(m_d3d_pipeline_state.GetAddressOf()));
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 		m_d3d_pipeline_state->SetName(L"LambertShaderPipelineState");
 	}
@@ -232,13 +229,6 @@ void LambertShader::Draw(const RenderContextDX12& rc, iModel* model)
 void LambertShader::Draw(const RenderContextDX12& rc, ModelDX12* model)
 {
 	Graphics& graphics = Graphics::Instance();
-	const ModelResource* resource = model->GetResource();
-	const std::vector<ModelDX12::Node>& nodes = model->GetNodes();
-
-	struct CbSkeleton
-	{
-		DirectX::XMFLOAT4X4 boneTransforms[256];
-	};
 
 	for (ModelDX12::Mesh& mesh : model->GetMeshes())
 	{
@@ -248,30 +238,12 @@ void LambertShader::Draw(const RenderContextDX12& rc, ModelDX12* model)
 		// メッシュ定数バッファ設定
 		rc.d3d_command_list->SetGraphicsRootDescriptorTable(1, frame_resource.cbv_descriptor->GetGpuHandle());
 
-		// スケルトン用定数バッファ更新
-		CbSkeleton* cbSkeleton = reinterpret_cast<CbSkeleton*>(frame_resource.cbv_data);
-		if (res_mesh->bones.size() > 0)
-		{
-			for (size_t i = 0; i < res_mesh->bones.size(); ++i)
-			{
-				DirectX::XMMATRIX worldTransform = DirectX::XMLoadFloat4x4(&nodes.at(res_mesh->bones.at(i).nodeIndex).world_transform);
-				DirectX::XMMATRIX offsetTransform = DirectX::XMLoadFloat4x4(&res_mesh->bones.at(i).offsetTransform);
-				DirectX::XMMATRIX boneTransform = offsetTransform * worldTransform;
-				DirectX::XMStoreFloat4x4(&cbSkeleton->boneTransforms[i], boneTransform);
-			}
-		}
-		else
-		{
-			cbSkeleton->boneTransforms[0] = nodes.at(res_mesh->nodeIndex).world_transform;
-		}
-
 		// 頂点バッファ設定
-		rc.d3d_command_list->IASetVertexBuffers(0, 1, &res_mesh->d3d_vbv);
+		rc.d3d_command_list->IASetVertexBuffers(0, 1, mesh.bones.empty() ? &mesh.mesh->d3d_vbv : &frame_resource.d3d_vbv);
 		rc.d3d_command_list->IASetIndexBuffer(&res_mesh->d3d_ibv);
 		rc.d3d_command_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		// サブセット
-
 		const ModelResource::Material* material = res_mesh->material;
 
 		// マテリアル定数バッファ設定

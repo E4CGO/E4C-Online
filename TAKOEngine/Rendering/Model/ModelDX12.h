@@ -22,9 +22,15 @@ public:
 		DirectX::XMFLOAT4	rotate;
 		DirectX::XMFLOAT3	translate;
 		DirectX::XMFLOAT4X4	local_transform;
-		DirectX::XMFLOAT4X4	world_transform;
+		DirectX::XMFLOAT4X4	global_transform;
 
 		std::vector<Node*>	children;
+	};
+
+	struct Bone
+	{
+		DirectX::XMFLOAT4X4	offset_transform;
+		Node* node = nullptr;
 	};
 
 	struct Mesh
@@ -39,22 +45,26 @@ public:
 		{
 			Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_vbv_uav_resource;
 			D3D12_VERTEX_BUFFER_VIEW				d3d_vbv;
-			Descriptor* uav_descriptor = nullptr;
+			Descriptor*                             uav_descriptor = nullptr;
 
 			Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cbv_resource;
-			Descriptor* cbv_descriptor = nullptr;
-			Constants* cbv_data = nullptr;
+			Descriptor*                             cbv_descriptor = nullptr;
+			Constants*                              cbv_data = nullptr;
 		};
-		std::vector<FrameResource>				frame_resources;
+		std::vector<FrameResource>	frame_resources;
 
 		const ModelResource::Mesh* mesh = nullptr;
 
-		Node* node = nullptr;
+		std::vector<Bone>	bones;
+		Node*               node = nullptr;
 		UINT				vertex_count;
 	};
 
 	// 行列計算
-	void UpdateTransform(const DirectX::XMFLOAT4X4& transform);
+	void UpdateTransform();
+
+	// フレームリソース更新処理
+	void UpdateFrameResource();
 
 	// アニメーション
 	bool IsPlayAnimation() const { return m_current_animation >= 0; }
@@ -85,4 +95,6 @@ private:
 	float							m_current_seconds = 0.0f;
 	bool							m_loop_animation = false;
 	bool							m_end_animation = false;
+
+	DirectX::XMFLOAT4X4 transform;
 };

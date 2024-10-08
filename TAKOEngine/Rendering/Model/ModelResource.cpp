@@ -580,6 +580,7 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 				D3D12_HEAP_FLAG_NONE,
 				&d3d_resource_desc,
 				D3D12_RESOURCE_STATE_GENERIC_READ,
+				//D3D12_RESOURCE_STATE_COPY_DEST,
 				nullptr,
 				IID_PPV_ARGS(mesh.d3d_ib_resource.GetAddressOf())
 			);
@@ -593,6 +594,51 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 
 			// アップロード用バッファを描画用バッファにコピー
 			graphics.CopyBuffer(d3d_upload_resource.Get(), mesh.d3d_ib_resource.Get());
+		}
+
+		// シェーダリソースビューを生成
+		{
+			D3D12_SHADER_RESOURCE_VIEW_DESC d3d_srv_desc = {};
+			d3d_srv_desc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+			d3d_srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+			d3d_srv_desc.Format = DXGI_FORMAT_UNKNOWN;
+			d3d_srv_desc.Buffer.FirstElement = 0;
+			d3d_srv_desc.Buffer.NumElements = static_cast<UINT>(mesh.vertices.size());
+			d3d_srv_desc.Buffer.StructureByteStride = sizeof(Vertex);
+			d3d_srv_desc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+
+			// ディスクリプタ取得
+			mesh.srv_descriptor = graphics.GetShaderResourceDescriptorHeap()->PopDescriptor();
+
+			// シェーダリソースビューを生成.
+			d3d_device->CreateShaderResourceView(
+				mesh.d3d_vb_resource.Get(),
+				&d3d_srv_desc,
+				mesh.srv_descriptor->GetCpuHandle()
+			);
+		}
+
+	}
+}
+
+ModelResource::~ModelResource()
+{
+	Graphics& graphics = Graphics::Instance();
+	DescriptorHeap* descriptor_pool = graphics.GetShaderResourceDescriptorHeap();
+
+	for (Material& material : materials)
+	{
+		if (material.srv_descriptor != nullptr)
+		{
+			descriptor_pool->PushDescriptor(material.srv_descriptor);
+		}
+	}
+
+	for (Mesh& mesh : meshes)
+	{
+		if (mesh.srv_descriptor != nullptr)
+		{
+			descriptor_pool->PushDescriptor(mesh.srv_descriptor);
 		}
 	}
 }

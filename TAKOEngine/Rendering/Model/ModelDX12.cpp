@@ -5,8 +5,7 @@
 // コンストラクタ
 ModelDX12::ModelDX12(const char* filename)
 {
-	Graphics& graphics = Graphics::Instance();
-
+	Graphics&       graphics = Graphics::Instance();
 	ID3D12Device* d3d_device = graphics.GetDeviceDX12();
 
 	HRESULT hr = S_OK;
@@ -48,37 +47,46 @@ ModelDX12::ModelDX12(const char* filename)
 			auto&& src_mesh = res_meshes.at(mesh_index);
 			auto&& dst_mesh = m_meshes.at(mesh_index);
 
-			dst_mesh.mesh = &src_mesh;
+			dst_mesh.mesh         = &src_mesh;
 			dst_mesh.vertex_count = RoundUp(SkinningCSThreadNum, static_cast<UINT>(src_mesh.vertices.size()));
+			dst_mesh.node         = &m_nodes.at(src_mesh.nodeIndex);
 			dst_mesh.frame_resources.resize(graphics.GetBufferCount());
+
+			//ボーン
+			dst_mesh.bones.resize(src_mesh.nodeIndices.size());
+			for (size_t bone_index = 0; bone_index < dst_mesh.bones.size(); ++bone_index)
+			{
+				auto& dst_bone            = dst_mesh.bones.at(bone_index);
+				dst_bone.node             = &m_nodes.at(src_mesh.nodeIndices.at(bone_index));
+				dst_bone.offset_transform = src_mesh.offsetTransforms.at(bone_index);
+			}
 
 			// フレームリソース
 			for (Mesh::FrameResource& frame_resource : dst_mesh.frame_resources)
 			{
-				UINT bone_num = static_cast<UINT>(src_mesh.bones.size());
-				if (bone_num == 0) bone_num = 1;
+				UINT buffer_size = (sizeof(Mesh::Constants) + 255) & ~255;
 
 				// ヒーププロパティの設定
 				D3D12_HEAP_PROPERTIES d3d_heap_props{};
-				d3d_heap_props.Type = D3D12_HEAP_TYPE_UPLOAD;
-				d3d_heap_props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+				d3d_heap_props.Type                 = D3D12_HEAP_TYPE_UPLOAD;
+				d3d_heap_props.CPUPageProperty      = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
 				d3d_heap_props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-				d3d_heap_props.CreationNodeMask = 1;
-				d3d_heap_props.VisibleNodeMask = 1;
+				d3d_heap_props.CreationNodeMask     = 1;
+				d3d_heap_props.VisibleNodeMask      = 1;
 
 				// リソースの設定
 				D3D12_RESOURCE_DESC d3d_resource_desc{};
-				d3d_resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-				d3d_resource_desc.Alignment = 0;
-				d3d_resource_desc.Width = ((sizeof(DirectX::XMFLOAT4X4) * bone_num) + 255) & ~255;	// 256バイトアライメントにする
-				d3d_resource_desc.Height = 1;
-				d3d_resource_desc.DepthOrArraySize = 1;
-				d3d_resource_desc.MipLevels = 1;
-				d3d_resource_desc.Format = DXGI_FORMAT_UNKNOWN;
-				d3d_resource_desc.SampleDesc.Count = 1;
+				d3d_resource_desc.Dimension          = D3D12_RESOURCE_DIMENSION_BUFFER;
+				d3d_resource_desc.Alignment          = 0;
+				d3d_resource_desc.Width              = buffer_size;
+				d3d_resource_desc.Height             = 1;
+				d3d_resource_desc.DepthOrArraySize   = 1;
+				d3d_resource_desc.MipLevels          = 1;
+				d3d_resource_desc.Format             = DXGI_FORMAT_UNKNOWN;
+				d3d_resource_desc.SampleDesc.Count   = 1;
 				d3d_resource_desc.SampleDesc.Quality = 0;
-				d3d_resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-				d3d_resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+				d3d_resource_desc.Layout             = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+				d3d_resource_desc.Flags              = D3D12_RESOURCE_FLAG_NONE;
 
 				// 定数バッファの生成
 				hr = d3d_device->CreateCommittedResource(
@@ -87,8 +95,7 @@ ModelDX12::ModelDX12(const char* filename)
 					&d3d_resource_desc,
 					D3D12_RESOURCE_STATE_GENERIC_READ,
 					nullptr,
-					IID_PPV_ARGS(frame_resource.d3d_cbv_resource.GetAddressOf())
-				);
+					IID_PPV_ARGS(frame_resource.d3d_cbv_resource.GetAddressOf()));
 				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 				frame_resource.d3d_cbv_resource->SetName(L"ModelConstantBuffer");
 
@@ -98,50 +105,49 @@ ModelDX12::ModelDX12(const char* filename)
 				// 定数バッファビューの生成
 				D3D12_CONSTANT_BUFFER_VIEW_DESC d3d_cbv_desc;
 				d3d_cbv_desc.BufferLocation = frame_resource.d3d_cbv_resource->GetGPUVirtualAddress();
-				d3d_cbv_desc.SizeInBytes = static_cast<UINT>(d3d_resource_desc.Width);
+				d3d_cbv_desc.SizeInBytes    = buffer_size;
 				d3d_device->CreateConstantBufferView(
 					&d3d_cbv_desc,
-					frame_resource.cbv_descriptor->GetCpuHandle()
-				);
+					frame_resource.cbv_descriptor->GetCpuHandle());
 
 				// マップしておく
 				hr = frame_resource.d3d_cbv_resource->Map(0, nullptr, reinterpret_cast<void**>(&frame_resource.cbv_data));
 				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
 				//スキニング計算用頂点バッファ
-				if (dst_mesh.mesh->bones.size() > 0)
+				if (dst_mesh.bones.size() > 0)
 				{
 					UINT stride = sizeof(ModelResource::Vertex);
 					UINT buffer_size = static_cast<UINT>(stride * dst_mesh.vertex_count);
 
 					// ヒーププロパティの設定
 					D3D12_HEAP_PROPERTIES d3d_heap_props{};
-					d3d_heap_props.Type = D3D12_HEAP_TYPE_UPLOAD;
-					d3d_heap_props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+					d3d_heap_props.Type                 = D3D12_HEAP_TYPE_DEFAULT;
+					d3d_heap_props.CPUPageProperty      = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
 					d3d_heap_props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-					d3d_heap_props.CreationNodeMask = 1;
-					d3d_heap_props.VisibleNodeMask = 1;
+					d3d_heap_props.CreationNodeMask     = 1;
+					d3d_heap_props.VisibleNodeMask      = 1;
 
 					// リソースの設定
 					D3D12_RESOURCE_DESC d3d_resource_desc{};
-					d3d_resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-					d3d_resource_desc.Alignment = 0;
-					d3d_resource_desc.Width = ((sizeof(DirectX::XMFLOAT4X4) * bone_num) + 255) & ~255;	// 256バイトアライメントにする
-					d3d_resource_desc.Height = 1;
-					d3d_resource_desc.DepthOrArraySize = 1;
-					d3d_resource_desc.MipLevels = 1;
-					d3d_resource_desc.Format = DXGI_FORMAT_UNKNOWN;
-					d3d_resource_desc.SampleDesc.Count = 1;
+					d3d_resource_desc.Dimension          = D3D12_RESOURCE_DIMENSION_BUFFER;
+					d3d_resource_desc.Alignment          = 0;
+					d3d_resource_desc.Width              = buffer_size;
+					d3d_resource_desc.Height             = 1;
+					d3d_resource_desc.DepthOrArraySize   = 1;
+					d3d_resource_desc.MipLevels          = 1;
+					d3d_resource_desc.Format             = DXGI_FORMAT_UNKNOWN;
+					d3d_resource_desc.SampleDesc.Count   = 1;
 					d3d_resource_desc.SampleDesc.Quality = 0;
-					d3d_resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-					d3d_resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+					d3d_resource_desc.Layout             = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+					d3d_resource_desc.Flags              = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 
 					// 定数バッファの生成
 					hr = d3d_device->CreateCommittedResource(
 						&d3d_heap_props,
 						D3D12_HEAP_FLAG_NONE,
 						&d3d_resource_desc,
-						D3D12_RESOURCE_STATE_GENERIC_READ,
+						D3D12_RESOURCE_STATE_COMMON,
 						nullptr,
 						IID_PPV_ARGS(frame_resource.d3d_vbv_uav_resource.GetAddressOf()));
 					_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
@@ -149,21 +155,21 @@ ModelDX12::ModelDX12(const char* filename)
 
 					// 頂点バッファビュー設定
 					frame_resource.d3d_vbv.BufferLocation = frame_resource.d3d_vbv_uav_resource->GetGPUVirtualAddress();
-					frame_resource.d3d_vbv.SizeInBytes = buffer_size;
-					frame_resource.d3d_vbv.StrideInBytes = stride;
+					frame_resource.d3d_vbv.SizeInBytes    = buffer_size;
+					frame_resource.d3d_vbv.StrideInBytes  = stride;
 
 					// ディスクリプタ取得
 					frame_resource.uav_descriptor = graphics.GetShaderResourceDescriptorHeap()->PopDescriptor();
 
 					// アンオーダードアクセスビューの設定
 					D3D12_UNORDERED_ACCESS_VIEW_DESC d3d_uav_desc{};
-					d3d_uav_desc.Format = DXGI_FORMAT_UNKNOWN;
-					d3d_uav_desc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
-					d3d_uav_desc.Buffer.FirstElement = 0;
-					d3d_uav_desc.Buffer.NumElements = dst_mesh.vertex_count;
-					d3d_uav_desc.Buffer.StructureByteStride = stride;
+					d3d_uav_desc.Format                      = DXGI_FORMAT_UNKNOWN;
+					d3d_uav_desc.ViewDimension               = D3D12_UAV_DIMENSION_BUFFER;
+					d3d_uav_desc.Buffer.FirstElement         = 0;
+					d3d_uav_desc.Buffer.NumElements          = dst_mesh.vertex_count;
+					d3d_uav_desc.Buffer.StructureByteStride  = stride;
 					d3d_uav_desc.Buffer.CounterOffsetInBytes = 0;
-					d3d_uav_desc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
+					d3d_uav_desc.Buffer.Flags                = D3D12_BUFFER_UAV_FLAG_NONE;
 
 					// アンオーダードアクセスビューの生成
 					d3d_device->CreateUnorderedAccessView(
@@ -178,7 +184,8 @@ ModelDX12::ModelDX12(const char* filename)
 
 	// 行列計算
 	const DirectX::XMFLOAT4X4 transform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
-	UpdateTransform(transform);
+	this->transform = transform;
+	UpdateTransform();
 }
 
 ModelDX12::~ModelDX12()
@@ -207,10 +214,8 @@ ModelDX12::~ModelDX12()
 }
 
 // 変換行列計算
-void ModelDX12::UpdateTransform(const DirectX::XMFLOAT4X4& transform)
+void ModelDX12::UpdateTransform()
 {
-	DirectX::XMMATRIX Transform = DirectX::XMLoadFloat4x4(&transform);
-
 	for (Node& node : m_nodes)
 	{
 		// ローカル行列算出
@@ -218,43 +223,49 @@ void ModelDX12::UpdateTransform(const DirectX::XMFLOAT4X4& transform)
 		DirectX::XMMATRIX R = DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&node.rotate));
 		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(node.translate.x, node.translate.y, node.translate.z);
 		DirectX::XMMATRIX LocalTransform = S * R * T;
+		DirectX::XMStoreFloat4x4(&node.local_transform, LocalTransform);
 
 		// ワールド行列算出
-		DirectX::XMMATRIX ParentTransform;
 		if (node.parent != nullptr)
 		{
-			ParentTransform = DirectX::XMLoadFloat4x4(&node.parent->world_transform);
+			DirectX::XMMATRIX ParentTransform = DirectX::XMLoadFloat4x4(&node.parent->global_transform);
+			DirectX::XMMATRIX GlobalTransform = LocalTransform * ParentTransform;
+			DirectX::XMStoreFloat4x4(&node.global_transform, GlobalTransform);
 		}
 		else
 		{
-			ParentTransform = Transform;
+			DirectX::XMStoreFloat4x4(&node.global_transform, LocalTransform);
 		}
-		DirectX::XMMATRIX WorldTransform = LocalTransform * ParentTransform;
-
-		// 計算結果を格納
-		DirectX::XMStoreFloat4x4(&node.local_transform, LocalTransform);
-		DirectX::XMStoreFloat4x4(&node.world_transform, WorldTransform);
 	}
+}
 
+// フレームリソース更新処理
+void ModelDX12::UpdateFrameResource()
+{
 	Graphics& graphics = Graphics::Instance();
+	DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&transform);
+
+	//メッシュの更新
 	for (Mesh& mesh : m_meshes)
 	{
-		const ModelResource::Mesh* res_mesh = mesh.mesh;
 		Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
 
-		if (res_mesh->nodeIndices.size() > 0)
+		if (mesh.bones.size() > 0)
 		{
-			for (size_t i = 0; i < res_mesh->nodeIndices.size(); ++i)
+			for (size_t bone_index = 0; bone_index < mesh.bones.size(); ++bone_index)
 			{
-				DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&m_nodes.at(res_mesh->nodeIndices.at(i)).world_transform);
-				DirectX::XMMATRIX OffsetTransform = DirectX::XMLoadFloat4x4(&res_mesh->offsetTransforms.at(i));
-				DirectX::XMMATRIX BoneTransform = OffsetTransform * WorldTransform;
-				DirectX::XMStoreFloat4x4(&frame_resource.cbv_data[i].bone_transforms[i], BoneTransform);
+				const Bone& bone = mesh.bones.at(bone_index);
+				DirectX::XMMATRIX GlobalTransform = DirectX::XMLoadFloat4x4(&bone.node->global_transform);
+				DirectX::XMMATRIX OffsetTransform = DirectX::XMLoadFloat4x4(&bone.offset_transform);
+				DirectX::XMMATRIX BoneTransform   = OffsetTransform * GlobalTransform;
+				DirectX::XMStoreFloat4x4(&frame_resource.cbv_data->bone_transforms[bone_index], BoneTransform);
 			}
+			frame_resource.cbv_data->world_transform = transform;
 		}
 		else
 		{
-			frame_resource.cbv_data[0].world_transform = m_nodes.at(res_mesh->nodeIndex).world_transform;
+			DirectX::XMMATRIX GlobalTransform = DirectX::XMLoadFloat4x4(&mesh.node->global_transform);
+			DirectX::XMStoreFloat4x4(&frame_resource.cbv_data->world_transform, GlobalTransform * WorldTransform);
 		}
 	}
 }
