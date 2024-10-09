@@ -3,6 +3,7 @@
 #include "TAKOEngine/Network/url.h"
 #include "TAKOEngine/Rendering/ResourceManager.h"
 #include "TAKOEngine/GUI/UIManager.h"
+#include "TAKOEngine/Effects//EffectManager.h"
 
 #include <imgui.h>
 #include <string>
@@ -250,6 +251,11 @@ void SceneTitle::RenderDX12()
 		}
 		shader->End(rc);
 	}
+
+	EFFECTS.GetEffect(EffectManager::EFFECT_IDX::BOMB_EFFECT)->PlayDX12(DirectX::XMFLOAT3(0.f, 0.f, 0.f), 5.0f);
+
+	EFFECTS.RenderDX12(camera.GetView(), camera.GetProjection());
+
 	TentacleLib::graphics.End();
 }
 

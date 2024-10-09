@@ -541,8 +541,8 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	frameBuffers[static_cast<int>(FrameBufferId::Scene)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight);
 	frameBuffers[static_cast<int>(FrameBufferId::Luminance)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth / 2, screenHeight / 2);
 	frameBuffers[static_cast<int>(FrameBufferId::GaussianBlur)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth / 2, screenHeight / 2);
-	frameBuffers[static_cast<int>(FrameBufferId::Normal)]       = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
-	frameBuffers[static_cast<int>(FrameBufferId::Position)]     = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT);
+	frameBuffers[static_cast<int>(FrameBufferId::Normal)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
+	frameBuffers[static_cast<int>(FrameBufferId::Position)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT);
 
 	// レンダーステート作成
 	renderState = std::make_unique<RenderState>(device.Get());
@@ -563,8 +563,8 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	spriteShaders[static_cast<int>(SpriteShaderId::ColorGrading)] = std::make_unique<ColorGradingShader>(device.Get());
 	spriteShaders[static_cast<int>(SpriteShaderId::GaussianBlur)] = std::make_unique<GaussianBlurShader>(device.Get());
 	spriteShaders[static_cast<int>(SpriteShaderId::LuminanceExtraction)] = std::make_unique<LuminanceExtractionShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::Finalpass)]           = std::make_unique<FinalpassShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::Deferred)]            = std::make_unique<DeferredLightingShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::Finalpass)] = std::make_unique<FinalpassShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::Deferred)] = std::make_unique<DeferredLightingShader>(device.Get());
 
 	// レンダラ
 	debugRenderer = std::make_unique<DebugRenderer>(device.Get());
@@ -647,6 +647,7 @@ void Graphics::Execute()
 	{
 		frame_resource.d3d_command_list.Get()
 	};
+
 	m_graphics_queue.d3d_command_queue->ExecuteCommandLists(_countof(d3d_command_lists), d3d_command_lists);
 
 	// 画面表示
