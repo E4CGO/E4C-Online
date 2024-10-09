@@ -186,7 +186,7 @@ void AssimpImporter::LoadMeshes(MeshList& meshes, const NodeList& nodes, const a
 		mesh.indices.resize(aMesh->mNumFaces * 3);
 		mesh.materialIndex = static_cast<int>(aMesh->mMaterialIndex);
 		mesh.nodeIndex = nodeIndexMap[aNode];
-
+		
 		// 頂点データ
 		for (uint32_t aVertexIndex = 0; aVertexIndex < aMesh->mNumVertices; ++aVertexIndex)
 		{
@@ -295,6 +295,8 @@ void AssimpImporter::LoadMeshes(MeshList& meshes, const NodeList& nodes, const a
 				ModelResource::Bone& bone = mesh.bones.emplace_back();
 				bone.nodeIndex = nodeIndexMap[aBone->mNode];
 				bone.offsetTransform = aiMatrix4x4ToXMFLOAT4X4(aBone->mOffsetMatrix);
+				mesh.nodeIndices.push_back(bone.nodeIndex);
+				mesh.offsetTransforms.push_back(bone.offsetTransform);
 			}
 			for (BoneInfluence& boneInfluence : boneInfluences)
 			{

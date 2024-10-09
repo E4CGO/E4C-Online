@@ -14,7 +14,7 @@ class ModelResource
 {
 public:
 	ModelResource() {}
-	virtual ~ModelResource() {}
+	~ModelResource();
 
 	using NodeId = UINT64;
 
@@ -69,7 +69,7 @@ public:
 	{
 		DirectX::XMFLOAT3 position = { 0, 0, 0 };
 		DirectX::XMFLOAT4 boneWeight = { 1, 0, 0, 0 };
-		DirectX::XMUINT4 boneIndex = { 0, 0, 0, 0 };
+		DirectX::XMUINT4  boneIndex = { 0, 0, 0, 0 };
 		DirectX::XMFLOAT2 texcoord = { 0, 0 };
 		DirectX::XMFLOAT4 color = { 1, 1, 1, 1 };
 		DirectX::XMFLOAT3 normal = { 0, 0, 0 };
@@ -101,8 +101,8 @@ public:
 		int materialIndex = 0;
 		Material* material = nullptr;
 
-		int nodeIndex = 0;
-		Node* node = nullptr;
+		int                                     nodeIndex = 0;
+		Node*                                   node = nullptr;
 		std::vector<int>						nodeIndices;
 		std::vector<DirectX::XMFLOAT4X4>		offsetTransforms;
 
@@ -115,10 +115,11 @@ public:
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_vb_resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_ib_resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cb_resource;
+		
+		Descriptor* srv_descriptor = nullptr;
 
 		D3D12_VERTEX_BUFFER_VIEW				d3d_vbv;
 		D3D12_INDEX_BUFFER_VIEW					d3d_ibv;
-		Descriptor* cbv_descriptor = nullptr;
 
 		template<class Archive>
 		void serialize(Archive& archive);

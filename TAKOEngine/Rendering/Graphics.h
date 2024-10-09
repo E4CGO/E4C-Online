@@ -76,8 +76,8 @@ public:
 		return instance;
 	}
 
-	bool isDX12Active = false;
-	bool isDX11Active = true;
+	bool isDX12Active = true;
+	bool isDX11Active = false;
 
 	// 蛻晄悄蛹�
 	void Initalize(HWND hWnd, UINT buffer_count);
@@ -225,6 +225,7 @@ private:
 	std::unique_ptr<DescriptorHeap>						m_sampler_descriptor_heap;
 
 	std::unique_ptr<Shader>								m_shader;
+	std::unique_ptr<SkinningPipeline>					m_skinning_pipeline;
 
 	UINT	m_buffer_count = 0;
 

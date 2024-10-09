@@ -272,7 +272,7 @@ SkinningPipeline::SkinningPipeline(ID3D12Device* device)
 			cs_data.size(),
 			IID_PPV_ARGS(m_d3d_root_signature.GetAddressOf()));
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-		m_d3d_pipeline_state->SetName(L"SkinningRootSignature");
+		m_d3d_root_signature->SetName(L"SkinningRootSignature");
 	}
 
 	//パイプラインステートの生成
@@ -283,7 +283,7 @@ SkinningPipeline::SkinningPipeline(ID3D12Device* device)
 		d3d_compute_pipeline_state_desc.pRootSignature = m_d3d_root_signature.Get();
 
 		d3d_compute_pipeline_state_desc.CS.pShaderBytecode = cs_data.data();
-		d3d_compute_pipeline_state_desc.CS.BytecodeLength = cs_data.size();
+		d3d_compute_pipeline_state_desc.CS.BytecodeLength  = cs_data.size();
 
 		//パイプラインステート生成
 		hr = device->CreateComputePipelineState(
@@ -310,6 +310,8 @@ SkinningPipeline::~SkinningPipeline()
 //*************************************************************
 void SkinningPipeline::Compute(const RenderContextDX12& rc, ModelDX12* model)
 {
+	Graphics& graphics = Graphics::Instance();
+
 	//パイプライン設定
 	rc.d3d_command_list->SetComputeRootSignature(m_d3d_root_signature.Get());
 	rc.d3d_command_list->SetPipelineState(m_d3d_pipeline_state.Get());
@@ -318,12 +320,12 @@ void SkinningPipeline::Compute(const RenderContextDX12& rc, ModelDX12* model)
 	{
 		if (mesh.mesh->bones.empty()) continue;
 
-		const ModelDX12::Mesh::FrameResource& mesh_fram_resource = mesh.frame_resources[rc.buffer_index];
+		const ModelDX12::Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
 
 		//ディスクリプタ設定
-		rc.d3d_command_list->SetComputeRootDescriptorTable(0, mesh.mesh->cbv_descriptor->GetGpuHandle());
-		rc.d3d_command_list->SetComputeRootDescriptorTable(1, mesh_fram_resource.uav_descriptor->GetGpuHandle());
-		rc.d3d_command_list->SetComputeRootDescriptorTable(2, mesh_fram_resource.cbv_descriptor->GetGpuHandle());
+		rc.d3d_command_list->SetComputeRootDescriptorTable(0, mesh.mesh->srv_descriptor->GetGpuHandle());
+		rc.d3d_command_list->SetComputeRootDescriptorTable(1, frame_resource.uav_descriptor->GetGpuHandle());
+		rc.d3d_command_list->SetComputeRootDescriptorTable(2, frame_resource.cbv_descriptor->GetGpuHandle());
 
 		//計算実行
 		rc.d3d_command_list->Dispatch(mesh.vertex_count / SkinningCSThreadNum, 1, 1);
