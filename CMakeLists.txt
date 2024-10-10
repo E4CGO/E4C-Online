@@ -829,6 +829,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/External/cereal/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/TeNTaCleLib"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/Effekseer170e/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/Effekseer170e/include/Effekseer"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/openssl/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/tinygltf"
 )
