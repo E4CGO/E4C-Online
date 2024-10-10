@@ -6,7 +6,8 @@
 
 //****************************************************
 // @brief     èâä˙âª
-// @param[in] ID3D12Device*, D3D12_GRAPHICS_PIPELINE_STATE_DESC
+// @param[in] device ID3D12Device*
+// @param[in] desc   D3D12_GRAPHICS_PIPELINE_STATE_DESC    
 // @return    Ç»Çµ
 //****************************************************
 void PipelineState::Init(ID3D12Device* device, D3D12_GRAPHICS_PIPELINE_STATE_DESC desc)
@@ -17,7 +18,8 @@ void PipelineState::Init(ID3D12Device* device, D3D12_GRAPHICS_PIPELINE_STATE_DES
 
 //****************************************************
 // @brief     èâä˙âª
-// @param[in] ID3D12Device*, D3D12_COMPUTE_PIPELINE_STATE_DESC
+// @param[in] device ID3D12Device*
+// @param[in] desc   D3D12_COMPUTE_PIPELINE_STATE_DESC
 // @return    Ç»Çµ
 //****************************************************
 void PipelineState::Init(ID3D12Device* device, D3D12_COMPUTE_PIPELINE_STATE_DESC desc)

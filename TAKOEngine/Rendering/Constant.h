@@ -1,6 +1,8 @@
 //! @file Constant.h
+//! @note
 
-#pragma once
+#ifndef __GRAPHICS_CONSTANT_H__
+#define __GRAPHICS_CONSTANT_H__
 
 #include <d3d12.h>
 
@@ -15,3 +17,5 @@ inline T RoundUp(const T& n, const T& v)
 {
 	return n * (((v)+n) / n);
 }
+
+#endif // !__GRAPHICS_CONSTANT_H__

@@ -221,7 +221,7 @@ LambertShader::~LambertShader()
 
 //***********************************************************
 // @brief       描画開始
-// @param[in]   const RenderContext&
+// @param[in]   rc     レンダーコンテキスト
 // @return      なし
 //***********************************************************
 void LambertShader::Begin(const RenderContext& rc)
@@ -230,7 +230,7 @@ void LambertShader::Begin(const RenderContext& rc)
 
 //***********************************************************
 // @brief       描画開始
-// @param[in]   const RenderContextDX12&
+// @param[in]   rc     レンダーコンテキスト(DX12)
 // @return      なし
 //***********************************************************
 void LambertShader::Begin(const RenderContextDX12& rc)
@@ -245,7 +245,8 @@ void LambertShader::Begin(const RenderContextDX12& rc)
 
 //***********************************************************
 // @brief       描画
-// @param[in]   const RenderContextDX12&, iModel*
+// @param[in]   rc     レンダーコンテキスト(DX12)
+// @param[in]   model  描画対象のモデルデータを指すポインタ
 // @return      なし
 //***********************************************************
 void LambertShader::Draw(const RenderContextDX12& rc, iModel* model)
@@ -254,7 +255,8 @@ void LambertShader::Draw(const RenderContextDX12& rc, iModel* model)
 
 //***********************************************************
 // @brief       描画
-// @param[in]   const RenderContextDX12&, ModelDX12*
+// @param[in]   rc     レンダーコンテキスト(DX12)
+// @param[in]   model  描画対象のモデルデータを指すポインタ(DX12)
 // @return      なし
 //***********************************************************
 void LambertShader::Draw(const RenderContextDX12& rc, ModelDX12* model)
@@ -290,7 +292,7 @@ void LambertShader::Draw(const RenderContextDX12& rc, ModelDX12* model)
 
 //***********************************************************
 // @brief       描画終了
-// @param[in]   const RenderContext&
+// @param[in]   rc     レンダーコンテキスト
 // @return      なし
 //***********************************************************
 void LambertShader::End(const RenderContext& rc)
@@ -299,7 +301,7 @@ void LambertShader::End(const RenderContext& rc)
 
 //***********************************************************
 // @brief       描画終了
-// @param[in]   const RenderContextDX12&
+// @param[in]   rc     レンダーコンテキスト(DX12)
 // @return      なし
 //***********************************************************
 void LambertShader::End(const RenderContextDX12& rc)

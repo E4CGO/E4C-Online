@@ -5,7 +5,9 @@
 
 //*********************************************************************
 // @brief      視錐台カリングを行う関数
-// @param[in]  const Cmara&, const std::vector<iModel::Mesh>&, std::vector<bool>& (visibleObjects)
+// @param[in]  camera          カメラ情報
+// @param[in]  meshes          メッシュデータのリスト
+// @param[in]  visibleObjects  メッシュが視錐台内にあるかどうかのフラグを格納するブール値のリスト
 // @return     なし
 //*********************************************************************
 void FrustumCulling::FrustumCullingFlag(const Camera& camera, const std::vector<iModel::Mesh>& meshes, std::vector<bool>& visibleObjects)
@@ -29,7 +31,9 @@ void FrustumCulling::FrustumCullingFlag(const Camera& camera, const std::vector<
 
 //*********************************************************************
 // @brief      フラスタムを計算する関数
-// @param[in]  Frustum&, const DirectX::XMFLOAT4X4& (viewMatrix), const DirectX::XMFLOAT4X4& (projectionMatrix)
+// @param[in]  frustum           結果として計算される視錐台（フラスタム）情報を格納するためのオブジェクト
+// @param[in]  viewMatrix        ビュー行列
+// @param[in]  projectionMatrix  カメラの視野角やクリップ距離（近接・遠方クリップ面）を定義するための行列
 // @return     なし
 //*********************************************************************
 void FrustumCulling::CalculateFrustumFromViewProjection(Frustum& frustum, const DirectX::XMFLOAT4X4& viewMatrix, const DirectX::XMFLOAT4X4& projectionMatrix)
@@ -85,7 +89,8 @@ void FrustumCulling::CalculateFrustumFromViewProjection(Frustum& frustum, const 
 
 //*********************************************************************
 // @brief      フラスタムとの衝突判定を行う関数
-// @param[in]  const Frustum&, const DirectX::BoundingBox& (objectBounds)
+// @param[in]  frustum      フラスタム（視錐台）を表すオブジェクト
+// @param[in]  objectBounds オブジェクトの境界ボックス
 // @return     bool
 //*********************************************************************
 bool FrustumCulling::IsObjectInFrustum(const Frustum& frustum, const DirectX::BoundingBox& objectBounds)

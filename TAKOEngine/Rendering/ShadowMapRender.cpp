@@ -28,7 +28,7 @@ namespace myRenderer
 
 		//*****************************************************************
 		// @brief      シャドウマップに描画するモデルを登録
-		// @param[in]  iModel
+		// @param[in]  model  描画対象のモデルデータを指すポインタ
 		// @return     なし
 		//*****************************************************************
 		void ShadowMapRender::ModelRegister(iModel* model)
@@ -43,7 +43,7 @@ namespace myRenderer
 
 		//*****************************************************************
 		// @brief      シャドウマップに使用するライトを取得
-		// @param[in]  Light*
+		// @param[in]  light シャドウマップ用に設定する光源を指すポインタ
 		// @return     なし
 		//*****************************************************************
 		void ShadowMapRender::SetShadowLight(Light* light)
@@ -296,7 +296,8 @@ namespace myRenderer
 
 //*****************************************************************
 // @brief      コンストラクタ
-// @param[in]  幅、高さ
+// @param[in]  width 幅
+// @param[in]  height 高さ
 // @return     なし
 //*****************************************************************
 DepthStencil::DepthStencil(UINT width, UINT height)

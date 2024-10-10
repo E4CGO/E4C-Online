@@ -20,6 +20,7 @@ class ModelShader : public Shader
 {
 public:
 	ModelShader(ID3D11Device* device, const char* vs, const char* ps);
+	ModelShader(ID3D12Device* device, const char* vs, const char* ps, const wchar_t* rootName);
 
 	virtual ~ModelShader() override = default;
 
@@ -91,7 +92,7 @@ protected:
 	Microsoft::WRL::ComPtr<ID3D12PipelineState>		m_d3d_pipeline_state;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature>		m_d3d_root_signature;
 
-	PipelineState m_pipelineState;
+
 };
 
 //******************************************************************

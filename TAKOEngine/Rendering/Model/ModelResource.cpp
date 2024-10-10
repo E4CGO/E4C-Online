@@ -580,7 +580,6 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 				D3D12_HEAP_FLAG_NONE,
 				&d3d_resource_desc,
 				D3D12_RESOURCE_STATE_GENERIC_READ,
-				//D3D12_RESOURCE_STATE_COPY_DEST,
 				nullptr,
 				IID_PPV_ARGS(mesh.d3d_ib_resource.GetAddressOf())
 			);

@@ -10,7 +10,9 @@
 
 //******************************************************************
 // @brief       コンストラクタ
-// @param[in]   なし
+// @param[in]   device ID3D11Device*
+// @param[in]   vs     VertexShaderの名前
+// @param[in]   ps     PixelShaderの名前
 // @return      なし
 //******************************************************************
 ModelShader::ModelShader(ID3D11Device* device, const char* vs, const char* ps)
@@ -71,8 +73,69 @@ ModelShader::ModelShader(ID3D11Device* device, const char* vs, const char* ps)
 }
 
 //******************************************************************
+// @brief       コンストラクタ
+// @param[in]   device   ID3D12Device*
+// @param[in]   vs       VertexShaderの名前
+// @param[in]   ps       PixelShaderの名前
+// @param[in]   rootName ルートシグネクチャに設定する名前
+// @return      なし
+//******************************************************************
+ModelShader::ModelShader(ID3D12Device* device, const char* vs, const char* ps, const wchar_t* rootName)
+{
+	HRESULT hr = S_OK;
+
+	//! シェーダー読み込み
+	std::vector<BYTE> vs_data, ps_data;
+	{
+		LoadShaderFile(vs, vs_data);
+		LoadShaderFile(ps, ps_data);
+	}
+
+	//! ルートシグネクチャの生成
+	{
+		hr = device->CreateRootSignature(
+			0,
+			vs_data.data(),
+			vs_data.size(),
+			IID_PPV_ARGS(m_d3d_root_signature.GetAddressOf()));
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+		m_d3d_root_signature->SetName(rootName);
+	}
+
+	//!パイプラインステートの生成
+	{
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC d3d_graphics_pipeline_state_desc = {};
+
+		//! ルートシグネクチャ
+		d3d_graphics_pipeline_state_desc.pRootSignature = m_d3d_root_signature.Get();
+
+		//! シェーダー設定
+		d3d_graphics_pipeline_state_desc.VS.pShaderBytecode = vs_data.data();
+		d3d_graphics_pipeline_state_desc.VS.BytecodeLength  = vs_data.size();
+		d3d_graphics_pipeline_state_desc.PS.pShaderBytecode = ps_data.data();
+		d3d_graphics_pipeline_state_desc.PS.BytecodeLength  = ps_data.size();
+
+		// 入力レイアウト
+		D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
+		{
+			{ "POSITION",     0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ "BONE_WEIGHTS", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ "BONE_INDICES", 0, DXGI_FORMAT_R32G32B32A32_UINT,  0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ "TEXCOORD",     0, DXGI_FORMAT_R32G32_FLOAT,       0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ "COLOR",        0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ "NORMAL",       0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ "TANGENT",      0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		};
+		d3d_graphics_pipeline_state_desc.InputLayout.pInputElementDescs = inputElementDescs;
+		d3d_graphics_pipeline_state_desc.InputLayout.NumElements        = _countof(inputElementDescs);
+
+
+	}
+}
+
+//******************************************************************
 // @brief       描画開始
-// @param[in]   const RenderContext&
+// @param[in]   rc  レンダーコンテキスト
 // @return      なし
 //******************************************************************
 void ModelShader::Begin(const RenderContext& rc)
@@ -160,35 +223,18 @@ void ModelShader::Begin(const RenderContext& rc)
 
 //******************************************************************
 // @brief       描画開始
-// @param[in]   const RenderContextDX12&
+// @param[in]   rc  レンダーコンテキスト(DX12)
 // @return      なし
 //******************************************************************
 void ModelShader::Begin(const RenderContextDX12& rc)
 {
-	ID3D12Device* device = T_GRAPHICS.GetDeviceDX12();
-
-	D3D12_INPUT_ELEMENT_DESC inputElementDesc[] =
-	{
-		{ "POSITION",     0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "BONE_WEIGHTS", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "BONE_INDICES", 0, DXGI_FORMAT_R32G32B32A32_UINT,  0, D3D11_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD",     0, DXGI_FORMAT_R32G32_FLOAT,       0, D3D11_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "COLOR",        0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "NORMAL",       0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "TANGENT",      0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-	};
-
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = { 0 };
-	desc.InputLayout = { inputElementDesc, _countof(inputElementDesc) };
-
-
-
-	m_pipelineState.Init(device, desc);
+	
 }
 
 //******************************************************************
 // @brief       モデル描画
-// @param[in]   const RenderContext&, iModel*
+// @param[in]   rc     レンダーコンテキスト(DX12)
+// @param[in]   model  描画対象のモデルデータを指すポインタ
 // @return      なし
 //******************************************************************
 void ModelShader::Draw(const RenderContextDX12& rc, iModel* model)
@@ -197,7 +243,8 @@ void ModelShader::Draw(const RenderContextDX12& rc, iModel* model)
 
 //******************************************************************
 // @brief       モデル描画
-// @param[in]   const RenderContextDX12&, ModelDX12*
+// @param[in]   rc     レンダーコンテキスト(DX12)
+// @param[in]   model  描画対象のモデルデータを指すポインタ(DX12)
 // @return      なし
 //******************************************************************
 void ModelShader::Draw(const RenderContextDX12& rc, ModelDX12* model)
@@ -206,7 +253,7 @@ void ModelShader::Draw(const RenderContextDX12& rc, ModelDX12* model)
 
 //******************************************************************
 // @brief       描画終了
-// @param[in]   const RenderContext&
+// @param[in]   rc     レンダーコンテキスト
 // @return      なし
 //******************************************************************
 void ModelShader::End(const RenderContext& rc)
@@ -215,7 +262,7 @@ void ModelShader::End(const RenderContext& rc)
 
 //******************************************************************
 // @brief       描画終了
-// @param[in]   const RenderContextDX12&
+// @param[in]   rc     レンダーコンテキスト(DX12)
 // @return      なし
 //******************************************************************
 void ModelShader::End(const RenderContextDX12& rc)
@@ -224,7 +271,9 @@ void ModelShader::End(const RenderContextDX12& rc)
 
 //******************************************************************
 // @brief       モデル描画
-// @param[in]   const RenderContext&, const iModel*, DirectX::XMFLOAT4(color)
+// @param[in]   rc     レンダーコンテキスト
+// @param[in]   model  描画対象のモデルデータを指すポインタ
+// @param[in]   color  マテリアルカラー
 // @return      なし
 //******************************************************************
 void ModelShader::Draw(const RenderContext& rc, const iModel* model, DirectX::XMFLOAT4 color)
@@ -292,7 +341,7 @@ void ModelShader::Draw(const RenderContext& rc, const iModel* model, DirectX::XM
 
 //*************************************************************
 // @brief       コンストラクタ
-// @param[in]   デバイス
+// @param[in]   device　ID3D12Device*
 // @return      なし
 //*************************************************************
 SkinningPipeline::SkinningPipeline(ID3D12Device* device)
@@ -346,7 +395,8 @@ SkinningPipeline::~SkinningPipeline()
 
 //*************************************************************
 // @brief       計算
-// @param[in]   RenderContext,Model
+// @param[in]   rc     レンダーコンテキスト(DX12)
+// @param[in]   model  描画対象のモデルデータを指すポインタ(DX12)
 // @return      なし
 //*************************************************************
 void SkinningPipeline::Compute(const RenderContextDX12& rc, ModelDX12* model)

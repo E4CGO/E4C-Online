@@ -22,8 +22,8 @@ cbuffer ConstantBuffer : register(b0)
     row_major float4x4	bone_transforms[255];
 };
 
-StructuredBuffer<Vertex>	src_vertices : register(t0);
-RWStructuredBuffer<Vertex>	dst_vertices : register(u0);
+StructuredBuffer<Vertex>	src_vertices : register(t0); //ModelResourceの情報
+RWStructuredBuffer<Vertex>	dst_vertices : register(u0); //Modelの情報
 
 #define CS_THREAD_NUM 8
 
