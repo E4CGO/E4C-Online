@@ -1,4 +1,8 @@
-#pragma once
+//! @file ModelShader.h
+//! @note
+
+#ifndef __GRAPHICS_MODEL_SHADER_H__
+#define __GRAPHICS_MODEL_SHADER_H__
 
 #include <string>
 #include <d3d12.h>
@@ -6,6 +10,12 @@
 #include "TAKOEngine/Rendering/Model/ModelResource.h"
 #include "TAKOEngine/Rendering/Shaders/Shader.h"
 
+//******************************************************************
+//  @class  ModelShader
+//  @brief  Shaderの派生クラス
+//  @par    [説明]
+//			他のシェーダーの基底クラス
+//******************************************************************
 class ModelShader : public Shader
 {
 public:
@@ -15,11 +25,7 @@ public:
 
 	// 描画開始
 	virtual void Begin(const RenderContext& rc) override;
-	void Begin(const RenderContextDX12& rc) override;
-	void Draw(const RenderContextDX12& rc, iModel* model) override;
-	void Draw(const RenderContextDX12& rc, ModelDX12* model) override;
 	void End(const RenderContext& rc) override;
-	void End(const RenderContextDX12& rc) override;
 
 	// モデル描画
 	virtual void Draw(const RenderContext& rc, const iModel* model, DirectX::XMFLOAT4 color = { 1, 1, 1, 1 });
@@ -76,28 +82,6 @@ protected:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> shadowMapConstantBuffer;
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> toontexture;
-
-	Microsoft::WRL::ComPtr<ID3D12PipelineState>		m_d3d_pipeline_state;
-	Microsoft::WRL::ComPtr<ID3D12RootSignature>		m_d3d_root_signature;
-
-	PipelineState m_pipelineState;
 };
 
-//******************************************************************
-//  @class  SkinningPipeline
-//  @brief  スキニングパイプライン
-//  @par    コンピュートシェーダーを使用して最適化を行う
-//******************************************************************
-class SkinningPipeline
-{
-public:
-	SkinningPipeline(ID3D12Device* device);
-	~SkinningPipeline();
-
-	//計算
-	void Compute(const RenderContextDX12& rc, ModelDX12* model);
-
-private:
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> m_d3d_pipeline_state;
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> m_d3d_root_signature;
-};
+#endif // !__GRAPHICS_MODEL_SHADER_H__

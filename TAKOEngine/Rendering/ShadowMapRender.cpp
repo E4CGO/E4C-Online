@@ -1,3 +1,6 @@
+//! @file ShadowMapRender.cpp
+//! @note
+
 #include <d3d11.h>
 #include <imgui.h>
 #include "Misc.h"
@@ -9,7 +12,11 @@ namespace myRenderer
 {
 	namespace shadow
 	{
-		// 初期化
+		//*****************************************************************
+		// @brief      初期化
+		// @param[in]  なし
+		// @return     なし
+		//*****************************************************************
 		void ShadowMapRender::Initialize()
 		{
 			for (int i = 0; i < NUM_SHADOW_MAP; i++)
@@ -19,7 +26,11 @@ namespace myRenderer
 			}
 		}
 
-		//シャドウマップに描画するモデルを登録
+		//*****************************************************************
+		// @brief      シャドウマップに描画するモデルを登録
+		// @param[in]  model  描画対象のモデルデータを指すポインタ
+		// @return     なし
+		//*****************************************************************
 		void ShadowMapRender::ModelRegister(iModel* model)
 		{
 			// モデルが既に登録されているか調べる
@@ -30,20 +41,32 @@ namespace myRenderer
 			m_models.emplace_back(model);
 		}
 
-		//シャドウマップに使用するライトを取得
+		//*****************************************************************
+		// @brief      シャドウマップに使用するライトを取得
+		// @param[in]  light シャドウマップ用に設定する光源を指すポインタ
+		// @return     なし
+		//*****************************************************************
 		void ShadowMapRender::SetShadowLight(Light* light)
 		{
 			this->light = light;
 		}
 
-		//登録済みのライトを全削除
+		//*****************************************************************
+		// @brief      登録済みのライトを全削除
+		// @param[in]  なし
+		// @return     なし
+		//*****************************************************************
 		void ShadowMapRender::Clear()
 		{
 			m_models.clear();
 			light = nullptr;
 		}
 
-		//描画
+		//*****************************************************************
+		// @brief      描画
+		// @param[in]  なし
+		// @return     なし
+		//*****************************************************************
 		void ShadowMapRender::Render()
 		{
 			if (!light) return;
@@ -231,6 +254,11 @@ namespace myRenderer
 			}
 		}
 
+		//*****************************************************************
+		// @brief      GUI描画
+		// @param[in]  なし
+		// @return     なし
+		//*****************************************************************
 		void ShadowMapRender::DrawDebugGUI()
 		{
 			//シャドウマップ
@@ -246,7 +274,11 @@ namespace myRenderer
 			}
 		}
 
-		// シャドウマップ情報をRenderContextに積む
+		//*****************************************************************
+		// @brief      シャドウマップ情報をRenderContextに積む
+		// @param[in]  なし
+		// @return     ShadowMapData
+		//*****************************************************************
 		ShadowMapData ShadowMapRender::GetShadowMapData()
 		{
 			ShadowMapData shadowMapData;
@@ -262,6 +294,12 @@ namespace myRenderer
 	}
 }
 
+//*****************************************************************
+// @brief      コンストラクタ
+// @param[in]  width 幅
+// @param[in]  height 高さ
+// @return     なし
+//*****************************************************************
 DepthStencil::DepthStencil(UINT width, UINT height)
 {
 	ID3D11Device* device = Graphics::Instance().GetDevice();

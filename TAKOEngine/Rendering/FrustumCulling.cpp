@@ -1,7 +1,16 @@
+//! @file FrustumCulling.cpp
+//! @note
+
 #include "FrustumCulling.h"
 
-// 視錐台カリングを行う関数
-void FrustumCulling::FrustumCullingFlag(const Camera & camera, const std::vector<iModel::Mesh>&meshes, std::vector<bool>&visibleObjects)
+//*********************************************************************
+// @brief      視錐台カリングを行う関数
+// @param[in]  camera          カメラ情報
+// @param[in]  meshes          メッシュデータのリスト
+// @param[in]  visibleObjects  メッシュが視錐台内にあるかどうかのフラグを格納するブール値のリスト
+// @return     なし
+//*********************************************************************
+void FrustumCulling::FrustumCullingFlag(const Camera& camera, const std::vector<iModel::Mesh>& meshes, std::vector<bool>& visibleObjects)
 {
     // カメラのビュー行列と射影行列を取得
     DirectX::XMFLOAT4X4 viewMatrix       = camera.GetView();
@@ -20,7 +29,13 @@ void FrustumCulling::FrustumCullingFlag(const Camera & camera, const std::vector
     }
 }
 
-// フラスタムを計算する関数
+//*********************************************************************
+// @brief      フラスタムを計算する関数
+// @param[in]  frustum           結果として計算される視錐台（フラスタム）情報を格納するためのオブジェクト
+// @param[in]  viewMatrix        ビュー行列
+// @param[in]  projectionMatrix  カメラの視野角やクリップ距離（近接・遠方クリップ面）を定義するための行列
+// @return     なし
+//*********************************************************************
 void FrustumCulling::CalculateFrustumFromViewProjection(Frustum& frustum, const DirectX::XMFLOAT4X4& viewMatrix, const DirectX::XMFLOAT4X4& projectionMatrix)
 {
     // ビュー行列と射影行列を組み合わせた行列を計算
@@ -72,7 +87,12 @@ void FrustumCulling::CalculateFrustumFromViewProjection(Frustum& frustum, const 
     }
 }
 
-// フラスタムとの衝突判定を行う関数
+//*********************************************************************
+// @brief      フラスタムとの衝突判定を行う関数
+// @param[in]  frustum      フラスタム（視錐台）を表すオブジェクト
+// @param[in]  objectBounds オブジェクトの境界ボックス
+// @return     bool
+//*********************************************************************
 bool FrustumCulling::IsObjectInFrustum(const Frustum& frustum, const DirectX::BoundingBox& objectBounds)
 {
     // オブジェクトの境界ボックスの頂点を取得

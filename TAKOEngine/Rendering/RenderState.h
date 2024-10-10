@@ -1,8 +1,17 @@
-#pragma once
+//! @file RenderState.h
+//! @note
+
+#ifndef __GRAHICS_RENDER_STATE_H__
+#define __GRAHICS_RENDER_STATE_H__
 
 #include <wrl.h>
 #include <d3d11.h>
+#include <d3d12.h>
+#include <unordered_map>
 
+#include "TAKOEngine\Rendering\Descriptor.h"
+
+//サンプラーステート
 enum class SamplerState
 {
 	PointWrap,
@@ -50,7 +59,11 @@ enum class RasterizerState
 	EnumCount
 };
 
-// レンダーステート
+//****************************************************************
+// @class RenderState
+// @brief サンプラー、デプス、ブレンド、ラスタライザーステートの設定or取得
+// @par   [説明]
+//****************************************************************
 class RenderState
 {
 public:
@@ -86,3 +99,25 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11BlendState> blendStates[static_cast<int>(BlendState::EnumCount)];
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStates[static_cast<int>(RasterizerState::EnumCount)];
 };
+
+//*****************************************************************
+// @class SamplerManager
+// @brief サンプラーを生成
+// @par   [説明]
+//*****************************************************************
+class SamplerManager
+{
+public:
+	SamplerManager(SamplerState state);
+	~SamplerManager();
+
+	Descriptor* GetDescriptor() { return m_sampler_descriptor; }
+
+private:
+	Descriptor* m_sampler_descriptor = nullptr;
+
+	// サンプラーを作成する内部関数
+	void CreateSampler(ID3D12Device* device, SamplerState type, D3D12_SAMPLER_DESC& samplerDesc);
+};
+
+#endif // !__GRAHICS_RENDER_STATE_H__

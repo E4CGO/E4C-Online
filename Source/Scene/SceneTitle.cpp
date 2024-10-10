@@ -70,6 +70,7 @@ void SceneTitle::Initialize()
 		ID3D12Device* d3d_device = T_GRAPHICS.GetDeviceDX12();
 		m_skinning_pipeline = std::make_unique<SkinningPipeline>(d3d_device);
 		test = std::make_unique<ModelDX12>("Data/Model/Character/Barbarian.glb");
+		//test = std::make_unique<ModelDX12>("Data/Model/Character/test.glb");
 		test->PlayAnimation(0, true);
 
 		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/button_agree.png");
@@ -253,11 +254,10 @@ void SceneTitle::RenderDX12()
 		m_skinning_pipeline->Compute(rc, test.get());
 
 		// モデル描画
-		Shader* shader = TentacleLib::graphics.GetShader();
-		shader->Begin(rc);
+		ModelShaderDX12* shader = TentacleLib::graphics.GetModelShaderDX12(ModelShaderDX12Id::Lambert);
 		if (test != nullptr)
 		{
-			shader->Draw(rc, test.get());
+			shader->Render(rc, test.get());
 		}
 		shader->End(rc);
 

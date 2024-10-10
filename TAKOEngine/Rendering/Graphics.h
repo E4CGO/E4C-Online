@@ -11,6 +11,7 @@
 #include "TAKOEngine/Rendering/RenderState.h"
 #include "TAKOEngine/Rendering/Gizmos.h"
 #include "TAKOEngine/Rendering/Shaders/ModelShader.h"
+#include "TAKOEngine/Rendering/Shaders/ModelShaderDX12.h"
 #include "TAKOEngine/Rendering/Shaders/SpriteShader.h"
 #include "TAKOEngine/Rendering/DebugRenderer.h"
 #include "TAKOEngine/Rendering/LineRenderer.h"
@@ -24,6 +25,13 @@ enum class ModelShaderId
 	Toon,
 	Skydome,
 	ShadowMap,
+
+	EnumCount
+};
+
+enum class ModelShaderDX12Id
+{
+	Lambert,
 
 	EnumCount
 };
@@ -111,7 +119,10 @@ public:
 
 	// モデルシェーダー取得
 	ModelShader* GetModelShader(ModelShaderId shaderId) { return modelShaders[static_cast<int>(shaderId)].get(); }
-	// スプライトシェーダー取得
+	//DirextX12のモデルシェーダー取得
+	ModelShaderDX12* GetModelShaderDX12(ModelShaderDX12Id shaderId) { return dx12_modelshaders[static_cast<int>(shaderId)].get(); }
+
+	// 繧ｹ繝励Λ繧､繝医す繧ｧ繝ｼ繝繝ｼ蜿門ｾ�
 	SpriteShader* GetSpriteShader(SpriteShaderId shaderId) { return spriteShaders[static_cast<int>(shaderId)].get(); }
 	// デバッグレンダラ取得
 	DebugRenderer* GetDebugRenderer() const { return debugRenderer.get(); }
@@ -162,9 +173,7 @@ public:
 
 	const Descriptor* UpdateSceneConstantBuffer(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection, const DirectX::XMFLOAT3& light_direction);
 
-	Shader* GetShader() const { return m_shader.get(); }
-
-	// テクスチャ読み込み
+	// 繝�繧ｯ繧ｹ繝√Ε隱ｭ縺ｿ霎ｼ縺ｿ
 	HRESULT LoadTexture(const char* filename, ID3D12Resource** d3d_resource);
 
 	// テクスチャ作成
@@ -175,6 +184,8 @@ public:
 
 	// バッファコピー
 	HRESULT CopyBuffer(ID3D12Resource* d3d_src_resource, ID3D12Resource* d3d_dst_resource);
+
+	SamplerManager* GetSampler(SamplerState state) { return m_sampler[static_cast<int>(state)].get(); }
 
 private:
 	// イメージコピー
@@ -194,6 +205,7 @@ private:
 	std::unique_ptr<Gizmos> gizmos;
 
 	std::unique_ptr<ModelShader> modelShaders[static_cast<int>(ModelShaderId::EnumCount)];
+	std::unique_ptr<ModelShaderDX12> dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::EnumCount)];
 	std::unique_ptr<SpriteShader> spriteShaders[static_cast<int>(SpriteShaderId::EnumCount)];
 
 	std::unique_ptr<DebugRenderer>					debugRenderer;
@@ -232,8 +244,7 @@ private:
 
 	std::unique_ptr<DescriptorHeap>						m_sampler_descriptor_heap;
 
-	std::unique_ptr<Shader>								m_shader;
-	std::unique_ptr<SkinningPipeline>					m_skinning_pipeline;
+	std::unique_ptr<SamplerManager> m_sampler[static_cast<int>(SamplerState::EnumCount)];
 
 	UINT	m_buffer_count = 0;
 

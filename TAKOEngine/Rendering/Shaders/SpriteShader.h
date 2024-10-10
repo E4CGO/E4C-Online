@@ -11,14 +11,11 @@ public:
 
 	// 描画開始
 	virtual void Begin(const RenderContext& rc) override;
-	void Begin(const RenderContextDX12& rc) override;
-	void Draw(const RenderContextDX12& rc, iModel* model) override;
-	void Draw(const RenderContextDX12& rc, ModelDX12* model) override;
-	void End(const RenderContext& rc) override;
-	void End(const RenderContextDX12& rc) override;
-
+	
 	// モデル描画
 	virtual void Draw(const RenderContext& rc, const Sprite* sprite);
+
+	void End(const RenderContext& rc) override;
 
 protected:
 	virtual void UpdateConstantBuffer(const RenderContext& rc) {};

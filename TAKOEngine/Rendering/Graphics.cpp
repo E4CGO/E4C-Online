@@ -60,6 +60,14 @@ void Graphics::FinishDX12()
 			frame_resource.d3d_cbv_resource->Unmap(0, nullptr);
 		}
 	}
+
+	for (int i = 0; i < static_cast<int>(SamplerState::EnumCount); i++)
+	{
+		if (m_sampler[i]->GetDescriptor() != nullptr)
+		{
+			m_sampler_descriptor_heap->PushDescriptor(m_sampler[i]->GetDescriptor());
+		}
+	}
 }
 
 // 初期化
@@ -555,6 +563,14 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	// レンダーステート作成
 	renderState = std::make_unique<RenderState>(device.Get());
 
+	//サンプラーステート作成
+	m_sampler[static_cast<int>(SamplerState::PointWrap)]    = std::make_unique<SamplerManager>(SamplerState::PointWrap);
+	m_sampler[static_cast<int>(SamplerState::PointClamp)]   = std::make_unique<SamplerManager>(SamplerState::PointClamp);
+	m_sampler[static_cast<int>(SamplerState::LinearWrap)]   = std::make_unique<SamplerManager>(SamplerState::LinearWrap);
+	m_sampler[static_cast<int>(SamplerState::LinearClamp)]  = std::make_unique<SamplerManager>(SamplerState::LinearClamp);
+	m_sampler[static_cast<int>(SamplerState::LinearBorder)] = std::make_unique<SamplerManager>(SamplerState::LinearBorder);
+	m_sampler[static_cast<int>(SamplerState::ShadowMap)]    = std::make_unique<SamplerManager>(SamplerState::ShadowMap);
+
 	// ギズモ生成
 	gizmos = std::make_unique<Gizmos>(device.Get());
 
@@ -563,6 +579,9 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	modelShaders[static_cast<int>(ModelShaderId::Toon)] = std::make_unique<ToonShader>(device.Get());
 	modelShaders[static_cast<int>(ModelShaderId::Skydome)] = std::make_unique<SkydomeShader>(device.Get());
 	modelShaders[static_cast<int>(ModelShaderId::ShadowMap)] = std::make_unique<ShadowMapShader>(device.Get());
+
+	// DX12のモデルシェーダー生成
+	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Lambert)] = std::make_unique<LambertShader>();
 
 	// スプライトシェーダー生成
 	spriteShaders[static_cast<int>(SpriteShaderId::Default)] = std::make_unique<DefaultSpriteShader>(device.Get());
@@ -576,7 +595,7 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 
 	// レンダラ
 	debugRenderer = std::make_unique<DebugRenderer>(device.Get());
-	lineRenderer = std::make_unique<LineRenderer>(device.Get(), 1024);
+	lineRenderer  = std::make_unique<LineRenderer>(device.Get(), 1024);
 }
 
 void Graphics::Present(UINT syncInterval)

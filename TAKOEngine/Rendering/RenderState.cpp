@@ -1,7 +1,15 @@
+//! @file RenderState.cpp
+//! @note
+
 #include "Misc.h"
 #include "RenderState.h"
+#include "Graphics.h"
 
-// コンストラクタ
+//***********************************************************
+// @brief       コンストラクタ
+// @param[in]   device   ID3D11Device*
+// @return      なし
+//***********************************************************
 RenderState::RenderState(ID3D11Device* device)
 {
 	// SamplerState
@@ -343,4 +351,154 @@ RenderState::RenderState(ID3D11Device* device)
 			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 		}
 	}
+}
+
+//***********************************************************
+// @brief       コンストラクタ
+// @param[in]   なし
+// @return      なし
+//***********************************************************
+SamplerManager::SamplerManager(SamplerState state)
+{
+	ID3D12Device* device = Graphics::Instance().GetDeviceDX12();
+
+	//サンプラーの種類ごとに作成
+	D3D12_SAMPLER_DESC samplerDesc = {};
+
+	switch (static_cast<int>(state))
+	{
+	case 0: 
+		//! ポイントサンプリング&テクスチャ繰り返しあり  PointWrap
+		samplerDesc.MipLODBias     = 0.0f;
+		samplerDesc.MaxAnisotropy  = 1;
+		samplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+		samplerDesc.MinLOD         = 0.0f;
+		samplerDesc.MaxLOD         = D3D12_FLOAT32_MAX;
+		samplerDesc.BorderColor[0] = 1.0f;
+		samplerDesc.BorderColor[1] = 1.0f;
+		samplerDesc.BorderColor[2] = 1.0f;
+		samplerDesc.BorderColor[3] = 1.0f;
+		samplerDesc.AddressU       = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		samplerDesc.AddressV       = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		samplerDesc.AddressW       = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		samplerDesc.Filter         = D3D12_FILTER_MIN_MAG_MIP_POINT;
+		break;
+
+	case 1: 
+		//! ポイントサンプリング＆テクスチャ繰り返しなし    PointClamp
+		samplerDesc.MipLODBias     = 0.0f;
+		samplerDesc.MaxAnisotropy  = 1;
+		samplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+		samplerDesc.MinLOD         = 0.0f;
+		samplerDesc.MaxLOD         = D3D12_FLOAT32_MAX;
+		samplerDesc.BorderColor[0] = 1.0f;
+		samplerDesc.BorderColor[1] = 1.0f;
+		samplerDesc.BorderColor[2] = 1.0f;
+		samplerDesc.BorderColor[3] = 1.0f;
+		samplerDesc.AddressU       = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+		samplerDesc.AddressV       = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+		samplerDesc.AddressW       = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+		samplerDesc.Filter         = D3D12_FILTER_MIN_MAG_MIP_POINT;
+		break;
+
+	case 2:
+		//! リニアサンプリング＆テクスチャ繰り返しあり   LinearWrap
+		samplerDesc.MipLODBias     = 0.0f;
+		samplerDesc.MaxAnisotropy  = 1;
+		samplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+		samplerDesc.MinLOD         = 0.0f;
+		samplerDesc.MaxLOD         = D3D12_FLOAT32_MAX;
+		samplerDesc.BorderColor[0] = 1.0f;
+		samplerDesc.BorderColor[1] = 1.0f;
+		samplerDesc.BorderColor[2] = 1.0f;
+		samplerDesc.BorderColor[3] = 1.0f;
+		samplerDesc.AddressU       = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		samplerDesc.AddressV       = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		samplerDesc.AddressW       = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		samplerDesc.Filter         = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+		break;
+
+	case 3:
+		//! リニアサンプリング＆テクスチャ繰り返しなし   LinearClamp
+		samplerDesc.MipLODBias     = 0.0f;
+		samplerDesc.MaxAnisotropy  = 1;
+		samplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+		samplerDesc.MinLOD         = 0.0f;
+		samplerDesc.MaxLOD         = D3D12_FLOAT32_MAX;
+		samplerDesc.BorderColor[0] = 1.0f;
+		samplerDesc.BorderColor[1] = 1.0f;
+		samplerDesc.BorderColor[2] = 1.0f;
+		samplerDesc.BorderColor[3] = 1.0f;
+		samplerDesc.AddressU       = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+		samplerDesc.AddressV       = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+		samplerDesc.AddressW       = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+		samplerDesc.Filter         = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+		break;
+
+	case 4:
+		//! リニアサンプリング&テクスチャボーダー   LinearBorder
+		samplerDesc.MipLODBias     = 0.0f;
+		samplerDesc.MaxAnisotropy  = 1;
+		samplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+		samplerDesc.MinLOD         = 0.0f;
+		samplerDesc.MaxLOD         = D3D12_FLOAT32_MAX;
+		samplerDesc.BorderColor[0] = 0.0f;
+		samplerDesc.BorderColor[1] = 1.0f;
+		samplerDesc.BorderColor[2] = 0.0f;
+		samplerDesc.BorderColor[3] = 0.0f;
+		samplerDesc.AddressU       = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+		samplerDesc.AddressV       = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+		samplerDesc.AddressW       = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+		samplerDesc.Filter         = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+		break;
+
+	case 5:
+		//! シャドウマップ用サンプラーステート   ShadowMap
+		samplerDesc.MipLODBias     = 0.0f;
+		samplerDesc.MaxAnisotropy  = 1;
+		samplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+		samplerDesc.MinLOD         = 0.0f;
+		samplerDesc.MaxLOD         = D3D12_FLOAT32_MAX;
+		samplerDesc.BorderColor[0] = D3D12_FLOAT32_MAX;
+		samplerDesc.BorderColor[1] = D3D12_FLOAT32_MAX;
+		samplerDesc.BorderColor[2] = D3D12_FLOAT32_MAX;
+		samplerDesc.BorderColor[3] = D3D12_FLOAT32_MAX;
+		samplerDesc.AddressU       = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+		samplerDesc.AddressV       = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+		samplerDesc.AddressW       = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+		samplerDesc.Filter         = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+		break;
+
+	default:
+		break;
+	}
+
+	CreateSampler(device, state, samplerDesc);
+}
+
+//***********************************************************
+// @brief       デストラクタ
+// @param[in]   なし
+// @return      なし
+//***********************************************************
+SamplerManager::~SamplerManager()
+{
+}
+
+//***********************************************************
+// @brief       サンプラーを作成する内部関数
+// @param[in]   device       ID3D11Device*
+// @param[in]   type         サンプラータイプを選ぶ
+// @param[in]   samplerDesc  作成したサンプラーを設定
+// @return      なし
+//***********************************************************
+void SamplerManager::CreateSampler(ID3D12Device* device, SamplerState type, D3D12_SAMPLER_DESC& samplerDesc)
+{
+	Graphics& graphics = Graphics::Instance(); 
+
+	//ディスクリプタを取得
+	m_sampler_descriptor = graphics.GetSamplerDescriptorHeap()->PopDescriptor(); 
+
+	// サンプラーを作成してヒープにバインド
+	device->CreateSampler(&samplerDesc, m_sampler_descriptor->GetCpuHandle());
 }

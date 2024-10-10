@@ -1,9 +1,14 @@
 #pragma once
 
+#include <d3d12.h>
+
+#include "TAKOEngine/Rendering/Descriptor.h"
+
 #include "TAKOEngine/Editor/Camera/Camera.h"
 #include "TAKOEngine/Rendering/RenderState.h"
 #include "TAKOEngine/Rendering/MyRender.h"
 
+#pragma region ShaderData(DX11)
 //	UVスクロール情報
 struct UVScrollData
 {
@@ -131,6 +136,7 @@ struct FinalpassnData
 	ID3D11ShaderResourceView* bloomTexture;
 };
 
+//影情報
 struct ShadowMapData
 {
 	//カメラ情報
@@ -149,6 +155,7 @@ struct ShadowMapData
 	//影の色
 	DirectX::XMFLOAT3 shadowColor = { 0.5f,0.5f,0.5f };
 };
+#pragma endregion
 
 struct RenderContext
 {
@@ -181,4 +188,15 @@ struct RenderContext
 
 	//Deferred Rendering用SRV
 	DeferredData deferredData;
+};
+
+// レンダーコンテキスト(DX12)
+struct RenderContextDX12
+{
+	ID3D12GraphicsCommandList* d3d_command_list = nullptr;
+	Descriptor* scene_cbv_descriptor = nullptr;
+
+	DirectX::XMFLOAT4X4			view;
+	DirectX::XMFLOAT4X4			projection;
+	DirectX::XMFLOAT4			light_direction;
 };

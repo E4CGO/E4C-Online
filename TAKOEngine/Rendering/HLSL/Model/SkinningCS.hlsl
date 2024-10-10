@@ -1,5 +1,5 @@
 //--------------------------
-// ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒãƒãƒ£ã®è¨­å®š
+// ƒ‹[ƒgƒVƒOƒlƒ`ƒƒ‚Ìİ’è
 //--------------------------
 #define ROOT_SIG "DescriptorTable(SRV(t0)), \
                   DescriptorTable(UAV(u0)), \
@@ -22,13 +22,13 @@ cbuffer ConstantBuffer : register(b0)
     row_major float4x4	bone_transforms[255];
 };
 
-StructuredBuffer<Vertex>	src_vertices : register(t0);
-RWStructuredBuffer<Vertex>	dst_vertices : register(u0);
+StructuredBuffer<Vertex>	src_vertices : register(t0); //ModelResource‚Ìî•ñ
+RWStructuredBuffer<Vertex>	dst_vertices : register(u0); //Model‚Ìî•ñ
 
 #define CS_THREAD_NUM 8
 
 //--------------------------
-// ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒãƒãƒ£ã®è¨­å®š
+// ƒ‹[ƒgƒVƒOƒlƒ`ƒƒ‚Ìİ’è
 //--------------------------
 [RootSignature(ROOT_SIG)]
 [numthreads(CS_THREAD_NUM, 1, 1)]
