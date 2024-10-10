@@ -1,7 +1,16 @@
-#pragma once
+//! @file PipelineState.h
+//! @note
+
+#ifndef __CORE_PIPLINESTATE_H__
+#define __CORE_PIPLINESTATE_H__
 
 #include <d3d12.h>
 
+//**********************************************
+// @class PipelineState
+// @brief パイプラインステート
+// @par   [説明]
+//**********************************************
 class PipelineState
 {
 public:
@@ -22,3 +31,5 @@ public:
 private:
 	ID3D12PipelineState* m_pipelineState = nullptr;
 };
+
+#endif // !__CORE_PIPLINESTATE_H__

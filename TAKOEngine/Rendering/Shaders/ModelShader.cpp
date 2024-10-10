@@ -1,3 +1,6 @@
+//! @file ModelShader.cpp
+//! @note 
+
 #include <cassert>
 #include "TAKOEngine/Runtime/tentacle_lib.h"
 #include "TAKOEngine/Rendering/Misc.h"
@@ -5,6 +8,11 @@
 #include "TAKOEngine/Rendering/Shaders/ModelShader.h"
 #include "TAKOEngine/Rendering/FrustumCulling.h"
 
+//******************************************************************
+// @brief       コンストラクタ
+// @param[in]   なし
+// @return      なし
+//******************************************************************
 ModelShader::ModelShader(ID3D11Device* device, const char* vs, const char* ps)
 {
 	// 入力レイアウト
@@ -62,7 +70,11 @@ ModelShader::ModelShader(ID3D11Device* device, const char* vs, const char* ps)
 		shadowMapConstantBuffer.GetAddressOf());
 }
 
-// 描画開始
+//******************************************************************
+// @brief       描画開始
+// @param[in]   const RenderContext&
+// @return      なし
+//******************************************************************
 void ModelShader::Begin(const RenderContext& rc)
 {
 	ID3D11DeviceContext* dc = rc.deviceContext;
@@ -146,6 +158,11 @@ void ModelShader::Begin(const RenderContext& rc)
 	rc.deviceContext->PSSetShaderResources(10, ARRAYSIZE(srvs), srvs);
 }
 
+//******************************************************************
+// @brief       描画開始
+// @param[in]   const RenderContextDX12&
+// @return      なし
+//******************************************************************
 void ModelShader::Begin(const RenderContextDX12& rc)
 {
 	ID3D12Device* device = T_GRAPHICS.GetDeviceDX12();
@@ -169,23 +186,47 @@ void ModelShader::Begin(const RenderContextDX12& rc)
 	m_pipelineState.Init(device, desc);
 }
 
+//******************************************************************
+// @brief       モデル描画
+// @param[in]   const RenderContext&, iModel*
+// @return      なし
+//******************************************************************
 void ModelShader::Draw(const RenderContextDX12& rc, iModel* model)
 {
 }
 
+//******************************************************************
+// @brief       モデル描画
+// @param[in]   const RenderContextDX12&, ModelDX12*
+// @return      なし
+//******************************************************************
 void ModelShader::Draw(const RenderContextDX12& rc, ModelDX12* model)
 {
 }
 
+//******************************************************************
+// @brief       描画終了
+// @param[in]   const RenderContext&
+// @return      なし
+//******************************************************************
 void ModelShader::End(const RenderContext& rc)
 {
 }
 
+//******************************************************************
+// @brief       描画終了
+// @param[in]   const RenderContextDX12&
+// @return      なし
+//******************************************************************
 void ModelShader::End(const RenderContextDX12& rc)
 {
 }
 
-// モデル描画
+//******************************************************************
+// @brief       モデル描画
+// @param[in]   const RenderContext&, const iModel*, DirectX::XMFLOAT4(color)
+// @return      なし
+//******************************************************************
 void ModelShader::Draw(const RenderContext& rc, const iModel* model, DirectX::XMFLOAT4 color)
 {
 	ID3D11DeviceContext* dc = rc.deviceContext;

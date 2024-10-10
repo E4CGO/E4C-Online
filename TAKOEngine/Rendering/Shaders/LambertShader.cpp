@@ -1,9 +1,17 @@
+//! @file LambertShader.cpp
+//! @note 
+
 #include "TAKOEngine/Rendering/Misc.h"
 #include "TAKOEngine/Rendering/Graphics.h"
 #include "TAKOEngine/Rendering/Model/Model.h"
 #include "TAKOEngine/Rendering/Model/ModelDX12.h"
 #include "TAKOEngine/Rendering/Shaders/LambertShader.h"
 
+//***********************************************************
+// @brief       コンストラクタ
+// @param[in]   なし
+// @return      なし
+//***********************************************************
 LambertShader::LambertShader()
 {
 	ID3D12Device* device = Graphics::Instance().GetDeviceDX12();
@@ -202,15 +210,29 @@ LambertShader::LambertShader()
 	}
 }
 
+//***********************************************************
+// @brief       デストラクタ
+// @param[in]   なし
+// @return      なし
+//***********************************************************
 LambertShader::~LambertShader()
 {
 }
 
+//***********************************************************
+// @brief       描画開始
+// @param[in]   const RenderContext&
+// @return      なし
+//***********************************************************
 void LambertShader::Begin(const RenderContext& rc)
 {
 }
 
-// 描画開始
+//***********************************************************
+// @brief       描画開始
+// @param[in]   const RenderContextDX12&
+// @return      なし
+//***********************************************************
 void LambertShader::Begin(const RenderContextDX12& rc)
 {
 	// パイプライン設定
@@ -221,11 +243,20 @@ void LambertShader::Begin(const RenderContextDX12& rc)
 	rc.d3d_command_list->SetGraphicsRootDescriptorTable(0, rc.scene_cbv_descriptor->GetGpuHandle());
 }
 
+//***********************************************************
+// @brief       描画
+// @param[in]   const RenderContextDX12&, iModel*
+// @return      なし
+//***********************************************************
 void LambertShader::Draw(const RenderContextDX12& rc, iModel* model)
 {
 }
 
-// 描画
+//***********************************************************
+// @brief       描画
+// @param[in]   const RenderContextDX12&, ModelDX12*
+// @return      なし
+//***********************************************************
 void LambertShader::Draw(const RenderContextDX12& rc, ModelDX12* model)
 {
 	Graphics& graphics = Graphics::Instance();
@@ -257,11 +288,20 @@ void LambertShader::Draw(const RenderContextDX12& rc, ModelDX12* model)
 	}
 }
 
+//***********************************************************
+// @brief       描画終了
+// @param[in]   const RenderContext&
+// @return      なし
+//***********************************************************
 void LambertShader::End(const RenderContext& rc)
 {
 }
 
-// 描画終了
+//***********************************************************
+// @brief       描画終了
+// @param[in]   const RenderContextDX12&
+// @return      なし
+//***********************************************************
 void LambertShader::End(const RenderContextDX12& rc)
 {
 }

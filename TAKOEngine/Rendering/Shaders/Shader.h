@@ -1,4 +1,8 @@
-#pragma once
+//! @file Shader.h
+//! @note
+
+#ifndef __GRAPHICS_SHADER_H__
+#define __GRAPHICS_SHADER_H__
 
 #include <vector>
 #include <d3d12.h>
@@ -22,6 +26,11 @@ struct RenderContextDX12
 	DirectX::XMFLOAT4			light_direction;
 };
 
+//********************************************************************
+// @class Shader
+// @brief シェーダー関連の基底クラス
+// @par   [説明]
+//********************************************************************
 class Shader
 {
 public:
@@ -52,3 +61,5 @@ public:
 protected:
 	void LoadShaderFile(const char* filename, std::vector<BYTE>& data);
 };
+
+#endif // !__GRAPHICS_SHADER_H__

@@ -1,7 +1,14 @@
+//! @file FrustumCulling.cpp
+//! @note
+
 #include "FrustumCulling.h"
 
-// 視錐台カリングを行う関数
-void FrustumCulling::FrustumCullingFlag(const Camera & camera, const std::vector<iModel::Mesh>&meshes, std::vector<bool>&visibleObjects)
+//*********************************************************************
+// @brief      視錐台カリングを行う関数
+// @param[in]  const Cmara&, const std::vector<iModel::Mesh>&, std::vector<bool>& (visibleObjects)
+// @return     なし
+//*********************************************************************
+void FrustumCulling::FrustumCullingFlag(const Camera& camera, const std::vector<iModel::Mesh>& meshes, std::vector<bool>& visibleObjects)
 {
     // カメラのビュー行列と射影行列を取得
     DirectX::XMFLOAT4X4 viewMatrix       = camera.GetView();
@@ -20,7 +27,11 @@ void FrustumCulling::FrustumCullingFlag(const Camera & camera, const std::vector
     }
 }
 
-// フラスタムを計算する関数
+//*********************************************************************
+// @brief      フラスタムを計算する関数
+// @param[in]  Frustum&, const DirectX::XMFLOAT4X4& (viewMatrix), const DirectX::XMFLOAT4X4& (projectionMatrix)
+// @return     なし
+//*********************************************************************
 void FrustumCulling::CalculateFrustumFromViewProjection(Frustum& frustum, const DirectX::XMFLOAT4X4& viewMatrix, const DirectX::XMFLOAT4X4& projectionMatrix)
 {
     // ビュー行列と射影行列を組み合わせた行列を計算
@@ -72,7 +83,11 @@ void FrustumCulling::CalculateFrustumFromViewProjection(Frustum& frustum, const 
     }
 }
 
-// フラスタムとの衝突判定を行う関数
+//*********************************************************************
+// @brief      フラスタムとの衝突判定を行う関数
+// @param[in]  const Frustum&, const DirectX::BoundingBox& (objectBounds)
+// @return     bool
+//*********************************************************************
 bool FrustumCulling::IsObjectInFrustum(const Frustum& frustum, const DirectX::BoundingBox& objectBounds)
 {
     // オブジェクトの境界ボックスの頂点を取得

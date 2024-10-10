@@ -1,4 +1,8 @@
-#pragma once
+//! @file ShadowMapRender.h
+//! @note
+
+#ifndef __GRAPHICS_SHADOWMAP_RENDER_H__
+#define __GRAPHICS_SHADOWMAP_RENDER_H__
 
 #include <memory>
 #include <vector>
@@ -9,26 +13,30 @@
 #include "TAKOEngine/Rendering/Model/Model.h"
 #include "TAKOEngine/Rendering/Light.h"
 
-// 深度ステンシルバッファ
+//*****************************************************
+// @class DepthStencil
+// @brief 深度ステンシルバッファ
+// @par   [説明]
+//*****************************************************
 class DepthStencil
 {
 public:
 	DepthStencil(UINT width, UINT height);
 	~DepthStencil() {}
 
-	// シェーダーリソースビュー取得
+	//! シェーダーリソースビュー取得
 	const Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& GetShaderResourceView() { return shaderResourceView; }
 
-	// 深度ステンシルビュー取得
+	//! 深度ステンシルビュー取得
 	const Microsoft::WRL::ComPtr<ID3D11DepthStencilView>& GetDepthStencilView() { return depthStencilView; }
 
-	// テクスチャの情報取得
+	//! テクスチャの情報取得
 	D3D11_TEXTURE2D_DESC GetTexture2dDesc() { return texture2dDesc; }
 
-	// テクスチャ幅取得
+	//! テクスチャ幅取得
 	inline int GetWidth() const { return texture2dDesc.Width; }
 
-	// テクスチャ高さ取得
+	//! テクスチャ高さ取得
 	inline int GetHeight() const { return texture2dDesc.Height; }
 
 private:
@@ -41,6 +49,11 @@ namespace myRenderer
 {
 	namespace shadow
 	{
+		//*****************************************************
+		// @class ShadowMapRender
+		// @brief 影を描画する用のレンダラ
+		// @par   [説明]
+		//*****************************************************
 		class ShadowMapRender
 		{
 		public:
@@ -80,7 +93,7 @@ namespace myRenderer
 			D3D11_TEXTURE2D_DESC texture2dDesc;
 			UINT width = 1024;
 		};
-
 	}
 }
  
+#endif // !__GRAPHICS_SHADOWMAP_RENDER_H__
