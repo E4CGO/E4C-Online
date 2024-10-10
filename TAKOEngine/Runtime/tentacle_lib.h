@@ -2,26 +2,6 @@
 
 #define _WINSOCKAPI_
 
-#pragma comment( lib, "d3d11.lib" )
-#pragma comment( lib, "d3d12.lib" )
-#pragma comment( lib, "dxgi.lib" )
-#pragma comment( lib, "xinput.lib" )
-#pragma comment( lib, "xaudio2.lib" )
-#pragma comment( lib, "winmm.lib" )
-#pragma comment( lib, "zlibstatic.lib" )
-#pragma comment( lib, "assimp.lib" )
-#pragma comment( lib, "SDL2.lib" )
-#pragma comment( lib, "SDL2main.lib" )
-#pragma comment( lib, "SDL2_mixer.lib" )
-#pragma comment( lib, "SDL2-static.lib" )
-#pragma comment( lib, "Effekseer.lib" )
-#pragma comment( lib, "EffekseerRendererDX11.lib" )
-#pragma comment( lib, "xinput.lib" )
-
-#pragma comment( lib, "Crypt32.lib" )
-#pragma comment( lib, "libssl.lib" )
-#pragma comment( lib, "libcrypto.lib" )
-
 #include <unordered_map>
 
 #include "TAKOEngine/Rendering/Graphics.h"

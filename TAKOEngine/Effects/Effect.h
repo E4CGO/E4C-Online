@@ -1,15 +1,18 @@
 #pragma once
+#include <string>
 #include <DirectXMath.h>
-#include <Effekseer.h>
+#include <Effekseer/Effekseer.h>
 
 class Effect
 {
 public:
 	Effect(const char* filename);
+	Effect(const char* filename, std::string version);
 	~Effect() {};
 
 	// çƒê∂
 	Effekseer::Handle Play(const DirectX::XMFLOAT3& position, float scale = 1.0f);
+	Effekseer::Handle PlayDX12(const DirectX::XMFLOAT3& position, float scale = 1.0f);
 
 	// í‚é~
 	void Stop(Effekseer::Handle handle);
@@ -24,4 +27,5 @@ private:
 	Effekseer::EffectRef effekseerEffect;
 
 	Effekseer::ManagerRef Manager();
+	Effekseer::ManagerRef ManagerDX12();
 };

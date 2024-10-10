@@ -38,6 +38,8 @@ Framework::Framework(HWND hWnd)
 	// エフェクトマネージャー初期化
 	EFFECTS.Initialize();
 
+	EFFECTS.InitializeDX12();
+
 	// シーン初期化
 	SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTitle));
 }
