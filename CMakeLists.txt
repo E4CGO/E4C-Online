@@ -895,22 +895,26 @@ set(ZIP_FILE_URLS
     "https://www.dropbox.com/scl/fi/ovb2dkjr3n1ayljdb0ftn/Data.zip?rlkey=2th7h96r3p4qsxn12oqnnp1wv&st=uywpwppu&dl=0"
     "https://www.dropbox.com/scl/fi/nm7h69ap66e62978butip/Dependencies.zip?rlkey=9icgfv9xwc9is1hziwhk5kjjs&st=gv2qvxdg&dl=0"
     "https://www.dropbox.com/scl/fi/1nbbetvdxp4dthu45kayx/External.zip?rlkey=ndtf9xh27fhaiuhnwnn4btf26&st=16hvp0yp&dl=0"
+    "https://www.dropbox.com/scl/fi/hvu3y0cztxca9ztosju2j/Docs.zip?rlkey=24lazv9kbo0y86cnihpxff6re&st=8ulu8iw1&dl=0"
 )
 
 # Local path where the ZIP file will be downloaded
 set(ZIP_FILE_PATHS
     "${CMAKE_SOURCE_DIR}/Data.zip"
     "${CMAKE_SOURCE_DIR}/Dependencies.zip"
-    "${CMAKE_SOURCE_DIR}/External.zip")
+    "${CMAKE_SOURCE_DIR}/External.zip"
+    "${CMAKE_SOURCE_DIR}/Docs.zip"
+)
 
 # Local path where ZIP file will be unarchived
 set(DESTINATION_DIRS
     "${CMAKE_SOURCE_DIR}/Data"
     "${CMAKE_SOURCE_DIR}/Dependencies"
     "${CMAKE_SOURCE_DIR}/External"
+    "${CMAKE_SOURCE_DIR}/Docs"
 )
 
-foreach(i RANGE 0 2)
+foreach(i RANGE 0 3)
     list(GET ZIP_FILE_URLS ${i} ZIP_FILE_URL)
     list(GET ZIP_FILE_PATHS ${i} ZIP_FILE_PATH)
     list(GET DESTINATION_DIRS ${i} DESTINATION_DIR)

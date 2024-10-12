@@ -81,6 +81,9 @@ def update_shaders():
             if(shader_type == 'VS'):
                 path_front += "/" + line[-2] + ".hlsl,5.0,Vertex,main" + '"'
 
+            if(shader_type == 'CS'):
+                path_front += "/" + line[-2] + ".hlsl,5.0,Compute,main" + '"'
+
             the_file.write(f"{path_front}\n")
 
         the_file.write(f")\n")
