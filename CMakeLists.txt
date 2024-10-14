@@ -401,6 +401,8 @@ set(TAKOEngine__Rendering
     "TAKOEngine/Rendering/ShadowMapRender.h"
     "TAKOEngine/Rendering/Sprite.cpp"
     "TAKOEngine/Rendering/Sprite.h"
+    "TAKOEngine/Rendering/SpriteDX12.cpp"
+    "TAKOEngine/Rendering/SpriteDX12.h"
     "TAKOEngine/Rendering/TextSprite.cpp"
     "TAKOEngine/Rendering/TextSprite.h"
 )

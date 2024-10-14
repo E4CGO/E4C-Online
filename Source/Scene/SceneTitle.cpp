@@ -71,6 +71,8 @@ void SceneTitle::Initialize()
 		m_skinning_pipeline = std::make_unique<SkinningPipeline>(d3d_device);
 		test = std::make_unique<ModelDX12>("Data/Model/Character/Barbarian.glb");
 		test->PlayAnimation(0, true);
+
+		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/button_agree.png");
 	}
 
 	// 光
@@ -258,6 +260,14 @@ void SceneTitle::RenderDX12()
 			shader->Draw(rc, test.get());
 		}
 		shader->End(rc);
+
+		// スプライト描画
+		if (m_sprites[0] != nullptr)
+		{
+			m_sprites[0]->Begin(d3d_command_list);
+			m_sprites[0]->Draw(0, 0, 100, 100, 0, 1, 1, 1, 1);
+			m_sprites[0]->End(d3d_command_list);
+		}
 
 		EFFECTS.GetEffect(EffectManager::EFFECT_IDX::BOMB_EFFECT)->PlayDX12(DirectX::XMFLOAT3(0.f, 0.f, 0.f), 5.0f);
 
