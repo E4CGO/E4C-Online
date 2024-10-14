@@ -110,6 +110,8 @@ set(External__imgui-docking
     "External/imgui-docking/imgui_draw.cpp"
     "External/imgui-docking/imgui_impl_dx11.cpp"
     "External/imgui-docking/imgui_impl_dx11.h"
+    "External/imgui-docking/imgui_impl_dx12.cpp"
+    "External/imgui-docking/imgui_impl_dx12.h"
     "External/imgui-docking/imgui_impl_win32.cpp"
     "External/imgui-docking/imgui_impl_win32.h"
     "External/imgui-docking/imgui_internal.h"

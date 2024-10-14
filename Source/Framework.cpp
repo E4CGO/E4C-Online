@@ -1,8 +1,8 @@
 #include <memory>
 #include <sstream>
-#include <imgui.h>
 
 #include "Framework.h"
+#include <imgui.h>
 
 #include "TAKOEngine/Tool/ImGuiRenderer.h"
 #include "TAKOEngine/Effects/EffectManager.h"
@@ -25,8 +25,11 @@ Framework::Framework(HWND hWnd)
 	TentacleLib::SetSyncInterval(syncInterval);
 	TentacleLib::SetShowFPS(true);
 
-	// IMGUI初期化
-	ImGuiRenderer::Initialize(hWnd, T_GRAPHICS.GetDevice(), T_GRAPHICS.GetDeviceContext());
+	if (T_GRAPHICS.isDX11Active)
+	{
+		// IMGUI初期化
+		ImGuiRenderer::Initialize(hWnd, T_GRAPHICS.GetDevice(), T_GRAPHICS.GetDeviceContext());
+	}
 
 	// ネットワーク
 	Network::Initialize();
@@ -54,8 +57,11 @@ Framework::~Framework()
 	// エフェクトマネージャー終了化
 	EFFECTS.Finalize();
 
-	// IMGUI終了
-	ImGuiRenderer::Finalize();
+	if (T_GRAPHICS.isDX11Active)
+	{
+		// IMGUI終了
+		ImGuiRenderer::Finalize();
+	}
 
 	Network::Finalize();
 }
@@ -68,6 +74,7 @@ void Framework::Update(float elapsedTime)
 		T_GRAPHICS.isDX12Active = !T_GRAPHICS.isDX12Active;
 		T_GRAPHICS.isDX11Active = !T_GRAPHICS.isDX11Active;
 	}
+
 	// シーン更新処理
 	SceneManager::Instance().Update(elapsedTime);
 }
@@ -100,8 +107,11 @@ void Framework::Render(float elapsedTime)
 	}
 	if (T_GRAPHICS.isDX12Active)
 	{
-		T_GRAPHICS.Execute();
+		T_GRAPHICS.GetImGUIRenderer()->NewFrameDX12();
+
 		SceneManager::Instance().RenderDX12();
+
+		T_GRAPHICS.Execute();
 	}
 }
 

@@ -16,6 +16,7 @@
 #include "TAKOEngine/Rendering/LineRenderer.h"
 #include "TAKOEngine/Rendering/Descriptor.h"
 #include "TAKOEngine/Rendering/ConstantBuffer.h"
+#include "TAKOEngine/Tool/ImGuiRenderer.h"
 
 enum class ModelShaderId
 {
@@ -76,8 +77,8 @@ public:
 		return instance;
 	}
 
-	bool isDX12Active = false;
-	bool isDX11Active = true;
+	bool isDX12Active = true;
+	bool isDX11Active = false;
 
 	struct CommandQueue
 	{
@@ -116,6 +117,9 @@ public:
 	DebugRenderer* GetDebugRenderer() const { return debugRenderer.get(); }
 	// ラインレンダラ取得
 	LineRenderer* GetLineRenderer() const { return lineRenderer.get(); }
+
+	// ImGUIンレンダラ取得
+	ImGuiRenderer* GetImGUIRenderer() const { return m_imgui_renderer.get(); }
 
 	// バッファ数取得
 	UINT GetBufferCount() const { return m_buffer_count; }
@@ -156,7 +160,7 @@ public:
 
 	void FinishDX12();
 
-	Descriptor* UpdateSceneConstantBuffer(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection, const DirectX::XMFLOAT3& light_direction);
+	const Descriptor* UpdateSceneConstantBuffer(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection, const DirectX::XMFLOAT3& light_direction);
 
 	Shader* GetShader() const { return m_shader.get(); }
 
@@ -206,9 +210,9 @@ private:
 		Microsoft::WRL::ComPtr<ID3D12Resource>				d3d_rtv_resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource>				d3d_dsv_resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource>				d3d_cbv_resource;
-		Descriptor* rtv_descriptor = nullptr;
-		Descriptor* dsv_descriptor = nullptr;
-		Descriptor* cbv_descriptor = nullptr;
+		const Descriptor* rtv_descriptor = nullptr;
+		const Descriptor* dsv_descriptor = nullptr;
+		const Descriptor* cbv_descriptor = nullptr;
 		CbScene* cb_scene_data = nullptr;
 	};
 
@@ -220,9 +224,12 @@ private:
 	CommandQueue										m_resource_queue;
 	CommandQueue										m_graphics_queue;
 	std::vector<FrameResource>							m_frame_resources;
+
 	std::unique_ptr<DescriptorHeap>						m_rtv_descriptor_heap;
 	std::unique_ptr<DescriptorHeap>						m_dsv_descriptor_heap;
-	std::unique_ptr<DescriptorHeap>						m_shader_resource_descriptor_heap;
+
+	std::shared_ptr<DescriptorHeap>						m_shader_resource_descriptor_heap;
+
 	std::unique_ptr<DescriptorHeap>						m_sampler_descriptor_heap;
 
 	std::unique_ptr<Shader>								m_shader;
@@ -232,4 +239,6 @@ private:
 
 	float m_screen_width;
 	float m_screen_height;
+
+	std::unique_ptr<ImGuiRenderer>						m_imgui_renderer;
 };

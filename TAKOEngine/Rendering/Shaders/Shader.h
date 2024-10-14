@@ -15,7 +15,7 @@
 struct RenderContextDX12
 {
 	ID3D12GraphicsCommandList* d3d_command_list = nullptr;
-	Descriptor* scene_cbv_descriptor = nullptr;
+	const Descriptor* scene_cbv_descriptor = nullptr;
 
 	DirectX::XMFLOAT4X4			view;
 	DirectX::XMFLOAT4X4			projection;
@@ -41,7 +41,7 @@ public:
 		dc->VSSetShader(nullptr, nullptr, 0);
 		dc->PSSetShader(nullptr, nullptr, 0);
 		dc->IASetInputLayout(nullptr);
-		
+
 		ID3D11ShaderResourceView* srvs[] = { nullptr, nullptr };
 		dc->PSSetShaderResources(0, ARRAYSIZE(srvs), srvs);
 		ID3D11ShaderResourceView* shadowSrvs[] = { nullptr, nullptr, nullptr, nullptr };

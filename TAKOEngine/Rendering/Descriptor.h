@@ -1,28 +1,26 @@
 #pragma once
 
-#pragma once
-
 #include <vector>
 #include <mutex>
 #include <d3d12.h>
 #include <wrl.h>
 
 //============================================================================
-// ƒfƒBƒXƒNƒŠƒvƒ^
+// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿
 //----------------------------------------------------------------------------
 class Descriptor
 {
 public:
-	// ‰Šú‰»
+	// åˆæœŸåŒ–
 	void Initialize(D3D12_CPU_DESCRIPTOR_HANDLE d3d_cpu_descriptor_handle, D3D12_GPU_DESCRIPTOR_HANDLE d3d_gpu_descriptor_handle, UINT index);
 
-	// GPUƒnƒ“ƒhƒ‹æ“¾
+	// GPUãƒãƒ³ãƒ‰ãƒ«å–å¾—
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCpuHandle() const { return m_d3d_cpu_descriptor_handle; }
 
-	// GPUƒnƒ“ƒhƒ‹æ“¾
+	// GPUãƒãƒ³ãƒ‰ãƒ«å–å¾—
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGpuHandle() const { return m_d3d_gpu_descriptor_handle; }
 
-	// ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv“à‚ÌƒCƒ“ƒfƒbƒNƒXæ“¾
+	// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—å†…ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹å–å¾—
 	UINT GetIndex() const { return m_index; }
 
 private:
@@ -32,7 +30,7 @@ private:
 };
 
 //============================================================================
-// ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv
+// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—
 //----------------------------------------------------------------------------
 class DescriptorHeap
 {
@@ -41,19 +39,19 @@ public:
 	~DescriptorHeap();
 
 public:
-	// D3DƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒvæ“¾
+	// D3Dãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—å–å¾—
 	ID3D12DescriptorHeap* GetD3DDescriptorHeap() const { return m_d3d_descriptor_heap.Get(); }
 
-	// ƒfƒBƒXƒNƒŠƒvƒ^‚ğó‚¯æ‚é
-	Descriptor* PopDescriptor();
+	// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã‚’å—ã‘å–ã‚‹
+	const Descriptor* PopDescriptor();
 
-	// ƒfƒBƒXƒNƒŠƒvƒ^‚ğ•Ô‹p‚·‚é
-	void PushDescriptor(Descriptor* descriptor);
+	// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã‚’è¿”å´ã™ã‚‹
+	void PushDescriptor(const Descriptor* descriptor);
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>		m_d3d_descriptor_heap;
 	std::mutex											m_mutex;
 	std::vector<Descriptor>								m_descriptors;
-	std::vector<Descriptor*>							m_descriptor_stack;
+	std::vector<const Descriptor*>						m_descriptor_stack;
 	int													m_descriptor_stack_index = 0;
 };

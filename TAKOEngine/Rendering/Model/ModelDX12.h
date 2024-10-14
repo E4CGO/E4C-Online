@@ -45,18 +45,18 @@ public:
 		{
 			Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_vbv_uav_resource;
 			D3D12_VERTEX_BUFFER_VIEW				d3d_vbv;
-			Descriptor*                             uav_descriptor = nullptr;
+			const Descriptor* uav_descriptor = nullptr;
 
 			Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cbv_resource;
-			Descriptor*                             cbv_descriptor = nullptr;
-			Constants*                              cbv_data = nullptr;
+			const Descriptor* cbv_descriptor = nullptr;
+			Constants* cbv_data = nullptr;
 		};
 		std::vector<FrameResource>	frame_resources;
 
 		const ModelResource::Mesh* mesh = nullptr;
 
 		std::vector<Bone>	bones;
-		Node*               node = nullptr;
+		Node* node = nullptr;
 		UINT				vertex_count;
 	};
 
@@ -85,6 +85,8 @@ public:
 
 	// リソース取得
 	const ModelResource* GetResource() const { return m_resource.get(); }
+
+	void SetTransformMatrix(DirectX::XMFLOAT4X4 transform) { this->transform = transform; }
 
 private:
 	std::shared_ptr<ModelResource>			m_resource;

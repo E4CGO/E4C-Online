@@ -449,6 +449,14 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 		}
 
 		m_shader = std::make_unique <LambertShader>();
+
+		// IMGUI
+		{
+			if (isDX12Active)
+			{
+				m_imgui_renderer = std::make_unique<ImGuiRenderer>(hWnd, m_d3d_device.Get(), RenderTargetFormat, BufferCount, m_shader_resource_descriptor_heap);
+			}
+		}
 	}
 
 #endif // USEDX12
@@ -733,7 +741,7 @@ void Graphics::End()
 	frame_resource.d3d_command_list->Close();
 }
 
-Descriptor* Graphics::UpdateSceneConstantBuffer(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection, const DirectX::XMFLOAT3& light_direction)
+const Descriptor* Graphics::UpdateSceneConstantBuffer(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection, const DirectX::XMFLOAT3& light_direction)
 {
 	UINT frame_buffer_index = m_dxgi_swap_chain->GetCurrentBackBufferIndex();
 	FrameResource& frame_resource = m_frame_resources.at(frame_buffer_index);
