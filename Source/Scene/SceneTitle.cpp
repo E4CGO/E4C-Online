@@ -170,7 +170,15 @@ void SceneTitle::Update(float elapsedTime)
 
 	if (test != nullptr && T_GRAPHICS.isDX12Active)
 	{
-		const DirectX::XMFLOAT4X4 w = { 2.5f,0.f,0.f,0.f, 0.f,2.5f,0.f,0.f, 0.f,0.f,2.5f,0.f, 0.f,0.f,0.f,1.f };
+		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(test_scale.x, test_scale.y, test_scale.z);
+		DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(
+			DirectX::XMConvertToRadians(test_rotation.x),
+			DirectX::XMConvertToRadians(test_rotation.y),
+			DirectX::XMConvertToRadians(test_rotation.z));
+		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(test_position.x, test_position.y, test_position.z);
+		DirectX::XMMATRIX TRANSFORM = S * R * T;
+		DirectX::XMStoreFloat4x4(&test_transform, TRANSFORM);
+		test->SetTransformMatrix(test_transform);
 		test->UpdateAnimation(elapsedTime);
 		test->UpdateTransform();
 	}
@@ -228,16 +236,16 @@ void SceneTitle::RenderDX12()
 		Camera& camera = Camera::Instance();
 
 		// シーン用定数バッファ更新
-		Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
+		const Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
 			camera.GetView(),
 			camera.GetProjection(),
 			DirectX::XMFLOAT3(0, -1, 0));
 
 		// レンダーコンテキスト設定
 		RenderContextDX12 rc;
-		rc.d3d_command_list     = d3d_command_list;
+		rc.d3d_command_list = d3d_command_list;
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
-		
+
 		//スキニング
 		test->UpdateFrameResource();
 		m_skinning_pipeline->Compute(rc, test.get());
@@ -250,13 +258,38 @@ void SceneTitle::RenderDX12()
 			shader->Draw(rc, test.get());
 		}
 		shader->End(rc);
+
+		EFFECTS.GetEffect(EffectManager::EFFECT_IDX::BOMB_EFFECT)->PlayDX12(DirectX::XMFLOAT3(0.f, 0.f, 0.f), 5.0f);
+
+		EFFECTS.RenderDX12(camera.GetView(), camera.GetProjection());
+
+		// IMGUI描画処理
+		{
+			{
+				ImVec2 displaySize = ImGui::GetIO().DisplaySize;
+				ImVec2 pos = ImVec2{ 0,0 };
+				float width = 210;
+				float height = 460;
+				ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y), ImGuiCond_Once);
+				ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_Once);
+
+				if (ImGui::Begin("Debug"))
+				{
+					if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+					{
+						ImGui::DragFloat3("Position", &test_position.x, 1.0f);
+						ImGui::DragFloat3("Rotation", &test_rotation.x, 1.0f);
+						ImGui::DragFloat3("Scale", &test_scale.x, 1.01f);
+					}
+				}
+				ImGui::End();
+			}
+
+			T_GRAPHICS.GetImGUIRenderer()->RenderDX12(d3d_command_list);
+		}
+
+		TentacleLib::graphics.End();
 	}
-
-	EFFECTS.GetEffect(EffectManager::EFFECT_IDX::BOMB_EFFECT)->PlayDX12(DirectX::XMFLOAT3(0.f, 0.f, 0.f), 5.0f);
-
-	EFFECTS.RenderDX12(camera.GetView(), camera.GetProjection());
-
-	TentacleLib::graphics.End();
 }
 
 void SceneTitle::DrawSceneGUI()

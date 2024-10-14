@@ -1,38 +1,79 @@
-#pragma once
+//! @file ImGuiRenderer.h
+//! @note ImGuiã‚’ç®¡ç†
+
+#ifndef __INCLUDED_IMGUI_RENDERER_H__
+#define __INCLUDED_IMGUI_RENDERER_H__
 
 #undef _WINSOCKAPI_
 #define _WINSOCKAPI
+
 #include <windows.h>
 #include <d3d11.h>
+#include <d3d12.h>
+#include <memory>
 #include <string>
 #include <imgui.h>
 
+#include "TAKOEngine/Rendering/Descriptor.h"
+
+/**************************************************************************//**
+		@class		ImGuiRenderer
+		@brief		ImGuiç®¡ç†ã‚¯ãƒ©ã‚¹
+		@par		ImGuiã‚’è¨­å®šã¨ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°
+*//***************************************************************************/
 class ImGuiRenderer
 {
 public:
-	// ‰Šú‰»
+	// åˆæœŸåŒ–
 	static void Initialize(HWND hWnd, ID3D11Device* device, ID3D11DeviceContext* dc);
 
-	// I—¹‰»
+	// DX12ã§åˆæœŸåŒ–
+	ImGuiRenderer(
+		HWND hwnd,
+		ID3D12Device* d3d_device,
+		DXGI_FORMAT dxgi_format,
+		int buffer_count,
+		std::shared_ptr<DescriptorHeap> descriptor_heap);
+
+	// çµ‚äº†åŒ–
 	static void Finalize();
 
-	// ƒtƒŒ[ƒ€ŠJnˆ—
+	// çµ‚äº†åŒ–
+	void FinalizeDX12();
+
+	// ãƒªã‚µã‚¤ã‚º
+	void Resize(float width, float height);
+
+	// ãƒ•ãƒ¬ãƒ¼ãƒ é–‹å§‹å‡¦ç†
 	static void NewFrame();
 
-	// •`‰æÀs
+	// ãƒ•ãƒ¬ãƒ¼ãƒ é–‹å§‹å‡¦ç†
+	void NewFrameDX12();
+
+	// æç”»å®Ÿè¡Œ
 	static void Render(ID3D11DeviceContext* context);
 
-	// WIN32ƒƒbƒZ[ƒWƒnƒ“ƒhƒ‰[
+	// DX12ã§æç”»å®Ÿè¡Œ
+	void RenderDX12(ID3D12GraphicsCommandList* d3d_command_list);
+
+	// WIN32ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒãƒ³ãƒ‰ãƒ©ãƒ¼
 	static LRESULT HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+public:
+	enum FONT {
+		DEFAULT,
+		TAMANEGI,
+	};
 
 private:
 	static std::string path;
 	static void LoadFontFile(const char* filename, float size);
 	static void CacheFonts(int idx);
 	static bool LoadFontsCache(int idx);
-public:
-	enum FONT {
-		DEFAULT,
-		TAMANEGI,
-	};
+
+	std::shared_ptr<DescriptorHeap>	m_descriptor_heap;
+	const Descriptor* m_pFont_srv_descriptor = nullptr;
+	ImGuiContext* m_pImgui_context = nullptr;
 };
+
+#endif // __INCLUDED_IMGUI_RENDERER_H__

@@ -1,11 +1,14 @@
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>
-#include "ImGuiRenderer.h"
+#include <imgui_impl_dx12.h>
+
 #include <string_view>
 #include <filesystem>
 #include <iostream>
 #include <fstream>
 #include <profiler.h>
+
+#include "ImGuiRenderer.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -13,7 +16,7 @@ bool gPause = false;
 
 std::string ImGuiRenderer::path = "Data/Font/Fonts.imfont";
 
-// ‰Šú‰»
+// åˆæœŸåŒ–
 void ImGuiRenderer::Initialize(HWND hWnd, ID3D11Device* device, ID3D11DeviceContext* dc)
 {
 	// Setup Dear ImGui context
@@ -74,7 +77,78 @@ void ImGuiRenderer::Initialize(HWND hWnd, ID3D11Device* device, ID3D11DeviceCont
 	ProfileInitialize(&gPause, [](bool pause) { gPause = pause; });
 }
 
-// I—¹‰»
+ImGuiRenderer::ImGuiRenderer(HWND hwnd,
+	ID3D12Device* d3d_device,
+	DXGI_FORMAT dxgi_format,
+	int buffer_count,
+	std::shared_ptr<DescriptorHeap> descriptor_heap)
+	: m_descriptor_heap(descriptor_heap)
+{
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	m_pImgui_context = ImGui::CreateContext();
+	ImGui::SetCurrentContext(m_pImgui_context);
+	ImGuiIO& io = ImGui::GetIO();
+
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+	//io.ConfigViewportsNoAutoMerge = true;
+	//io.ConfigViewportsNoTaskBarIcon = true;
+	//io.ConfigViewportsNoDefaultParent = true;
+	//io.ConfigDockingAlwaysTabBar = true;
+	//io.ConfigDockingTransparentPayload = true;
+#if 1
+	io.ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleFonts;     // FIXME-DPI: THIS CURRENTLY DOESN'T WORK AS EXPECTED. DON'T USE IN USER APP!
+	io.ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleViewports; // FIXME-DPI
+#endif
+
+	// Setup Dear ImGui style
+	//ImGui::StyleColorsLight();
+	//ImGui::StyleColorsDark();
+	//ImGui::StyleColorsClassic();
+
+	// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+	ImGuiStyle& style = ImGui::GetStyle();
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		style.WindowRounding = 0.0f;
+		style.Colors[ImGuiCol_WindowBg].w = 0.5f;
+	}
+
+	// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿å–å¾—
+	m_pFont_srv_descriptor = descriptor_heap->PopDescriptor();
+
+	// Setup Platform/Renderer backends
+	ImGui_ImplWin32_Init(hwnd);
+	ImGui_ImplDX12_Init(
+		d3d_device, buffer_count, dxgi_format,
+		descriptor_heap->GetD3DDescriptorHeap(),
+		m_pFont_srv_descriptor->GetCpuHandle(),
+		m_pFont_srv_descriptor->GetGpuHandle()
+	);
+
+	// Load Fonts
+	// - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
+	// - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
+	// - If the file cannot be loaded, the function will return NULL. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
+	// - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
+	// - Read 'docs/FONTS.md' for more instructions and details.
+	// - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
+	//io.Fonts->AddFontDefault();
+	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
+	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
+	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
+	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);
+#if 1
+	//ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
+	ImFont* font = io.Fonts->AddFontFromFileTTF("Data\\Font\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
+	IM_ASSERT(font != NULL);
+#endif
+}
+
+// çµ‚äº†åŒ–
 void ImGuiRenderer::Finalize()
 {
 	ProfileShutdown();
@@ -84,7 +158,29 @@ void ImGuiRenderer::Finalize()
 	ImGui::DestroyContext();
 }
 
-// ƒtƒŒ[ƒ€ŠJnˆ—
+void ImGuiRenderer::FinalizeDX12()
+{
+	// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿è¿”å´
+	m_descriptor_heap->PushDescriptor(m_pFont_srv_descriptor);
+
+	// Cleanup
+	ImGui_ImplDX12_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+
+	if (m_pImgui_context != nullptr)
+	{
+		ImGui::DestroyContext(m_pImgui_context);
+		m_pImgui_context = nullptr;
+	}
+}
+
+void ImGuiRenderer::Resize(float width, float height)
+{
+	ImGuiIO& io = ImGui::GetIO();
+	io.DisplaySize = ImVec2(width, height);
+}
+
+// ãƒ•ãƒ¬ãƒ¼ãƒ é–‹å§‹å‡¦ç†
 void ImGuiRenderer::NewFrame()
 {
 	ImGui_ImplDX11_NewFrame();
@@ -130,7 +226,15 @@ void ImGuiRenderer::NewFrame()
 #endif
 }
 
-// •`‰æ
+void ImGuiRenderer::NewFrameDX12()
+{
+	ImGui_ImplDX12_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+
+	ImGui::NewFrame();
+}
+
+// æç”»
 void ImGuiRenderer::Render(ID3D11DeviceContext* context)
 {
 	// Rendering
@@ -147,7 +251,24 @@ void ImGuiRenderer::Render(ID3D11DeviceContext* context)
 	}
 }
 
-// WIN32ƒƒbƒZ[ƒWƒnƒ“ƒhƒ‰[
+void ImGuiRenderer::RenderDX12(ID3D12GraphicsCommandList* d3d_command_list)
+{
+	// Rendering
+	ImGui::Render();
+
+	// æç”»å®Ÿè¡Œ
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), d3d_command_list);
+
+	// Update and Render additional Platform Windows
+	ImGuiIO& io = ImGui::GetIO();
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		ImGui::UpdatePlatformWindows();
+		ImGui::RenderPlatformWindowsDefault();
+	}
+}
+
+// WIN32ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒãƒ³ãƒ‰ãƒ©ãƒ¼
 LRESULT ImGuiRenderer::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	return ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);

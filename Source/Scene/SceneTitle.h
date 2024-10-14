@@ -75,8 +75,12 @@ private:
 
 	// テスト用
 	std::unique_ptr<ModelDX12> test;
+	DirectX::XMFLOAT4X4 test_transform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+	DirectX::XMFLOAT3 test_position = {0, 0, 0};
+	DirectX::XMFLOAT4 test_rotation = { 0, 0, 0, 0 };
+	DirectX::XMFLOAT3 test_scale = { 1, 1, 1 };
 	std::unique_ptr<SkinningPipeline>	m_skinning_pipeline;
-	
+
 	static float time;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constant_buffers[8];
 };

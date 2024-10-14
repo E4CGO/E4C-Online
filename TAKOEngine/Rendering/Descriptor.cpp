@@ -3,9 +3,9 @@
 #include "TAKOEngine/Tool/Logger.h"
 
 //============================================================================
-// ƒfƒBƒXƒNƒŠƒvƒ^
+// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿
 //----------------------------------------------------------------------------
-// ‰Šú‰»
+// åˆæœŸåŒ–
 void Descriptor::Initialize(D3D12_CPU_DESCRIPTOR_HANDLE d3d_cpu_descriptor_handle, D3D12_GPU_DESCRIPTOR_HANDLE d3d_gpu_descriptor_handle, UINT index)
 {
 	m_d3d_cpu_descriptor_handle = d3d_cpu_descriptor_handle;
@@ -14,14 +14,14 @@ void Descriptor::Initialize(D3D12_CPU_DESCRIPTOR_HANDLE d3d_cpu_descriptor_handl
 }
 
 //============================================================================
-// ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‘€ìƒIƒuƒWƒFƒNƒg
+// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—æ“ä½œã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 //----------------------------------------------------------------------------
-// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 DescriptorHeap::DescriptorHeap(ID3D12Device* d3d_device, D3D12_DESCRIPTOR_HEAP_TYPE d3d_descriptor_heap_type, UINT max_descriptor_count)
 {
 	HRESULT hr;
 
-	// ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒvƒ^ƒCƒv–ˆ‚Ìİ’è
+	// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã‚¿ã‚¤ãƒ—æ¯ã®è¨­å®š
 	LPCWSTR name = L"";
 	D3D12_DESCRIPTOR_HEAP_FLAGS d3d_descriptor_heap_flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	switch (d3d_descriptor_heap_type)
@@ -42,25 +42,25 @@ DescriptorHeap::DescriptorHeap(ID3D12Device* d3d_device, D3D12_DESCRIPTOR_HEAP_T
 		break;
 	}
 
-	// ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv¶¬
+	// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ç”Ÿæˆ
 	D3D12_DESCRIPTOR_HEAP_DESC desc{};
-	desc.Type = d3d_descriptor_heap_type;					// ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚Ìƒ^ƒCƒv
-	desc.NumDescriptors = max_descriptor_count;				// Ši”[‚Å‚«‚éƒfƒBƒXƒNƒŠƒvƒ^‚Ì”
-	desc.Flags = d3d_descriptor_heap_flags;					// ƒfƒBƒXƒNƒŠƒvƒ^‚ªw‚µ‚Ä‚¢‚éƒf[ƒ^‚ğƒVƒF[ƒ_‚©‚çQÆ‚µ‚½‚¢‚©‚Ç‚¤‚©
-	desc.NodeMask = 0;										// ƒAƒ_ƒvƒ^‚ğ1‚Â‚µ‚©g‚í‚È‚¢ê‡‚Í0‚ğw’è
+	desc.Type = d3d_descriptor_heap_type;					// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®ã‚¿ã‚¤ãƒ—
+	desc.NumDescriptors = max_descriptor_count;				// æ ¼ç´ã§ãã‚‹ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã®æ•°
+	desc.Flags = d3d_descriptor_heap_flags;					// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãŒæŒ‡ã—ã¦ã„ã‚‹ãƒ‡ãƒ¼ã‚¿ã‚’ã‚·ã‚§ãƒ¼ãƒ€ã‹ã‚‰å‚ç…§ã—ãŸã„ã‹ã©ã†ã‹
+	desc.NodeMask = 0;										// ã‚¢ãƒ€ãƒ—ã‚¿ã‚’1ã¤ã—ã‹ä½¿ã‚ãªã„å ´åˆã¯0ã‚’æŒ‡å®š
 
 	hr = d3d_device->CreateDescriptorHeap(
-		&desc,												// ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚Ìİ’è
-		IID_PPV_ARGS(m_d3d_descriptor_heap.GetAddressOf())	// Ši”[‚·‚éƒ|ƒCƒ“ƒ^‚ÌƒAƒhƒŒƒX
+		&desc,												// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®è¨­å®š
+		IID_PPV_ARGS(m_d3d_descriptor_heap.GetAddressOf())	// æ ¼ç´ã™ã‚‹ãƒã‚¤ãƒ³ã‚¿ã®ã‚¢ãƒ‰ãƒ¬ã‚¹
 	);
 	_ASSERT_EXPR_A(SUCCEEDED(hr), HRTrace(hr));
 
 	m_d3d_descriptor_heap->SetName(name);
 
-	// ƒfƒBƒXƒNƒŠƒvƒ^‚ğ‚ ‚ç‚©‚¶‚ßÅ‘å”Šm•Û‚µ‚Ä‚¨‚­
+	// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã‚’ã‚ã‚‰ã‹ã˜ã‚æœ€å¤§æ•°ç¢ºä¿ã—ã¦ãŠã
 	m_descriptors.resize(max_descriptor_count);
 
-	// ƒfƒBƒXƒNƒŠƒvƒ^‰Šú‰»
+	// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿åˆæœŸåŒ–
 	UINT d3d_descriptor_size = d3d_device->GetDescriptorHandleIncrementSize(d3d_descriptor_heap_type);
 	D3D12_CPU_DESCRIPTOR_HANDLE d3d_cpu_handle = m_d3d_descriptor_heap->GetCPUDescriptorHandleForHeapStart();
 	D3D12_GPU_DESCRIPTOR_HANDLE d3d_gpu_handle = m_d3d_descriptor_heap->GetGPUDescriptorHandleForHeapStart();
@@ -78,14 +78,14 @@ DescriptorHeap::DescriptorHeap(ID3D12Device* d3d_device, D3D12_DESCRIPTOR_HEAP_T
 	m_descriptor_stack_index = static_cast<int>(max_descriptor_count - 1);
 }
 
-// ƒfƒXƒgƒ‰ƒNƒ^
+// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 DescriptorHeap::~DescriptorHeap()
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
 }
 
-// ƒfƒBƒXƒNƒŠƒvƒ^‚ğó‚¯æ‚é
-Descriptor* DescriptorHeap::PopDescriptor()
+// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã‚’å—ã‘å–ã‚‹
+const Descriptor* DescriptorHeap::PopDescriptor()
 {
 	if (m_descriptor_stack_index < 0)
 	{
@@ -94,15 +94,15 @@ Descriptor* DescriptorHeap::PopDescriptor()
 
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	Descriptor* descriptor = m_descriptor_stack[m_descriptor_stack_index];
+	const Descriptor* descriptor = m_descriptor_stack[m_descriptor_stack_index];
 	m_descriptor_stack[m_descriptor_stack_index] = nullptr;
 	m_descriptor_stack_index--;
 
 	return descriptor;
 }
 
-// ƒfƒBƒXƒNƒŠƒvƒ^‚ğ•Ô‹p‚·‚é
-void DescriptorHeap::PushDescriptor(Descriptor* descriptor)
+// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã‚’è¿”å´ã™ã‚‹
+void DescriptorHeap::PushDescriptor(const Descriptor* descriptor)
 {
 	if (m_descriptor_stack_index >= m_descriptor_stack.size() - 1)
 	{

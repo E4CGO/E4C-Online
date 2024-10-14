@@ -46,8 +46,8 @@ public:
 
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cbv_resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_srv_resource;
-		Descriptor* cbv_descriptor = nullptr;
-		Descriptor* srv_descriptor = nullptr;
+		const Descriptor* cbv_descriptor = nullptr;
+		const Descriptor* srv_descriptor = nullptr;
 
 		template<class Archive>
 		void serialize(Archive& archive);
@@ -102,7 +102,7 @@ public:
 		Material* material = nullptr;
 
 		int                                     nodeIndex = 0;
-		Node*                                   node = nullptr;
+		Node* node = nullptr;
 		std::vector<int>						nodeIndices;
 		std::vector<DirectX::XMFLOAT4X4>		offsetTransforms;
 
@@ -115,8 +115,8 @@ public:
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_vb_resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_ib_resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cb_resource;
-		
-		Descriptor* srv_descriptor = nullptr;
+
+		const Descriptor* srv_descriptor = nullptr;
 
 		D3D12_VERTEX_BUFFER_VIEW				d3d_vbv;
 		D3D12_INDEX_BUFFER_VIEW					d3d_ibv;

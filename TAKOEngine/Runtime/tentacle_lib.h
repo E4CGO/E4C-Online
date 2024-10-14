@@ -2,6 +2,8 @@
 
 #define _WINSOCKAPI_
 
+#define IM_ASSERT(_EXPR) ((void)(_EXPR))
+
 #include <unordered_map>
 
 #include "TAKOEngine/Rendering/Graphics.h"
