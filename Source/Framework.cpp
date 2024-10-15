@@ -11,6 +11,7 @@
 #include "Scene/SceneTitle.h"
 #include "Scene/SceneManager.h"
 #include "Scene/SceneTest.h"
+#include "Scene/GameLoop/SceneTitle_E4C.h"
 
 #include "GameData.h"
 
@@ -44,7 +45,7 @@ Framework::Framework(HWND hWnd)
 	EFFECTS.InitializeDX12();
 
 	// シーン初期化
-	SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTitle));
+	SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTitle_E4C));
 }
 
 // デストラクタ

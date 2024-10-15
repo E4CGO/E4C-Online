@@ -1,0 +1,189 @@
+#include "TAKOEngine/Runtime/tentacle_lib.h"
+#include "TAKOEngine/Rendering/ResourceManager.h"
+#include "TAKOEngine/GUI/UIManager.h"
+
+#include <imgui.h>
+#include <string>
+
+#include "Scene/SceneManager.h"
+#include "SceneTitle_E4C.h"
+#include "Scene/SceneGame.h"
+
+#include "GameData.h"
+
+//テスト用
+float SceneTitle_E4C::time = { 0 };
+
+void SceneTitle_E4C::Initialize()
+{
+	// Sprite Resource Preload
+	for (auto& filename : spriteList)
+	{
+		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
+	}
+
+	//シャドウマップレンダラ
+	shadowMapRenderer->Initialize();
+
+	// モデル
+	{
+		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/button_agree.png");
+	}
+
+	test_head = std::make_unique<ModelObject>("Data/Model/Character/CombineCharacter/test_parts_model_head.glb");
+	test_body = std::make_unique<ModelObject>("Data/Model/Character/CombineCharacter/test_parts_model_body.glb");
+	test_animation = std::make_unique<ModelObject>("Data/Model/Character/CombineCharacter/test_parts_animation.glb");
+
+	test_head->GetModel()->CopyAnimations(test_animation.get()->GetModel().get());
+	//test_body->GetModel()->CopyAnimations(test_animation.get()->GetModel().get());
+
+	test_head->SetAnimation(0, true, 0.0f);
+	//test_body->SetAnimation(0, true, 0.0f);
+
+	//title = new WidgetText("P2Pダンジョン・アドベンチャー");
+	//title->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+	//title->SetScale(2.0f);
+	//title->SetBorder(1);
+	//title->SetBorderColor({ 1.0f, 0.0f, 0.0f, 1.0f });
+	//title->SetAlign(FONT_ALIGN::CENTER);
+	//title->SetPosition({ SCREEN_W * 0.5f, SCREEN_H * 0.2f });
+	//UI.Register(title);
+
+	// 光
+	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
+	Light* dl = new Light(LightType::Directional);
+	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
+	LightManager::Instance().Register(dl);
+	shadowMapRenderer->SetShadowLight(dl);
+
+	// カメラ設定
+	camera.SetPerspectiveFov(
+		DirectX::XMConvertToRadians(45),		// 画角
+		SCREEN_W / SCREEN_H,					// 画面アスペクト比
+		0.1f,									// ニアクリップ
+		10000.0f								// ファークリップ
+	);
+	camera.SetLookAt(
+		{ -5.661f, 2.5f, 5.584f },				// 視点
+		{ 0.0f, 2.0, 0.0f },					// 注視点
+		{ 0.036f, 0.999f, -0.035f }				// 上ベクトル
+	);
+	cameraController = std::make_unique<FreeCameraController>();
+	cameraController->SyncCameraToController(camera);
+	cameraController->SetEnable(false);
+
+	// ステート
+	//stateMachine = std::make_unique<StateMachine<SceneTitle_E4C>>();
+	//stateMachine->RegisterState(STATE::TITLE, new SceneTitleState::TitleState(this));
+	//stateMachine->RegisterState(STATE::LOGIN_CHECK, new SceneTitleState::LoginCheckState(this));
+	//stateMachine->RegisterState(STATE::INPUT, new SceneTitleState::InputState(this));
+	//stateMachine->RegisterState(STATE::SETTING, new SceneTitleState::SettingState(this));
+	//stateMachine->RegisterState(STATE::LOGIN, new SceneTitleState::LoginState(this));
+	//stateMachine->SetState(STATE::TITLE);
+}
+
+void SceneTitle_E4C::Finalize()
+{
+	spritePreLoad.clear();
+	UI.Clear();
+	shadowMapRenderer->Clear();
+}
+
+// 更新処理
+void SceneTitle_E4C::Update(float elapsedTime)
+{
+	time += elapsedTime;
+
+	//stateMachine->Update(elapsedTime);
+
+	if (T_INPUT.KeyDown(VK_F5))
+	{
+		barb_part_one = !barb_part_one;
+		time = 0;
+	}
+
+	if (T_INPUT.KeyDown(VK_F6))
+	{
+		barb_part_two = !barb_part_two;
+		time = 0;
+	}
+
+	test_head->Update(elapsedTime);
+	//test_body->Update(elapsedTime);
+
+#ifdef _DEBUG
+	// カメラ更新
+	cameraController->Update();
+	cameraController->SyncContrllerToCamera(camera);
+#endif // _DEBUG
+
+	UI.Update(elapsedTime);
+}
+
+// 描画処理
+void SceneTitle_E4C::Render()
+{
+	T_TEXT.Begin();
+
+	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->Clear(T_GRAPHICS.GetDeviceContext(), 0.2f, 0.2f, 0.2f, 1);
+	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
+
+	// 描画コンテキスト設定
+	RenderContext rc;
+	rc.camera = &camera;
+	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
+	rc.renderState = T_GRAPHICS.GetRenderState();
+
+	// ライトの情報を詰め込む
+	LightManager::Instance().PushRenderContext(rc);
+
+	//	シャドウマップ描画
+	shadowMapRenderer->Render();
+	rc.shadowMapData = shadowMapRenderer->GetShadowMapData();
+
+	test_head->Render(rc);
+	//test_body->Render(rc);
+
+	UI.Render(rc);
+
+	T_TEXT.End();
+
+#ifdef _DEBUG
+	// DebugIMGUI
+	//DrawSceneGUI();
+	shadowMapRenderer->DrawDebugGUI();
+#endif // _DEBUG
+}
+
+void SceneTitle_E4C::RenderDX12()
+{
+	ID3D12GraphicsCommandList* d3d_command_list = TentacleLib::graphics.Begin();
+	{
+		Camera& camera = Camera::Instance();
+
+		// シーン用定数バッファ更新
+		const Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
+			camera.GetView(),
+			camera.GetProjection(),
+			DirectX::XMFLOAT3(0, -1, 0));
+
+		// レンダーコンテキスト設定
+		RenderContextDX12 rc;
+		rc.d3d_command_list = d3d_command_list;
+		rc.scene_cbv_descriptor = scene_cbv_descriptor;
+
+		// スプライト描画
+		if (m_sprites[0] != nullptr)
+		{
+			m_sprites[0]->Begin(d3d_command_list);
+			m_sprites[0]->Draw(0, 0, 100, 100, 0, 1, 1, 1, 1);
+			m_sprites[0]->End(d3d_command_list);
+		}
+
+		TentacleLib::graphics.End();
+	}
+}
+
+void SceneTitle_E4C::DrawSceneGUI()
+{
+}
