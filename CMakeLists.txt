@@ -242,6 +242,12 @@ set(Source__GameObject__Character__Player
 )
 source_group("Source\\GameObject\\Character\\Player" FILES ${Source__GameObject__Character__Player})
 
+set(Source__Scene__GameLoop
+    "Source/Scene/GameLoop/SceneTitle_E4C.cpp"
+    "Source/Scene/GameLoop/SceneTitle_E4C.h"
+)
+source_group("Source\\Scene\\GameLoop" FILES ${Source__Scene__GameLoop})
+
 set(Source__Scene__Stage
     "Source/Scene/Stage/Stage.cpp"
     "Source/Scene/Stage/Stage.h"
@@ -622,6 +628,7 @@ set(ALL_FILES
     ${Source__GameObject__Projectile}
     ${Source__GameObject__Character__Enemy}
     ${Source__GameObject__Character__Player}
+    ${Source__Scene__GameLoop}
     ${Source__Scene__Stage}
     ${Source__UI__Widget}
     ${TAKOEngine__AI}
