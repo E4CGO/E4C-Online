@@ -12,8 +12,8 @@
 
 //****************************************************
 // @class LambertShader
-// @brief DirectX12‚Ì•`‰æƒeƒXƒg
-// @par   [à–¾]
+// @brief DirectX12ã®æç”»ãƒ†ã‚¹ãƒˆ
+// @par   PBRã¹ãƒ¼ã‚¹æç”»
 //****************************************************
 class LambertShader : public ModelShaderDX12
 {
