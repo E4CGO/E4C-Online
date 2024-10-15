@@ -1,4 +1,8 @@
-#pragma once
+//! @file LambertShader.h
+//! @note
+
+#ifndef __GRAPHICS_LAMBERT_SHADER_H__
+#define __GRAPHICS_LAMBERT_SHADER_H__
 
 #include <memory>
 #include <d3d12.h>
@@ -6,20 +10,24 @@
 
 #include "TAKOEngine/Rendering/Shaders/Shader.h"
 
-class LambertShader : public Shader
+//****************************************************
+// @class LambertShader
+// @brief DirectX12の描画テスト
+// @par   PBRべース描画
+//****************************************************
+class LambertShader : public ModelShaderDX12
 {
 public:
 	LambertShader();
 	~LambertShader() override;
 
-	void Begin(const RenderContext& rc) override;
-	void Begin(const RenderContextDX12& rc) override;
-	void Draw(const RenderContextDX12& rc, iModel* model) override;
-	void Draw(const RenderContextDX12& rc, ModelDX12* model) override;
-	void End(const RenderContext& rc) override;
-	void End(const RenderContextDX12& rc) override;
+	void Render(const RenderContextDX12& rc, ModelDX12* model) override;
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12PipelineState>		m_d3d_pipeline_state;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature>		m_d3d_root_signature;
+
+	SamplerManager* m_sampler;
 };
+
+#endif // !__GRAPHICS_LAMBERT_SHADER_H__

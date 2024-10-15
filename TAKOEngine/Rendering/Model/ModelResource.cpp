@@ -580,7 +580,6 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 				D3D12_HEAP_FLAG_NONE,
 				&d3d_resource_desc,
 				D3D12_RESOURCE_STATE_GENERIC_READ,
-				//D3D12_RESOURCE_STATE_COPY_DEST,
 				nullptr,
 				IID_PPV_ARGS(mesh.d3d_ib_resource.GetAddressOf())
 			);
@@ -614,10 +613,8 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 			d3d_device->CreateShaderResourceView(
 				mesh.d3d_vb_resource.Get(),
 				&d3d_srv_desc,
-				mesh.srv_descriptor->GetCpuHandle()
-			);
+				mesh.srv_descriptor->GetCpuHandle());
 		}
-
 	}
 }
 

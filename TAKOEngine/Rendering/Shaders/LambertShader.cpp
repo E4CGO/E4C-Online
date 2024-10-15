@@ -1,111 +1,40 @@
+//! @file LambertShader.cpp
+//! @note 
+
 #include "TAKOEngine/Rendering/Misc.h"
 #include "TAKOEngine/Rendering/Graphics.h"
 #include "TAKOEngine/Rendering/Model/Model.h"
 #include "TAKOEngine/Rendering/Model/ModelDX12.h"
+#include "TAKOEngine/Rendering/GpuResourceUtils.h"
 #include "TAKOEngine/Rendering/Shaders/LambertShader.h"
 
+//***********************************************************
+// @brief       コンストラクタ
+// @param[in]   なし
+// @return      なし
+//***********************************************************
 LambertShader::LambertShader()
 {
 	ID3D12Device* device = Graphics::Instance().GetDeviceDX12();
-
+	Graphics&   graphics = Graphics::Instance();
+	const RenderStateDX12* renderState = graphics.GetRenderStateDX12();
+	
 	HRESULT hr = S_OK;
+
+	// シェーダー
+	std::vector<BYTE> vsData, psData;
+	{
+		GpuResourceUtils::LoadShaderFile("Data/Shader/LambertDX12VS.cso", vsData);
+		GpuResourceUtils::LoadShaderFile("Data/Shader/LambertDX12PS.cso", psData);
+	}
 
 	// ルートシグネチャの生成
 	{
-		// ディスクリプタレンジの設定
-		D3D12_DESCRIPTOR_RANGE d3d_descriptor_ranges[4] = {};
-		{
-			// b0
-			d3d_descriptor_ranges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;	// レンジ種別
-			d3d_descriptor_ranges[0].NumDescriptors = 1;							// ディスクリプタ数
-			d3d_descriptor_ranges[0].BaseShaderRegister = 0;						// 先頭レジスタ番号
-			d3d_descriptor_ranges[0].RegisterSpace = 0;								// つじつまを合わせるためのスペース
-			d3d_descriptor_ranges[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-			// b1
-			d3d_descriptor_ranges[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;	// レンジ種別
-			d3d_descriptor_ranges[1].NumDescriptors = 1;							// ディスクリプタ数
-			d3d_descriptor_ranges[1].BaseShaderRegister = 1;						// 先頭レジスタ番号
-			d3d_descriptor_ranges[1].RegisterSpace = 0;								// つじつまを合わせるためのスペース
-			d3d_descriptor_ranges[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-			// b2
-			d3d_descriptor_ranges[2].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;	// レンジ種別
-			d3d_descriptor_ranges[2].NumDescriptors = 1;							// ディスクリプタ数
-			d3d_descriptor_ranges[2].BaseShaderRegister = 2;						// 先頭レジスタ番号
-			d3d_descriptor_ranges[2].RegisterSpace = 0;								// つじつまを合わせるためのスペース
-			d3d_descriptor_ranges[2].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-			// t0
-			d3d_descriptor_ranges[3].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;	// レンジ種別
-			d3d_descriptor_ranges[3].NumDescriptors = 1;							// ディスクリプタ数
-			d3d_descriptor_ranges[3].BaseShaderRegister = 0;						// 先頭レジスタ番号
-			d3d_descriptor_ranges[3].RegisterSpace = 0;								// つじつまを合わせるためのスペース
-			d3d_descriptor_ranges[3].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-		}
-
-		// ルートパラメータの設定
-		D3D12_ROOT_PARAMETER d3d_root_parameters[4] = {};
-		{
-			d3d_root_parameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;		// パラメータ種別
-			d3d_root_parameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;				// どのシェーダーから利用可能か
-			d3d_root_parameters[0].DescriptorTable.NumDescriptorRanges = 1;							// ディスクリプタレンジ数
-			d3d_root_parameters[0].DescriptorTable.pDescriptorRanges = &d3d_descriptor_ranges[0];	// ディスクリプタレンジのアドレス
-
-			d3d_root_parameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;		// パラメータ種別
-			d3d_root_parameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;				// どのシェーダーから利用可能か
-			d3d_root_parameters[1].DescriptorTable.NumDescriptorRanges = 1;							// ディスクリプタレンジ数
-			d3d_root_parameters[1].DescriptorTable.pDescriptorRanges = &d3d_descriptor_ranges[1];	// ディスクリプタレンジのアドレス
-
-			d3d_root_parameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;		// パラメータ種別
-			d3d_root_parameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;				// どのシェーダーから利用可能か
-			d3d_root_parameters[2].DescriptorTable.NumDescriptorRanges = 1;							// ディスクリプタレンジ数
-			d3d_root_parameters[2].DescriptorTable.pDescriptorRanges = &d3d_descriptor_ranges[2];	// ディスクリプタレンジのアドレス
-
-			d3d_root_parameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;		// パラメータ種別
-			d3d_root_parameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;				// どのシェーダーから利用可能か
-			d3d_root_parameters[3].DescriptorTable.NumDescriptorRanges = 1;							// ディスクリプタレンジ数
-			d3d_root_parameters[3].DescriptorTable.pDescriptorRanges = &d3d_descriptor_ranges[3];	// ディスクリプタレンジのアドレス
-		}
-
-		// 静的サンプラーの設定.
-		D3D12_STATIC_SAMPLER_DESC d3d_static_sampler_descs[1] = {};
-		{
-			d3d_static_sampler_descs[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-			d3d_static_sampler_descs[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-			d3d_static_sampler_descs[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-			d3d_static_sampler_descs[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-			d3d_static_sampler_descs[0].MipLODBias = 0;
-			d3d_static_sampler_descs[0].MaxAnisotropy = 0;
-			d3d_static_sampler_descs[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
-			d3d_static_sampler_descs[0].BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;
-			d3d_static_sampler_descs[0].MinLOD = 0.0f;
-			d3d_static_sampler_descs[0].MaxLOD = D3D12_FLOAT32_MAX;
-			d3d_static_sampler_descs[0].ShaderRegister = 0;
-			d3d_static_sampler_descs[0].RegisterSpace = 0;
-			d3d_static_sampler_descs[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-		}
-
-		// ルートシグネチャの設定
-		D3D12_ROOT_SIGNATURE_DESC d3d_root_signature_desc = {};
-		d3d_root_signature_desc.NumParameters = _countof(d3d_root_parameters);
-		d3d_root_signature_desc.pParameters = d3d_root_parameters;
-		d3d_root_signature_desc.NumStaticSamplers = _countof(d3d_static_sampler_descs);
-		d3d_root_signature_desc.pStaticSamplers = d3d_static_sampler_descs;
-		d3d_root_signature_desc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-
-		// シリアライズ
-		Microsoft::WRL::ComPtr<ID3DBlob> d3d_signature_blob;
-		Microsoft::WRL::ComPtr<ID3DBlob> d3d_error_blob;
-		hr = D3D12SerializeRootSignature(
-			&d3d_root_signature_desc,
-			D3D_ROOT_SIGNATURE_VERSION_1,
-			d3d_signature_blob.GetAddressOf(),
-			d3d_error_blob.GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-
 		// ルートシグネチャ生成
 		hr = device->CreateRootSignature(
 			0,
-			d3d_signature_blob->GetBufferPointer(),
-			d3d_signature_blob->GetBufferSize(),
+			vsData.data(),
+			vsData.size(),
 			IID_PPV_ARGS(m_d3d_root_signature.GetAddressOf()));
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 		m_d3d_root_signature->SetName(L"LambertShaderRootSignature");
@@ -118,15 +47,10 @@ LambertShader::LambertShader()
 		// ルートシグネチャ
 		d3d_graphics_pipeline_state_desc.pRootSignature = m_d3d_root_signature.Get();
 
-		// シェーダー
-		std::vector<BYTE> vsData, psData;
-		LoadShaderFile("Data/Shader/LambertDX12VS.cso", vsData);
-		LoadShaderFile("Data/Shader/LambertDX12PS.cso", psData);
-
 		d3d_graphics_pipeline_state_desc.VS.pShaderBytecode = vsData.data();
-		d3d_graphics_pipeline_state_desc.VS.BytecodeLength = vsData.size();
+		d3d_graphics_pipeline_state_desc.VS.BytecodeLength  = vsData.size();
 		d3d_graphics_pipeline_state_desc.PS.pShaderBytecode = psData.data();
-		d3d_graphics_pipeline_state_desc.PS.BytecodeLength = psData.size();
+		d3d_graphics_pipeline_state_desc.PS.BytecodeLength  = psData.size();
 
 		// 入力レイアウト
 		D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
@@ -143,7 +67,7 @@ LambertShader::LambertShader()
 		d3d_graphics_pipeline_state_desc.InputLayout.NumElements = _countof(inputElementDescs);
 
 		// ブレンドステート
-		d3d_graphics_pipeline_state_desc.BlendState.AlphaToCoverageEnable = false;
+		/*d3d_graphics_pipeline_state_desc.BlendState.AlphaToCoverageEnable = false;
 		d3d_graphics_pipeline_state_desc.BlendState.IndependentBlendEnable = false;
 		d3d_graphics_pipeline_state_desc.BlendState.RenderTarget[0].BlendEnable = true;
 		d3d_graphics_pipeline_state_desc.BlendState.RenderTarget[0].LogicOpEnable = false;
@@ -153,16 +77,18 @@ LambertShader::LambertShader()
 		d3d_graphics_pipeline_state_desc.BlendState.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
 		d3d_graphics_pipeline_state_desc.BlendState.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 		d3d_graphics_pipeline_state_desc.BlendState.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-		d3d_graphics_pipeline_state_desc.BlendState.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+		d3d_graphics_pipeline_state_desc.BlendState.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;*/
+		d3d_graphics_pipeline_state_desc.BlendState = renderState->GetBlendState(BlendState::Opaque);
 
 		// 深度ステンシルステート
-		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthEnable = true;
+		/*d3d_graphics_pipeline_state_desc.DepthStencilState.DepthEnable = true;
 		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-		d3d_graphics_pipeline_state_desc.DepthStencilState.StencilEnable = false;
+		d3d_graphics_pipeline_state_desc.DepthStencilState.StencilEnable = false;*/
+		d3d_graphics_pipeline_state_desc.DepthStencilState = renderState->GetDepthState(DepthState::TestAndWrite);
 
 		// ラスタライザーステート
-		d3d_graphics_pipeline_state_desc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+		/*d3d_graphics_pipeline_state_desc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
 		d3d_graphics_pipeline_state_desc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
 		d3d_graphics_pipeline_state_desc.RasterizerState.FrontCounterClockwise = true;
 		d3d_graphics_pipeline_state_desc.RasterizerState.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
@@ -172,7 +98,8 @@ LambertShader::LambertShader()
 		d3d_graphics_pipeline_state_desc.RasterizerState.MultisampleEnable = false;
 		d3d_graphics_pipeline_state_desc.RasterizerState.AntialiasedLineEnable = false;
 		d3d_graphics_pipeline_state_desc.RasterizerState.ForcedSampleCount = 0;
-		d3d_graphics_pipeline_state_desc.RasterizerState.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
+		d3d_graphics_pipeline_state_desc.RasterizerState.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;*/
+		d3d_graphics_pipeline_state_desc.RasterizerState = renderState->GetRasterizer(RasterizerState::SolidCullBack);
 
 		// プリミティブトポロジー
 		d3d_graphics_pipeline_state_desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -200,18 +127,27 @@ LambertShader::LambertShader()
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 		m_d3d_pipeline_state->SetName(L"LambertShaderPipelineState");
 	}
+
+	//サンプラーステート設定
+	m_sampler = graphics.GetSampler(SamplerState::LinearWrap);
 }
 
+//***********************************************************
+// @brief       デストラクタ
+// @param[in]   なし
+// @return      なし
+//***********************************************************
 LambertShader::~LambertShader()
 {
 }
 
-void LambertShader::Begin(const RenderContext& rc)
-{
-}
-
-// 描画開始
-void LambertShader::Begin(const RenderContextDX12& rc)
+//***********************************************************
+// @brief       描画
+// @param[in]   rc     レンダーコンテキスト
+// @param[in]   model  描画対象のモデルデータを指すポインタ
+// @return      なし
+//***********************************************************
+void LambertShader::Render(const RenderContextDX12& rc, ModelDX12* model)
 {
 	// パイプライン設定
 	rc.d3d_command_list->SetGraphicsRootSignature(m_d3d_root_signature.Get());
@@ -219,15 +155,7 @@ void LambertShader::Begin(const RenderContextDX12& rc)
 
 	// シーン定数バッファ設定
 	rc.d3d_command_list->SetGraphicsRootDescriptorTable(0, rc.scene_cbv_descriptor->GetGpuHandle());
-}
 
-void LambertShader::Draw(const RenderContextDX12& rc, iModel* model)
-{
-}
-
-// 描画
-void LambertShader::Draw(const RenderContextDX12& rc, ModelDX12* model)
-{
 	Graphics& graphics = Graphics::Instance();
 
 	for (ModelDX12::Mesh& mesh : model->GetMeshes())
@@ -251,17 +179,11 @@ void LambertShader::Draw(const RenderContextDX12& rc, ModelDX12* model)
 
 		// シェーダーリソースビュー設定
 		rc.d3d_command_list->SetGraphicsRootDescriptorTable(3, material->srv_descriptor->GetGpuHandle());
+		
+		//サンプラーステート設定
+		rc.d3d_command_list->SetGraphicsRootDescriptorTable(4, m_sampler->GetDescriptor()->GetGpuHandle());
 
 		// 描画
 		rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), 1, 0, 0, 0);
 	}
-}
-
-void LambertShader::End(const RenderContext& rc)
-{
-}
-
-// 描画終了
-void LambertShader::End(const RenderContextDX12& rc)
-{
 }

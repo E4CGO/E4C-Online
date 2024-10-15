@@ -58,23 +58,7 @@ void SpriteShader::Begin(const RenderContext& rc)
 	rc.deviceContext->PSSetSamplers(0, _countof(samplerStates), samplerStates);
 }
 
-void SpriteShader::Begin(const RenderContextDX12& rc)
-{
-}
-
-void SpriteShader::Draw(const RenderContextDX12& rc, iModel* model)
-{
-}
-
-void SpriteShader::Draw(const RenderContextDX12& rc, ModelDX12* model)
-{
-}
-
 void SpriteShader::End(const RenderContext& rc)
-{
-}
-
-void SpriteShader::End(const RenderContextDX12& rc)
 {
 }
 
