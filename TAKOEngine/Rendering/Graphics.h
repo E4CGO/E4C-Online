@@ -85,8 +85,8 @@ public:
 		return instance;
 	}
 
-	bool isDX12Active = true;
-	bool isDX11Active = false;
+	bool isDX12Active = false;
+	bool isDX11Active = true;
 
 	struct CommandQueue
 	{
@@ -114,18 +114,15 @@ public:
 	RenderState* GetRenderState() { return renderState.get(); }
 	//DX12のレンダーステート
 	RenderStateDX12* GetRenderStateDX12() { return m_renderStateDX12.get(); }
-
-	// 繧ｮ繧ｺ繝｢蜿門ｾ�
+	// ギズモ取得
 	Gizmos* GetGizmos() { return gizmos.get(); }
 	// ミューテックス取得
 	std::mutex& GetMutex() { return mutex; }
-
 	// モデルシェーダー取得
 	ModelShader* GetModelShader(ModelShaderId shaderId) { return modelShaders[static_cast<int>(shaderId)].get(); }
 	//DirextX12のモデルシェーダー取得
 	ModelShaderDX12* GetModelShaderDX12(ModelShaderDX12Id shaderId) { return dx12_modelshaders[static_cast<int>(shaderId)].get(); }
-
-	// 繧ｹ繝励Λ繧､繝医す繧ｧ繝ｼ繝繝ｼ蜿門ｾ�
+	// スプライトシェーダー取得
 	SpriteShader* GetSpriteShader(SpriteShaderId shaderId) { return spriteShaders[static_cast<int>(shaderId)].get(); }
 	// デバッグレンダラ取得
 	DebugRenderer* GetDebugRenderer() const { return debugRenderer.get(); }
@@ -135,7 +132,6 @@ public:
 	//スキニング取得
 	SkinningPipeline* GetSkinningPipeline() const { return m_skinning_pipeline.get(); }
 
-	// 繝舌ャ繝輔ぃ謨ｰ蜿門ｾ�
 	// ImGUIンレンダラ取得
 	ImGuiRenderer* GetImGUIRenderer() const { return m_imgui_renderer.get(); }
 
@@ -180,7 +176,7 @@ public:
 
 	const Descriptor* UpdateSceneConstantBuffer(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection, const DirectX::XMFLOAT3& light_direction);
 
-	// 繝�繧ｯ繧ｹ繝√Ε隱ｭ縺ｿ霎ｼ縺ｿ
+	// テクスチャ読み込み
 	HRESULT LoadTexture(const char* filename, ID3D12Resource** d3d_resource);
 
 	// テクスチャ作成
@@ -223,7 +219,7 @@ private:
 	//スキニング
 	std::unique_ptr<SkinningPipeline>	m_skinning_pipeline;
 
-	std::mutex mutex;	// 繝溘Η繝ｼ繝�繝�繧ｯ繧ｹ
+	std::mutex mutex;	// ミューテックス
 
 	static Graphics* s_instance;
 
