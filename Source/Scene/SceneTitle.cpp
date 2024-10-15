@@ -29,6 +29,9 @@ void SceneTitle::Initialize()
 	//シャドウマップレンダラ
 	shadowMapRenderer->Initialize();
 
+	//スキニング
+	m_skinning_pipeline = T_GRAPHICS.GetSkinningPipeline();
+
 	// モデル
 	{
 		// 背景
@@ -67,8 +70,6 @@ void SceneTitle::Initialize()
 		rouge->GetModel()->FindNode("Throwable")->visible = false;
 		shadowMapRenderer->ModelRegister(rouge->GetModel().get());
 
-		ID3D12Device* d3d_device = T_GRAPHICS.GetDeviceDX12();
-		m_skinning_pipeline = std::make_unique<SkinningPipeline>(d3d_device);
 		test = std::make_unique<ModelDX12>("Data/Model/Character/Barbarian.glb");
 		//test = std::make_unique<ModelDX12>("Data/Model/Character/test.glb");
 		test->PlayAnimation(0, true);
@@ -259,7 +260,6 @@ void SceneTitle::RenderDX12()
 		{
 			shader->Render(rc, test.get());
 		}
-		shader->End(rc);
 
 		// スプライト描画
 		if (m_sprites[0] != nullptr)

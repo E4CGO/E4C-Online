@@ -16,7 +16,9 @@
 LambertShader::LambertShader()
 {
 	ID3D12Device* device = Graphics::Instance().GetDeviceDX12();
-	Graphics& graphics = Graphics::Instance();
+	Graphics&   graphics = Graphics::Instance();
+	const RenderStateDX12* renderState = graphics.GetRenderStateDX12();
+	
 	HRESULT hr = S_OK;
 
 	// シェーダー
@@ -65,7 +67,7 @@ LambertShader::LambertShader()
 		d3d_graphics_pipeline_state_desc.InputLayout.NumElements = _countof(inputElementDescs);
 
 		// ブレンドステート
-		d3d_graphics_pipeline_state_desc.BlendState.AlphaToCoverageEnable = false;
+		/*d3d_graphics_pipeline_state_desc.BlendState.AlphaToCoverageEnable = false;
 		d3d_graphics_pipeline_state_desc.BlendState.IndependentBlendEnable = false;
 		d3d_graphics_pipeline_state_desc.BlendState.RenderTarget[0].BlendEnable = true;
 		d3d_graphics_pipeline_state_desc.BlendState.RenderTarget[0].LogicOpEnable = false;
@@ -75,16 +77,18 @@ LambertShader::LambertShader()
 		d3d_graphics_pipeline_state_desc.BlendState.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
 		d3d_graphics_pipeline_state_desc.BlendState.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 		d3d_graphics_pipeline_state_desc.BlendState.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-		d3d_graphics_pipeline_state_desc.BlendState.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+		d3d_graphics_pipeline_state_desc.BlendState.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;*/
+		d3d_graphics_pipeline_state_desc.BlendState = renderState->GetBlendState(BlendState::Opaque);
 
 		// 深度ステンシルステート
-		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthEnable = true;
+		/*d3d_graphics_pipeline_state_desc.DepthStencilState.DepthEnable = true;
 		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-		d3d_graphics_pipeline_state_desc.DepthStencilState.StencilEnable = false;
+		d3d_graphics_pipeline_state_desc.DepthStencilState.StencilEnable = false;*/
+		d3d_graphics_pipeline_state_desc.DepthStencilState = renderState->GetDepthState(DepthState::TestAndWrite);
 
 		// ラスタライザーステート
-		d3d_graphics_pipeline_state_desc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+		/*d3d_graphics_pipeline_state_desc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
 		d3d_graphics_pipeline_state_desc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
 		d3d_graphics_pipeline_state_desc.RasterizerState.FrontCounterClockwise = true;
 		d3d_graphics_pipeline_state_desc.RasterizerState.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
@@ -94,7 +98,8 @@ LambertShader::LambertShader()
 		d3d_graphics_pipeline_state_desc.RasterizerState.MultisampleEnable = false;
 		d3d_graphics_pipeline_state_desc.RasterizerState.AntialiasedLineEnable = false;
 		d3d_graphics_pipeline_state_desc.RasterizerState.ForcedSampleCount = 0;
-		d3d_graphics_pipeline_state_desc.RasterizerState.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
+		d3d_graphics_pipeline_state_desc.RasterizerState.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;*/
+		d3d_graphics_pipeline_state_desc.RasterizerState = renderState->GetRasterizer(RasterizerState::SolidCullBack);
 
 		// プリミティブトポロジー
 		d3d_graphics_pipeline_state_desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;

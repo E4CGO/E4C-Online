@@ -46,8 +46,12 @@ public:
 private:
 	std::unique_ptr<StateMachine<SceneTitle>> stateMachine;
 
+	//シャドウマップレンダラ
 	std::unique_ptr<myRenderer::shadow::ShadowMapRender> shadowMapRenderer = std::make_unique<myRenderer::shadow::ShadowMapRender>();
 
+	//スキニング
+	SkinningPipeline*	m_skinning_pipeline;
+	
 	Camera& camera = Camera::Instance();
 	std::unique_ptr<FreeCameraController> cameraController;
 
@@ -80,7 +84,6 @@ private:
 	DirectX::XMFLOAT3 test_position = { 0, 0, 0 };
 	DirectX::XMFLOAT4 test_rotation = { 0, 0, 0, 0 };
 	DirectX::XMFLOAT3 test_scale = { 1, 1, 1 };
-	std::unique_ptr<SkinningPipeline>	m_skinning_pipeline;
 
 	std::unique_ptr<SpriteDX12>			m_sprites[8];
 

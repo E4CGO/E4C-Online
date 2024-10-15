@@ -85,8 +85,8 @@ public:
 		return instance;
 	}
 
-	bool isDX12Active = false;
-	bool isDX11Active = true;
+	bool isDX12Active = true;
+	bool isDX11Active = false;
 
 	struct CommandQueue
 	{
@@ -112,7 +112,10 @@ public:
 	FrameBuffer* GetFrameBuffer(FrameBufferId frameBufferId) { return frameBuffers[static_cast<int>(frameBufferId)].get(); }
 	// レンダーステート取得
 	RenderState* GetRenderState() { return renderState.get(); }
-	// ギズモ取得
+	//DX12のレンダーステート
+	RenderStateDX12* GetRenderStateDX12() { return m_renderStateDX12.get(); }
+
+	// 繧ｮ繧ｺ繝｢蜿門ｾ�
 	Gizmos* GetGizmos() { return gizmos.get(); }
 	// ミューテックス取得
 	std::mutex& GetMutex() { return mutex; }
@@ -129,6 +132,10 @@ public:
 	// ラインレンダラ取得
 	LineRenderer* GetLineRenderer() const { return lineRenderer.get(); }
 
+	//スキニング取得
+	SkinningPipeline* GetSkinningPipeline() const { return m_skinning_pipeline.get(); }
+
+	// 繝舌ャ繝輔ぃ謨ｰ蜿門ｾ�
 	// ImGUIンレンダラ取得
 	ImGuiRenderer* GetImGUIRenderer() const { return m_imgui_renderer.get(); }
 
@@ -185,6 +192,7 @@ public:
 	// バッファコピー
 	HRESULT CopyBuffer(ID3D12Resource* d3d_src_resource, ID3D12Resource* d3d_dst_resource);
 
+	//Sampler取得
 	SamplerManager* GetSampler(SamplerState state) { return m_sampler[static_cast<int>(state)].get(); }
 
 private:
@@ -202,6 +210,7 @@ private:
 	float screenHeight;
 	std::unique_ptr<FrameBuffer> frameBuffers[static_cast<int>(FrameBufferId::EnumCount)];
 	std::unique_ptr<RenderState> renderState;
+	std::unique_ptr<RenderStateDX12> m_renderStateDX12;
 	std::unique_ptr<Gizmos> gizmos;
 
 	std::unique_ptr<ModelShader> modelShaders[static_cast<int>(ModelShaderId::EnumCount)];
@@ -211,7 +220,10 @@ private:
 	std::unique_ptr<DebugRenderer>					debugRenderer;
 	std::unique_ptr<LineRenderer>					lineRenderer;
 
-	std::mutex mutex;	// ミューテックス
+	//スキニング
+	std::unique_ptr<SkinningPipeline>	m_skinning_pipeline;
+
+	std::mutex mutex;	// 繝溘Η繝ｼ繝�繝�繧ｯ繧ｹ
 
 	static Graphics* s_instance;
 

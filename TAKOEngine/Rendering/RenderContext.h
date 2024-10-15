@@ -194,7 +194,7 @@ struct RenderContext
 struct RenderContextDX12
 {
 	ID3D12GraphicsCommandList* d3d_command_list = nullptr;
-	Descriptor* scene_cbv_descriptor = nullptr;
+	const Descriptor* scene_cbv_descriptor = nullptr;
 
 	DirectX::XMFLOAT4X4			view;
 	DirectX::XMFLOAT4X4			projection;
