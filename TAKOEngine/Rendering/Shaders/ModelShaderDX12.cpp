@@ -2,11 +2,8 @@
 //! @note
 
 #include <cassert>
-#include "TAKOEngine/Runtime/tentacle_lib.h"
 #include "TAKOEngine/Rendering/Misc.h"
-#include "TAKOEngine/Rendering/GpuResourceUtils.h"
-#include "TAKOEngine/Rendering/FrustumCulling.h"
-
+#include "TAKOEngine/Rendering/Graphics.h"
 #include "TAKOEngine/Rendering/Shaders/ModelShaderDX12.h"
 
 //*************************************************************

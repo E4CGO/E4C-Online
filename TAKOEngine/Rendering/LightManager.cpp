@@ -1,16 +1,34 @@
+//! @file LightManager.cpp
+//! @note
+
 #include "LightManager.h"
 #include "imgui.h"
 
+//***********************************************************
+// @brief       デストラクタ
+// @param[in]   なし
+// @return      なし
+//***********************************************************
 LightManager::~LightManager()
 {
 	Clear();
 }
 
+//***********************************************************
+// @brief       ライトを登録する
+// @param[in]   light  登録する光源を指すポインタ
+// @return      なし
+//***********************************************************
 void LightManager::Register(Light* light)
 {
 	lights.emplace_back(light);
 }
 
+//***********************************************************
+// @brief       ライトの登録を解除する
+// @param[in]   light  登録する光源を指すポインタ
+// @return      なし
+//***********************************************************
 void LightManager::Remove(Light* light)
 {
 	std::vector<Light*>::iterator	it = std::find(lights.begin(), lights.end(), light);
@@ -21,6 +39,11 @@ void LightManager::Remove(Light* light)
 	}
 }
 
+//***********************************************************
+// @brief       登録済みのライトを全削除する
+// @param[in]   なし
+// @return      なし
+//***********************************************************
 void LightManager::Clear()
 {
 	for (Light* light : lights)
@@ -30,6 +53,11 @@ void LightManager::Clear()
 	lights.clear();
 }
 
+//***********************************************************
+// @brief       ライト情報をRenderContextに積む
+// @param[in]   rc   レンダーコンテキスト
+// @return      なし
+//***********************************************************
 void LightManager::PushRenderContext(RenderContext& rc)
 {
 	// 環境光の情報を追加
@@ -42,6 +70,11 @@ void LightManager::PushRenderContext(RenderContext& rc)
 	}
 }
 
+//***********************************************************
+// @brief      デバッグ情報の表示
+// @param[in]  なし
+// @return     なし
+//***********************************************************
 void LightManager::DrawDebugGUI()
 {
 	if (ImGui::TreeNode("Lights"))
@@ -58,6 +91,11 @@ void LightManager::DrawDebugGUI()
 	}
 }
 
+//***********************************************************
+// @brief      デバッグ図形の表示
+// @param[in]  なし
+// @return     なし
+//***********************************************************
 void LightManager::DrawDebugPrimitive()
 {
 	for (Light* light : lights)

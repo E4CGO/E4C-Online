@@ -78,7 +78,6 @@ void SceneTitle::Initialize()
 	}
 
 	// 光
-	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
@@ -138,7 +137,7 @@ void SceneTitle::Initialize()
 		delete xhr;
 	}
 
-	{
+	/*{
 		HRESULT hr;
 
 		D3D11_BUFFER_DESC buffer_desc{};
@@ -150,7 +149,7 @@ void SceneTitle::Initialize()
 		buffer_desc.StructureByteStride = 0;
 		hr = T_GRAPHICS.GetDevice()->CreateBuffer(&buffer_desc, nullptr, constant_buffers[1].GetAddressOf());
 		COMPLETION_CHECK
-	}
+	}*/
 }
 
 void SceneTitle::Finalize()
@@ -237,12 +236,9 @@ void SceneTitle::RenderDX12()
 {
 	ID3D12GraphicsCommandList* d3d_command_list = TentacleLib::graphics.Begin();
 	{
-		Camera& camera = Camera::Instance();
-
 		// シーン用定数バッファ更新
 		const Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
-			camera.GetView(),
-			camera.GetProjection(),
+			Camera::Instance(),
 			DirectX::XMFLOAT3(0, -1, 0));
 
 		// レンダーコンテキスト設定
@@ -255,7 +251,7 @@ void SceneTitle::RenderDX12()
 		m_skinning_pipeline->Compute(rc, test.get());
 
 		// モデル描画
-		ModelShaderDX12* shader = TentacleLib::graphics.GetModelShaderDX12(ModelShaderDX12Id::Lambert);
+		ModelShaderDX12* shader = TentacleLib::graphics.GetModelShaderDX12(ModelShaderDX12Id::Phong);
 		if (test != nullptr)
 		{
 			shader->Render(rc, test.get());
@@ -269,9 +265,9 @@ void SceneTitle::RenderDX12()
 			m_sprites[0]->End(d3d_command_list);
 		}
 
-		EFFECTS.GetEffect(EffectManager::EFFECT_IDX::BOMB_EFFECT)->PlayDX12(DirectX::XMFLOAT3(0.f, 0.f, 0.f), 5.0f);
+		//EFFECTS.GetEffect(EffectManager::EFFECT_IDX::BOMB_EFFECT)->PlayDX12(DirectX::XMFLOAT3(0.f, 0.f, 0.f), 5.0f);
 
-		EFFECTS.RenderDX12(camera.GetView(), camera.GetProjection());
+		//EFFECTS.RenderDX12(camera.GetView(), camera.GetProjection());
 
 		// IMGUI描画処理
 		{

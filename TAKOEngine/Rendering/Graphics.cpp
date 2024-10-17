@@ -3,6 +3,7 @@
 #include <WICTextureLoader12.h>
 
 #include "TAKOEngine/Rendering/Misc.h"
+#include "TAKOEngine/Rendering/LightManager.h"
 
 #include "TAKOEngine/Rendering/Shaders/PhongShader.h"
 #include "TAKOEngine/Rendering/Shaders/ToonShader.h"
@@ -27,6 +28,12 @@ Graphics::~Graphics()
 
 void Graphics::FinishDX12()
 {
+	if (isDX12Active)
+	{
+		// IMGUI終了
+		m_imgui_renderer->FinalizeDX12();
+	}
+
 	CommandQueue* command_queues[] =
 	{
 		&m_graphics_queue,
@@ -545,7 +552,6 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 			&featureLevel,
 			immediateContext.GetAddressOf()
 		);
-
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 	adapter->Release();
@@ -555,11 +561,11 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	frameBuffers[static_cast<int>(FrameBufferId::Scene)]        = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight);
 	frameBuffers[static_cast<int>(FrameBufferId::Luminance)]    = std::make_unique<FrameBuffer>(device.Get(), screenWidth / 2, screenHeight / 2);
 	frameBuffers[static_cast<int>(FrameBufferId::GaussianBlur)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth / 2, screenHeight / 2);
-	frameBuffers[static_cast<int>(FrameBufferId::Normal)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
-	frameBuffers[static_cast<int>(FrameBufferId::Position)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT);
+	frameBuffers[static_cast<int>(FrameBufferId::Normal)]       = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
+	frameBuffers[static_cast<int>(FrameBufferId::Position)]     = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT);
 
 	// レンダーステート作成
-	renderState = std::make_unique<RenderState>(device.Get());
+	renderState       = std::make_unique<RenderState>(device.Get());
 	m_renderStateDX12 = std::make_unique<RenderStateDX12>();
 
 	//サンプラーステート作成
@@ -580,7 +586,8 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	modelShaders[static_cast<int>(ModelShaderId::ShadowMap)] = std::make_unique<ShadowMapShader>(device.Get());
 
 	// DX12のモデルシェーダー生成
-	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Lambert)] = std::make_unique<LambertShader>();
+	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Lambert)] = std::make_unique<LambertShader>(m_d3d_device.Get());
+	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Phong)]   = std::make_unique<PhongShaderDX12>(m_d3d_device.Get());
 
 	// スプライトシェーダー生成
 	spriteShaders[static_cast<int>(SpriteShaderId::Default)]             = std::make_unique<DefaultSpriteShader>(device.Get());
@@ -589,8 +596,8 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	spriteShaders[static_cast<int>(SpriteShaderId::ColorGrading)]        = std::make_unique<ColorGradingShader>(device.Get());
 	spriteShaders[static_cast<int>(SpriteShaderId::GaussianBlur)]        = std::make_unique<GaussianBlurShader>(device.Get());
 	spriteShaders[static_cast<int>(SpriteShaderId::LuminanceExtraction)] = std::make_unique<LuminanceExtractionShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::Finalpass)] = std::make_unique<FinalpassShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::Deferred)] = std::make_unique<DeferredLightingShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::Finalpass)]           = std::make_unique<FinalpassShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::Deferred)]            = std::make_unique<DeferredLightingShader>(device.Get());
 
 	// レンダラ
 	debugRenderer = std::make_unique<DebugRenderer>(device.Get());
@@ -762,19 +769,79 @@ void Graphics::End()
 	frame_resource.d3d_command_list->Close();
 }
 
-const Descriptor* Graphics::UpdateSceneConstantBuffer(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection, const DirectX::XMFLOAT3& light_direction)
+//TODO : UpdataConstantBuffer
+const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera& camera, const DirectX::XMFLOAT3& light_direction)
 {
+	LightManager& ligtManager = LightManager::Instance();
+
 	UINT frame_buffer_index = m_dxgi_swap_chain->GetCurrentBackBufferIndex();
 	FrameResource& frame_resource = m_frame_resources.at(frame_buffer_index);
 
-	DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&view);
-	DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&projection);
+	DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&camera.GetView());
+	DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&camera.GetProjection());
 	DirectX::XMMATRIX ViewProjection = DirectX::XMMatrixMultiply(View, Projection);
 	DirectX::XMStoreFloat4x4(&frame_resource.cb_scene_data->view_projection, ViewProjection);
+
 	frame_resource.cb_scene_data->light_direction.x = light_direction.x;
 	frame_resource.cb_scene_data->light_direction.y = light_direction.y;
 	frame_resource.cb_scene_data->light_direction.z = light_direction.z;
 	frame_resource.cb_scene_data->light_direction.w = 0.0f;
+
+	// カメラ
+	frame_resource.cb_scene_data->camera_position.x = camera.GetEye().x;
+	frame_resource.cb_scene_data->camera_position.y = camera.GetEye().y;
+	frame_resource.cb_scene_data->camera_position.z = camera.GetEye().z;
+
+	// ライト情報
+	frame_resource.cb_scene_data->ambientLightColor = ligtManager.GetAmbientColor();
+
+	for (Light* light : ligtManager.GetAllLight())
+	{
+		switch (light->GetLightType())
+		{
+		case	LightType::Directional:
+		{
+			frame_resource.cb_scene_data->directionalLightData.direction.x = light->GetDirection().x;
+			frame_resource.cb_scene_data->directionalLightData.direction.y = light->GetDirection().y;
+			frame_resource.cb_scene_data->directionalLightData.direction.z = light->GetDirection().z;
+			frame_resource.cb_scene_data->directionalLightData.direction.w = 0.0f;
+			frame_resource.cb_scene_data->directionalLightData.color = light->GetColor();
+			break;
+		}
+		case	LightType::Point:
+		{
+			if (frame_resource.cb_scene_data->pointLightCount >= PointLightMax) break;
+			
+			frame_resource.cb_scene_data->pointLightData[frame_resource.cb_scene_data->pointLightCount].position.x = light->GetPosition().x;
+			frame_resource.cb_scene_data->pointLightData[frame_resource.cb_scene_data->pointLightCount].position.y = light->GetPosition().y;
+			frame_resource.cb_scene_data->pointLightData[frame_resource.cb_scene_data->pointLightCount].position.z = light->GetPosition().z;
+			frame_resource.cb_scene_data->pointLightData[frame_resource.cb_scene_data->pointLightCount].position.w = 1.0f;
+			frame_resource.cb_scene_data->pointLightData[frame_resource.cb_scene_data->pointLightCount].color = light->GetColor();
+			frame_resource.cb_scene_data->pointLightData[frame_resource.cb_scene_data->pointLightCount].range = light->GetRange();
+			++frame_resource.cb_scene_data->pointLightCount;
+			break;
+		}
+		case	LightType::Spot:
+		{
+			if (frame_resource.cb_scene_data->spotLightCount >= SpotLightMax) break;
+
+			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].position.x = light->GetPosition().x;
+			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].position.y = light->GetPosition().y;
+			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].position.z = light->GetPosition().z;
+			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].position.w = 1.0f;
+			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].direction.x = light->GetDirection().x;
+			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].direction.y = light->GetDirection().y;
+			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].direction.z = light->GetDirection().z;
+			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].direction.w = 0.0f;
+			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].color = light->GetColor();
+			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].range = light->GetRange();
+			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].innerCorn = light->GetInnerCorn();
+			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].outerCorn = light->GetOuterCorn();
+			++frame_resource.cb_scene_data->spotLightCount;
+			break;
+		}
+		}
+	}
 
 	return frame_resource.cbv_descriptor;
 }

@@ -88,5 +88,5 @@ private:
 	std::unique_ptr<SpriteDX12>			m_sprites[8];
 
 	static float time;
-	Microsoft::WRL::ComPtr<ID3D11Buffer> constant_buffers[8];
+	//Microsoft::WRL::ComPtr<ID3D11Buffer> constant_buffers[8];
 };

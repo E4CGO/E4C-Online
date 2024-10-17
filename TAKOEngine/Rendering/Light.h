@@ -1,4 +1,8 @@
-#pragma once
+//! @file Light.h
+//! @note
+
+#ifndef __LIGHT_LIGHT_H__
+#define __LIGHT_LIGHT_H__
 
 #include <DirectXMath.h>
 
@@ -13,6 +17,11 @@ enum class LightType
 };
 
 // 光源クラス
+//*********************************************************************
+// @class Light
+// @brief ライトクラス
+// @par   [説明]
+//*********************************************************************
 class Light
 {
 public:
@@ -62,3 +71,5 @@ private:
 	float	innerCorn = 0.99f;	// インナー
 	float	outerCorn = 0.9f;	// アウター
 };
+
+#endif // !__LIGHT_LIGHT_H__
