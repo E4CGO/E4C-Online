@@ -8,7 +8,7 @@
 #include <d3d12.h>
 #include <wrl.h>
 
-#include "TAKOEngine/Rendering/Shaders/Shader.h"
+#include "ModelShaderDX12.h"
 
 //****************************************************
 // @class LambertShader
@@ -18,7 +18,7 @@
 class LambertShader : public ModelShaderDX12
 {
 public:
-	LambertShader();
+	LambertShader(ID3D12Device* device);
 	~LambertShader() override;
 
 	void Render(const RenderContextDX12& rc, ModelDX12* model) override;

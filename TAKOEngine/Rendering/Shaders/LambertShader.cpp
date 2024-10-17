@@ -3,9 +3,6 @@
 
 #include "TAKOEngine/Rendering/Misc.h"
 #include "TAKOEngine/Rendering/Graphics.h"
-#include "TAKOEngine/Rendering/Model/Model.h"
-#include "TAKOEngine/Rendering/Model/ModelDX12.h"
-#include "TAKOEngine/Rendering/GpuResourceUtils.h"
 #include "TAKOEngine/Rendering/Shaders/LambertShader.h"
 
 //***********************************************************
@@ -13,9 +10,8 @@
 // @param[in]   なし
 // @return      なし
 //***********************************************************
-LambertShader::LambertShader()
+LambertShader::LambertShader(ID3D12Device* device)
 {
-	ID3D12Device* device = Graphics::Instance().GetDeviceDX12();
 	Graphics&   graphics = Graphics::Instance();
 	const RenderStateDX12* renderState = graphics.GetRenderStateDX12();
 	
@@ -30,7 +26,6 @@ LambertShader::LambertShader()
 
 	// ルートシグネチャの生成
 	{
-		// ルートシグネチャ生成
 		hr = device->CreateRootSignature(
 			0,
 			vsData.data(),

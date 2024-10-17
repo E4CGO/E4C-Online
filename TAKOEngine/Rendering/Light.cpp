@@ -1,10 +1,23 @@
+//! @file Light.cpp
+//! @note
+
 #include <imgui.h>
 
 #include "TAKOEngine/Rendering/Graphics.h"
 #include "TAKOEngine/Rendering/Light.h"
 
+//***********************************************************
+// @brief       コンストラクタ
+// @param[in]   なし
+// @return      なし
+//***********************************************************
 Light::Light(LightType lightType) : lightType(lightType) {}
 
+//***********************************************************
+// @brief      ライト情報をRenderContextに積む
+// @param[in]  rc  レンダーコンテキスト
+// @return     なし
+//***********************************************************
 void Light::PushRenderContext(RenderContext& rc) const
 {
 	// 登録されている光源の情報を設定
@@ -55,6 +68,11 @@ void Light::PushRenderContext(RenderContext& rc) const
 	}
 }
 
+//***********************************************************
+// @brief      デバッグ情報の表示
+// @param[in]  なし
+// @return     なし
+//***********************************************************
 void Light::DrawDebugGUI()
 {
 	static const char* lightTypeName[] =
@@ -104,6 +122,11 @@ void Light::DrawDebugGUI()
 	}
 }
 
+//***********************************************************
+// @brief      デバッグ図形の表示
+// @param[in]  なし
+// @return     なし
+//***********************************************************
 void Light::DrawDebugPrimitive()
 {
 	DebugRenderer* debugRenderer = Graphics::Instance().GetDebugRenderer();

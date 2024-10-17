@@ -32,6 +32,7 @@ enum class ModelShaderId
 enum class ModelShaderDX12Id
 {
 	Lambert,
+	Phong,
 
 	EnumCount
 };
@@ -174,7 +175,7 @@ public:
 
 	void FinishDX12();
 
-	const Descriptor* UpdateSceneConstantBuffer(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection, const DirectX::XMFLOAT3& light_direction);
+	const Descriptor* UpdateSceneConstantBuffer(const Camera& camera, const DirectX::XMFLOAT3& light_direction);
 
 	// テクスチャ読み込み
 	HRESULT LoadTexture(const char* filename, ID3D12Resource** d3d_resource);

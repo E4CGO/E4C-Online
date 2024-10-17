@@ -39,9 +39,15 @@ Framework::Framework(HWND hWnd)
 	GAME_DATA.SetIp(address);
 
 	// エフェクトマネージャー初期化
-	EFFECTS.Initialize();
+	if (T_GRAPHICS.isDX11Active)
+	{
+		EFFECTS.Initialize();
+	}
 
-	EFFECTS.InitializeDX12();
+	if (T_GRAPHICS.isDX12Active)
+	{
+		//EFFECTS.InitializeDX12();
+	}
 
 	// シーン初期化
 	SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTitle));

@@ -36,18 +36,20 @@ public:
 	struct Material
 	{
 		std::string name;
-		std::string			textureFilename;
+		std::string	textureFilename;
 		std::string diffuseTextureFileName;
+		std::string normalTextureFileName;
 
 		DirectX::XMFLOAT4 color = { 1, 1, 1, 1 };
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> diffuseMap;
-		std::string normalTextureFileName;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> normalMap;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cbv_resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_srv_resource;
+		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_normal_srv_resource;
 		const Descriptor* cbv_descriptor = nullptr;
 		const Descriptor* srv_descriptor = nullptr;
+		const Descriptor* srv_normal_descriptor = nullptr;
 
 		template<class Archive>
 		void serialize(Archive& archive);
