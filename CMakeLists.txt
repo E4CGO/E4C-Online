@@ -559,6 +559,7 @@ set(TAKOEngine__Rendering__HLSL__Model
     "TAKOEngine/Rendering/HLSL/Model/LambertPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/LambertVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/Phong.hlsli"
+    "TAKOEngine/Rendering/HLSL/Model/PhongDX12.hlsli"
     "TAKOEngine/Rendering/HLSL/Model/PhongDX12PS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/PhongDX12VS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/PhongPS.hlsl"
