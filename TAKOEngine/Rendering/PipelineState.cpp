@@ -5,10 +5,10 @@
 #include "TAKOEngine/Rendering/PipelineState.h"
 
 //****************************************************
-// @brief     ‰Šú‰»
+// @brief     åˆæœŸåŒ–
 // @param[in] device ID3D12Device*
 // @param[in] desc   D3D12_GRAPHICS_PIPELINE_STATE_DESC    
-// @return    ‚È‚µ
+// @return    ãªã—
 //****************************************************
 void PipelineState::Init(ID3D12Device* device, D3D12_GRAPHICS_PIPELINE_STATE_DESC desc)
 {
@@ -17,10 +17,10 @@ void PipelineState::Init(ID3D12Device* device, D3D12_GRAPHICS_PIPELINE_STATE_DES
 }
 
 //****************************************************
-// @brief     ‰Šú‰»
+// @brief     åˆæœŸåŒ–
 // @param[in] device ID3D12Device*
 // @param[in] desc   D3D12_COMPUTE_PIPELINE_STATE_DESC
-// @return    ‚È‚µ
+// @return    ãªã—
 //****************************************************
 void PipelineState::Init(ID3D12Device* device, D3D12_COMPUTE_PIPELINE_STATE_DESC desc)
 {
