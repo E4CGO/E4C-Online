@@ -25,6 +25,8 @@ public:
 
 	virtual void Update(float elapsedTime);
 
+	virtual void Render() = 0;
+
 	void SetPhase(int phase);
 	void NextPhase();
 	int GetPhase() { return phase; }

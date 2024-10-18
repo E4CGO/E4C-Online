@@ -1,5 +1,8 @@
 #include "Scene/SceneGame.h"
 #include "Scene/SceneTitle.h"
+#include "Scene/GameLoop/SceneTitle_E4C.h"
+#include "Scene/GameLoop/SceneCharacter_E4C.h"
+#include "Scene/GameLoop/SceneGame_E4C.h"
 
 #include "TAKOEngine/AI/StateMachine.h"
 
@@ -83,3 +86,6 @@ template class StateMachine<Player>;
 template class StateMachine<Enemy>;
 template class StateMachine<SceneTitle>;
 template class StateMachine<SceneGame>;
+template class StateMachine<SceneTitle_E4C>;
+template class StateMachine<SceneCharacter_E4C>;
+template class StateMachine<SceneGame_E4C>;

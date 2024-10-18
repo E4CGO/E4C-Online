@@ -1,4 +1,5 @@
 #include "TAKOEngine/Runtime/tentacle_lib.h"
+#include "TAKOEngine/Network/HttpRequest.h"
 #include "TAKOEngine/Rendering/ResourceManager.h"
 #include "TAKOEngine/GUI/UIManager.h"
 
@@ -7,7 +8,7 @@
 
 #include "Scene/SceneManager.h"
 #include "SceneTitle_E4C.h"
-#include "Scene/SceneGame.h"
+#include "SceneTitle_E4CState.h"
 
 #include "GameData.h"
 
@@ -27,27 +28,9 @@ void SceneTitle_E4C::Initialize()
 
 	// モデル
 	{
-		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/button_agree.png");
+		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/UI/start.png");
+		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/UI/exit.png");
 	}
-
-	test_head = std::make_unique<ModelObject>("Data/Model/Character/CombineCharacter/test_parts_model_head.glb");
-	test_body = std::make_unique<ModelObject>("Data/Model/Character/CombineCharacter/test_parts_model_body.glb");
-	test_animation = std::make_unique<ModelObject>("Data/Model/Character/CombineCharacter/test_parts_animation.glb");
-
-	test_head->GetModel()->CopyAnimations(test_animation.get()->GetModel().get());
-	//test_body->GetModel()->CopyAnimations(test_animation.get()->GetModel().get());
-
-	test_head->SetAnimation(0, true, 0.0f);
-	//test_body->SetAnimation(0, true, 0.0f);
-
-	//title = new WidgetText("P2Pダンジョン・アドベンチャー");
-	//title->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-	//title->SetScale(2.0f);
-	//title->SetBorder(1);
-	//title->SetBorderColor({ 1.0f, 0.0f, 0.0f, 1.0f });
-	//title->SetAlign(FONT_ALIGN::CENTER);
-	//title->SetPosition({ SCREEN_W * 0.5f, SCREEN_H * 0.2f });
-	//UI.Register(title);
 
 	// 光
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
@@ -73,13 +56,11 @@ void SceneTitle_E4C::Initialize()
 	cameraController->SetEnable(false);
 
 	// ステート
-	//stateMachine = std::make_unique<StateMachine<SceneTitle_E4C>>();
-	//stateMachine->RegisterState(STATE::TITLE, new SceneTitleState::TitleState(this));
-	//stateMachine->RegisterState(STATE::LOGIN_CHECK, new SceneTitleState::LoginCheckState(this));
-	//stateMachine->RegisterState(STATE::INPUT, new SceneTitleState::InputState(this));
-	//stateMachine->RegisterState(STATE::SETTING, new SceneTitleState::SettingState(this));
-	//stateMachine->RegisterState(STATE::LOGIN, new SceneTitleState::LoginState(this));
-	//stateMachine->SetState(STATE::TITLE);
+	stateMachine = std::make_unique<StateMachine<SceneTitle_E4C>>();
+	stateMachine->RegisterState(STATE::INIT, new SceneTitle_E4CState::InitState(this));
+	stateMachine->RegisterState(STATE::START, new SceneTitle_E4CState::StartState(this));
+	stateMachine->RegisterState(STATE::EXIT, new SceneTitle_E4CState::ExitState(this));
+	stateMachine->SetState(STATE::INIT);
 }
 
 void SceneTitle_E4C::Finalize()
@@ -94,22 +75,7 @@ void SceneTitle_E4C::Update(float elapsedTime)
 {
 	time += elapsedTime;
 
-	//stateMachine->Update(elapsedTime);
-
-	if (T_INPUT.KeyDown(VK_F5))
-	{
-		barb_part_one = !barb_part_one;
-		time = 0;
-	}
-
-	if (T_INPUT.KeyDown(VK_F6))
-	{
-		barb_part_two = !barb_part_two;
-		time = 0;
-	}
-
-	test_head->Update(elapsedTime);
-	//test_body->Update(elapsedTime);
+	stateMachine->Update(elapsedTime);
 
 #ifdef _DEBUG
 	// カメラ更新
@@ -141,9 +107,6 @@ void SceneTitle_E4C::Render()
 	shadowMapRenderer->Render();
 	rc.shadowMapData = shadowMapRenderer->GetShadowMapData();
 
-	test_head->Render(rc);
-	//test_body->Render(rc);
-
 	UI.Render(rc);
 
 	T_TEXT.End();
@@ -151,7 +114,7 @@ void SceneTitle_E4C::Render()
 #ifdef _DEBUG
 	// DebugIMGUI
 	//DrawSceneGUI();
-	shadowMapRenderer->DrawDebugGUI();
+	//shadowMapRenderer->DrawDebugGUI();
 #endif // _DEBUG
 }
 

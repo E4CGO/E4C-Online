@@ -136,6 +136,7 @@ set(Source
     "Source/GameData.h"
     "Source/Main.cpp"
     "Source/Manager.h"
+    "Source/PlayerCharacterData.h"
 )
 source_group("Source" FILES ${Source})
 
@@ -200,6 +201,12 @@ set(Source__GameObject__Projectile
 )
 source_group("Source\\GameObject\\Projectile" FILES ${Source__GameObject__Projectile})
 
+set(Source__GameObject__Props
+    "Source/GameObject/Props/Teleporter.cpp"
+    "Source/GameObject/Props/Teleporter.h"
+)
+source_group("Source\\GameObject\\Props" FILES ${Source__GameObject__Props})
+
 set(Source__GameObject__Character__Enemy
     "Source/GameObject/Character/Enemy/Chest.cpp"
     "Source/GameObject/Character/Enemy/Chest.h"
@@ -243,8 +250,18 @@ set(Source__GameObject__Character__Player
 source_group("Source\\GameObject\\Character\\Player" FILES ${Source__GameObject__Character__Player})
 
 set(Source__Scene__GameLoop
+    "Source/Scene/GameLoop/SceneCharacter_E4C.cpp"
+    "Source/Scene/GameLoop/SceneCharacter_E4C.h"
+    "Source/Scene/GameLoop/SceneCharacter_E4CState.cpp"
+    "Source/Scene/GameLoop/SceneCharacter_E4CState.h"
+    "Source/Scene/GameLoop/SceneGame_E4C.cpp"
+    "Source/Scene/GameLoop/SceneGame_E4C.h"
+    "Source/Scene/GameLoop/SceneGame_E4CState.cpp"
+    "Source/Scene/GameLoop/SceneGame_E4CState.h"
     "Source/Scene/GameLoop/SceneTitle_E4C.cpp"
     "Source/Scene/GameLoop/SceneTitle_E4C.h"
+    "Source/Scene/GameLoop/SceneTitle_E4CState.cpp"
+    "Source/Scene/GameLoop/SceneTitle_E4CState.h"
 )
 source_group("Source\\Scene\\GameLoop" FILES ${Source__Scene__GameLoop})
 
@@ -257,6 +274,12 @@ set(Source__Scene__Stage
     "Source/Scene/Stage/TestingStage.h"
 )
 source_group("Source\\Scene\\Stage" FILES ${Source__Scene__Stage})
+
+set(Source__Scene__GameLoop__Stage
+    "Source/Scene/GameLoop/Stage/StageOpenWorld_E4C.cpp"
+    "Source/Scene/GameLoop/Stage/StageOpenWorld_E4C.h"
+)
+source_group("Source\\Scene\\GameLoop\\Stage" FILES ${Source__Scene__GameLoop__Stage})
 
 set(Source__UI__Widget
     "Source/UI/Widget/WidgetBossHp.cpp"
@@ -503,6 +526,7 @@ set(TAKOEngine__Rendering__Shaders
     "TAKOEngine/Rendering/Shaders/ModelShaderDX12.h"
     "TAKOEngine/Rendering/Shaders/PhongShader.cpp"
     "TAKOEngine/Rendering/Shaders/PhongShader.h"
+    "TAKOEngine/Rendering/Shaders/Shader.cpp"
     "TAKOEngine/Rendering/Shaders/Shader.h"
     "TAKOEngine/Rendering/Shaders/ShadowMapShader.cpp"
     "TAKOEngine/Rendering/Shaders/ShadowMapShader.h"
@@ -627,10 +651,12 @@ set(ALL_FILES
     ${Source__UI}
     ${Source__GameObject__Character}
     ${Source__GameObject__Projectile}
+    ${Source__GameObject__Props}
     ${Source__GameObject__Character__Enemy}
     ${Source__GameObject__Character__Player}
     ${Source__Scene__GameLoop}
     ${Source__Scene__Stage}
+    ${Source__Scene__GameLoop__Stage}
     ${Source__UI__Widget}
     ${TAKOEngine__AI}
     ${TAKOEngine__Editor}
