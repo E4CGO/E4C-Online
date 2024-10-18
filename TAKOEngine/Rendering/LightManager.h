@@ -1,11 +1,19 @@
-#pragma once
+//! @file LightManager.h
+//! @note
+
+#ifndef __LIGHT_LIGHT_MANAGER_H__
+#define __LIGHT_LIGHT_MANAGER_H__
 
 #include <vector>
 
 #include "TAKOEngine/Rendering/Light.h"
 #include "TAKOEngine/Rendering/RenderContext.h"
 
-// ライト管理クラス
+//*********************************************************
+// @class LightManager
+// @brief ライト管理クラス
+// @par   [説明]
+//*********************************************************
 class LightManager
 {
 	LightManager() {}
@@ -43,8 +51,11 @@ public:
 	// ライトの情報
 	int GetLightCount() const { return static_cast<int>(lights.size()); }
 	Light* GetLight(int index) const { return lights.at(index); }
+	std::vector<Light*> GetAllLight() const { return lights; }
 
 private:
 	std::vector<Light*>	lights;
 	DirectX::XMFLOAT4	ambientColor = { 0.2f, 0.2f, 0.2f, 1.0f };
 };
+
+#endif // !__LIGHT_LIGHT_MANAGER_H__

@@ -7,8 +7,11 @@
 #include <string>
 #include <d3d12.h>
 
+#include "TAKOEngine/Rendering/RenderContext.h"
+#include "TAKOEngine/Rendering/Model/ModelDX12.h"
 #include "TAKOEngine/Rendering/Model/ModelResource.h"
-#include "TAKOEngine/Rendering/Shaders/Shader.h"
+#include "TAKOEngine/Rendering/GpuResourceUtils.h"
+#include "TAKOEngine/Rendering/FrustumCulling.h"
 
 //******************************************************************
 //  @class  ModelShaderDX12

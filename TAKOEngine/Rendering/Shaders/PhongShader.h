@@ -34,7 +34,7 @@ private:
 class PhongShaderDX12 : public ModelShaderDX12
 {
 public:
-	PhongShaderDX12();
+	PhongShaderDX12(ID3D12Device* device);
 	~PhongShaderDX12() override;
 
 	void Render(const RenderContextDX12& rc, ModelDX12* model) override;
