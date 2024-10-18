@@ -183,7 +183,9 @@ public:
 	// 各種データ取得
 	const std::vector<Mesh>& GetMeshes() const { return meshes; }
 	const std::vector<Node>& GetNodes() const { return nodes; }
+	void SetNodes(std::vector<Node> nodes) { this->nodes = nodes; }
 	const std::vector<Animation>& GetAnimations() const { return animations; }
+	void SetAnimations(std::vector<Animation> animations) { this->animations = animations; }
 	const std::vector<Material>& GetMaterials() const { return materials; }
 
 	// 読み込み
