@@ -10,13 +10,13 @@ struct CbScene
 	DirectX::XMFLOAT4X4	view_projection;
 	DirectX::XMFLOAT4   camera_position;
 
-	//ライト情報
-	DirectX::XMFLOAT4		ambientLightColor;
-	DirectionalLightData	directionalLightData;
-	PointLightData			pointLightData[PointLightMax];	// 点光源情報
-	SpotLightData			spotLightData[SpotLightMax];	// スポットライト情報
-	int						pointLightCount = 0;			// 点光源数
-	int						spotLightCount = 0;				// スポットライト数
+	//繝ｩ繧､繝域ュ蝣ｱ
+	DirectX::XMFLOAT4				ambientLightColor;
+	DirectionalLightData				directionalLightData;
+	PointLightData					pointLightData[PointLightMax];			// 轤ｹ蜈画ｺ先ュ蝣ｱ
+	SpotLightData					spotLightData[SpotLightMax];			// 繧ｹ繝昴ャ繝医Λ繧､繝域ュ蝣ｱ
+	int						pointLightCount = 0;				// 轤ｹ蜈画ｺ先焚
+	int						spotLightCount = 0;				// 繧ｹ繝昴ャ繝医Λ繧､繝域焚
 };
 
 struct CbLambertMaterial
