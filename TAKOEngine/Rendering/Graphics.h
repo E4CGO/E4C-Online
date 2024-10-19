@@ -33,6 +33,7 @@ enum class ModelShaderDX12Id
 {
 	Lambert,
 	Phong,
+	Toon,
 
 	EnumCount
 };
@@ -86,8 +87,8 @@ public:
 		return instance;
 	}
 
-	bool isDX12Active = false;
-	bool isDX11Active = true;
+	bool isDX12Active = true;
+	bool isDX11Active = false;
 
 	struct CommandQueue
 	{

@@ -14,7 +14,7 @@ struct VS_OUT
 cbuffer CbScene : register(b0)
 {
     row_major float4x4 viewProjection;
-    float4 cameraPosition;
+    float4             cameraPosition;
     
     //ƒ‰ƒCƒgî•ñ
     float4               ambientLightColor;

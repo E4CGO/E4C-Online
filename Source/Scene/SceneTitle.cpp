@@ -70,8 +70,8 @@ void SceneTitle::Initialize()
 		rouge->GetModel()->FindNode("Throwable")->visible = false;
 		shadowMapRenderer->ModelRegister(rouge->GetModel().get());
 
-		test = std::make_unique<ModelDX12>("Data/Model/Character/Barbarian.glb");
-		//test = std::make_unique<ModelDX12>("Data/Model/Character/test.glb");
+		//test = std::make_unique<ModelDX12>("Data/Model/Character/Barbarian.glb");
+		test = std::make_unique<ModelDX12>("Data/Model/Enemy/Goblin.glb");
 		test->PlayAnimation(0, true);
 
 		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/button_agree.png");
@@ -251,7 +251,7 @@ void SceneTitle::RenderDX12()
 		m_skinning_pipeline->Compute(rc, test.get());
 
 		// モデル描画
-		ModelShaderDX12* shader = TentacleLib::graphics.GetModelShaderDX12(ModelShaderDX12Id::Phong);
+		ModelShaderDX12* shader = TentacleLib::graphics.GetModelShaderDX12(ModelShaderDX12Id::Toon);
 		if (test != nullptr)
 		{
 			shader->Render(rc, test.get());
