@@ -235,8 +235,7 @@ void SceneCharacter_E4C::RenderDX12()
 
 		// シーン用定数バッファ更新
 		const Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
-			camera.GetView(),
-			camera.GetProjection(),
+			Camera::Instance(),
 			DirectX::XMFLOAT3(0, -1, 0));
 
 		// レンダーコンテキスト設定

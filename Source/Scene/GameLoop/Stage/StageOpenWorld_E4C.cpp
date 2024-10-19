@@ -25,7 +25,7 @@ void StageOpenWorld_E4C::Initialize()
 	map = std::make_unique<gltf_model>(T_GRAPHICS.GetDevice(), "Data/Model/Stage/Terrain_Reduced.glb");
 
 	player = std::make_unique<Barbarian>();
-	player->SetPosition({ 5, 50, 5 });
+	player->SetPosition({ 5, 20, 5 });
 	player->GetStateMachine()->ChangeState(static_cast<int>(Player::State::Idle));
 
 	teleporter = std::make_unique<Teleporter>("Data/Model/Cube/testCubes.glb", 1.0);
@@ -59,7 +59,7 @@ void StageOpenWorld_E4C::Initialize()
 		HRESULT hr;
 
 		D3D11_BUFFER_DESC buffer_desc{};
-		buffer_desc.ByteWidth = sizeof(CbScene);
+		buffer_desc.ByteWidth = (sizeof(CbScene) + 15) / 16 * 16;
 		buffer_desc.Usage = D3D11_USAGE_DEFAULT;
 		buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		buffer_desc.CPUAccessFlags = 0;

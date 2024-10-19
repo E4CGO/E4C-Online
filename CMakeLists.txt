@@ -526,7 +526,6 @@ set(TAKOEngine__Rendering__Shaders
     "TAKOEngine/Rendering/Shaders/ModelShaderDX12.h"
     "TAKOEngine/Rendering/Shaders/PhongShader.cpp"
     "TAKOEngine/Rendering/Shaders/PhongShader.h"
-    "TAKOEngine/Rendering/Shaders/Shader.cpp"
     "TAKOEngine/Rendering/Shaders/Shader.h"
     "TAKOEngine/Rendering/Shaders/ShadowMapShader.cpp"
     "TAKOEngine/Rendering/Shaders/ShadowMapShader.h"
