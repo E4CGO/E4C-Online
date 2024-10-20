@@ -87,8 +87,8 @@ public:
 		return instance;
 	}
 
-	bool isDX12Active = true;
-	bool isDX11Active = false;
+	bool isDX12Active = false;
+	bool isDX11Active = true;
 
 	struct CommandQueue
 	{
