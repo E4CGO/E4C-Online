@@ -33,6 +33,7 @@ enum class ModelShaderDX12Id
 {
 	Lambert,
 	Phong,
+	Toon,
 
 	EnumCount
 };

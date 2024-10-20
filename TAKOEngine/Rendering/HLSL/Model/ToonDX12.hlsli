@@ -14,14 +14,14 @@ struct VS_OUT
 cbuffer CbScene : register(b0)
 {
     row_major float4x4 viewProjection;
-    float4 cameraPosition;
+    float4             cameraPosition;
     
     //ライト情報
     float4               ambientLightColor;
     DirectionalLightData directionalLightData;
     PointLightData       pointLightData[PointLightMax]; 	// 点光源情報
     SpotLightData        spotLightData[SpotLightMax];   	// スポットライト情報
-    int                  pointLightCount;               	// 点光源数
+    int                  pointLightCount;              		// 点光源数
     int                  spotLightCount;                	// スポットライト数
 };
 

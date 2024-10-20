@@ -588,6 +588,7 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	// DX12のモデルシェーダー生成
 	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Lambert)] = std::make_unique<LambertShader>(m_d3d_device.Get());
 	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Phong)]   = std::make_unique<PhongShaderDX12>(m_d3d_device.Get());
+	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Toon)]    = std::make_unique<ToonShaderDX12>(m_d3d_device.Get());
 
 	// スプライトシェーダー生成
 	spriteShaders[static_cast<int>(SpriteShaderId::Default)]             = std::make_unique<DefaultSpriteShader>(device.Get());
@@ -774,18 +775,13 @@ const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera& camera, cons
 {
 	LightManager& ligtManager = LightManager::Instance();
 
-	UINT frame_buffer_index = m_dxgi_swap_chain->GetCurrentBackBufferIndex();
+	UINT       frame_buffer_index = m_dxgi_swap_chain->GetCurrentBackBufferIndex();
 	FrameResource& frame_resource = m_frame_resources.at(frame_buffer_index);
 
-	DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&camera.GetView());
-	DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&camera.GetProjection());
+	DirectX::XMMATRIX View           = DirectX::XMLoadFloat4x4(&camera.GetView());
+	DirectX::XMMATRIX Projection     = DirectX::XMLoadFloat4x4(&camera.GetProjection());
 	DirectX::XMMATRIX ViewProjection = DirectX::XMMatrixMultiply(View, Projection);
 	DirectX::XMStoreFloat4x4(&frame_resource.cb_scene_data->view_projection, ViewProjection);
-
-	frame_resource.cb_scene_data->light_direction.x = light_direction.x;
-	frame_resource.cb_scene_data->light_direction.y = light_direction.y;
-	frame_resource.cb_scene_data->light_direction.z = light_direction.z;
-	frame_resource.cb_scene_data->light_direction.w = 0.0f;
 
 	// カメラ
 	frame_resource.cb_scene_data->camera_position.x = camera.GetEye().x;

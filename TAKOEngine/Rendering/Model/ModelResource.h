@@ -47,6 +47,7 @@ public:
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cbv_resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_srv_resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_normal_srv_resource;
+		
 		const Descriptor* cbv_descriptor = nullptr;
 		const Descriptor* srv_descriptor = nullptr;
 		const Descriptor* srv_normal_descriptor = nullptr;
@@ -117,8 +118,10 @@ public:
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_vb_resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_ib_resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cb_resource;
+		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_toon_srv_resource;
 
 		const Descriptor* srv_descriptor = nullptr;
+		const Descriptor* srv_toon_descriptor = nullptr;
 
 		D3D12_VERTEX_BUFFER_VIEW				d3d_vbv;
 		D3D12_INDEX_BUFFER_VIEW					d3d_ibv;

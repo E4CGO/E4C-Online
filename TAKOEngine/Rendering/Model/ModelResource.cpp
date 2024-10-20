@@ -577,6 +577,42 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 			graphics.CopyBuffer(d3d_upload_resource.Get(), mesh.d3d_vb_resource.Get());
 		}
 
+		//ToonTexture
+		{
+			const char* filename = "Data/Sprites/ramp3.png";
+			hr = graphics.LoadTexture(filename, mesh.d3d_toon_srv_resource.GetAddressOf());
+			if (FAILED(hr))
+			{
+				// 読み込み失敗したらダミーテクスチャを作る
+				LOG("load failed : %s\n", filename);
+
+				hr = graphics.CreateDummyTexture(mesh.d3d_toon_srv_resource.GetAddressOf());
+				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+			}
+
+			//シェーダリソースビューの生成
+			{
+				D3D12_RESOURCE_DESC d3d_resource_desc = mesh.d3d_toon_srv_resource->GetDesc();
+
+				// シェーダーリソースビューの設定
+				D3D12_SHADER_RESOURCE_VIEW_DESC d3d_srv_desc = {};
+				d3d_srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+				d3d_srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+				d3d_srv_desc.Format = d3d_resource_desc.Format;
+				d3d_srv_desc.Texture2D.MipLevels = d3d_resource_desc.MipLevels;
+				d3d_srv_desc.Texture2D.MostDetailedMip = 0;
+
+				// ディスクリプタ取得
+				mesh.srv_toon_descriptor = graphics.GetShaderResourceDescriptorHeap()->PopDescriptor();
+
+				// シェーダリソースビューを生成.
+				d3d_device->CreateShaderResourceView(
+					mesh.d3d_toon_srv_resource.Get(),
+					&d3d_srv_desc,
+					mesh.srv_toon_descriptor->GetCpuHandle());
+			}
+		}
+
 		// インデックスバッファ
 		{
 			// ヒーププロパティの設定
@@ -688,6 +724,11 @@ ModelResource::~ModelResource()
 		if (mesh.srv_descriptor != nullptr)
 		{
 			descriptor_pool->PushDescriptor(mesh.srv_descriptor);
+		}
+
+		if (mesh.srv_toon_descriptor != nullptr)
+		{
+			descriptor_pool->PushDescriptor(mesh.srv_toon_descriptor);
 		}
 	}
 }
