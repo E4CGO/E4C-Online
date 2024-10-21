@@ -249,22 +249,6 @@ set(Source__GameObject__Character__Player
 )
 source_group("Source\\GameObject\\Character\\Player" FILES ${Source__GameObject__Character__Player})
 
-set(Source__Scene__GameLoop
-    "Source/Scene/GameLoop/SceneCharacter_E4C.cpp"
-    "Source/Scene/GameLoop/SceneCharacter_E4C.h"
-    "Source/Scene/GameLoop/SceneCharacter_E4CState.cpp"
-    "Source/Scene/GameLoop/SceneCharacter_E4CState.h"
-    "Source/Scene/GameLoop/SceneGame_E4C.cpp"
-    "Source/Scene/GameLoop/SceneGame_E4C.h"
-    "Source/Scene/GameLoop/SceneGame_E4CState.cpp"
-    "Source/Scene/GameLoop/SceneGame_E4CState.h"
-    "Source/Scene/GameLoop/SceneTitle_E4C.cpp"
-    "Source/Scene/GameLoop/SceneTitle_E4C.h"
-    "Source/Scene/GameLoop/SceneTitle_E4CState.cpp"
-    "Source/Scene/GameLoop/SceneTitle_E4CState.h"
-)
-source_group("Source\\Scene\\GameLoop" FILES ${Source__Scene__GameLoop})
-
 set(Source__Scene__Stage
     "Source/Scene/Stage/Stage.cpp"
     "Source/Scene/Stage/Stage.h"
@@ -275,11 +259,35 @@ set(Source__Scene__Stage
 )
 source_group("Source\\Scene\\Stage" FILES ${Source__Scene__Stage})
 
-set(Source__Scene__GameLoop__Stage
-    "Source/Scene/GameLoop/Stage/StageOpenWorld_E4C.cpp"
-    "Source/Scene/GameLoop/Stage/StageOpenWorld_E4C.h"
+set(Source__Scene__GameLoop__SceneCharacter
+    "Source/Scene/GameLoop/SceneCharacter/SceneCharacter_E4C.cpp"
+    "Source/Scene/GameLoop/SceneCharacter/SceneCharacter_E4C.h"
+    "Source/Scene/GameLoop/SceneCharacter/SceneCharacter_E4CState.cpp"
+    "Source/Scene/GameLoop/SceneCharacter/SceneCharacter_E4CState.h"
 )
-source_group("Source\\Scene\\GameLoop\\Stage" FILES ${Source__Scene__GameLoop__Stage})
+source_group("Source\\Scene\\GameLoop\\SceneCharacter" FILES ${Source__Scene__GameLoop__SceneCharacter})
+
+set(Source__Scene__GameLoop__SceneGame
+    "Source/Scene/GameLoop/SceneGame/SceneGame_E4C.cpp"
+    "Source/Scene/GameLoop/SceneGame/SceneGame_E4C.h"
+    "Source/Scene/GameLoop/SceneGame/SceneGame_E4CState.cpp"
+    "Source/Scene/GameLoop/SceneGame/SceneGame_E4CState.h"
+)
+source_group("Source\\Scene\\GameLoop\\SceneGame" FILES ${Source__Scene__GameLoop__SceneGame})
+
+set(Source__Scene__GameLoop__SceneTitle
+    "Source/Scene/GameLoop/SceneTitle/SceneTitle_E4C.cpp"
+    "Source/Scene/GameLoop/SceneTitle/SceneTitle_E4C.h"
+    "Source/Scene/GameLoop/SceneTitle/SceneTitle_E4CState.cpp"
+    "Source/Scene/GameLoop/SceneTitle/SceneTitle_E4CState.h"
+)
+source_group("Source\\Scene\\GameLoop\\SceneTitle" FILES ${Source__Scene__GameLoop__SceneTitle})
+
+set(Source__Scene__GameLoop__SceneGame__Stage
+    "Source/Scene/GameLoop/SceneGame/Stage/StageOpenWorld_E4C.cpp"
+    "Source/Scene/GameLoop/SceneGame/Stage/StageOpenWorld_E4C.h"
+)
+source_group("Source\\Scene\\GameLoop\\SceneGame\\Stage" FILES ${Source__Scene__GameLoop__SceneGame__Stage})
 
 set(Source__UI__Widget
     "Source/UI/Widget/WidgetBossHp.cpp"
@@ -417,6 +425,8 @@ set(TAKOEngine__Rendering
     "TAKOEngine/Rendering/MyRender.h"
     "TAKOEngine/Rendering/PipelineState.cpp"
     "TAKOEngine/Rendering/PipelineState.h"
+    "TAKOEngine/Rendering/Plane.cpp"
+    "TAKOEngine/Rendering/Plane.h"
     "TAKOEngine/Rendering/PostEffect.cpp"
     "TAKOEngine/Rendering/PostEffect.h"
     "TAKOEngine/Rendering/PostprocessingRenderer.cpp"
@@ -526,6 +536,8 @@ set(TAKOEngine__Rendering__Shaders
     "TAKOEngine/Rendering/Shaders/ModelShaderDX12.h"
     "TAKOEngine/Rendering/Shaders/PhongShader.cpp"
     "TAKOEngine/Rendering/Shaders/PhongShader.h"
+    "TAKOEngine/Rendering/Shaders/PlaneShader.cpp"
+    "TAKOEngine/Rendering/Shaders/PlaneShader.h"
     "TAKOEngine/Rendering/Shaders/Shader.h"
     "TAKOEngine/Rendering/Shaders/ShadowMapShader.cpp"
     "TAKOEngine/Rendering/Shaders/ShadowMapShader.h"
@@ -625,6 +637,16 @@ set(TAKOEngine__Rendering__HLSL__PostEffect
 )
 source_group("TAKOEngine\\Rendering\\HLSL\\PostEffect" FILES ${TAKOEngine__Rendering__HLSL__PostEffect})
 
+set(TAKOEngine__Rendering__HLSL__Primitives
+    "TAKOEngine/Rendering/HLSL/Primitives/Plane.hlsli"
+    "TAKOEngine/Rendering/HLSL/Primitives/PlanePS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/PlaneVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/Portal.hlsli"
+    "TAKOEngine/Rendering/HLSL/Primitives/PortalPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/PortalVS.hlsl"
+)
+source_group("TAKOEngine\\Rendering\\HLSL\\Primitives" FILES ${TAKOEngine__Rendering__HLSL__Primitives})
+
 set(TAKOEngine__Rendering__HLSL__Skydome
     "TAKOEngine/Rendering/HLSL/Skydome/Skydome.hlsli"
     "TAKOEngine/Rendering/HLSL/Skydome/SkydomePS.hlsl"
@@ -662,7 +684,10 @@ set(ALL_FILES
     ${Source__GameObject__Character__Player}
     ${Source__Scene__GameLoop}
     ${Source__Scene__Stage}
-    ${Source__Scene__GameLoop__Stage}
+    ${Source__Scene__GameLoop__SceneCharacter}
+    ${Source__Scene__GameLoop__SceneGame}
+    ${Source__Scene__GameLoop__SceneTitle}
+    ${Source__Scene__GameLoop__SceneGame__Stage}
     ${Source__UI__Widget}
     ${TAKOEngine__AI}
     ${TAKOEngine__Editor}
@@ -685,6 +710,7 @@ set(ALL_FILES
     ${TAKOEngine__Rendering__HLSL__Lighting}
     ${TAKOEngine__Rendering__HLSL__Model}
     ${TAKOEngine__Rendering__HLSL__PostEffect}
+    ${TAKOEngine__Rendering__HLSL__Primitives}
     ${TAKOEngine__Rendering__HLSL__Skydome}
     ${TAKOEngine__Rendering__HLSL__Sprite}
     ${TAKOEngine__Rendering__HLSL__UVScroll}
@@ -745,6 +771,10 @@ set(SHADER_NAMES
     "GaussianBlurPS.cso"
     "LuminanceExtractionPS.cso"
     "MaskPS.cso"
+    "PlanePS.cso"
+    "PlaneVS.cso"
+    "PortalPS.cso"
+    "PortalVS.cso"
     "SkydomePS.cso"
     "SkydomeVS.cso"
     "SpritePS.cso"
@@ -773,7 +803,7 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/PhongDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/PhongPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/PhongVS.hlsl,5.0,Vertex,main"
-    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/SkinningCS.hlsl,5.0,Compute,main" 
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/SkinningCS.hlsl,5.0,Compute,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/ToonDX12GS.hlsl,5.0,Geometry,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/ToonDX12PS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/ToonDX12VS.hlsl,5.0,Vertex,main"
@@ -786,6 +816,10 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/GaussianBlurPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/LuminanceExtractionPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/MaskPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlanePS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlaneVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PortalPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PortalVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Skydome/SkydomePS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Skydome/SkydomeVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Sprite/SpritePS.hlsl,5.0,Pixel,main"

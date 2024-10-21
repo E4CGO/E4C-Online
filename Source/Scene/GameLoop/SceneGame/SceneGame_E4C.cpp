@@ -6,7 +6,7 @@
 
 #include "SceneGame_E4C.h"
 #include "SceneGame_E4CState.h"
-#include "Scene/GameLoop/Stage/StageOpenWorld_E4C.h"
+#include "Scene/GameLoop/SceneGame/Stage/StageOpenWorld_E4C.h"
 #include "Scene/Stage/TestingStage.h"
 
 void SceneGame_E4C::Initialize()

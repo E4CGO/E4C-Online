@@ -13,12 +13,15 @@
 
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Tool/GLTFImporter.h"
+#include "TAKOEngine/Tool/Timer.h"
+
+static float timer = 0;
 
 void StageOpenWorld_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
 
-	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01);
+	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
 	stage_collision->Update(0);
 	MAPTILES.Register(stage_collision);
 
@@ -30,6 +33,25 @@ void StageOpenWorld_E4C::Initialize()
 
 	teleporter = std::make_unique<Teleporter>("Data/Model/Cube/testCubes.glb", 1.0);
 	teleporter->SetPosition({ 50, 0, 60 });
+
+	std::array<DirectX::XMFLOAT3, 4 > positions = {
+	DirectX::XMFLOAT3{ 10.0f, 10.0f, 5.0f},
+	DirectX::XMFLOAT3{ 10.0f, 20.0f, 5.0f },
+	DirectX::XMFLOAT3{ 5.0f, 10.0f, 5.0f },
+	DirectX::XMFLOAT3{ 5.0f, 10.0f, 5.0f }
+	};
+
+	plane = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "Data/Sprites/gem.png", 1.0f, positions);
+
+	positions = {
+		DirectX::XMFLOAT3{ 15.0f, 15.0f, 5.0f},
+		DirectX::XMFLOAT3{ 15.0f, 25.0f, 5.0f },
+		DirectX::XMFLOAT3{ 25.0f, 15.0f, 5.0f },
+		DirectX::XMFLOAT3{ 25.0f, 25.0f, 5.0f }
+	};
+
+	portal = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), nullptr, 1.0f, positions);
+	portal.get()->SetShader(ModelShaderId::Portal);
 
 	// 光
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
@@ -77,10 +99,14 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 
 	player->Update(elapsedTime);
 	teleporter->Update(elapsedTime);
+	plane->Update(elapsedTime);
+	portal->Update(elapsedTime);
 
 	teleporter->CheckPlayer(player->GetPosition(), elapsedTime);
 
 	if (teleporter->GetPortalReady()) STAGES.stageNumber = 1;
+
+	timer += elapsedTime;
 }
 
 void StageOpenWorld_E4C::Render()
@@ -93,6 +119,9 @@ void StageOpenWorld_E4C::Render()
 	rc.camera = &camera;
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
+
+	rc.timerGlobal = timer;
+	rc.timerTick = TentacleLib::Timer::Instance().Delta();
 
 	// ライトの情報を詰め込む
 	LightManager::Instance().PushRenderContext(rc);
@@ -146,8 +175,6 @@ void StageOpenWorld_E4C::Render()
 		DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&rc.camera->GetProjection());
 		DirectX::XMStoreFloat4x4(&cbScene.view_projection, V * P);
 
-		cbScene.light_direction = rc.directionalLightData.direction;
-
 		const DirectX::XMFLOAT3& eye = rc.camera->GetEye();
 		cbScene.camera_position.x = eye.x;
 		cbScene.camera_position.y = eye.y;
@@ -167,6 +194,8 @@ void StageOpenWorld_E4C::Render()
 	}
 
 	teleporter->Render(rc);
+	plane->Render(rc);
+	portal->Render(rc);
 }
 
 void StageOpenWorld_E4C::OnPhase()
