@@ -11,7 +11,7 @@
 #include "Scene/SceneTitle.h"
 #include "Scene/SceneManager.h"
 #include "Scene/SceneTest.h"
-#include "Scene/GameLoop/SceneTitle_E4C.h"
+#include "Scene/GameLoop/SceneTitle/SceneTitle_E4C.h"
 
 #include "GameData.h"
 

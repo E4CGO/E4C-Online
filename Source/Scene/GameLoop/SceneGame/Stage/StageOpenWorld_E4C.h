@@ -1,11 +1,13 @@
 #pragma once
 
 #include <memory>
+#include <array>
 
 #include "GameObject/ModelObject.h"
 #include "GameObject/GameObject.h"
 #include "GameObject/Character/Player/Barbarian.h"
 #include "GameObject/Props/Teleporter.h"
+#include "TAKOEngine/Rendering/Shaders/PlaneShader.h"
 
 #include "Scene/Scene.h"
 #include "Scene/Stage/Stage.h"
@@ -42,6 +44,8 @@ private:
 	std::unique_ptr<Player> player;
 
 	std::unique_ptr <Teleporter> teleporter;
+	std::unique_ptr <Plane> plane;
+	std::unique_ptr <Plane> portal;
 
 	std::unique_ptr<gltf_model> map;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constant_buffers[8];

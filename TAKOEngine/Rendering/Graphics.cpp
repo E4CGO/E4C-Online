@@ -9,6 +9,7 @@
 #include "TAKOEngine/Rendering/Shaders/ToonShader.h"
 #include "TAKOEngine/Rendering/Shaders/SkydomeShader.h"
 #include "TAKOEngine/Rendering/Shaders/ShadowMapShader.h"
+#include "TAKOEngine/Rendering/Shaders//PlaneShader.h"
 
 #include "TAKOEngine/Rendering/Shaders/UVScrollShader.h"
 #include "TAKOEngine/Rendering/Shaders/MaskShader.h"
@@ -557,52 +558,54 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	adapter->Release();
 
 	// フレームバッファ作成
-	frameBuffers[static_cast<int>(FrameBufferId::Display)]      = std::make_unique<FrameBuffer>(device.Get(), swapchain.Get());
-	frameBuffers[static_cast<int>(FrameBufferId::Scene)]        = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight);
-	frameBuffers[static_cast<int>(FrameBufferId::Luminance)]    = std::make_unique<FrameBuffer>(device.Get(), screenWidth / 2, screenHeight / 2);
+	frameBuffers[static_cast<int>(FrameBufferId::Display)] = std::make_unique<FrameBuffer>(device.Get(), swapchain.Get());
+	frameBuffers[static_cast<int>(FrameBufferId::Scene)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight);
+	frameBuffers[static_cast<int>(FrameBufferId::Luminance)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth / 2, screenHeight / 2);
 	frameBuffers[static_cast<int>(FrameBufferId::GaussianBlur)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth / 2, screenHeight / 2);
-	frameBuffers[static_cast<int>(FrameBufferId::Normal)]       = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
-	frameBuffers[static_cast<int>(FrameBufferId::Position)]     = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT);
+	frameBuffers[static_cast<int>(FrameBufferId::Normal)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
+	frameBuffers[static_cast<int>(FrameBufferId::Position)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT);
 
 	// レンダーステート作成
-	renderState       = std::make_unique<RenderState>(device.Get());
+	renderState = std::make_unique<RenderState>(device.Get());
 	m_renderStateDX12 = std::make_unique<RenderStateDX12>();
 
 	//サンプラーステート作成
-	m_sampler[static_cast<int>(SamplerState::PointWrap)]    = std::make_unique<SamplerManager>(SamplerState::PointWrap);
-	m_sampler[static_cast<int>(SamplerState::PointClamp)]   = std::make_unique<SamplerManager>(SamplerState::PointClamp);
-	m_sampler[static_cast<int>(SamplerState::LinearWrap)]   = std::make_unique<SamplerManager>(SamplerState::LinearWrap);
-	m_sampler[static_cast<int>(SamplerState::LinearClamp)]  = std::make_unique<SamplerManager>(SamplerState::LinearClamp);
+	m_sampler[static_cast<int>(SamplerState::PointWrap)] = std::make_unique<SamplerManager>(SamplerState::PointWrap);
+	m_sampler[static_cast<int>(SamplerState::PointClamp)] = std::make_unique<SamplerManager>(SamplerState::PointClamp);
+	m_sampler[static_cast<int>(SamplerState::LinearWrap)] = std::make_unique<SamplerManager>(SamplerState::LinearWrap);
+	m_sampler[static_cast<int>(SamplerState::LinearClamp)] = std::make_unique<SamplerManager>(SamplerState::LinearClamp);
 	m_sampler[static_cast<int>(SamplerState::LinearBorder)] = std::make_unique<SamplerManager>(SamplerState::LinearBorder);
-	m_sampler[static_cast<int>(SamplerState::ShadowMap)]    = std::make_unique<SamplerManager>(SamplerState::ShadowMap);
+	m_sampler[static_cast<int>(SamplerState::ShadowMap)] = std::make_unique<SamplerManager>(SamplerState::ShadowMap);
 
 	// ギズモ生成
 	gizmos = std::make_unique<Gizmos>(device.Get());
 
 	// モデルシェーダー生成
-	modelShaders[static_cast<int>(ModelShaderId::Phong)]     = std::make_unique<PhongShader>(device.Get());
-	modelShaders[static_cast<int>(ModelShaderId::Toon)]      = std::make_unique<ToonShader>(device.Get());
-	modelShaders[static_cast<int>(ModelShaderId::Skydome)]   = std::make_unique<SkydomeShader>(device.Get());
+	modelShaders[static_cast<int>(ModelShaderId::Phong)] = std::make_unique<PhongShader>(device.Get());
+	modelShaders[static_cast<int>(ModelShaderId::Toon)] = std::make_unique<ToonShader>(device.Get());
+	modelShaders[static_cast<int>(ModelShaderId::Skydome)] = std::make_unique<SkydomeShader>(device.Get());
 	modelShaders[static_cast<int>(ModelShaderId::ShadowMap)] = std::make_unique<ShadowMapShader>(device.Get());
+	modelShaders[static_cast<int>(ModelShaderId::Plane)] = std::make_unique<PlaneShader>(device.Get(), "Data/Shader/PlaneVS.cso", "Data/Shader/PlanePS.cso");
+	modelShaders[static_cast<int>(ModelShaderId::Portal)] = std::make_unique<PortalShader>(device.Get(), "Data/Shader/PortalVS.cso", "Data/Shader/PortalPS.cso");
 
 	// DX12のモデルシェーダー生成
 	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Lambert)] = std::make_unique<LambertShader>(m_d3d_device.Get());
-	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Phong)]   = std::make_unique<PhongShaderDX12>(m_d3d_device.Get());
-	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Toon)]    = std::make_unique<ToonShaderDX12>(m_d3d_device.Get());
+	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Phong)] = std::make_unique<PhongShaderDX12>(m_d3d_device.Get());
+	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Toon)] = std::make_unique<ToonShaderDX12>(m_d3d_device.Get());
 
 	// スプライトシェーダー生成
-	spriteShaders[static_cast<int>(SpriteShaderId::Default)]             = std::make_unique<DefaultSpriteShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::UVScroll)]            = std::make_unique<UVScrollShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::Mask)]                = std::make_unique<MaskShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::ColorGrading)]        = std::make_unique<ColorGradingShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::GaussianBlur)]        = std::make_unique<GaussianBlurShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::Default)] = std::make_unique<DefaultSpriteShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::UVScroll)] = std::make_unique<UVScrollShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::Mask)] = std::make_unique<MaskShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::ColorGrading)] = std::make_unique<ColorGradingShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::GaussianBlur)] = std::make_unique<GaussianBlurShader>(device.Get());
 	spriteShaders[static_cast<int>(SpriteShaderId::LuminanceExtraction)] = std::make_unique<LuminanceExtractionShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::Finalpass)]           = std::make_unique<FinalpassShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::Deferred)]            = std::make_unique<DeferredLightingShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::Finalpass)] = std::make_unique<FinalpassShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::Deferred)] = std::make_unique<DeferredLightingShader>(device.Get());
 
 	// レンダラ
 	debugRenderer = std::make_unique<DebugRenderer>(device.Get());
-	lineRenderer  = std::make_unique<LineRenderer>(device.Get(), 1024);
+	lineRenderer = std::make_unique<LineRenderer>(device.Get(), 1024);
 
 	//スキニング
 	m_skinning_pipeline = std::make_unique<SkinningPipeline>(m_d3d_device.Get());
@@ -778,8 +781,8 @@ const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera& camera, cons
 	UINT       frame_buffer_index = m_dxgi_swap_chain->GetCurrentBackBufferIndex();
 	FrameResource& frame_resource = m_frame_resources.at(frame_buffer_index);
 
-	DirectX::XMMATRIX View           = DirectX::XMLoadFloat4x4(&camera.GetView());
-	DirectX::XMMATRIX Projection     = DirectX::XMLoadFloat4x4(&camera.GetProjection());
+	DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&camera.GetView());
+	DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&camera.GetProjection());
 	DirectX::XMMATRIX ViewProjection = DirectX::XMMatrixMultiply(View, Projection);
 	DirectX::XMStoreFloat4x4(&frame_resource.cb_scene_data->view_projection, ViewProjection);
 
@@ -807,7 +810,7 @@ const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera& camera, cons
 		case	LightType::Point:
 		{
 			if (frame_resource.cb_scene_data->pointLightCount >= PointLightMax) break;
-			
+
 			frame_resource.cb_scene_data->pointLightData[frame_resource.cb_scene_data->pointLightCount].position.x = light->GetPosition().x;
 			frame_resource.cb_scene_data->pointLightData[frame_resource.cb_scene_data->pointLightCount].position.y = light->GetPosition().y;
 			frame_resource.cb_scene_data->pointLightData[frame_resource.cb_scene_data->pointLightCount].position.z = light->GetPosition().z;

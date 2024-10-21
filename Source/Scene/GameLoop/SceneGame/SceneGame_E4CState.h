@@ -2,7 +2,7 @@
 
 #include "TAKOEngine/AI/BaseState.h"
 
-#include "Scene/GameLoop/SceneGame_E4c.h"
+#include "Scene/GameLoop/SceneGame/SceneGame_E4c.h"
 #include "UI/Widget/WidgetText.h"
 
 namespace SceneGame_E4CState

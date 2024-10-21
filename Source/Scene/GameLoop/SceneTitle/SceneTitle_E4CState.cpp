@@ -2,7 +2,7 @@
 
 #include "TAKOEngine/GUI/UIManager.h"
 #include "Scene/SceneManager.h"
-#include "Scene/GameLoop/SceneCharacter_E4C.h"
+#include "Scene/GameLoop/SceneCharacter/SceneCharacter_E4C.h"
 
 #include "Source/UI/Widget/WidgetText.h"
 #include "Source/UI/Widget/WidgetButtonImage.h"

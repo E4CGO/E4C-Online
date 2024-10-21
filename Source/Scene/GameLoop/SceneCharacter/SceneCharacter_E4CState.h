@@ -4,7 +4,7 @@
 #include "TAKOEngine/AI/BaseState.h"
 #include "Source/UI/Widget/WidgetButtonImage.h"
 
-#include "Scene/GameLoop/SceneCharacter_E4C.h"
+#include "Scene/GameLoop/SceneCharacter/SceneCharacter_E4C.h"
 
 namespace SceneCharacter_E4CState
 {

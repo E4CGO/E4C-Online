@@ -1,6 +1,6 @@
 #include "Sprite.hlsli"
 
-// ’¸“_ƒVƒF[ƒ_[ƒGƒ“ƒgƒŠƒ|ƒCƒ“ƒg
+// é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚¨ãƒ³ãƒˆãƒªãƒã‚¤ãƒ³ãƒˆ
 VS_OUT main(float4 position : POSITION, float4 color : COLOR, float2 texcoord : TEXCOORD)
 {
 	VS_OUT vout;
