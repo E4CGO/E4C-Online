@@ -586,9 +586,12 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	modelShaders[static_cast<int>(ModelShaderId::ShadowMap)] = std::make_unique<ShadowMapShader>(device.Get());
 
 	// DX12のモデルシェーダー生成
-	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Lambert)] = std::make_unique<LambertShader>(m_d3d_device.Get());
-	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Phong)]   = std::make_unique<PhongShaderDX12>(m_d3d_device.Get());
-	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Toon)]    = std::make_unique<ToonShaderDX12>(m_d3d_device.Get());
+	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Lambert)]           = std::make_unique<LambertShader>(m_d3d_device.Get());
+	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::LambertInstancing)] = std::make_unique<LambertShader>(m_d3d_device.Get(), true);
+	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Phong)]             = std::make_unique<PhongShaderDX12>(m_d3d_device.Get());
+	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::PhongInstancing)]   = std::make_unique<PhongShaderDX12>(m_d3d_device.Get(), true);
+	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Toon)]              = std::make_unique<ToonShaderDX12>(m_d3d_device.Get());
+	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::ToonInstancing)]    = std::make_unique<ToonShaderDX12>(m_d3d_device.Get(), true);
 
 	// スプライトシェーダー生成
 	spriteShaders[static_cast<int>(SpriteShaderId::Default)]             = std::make_unique<DefaultSpriteShader>(device.Get());

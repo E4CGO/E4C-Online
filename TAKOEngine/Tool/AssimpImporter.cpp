@@ -215,6 +215,7 @@ void AssimpImporter::LoadMeshes(MeshList& meshes, const NodeList& nodes, const a
 		}
 
 		// インデックスデータ
+		int32_t indexOffset = mesh.indices.size();
 		for (uint32_t aFaceIndex = 0; aFaceIndex < aMesh->mNumFaces; ++aFaceIndex)
 		{
 			const aiFace& aFace = aMesh->mFaces[aFaceIndex];
@@ -223,6 +224,15 @@ void AssimpImporter::LoadMeshes(MeshList& meshes, const NodeList& nodes, const a
 			mesh.indices[index + 1] = aFace.mIndices[1];
 			mesh.indices[index + 2] = aFace.mIndices[0];
 		}
+
+		// サブセットデータ
+		ModelResource::Subset subset;
+		subset.startIndex = mesh.indices.size();
+		subset.indexCount = aMesh->mNumFaces * 3;
+		subset.materialIndex = mesh.materialIndex;
+		subset.material      = nullptr;
+
+		mesh.subsets.push_back(subset);
 
 		// スキニングデータ
 		if (aMesh->mNumBones > 0)

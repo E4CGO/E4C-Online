@@ -43,7 +43,7 @@ void PhongShader::SetShaderResourceView(const ModelResource::Mesh& mesh, ID3D11D
 // @param[in]   なし
 // @return      なし
 //***********************************************************
-PhongShaderDX12::PhongShaderDX12(ID3D12Device* device)
+PhongShaderDX12::PhongShaderDX12(ID3D12Device* device, bool instancing)
 {
 	Graphics&                 graphics = Graphics::Instance();
 	const RenderStateDX12* renderState = graphics.GetRenderStateDX12();
@@ -53,7 +53,8 @@ PhongShaderDX12::PhongShaderDX12(ID3D12Device* device)
 	// シェーダー
 	std::vector<BYTE> vsData, psData;
 	{
-		GpuResourceUtils::LoadShaderFile("Data/Shader/PhongDX12VS.cso", vsData);
+		if (!instancing) GpuResourceUtils::LoadShaderFile("Data/Shader/PhongDX12VS.cso", vsData);
+		else GpuResourceUtils::LoadShaderFile("Data/Shader/PhongInstancingVS.cso", vsData);
 		GpuResourceUtils::LoadShaderFile("Data/Shader/PhongDX12PS.cso", psData);
 	}
 
@@ -151,6 +152,15 @@ PhongShaderDX12::~PhongShaderDX12()
 //***********************************************************
 void PhongShaderDX12::Render(const RenderContextDX12& rc, ModelDX12* model)
 {
+	Graphics& graphics = Graphics::Instance();
+
+	// カメラに写っている範囲のオブジェクトをフラグでマークする配列を用意
+	std::vector<bool> visibleObjects(model->GetMeshes().size(), false);
+
+	// 視錐台カリングを実行して可視オブジェクトをマーク
+	FrustumCulling::FrustumCullingFlag(Camera::Instance(), model->GetMeshes(), visibleObjects);
+	int culling = 0;
+
 	//パイプライン設定
 	rc.d3d_command_list->SetGraphicsRootSignature(m_d3d_root_signature.Get());
 	rc.d3d_command_list->SetPipelineState(m_d3d_pipeline_state.Get());
@@ -158,12 +168,12 @@ void PhongShaderDX12::Render(const RenderContextDX12& rc, ModelDX12* model)
 	//シーン定数バッファ設定
 	rc.d3d_command_list->SetGraphicsRootDescriptorTable(0, rc.scene_cbv_descriptor->GetGpuHandle());  //CbScene
 
-	Graphics& graphics = Graphics::Instance();
-
-	for (ModelDX12::Mesh& mesh : model->GetMeshes())
+	for (const ModelDX12::Mesh& mesh : model->GetMeshes())
 	{
+		if (!visibleObjects[culling++]) continue;
+
 		const ModelResource::Mesh* res_mesh = mesh.mesh;
-		ModelDX12::Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
+		const ModelDX12::Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
 
 		// メッシュ定数バッファ設定
 		rc.d3d_command_list->SetGraphicsRootDescriptorTable(1, frame_resource.cbv_descriptor->GetGpuHandle());  //CbMesh
@@ -187,6 +197,14 @@ void PhongShaderDX12::Render(const RenderContextDX12& rc, ModelDX12* model)
 		rc.d3d_command_list->SetGraphicsRootDescriptorTable(5, m_sampler->GetDescriptor()->GetGpuHandle());
 
 		// 描画
-		rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), 1, 0, 0, 0);
+		if (frame_resource.instancingCount == 0)
+		{
+			rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), 1, 0, 0, 0);
+		}
+		else
+		{
+			//インスタンシング
+			rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), frame_resource.instancingCount, 0, 0, 0);
+		}
 	}
 }

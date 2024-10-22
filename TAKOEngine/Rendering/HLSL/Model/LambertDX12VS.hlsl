@@ -24,7 +24,7 @@ VS_OUT main(
 #endif
     
     VS_OUT vout;
-    vout.position = mul(float4(p, 1.0f), mul(world_transform, viewProjection));
+    vout.vertex = mul(float4(p, 1.0f), mul(world_transform, viewProjection));
 
     float3 N = normalize(n);
     float3 L = normalize(-lightDirection.xyz);
