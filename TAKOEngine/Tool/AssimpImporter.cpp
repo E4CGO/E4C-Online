@@ -6,52 +6,52 @@
 
 #include "TAKOEngine/Rendering/Misc.h"
 
-// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 AssimpImporter::AssimpImporter(const char* filename)
 	: filepath(filename)
 {
-	// Šg’£qæ“¾
+	// æ‹¡å¼µå­å–å¾—
 	std::string extension = filepath.extension().string();
-	std::transform(extension.begin(), extension.end(), extension.begin(), tolower);	// ¬•¶š‰»
+	std::transform(extension.begin(), extension.end(), extension.begin(), tolower);	// å°æ–‡å­—åŒ–
 
-	// FBXƒtƒ@ƒCƒ‹‚Ìê‡‚Í“Áê‚ÈƒCƒ“ƒ|[ƒgƒIƒvƒVƒ‡ƒ“İ’è‚ğ‚·‚é
+	// FBXãƒ•ã‚¡ã‚¤ãƒ«ã®å ´åˆã¯ç‰¹æ®Šãªã‚¤ãƒ³ãƒãƒ¼ãƒˆã‚ªãƒ—ã‚·ãƒ§ãƒ³è¨­å®šã‚’ã™ã‚‹
 	if (extension == ".fbx")
 	{
-		// $AssimpFBX$‚ª•t‰Á‚³‚ê‚½—]Œv‚Èƒm[ƒh‚ğì¬‚µ‚Ä‚µ‚Ü‚¤‚Ì‚ğ—}§‚·‚é
+		// $AssimpFBX$ãŒä»˜åŠ ã•ã‚ŒãŸä½™è¨ˆãªãƒãƒ¼ãƒ‰ã‚’ä½œæˆã—ã¦ã—ã¾ã†ã®ã‚’æŠ‘åˆ¶ã™ã‚‹
 		aImporter.SetPropertyInteger(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
 	}
 
-	// ƒCƒ“ƒ|[ƒg‚ÌƒIƒvƒVƒ‡ƒ“ƒtƒ‰ƒO
+	// ã‚¤ãƒ³ãƒãƒ¼ãƒˆæ™‚ã®ã‚ªãƒ—ã‚·ãƒ§ãƒ³ãƒ•ãƒ©ã‚°
 	uint32_t aFlags = 0
-		//| aiProcess_Triangulate							// ‘½ŠpŒ`‚ğOŠpŒ`‰»‚·‚é
-		| aiProcess_JoinIdenticalVertices				// d•¡’¸“_‚ğƒ}[ƒW‚·‚é
-		| aiProcess_PopulateArmatureData				// ƒ{[ƒ“‚ÌQÆƒf[ƒ^‚ğæ“¾‚Å‚«‚é‚æ‚¤‚É‚·‚é
+		//| aiProcess_Triangulate							// å¤šè§’å½¢ã‚’ä¸‰è§’å½¢åŒ–ã™ã‚‹
+		| aiProcess_JoinIdenticalVertices				// é‡è¤‡é ‚ç‚¹ã‚’ãƒãƒ¼ã‚¸ã™ã‚‹
+		| aiProcess_PopulateArmatureData				// ãƒœãƒ¼ãƒ³ã®å‚ç…§ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã§ãã‚‹ã‚ˆã†ã«ã™ã‚‹
 		//| aiProcess_OptimizeMeshes
 		//| aiProcess_OptimizeGraph
 		//| aiProcess_FixInfacingNormals
-		| aiProcess_CalcTangentSpace;					// Úü‚ğŒvZ‚·‚é
+		| aiProcess_CalcTangentSpace;					// æ¥ç·šã‚’è¨ˆç®—ã™ã‚‹
 
-	// ƒtƒ@ƒCƒ‹“Ç‚İ‚İ
+	// ãƒ•ã‚¡ã‚¤ãƒ«èª­ã¿è¾¼ã¿
 	aScene = aImporter.ReadFile(filename, aFlags);
 	_ASSERT_EXPR_A(aScene, aImporter.GetErrorString());
 }
 
-// ƒm[ƒhƒf[ƒ^‚ğ“Ç‚İ‚İ
+// ãƒãƒ¼ãƒ‰ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã¿
 void AssimpImporter::LoadNodes(NodeList& nodes)
 {
 	LoadNodes(nodes, aScene->mRootNode, -1);
 }
 
-// ƒƒbƒVƒ…ƒf[ƒ^‚ğ“Ç‚İ‚İ
+// ãƒ¡ãƒƒã‚·ãƒ¥ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã¿
 void AssimpImporter::LoadMeshes(MeshList& meshes, const NodeList& nodes)
 {
 	LoadMeshes(meshes, nodes, aScene->mRootNode);
 }
 
-// ƒ}ƒeƒŠƒAƒ‹ƒf[ƒ^‚ğ“Ç‚İ‚İ
+// ãƒãƒ†ãƒªã‚¢ãƒ«ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã¿
 void AssimpImporter::LoadMaterials(MaterialList& materials)
 {
-	// ƒfƒBƒŒƒNƒgƒŠƒpƒXæ“¾
+	// ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªãƒ‘ã‚¹å–å¾—
 	std::filesystem::path dirpath(filepath.parent_path());
 
 	materials.resize(aScene->mNumMaterials);
@@ -60,50 +60,50 @@ void AssimpImporter::LoadMaterials(MaterialList& materials)
 		const aiMaterial* aMaterial = aScene->mMaterials[aMaterialIndex];
 		ModelResource::Material& material = materials.at(aMaterialIndex);
 
-		// ƒ}ƒeƒŠƒAƒ‹–¼
+		// ãƒãƒ†ãƒªã‚¢ãƒ«å
 		aiString aMaterialName;
 		aMaterial->Get(AI_MATKEY_NAME, aMaterialName);
 		material.name = aMaterialName.C_Str();
 
-		// ƒfƒBƒtƒ…[ƒYF
+		// ãƒ‡ã‚£ãƒ•ãƒ¥ãƒ¼ã‚ºè‰²
 		aiColor3D aDiffuseColor;
 		if (AI_SUCCESS == aMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, aDiffuseColor))
 		{
 			material.color = aiColor3DToXMFLOAT4(aDiffuseColor);
 		}
 
-		// ƒeƒNƒXƒ`ƒƒ“Ç‚İ‚İŠÖ”
+		// ãƒ†ã‚¯ã‚¹ãƒãƒ£èª­ã¿è¾¼ã¿é–¢æ•°
 		auto loadTexture = [&](aiTextureType aTextureType, std::string& textureFilename)
 			{
-				// ƒeƒNƒXƒ`ƒƒƒtƒ@ƒCƒ‹ƒpƒXæ“¾
+				// ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹å–å¾—
 				aiString aTextureFilePath;
 				if (AI_SUCCESS == aMaterial->GetTexture(aTextureType, 0, &aTextureFilePath))
 				{
-					// –„‚ß‚İƒeƒNƒXƒ`ƒƒ‚©Šm”F
+					// åŸ‹ã‚è¾¼ã¿ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‹ç¢ºèª
 					const aiTexture* aTexture = aScene->GetEmbeddedTexture(aTextureFilePath.C_Str());
 					if (aTexture != nullptr)
 					{
-						// ƒeƒNƒXƒ`ƒƒƒtƒ@ƒCƒ‹ƒpƒXì¬
+						// ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ä½œæˆ
 						std::filesystem::path textureFilePath(aTextureFilePath.C_Str());
 						if (textureFilePath == "*0")
 						{
-							// ƒeƒNƒXƒ`ƒƒƒtƒ@ƒCƒ‹–¼‚ª‚È‚©‚Á‚½ê‡‚Íƒ}ƒeƒŠƒAƒ‹–¼‚ÆƒeƒNƒXƒ`ƒƒƒ^ƒCƒv‚©‚çì¬
+							// ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ•ã‚¡ã‚¤ãƒ«åãŒãªã‹ã£ãŸå ´åˆã¯ãƒãƒ†ãƒªã‚¢ãƒ«åã¨ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚¿ã‚¤ãƒ—ã‹ã‚‰ä½œæˆ
 							textureFilePath = material.name + "_" + aiTextureTypeToString(aTextureType) + "." + aTexture->achFormatHint;
 						}
 						textureFilePath = "Textures" / textureFilePath.filename();
 
-						// –„‚ß‚İƒeƒNƒXƒ`ƒƒ‚ğo—Í‚·‚éƒfƒBƒŒƒNƒgƒŠ‚ğŠm”F
+						// åŸ‹ã‚è¾¼ã¿ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’å‡ºåŠ›ã™ã‚‹ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’ç¢ºèª
 						std::filesystem::path outputDirPath(dirpath / textureFilePath.parent_path());
 						if (!std::filesystem::exists(outputDirPath))
 						{
-							// ‚È‚©‚Á‚½‚çƒfƒBƒŒƒNƒgƒŠì¬
+							// ãªã‹ã£ãŸã‚‰ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªä½œæˆ
 							std::filesystem::create_directories(outputDirPath);
 						}
-						// o—ÍƒfƒBƒŒƒNƒgƒŠ‚É‰æ‘œƒtƒ@ƒCƒ‹‚ğ•Û‘¶
+						// å‡ºåŠ›ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã«ç”»åƒãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä¿å­˜
 						std::filesystem::path outputFilePath(dirpath / textureFilePath);
 						if (!std::filesystem::exists(outputFilePath))
 						{
-							// mHeight‚ª0‚Ìê‡‚Í‰æ‘œ‚Ì¶ƒf[ƒ^‚È‚Ì‚Å‚»‚Ì‚Ü‚ÜƒoƒCƒiƒŠo—Í
+							// mHeightãŒ0ã®å ´åˆã¯ç”»åƒã®ç”Ÿãƒ‡ãƒ¼ã‚¿ãªã®ã§ãã®ã¾ã¾ãƒã‚¤ãƒŠãƒªå‡ºåŠ›
 							if (aTexture->mHeight == 0)
 							{
 								std::ofstream os(outputFilePath.string().c_str(), std::ios::binary);
@@ -111,7 +111,7 @@ void AssimpImporter::LoadMaterials(MaterialList& materials)
 							}
 							else
 							{
-								// ƒŠƒjƒA‚È‰æ‘œƒf[ƒ^‚Í.png‚Åo—Í
+								// ãƒªãƒ‹ã‚¢ãªç”»åƒãƒ‡ãƒ¼ã‚¿ã¯.pngã§å‡ºåŠ›
 								outputFilePath.replace_extension(".png");
 								stbi_write_png(
 									outputFilePath.string().c_str(),
@@ -121,41 +121,41 @@ void AssimpImporter::LoadMaterials(MaterialList& materials)
 									aTexture->pcData, 0);
 							}
 						}
-						// ƒeƒNƒXƒ`ƒƒƒtƒ@ƒCƒ‹ƒpƒX‚ğŠi”[
+						// ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ã‚’æ ¼ç´
 						textureFilename = textureFilePath.string();
 					}
 					else
 					{
-						// ƒeƒNƒXƒ`ƒƒƒtƒ@ƒCƒ‹ƒpƒX‚ğ‚»‚Ì‚Ü‚ÜŠi”[
+						// ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ã‚’ãã®ã¾ã¾æ ¼ç´
 						textureFilename = aTextureFilePath.C_Str();
 					}
 				}
 			};
 
-		// ƒfƒBƒtƒ…[ƒYƒ}ƒbƒv
+		// ãƒ‡ã‚£ãƒ•ãƒ¥ãƒ¼ã‚ºãƒãƒƒãƒ—
 		loadTexture(aiTextureType_DIFFUSE, material.diffuseTextureFileName);
 
-		// ƒm[ƒ}ƒ‹ƒ}ƒbƒv
+		// ãƒãƒ¼ãƒãƒ«ãƒãƒƒãƒ—
 		loadTexture(aiTextureType_NORMALS, material.normalTextureFileName);
 	}
 }
 
-// ƒm[ƒhƒf[ƒ^‚ğÄ‹A“Ç‚İ‚İ
+// ãƒãƒ¼ãƒ‰ãƒ‡ãƒ¼ã‚¿ã‚’å†å¸°èª­ã¿è¾¼ã¿
 void AssimpImporter::LoadNodes(NodeList& nodes, const aiNode* aNode, int parentIndex)
 {
-	// aiNode*‚©‚çModel::Node‚ÌƒCƒ“ƒfƒbƒNƒX‚ğæ“¾‚Å‚«‚é‚æ‚¤‚É‚·‚é
+	// aiNode*ã‹ã‚‰Model::Nodeã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’å–å¾—ã§ãã‚‹ã‚ˆã†ã«ã™ã‚‹
 	std::map<const aiNode*, int>::iterator it = nodeIndexMap.find(aNode);
 	if (it == nodeIndexMap.end())
 	{
 		nodeIndexMap[aNode] = static_cast<int>(nodes.size());
 	}
 
-	// ƒgƒ‰ƒ“ƒXƒtƒH[ƒ€ƒf[ƒ^æ‚èo‚µ
+	// ãƒˆãƒ©ãƒ³ã‚¹ãƒ•ã‚©ãƒ¼ãƒ ãƒ‡ãƒ¼ã‚¿å–ã‚Šå‡ºã—
 	aiVector3D aScale, aPosition;
 	aiQuaternion aRotation;
 	aNode->mTransformation.Decompose(aScale, aRotation, aPosition);
 
-	// ƒm[ƒhƒf[ƒ^Ši”[
+	// ãƒãƒ¼ãƒ‰ãƒ‡ãƒ¼ã‚¿æ ¼ç´
 	ModelResource::Node& node = nodes.emplace_back();
 	node.name = aNode->mName.C_Str();
 	node.parentIndex = parentIndex;
@@ -165,56 +165,56 @@ void AssimpImporter::LoadNodes(NodeList& nodes, const aiNode* aNode, int parentI
 
 	parentIndex = static_cast<int>(nodes.size() - 1);
 
-	// Ä‹A“I‚Éqƒm[ƒh‚ğˆ—‚·‚é
+	// å†å¸°çš„ã«å­ãƒãƒ¼ãƒ‰ã‚’å‡¦ç†ã™ã‚‹
 	for (uint32_t aNodeIndex = 0; aNodeIndex < aNode->mNumChildren; ++aNodeIndex)
 	{
 		LoadNodes(nodes, aNode->mChildren[aNodeIndex], parentIndex);
 	}
 }
 
-// ƒƒbƒVƒ…ƒf[ƒ^‚ğ“Ç‚İ‚İ
+// ãƒ¡ãƒƒã‚·ãƒ¥ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã¿
 void AssimpImporter::LoadMeshes(MeshList& meshes, const NodeList& nodes, const aiNode* aNode)
 {
-	// ƒƒbƒVƒ…ƒf[ƒ^“Ç‚İæ‚è
+	// ãƒ¡ãƒƒã‚·ãƒ¥ãƒ‡ãƒ¼ã‚¿èª­ã¿å–ã‚Š
 	for (uint32_t aMeshIndex = 0; aMeshIndex < aNode->mNumMeshes; ++aMeshIndex)
 	{
 		const aiMesh* aMesh = aScene->mMeshes[aNode->mMeshes[aMeshIndex]];
 
-		// ƒƒbƒVƒ…ƒf[ƒ^Ši”[
+		// ãƒ¡ãƒƒã‚·ãƒ¥ãƒ‡ãƒ¼ã‚¿æ ¼ç´
 		ModelResource::Mesh& mesh = meshes.emplace_back();
 		mesh.vertices.resize(aMesh->mNumVertices);
 		mesh.indices.resize(aMesh->mNumFaces * 3);
 		mesh.materialIndex = static_cast<int>(aMesh->mMaterialIndex);
 		mesh.nodeIndex = nodeIndexMap[aNode];
-		
-		// ’¸“_ƒf[ƒ^
+
+		// é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿
 		for (uint32_t aVertexIndex = 0; aVertexIndex < aMesh->mNumVertices; ++aVertexIndex)
 		{
 			ModelResource::Vertex& vertex = mesh.vertices.at(aVertexIndex);
-			// ˆÊ’u
+			// ä½ç½®
 			if (aMesh->HasPositions())
 			{
 				vertex.position = aiVector3DToXMFLOAT3(aMesh->mVertices[aVertexIndex]);
 			}
-			// ƒeƒNƒXƒ`ƒƒÀ•W
+			// ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 			if (aMesh->HasTextureCoords(0))
 			{
 				vertex.texcoord = aiVector3DToXMFLOAT2(aMesh->mTextureCoords[0][aVertexIndex]);
 				vertex.texcoord.y = 1.0f - vertex.texcoord.y;
 			}
-			// –@ü
+			// æ³•ç·š
 			if (aMesh->HasNormals())
 			{
 				vertex.normal = aiVector3DToXMFLOAT3(aMesh->mNormals[aVertexIndex]);
 			}
-			// Úü
+			// æ¥ç·š
 			if (aMesh->HasTangentsAndBitangents())
 			{
 				vertex.tangent = aiVector3DToXMFLOAT3(aMesh->mTangents[aVertexIndex]);
 			}
 		}
 
-		// ƒCƒ“ƒfƒbƒNƒXƒf[ƒ^
+    // ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒ‡ãƒ¼ã‚¿
 		int32_t indexOffset = mesh.indices.size();
 		for (uint32_t aFaceIndex = 0; aFaceIndex < aMesh->mNumFaces; ++aFaceIndex)
 		{
@@ -225,7 +225,7 @@ void AssimpImporter::LoadMeshes(MeshList& meshes, const NodeList& nodes, const a
 			mesh.indices[index + 2] = aFace.mIndices[0];
 		}
 
-		// ƒTƒuƒZƒbƒgƒf[ƒ^
+		// ï¿½Tï¿½uï¿½Zï¿½bï¿½gï¿½fï¿½[ï¿½^
 		ModelResource::Subset subset;
 		subset.startIndex = mesh.indices.size();
 		subset.indexCount = aMesh->mNumFaces * 3;
@@ -234,10 +234,10 @@ void AssimpImporter::LoadMeshes(MeshList& meshes, const NodeList& nodes, const a
 
 		mesh.subsets.push_back(subset);
 
-		// ƒXƒLƒjƒ“ƒOƒf[ƒ^
+		// ã‚¹ã‚­ãƒ‹ãƒ³ã‚°ãƒ‡ãƒ¼ã‚¿
 		if (aMesh->mNumBones > 0)
 		{
-			// ƒ{[ƒ“‰e‹¿—Íƒf[ƒ^
+			// ãƒœãƒ¼ãƒ³å½±éŸ¿åŠ›ãƒ‡ãƒ¼ã‚¿
 			struct BoneInfluence
 			{
 				uint32_t	indices[4] = { 0, 0, 0, 0 };
@@ -288,12 +288,12 @@ void AssimpImporter::LoadMeshes(MeshList& meshes, const NodeList& nodes, const a
 			std::vector<BoneInfluence> boneInfluences;
 			boneInfluences.resize(aMesh->mNumVertices);
 
-			// ƒƒbƒVƒ…‚É‰e‹¿‚·‚éƒ{[ƒ“ƒf[ƒ^‚ğûW‚·‚é
+			// ãƒ¡ãƒƒã‚·ãƒ¥ã«å½±éŸ¿ã™ã‚‹ãƒœãƒ¼ãƒ³ãƒ‡ãƒ¼ã‚¿ã‚’åé›†ã™ã‚‹
 			for (uint32_t aBoneIndex = 0; aBoneIndex < aMesh->mNumBones; ++aBoneIndex)
 			{
 				const aiBone* aBone = aMesh->mBones[aBoneIndex];
 
-				// ’¸“_‰e‹¿—Íƒf[ƒ^‚ğ’Šo
+				// é ‚ç‚¹å½±éŸ¿åŠ›ãƒ‡ãƒ¼ã‚¿ã‚’æŠ½å‡º
 				for (uint32_t aWightIndex = 0; aWightIndex < aBone->mNumWeights; ++aWightIndex)
 				{
 					const aiVertexWeight& aWeight = aBone->mWeights[aWightIndex];
@@ -301,7 +301,7 @@ void AssimpImporter::LoadMeshes(MeshList& meshes, const NodeList& nodes, const a
 					boneInfluence.Add(aBoneIndex, aWeight.mWeight);
 				}
 
-				// ƒ{[ƒ“ƒf[ƒ^æ“¾
+				// ãƒœãƒ¼ãƒ³ãƒ‡ãƒ¼ã‚¿å–å¾—
 				ModelResource::Bone& bone = mesh.bones.emplace_back();
 				bone.nodeIndex = nodeIndexMap[aBone->mNode];
 				bone.offsetTransform = aiMatrix4x4ToXMFLOAT4X4(aBone->mOffsetMatrix);
@@ -313,7 +313,7 @@ void AssimpImporter::LoadMeshes(MeshList& meshes, const NodeList& nodes, const a
 				boneInfluence.Normalize();
 			}
 
-			// ’¸“_‰e‹¿—Íƒf[ƒ^‚ğŠi”[
+			// é ‚ç‚¹å½±éŸ¿åŠ›ãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´
 			for (size_t vertexIndex = 0; vertexIndex < mesh.vertices.size(); ++vertexIndex)
 			{
 				ModelResource::Vertex& vertex = mesh.vertices.at(vertexIndex);
@@ -330,14 +330,14 @@ void AssimpImporter::LoadMeshes(MeshList& meshes, const NodeList& nodes, const a
 		}
 	}
 
-	// Ä‹A“I‚Éqƒm[ƒh‚ğˆ—‚·‚é
+	// å†å¸°çš„ã«å­ãƒãƒ¼ãƒ‰ã‚’å‡¦ç†ã™ã‚‹
 	for (uint32_t aNodeIndex = 0; aNodeIndex < aNode->mNumChildren; ++aNodeIndex)
 	{
 		LoadMeshes(meshes, nodes, aNode->mChildren[aNodeIndex]);
 	}
 }
 
-// ƒm[ƒhƒCƒ“ƒfƒbƒNƒXæ“¾
+// ãƒãƒ¼ãƒ‰ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹å–å¾—
 int AssimpImporter::GetNodeIndex(const NodeList& nodes, const char* name)
 {
 	int index = 0;
@@ -352,7 +352,7 @@ int AssimpImporter::GetNodeIndex(const NodeList& nodes, const char* name)
 	return -1;
 }
 
-// ƒAƒjƒ[ƒVƒ‡ƒ“ƒf[ƒ^‚ğ“Ç‚İ‚İ
+// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã¿
 void AssimpImporter::LoadAnimations(AnimationList& animations, const NodeList& nodes)
 {
 	for (uint32_t aAnimationIndex = 0; aAnimationIndex < aScene->mNumAnimations; ++aAnimationIndex)
@@ -360,11 +360,11 @@ void AssimpImporter::LoadAnimations(AnimationList& animations, const NodeList& n
 		const aiAnimation* aAnimation = aScene->mAnimations[aAnimationIndex];
 		ModelResource::Animation& animation = animations.emplace_back();
 
-		// ƒAƒjƒ[ƒVƒ‡ƒ“î•ñ
+		// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³æƒ…å ±
 		animation.name = aAnimation->mName.C_Str();
 		animation.secondsLength = static_cast<float>(aAnimation->mDuration / aAnimation->mTicksPerSecond);
 
-		// ƒm[ƒh–ˆ‚ÌƒAƒjƒ[ƒVƒ‡ƒ“
+		// ãƒãƒ¼ãƒ‰æ¯ã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³
 		animation.nodeAnims.resize(nodes.size());
 		for (uint32_t aChannelIndex = 0; aChannelIndex < aAnimation->mNumChannels; ++aChannelIndex)
 		{
@@ -375,43 +375,43 @@ void AssimpImporter::LoadAnimations(AnimationList& animations, const NodeList& n
 			const ModelResource::Node& node = nodes.at(nodeIndex);
 			ModelResource::NodeAnim& nodeAnim = animation.nodeAnims.at(nodeIndex);
 
-			// ˆÊ’u
+			// ä½ç½®
 			for (uint32_t aPositionIndex = 0; aPositionIndex < aNodeAnim->mNumPositionKeys; ++aPositionIndex)
 			{
 				const aiVectorKey& aKey = aNodeAnim->mPositionKeys[aPositionIndex];
-				// ‚È‚º‚©Unity‚Åo—Í‚µ‚½ƒAƒjƒ[ƒVƒ‡ƒ“ƒf[ƒ^‚É‚ÍƒSƒ~‚Æv‚í‚ê‚éƒL[ƒtƒŒ[ƒ€‚ª‘¶İ‚µ‚Ä‚¢‚éê‡‚ª‚ ‚éB
-				// ¬”“_‚ª‘¶İ‚·‚éƒtƒŒ[ƒ€iŠÔj‚ªƒSƒ~ƒf[ƒ^‚Á‚Û‚¢‚Ì‚ÅœŠO‚·‚éB
-				if (fabs(std::round(aKey.mTime) - aKey.mTime) > 0.001) continue;
+				// ãªãœã‹Unityã§å‡ºåŠ›ã—ãŸã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ãƒ‡ãƒ¼ã‚¿ã«ã¯ã‚´ãƒŸã¨æ€ã‚ã‚Œã‚‹ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ãŒå­˜åœ¨ã—ã¦ã„ã‚‹å ´åˆãŒã‚ã‚‹ã€‚
+				// å°æ•°ç‚¹ãŒå­˜åœ¨ã™ã‚‹ãƒ•ãƒ¬ãƒ¼ãƒ ï¼ˆæ™‚é–“ï¼‰ãŒã‚´ãƒŸãƒ‡ãƒ¼ã‚¿ã£ã½ã„ã®ã§é™¤å¤–ã™ã‚‹ã€‚
+				//if (fabs(std::round(aKey.mTime) - aKey.mTime) > 0.001) continue;
 				ModelResource::VectorKeyframe& keyframe = nodeAnim.positionKeyframes.emplace_back();
 				keyframe.seconds = static_cast<float>(aKey.mTime / aAnimation->mTicksPerSecond);
 				keyframe.value = aiVector3DToXMFLOAT3(aKey.mValue);
 			}
-			// ‰ñ“]
+			// å›è»¢
 			for (uint32_t aRotationIndex = 0; aRotationIndex < aNodeAnim->mNumRotationKeys; ++aRotationIndex)
 			{
 				const aiQuatKey& aKey = aNodeAnim->mRotationKeys[aRotationIndex];
-				// ‚È‚º‚©Unity‚Åo—Í‚µ‚½ƒAƒjƒ[ƒVƒ‡ƒ“ƒf[ƒ^‚É‚ÍƒSƒ~‚Æv‚í‚ê‚éƒL[ƒtƒŒ[ƒ€‚ª‘¶İ‚µ‚Ä‚¢‚éê‡‚ª‚ ‚éB
-				// ¬”“_‚ª‘¶İ‚·‚éƒtƒŒ[ƒ€iŠÔj‚ªƒSƒ~ƒf[ƒ^‚Á‚Û‚¢‚Ì‚ÅœŠO‚·‚éB
-				if (fabs(std::round(aKey.mTime) - aKey.mTime) > 0.001) continue;
+				// ãªãœã‹Unityã§å‡ºåŠ›ã—ãŸã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ãƒ‡ãƒ¼ã‚¿ã«ã¯ã‚´ãƒŸã¨æ€ã‚ã‚Œã‚‹ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ãŒå­˜åœ¨ã—ã¦ã„ã‚‹å ´åˆãŒã‚ã‚‹ã€‚
+				// å°æ•°ç‚¹ãŒå­˜åœ¨ã™ã‚‹ãƒ•ãƒ¬ãƒ¼ãƒ ï¼ˆæ™‚é–“ï¼‰ãŒã‚´ãƒŸãƒ‡ãƒ¼ã‚¿ã£ã½ã„ã®ã§é™¤å¤–ã™ã‚‹ã€‚
+				//if (fabs(std::round(aKey.mTime) - aKey.mTime) > 0.001) continue;
 				ModelResource::QuaternionKeyframe& keyframe = nodeAnim.rotationKeyframes.emplace_back();
 				keyframe.seconds = static_cast<float>(aKey.mTime / aAnimation->mTicksPerSecond);
 				keyframe.value = aiQuaternionToXMFLOAT4(aKey.mValue);
 			}
-			// ƒXƒP[ƒ‹
+			// ã‚¹ã‚±ãƒ¼ãƒ«
 			for (uint32_t aScalingIndex = 0; aScalingIndex < aNodeAnim->mNumScalingKeys; ++aScalingIndex)
 			{
 				const aiVectorKey& aKey = aNodeAnim->mScalingKeys[aScalingIndex];
-				// ‚È‚º‚©Unity‚Åo—Í‚µ‚½ƒAƒjƒ[ƒVƒ‡ƒ“ƒf[ƒ^‚É‚ÍƒSƒ~‚Æv‚í‚ê‚éƒL[ƒtƒŒ[ƒ€‚ª‘¶İ‚µ‚Ä‚¢‚éê‡‚ª‚ ‚éB
-				// ¬”“_‚ª‘¶İ‚·‚éƒtƒŒ[ƒ€iŠÔj‚ªƒSƒ~ƒf[ƒ^‚Á‚Û‚¢‚Ì‚ÅœŠO‚·‚éB
-				if (fabs(std::round(aKey.mTime) - aKey.mTime) > 0.001) continue;
+				// ãªãœã‹Unityã§å‡ºåŠ›ã—ãŸã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ãƒ‡ãƒ¼ã‚¿ã«ã¯ã‚´ãƒŸã¨æ€ã‚ã‚Œã‚‹ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ãŒå­˜åœ¨ã—ã¦ã„ã‚‹å ´åˆãŒã‚ã‚‹ã€‚
+				// å°æ•°ç‚¹ãŒå­˜åœ¨ã™ã‚‹ãƒ•ãƒ¬ãƒ¼ãƒ ï¼ˆæ™‚é–“ï¼‰ãŒã‚´ãƒŸãƒ‡ãƒ¼ã‚¿ã£ã½ã„ã®ã§é™¤å¤–ã™ã‚‹ã€‚
+				//if (fabs(std::round(aKey.mTime) - aKey.mTime) > 0.001) continue;
 				ModelResource::VectorKeyframe& keyframe = nodeAnim.scaleKeyframes.emplace_back();
 				keyframe.seconds = static_cast<float>(aKey.mTime / aAnimation->mTicksPerSecond);
 				keyframe.value = aiVector3DToXMFLOAT3(aKey.mValue);
 			}
 
-			// ‘S‚Ä‚ÌƒL[‚Ì’l‚ª‚Ù‚Ú“¯‚¶“à—e‚¾‚Á‚½ê‡‚Íí‚é
+			// å…¨ã¦ã®ã‚­ãƒ¼ã®å€¤ãŒã»ã¼åŒã˜å†…å®¹ã ã£ãŸå ´åˆã¯å‰Šã‚‹
 			DirectX::XMVECTOR Epsilon = DirectX::XMVectorReplicate(0.00001f);
-			// ˆÊ’u
+			// ä½ç½®
 			{
 				bool result = true;
 				DirectX::XMVECTOR A = DirectX::XMLoadFloat3(&nodeAnim.positionKeyframes.at(0).value);
@@ -429,7 +429,7 @@ void AssimpImporter::LoadAnimations(AnimationList& animations, const NodeList& n
 					nodeAnim.positionKeyframes.resize(1);
 				}
 			}
-			// ‰ñ“]
+			// å›è»¢
 			{
 				bool result = true;
 				DirectX::XMVECTOR A = DirectX::XMLoadFloat4(&nodeAnim.rotationKeyframes.at(0).value);
@@ -447,7 +447,7 @@ void AssimpImporter::LoadAnimations(AnimationList& animations, const NodeList& n
 					nodeAnim.rotationKeyframes.resize(1);
 				}
 			}
-			// ƒXƒP[ƒ‹
+			// ã‚¹ã‚±ãƒ¼ãƒ«
 			{
 				bool result = true;
 				DirectX::XMVECTOR A = DirectX::XMLoadFloat3(&nodeAnim.scaleKeyframes.at(0).value);
@@ -466,12 +466,12 @@ void AssimpImporter::LoadAnimations(AnimationList& animations, const NodeList& n
 				}
 			}
 		}
-		// ƒAƒjƒ[ƒVƒ‡ƒ“‚ª‚È‚©‚Á‚½ƒm[ƒh‚É‘Î‚µ‚Ä‰Šúp¨‚ÌƒL[ƒtƒŒ[ƒ€‚ğ’Ç‰Á‚·‚é
+		// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ãŒãªã‹ã£ãŸãƒãƒ¼ãƒ‰ã«å¯¾ã—ã¦åˆæœŸå§¿å‹¢ã®ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’è¿½åŠ ã™ã‚‹
 		for (size_t nodeIndex = 0; nodeIndex < animation.nodeAnims.size(); ++nodeIndex)
 		{
 			const ModelResource::Node& node = nodes.at(nodeIndex);
 			ModelResource::NodeAnim& nodeAnim = animation.nodeAnims.at(nodeIndex);
-			// ˆÚ“®
+			// ç§»å‹•
 			if (nodeAnim.positionKeyframes.size() == 0)
 			{
 				ModelResource::VectorKeyframe& keyframe = nodeAnim.positionKeyframes.emplace_back();
@@ -484,7 +484,7 @@ void AssimpImporter::LoadAnimations(AnimationList& animations, const NodeList& n
 				keyframe.seconds = animation.secondsLength;
 				keyframe.value = nodeAnim.positionKeyframes.at(0).value;
 			}
-			// ‰ñ“]
+			// å›è»¢
 			if (nodeAnim.rotationKeyframes.size() == 0)
 			{
 				ModelResource::QuaternionKeyframe& keyframe = nodeAnim.rotationKeyframes.emplace_back();
@@ -497,7 +497,7 @@ void AssimpImporter::LoadAnimations(AnimationList& animations, const NodeList& n
 				keyframe.seconds = animation.secondsLength;
 				keyframe.value = nodeAnim.rotationKeyframes.at(0).value;
 			}
-			// ƒXƒP[ƒ‹
+			// ã‚¹ã‚±ãƒ¼ãƒ«
 			if (nodeAnim.scaleKeyframes.size() == 0)
 			{
 				ModelResource::VectorKeyframe& keyframe = nodeAnim.scaleKeyframes.emplace_back();
@@ -514,7 +514,7 @@ void AssimpImporter::LoadAnimations(AnimationList& animations, const NodeList& n
 	}
 }
 
-// aiVector3D ¨ XMFLOAT2
+// aiVector3D â†’ XMFLOAT2
 DirectX::XMFLOAT2 AssimpImporter::aiVector3DToXMFLOAT2(const aiVector3D& aValue)
 {
 	return DirectX::XMFLOAT2(
@@ -523,7 +523,7 @@ DirectX::XMFLOAT2 AssimpImporter::aiVector3DToXMFLOAT2(const aiVector3D& aValue)
 	);
 }
 
-// aiVector3D ¨ XMFLOAT3
+// aiVector3D â†’ XMFLOAT3
 DirectX::XMFLOAT3 AssimpImporter::aiVector3DToXMFLOAT3(const aiVector3D& aValue)
 {
 	return DirectX::XMFLOAT3(
@@ -533,7 +533,7 @@ DirectX::XMFLOAT3 AssimpImporter::aiVector3DToXMFLOAT3(const aiVector3D& aValue)
 	);
 }
 
-// aiColor3D ¨ XMFLOAT4
+// aiColor3D â†’ XMFLOAT4
 DirectX::XMFLOAT4 AssimpImporter::aiColor3DToXMFLOAT4(const aiColor3D& aValue)
 {
 	return DirectX::XMFLOAT4(
@@ -544,7 +544,7 @@ DirectX::XMFLOAT4 AssimpImporter::aiColor3DToXMFLOAT4(const aiColor3D& aValue)
 	);
 }
 
-// aiQuaternion ¨ XMFLOAT4
+// aiQuaternion â†’ XMFLOAT4
 DirectX::XMFLOAT4 AssimpImporter::aiQuaternionToXMFLOAT4(const aiQuaternion& aValue)
 {
 	return DirectX::XMFLOAT4(
@@ -555,7 +555,7 @@ DirectX::XMFLOAT4 AssimpImporter::aiQuaternionToXMFLOAT4(const aiQuaternion& aVa
 	);
 }
 
-// aiMatrix4x4 ¨ XMFLOAT4X4
+// aiMatrix4x4 â†’ XMFLOAT4X4
 DirectX::XMFLOAT4X4 AssimpImporter::aiMatrix4x4ToXMFLOAT4X4(const aiMatrix4x4& aValue)
 {
 	return DirectX::XMFLOAT4X4(

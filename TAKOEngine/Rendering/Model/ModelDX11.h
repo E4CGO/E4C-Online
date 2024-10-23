@@ -45,6 +45,9 @@ public:
 	// アニメーション取得
 	int GetAnimationId() { return currentAnimationIndex; }
 
+	void CopyAnimations(iModel* model);
+	void CopyNodes(iModel* model);
+
 	int GetCurrentAnimationIndex() const { return  currentAnimationIndex; }
 
 	// 現在のアニメーション再生時間取得
