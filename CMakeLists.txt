@@ -504,6 +504,8 @@ set(TAKOEngine__Rendering__Shaders
     "TAKOEngine/Rendering/Shaders/SkydomeShader.h"
     "TAKOEngine/Rendering/Shaders/SpriteShader.cpp"
     "TAKOEngine/Rendering/Shaders/SpriteShader.h"
+    "TAKOEngine/Rendering/Shaders/SpriteShaderDX12.cpp"
+    "TAKOEngine/Rendering/Shaders/SpriteShaderDX12.h"
     "TAKOEngine/Rendering/Shaders/ToonShader.cpp"
     "TAKOEngine/Rendering/Shaders/ToonShader.h"
     "TAKOEngine/Rendering/Shaders/UVScrollShader.cpp"
