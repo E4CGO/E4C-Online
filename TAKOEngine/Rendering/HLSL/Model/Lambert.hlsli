@@ -1,3 +1,5 @@
+#include	"../Lighting/Light.hlsli"
+
 struct VS_IN
 {
     float4 position : POSITION;
@@ -31,6 +33,14 @@ cbuffer SCENE_CONSTANT_BUFFER : register(b1)
     row_major float4x4 view_projection;
     float4 light_direction;
     float4 camera_position;
+
+    //ライト情報
+    float4 ambientLightColor;
+    DirectionalLightData directionalLightData;
+    PointLightData pointLightData[PointLightMax];   // 点光源情報
+    SpotLightData spotLightData[SpotLightMax];      // スポットライト情報
+    int pointLightCount;                            // 点光源数
+    int spotLightCount;                             // スポットライト数
 }
 
 static const uint PRIMITIVE_MAX_JOINTS = 512;

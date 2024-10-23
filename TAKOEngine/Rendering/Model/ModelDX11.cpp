@@ -23,12 +23,12 @@ ModelDX11::ModelDX11(ID3D11Device* device, const char* filename, float scaling) 
 		auto&& src = resNodes.at(nodeIndex);
 		auto&& dst = nodes.at(nodeIndex);
 
-		dst.name     = src.name.c_str();
-		dst.scale    = src.scale;
+		dst.name = src.name.c_str();
+		dst.scale = src.scale;
 		dst.rotation = src.rotation;
 		dst.position = src.position;
 
-		dst.parent   = src.parentIndex >= 0 ? &nodes.at(src.parentIndex) : nullptr;
+		dst.parent = src.parentIndex >= 0 ? &nodes.at(src.parentIndex) : nullptr;
 		if (dst.parent != nullptr)
 		{
 			dst.parent->children.emplace_back(&dst);
@@ -42,7 +42,7 @@ ModelDX11::ModelDX11(ID3D11Device* device, const char* filename, float scaling) 
 	{
 		const ModelResource::Mesh& resMesh = resMeshes.at(meshIndex);
 		Mesh& mesh = m_meshes.at(meshIndex);
-		mesh.mesh  = &resMesh;
+		mesh.mesh = &resMesh;
 	}
 }
 
@@ -88,6 +88,16 @@ void ModelDX11::UpdateAnimation(float elapsedTime)
 {
 	ComputeAnimation(elapsedTime);
 	ComputeBlending(elapsedTime);
+}
+
+void ModelDX11::CopyAnimations(iModel* model)
+{
+	resource->SetAnimations(model->GetResource()->GetAnimations());
+}
+
+void ModelDX11::CopyNodes(iModel* model)
+{
+	resource->SetNodes(model->GetResource()->GetNodes());
 }
 
 void ModelDX11::ComputeAnimation(float elapsedTime)
@@ -292,5 +302,4 @@ ModelDX11::Node* ModelDX11::FindNode(const char* name)
 //デバッグ情報
 void ModelDX11::DrawDebugGUI()
 {
-
 }

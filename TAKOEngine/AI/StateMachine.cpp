@@ -1,5 +1,8 @@
 #include "Scene/SceneGame.h"
 #include "Scene/SceneTitle.h"
+#include "Scene/GameLoop/SceneTitle/SceneTitle_E4C.h"
+#include "Scene/GameLoop/SceneCharacter/SceneCharacter_E4C.h"
+#include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
 
 #include "TAKOEngine/AI/StateMachine.h"
 
@@ -15,13 +18,13 @@ StateMachine<T>::~StateMachine()
 	}
 	statePool.clear();
 }
-// XVˆ—
+// ï¿½Xï¿½Vï¿½ï¿½ï¿½ï¿½
 template <typename T>
 void StateMachine<T>::Update(float elapsedTime)
 {
 	currentState->Execute(elapsedTime);
 }
-// ƒXƒe[ƒgƒZƒbƒg
+// ï¿½Xï¿½eï¿½[ï¿½gï¿½Zï¿½bï¿½g
 template <typename T>
 void StateMachine<T>::SetState(int newState)
 {
@@ -29,25 +32,25 @@ void StateMachine<T>::SetState(int newState)
 	currentState = statePool[newState];
 	currentState->Enter();
 }
-// ƒXƒe[ƒg•ÏX
+// ï¿½Xï¿½eï¿½[ï¿½gï¿½ÏX
 template <typename T>
 void StateMachine<T>::ChangeState(int newState)
 {
 	if (statePool.find(newState) == statePool.end()) return;
-	// Œ»İ‚ÌƒXƒe[ƒg‚ÌExitŠÖ”‚ğÀsAV‚µ‚¢ƒXƒe[ƒg‚ğƒZƒbƒgAV‚µ‚¢ƒXƒe[ƒg‚ÌEnterŠÖ”‚ğŒÄ‚Ño‚·B
+	// ï¿½ï¿½ï¿½İ‚ÌƒXï¿½eï¿½[ï¿½gï¿½ï¿½Exitï¿½Öï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sï¿½Aï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½eï¿½[ï¿½gï¿½ï¿½ï¿½Zï¿½bï¿½gï¿½Aï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½eï¿½[ï¿½gï¿½ï¿½Enterï¿½Öï¿½ï¿½ï¿½ï¿½Ä‚Ñoï¿½ï¿½ï¿½B
 	currentState->Exit();
 
 	SetState(newState);
 }
-// ƒXƒe[ƒg“o˜^
+// ï¿½Xï¿½eï¿½[ï¿½gï¿½oï¿½^
 template <typename T>
 void StateMachine<T>::RegisterState(int id, HierarchicalState<T>* state)
 {
 	if (statePool.find(id) != statePool.end()) delete statePool[id];
-	// eƒXƒe[ƒg“o˜^
+	// ï¿½eï¿½Xï¿½eï¿½[ï¿½gï¿½oï¿½^
 	statePool[id] = state;
 }
-// ƒXƒe[ƒg”Ô†æ“¾
+// ï¿½Xï¿½eï¿½[ï¿½gï¿½Ôï¿½ï¿½æ“¾
 template <typename T>
 int StateMachine<T>::GetStateIndex()
 {
@@ -55,27 +58,27 @@ int StateMachine<T>::GetStateIndex()
 	{
 		if (state.second == currentState)
 		{
-			// i”Ô†–Ú‚ÌƒXƒe[ƒg‚ğƒŠƒ^[ƒ“
+			// iï¿½Ôï¿½ï¿½Ú‚ÌƒXï¿½eï¿½[ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½^ï¿½[ï¿½ï¿½
 			return state.first;
 		}
 	}
 
-	// ƒXƒe[ƒg‚ªŒ©‚Â‚©‚ç‚È‚©‚Á‚½
+	// ï¿½Xï¿½eï¿½[ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	return -1;
 }
 
-// ‚Q‘w–ÚƒXƒe[ƒg•ÏX
+// ï¿½Qï¿½wï¿½ÚƒXï¿½eï¿½[ï¿½gï¿½ÏX
 template <typename T>
 void StateMachine<T>::ChangeSubState(int newState)
 {
-	// HierarchicalStateƒNƒ‰ƒX‚ÌChangeSubState‚ğŒÄ‚Ño‚·
+	// HierarchicalStateï¿½Nï¿½ï¿½ï¿½Xï¿½ï¿½ChangeSubStateï¿½ï¿½ï¿½Ä‚Ñoï¿½ï¿½
 	currentState->ChangeSubState(newState);
 }
-// ‚Q‘w–ÚƒXƒe[ƒg“o˜^
+// ï¿½Qï¿½wï¿½ÚƒXï¿½eï¿½[ï¿½gï¿½oï¿½^
 template <typename T>
 void StateMachine<T>::RegisterSubState(int index, int subIndex, State<T>* subState)
 {
-	if (statePool.find(index) == statePool.end()) return; // ‘¶İ‚µ‚È‚¢
+	if (statePool.find(index) == statePool.end()) return; // ï¿½ï¿½ï¿½İ‚ï¿½ï¿½È‚ï¿½
 	statePool[index]->RegisterSubState(subIndex, subState);
 }
 
@@ -83,3 +86,6 @@ template class StateMachine<Player>;
 template class StateMachine<Enemy>;
 template class StateMachine<SceneTitle>;
 template class StateMachine<SceneGame>;
+template class StateMachine<SceneTitle_E4C>;
+template class StateMachine<SceneCharacter_E4C>;
+template class StateMachine<SceneGame_E4C>;

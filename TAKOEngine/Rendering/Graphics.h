@@ -25,6 +25,8 @@ enum class ModelShaderId
 	Toon,
 	Skydome,
 	ShadowMap,
+	Plane,
+	Portal,
 
 	EnumCount
 };

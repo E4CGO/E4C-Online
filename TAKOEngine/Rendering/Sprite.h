@@ -12,7 +12,7 @@ public:
 
 	const DirectX::XMFLOAT2 GetTextureSize() const { return textureSize; }
 
-	// ’¸“_ƒf[ƒ^
+	// é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿
 	struct Vertex
 	{
 		DirectX::XMFLOAT3 position;
@@ -20,7 +20,7 @@ public:
 		DirectX::XMFLOAT2 texcoord;
 	};
 
-	// ƒoƒbƒtƒ@XV
+	// ãƒãƒƒãƒ•ã‚¡æ›´æ–°
 	virtual void Update(
 		float dx, float dy,
 		float dw, float dh,
@@ -29,42 +29,42 @@ public:
 		float angle,
 		float r, float g, float b, float a) const;
 
-	// •`‰æÀs
+	// æç”»å®Ÿè¡Œ
 	void Render(
 		ID3D11DeviceContext* dc,
-		float dx, float dy,					// ˆÊ’u
-		float dz,							// šús
-		float dw, float dh,					// ƒTƒCƒY
-		float sx, float sy,					// ‰æ‘œØ‚è”²‚«ˆÊ’u
-		float sw, float sh,					// ‰æ‘œØ‚è”²‚«ƒTƒCƒY
-		float angle,						// Šp“x
-		float r, float g, float b, float a	// F
+		float dx, float dy,					// ä½ç½®
+		float dz,							// å¥§è¡Œ
+		float dw, float dh,					// ã‚µã‚¤ã‚º
+		float sx, float sy,					// ç”»åƒåˆ‡ã‚ŠæŠœãä½ç½®
+		float sw, float sh,					// ç”»åƒåˆ‡ã‚ŠæŠœãã‚µã‚¤ã‚º
+		float angle,						// è§’åº¦
+		float r, float g, float b, float a	// è‰²
 	) const;
 
-	// •`‰æÀs (ƒeƒNƒXƒ`ƒƒØ‚è”²‚«w’è‚È‚µ)
+	// æç”»å®Ÿè¡Œ (ãƒ†ã‚¯ã‚¹ãƒãƒ£åˆ‡ã‚ŠæŠœãæŒ‡å®šãªã—)
 	void Render(
 		ID3D11DeviceContext* dc,
-		float dx, float dy,					// ˆÊ’u
-		float dz,							// šús
-		float dw, float dh,					// ƒTƒCƒY
-		float angle,						// Šp“x
-		float r, float g, float b, float a	// F
+		float dx, float dy,					// ä½ç½®
+		float dz,							// å¥§è¡Œ
+		float dw, float dh,					// ã‚µã‚¤ã‚º
+		float angle,						// è§’åº¦
+		float r, float g, float b, float a	// è‰²
 	) const;
-	// •`‰æÀs (ƒeƒNƒXƒ`ƒƒØ‚è”²‚«w’è‚È‚µFŠp“xw’è‚È‚µ)
+	// æç”»å®Ÿè¡Œ (ãƒ†ã‚¯ã‚¹ãƒãƒ£åˆ‡ã‚ŠæŠœãæŒ‡å®šãªã—è‰²è§’åº¦æŒ‡å®šãªã—)
 	void Render(
 		ID3D11DeviceContext* dc,
-		float dx, float dy,					// ˆÊ’u
-		float dz,							// šús
-		float dw, float dh					// ƒTƒCƒY
+		float dx, float dy,					// ä½ç½®
+		float dz,							// å¥§è¡Œ
+		float dw, float dh					// ã‚µã‚¤ã‚º
 	) const;
 
-	// ƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[‚Ìİ’è
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼ã®è¨­å®š
 	void SetShaderResourceView(const Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& srv, int texWidth, int texHeight);
 
-	// ’¸“_ƒoƒbƒtƒ@‚Ìæ“¾
+	// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã®å–å¾—
 	const Microsoft::WRL::ComPtr<ID3D11Buffer>& GetVertexBuffer() const { return vertexBuffer; }
 
-	// ƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[‚Ìæ“¾
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼ã®å–å¾—
 	const Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& GetShaderResourceView() const { return shaderResourceView; }
 protected:
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
