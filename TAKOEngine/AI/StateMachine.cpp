@@ -7,6 +7,7 @@
 #include "TAKOEngine/AI/StateMachine.h"
 
 #include "GameObject/Character/Player/Player.h"
+#include "GameObject/Character/Player/CombinedPlayer.h"
 #include "GameObject/Character/Enemy/Enemy.h"
 
 template <typename T>
@@ -83,6 +84,7 @@ void StateMachine<T>::RegisterSubState(int index, int subIndex, State<T>* subSta
 }
 
 template class StateMachine<Player>;
+template class StateMachine<CombinedPlayer>;
 template class StateMachine<Enemy>;
 template class StateMachine<SceneTitle>;
 template class StateMachine<SceneGame>;

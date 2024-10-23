@@ -18,6 +18,17 @@ private:
 	~PlayerCharacterData() = default;
 public:
 
+	std::unordered_map<uint8_t, const char*> modelParts =
+	{
+		{ 0, "Data/Model/Character/BarbarianAnim.glb" },
+		{ 1, "Data/Model/Character/HEAD_BARB.glb" },
+		{ 2, "Data/Model/Character/BODY_BARB.glb" },
+		{ 3, "Data/Model/Character/WEAPON_BARB.glb" },
+		{ 4, "Data/Model/Character/HEAD_MAGE.glb" },
+		{ 5, "Data/Model/Character/BODY_MAGE.glb" },
+		{ 6, "Data/Model/Character/WEAPON_MAGE.glb" },
+	};
+
 	struct CharacterInfo
 	{
 		bool visible;
@@ -26,10 +37,10 @@ public:
 
 		struct Character
 		{
-			int genderType;
-			int headType;
-			int bodyType;
-			int weaponType;
+			uint8_t genderType;
+			uint8_t headType;
+			uint8_t bodyType;
+			uint8_t weaponType;
 
 			Character& operator=(const Character& other)
 			{

@@ -94,15 +94,18 @@ void SceneCharacter_E4C::Update(float elapsedTime)
 	{
 		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.bodyType != 0)
 		{
-			m_Characters_LEFT[0]->Update(elapsedTime);
+			if (m_Characters_LEFT[0] != nullptr)
+				m_Characters_LEFT[0]->Update(elapsedTime);
 		}
 		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.headType != 0)
 		{
-			m_Characters_LEFT[1]->Update(elapsedTime);
+			if (m_Characters_LEFT[1] != nullptr)
+				m_Characters_LEFT[1]->Update(elapsedTime);
 		}
 		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.weaponType != 0)
 		{
-			m_Characters_LEFT[2]->Update(elapsedTime);
+			if (m_Characters_LEFT[2] != nullptr)
+				m_Characters_LEFT[2]->Update(elapsedTime);
 		}
 	}
 
@@ -110,15 +113,18 @@ void SceneCharacter_E4C::Update(float elapsedTime)
 	{
 		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.bodyType != 0)
 		{
-			m_Characters_CENTER[0]->Update(elapsedTime);
+			if (m_Characters_CENTER[0] != nullptr)
+				m_Characters_CENTER[0]->Update(elapsedTime);
 		}
 		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.headType != 0)
 		{
-			m_Characters_CENTER[1]->Update(elapsedTime);
+			if (m_Characters_CENTER[1] != nullptr)
+				m_Characters_CENTER[1]->Update(elapsedTime);
 		}
 		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.weaponType != 0)
 		{
-			m_Characters_CENTER[2]->Update(elapsedTime);
+			if (m_Characters_CENTER[2] != nullptr)
+				m_Characters_CENTER[2]->Update(elapsedTime);
 		}
 	}
 
@@ -126,15 +132,18 @@ void SceneCharacter_E4C::Update(float elapsedTime)
 	{
 		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.bodyType != 0)
 		{
-			m_Characters_RIGHT[0]->Update(elapsedTime);
+			if (m_Characters_RIGHT[0] != nullptr)
+				m_Characters_RIGHT[0]->Update(elapsedTime);
 		}
 		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.headType != 0)
 		{
-			m_Characters_RIGHT[1]->Update(elapsedTime);
+			if (m_Characters_RIGHT[1] != nullptr)
+				m_Characters_RIGHT[1]->Update(elapsedTime);
 		}
 		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.weaponType != 0)
 		{
-			m_Characters_RIGHT[2]->Update(elapsedTime);
+			if (m_Characters_RIGHT[2] != nullptr)
+				m_Characters_RIGHT[2]->Update(elapsedTime);
 		}
 	}
 
@@ -172,15 +181,18 @@ void SceneCharacter_E4C::Render()
 	{
 		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.headType != 0)
 		{
-			m_Characters_LEFT[0]->Render(rc);
+			if (m_Characters_LEFT[0] != nullptr)
+				m_Characters_LEFT[0]->Render(rc);
 		}
 		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.bodyType != 0)
 		{
-			m_Characters_LEFT[1]->Render(rc);
+			if (m_Characters_LEFT[1] != nullptr)
+				m_Characters_LEFT[1]->Render(rc);
 		}
 		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.weaponType != 0)
 		{
-			m_Characters_LEFT[2]->Render(rc);
+			if (m_Characters_LEFT[2] != nullptr)
+				m_Characters_LEFT[2]->Render(rc);
 		}
 	}
 
@@ -188,15 +200,18 @@ void SceneCharacter_E4C::Render()
 	{
 		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.headType != 0)
 		{
-			m_Characters_CENTER[0]->Render(rc);
+			if (m_Characters_CENTER[0] != nullptr)
+				m_Characters_CENTER[0]->Render(rc);
 		}
 		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.bodyType != 0)
 		{
-			m_Characters_CENTER[1]->Render(rc);
+			if (m_Characters_CENTER[1] != nullptr)
+				m_Characters_CENTER[1]->Render(rc);
 		}
 		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.weaponType != 0)
 		{
-			m_Characters_CENTER[2]->Render(rc);
+			if (m_Characters_CENTER[2] != nullptr)
+				m_Characters_CENTER[2]->Render(rc);
 		}
 	}
 
@@ -204,15 +219,18 @@ void SceneCharacter_E4C::Render()
 	{
 		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.headType != 0)
 		{
-			m_Characters_RIGHT[0]->Render(rc);
+			if (m_Characters_RIGHT[0] != nullptr)
+				m_Characters_RIGHT[0]->Render(rc);
 		}
 		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.bodyType != 0)
 		{
-			m_Characters_RIGHT[1]->Render(rc);
+			if (m_Characters_RIGHT[1] != nullptr)
+				m_Characters_RIGHT[1]->Render(rc);
 		}
 		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.weaponType != 0)
 		{
-			m_Characters_RIGHT[2]->Render(rc);
+			if (m_Characters_RIGHT[2] != nullptr)
+				m_Characters_RIGHT[2]->Render(rc);
 		}
 	}
 
