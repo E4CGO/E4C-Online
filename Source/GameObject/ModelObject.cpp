@@ -10,15 +10,19 @@
 #include "TAKOEngine/Rendering/Model/NewModelDX11.h"
 #include "TAKOEngine/Rendering/Model/ModelDX12.h"
 
+ModelObject::ModelObject()
+{
+}
+
 ModelObject::ModelObject(const char* filename, float scaling, std::string renderMode)
 {
-	if(renderMode == "DX11")
-	model = std::make_unique<ModelDX11>(T_GRAPHICS.GetDevice(), filename, scaling);
+	if (renderMode == "DX11" && strlen(filename) != 0)
+		model = std::make_unique<ModelDX11>(T_GRAPHICS.GetDevice(), filename, scaling);
 
-	if(renderMode == "DX11GLTF")
-	//model = std::make_unique<gltf_model>(T_GRAPHICS.GetDevice(), filename);
+	if (renderMode == "DX11GLTF" && strlen(filename) != 0)
+		//model = std::make_unique<gltf_model>(T_GRAPHICS.GetDevice(), filename);
 
-	if(renderMode == "DX12");
+		if (renderMode == "DX12" && strlen(filename) != 0);
 }
 
 void ModelObject::SetShader(ModelShaderId id)
@@ -33,6 +37,8 @@ void ModelObject::SetAnimation(int index, bool loop, float blendSeconds)
 
 void ModelObject::Update(float elapsedTime)
 {
+	if (model == nullptr) return;
+
 	// 行列更新
 	UpdateTransform();
 
@@ -45,8 +51,10 @@ void ModelObject::Update(float elapsedTime)
 
 void ModelObject::Render(const RenderContext& rc)
 {
+	if (model == nullptr) return;
+
 	if (!visible) return;
-	
+
 	// 描画
 	ModelShader* shader = T_GRAPHICS.GetModelShader(shaderId);
 	shader->Begin(rc);
@@ -70,7 +78,7 @@ void ModelObject::SetCollider(Collider::COLLIDER_TYPE collider)
 	case Collider::COLLIDER_TYPE::BOUNDING_BOX:
 		this->collider = std::make_unique<BoundingBoxCollider>(model.get());
 		break;
-	case Collider::COLLIDER_TYPE ::MAP:
+	case Collider::COLLIDER_TYPE::MAP:
 		//this->collider = std::make_unique<ModelCollider>(model.get());
 		this->collider = std::make_unique<MapCollider>(model.get());
 		break;

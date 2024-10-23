@@ -10,6 +10,7 @@
 AssimpImporter::AssimpImporter(const char* filename)
 	: filepath(filename)
 {
+	if (strlen(filename) == 0) return;
 	// 拡張子取得
 	std::string extension = filepath.extension().string();
 	std::transform(extension.begin(), extension.end(), extension.begin(), tolower);	// 小文字化

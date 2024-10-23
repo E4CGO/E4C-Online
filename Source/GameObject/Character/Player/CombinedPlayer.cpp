@@ -9,7 +9,7 @@
 #include "TAKOEngine/Editor/Camera/Camera.h"
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 
-#include "GameObject/Character/Player/PlayerState.h"
+#include "GameObject/Character/Player/PlayerCombinedState.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 
 #include "Map\MapTileManager.h"
@@ -23,9 +23,37 @@ CombinedPlayer::CombinedPlayer(const char* filename, float scaling, PlayerCharac
 	jumpSpeed = 20.0f;
 	dodgeSpeed = 20.0f;
 
-	stateMachine = new StateMachine<Player>;
+	stateMachine = new StateMachine<CombinedPlayer>;
 	RegisterCommonState();
-	//stateMachine->SetState(static_cast<int>(State::Waiting));
+	stateMachine->SetState(static_cast<int>(State::Waiting));
+
+	mpCost[static_cast<int>(State::Dodge)] = 20.0f;
+
+	// 衝突判定
+	SetCollider(Collider::COLLIDER_TYPE::SPHERE);
+
+	m_CharacterParts.resize(3);
+
+	const char* head = PlayerCharacterData::Instance().modelParts.at(dataInfo.Character.headType);
+	const char* body = PlayerCharacterData::Instance().modelParts.at(dataInfo.Character.bodyType);
+	const char* weapon = PlayerCharacterData::Instance().modelParts.at(dataInfo.Character.weaponType);
+
+	m_CharacterParts[0] = std::make_unique<ModelObject>(head);
+	m_CharacterParts[1] = std::make_unique<ModelObject>(body);
+	m_CharacterParts[2] = std::make_unique<ModelObject>(weapon);
+}
+
+CombinedPlayer::CombinedPlayer(PlayerCharacterData::CharacterInfo dataInfo)
+	: Character("", 1.0f)
+{
+	moveSpeed = 10.0f;
+	turnSpeed = DirectX::XMConvertToRadians(720);
+	jumpSpeed = 20.0f;
+	dodgeSpeed = 20.0f;
+
+	stateMachine = new StateMachine<CombinedPlayer>;
+	RegisterCommonState();
+	stateMachine->SetState(static_cast<int>(State::Waiting));
 
 	mpCost[static_cast<int>(State::Dodge)] = 20.0f;
 
@@ -56,16 +84,16 @@ CombinedPlayer::~CombinedPlayer()
 
 void CombinedPlayer::RegisterCommonState()
 {
-	stateMachine->RegisterState(static_cast<int>(Player::State::Idle), new PlayerState::IdleState(dynamic_cast<Player*>(this)));
-	stateMachine->RegisterState(static_cast<int>(State::Move), new PlayerState::MoveState(dynamic_cast<Player*>(this)));
-	stateMachine->RegisterState(static_cast<int>(State::Jump), new PlayerState::JumpState(dynamic_cast<Player*>(this)));
-	stateMachine->RegisterState(static_cast<int>(State::Fall), new PlayerState::FallState(dynamic_cast<Player*>(this)));
-	stateMachine->RegisterState(static_cast<int>(State::Land), new PlayerState::LandState(dynamic_cast<Player*>(this)));
-	stateMachine->RegisterState(static_cast<int>(State::Dodge), new PlayerState::DodgeState(dynamic_cast<Player*>(this)));
-	stateMachine->RegisterState(static_cast<int>(State::Hurt), new PlayerState::HurtState(dynamic_cast<Player*>(this)));
-	stateMachine->RegisterState(static_cast<int>(State::Death), new PlayerState::DeathState(dynamic_cast<Player*>(this)));
-	stateMachine->RegisterState(static_cast<int>(State::Waiting), new PlayerState::WaitState(dynamic_cast<Player*>(this)));
-	stateMachine->RegisterState(static_cast<int>(State::Ready), new PlayerState::ReadyState(dynamic_cast<Player*>(this)));
+	stateMachine->RegisterState(static_cast<int>(CombinedPlayer::State::Idle), new PlayerCombinedState::IdleState(this));
+	stateMachine->RegisterState(static_cast<int>(CombinedPlayer::State::Move), new PlayerCombinedState::MoveState(this));
+	stateMachine->RegisterState(static_cast<int>(CombinedPlayer::State::Jump), new PlayerCombinedState::JumpState(this));
+	stateMachine->RegisterState(static_cast<int>(CombinedPlayer::State::Fall), new PlayerCombinedState::FallState(this));
+	stateMachine->RegisterState(static_cast<int>(CombinedPlayer::State::Land), new PlayerCombinedState::LandState(this));
+	stateMachine->RegisterState(static_cast<int>(CombinedPlayer::State::Dodge), new PlayerCombinedState::DodgeState(this));
+	stateMachine->RegisterState(static_cast<int>(CombinedPlayer::State::Hurt), new PlayerCombinedState::HurtState(this));
+	stateMachine->RegisterState(static_cast<int>(CombinedPlayer::State::Death), new PlayerCombinedState::DeathState(this));
+	stateMachine->RegisterState(static_cast<int>(CombinedPlayer::State::Waiting), new PlayerCombinedState::WaitState(this));
+	stateMachine->RegisterState(static_cast<int>(CombinedPlayer::State::Ready), new PlayerCombinedState::ReadyState(this));
 }
 
 void CombinedPlayer::UpdateTarget()
@@ -320,7 +348,7 @@ void CombinedPlayer::Update(float elapsedTime)
 	}
 	{
 		ProfileScopedSection_2("stateMachine", ImGuiControl::Profiler::Blue);
-		//stateMachine->Update(elapsedTime);
+		stateMachine->Update(elapsedTime);
 	}
 	{
 		ProfileScopedSection_2("SkillTimers", ImGuiControl::Profiler::Green);
@@ -333,7 +361,7 @@ void CombinedPlayer::Update(float elapsedTime)
 
 	for (auto& it : m_CharacterParts)
 	{
-		it->Update(elapsedTime);
+		if (it != nullptr) it->Update(elapsedTime);
 	}
 }
 
@@ -362,7 +390,7 @@ void CombinedPlayer::Render(const RenderContext& rc)
 
 	for (auto& it : m_CharacterParts)
 	{
-		it->Render(rc);
+		if (it != nullptr)	it->Render(rc);
 	}
 
 #ifdef _DEBUG
@@ -458,6 +486,31 @@ void CombinedPlayer::TurnByInput()
 {
 	if (!IsPlayer()) return;
 	Turn(T_TIMER.Delta(), inputDirection.x, inputDirection.y, turnSpeed);
+}
+
+void CombinedPlayer::SetAnimations(int index, bool loop, float blendSeconds)
+{
+	for (auto& it : m_CharacterParts)
+	{
+		if (it != nullptr) it->SetAnimation(index, loop, blendSeconds);
+	}
+}
+
+void CombinedPlayer::PlayAnimations(int index, bool loop, float blendSeconds)
+{
+	for (auto& it : m_CharacterParts)
+	{
+		if (it != nullptr) it->GetModel()->PlayAnimation(index, loop, blendSeconds);
+	}
+}
+
+bool CombinedPlayer::IsPlayAnimations()
+{
+	for (auto& it : m_CharacterParts)
+	{
+		if (it != nullptr) return it->GetModel()->IsPlayAnimation();
+	}
+	return false;
 }
 
 void CombinedPlayer::RecoverMp(float elapsedTime)

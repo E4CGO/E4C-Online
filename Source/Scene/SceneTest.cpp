@@ -4,7 +4,7 @@
 
 void SceneTest::Initialize()
 {
-	stage = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 1);
+	stage = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.1);
 	stage->Update(0);
 	MAPTILES.Register(stage);
 
@@ -14,8 +14,9 @@ void SceneTest::Initialize()
 		{0 , 1, 2, 3 }
 	};
 
-	newPlayer = std::make_unique<CombinedPlayer>("Data/Model/Character/BarbarianAnim.glb", 1.0f, charInfo);
-	//newPlayer->GetStateMachine()->ChangeState(static_cast<int>(Player::State::Idle));
+	newPlayer = std::make_unique<CombinedPlayer>(charInfo);
+	newPlayer->SetPosition({ 5, 20, 5 });
+	newPlayer->GetStateMachine()->ChangeState(static_cast<int>(CombinedPlayer::State::Idle));
 
 	//player = std::make_unique<Player>("Data/Model/Character/Barbarian.glb", 1.0f);
 	//player->SetPosition({ 5, 50, 5 });
@@ -53,7 +54,7 @@ void SceneTest::Initialize()
 	cameraController->SyncCameraToController(camera);
 	//cameraController->SetEnable(false);
 	cameraController->SetEnable(true);
-	cameraController->SetPlayer(player.get());
+	cameraController->SetPlayer(newPlayer.get());
 }
 
 void SceneTest::Finalize()

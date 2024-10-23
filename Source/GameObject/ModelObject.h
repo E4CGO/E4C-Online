@@ -9,6 +9,7 @@
 class ModelObject : public GameObject
 {
 public:
+	ModelObject();
 	ModelObject(const char* filename, float scaling = 1.0f, std::string renderMode = "DX11");
 	virtual ~ModelObject() = default;
 

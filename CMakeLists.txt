@@ -240,6 +240,8 @@ set(Source__GameObject__Character__Player
     "Source/GameObject/Character/Player/Mage.h"
     "Source/GameObject/Character/Player/Player.cpp"
     "Source/GameObject/Character/Player/Player.h"
+    "Source/GameObject/Character/Player/PlayerCombinedState.cpp"
+    "Source/GameObject/Character/Player/PlayerCombinedState.h"
     "Source/GameObject/Character/Player/PlayerManager.cpp"
     "Source/GameObject/Character/Player/PlayerManager.h"
     "Source/GameObject/Character/Player/PlayerState.cpp"

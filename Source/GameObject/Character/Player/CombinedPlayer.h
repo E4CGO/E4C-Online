@@ -16,6 +16,7 @@ class CombinedPlayer : public Character
 {
 public:
 	CombinedPlayer(const char* filename, float scaling = 1.0f, PlayerCharacterData::CharacterInfo dataInfo = { 0, "", {0, 0, 0, 0} });
+	CombinedPlayer(PlayerCharacterData::CharacterInfo dataInfo = { 0, "", {0, 0, 0, 0} });
 	~CombinedPlayer();
 
 	virtual void Update(float elapsedTime) override;
@@ -59,6 +60,11 @@ public:
 	void SetTurnSpeed(float turnSpeed) { this->turnSpeed = turnSpeed; }
 
 	void SetName(const char* name) { strcpy_s(this->name, 64, name); };
+	void SetAnimations(int index, bool loop, float blendSeconds);
+
+	void PlayAnimations(int index, bool loop, float blendSeconds);
+
+	bool IsPlayAnimations();
 
 	// MP管理
 	void RecoverMp(float elapsedTime);
@@ -89,7 +95,7 @@ public:
 	//virtual DirectX::XMFLOAT3 GetShotAngle() { return angle; }
 
 	int GetState() { return stateMachine->GetStateIndex(); }
-	StateMachine<Player>* GetStateMachine() { return stateMachine; }
+	StateMachine<CombinedPlayer>* GetStateMachine() { return stateMachine; }
 
 	Collider* GetAttackCollider(int idx) { return attackColliders[idx]; }
 	std::unordered_map<int, Collider*> GetAttackColliders() { return attackColliders; }
@@ -263,7 +269,7 @@ protected:
 		{ 0.7f, 0.7f, 1.0f, 1.0f }, // BLUE
 	};
 
-	StateMachine<Player>* stateMachine;
+	StateMachine<CombinedPlayer>* stateMachine;
 
 	std::unordered_map<int, Collider*> attackColliders; // 攻撃判定
 
