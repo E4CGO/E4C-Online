@@ -43,7 +43,7 @@ private:
 class ToonShaderDX12 : public ModelShaderDX12
 {
 public:
-	ToonShaderDX12(ID3D12Device* device);
+	ToonShaderDX12(ID3D12Device* device, bool instancing = false); 
 	~ToonShaderDX12() override;
 
 	void Render(const RenderContextDX12& rc, ModelDX12* model) override;

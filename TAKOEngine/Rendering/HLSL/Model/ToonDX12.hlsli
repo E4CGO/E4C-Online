@@ -1,4 +1,5 @@
-#include	"../Lighting/Light.hlsli"
+#include "../Lighting/Light.hlsli"
+#include "Constants.hlsli"
 
 struct VS_OUT
 {
@@ -28,7 +29,8 @@ cbuffer CbScene : register(b0)
 cbuffer CbMesh : register(b1)
 {
     row_major float4x4 world_transform;
-    row_major float4x4 boneTransforms[255];
+    row_major float4x4 boneTransforms[MAX_BONES];
+    row_major float4x4 instancingTransform[MAX_INSTANCES];
 };
 
 cbuffer CbMaterial : register(b2)
