@@ -3,8 +3,11 @@
 #include "TAKOEngine/Rendering/ResourceManager.h"
 #include "TAKOEngine/GUI/UIManager.h"
 
+#include "TAKOEngine/Sound/Sound.h"
+
 #include <imgui.h>
 #include <string>
+#include <fstream>
 
 #include "Scene/SceneManager.h"
 #include "SceneTitle_E4C.h"
@@ -61,6 +64,10 @@ void SceneTitle_E4C::Initialize()
 	stateMachine->RegisterState(STATE::START, new SceneTitle_E4CState::StartState(this));
 	stateMachine->RegisterState(STATE::EXIT, new SceneTitle_E4CState::ExitState(this));
 	stateMachine->SetState(STATE::INIT);
+
+	Sound::Instance().InitAudio();
+	Sound::Instance().LoadAudio("Data/Sound/TitleTheme.mp3");
+	Sound::Instance().PlayAudio(0);
 }
 
 void SceneTitle_E4C::Finalize()
@@ -68,6 +75,7 @@ void SceneTitle_E4C::Finalize()
 	spritePreLoad.clear();
 	UI.Clear();
 	shadowMapRenderer->Clear();
+	Sound::Instance().StopAudio(0);
 }
 
 // 更新処理
