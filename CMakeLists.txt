@@ -456,6 +456,8 @@ source_group("TAKOEngine\\Runtime" FILES ${TAKOEngine__Runtime})
 set(TAKOEngine__Sound
     "TAKOEngine/Sound/Audio.cpp"
     "TAKOEngine/Sound/Audio.h"
+    "TAKOEngine/Sound/Sound.cpp"
+    "TAKOEngine/Sound/Sound.h"
 )
 source_group("TAKOEngine\\Sound" FILES ${TAKOEngine__Sound})
 
@@ -930,6 +932,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/External/Effekseer170e/include/Effekseer"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/openssl/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/tinygltf"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/OpenAL/include"
 )
 
 # ###############################################################################
@@ -1138,6 +1141,7 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "Crypt32"
     "libssl"
     "libcrypto"
+    "OpenAL32"
     ">"
     "$<$<CONFIG:Release>:"
     "SDL2"
@@ -1163,6 +1167,7 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "Crypt32"
     "libssl"
     "libcrypto"
+    "OpenAL32"
     ">"
     "kernel32"
     "user32"
@@ -1188,6 +1193,7 @@ target_link_directories(${PROJECT_NAME} PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtk/native/lib/x64/$<CONFIG>"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtex/native/lib/x64/$<CONFIG>"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/OpenAL/libs/Win64/"
     ">"
     "$<$<CONFIG:Release>:"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/nlohmann"
@@ -1199,5 +1205,6 @@ target_link_directories(${PROJECT_NAME} PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtk/native/lib/x64/$<CONFIG>"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/lib/x64"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/OpenAL/libs/Win64"
     ">"
 )

@@ -7,6 +7,9 @@
 #include "TAKOEngine/Tool/ImGuiRenderer.h"
 #include "TAKOEngine/Effects/EffectManager.h"
 
+#define MINIMP3_IMPLEMENTATION
+#include "TAKOEngine/Sound/Sound.h"
+
 #include "Scene/SceneGame.h"
 #include "Scene/SceneTitle.h"
 #include "Scene/SceneManager.h"
@@ -71,6 +74,8 @@ Framework::~Framework()
 	}
 
 	Network::Finalize();
+
+	Sound::Instance().Finalize();
 }
 
 // 更新処理
