@@ -13,6 +13,7 @@
 #include "TAKOEngine/Rendering/Shaders/ModelShader.h"
 #include "TAKOEngine/Rendering/Shaders/ModelShaderDX12.h"
 #include "TAKOEngine/Rendering/Shaders/SpriteShader.h"
+#include "TAKOEngine/Rendering/Shaders/SpriteShaderDX12.h"
 #include "TAKOEngine/Rendering/DebugRenderer.h"
 #include "TAKOEngine/Rendering/LineRenderer.h"
 #include "TAKOEngine/Rendering/Descriptor.h"
@@ -53,6 +54,14 @@ enum class SpriteShaderId
 	LuminanceExtraction,
 	Finalpass,
 	Deferred,
+
+	EnumCount
+};
+
+enum class SpriteShaderDX12Id
+{
+	Default,
+	LuminanceExtraction,
 
 	EnumCount
 };
@@ -131,6 +140,8 @@ public:
 	ModelShaderDX12* GetModelShaderDX12(ModelShaderDX12Id shaderId) { return dx12_modelshaders[static_cast<int>(shaderId)].get(); }
 	// スプライトシェーダー取得
 	SpriteShader* GetSpriteShader(SpriteShaderId shaderId) { return spriteShaders[static_cast<int>(shaderId)].get(); }
+	// DX12のスプライトシェーダー取得
+	SpriteShaderDX12* GetSpriteShaderDX12(SpriteShaderDX12Id shaderId) { return dx12_spriteShaders[static_cast<int>(shaderId)].get(); }
 	// デバッグレンダラ取得
 	DebugRenderer* GetDebugRenderer() const { return debugRenderer.get(); }
 	// ラインレンダラ取得
@@ -219,6 +230,7 @@ private:
 	std::unique_ptr<ModelShader> modelShaders[static_cast<int>(ModelShaderId::EnumCount)];
 	std::unique_ptr<ModelShaderDX12> dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::EnumCount)];
 	std::unique_ptr<SpriteShader> spriteShaders[static_cast<int>(SpriteShaderId::EnumCount)];
+	std::unique_ptr<SpriteShaderDX12> dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::EnumCount)];
 
 	std::unique_ptr<DebugRenderer>					debugRenderer;
 	std::unique_ptr<LineRenderer>					lineRenderer;

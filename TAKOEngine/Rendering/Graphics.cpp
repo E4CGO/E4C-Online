@@ -589,7 +589,6 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	modelShaders[static_cast<int>(ModelShaderId::Portal)] = std::make_unique<PortalShader>(device.Get(), "Data/Shader/PortalVS.cso", "Data/Shader/PortalPS.cso");
 
 	// DX12のモデルシェーダー生成
-
 	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Lambert)]           = std::make_unique<LambertShader>(m_d3d_device.Get());
 	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::LambertInstancing)] = std::make_unique<LambertShader>(m_d3d_device.Get(), true);
 	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Phong)]             = std::make_unique<PhongShaderDX12>(m_d3d_device.Get());
@@ -606,6 +605,10 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	spriteShaders[static_cast<int>(SpriteShaderId::LuminanceExtraction)] = std::make_unique<LuminanceExtractionShader>(device.Get());
 	spriteShaders[static_cast<int>(SpriteShaderId::Finalpass)] = std::make_unique<FinalpassShader>(device.Get());
 	spriteShaders[static_cast<int>(SpriteShaderId::Deferred)] = std::make_unique<DeferredLightingShader>(device.Get());
+
+	// DX12のスプライトシェーダー生成
+	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::Default)]             = std::make_unique<DefaultSpriteShaderDX12>(m_d3d_device.Get());
+	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::LuminanceExtraction)] = std::make_unique<LuminanceExtractionShaderDX12>(m_d3d_device.Get());
 
 	// レンダラ
 	debugRenderer = std::make_unique<DebugRenderer>(device.Get());

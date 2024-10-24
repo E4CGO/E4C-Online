@@ -246,7 +246,7 @@ void SceneCharacter_E4C::RenderDX12()
 		// スプライト描画
 		if (m_sprites[0] != nullptr)
 		{
-			m_sprites[0]->Begin(d3d_command_list);
+			m_sprites[0]->Begin(rc);
 			m_sprites[0]->Draw(0, 0, 100, 100, 0, 1, 1, 1, 1);
 			m_sprites[0]->End(d3d_command_list);
 		}

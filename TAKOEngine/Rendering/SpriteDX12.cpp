@@ -273,6 +273,55 @@ SpriteDX12::SpriteDX12(UINT sprite_count, const char* filename)
 			frame_resource.d3d_vb_resource->Map(0, nullptr, reinterpret_cast<void**>(&frame_resource.vertex_data));
 		}
 
+		// コンスタントバッファ生成
+		{
+			// ヒーププロパティの設定
+			D3D12_HEAP_PROPERTIES d3d_head_props{};
+			d3d_head_props.Type = D3D12_HEAP_TYPE_UPLOAD;
+			d3d_head_props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+			d3d_head_props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+			d3d_head_props.CreationNodeMask = 1;
+			d3d_head_props.VisibleNodeMask = 1;
+
+			// リソースの設定
+			D3D12_RESOURCE_DESC d3d_resource_desc{};
+			d3d_resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+			d3d_resource_desc.Alignment = 0;
+			d3d_resource_desc.Width = ((sizeof(CbSpriteData)) + 255) & ~255;
+			d3d_resource_desc.Height = 1;
+			d3d_resource_desc.DepthOrArraySize = 1;
+			d3d_resource_desc.MipLevels = 1;
+			d3d_resource_desc.Format = DXGI_FORMAT_UNKNOWN;
+			d3d_resource_desc.SampleDesc.Count = 1;
+			d3d_resource_desc.SampleDesc.Quality = 0;
+			d3d_resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+			d3d_resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+			// リソース生成
+			hr = d3d_device->CreateCommittedResource(
+				&d3d_head_props,
+				D3D12_HEAP_FLAG_NONE,
+				&d3d_resource_desc,
+				D3D12_RESOURCE_STATE_GENERIC_READ,
+				nullptr,
+				IID_PPV_ARGS(frame_resource.d3d_cbv_resource.GetAddressOf()));
+				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+				frame_resource.d3d_cbv_resource->SetName(L"SpriteSceneConstatBuffer");
+
+			// ディスクリプタ取得
+			frame_resource.cbv_descriptor = Graphics::Instance().GetShaderResourceDescriptorHeap()->PopDescriptor();
+
+			// コンスタントバッファビューの生成
+			D3D12_CONSTANT_BUFFER_VIEW_DESC d3d_cbv_desc;
+			d3d_cbv_desc.BufferLocation = frame_resource.d3d_cbv_resource->GetGPUVirtualAddress();
+			d3d_cbv_desc.SizeInBytes = static_cast<UINT>(d3d_resource_desc.Width);
+			d3d_device->CreateConstantBufferView(
+				&d3d_cbv_desc,
+				frame_resource.cbv_descriptor->GetCpuHandle());
+
+			hr = frame_resource.d3d_cbv_resource->Map(0, nullptr, reinterpret_cast<void**>(&frame_resource.cb_scene_data));
+		}
+
 		// インデックスバッファの生成
 		{
 			// ヒーププロパティの設定
@@ -350,6 +399,14 @@ SpriteDX12::~SpriteDX12()
 		{
 			frame_resource.d3d_vb_resource->Unmap(0, nullptr);
 		}
+		if (frame_resource.cb_scene_data != nullptr)
+		{
+			frame_resource.d3d_cbv_resource->Unmap(0, nullptr);
+		}
+		if (frame_resource.cbv_descriptor != nullptr)
+		{
+			Graphics::Instance().GetShaderResourceDescriptorHeap()->PushDescriptor(frame_resource.cbv_descriptor);
+		}
 	}
 
 	if (m_srv_descriptor != nullptr)
@@ -363,9 +420,16 @@ SpriteDX12::~SpriteDX12()
 		@param[in]	d3d_command_list	コマンドリスト
 		@return		なし
 *//***************************************************************************/
-void SpriteDX12::Begin(ID3D12GraphicsCommandList* d3d_command_list)
+void SpriteDX12::Begin(const RenderContextDX12& rc)
 {
+	Graphics& graphics = Graphics::Instance();
+
 	m_sprite_index = 0;
+
+	FrameResource& fram_resource = m_frame_resources.at(graphics.GetCurrentBufferIndex());
+
+	fram_resource.cb_scene_data->threshold = rc.luminanceExtractionData.threshold;
+	fram_resource.cb_scene_data->intensity = rc.luminanceExtractionData.intensity;
 }
 
 /**************************************************************************//**
@@ -391,8 +455,7 @@ void SpriteDX12::Draw(
 		dx, dy, dw, dh,
 		0, 0, static_cast<float>(m_texture_width), static_cast<float>(m_texture_height),
 		angle,
-		r, g, b, a
-	);
+		r, g, b, a);
 }
 
 /**************************************************************************//**

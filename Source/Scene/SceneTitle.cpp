@@ -263,11 +263,12 @@ void SceneTitle::RenderDX12()
 		}
 
 		// スプライト描画
+		SpriteShaderDX12* sprite = TentacleLib::graphics.GetSpriteShaderDX12(SpriteShaderDX12Id::LuminanceExtraction);
 		if (m_sprites[0] != nullptr)
 		{
-			m_sprites[0]->Begin(d3d_command_list);
+			m_sprites[0]->Begin(rc);
 			m_sprites[0]->Draw(0, 0, 100, 100, 0, 1, 1, 1, 1);
-			m_sprites[0]->End(d3d_command_list);
+			sprite->Render(rc, m_sprites[0].get());
 		}
 
 		//EFFECTS.GetEffect(EffectManager::EFFECT_IDX::BOMB_EFFECT)->PlayDX12(DirectX::XMFLOAT3(0.f, 0.f, 0.f), 5.0f);

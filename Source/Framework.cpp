@@ -51,7 +51,8 @@ Framework::Framework(HWND hWnd)
 	}
 
 	// シーン初期化
-	SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTitle_E4C));
+	//SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTitle_E4C));
+	SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTitle));
 }
 
 // デストラクタ

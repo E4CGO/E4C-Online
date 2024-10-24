@@ -40,7 +40,8 @@ void PhongShader::SetShaderResourceView(const ModelResource::Mesh& mesh, ID3D11D
 
 //***********************************************************
 // @brief       コンストラクタ
-// @param[in]   なし
+// @param[in]   device　    ID3D12Device*
+// @param[in]   instancing インスタンシング　ture : あり, false : なし
 // @return      なし
 //***********************************************************
 PhongShaderDX12::PhongShaderDX12(ID3D12Device* device, bool instancing)

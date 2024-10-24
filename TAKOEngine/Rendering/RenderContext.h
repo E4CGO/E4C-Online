@@ -199,7 +199,9 @@ struct RenderContextDX12
 	ID3D12GraphicsCommandList* d3d_command_list = nullptr;
 	const Descriptor* scene_cbv_descriptor = nullptr;
 
-	DirectX::XMFLOAT4X4			view;
-	DirectX::XMFLOAT4X4			projection;
-	DirectX::XMFLOAT4			light_direction;
+	DirectX::XMFLOAT4X4	view;
+	DirectX::XMFLOAT4X4	projection;
+	DirectX::XMFLOAT4	light_direction;
+
+	LuminanceExtractionData	luminanceExtractionData; //	高輝度抽出用情報 
 };

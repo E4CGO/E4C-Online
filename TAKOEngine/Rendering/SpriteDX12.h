@@ -9,6 +9,17 @@
 #include <DirectXMath.h>
 
 #include "TAKOEngine/Rendering/Descriptor.h"
+#include "TAKOEngine/Rendering/RenderContext.h"
+
+struct CbSpriteData
+{
+	// 輝度シェーダー
+	float threshold;	// 閾値
+	float intensity;	// ブルームの強度
+	DirectX::XMFLOAT2 dummy;
+
+
+};
 
 /**************************************************************************//**
 		@class		SpriteDX12
@@ -17,7 +28,29 @@
 *//***************************************************************************/
 class SpriteDX12
 {
+private:
+	struct Vertex
+	{
+		DirectX::XMFLOAT3	position;
+		DirectX::XMFLOAT4	color;
+		DirectX::XMFLOAT2	texcoord;
+	};
+
 public:
+	struct FrameResource
+	{
+		Microsoft::WRL::ComPtr<ID3D12Resource>			d3d_vb_resource;
+		Microsoft::WRL::ComPtr<ID3D12Resource>			d3d_ib_resource;
+		D3D12_VERTEX_BUFFER_VIEW						d3d_vbv;
+		D3D12_INDEX_BUFFER_VIEW							d3d_ibv;
+		Vertex* vertex_data = nullptr;
+
+		Microsoft::WRL::ComPtr<ID3D12Resource>			d3d_cbv_resource;
+		const Descriptor* cbv_descriptor = nullptr;
+		CbSpriteData* cb_scene_data = nullptr;
+	};
+	std::vector<FrameResource>	m_frame_resources;
+
 	//! コンストラクタ
 	SpriteDX12(UINT sprite_count, const char* filename = nullptr);
 
@@ -25,7 +58,7 @@ public:
 	~SpriteDX12();
 
 	// 描画開始
-	void Begin(ID3D12GraphicsCommandList* d3d_command_list);
+	void Begin(const RenderContextDX12& rc);
 
 	// 描画登録
 	void Draw(
@@ -52,27 +85,13 @@ public:
 	// テクスチャ高さ取得
 	int GetTextureHeight() const { return m_texture_height; }
 
-private:
+	// ディスクリプタ取得
+	const Descriptor* GetDescriptor() { return m_srv_descriptor; }
 
-	struct Vertex
-	{
-		DirectX::XMFLOAT3	position;
-		DirectX::XMFLOAT4	color;
-		DirectX::XMFLOAT2	texcoord;
-	};
-
-	struct FrameResource
-	{
-		Microsoft::WRL::ComPtr<ID3D12Resource>			d3d_vb_resource;
-		Microsoft::WRL::ComPtr<ID3D12Resource>			d3d_ib_resource;
-		D3D12_VERTEX_BUFFER_VIEW						d3d_vbv;
-		D3D12_INDEX_BUFFER_VIEW							d3d_ibv;
-		Vertex* vertex_data = nullptr;
-	};
+	// スプライトカウント取得
+	const int GetSpriteCount() { return m_sprite_count; }
 
 private:
-
-	std::vector<FrameResource>							m_frame_resources;
 	Microsoft::WRL::ComPtr<ID3D12Resource>				m_d3d_texture;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState>			m_d3d_pipeline_state;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature>			m_d3d_root_signature;
