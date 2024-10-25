@@ -203,6 +203,8 @@ struct RenderContextDX12
 	DirectX::XMFLOAT4X4	projection;
 	DirectX::XMFLOAT4	light_direction;
 
+	// スプライトシェーダー情報
 	LuminanceExtractionData	luminanceExtractionData; //	高輝度抽出用情報 
 	GaussianFilterData		gaussianFilterData;		 //	ガウスフィルター情報
+	ColorGradingData		colorGradingData;		 //	色調補正情報
 };

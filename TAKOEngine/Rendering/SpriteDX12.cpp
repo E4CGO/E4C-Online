@@ -434,6 +434,11 @@ void SpriteDX12::Begin(const RenderContextDX12& rc)
 
 	// フィルター値計算(GaussianBlur)
 	CalcGaussianFilter(fram_resource, rc.gaussianFilterData);
+
+	// ColorGrading
+	fram_resource.cb_scene_data->hueShift = rc.colorGradingData.hueShift;
+	fram_resource.cb_scene_data->saturation = rc.colorGradingData.saturation;
+	fram_resource.cb_scene_data->brightness = rc.colorGradingData.brightness;
 }
 
 //**********************************************************************

@@ -63,6 +63,7 @@ enum class SpriteShaderDX12Id
 	Default,
 	LuminanceExtraction,
 	GaussianBlur,
+	ColorGrading,
 
 	EnumCount
 };

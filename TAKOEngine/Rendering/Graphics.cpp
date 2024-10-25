@@ -610,6 +610,7 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::Default)]             = std::make_unique<DefaultSpriteShaderDX12>(m_d3d_device.Get());
 	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::LuminanceExtraction)] = std::make_unique<LuminanceExtractionShaderDX12>(m_d3d_device.Get());
 	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::GaussianBlur)]        = std::make_unique<GaussianBlurShaderDX12>(m_d3d_device.Get());
+	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::ColorGrading)]        = std::make_unique<ColorGradingShaderDX12>(m_d3d_device.Get());
 
 	// レンダラ
 	debugRenderer = std::make_unique<DebugRenderer>(device.Get());

@@ -19,6 +19,12 @@ cbuffer CbScene : register(b0)
     float2 textureSize;   // 暈すテクスチャのサイズ
     float  kernelSize;    // カーネルサイズ
     float  dummy1;
+    
+    // ColorGrading
+    float hueShift;	    // 色相調整
+	float saturation;	// 彩度調整
+	float brightness;	// 明度調整
+	float dummy2;
 };
 
 #define ROOT_SIG "RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT), \
