@@ -15,6 +15,8 @@
 #include "TAKOEngine/Tool/GLTFImporter.h"
 #include "TAKOEngine/Tool/Timer.h"
 
+#include <profiler.h>
+
 static float timer = 0;
 
 void StageOpenWorld_E4C::Initialize()
@@ -24,11 +26,12 @@ void StageOpenWorld_E4C::Initialize()
 	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
 	stage_collision->Update(0);
 	MAPTILES.Register(stage_collision);
+	MAPTILES.CreateQuadtree(6);
 
 	map = std::make_unique<gltf_model>(T_GRAPHICS.GetDevice(), "Data/Model/Stage/Terrain_Reduced.glb");
 
 	player = std::make_unique<Barbarian>();
-	player->SetPosition({ 5, 20, 5 });
+	player->SetPosition({ 5, 10, 5 });
 	player->GetStateMachine()->ChangeState(static_cast<int>(Player::State::Idle));
 
 	teleporter = std::make_unique<Teleporter>("Data/Model/Cube/testCubes.glb", 1.0);
@@ -94,7 +97,10 @@ void StageOpenWorld_E4C::Initialize()
 
 void StageOpenWorld_E4C::Update(float elapsedTime)
 {
-	cameraController->Update(elapsedTime);
+	{
+		//ProfileScopedSection_2("Camera", ImGuiControl::Profiler::Yellow);
+		cameraController->Update(elapsedTime);
+	}
 	cameraController->SyncContrllerToCamera(camera);
 
 	player->Update(elapsedTime);

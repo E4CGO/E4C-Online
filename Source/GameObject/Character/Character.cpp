@@ -159,14 +159,15 @@ void Character::UpdateVerticalMove(float elapsedTime)
 		DirectX::XMFLOAT3 end = { position.x, position.y + my, position.z };
 		// レイキャストによる地面判定
 		HitResult hit;
-		if (MAPTILES.RayCast(start, end, hit))
+		//if (MAPTILES.RayCast(start, end, hit))
+		if (MAPTILES.VerticalRayCast(start, end, hit))
 		{
 			// 地面に接地している
 			position = hit.position;
 			// 回転
-			angle.x += hit.rotation.x;
-			angle.y += hit.rotation.y;
-			angle.z += hit.rotation.z;
+			//angle.x += hit.rotation.x;
+			//angle.y += hit.rotation.y;
+			//angle.z += hit.rotation.z;
 
 			normal = hit.normal;
 
@@ -198,9 +199,9 @@ void Character::UpdateVerticalMove(float elapsedTime)
 			// 地面に接地している
 			position = hit.position;
 			// 回転
-			angle.x += hit.rotation.x;
-			angle.y += hit.rotation.y;
-			angle.z += hit.rotation.z;
+			//angle.x += hit.rotation.x;
+			//angle.y += hit.rotation.y;
+			//angle.z += hit.rotation.z;
 
 			normal = hit.normal;
 
