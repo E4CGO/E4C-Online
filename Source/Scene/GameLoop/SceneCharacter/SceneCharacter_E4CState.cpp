@@ -136,48 +136,48 @@ void SceneCharacter_E4CState::CharacterCreationState::Enter()
 	btnStartCharacter->SetSize({ 196.0f * 1.5f, 92.0f * 1.5f });
 	UIManager::Instance().Register(btnStartCharacter);
 
-	if (btnCharacterLeft->IsHover())
-	{
-		PLAYER_CHARACTER_DATA.SetCharacterVisibility(1, 0);
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.headType == 0)
-		{
-			PLAYER_CHARACTER_DATA.SetCharacterHeadType(0, 1);
-			owner->UpdateCurrentModel(0, 0, 1);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.bodyType == 0)
-		{
-			PLAYER_CHARACTER_DATA.SetCharacterBodyType(0, 1);
-			owner->UpdateCurrentModel(0, 1, 1);
-		}
-	}
-	if (btnCharacterCenter->IsHover())
-	{
-		PLAYER_CHARACTER_DATA.SetCharacterVisibility(1, 1);
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.headType == 0)
-		{
-			PLAYER_CHARACTER_DATA.SetCharacterHeadType(1, 1);
-			owner->UpdateCurrentModel(1, 0, 1);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.bodyType == 0)
-		{
-			PLAYER_CHARACTER_DATA.SetCharacterBodyType(1, 1);
-			owner->UpdateCurrentModel(1, 1, 1);
-		}
-	}
-	if (btnCharacterRight->IsHover())
-	{
-		PLAYER_CHARACTER_DATA.SetCharacterVisibility(1, 2);
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.headType == 0)
-		{
-			PLAYER_CHARACTER_DATA.SetCharacterHeadType(2, 1);
-			owner->UpdateCurrentModel(2, 0, 1);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.bodyType == 0)
-		{
-			PLAYER_CHARACTER_DATA.SetCharacterBodyType(2, 1);
-			owner->UpdateCurrentModel(2, 1, 1);
-		}
-	}
+	//if (btnCharacterLeft->IsHover())
+	//{
+	//	PLAYER_CHARACTER_DATA.SetCharacterVisibility(1, 0);
+	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.headType == 0)
+	//	{
+	//		PLAYER_CHARACTER_DATA.SetCharacterHeadType(0, 1);
+	//		owner->UpdateCurrentModel(0, 0, 1);
+	//	}
+	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.bodyType == 0)
+	//	{
+	//		PLAYER_CHARACTER_DATA.SetCharacterBodyType(0, 1);
+	//		owner->UpdateCurrentModel(0, 1, 1);
+	//	}
+	//}
+	//if (btnCharacterCenter->IsHover())
+	//{
+	//	PLAYER_CHARACTER_DATA.SetCharacterVisibility(1, 1);
+	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.headType == 0)
+	//	{
+	//		PLAYER_CHARACTER_DATA.SetCharacterHeadType(1, 1);
+	//		owner->UpdateCurrentModel(1, 0, 1);
+	//	}
+	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.bodyType == 0)
+	//	{
+	//		PLAYER_CHARACTER_DATA.SetCharacterBodyType(1, 1);
+	//		owner->UpdateCurrentModel(1, 1, 1);
+	//	}
+	//}
+	//if (btnCharacterRight->IsHover())
+	//{
+	//	PLAYER_CHARACTER_DATA.SetCharacterVisibility(1, 2);
+	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.headType == 0)
+	//	{
+	//		PLAYER_CHARACTER_DATA.SetCharacterHeadType(2, 1);
+	//		owner->UpdateCurrentModel(2, 0, 1);
+	//	}
+	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.bodyType == 0)
+	//	{
+	//		PLAYER_CHARACTER_DATA.SetCharacterBodyType(2, 1);
+	//		owner->UpdateCurrentModel(2, 1, 1);
+	//	}
+	//}
 }
 void SceneCharacter_E4CState::CharacterCreationState::Execute(float elapsedTime)
 {

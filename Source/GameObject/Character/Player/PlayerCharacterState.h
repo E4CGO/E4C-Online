@@ -1,7 +1,7 @@
 #pragma once
 #include "TAKOEngine/AI/BaseState.h"
 
-#include "GameObject/Character/Player/CombinedPlayer.h"
+#include "GameObject/Character/Player/PlayerCharacter.h"
 
 // FLAG
 const uint32_t flag_Dodge = 1 << 0;
@@ -17,16 +17,16 @@ const uint32_t flag_Skill_2 = 1 << 9;
 const uint32_t flag_Skill_3 = 1 << 10;
 const uint32_t flag_Skill_4 = 1 << 11;
 
-namespace PlayerCombinedState
+namespace PlayerCharacterState
 {
-	void PlayerTransition(CombinedPlayer* owner, uint32_t flags);
+	void PlayerTransition(PlayerCharacter* owner, uint32_t flags);
 
 	// 待機ステートオブジェクト
-	class IdleState : public HierarchicalState<CombinedPlayer>
+	class IdleState : public HierarchicalState<PlayerCharacter>
 	{
 	public:
 		// コンストラクタ
-		IdleState(CombinedPlayer* player) : HierarchicalState<CombinedPlayer>(player) {};
+		IdleState(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
 		// デストラクタ
 		~IdleState() {}
 		// ステートに入った時のメソッド
@@ -38,11 +38,11 @@ namespace PlayerCombinedState
 	};
 
 	// 移動ステートオブジェクト
-	class MoveState : public HierarchicalState<CombinedPlayer>
+	class MoveState : public HierarchicalState<PlayerCharacter>
 	{
 	public:
 		// コンストラクタ
-		MoveState(CombinedPlayer* player) : HierarchicalState<CombinedPlayer>(player) {};
+		MoveState(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
 		// デストラクタ
 		~MoveState() {}
 		// ステートに入った時のメソッド
@@ -54,11 +54,11 @@ namespace PlayerCombinedState
 	};
 
 	// ジャンプステートオブジェクト
-	class JumpState : public HierarchicalState<CombinedPlayer>
+	class JumpState : public HierarchicalState<PlayerCharacter>
 	{
 	public:
 		// コンストラクタ
-		JumpState(CombinedPlayer* player) : HierarchicalState<CombinedPlayer>(player) {};
+		JumpState(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
 		// デストラクタ
 		~JumpState() {}
 		// ステートに入った時のメソッド
@@ -70,11 +70,11 @@ namespace PlayerCombinedState
 	};
 
 	// 落下ステートオブジェクト
-	class FallState : public HierarchicalState<CombinedPlayer>
+	class FallState : public HierarchicalState<PlayerCharacter>
 	{
 	public:
 		// コンストラクタ
-		FallState(CombinedPlayer* player) : HierarchicalState<CombinedPlayer>(player) {};
+		FallState(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
 		// デストラクタ
 		~FallState() {}
 		// ステートに入った時のメソッド
@@ -86,11 +86,11 @@ namespace PlayerCombinedState
 	};
 
 	// 着地ステートオブジェクト
-	class LandState : public HierarchicalState<CombinedPlayer>
+	class LandState : public HierarchicalState<PlayerCharacter>
 	{
 	public:
 		// コンストラクタ
-		LandState(CombinedPlayer* player) : HierarchicalState<CombinedPlayer>(player) {};
+		LandState(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
 		// デストラクタ
 		~LandState() {}
 		// ステートに入った時のメソッド
@@ -102,11 +102,11 @@ namespace PlayerCombinedState
 	};
 
 	// 回避ステートオブジェクト
-	class DodgeState : public HierarchicalState<CombinedPlayer>
+	class DodgeState : public HierarchicalState<PlayerCharacter>
 	{
 	public:
 		// コンストラクタ
-		DodgeState(CombinedPlayer* player) : HierarchicalState<CombinedPlayer>(player) {};
+		DodgeState(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
 		// デストラクタ
 		~DodgeState() {}
 		// ステートに入った時のメソッド
@@ -118,11 +118,11 @@ namespace PlayerCombinedState
 	};
 
 	// 怪我ステートオブジェクト
-	class HurtState : public HierarchicalState<CombinedPlayer>
+	class HurtState : public HierarchicalState<PlayerCharacter>
 	{
 	public:
 		// コンストラクタ
-		HurtState(CombinedPlayer* player) : HierarchicalState<CombinedPlayer>(player) {};
+		HurtState(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
 		// デストラクタ
 		~HurtState() {}
 		// ステートに入った時のメソッド
@@ -134,11 +134,11 @@ namespace PlayerCombinedState
 	};
 
 	// 死亡ステートオブジェクト
-	class DeathState : public HierarchicalState<CombinedPlayer>
+	class DeathState : public HierarchicalState<PlayerCharacter>
 	{
 	public:
 		// コンストラクタ
-		DeathState(CombinedPlayer* player) : HierarchicalState<CombinedPlayer>(player) {};
+		DeathState(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
 		// デストラクタ
 		~DeathState() {}
 		// ステートに入った時のメソッド
@@ -150,11 +150,11 @@ namespace PlayerCombinedState
 	};
 
 	// 待機用ステートオブジェクト
-	class WaitState : public HierarchicalState<CombinedPlayer>
+	class WaitState : public HierarchicalState<PlayerCharacter>
 	{
 	public:
 		// コンストラクタ
-		WaitState(CombinedPlayer* player) : HierarchicalState<CombinedPlayer>(player) {};
+		WaitState(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
 		// デストラクタ
 		~WaitState() {}
 		// ステートに入った時のメソッド
@@ -166,11 +166,11 @@ namespace PlayerCombinedState
 	};
 
 	// 待機用 (準備完了)ステートオブジェクト
-	class ReadyState : public HierarchicalState<CombinedPlayer>
+	class ReadyState : public HierarchicalState<PlayerCharacter>
 	{
 	public:
 		// コンストラクタ
-		ReadyState(CombinedPlayer* player) : HierarchicalState<CombinedPlayer>(player) {};
+		ReadyState(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
 		// デストラクタ
 		~ReadyState() {}
 		// ステートに入った時のメソッド

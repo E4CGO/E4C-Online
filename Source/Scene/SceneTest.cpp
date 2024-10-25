@@ -7,16 +7,17 @@ void SceneTest::Initialize()
 	stage = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.1);
 	stage->Update(0);
 	MAPTILES.Register(stage);
-
 	PlayerCharacterData::CharacterInfo charInfo = {
-		1,
-		"",
-		{0 , 1, 2, 3 }
+		true,			// visible
+		"",				// save
+		{				//Character
+			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+		}				
 	};
 
-	newPlayer = std::make_unique<CombinedPlayer>(charInfo);
-	newPlayer->SetPosition({ 5, 20, 5 });
-	newPlayer->GetStateMachine()->ChangeState(static_cast<int>(CombinedPlayer::State::Idle));
+	newPlayer = std::make_unique<PlayerCharacter>(charInfo);
+	newPlayer->SetPosition({ 5,	100, 5 });
+	newPlayer->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::State::Idle));
 
 	//player = std::make_unique<Player>("Data/Model/Character/Barbarian.glb", 1.0f);
 	//player->SetPosition({ 5, 50, 5 });
@@ -93,8 +94,8 @@ void SceneTest::Render()
 	// 描画
 	//knight->Render(rc);
 	//player->Render(rc);
-	newPlayer->Render(rc);
 	MAPTILES.Render(rc);
+	newPlayer->Render(rc);
 
 	ProfileDrawUI();
 }

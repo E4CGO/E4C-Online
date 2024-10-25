@@ -90,62 +90,62 @@ void SceneCharacter_E4C::Update(float elapsedTime)
 
 	stateMachine->Update(elapsedTime);
 
-	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].visible != 0)
-	{
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.bodyType != 0)
-		{
-			if (m_Characters_LEFT[0] != nullptr)
-				m_Characters_LEFT[0]->Update(elapsedTime);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.headType != 0)
-		{
-			if (m_Characters_LEFT[1] != nullptr)
-				m_Characters_LEFT[1]->Update(elapsedTime);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.weaponType != 0)
-		{
-			if (m_Characters_LEFT[2] != nullptr)
-				m_Characters_LEFT[2]->Update(elapsedTime);
-		}
-	}
+	//if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].visible != 0)
+	//{
+	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.bodyType != 0)
+	//	{
+	//		if (m_Characters_LEFT[0] != nullptr)
+	//			m_Characters_LEFT[0]->Update(elapsedTime);
+	//	}
+	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.headType != 0)
+	//	{
+	//		if (m_Characters_LEFT[1] != nullptr)
+	//			m_Characters_LEFT[1]->Update(elapsedTime);
+	//	}
+	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.weaponType != 0)
+	//	{
+	//		if (m_Characters_LEFT[2] != nullptr)
+	//			m_Characters_LEFT[2]->Update(elapsedTime);
+	//	}
+	//}
 
-	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].visible != 0)
-	{
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.bodyType != 0)
-		{
-			if (m_Characters_CENTER[0] != nullptr)
-				m_Characters_CENTER[0]->Update(elapsedTime);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.headType != 0)
-		{
-			if (m_Characters_CENTER[1] != nullptr)
-				m_Characters_CENTER[1]->Update(elapsedTime);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.weaponType != 0)
-		{
-			if (m_Characters_CENTER[2] != nullptr)
-				m_Characters_CENTER[2]->Update(elapsedTime);
-		}
-	}
+	//if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].visible != 0)
+	//{
+	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.bodyType != 0)
+	//	{
+	//		if (m_Characters_CENTER[0] != nullptr)
+	//			m_Characters_CENTER[0]->Update(elapsedTime);
+	//	}
+	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.headType != 0)
+	//	{
+	//		if (m_Characters_CENTER[1] != nullptr)
+	//			m_Characters_CENTER[1]->Update(elapsedTime);
+	//	}
+	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.weaponType != 0)
+	//	{
+	//		if (m_Characters_CENTER[2] != nullptr)
+	//			m_Characters_CENTER[2]->Update(elapsedTime);
+	//	}
+	//}
 
-	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].visible != 0)
-	{
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.bodyType != 0)
-		{
-			if (m_Characters_RIGHT[0] != nullptr)
-				m_Characters_RIGHT[0]->Update(elapsedTime);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.headType != 0)
-		{
-			if (m_Characters_RIGHT[1] != nullptr)
-				m_Characters_RIGHT[1]->Update(elapsedTime);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.weaponType != 0)
-		{
-			if (m_Characters_RIGHT[2] != nullptr)
-				m_Characters_RIGHT[2]->Update(elapsedTime);
-		}
-	}
+	//if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].visible != 0)
+	//{
+	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.bodyType != 0)
+	//	{
+	//		if (m_Characters_RIGHT[0] != nullptr)
+	//			m_Characters_RIGHT[0]->Update(elapsedTime);
+	//	}
+	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.headType != 0)
+	//	{
+	//		if (m_Characters_RIGHT[1] != nullptr)
+	//			m_Characters_RIGHT[1]->Update(elapsedTime);
+	//	}
+	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.weaponType != 0)
+	//	{
+	//		if (m_Characters_RIGHT[2] != nullptr)
+	//			m_Characters_RIGHT[2]->Update(elapsedTime);
+	//	}
+	//}
 
 #ifdef _DEBUG
 	// カメラ更新
@@ -177,62 +177,62 @@ void SceneCharacter_E4C::Render()
 	shadowMapRenderer->Render();
 	rc.shadowMapData = shadowMapRenderer->GetShadowMapData();
 
-	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].visible != 0)
-	{
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.headType != 0)
-		{
-			if (m_Characters_LEFT[0] != nullptr)
-				m_Characters_LEFT[0]->Render(rc);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.bodyType != 0)
-		{
-			if (m_Characters_LEFT[1] != nullptr)
-				m_Characters_LEFT[1]->Render(rc);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.weaponType != 0)
-		{
-			if (m_Characters_LEFT[2] != nullptr)
-				m_Characters_LEFT[2]->Render(rc);
-		}
-	}
+	//if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].visible != 0)
+	//{
+	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.headType != 0)
+	//	{
+	//		if (m_Characters_LEFT[0] != nullptr)
+	//			m_Characters_LEFT[0]->Render(rc);
+	//	}
+	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.bodyType != 0)
+	//	{
+	//		if (m_Characters_LEFT[1] != nullptr)
+	//			m_Characters_LEFT[1]->Render(rc);
+	//	}
+	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.weaponType != 0)
+	//	{
+	//		if (m_Characters_LEFT[2] != nullptr)
+	//			m_Characters_LEFT[2]->Render(rc);
+	//	}
+	//}
 
-	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].visible != 0)
-	{
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.headType != 0)
-		{
-			if (m_Characters_CENTER[0] != nullptr)
-				m_Characters_CENTER[0]->Render(rc);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.bodyType != 0)
-		{
-			if (m_Characters_CENTER[1] != nullptr)
-				m_Characters_CENTER[1]->Render(rc);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.weaponType != 0)
-		{
-			if (m_Characters_CENTER[2] != nullptr)
-				m_Characters_CENTER[2]->Render(rc);
-		}
-	}
+	//if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].visible != 0)
+	//{
+	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.headType != 0)
+	//	{
+	//		if (m_Characters_CENTER[0] != nullptr)
+	//			m_Characters_CENTER[0]->Render(rc);
+	//	}
+	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.bodyType != 0)
+	//	{
+	//		if (m_Characters_CENTER[1] != nullptr)
+	//			m_Characters_CENTER[1]->Render(rc);
+	//	}
+	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.weaponType != 0)
+	//	{
+	//		if (m_Characters_CENTER[2] != nullptr)
+	//			m_Characters_CENTER[2]->Render(rc);
+	//	}
+	//}
 
-	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].visible != 0)
-	{
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.headType != 0)
-		{
-			if (m_Characters_RIGHT[0] != nullptr)
-				m_Characters_RIGHT[0]->Render(rc);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.bodyType != 0)
-		{
-			if (m_Characters_RIGHT[1] != nullptr)
-				m_Characters_RIGHT[1]->Render(rc);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.weaponType != 0)
-		{
-			if (m_Characters_RIGHT[2] != nullptr)
-				m_Characters_RIGHT[2]->Render(rc);
-		}
-	}
+	//if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].visible != 0)
+	//{
+	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.headType != 0)
+	//	{
+	//		if (m_Characters_RIGHT[0] != nullptr)
+	//			m_Characters_RIGHT[0]->Render(rc);
+	//	}
+	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.bodyType != 0)
+	//	{
+	//		if (m_Characters_RIGHT[1] != nullptr)
+	//			m_Characters_RIGHT[1]->Render(rc);
+	//	}
+	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.weaponType != 0)
+	//	{
+	//		if (m_Characters_RIGHT[2] != nullptr)
+	//			m_Characters_RIGHT[2]->Render(rc);
+	//	}
+	//}
 
 	UI.Render(rc);
 

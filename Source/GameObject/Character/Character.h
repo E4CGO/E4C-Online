@@ -1,31 +1,44 @@
-#pragma once
+//! @file Character.h
+//! @note 
 
-#include "TAKOEngine/AI/StateMachine.h"
-#include "TAKOEngine/Rendering/RenderContext.h"
-#include "TAKOEngine/Physics/Collider.h"
+#ifndef __INCLUDED_CHARACTER_OBJECT_H__
+#define __INCLUDED_CHARACTER_OBJECT_H__
 
 #include "GameObject/ModelObject.h"
 
+/**************************************************************************//**
+	@class	Character
+	@brief	キャラクタークラス
+	@par	[説明]
+*//***************************************************************************/
 class Character : public ModelObject
 {
 public:
+	// コンストラクタ
+	Character() : ModelObject() {};
+	// コンストラクタ（引数付き）
 	Character(const char* filename, float scaling = 1.0f) : ModelObject(filename, scaling) {}
+	// デストラクタ
 	virtual ~Character() = default;
-
+	// 更新処理
 	virtual void Update(float elapsedTime) override;
-	void UpdateModel(float elapsedTime);
-	virtual void Render(const RenderContext& rc) override;
 
+	// 移動処理
 	virtual bool MoveTo(float elapsedtime, const DirectX::XMFLOAT3& target, float moveSpeed, float turnSpeed);
+
+	// 速力初期化
 	void Stop() { velocity = { 0.0f, 0.0f, 0.0f }; }
 
+	// 向き
 	void Turn(float elapsedTime, float vx, float vz, float speed);
 
+	// 攻撃コリジョン
 	virtual void AttackCollision() {}
 
 protected:
 	// 移動
 	void Move(float vx, float vz, float speed);
+	// 跳躍
 	void Jump(float speed);
 
 	// 速力
@@ -39,11 +52,18 @@ protected:
 	// 水平移動更新処理
 	virtual void UpdateHorizontalMove(float elapsedTime);
 
+	// 着地コールバック
 	virtual void OnLanding() {};
+	// 壁衝突コールバック
 	virtual void OnWall() {};
 public:
-	// 影響
-	void AddImpulse(const DirectX::XMFLOAT3& impulse);
+	// ベクトルを与える
+	void AddImpulse(const DirectX::XMFLOAT3& impulse)
+	{
+		velocity.x += impulse.x;
+		velocity.y += impulse.y;
+		velocity.z += impulse.z;
+	}
 
 	// アクセサ
 	// 位置取得
@@ -59,8 +79,10 @@ public:
 	// スケール設定
 	void SetScale(const DirectX::XMFLOAT3& scale) { this->scale = scale; }
 
+	// 最大スピードを取得
 	const float GetMaxMoveSpeed() { return maxMoveSpeed; }
 
+	// 高さを取得
 	float GetHeight() { return height; }
 
 	// 地面判定
@@ -74,27 +96,30 @@ public:
 	int GetMaxHp() { return maxHp; }
 	void ModifyHp(int hp);
 protected:
+	// コライダー更新処理
 	virtual void UpdateColliders() {};
 protected:
 	// レイキャスト用
-	float stepOffset = 0.5f;
-	float height = 2.0f;
+	float stepOffset = 0.5f;						// ステップ高さ
+	float height = 2.0f;							// 高さ
 
-	float gravity = -1.0f;
-	DirectX::XMFLOAT3 velocity = { 0, 0, 0 };
-	bool isGround = false;
-	bool isWall = false;
+	float gravity = -1.0f;							// 重力
+	DirectX::XMFLOAT3 velocity = { 0, 0, 0 };		// 速力
+	bool isGround = false;							// 地面フラグ
+	bool isWall = false;							// 壁フラグ
 	float friction = 0.5f;
 
-	float acceleration = 100.0f;
-	float maxMoveSpeed = 100.0f;
-	float moveVecX = 0.0f;
-	float moveVecZ = 0.0f;
-	float airControl = 0.1f;
+	// 移動用
+	float acceleration = 100.0f;					// 加速度
+	float maxMoveSpeed = 100.0f;					// 最大スピード			
+	float moveVecX = 0.0f;							// 移動量X
+	float moveVecZ = 0.0f;							// 移動量Y
+	float airControl = 0.1f;						// 空気抵抗
 
-	float hurtCoolTime = 0.0f;
+	float hurtCoolTime = 0.0f;						// 無敵時間
 
 	// HP
 	int hp = 1;
 	int maxHp = 1;
 };
+#endif

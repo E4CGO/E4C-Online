@@ -6,7 +6,7 @@
 
 // コンストラクタ
 Plane::Plane(ID3D11Device* device, const char* filename, float scaling, std::array<DirectX::XMFLOAT3, 4> positions)
-	: ModelObject(filename, scaling, "other")
+	: ModelObject(filename, scaling)
 {
 	HRESULT hr = S_OK;
 
@@ -133,7 +133,7 @@ void Plane::Update(float elapsedTime)
 
 void Plane::Render(const RenderContext& rc)
 {
-	ModelShader* shader = T_GRAPHICS.GetModelShader(shaderId);
+	ModelShader* shader = T_GRAPHICS.GetModelShader(m_shaderId);
 	shader->Begin(rc);
 	shader->Draw(rc, mesh);
 	shader->End(rc);

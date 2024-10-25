@@ -477,7 +477,7 @@ void Player::ImportData(PLAYER_DATA data)
 	velocity = data.velocity;
 	target = data.target;
 	angle.y = data.angle;
-	color = data.color;
+	m_color = data.color;
 	hp = data.hp;
 	maxHp = data.hp;
 	if (stateMachine->GetStateIndex() != data.state)
@@ -495,7 +495,7 @@ void Player::ExportData(PLAYER_DATA& data)
 	data.position = position;
 	data.velocity = velocity;
 	data.target = target;
-	data.color = color;
+	data.color = m_color;
 	data.angle = angle.y;
 	data.state = stateMachine->GetStateIndex();
 	data.hp = hp;

@@ -4,52 +4,62 @@
 #ifndef __INCLUDED_PLAYER_CHARACTER_DATA_H__
 #define __INCLUDED_PLAYER_CHARACTER_DATA_H__
 
-#include "TAKOEngine/Tool/Singleton.h"
-#include "json.hpp"
-
 #include <string>
 #include <vector>
+#include "TAKOEngine/Tool/Singleton.h"
+#include "json.hpp"
+#include "PlayerCharacterPattern.h"
+
+class PlayerCharacter;
 
 class PlayerCharacterData : public Singleton<PlayerCharacterData>
 {
 	friend class Singleton <PlayerCharacterData>;
 private:
-	PlayerCharacterData() = default;
-	~PlayerCharacterData() = default;
+	// コンストラクタ
+	PlayerCharacterData();
+	// デストラクタ
+	~PlayerCharacterData();
 public:
-
-	std::unordered_map<uint8_t, const char*> modelParts =
+	// 外見パータン
+	enum APPEARANCE_PATTERN
 	{
-		{ 0, "Data/Model/Character/BarbarianAnim.glb" },
-		{ 1, "Data/Model/Character/HEAD_BARB.glb" },
-		{ 2, "Data/Model/Character/BODY_BARB.glb" },
-		{ 3, "Data/Model/Character/WEAPON_BARB.glb" },
-		{ 4, "Data/Model/Character/HEAD_MAGE.glb" },
-		{ 5, "Data/Model/Character/BODY_MAGE.glb" },
-		{ 6, "Data/Model/Character/WEAPON_MAGE.glb" },
+		GENDER = 0,				// 性別
+		HAIR,					// 髪
+		HAIR_COLOR,				// 髪の色パターン
+		EYE_COLOR,				// 目の色パターン
+		SKIN_COLOR,				// 肌の色パターン
+		TOP,					// 上半身服パターン
+		TOP_COLOR,				// 上半身服色パターン
+		BOTTOM,					// 下半身服パターン
+		BOTTOM_COLOR,			// 下半身服色パターン
+		ARM_GEAR,				// 腕装備
+		ARM_GEAR_COLOR,			// 腕装備色パターン
+		LEFT_HAND_EQUIPMENT,	// 左手装備
+		RIGHT_HAND_EQUIPMENT,	// 右手装備
+
+
+		NUM						// カウント
 	};
 
 	struct CharacterInfo
 	{
-		bool visible;
+		bool visible = false;
 
-		std::string save;
+		std::string save = "";
 
 		struct Character
 		{
-			uint8_t genderType;
-			uint8_t headType;
-			uint8_t bodyType;
-			uint8_t weaponType;
+			uint8_t pattern[APPEARANCE_PATTERN::NUM] = {};
 
 			Character& operator=(const Character& other)
 			{
 				if (this != &other)
 				{
-					this->genderType = other.genderType;
-					this->headType = other.headType;
-					this->bodyType = other.bodyType;
-					this->weaponType = other.weaponType;
+					for (int i = 0; i < APPEARANCE_PATTERN::NUM; i++)
+					{
+						this->pattern[i] = other.pattern[i];
+					}
 				}
 				return *this;
 			}
@@ -67,17 +77,18 @@ public:
 		}
 	};
 
+	void LoadAppearance(PlayerCharacter* player, uint8_t appearance_idx, uint8_t pattern_idx);
 	nlohmann::json GetCharacterInfos() const { return m_CharacterInfos; }
 	void SetCharacterInfos(nlohmann::json savedData) { m_CharacterInfos = savedData; }
 
 	std::vector<CharacterInfo> GetCharacterInfosData() const { return m_CharaterInfosData; }
 	void SetCharacterInfosData(std::vector<CharacterInfo> savedData) { m_CharaterInfosData = savedData; }
 
-	void SetCharacterVisibility(bool visibility, int number) { this->m_CharaterInfosData[number].visible = visibility; }
-	void SetCharacterGenderType(int characterNumber, int value) { this->m_CharaterInfosData[characterNumber].Character.genderType = value; }
-	void SetCharacterHeadType(int characterNumber, int value) { this->m_CharaterInfosData[characterNumber].Character.headType = value; }
-	void SetCharacterBodyType(int characterNumber, int value) { this->m_CharaterInfosData[characterNumber].Character.bodyType = value; }
-	void SetCharacterWeaponType(int characterNumber, int value) { this->m_CharaterInfosData[characterNumber].Character.weaponType = value; }
+	//void SetCharacterVisibility(bool visibility, int number) { this->m_CharaterInfosData[number].visible = visibility; }
+	//void SetCharacterGenderType(int characterNumber, int value) { this->m_CharaterInfosData[characterNumber].Character.genderType = value; }
+	//void SetCharacterHeadType(int characterNumber, int value) { this->m_CharaterInfosData[characterNumber].Character.headType = value; }
+	//void SetCharacterBodyType(int characterNumber, int value) { this->m_CharaterInfosData[characterNumber].Character.bodyType = value; }
+	//void SetCharacterWeaponType(int characterNumber, int value) { this->m_CharaterInfosData[characterNumber].Character.weaponType = value; }
 
 	void ParseData()
 	{
@@ -101,8 +112,11 @@ public:
 			};
 		}
 	}
+	// 外見パターンをクリア
+	void ClearAppearancePatterns();
 
 private:
+	std::unordered_map<uint8_t, std::vector<PlayerCharacterPattern*>> m_pappearancePatterns;
 
 	nlohmann::json m_CharacterInfos;
 	std::vector<CharacterInfo> m_CharaterInfosData;

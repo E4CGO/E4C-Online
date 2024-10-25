@@ -1,11 +1,16 @@
 #include "Character.h"
 
-#include "TAKOEngine/Tool/Mathf.h"
-
 #include "Map/MapTileManager.h"
 
 #define POS_ERROR 0.0001f  // 誤差調整
 
+/**************************************************************************//**
+ 	@brief		移動処理
+	@param[in]	X移動量
+	@param[in]	Y移動量
+	@param[in]	スピード
+	@return なし
+*//***************************************************************************/
 void Character::Move(float vx, float vz, float speed) {
 	// 移動
 	moveVecX = vx;
@@ -13,6 +18,15 @@ void Character::Move(float vx, float vz, float speed) {
 
 	maxMoveSpeed = speed;
 }
+
+/**************************************************************************//**
+ 	@brief		回転処理
+	@param[in]	elapsedTime	経過時間
+	@param[in]	vx			X移動量
+	@param[in]	vz			Z移動量
+	@param[in]	speed		回転スピード
+	@return		なし
+*//***************************************************************************/
 void Character::Turn(float elapsedTime, float vx, float vz, float speed) {
 	speed *= elapsedTime;
 
@@ -54,7 +68,14 @@ void Character::Turn(float elapsedTime, float vx, float vz, float speed) {
 	while (angle.y > DirectX::XM_PI) angle.y -= DirectX::XM_2PI;
 	while (angle.y < -DirectX::XM_PI) angle.y += DirectX::XM_2PI;
 }
-
+/**************************************************************************//**
+ 	@brief		移動処理
+	@param[in]	elapsedtime	経過時間
+	@param[in]	target		ターゲット方向
+	@param[in]	moveSpeed	移動速度
+	@param[in]	turnSpeed	回転埴土
+	@return		目的地判定
+*//***************************************************************************/
 bool Character::MoveTo(float elapsedtime, const DirectX::XMFLOAT3& target, float moveSpeed, float turnSpeed)
 {
 	// Horizon
@@ -69,12 +90,20 @@ bool Character::MoveTo(float elapsedtime, const DirectX::XMFLOAT3& target, float
 	return false;
 }
 
+/**************************************************************************//**
+ 	@brief	跳躍勝利
+	@param[in]	speed	上スピード
+*//***************************************************************************/
 void Character::Jump(float speed)
 {
 	velocity.y = speed;
 	isGround = false;
 }
-
+/**************************************************************************//**
+ 	@brief		速力
+	@param[in]	elapsedTime	経過時間
+	@return		なし
+*//***************************************************************************/
 void Character::UpdateVelocity(float elapsedTime)
 {
 	// 経過フレーム
@@ -93,11 +122,20 @@ void Character::UpdateVelocity(float elapsedTime)
 	// 衝突判定更新
 	UpdateColliders();
 }
-
+/**************************************************************************//**
+ 	@brief		垂直速力更新処理
+	@param[in]	elapsedFrame	経過時間
+	@return		なし
+*//***************************************************************************/
 void Character::UpdateVerticalVelocity(float elapsedFrame)
 {
 	velocity.y += gravity * elapsedFrame;
 }
+/**************************************************************************//**
+	@brief		水平速力更新処理
+	@param[in]	elapsedFrame	経過時間
+	@return		なし
+*//***************************************************************************/
 void Character::UpdateHorizontalVelocity(float elapsedFrame)
 {
 	float length = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);
@@ -142,6 +180,11 @@ void Character::UpdateHorizontalVelocity(float elapsedFrame)
 	moveVecZ = 0.0f;
 }
 
+/**************************************************************************//**
+	@brief		垂直速力更新処理
+	@param[in]	elapsedFrame	経過時間
+	@return		なし
+*//***************************************************************************/
 void Character::UpdateVerticalMove(float elapsedTime)
 {
 	// 垂直方向の移動量
@@ -218,6 +261,12 @@ void Character::UpdateVerticalMove(float elapsedTime)
 		//angle.z = Mathf::Lerp(angle.z, -atan2f(normal.x, normal.y), 0.2f);
 	}
 }
+
+/**************************************************************************//**
+	@brief		水平速力更新処理
+	@param[in]	elapsedFrame	経過時間
+	@return		なし
+*//***************************************************************************/
 void Character::UpdateHorizontalMove(float elapsedTime)
 {
 	// 水平速力量計算
@@ -314,27 +363,15 @@ void Character::ModifyHp(int hp)
 	if (this->hp < 0) this->hp = 0;
 }
 
-void Character::AddImpulse(const DirectX::XMFLOAT3& impulse)
-{
-	velocity.x += impulse.x;
-	velocity.y += impulse.y;
-	velocity.z += impulse.z;
-}
-
+/**************************************************************************//**
+ 	@brief		更新処理
+	@param[in]	elapsedTime	経過時間
+	@return		なし
+*//***************************************************************************/
 void Character::Update(float elapsedTime)
 {
 	if (hurtCoolTime > 0.0f) hurtCoolTime -= elapsedTime;
 
 	UpdateVelocity(elapsedTime);			// 移動更新
-	UpdateModel(elapsedTime);
-}
-
-void Character::UpdateModel(float elapsedTime)
-{
 	ModelObject::Update(elapsedTime);
-}
-
-void Character::Render(const RenderContext& rc)
-{
-	ModelObject::Render(rc);
 }
