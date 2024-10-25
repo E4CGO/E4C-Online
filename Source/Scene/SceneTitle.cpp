@@ -263,7 +263,7 @@ void SceneTitle::RenderDX12()
 		}
 
 		// スプライト描画
-		SpriteShaderDX12* sprite = TentacleLib::graphics.GetSpriteShaderDX12(SpriteShaderDX12Id::LuminanceExtraction);
+		SpriteShaderDX12* sprite = TentacleLib::graphics.GetSpriteShaderDX12(SpriteShaderDX12Id::GaussianBlur);
 		if (m_sprites[0] != nullptr)
 		{
 			m_sprites[0]->Begin(rc);

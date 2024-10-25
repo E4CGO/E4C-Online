@@ -115,7 +115,7 @@ struct GaussianFilterData
 {
 	int					kernelSize = 8;		// カーネルサイズ
 	float				deviation = 10.0f;	// 標準偏差
-	DirectX::XMFLOAT2	textureSize;			// 暈すテクスチャのサイズ
+	DirectX::XMFLOAT2	textureSize = {};	// 暈すテクスチャのサイズ
 };
 
 // ガウスフィルターの最大カーネルサイズ
@@ -204,4 +204,5 @@ struct RenderContextDX12
 	DirectX::XMFLOAT4	light_direction;
 
 	LuminanceExtractionData	luminanceExtractionData; //	高輝度抽出用情報 
+	GaussianFilterData		gaussianFilterData;		 //	ガウスフィルター情報
 };

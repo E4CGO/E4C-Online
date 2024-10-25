@@ -417,7 +417,7 @@ SpriteDX12::~SpriteDX12()
 
 /**************************************************************************//**
 		@brief		描画開始
-		@param[in]	d3d_command_list	コマンドリスト
+		@param[in]	rc	レンダーコンテキスト
 		@return		なし
 *//***************************************************************************/
 void SpriteDX12::Begin(const RenderContextDX12& rc)
@@ -428,8 +428,56 @@ void SpriteDX12::Begin(const RenderContextDX12& rc)
 
 	FrameResource& fram_resource = m_frame_resources.at(graphics.GetCurrentBufferIndex());
 
+	// LuminanceExtraction
 	fram_resource.cb_scene_data->threshold = rc.luminanceExtractionData.threshold;
 	fram_resource.cb_scene_data->intensity = rc.luminanceExtractionData.intensity;
+
+	// フィルター値計算(GaussianBlur)
+	CalcGaussianFilter(fram_resource, rc.gaussianFilterData);
+}
+
+//**********************************************************************
+// @brief     フィルター値計算
+// @param[in] fram_resource       コンスタントバッファに送るデータ
+// @param[in] gaussianFilterData  ガウスフィルター計算情報
+// @return    なし
+//**********************************************************************
+void SpriteDX12::CalcGaussianFilter(FrameResource& fram_resource, const GaussianFilterData& gaussianFilterData)
+{
+	Graphics& graphics = Graphics::Instance();
+
+	int kernelSize = gaussianFilterData.kernelSize;
+
+	//偶数の場合は奇数に直す
+	if (kernelSize % 2 == 0) kernelSize++;
+	kernelSize = max(1, min(MaxKernelSize - 1, kernelSize));
+
+	fram_resource.cb_scene_data->kernelSize = static_cast<float>(kernelSize);
+	fram_resource.cb_scene_data->textureSize.x = 1.0f / (graphics.GetScreenWidth() / 2.0f);
+	fram_resource.cb_scene_data->textureSize.y = 1.0f / (graphics.GetScreenHeight() / 2.0f);
+	//fram_resource.cb_scene_data->textureSize.x = 1.0f / gaussianFilterData.textureSize.x;
+	//fram_resource.cb_scene_data->textureSize.y = 1.0f / gaussianFilterData.textureSize.y;
+
+	float deviationPow2 = 2.0f * gaussianFilterData.deviation * gaussianFilterData.deviation;
+	float sum = 0.0f;
+	int id = 0;
+	for (int y = -kernelSize / 2; y <= kernelSize / 2; y++)
+	{
+		for (int x = -kernelSize / 2; x <= kernelSize / 2; x++)
+		{
+			fram_resource.cb_scene_data->weights[id].x = (float)x;
+			fram_resource.cb_scene_data->weights[id].y = (float)y;
+			fram_resource.cb_scene_data->weights[id].z = (1 / DirectX::XM_PI * deviationPow2 * exp(0 - (x * x + y * y) / deviationPow2));
+
+			sum += fram_resource.cb_scene_data->weights[id].z;
+			id++;
+		}
+	}
+	
+	for (int i = 0; i < fram_resource.cb_scene_data->kernelSize * fram_resource.cb_scene_data->kernelSize; i++)
+	{
+		fram_resource.cb_scene_data->weights[i].z /= sum;
+	}
 }
 
 /**************************************************************************//**

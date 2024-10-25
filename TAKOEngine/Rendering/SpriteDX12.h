@@ -11,16 +11,6 @@
 #include "TAKOEngine/Rendering/Descriptor.h"
 #include "TAKOEngine/Rendering/RenderContext.h"
 
-struct CbSpriteData
-{
-	// 輝度シェーダー
-	float threshold;	// 閾値
-	float intensity;	// ブルームの強度
-	DirectX::XMFLOAT2 dummy;
-
-
-};
-
 /**************************************************************************//**
 		@class		SpriteDX12
 		@brief		DX12で画像描画クラス
@@ -29,6 +19,26 @@ struct CbSpriteData
 class SpriteDX12
 {
 private:
+	struct CbSpriteData
+	{
+		// 輝度シェーダー
+		float threshold;	// 閾値
+		float intensity;	// ブルームの強度
+		DirectX::XMFLOAT2 dummy;
+
+		// GaussianBlur
+		DirectX::XMFLOAT4 weights[MaxKernelSize * MaxKernelSize];  // 重さ
+		DirectX::XMFLOAT2 textureSize;   // 暈すテクスチャのサイズ
+		float kernelSize;                // カーネルサイズ
+		float dummy1;
+
+		// ColorGrading
+		float hueShift;	    // 色相調整
+		float saturation;	// 彩度調整
+		float brightness;	// 明度調整
+		float dummy2;
+	};
+
 	struct Vertex
 	{
 		DirectX::XMFLOAT3	position;
@@ -90,6 +100,10 @@ public:
 
 	// スプライトカウント取得
 	const int GetSpriteCount() { return m_sprite_count; }
+
+private:
+	// フィルター値計算
+	void CalcGaussianFilter(FrameResource& fram_resource, const GaussianFilterData& gaussianFilterData);
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource>				m_d3d_texture;

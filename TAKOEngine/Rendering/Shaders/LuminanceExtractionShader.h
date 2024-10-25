@@ -10,7 +10,7 @@
 //********************************************************
 // @class LuminanceExtractionShader
 // @brief 輝度シェーダー
-// @par   
+// @par   DX11
 //********************************************************
 class LuminanceExtractionShader : public SpriteShader
 {
@@ -30,7 +30,7 @@ private:
 //********************************************************
 // @class LuminanceExtractionShaderDX12
 // @brief 輝度シェーダー
-// @par   
+// @par   DX12
 //********************************************************
 class LuminanceExtractionShaderDX12 : public SpriteShaderDX12
 {
