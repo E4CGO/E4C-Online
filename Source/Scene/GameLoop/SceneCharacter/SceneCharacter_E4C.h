@@ -50,6 +50,9 @@ private:
 
 	std::unique_ptr<myRenderer::shadow::ShadowMapRender> shadowMapRenderer = std::make_unique<myRenderer::shadow::ShadowMapRender>();
 
+	// フレームバッファマネージャー
+	FrameBufferManager* m_framBuffer;
+
 	Camera& camera = Camera::Instance();
 	std::unique_ptr<FreeCameraController> cameraController;
 

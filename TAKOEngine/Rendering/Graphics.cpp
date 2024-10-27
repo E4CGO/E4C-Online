@@ -1,3 +1,6 @@
+//! @file Grahics.cpp
+//! @note
+
 #include "Graphics.h"
 
 #include <WICTextureLoader12.h>
@@ -22,11 +25,21 @@
 
 Graphics* Graphics::s_instance = nullptr;
 
+//******************************************************************
+// @class     デストラクタ
+// @param[in] なし
+// @return    なし
+//******************************************************************
 Graphics::~Graphics()
 {
 	FinishDX12();
 }
 
+//******************************************************************
+// @class     DX12の終了
+// @param[in] なし
+// @return    なし
+//******************************************************************
 void Graphics::FinishDX12()
 {
 	if (isDX12Active)
@@ -49,23 +62,36 @@ void Graphics::FinishDX12()
 			CloseHandle(command_queue->fence_event);
 		}
 	}
-	for (FrameResource& frame_resource : m_frame_resources)
+
+	for (int i = 0; i < MAX_BUFFER_COUNT; i++)
 	{
-		if (frame_resource.rtv_descriptor != nullptr)
+		if (rtv_descriptor[i] != nullptr)
 		{
-			m_rtv_descriptor_heap->PushDescriptor(frame_resource.rtv_descriptor);
+			m_rtv_descriptor_heap->PushDescriptor(rtv_descriptor[i]);
 		}
-		if (frame_resource.dsv_descriptor != nullptr)
+	}
+	if (dsv_descriptor != nullptr)
+	{
+		m_dsv_descriptor_heap->PushDescriptor(dsv_descriptor);
+	}
+	if (cbv_descriptor != nullptr)
+	{
+		m_shader_resource_descriptor_heap->PushDescriptor(cbv_descriptor);
+	}
+	if (cb_scene_data != nullptr)
+	{
+		d3d_cbv_resource->Unmap(0, nullptr);
+	}
+
+	for (int i = 0; i < static_cast<int>(FrameBufferDX12Id::EnumCount); i++)
+	{
+		if (dx12_frameBuffers[i]->GetRTVDescriptor() != nullptr)
 		{
-			m_dsv_descriptor_heap->PushDescriptor(frame_resource.dsv_descriptor);
+			m_rtv_descriptor_heap->PushDescriptor(dx12_frameBuffers[i]->GetRTVDescriptor());
 		}
-		if (frame_resource.cbv_descriptor != nullptr)
+		if (dx12_frameBuffers[i]->GetDSVDescriptor() != nullptr)
 		{
-			m_shader_resource_descriptor_heap->PushDescriptor(frame_resource.cbv_descriptor);
-		}
-		if (frame_resource.cb_scene_data != nullptr)
-		{
-			frame_resource.d3d_cbv_resource->Unmap(0, nullptr);
+			m_dsv_descriptor_heap->PushDescriptor(dx12_frameBuffers[i]->GetDSVDescriptor());
 		}
 	}
 
@@ -78,7 +104,12 @@ void Graphics::FinishDX12()
 	}
 }
 
-// 初期化
+//******************************************************************
+// @class     初期化
+// @param[in] hWnd　        HWND
+// @param[in] buffer_count  バッファの数
+// @return    なし
+//******************************************************************
 void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 {
 	_ASSERT_EXPR(s_instance == nullptr, "already instantiated");
@@ -262,154 +293,24 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 		m_shader_resource_descriptor_heap = std::make_unique<DescriptorHeap>(m_d3d_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1000);
 		m_sampler_descriptor_heap = std::make_unique<DescriptorHeap>(m_d3d_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, 1000);
 
-		m_frame_resources.resize(buffer_count);
-		for (UINT i = 0; i < buffer_count; ++i)
-		{
-			FrameResource& frame_resource = m_frame_resources.at(i);
+		m_viewport.TopLeftX = 0;
+		m_viewport.TopLeftY = 0;
+		m_viewport.Width    = screenWidth;
+		m_viewport.Height   = screenHeight;
+		m_viewport.MinDepth = 0.0f;
+		m_viewport.MaxDepth = 1.0f;
 
-			{
-				hr = m_dxgi_swap_chain->GetBuffer(
-					i,
-					IID_PPV_ARGS(frame_resource.d3d_rtv_resource.GetAddressOf())
-				);
-				COMPLETION_CHECK
-					frame_resource.d3d_rtv_resource->SetName(L"BackBuffer");
+		// フレームバッファ用のレンダリングターゲットビューを作成
+		CreateRTVForFameBuffer();
 
-				frame_resource.rtv_descriptor = m_rtv_descriptor_heap->PopDescriptor();
+		// フレームバッファ用の深度ステンシルビューを作成
+		CreateDSVForFrameBuffer(screenWidth, screenHeight);
 
-				D3D12_RENDER_TARGET_VIEW_DESC d3d_rtv_desc;
-				d3d_rtv_desc.Format = RenderTargetFormat;
-				d3d_rtv_desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-				d3d_rtv_desc.Texture2D.MipSlice = 0;
-				d3d_rtv_desc.Texture2D.PlaneSlice = 0;
+		// フレームバッファ用のコンスタントバッファを作成
+		CreateConstantBuffer();
 
-				m_d3d_device->CreateRenderTargetView(
-					frame_resource.d3d_rtv_resource.Get(),
-					&d3d_rtv_desc,
-					frame_resource.rtv_descriptor->GetCpuHandle()
-				);
-			}
-
-			{
-				D3D12_HEAP_PROPERTIES d3d_heap_props{};
-				d3d_heap_props.Type = D3D12_HEAP_TYPE_DEFAULT;
-				d3d_heap_props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-				d3d_heap_props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-				d3d_heap_props.CreationNodeMask = 1;
-				d3d_heap_props.VisibleNodeMask = 1;
-
-				D3D12_RESOURCE_DESC d3d_resource_desc{};
-				d3d_resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-				d3d_resource_desc.Alignment = 0;
-				d3d_resource_desc.Width = screenWidth;
-				d3d_resource_desc.Height = screenHeight;
-				d3d_resource_desc.DepthOrArraySize = 1;
-				d3d_resource_desc.MipLevels = 1;
-				d3d_resource_desc.Format = DXGI_FORMAT_D32_FLOAT;
-				d3d_resource_desc.SampleDesc.Count = 1;
-				d3d_resource_desc.SampleDesc.Quality = 0;
-				d3d_resource_desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-				d3d_resource_desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
-
-				D3D12_CLEAR_VALUE d3d_dsv_clear_value{};
-				d3d_dsv_clear_value.Format = DepthStencilFormat;
-				d3d_dsv_clear_value.DepthStencil.Depth = 1.0f;
-				d3d_dsv_clear_value.DepthStencil.Stencil = 0;
-
-				HRESULT hr = m_d3d_device->CreateCommittedResource(
-					&d3d_heap_props,
-					D3D12_HEAP_FLAG_NONE,
-					&d3d_resource_desc,
-					D3D12_RESOURCE_STATE_DEPTH_WRITE,
-					&d3d_dsv_clear_value,
-					IID_PPV_ARGS(frame_resource.d3d_dsv_resource.GetAddressOf())
-				);
-				COMPLETION_CHECK
-
-					frame_resource.d3d_dsv_resource->SetName(L"DepthStencilView");
-
-				frame_resource.dsv_descriptor = m_dsv_descriptor_heap->PopDescriptor();
-
-				D3D12_DEPTH_STENCIL_VIEW_DESC d3d_dsv_desc{};
-				d3d_dsv_desc.Format = DepthStencilFormat;
-				d3d_dsv_desc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-				d3d_dsv_desc.Flags = D3D12_DSV_FLAG_NONE;
-
-				m_d3d_device->CreateDepthStencilView(
-					frame_resource.d3d_dsv_resource.Get(),
-					&d3d_dsv_desc,
-					frame_resource.dsv_descriptor->GetCpuHandle()
-				);
-			}
-
-			{
-				D3D12_HEAP_PROPERTIES d3d_head_props{};
-				d3d_head_props.Type = D3D12_HEAP_TYPE_UPLOAD;
-				d3d_head_props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-				d3d_head_props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-				d3d_head_props.CreationNodeMask = 1;
-				d3d_head_props.VisibleNodeMask = 1;
-
-				D3D12_RESOURCE_DESC d3d_resource_desc{};
-				d3d_resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-				d3d_resource_desc.Alignment = 0;
-				d3d_resource_desc.Width = ((sizeof(CbScene)) + 255) & ~255;
-				d3d_resource_desc.Height = 1;
-				d3d_resource_desc.DepthOrArraySize = 1;
-				d3d_resource_desc.MipLevels = 1;
-				d3d_resource_desc.Format = DXGI_FORMAT_UNKNOWN;
-				d3d_resource_desc.SampleDesc.Count = 1;
-				d3d_resource_desc.SampleDesc.Quality = 0;
-				d3d_resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-				d3d_resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-				hr = m_d3d_device->CreateCommittedResource(
-					&d3d_head_props,
-					D3D12_HEAP_FLAG_NONE,
-					&d3d_resource_desc,
-					D3D12_RESOURCE_STATE_GENERIC_READ,
-					nullptr,
-					IID_PPV_ARGS(frame_resource.d3d_cbv_resource.GetAddressOf())
-				);
-				COMPLETION_CHECK
-					frame_resource.d3d_cbv_resource->SetName(L"SceneConstatBuffer");
-
-				frame_resource.cbv_descriptor = m_shader_resource_descriptor_heap->PopDescriptor();
-
-				D3D12_CONSTANT_BUFFER_VIEW_DESC d3d_cbv_desc;
-				d3d_cbv_desc.BufferLocation = frame_resource.d3d_cbv_resource->GetGPUVirtualAddress();
-				d3d_cbv_desc.SizeInBytes = static_cast<UINT>(d3d_resource_desc.Width);
-				m_d3d_device->CreateConstantBufferView(
-					&d3d_cbv_desc,
-					frame_resource.cbv_descriptor->GetCpuHandle()
-				);
-
-				hr = frame_resource.d3d_cbv_resource->Map(0, nullptr, reinterpret_cast<void**>(&frame_resource.cb_scene_data));
-				COMPLETION_CHECK
-			}
-
-			{
-				hr = m_d3d_device->CreateCommandAllocator(
-					D3D12_COMMAND_LIST_TYPE_DIRECT,
-					IID_PPV_ARGS(frame_resource.d3d_command_allocator.GetAddressOf())
-				);
-				COMPLETION_CHECK
-					frame_resource.d3d_command_allocator->SetName(L"GraphicsCommandAllocator");
-			}
-
-			{
-				hr = m_d3d_device->CreateCommandList(
-					0,
-					D3D12_COMMAND_LIST_TYPE_DIRECT,
-					frame_resource.d3d_command_allocator.Get(),
-					nullptr,
-					IID_PPV_ARGS(frame_resource.d3d_command_list.GetAddressOf())
-				);
-				COMPLETION_CHECK
-					frame_resource.d3d_command_list->Close();
-				frame_resource.d3d_command_list->SetName(L"GraphicsCommandList");
-			}
-		}
+		// コマンドリストとコマンドアロケーターの作成
+		CreateCommand();
 
 		{
 			{
@@ -558,35 +459,51 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	adapter->Release();
 
 	// フレームバッファ作成
-	frameBuffers[static_cast<int>(FrameBufferId::Display)] = std::make_unique<FrameBuffer>(device.Get(), swapchain.Get());
-	frameBuffers[static_cast<int>(FrameBufferId::Scene)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight);
-	frameBuffers[static_cast<int>(FrameBufferId::Luminance)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth / 2, screenHeight / 2);
+	frameBuffers[static_cast<int>(FrameBufferId::Display)]      = std::make_unique<FrameBuffer>(device.Get(), swapchain.Get());
+	frameBuffers[static_cast<int>(FrameBufferId::Scene)]        = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight);
+	frameBuffers[static_cast<int>(FrameBufferId::Luminance)]    = std::make_unique<FrameBuffer>(device.Get(), screenWidth / 2, screenHeight / 2);
 	frameBuffers[static_cast<int>(FrameBufferId::GaussianBlur)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth / 2, screenHeight / 2);
-	frameBuffers[static_cast<int>(FrameBufferId::Normal)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
-	frameBuffers[static_cast<int>(FrameBufferId::Position)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT);
+	frameBuffers[static_cast<int>(FrameBufferId::Normal)]       = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
+	frameBuffers[static_cast<int>(FrameBufferId::Position)]     = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT);
+
+	// フレームバッファマネージャー
+	m_frambufferManager = std::make_unique<FrameBufferManager>();
+	m_frambufferManager->Init(d3d_command_list.Get());
+
+	// フレームバッファ作成(DX12)
+	const wchar_t* resourceName1[] = { L"SceneRenderTarget", L"SceneDepthStencil" };
+	const wchar_t* resourceName2[] = { L"LuminanceRenderTarget",L"LuminanceDepthStencil" };
+	const wchar_t* resourceName3[] = { L"GaussianBlurRenderTarget",L"GaussianBlurDepthStencil" };
+	const wchar_t* resourceName4[] = { L"NormalRenderTarget",L"NormalDepthStencil" };
+	const wchar_t* resourceName5[] = { L"PositionRenderTarget",L"PositionDepthStencil" };
+	dx12_frameBuffers[static_cast<int>(FrameBufferDX12Id::Scene)]        = std::make_unique<FrameBufferDX12>(m_d3d_device.Get(), resourceName1, screenWidth, screenHeight);
+	dx12_frameBuffers[static_cast<int>(FrameBufferDX12Id::Luminance)]    = std::make_unique<FrameBufferDX12>(m_d3d_device.Get(), resourceName2, screenWidth / 2, screenHeight / 2);
+	dx12_frameBuffers[static_cast<int>(FrameBufferDX12Id::GaussianBlur)] = std::make_unique<FrameBufferDX12>(m_d3d_device.Get(), resourceName3, screenWidth / 2, screenHeight / 2);
+	dx12_frameBuffers[static_cast<int>(FrameBufferDX12Id::Normal)]       = std::make_unique<FrameBufferDX12>(m_d3d_device.Get(), resourceName4, screenWidth, screenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
+	dx12_frameBuffers[static_cast<int>(FrameBufferDX12Id::Position)]     = std::make_unique<FrameBufferDX12>(m_d3d_device.Get(), resourceName5, screenWidth, screenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT);
 
 	// レンダーステート作成
 	renderState = std::make_unique<RenderState>(device.Get());
 	m_renderStateDX12 = std::make_unique<RenderStateDX12>();
 
 	//サンプラーステート作成
-	m_sampler[static_cast<int>(SamplerState::PointWrap)] = std::make_unique<SamplerManager>(SamplerState::PointWrap);
-	m_sampler[static_cast<int>(SamplerState::PointClamp)] = std::make_unique<SamplerManager>(SamplerState::PointClamp);
-	m_sampler[static_cast<int>(SamplerState::LinearWrap)] = std::make_unique<SamplerManager>(SamplerState::LinearWrap);
-	m_sampler[static_cast<int>(SamplerState::LinearClamp)] = std::make_unique<SamplerManager>(SamplerState::LinearClamp);
+	m_sampler[static_cast<int>(SamplerState::PointWrap)]    = std::make_unique<SamplerManager>(SamplerState::PointWrap);
+	m_sampler[static_cast<int>(SamplerState::PointClamp)]   = std::make_unique<SamplerManager>(SamplerState::PointClamp);
+	m_sampler[static_cast<int>(SamplerState::LinearWrap)]   = std::make_unique<SamplerManager>(SamplerState::LinearWrap);
+	m_sampler[static_cast<int>(SamplerState::LinearClamp)]  = std::make_unique<SamplerManager>(SamplerState::LinearClamp);
 	m_sampler[static_cast<int>(SamplerState::LinearBorder)] = std::make_unique<SamplerManager>(SamplerState::LinearBorder);
-	m_sampler[static_cast<int>(SamplerState::ShadowMap)] = std::make_unique<SamplerManager>(SamplerState::ShadowMap);
+	m_sampler[static_cast<int>(SamplerState::ShadowMap)]    = std::make_unique<SamplerManager>(SamplerState::ShadowMap);
 
 	// ギズモ生成
 	gizmos = std::make_unique<Gizmos>(device.Get());
 
 	// モデルシェーダー生成
-	modelShaders[static_cast<int>(ModelShaderId::Phong)] = std::make_unique<PhongShader>(device.Get());
-	modelShaders[static_cast<int>(ModelShaderId::Toon)] = std::make_unique<ToonShader>(device.Get());
-	modelShaders[static_cast<int>(ModelShaderId::Skydome)] = std::make_unique<SkydomeShader>(device.Get());
+	modelShaders[static_cast<int>(ModelShaderId::Phong)]     = std::make_unique<PhongShader>(device.Get());
+	modelShaders[static_cast<int>(ModelShaderId::Toon)]      = std::make_unique<ToonShader>(device.Get());
+	modelShaders[static_cast<int>(ModelShaderId::Skydome)]   = std::make_unique<SkydomeShader>(device.Get());
 	modelShaders[static_cast<int>(ModelShaderId::ShadowMap)] = std::make_unique<ShadowMapShader>(device.Get());
-	modelShaders[static_cast<int>(ModelShaderId::Plane)] = std::make_unique<PlaneShader>(device.Get(), "Data/Shader/PlaneVS.cso", "Data/Shader/PlanePS.cso");
-	modelShaders[static_cast<int>(ModelShaderId::Portal)] = std::make_unique<PortalShader>(device.Get(), "Data/Shader/PortalVS.cso", "Data/Shader/PortalPS.cso");
+	modelShaders[static_cast<int>(ModelShaderId::Plane)]     = std::make_unique<PlaneShader>(device.Get(), "Data/Shader/PlaneVS.cso", "Data/Shader/PlanePS.cso");
+	modelShaders[static_cast<int>(ModelShaderId::Portal)]    = std::make_unique<PortalShader>(device.Get(), "Data/Shader/PortalVS.cso", "Data/Shader/PortalPS.cso");
 
 	// DX12のモデルシェーダー生成
 	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Lambert)]           = std::make_unique<LambertShader>(m_d3d_device.Get());
@@ -597,14 +514,14 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::ToonInstancing)]    = std::make_unique<ToonShaderDX12>(m_d3d_device.Get(), true);
 
 	// スプライトシェーダー生成
-	spriteShaders[static_cast<int>(SpriteShaderId::Default)] = std::make_unique<DefaultSpriteShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::UVScroll)] = std::make_unique<UVScrollShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::Mask)] = std::make_unique<MaskShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::ColorGrading)] = std::make_unique<ColorGradingShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::GaussianBlur)] = std::make_unique<GaussianBlurShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::Default)]             = std::make_unique<DefaultSpriteShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::UVScroll)]            = std::make_unique<UVScrollShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::Mask)]                = std::make_unique<MaskShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::ColorGrading)]        = std::make_unique<ColorGradingShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::GaussianBlur)]        = std::make_unique<GaussianBlurShader>(device.Get());
 	spriteShaders[static_cast<int>(SpriteShaderId::LuminanceExtraction)] = std::make_unique<LuminanceExtractionShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::Finalpass)] = std::make_unique<FinalpassShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::Deferred)] = std::make_unique<DeferredLightingShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::Finalpass)]           = std::make_unique<FinalpassShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::Deferred)]            = std::make_unique<DeferredLightingShader>(device.Get());
 
 	// DX12のスプライトシェーダー生成
 	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::Default)]             = std::make_unique<DefaultSpriteShaderDX12>(m_d3d_device.Get());
@@ -620,18 +537,31 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	m_skinning_pipeline = std::make_unique<SkinningPipeline>(m_d3d_device.Get());
 }
 
+//******************************************************************
+// @class     画面表示
+// @param[in] syncInterval　  垂直同期
+// @return    なし
+//******************************************************************
 void Graphics::Present(UINT syncInterval)
 {
 	swapchain->Present(syncInterval, 0);
 }
 
+//******************************************************************
+// @class     スクリーン作成取得
+// @param[in] worldPosition　  ワールド座標系での位置
+// @param[in] viewport         ビューポート情報
+// @param[in] View             ビュー行列
+// @param[in] Projection       射影行列
+// @param[in] World            ワールド行列
+// @return    DirectX::XMFLOAT3
+//******************************************************************
 DirectX::XMFLOAT3 Graphics::GetScreenPosition(
 	const DirectX::XMFLOAT3 worldPosition,
 	const D3D11_VIEWPORT& viewport,
 	const  DirectX::XMMATRIX& View,
 	const  DirectX::XMMATRIX& Projection,
-	const DirectX::XMMATRIX World
-)
+	const DirectX::XMMATRIX World)
 {
 	DirectX::XMVECTOR ScreenPosition = DirectX::XMVector3Project(
 		DirectX::XMVectorSet(worldPosition.x, worldPosition.y, worldPosition.z, 0),
@@ -649,6 +579,12 @@ DirectX::XMFLOAT3 Graphics::GetScreenPosition(
 	DirectX::XMStoreFloat3(&screenPosition, ScreenPosition);
 	return screenPosition;
 }
+
+//******************************************************************
+// @class     スクリーン作成取得
+// @param[in] worldPosition　  ワールド座標系での位置
+// @return    DirectX::XMFLOAT3
+//******************************************************************
 DirectX::XMFLOAT3 Graphics::GetScreenPosition(const DirectX::XMFLOAT3 worldPosition)
 {
 	// ビューボード
@@ -664,12 +600,73 @@ DirectX::XMFLOAT3 Graphics::GetScreenPosition(const DirectX::XMFLOAT3 worldPosit
 	return GetScreenPosition(worldPosition, viewport, View, Projection, World);
 }
 
+//******************************************************************
+// @class     描画開始
+// @param[in] なし
+// @return    なし
+//******************************************************************
+void Graphics::BeginRender()
+{
+	frame_buffer_index = m_dxgi_swap_chain->GetCurrentBackBufferIndex();
+
+	// コマンドアロケータををリセット
+	d3d_command_allocator->Reset();
+
+	// コマンドリストをリセット
+	m_frambufferManager->Reset(d3d_command_allocator.Get(), nullptr);
+
+	// ディスクリプタヒープをあらかじめ設定
+	ID3D12DescriptorHeap* d3d_descriptor_heaps[] =
+	{
+		m_shader_resource_descriptor_heap->GetD3DDescriptorHeap(),
+		m_sampler_descriptor_heap->GetD3DDescriptorHeap()
+	};
+	d3d_command_list->SetDescriptorHeaps(_countof(d3d_descriptor_heaps), d3d_descriptor_heaps);
+
+	// ビューポートを設定
+	m_frambufferManager->SetViewportAndScissor(m_viewport);
+
+	// バックバッファがレンダリングターゲットとして設定可能になるまで待つ
+	m_frambufferManager->WaitUntilToPossibleSetRenderTarget(d3d_rtv_resource[frame_buffer_index].Get());
+
+	// レンダーターゲットを設定
+	m_frambufferManager->SetRenderTarget(rtv_descriptor[frame_buffer_index]->GetCpuHandle(), dsv_descriptor->GetCpuHandle());
+
+	const float clearColor[] = { 0.0f, 0.0f, 1.0f, 1.0f };
+	m_frambufferManager->ClearRenderTargetView(rtv_descriptor[frame_buffer_index]->GetCpuHandle(), clearColor);
+	m_frambufferManager->ClearDepthStencilView(dsv_descriptor->GetCpuHandle(), 1.0f);
+}
+
+//******************************************************************
+// @class     描画終了
+// @param[in] なし
+// @return    なし
+//******************************************************************
+void Graphics::End()
+{
+	// レンダーターゲットへの描き込み完了待ち
+	m_frambufferManager->WaitUntilFinishDrawingToRenderTarget(d3d_rtv_resource[frame_buffer_index].Get());
+	
+	// レンダリングコンテキストを閉じる
+	m_frambufferManager->Close();
+}
+
+//******************************************************************
+// @class     描画コマンド実行完了まで待つ
+// @param[in] なし
+// @return    なし
+//******************************************************************
 void Graphics::WaitIdle()
 {
 	WaitIdle(m_graphics_queue);
 	WaitIdle(m_resource_queue);
 }
 
+//******************************************************************
+// @class     描画コマンド実行完了まで待つ
+// @param[in] command_queue　コマンドキュー
+// @return    なし
+//******************************************************************
 void Graphics::WaitIdle(CommandQueue& command_queue)
 {
 	command_queue.d3d_command_queue->Signal(command_queue.d3d_fence.Get(), ++command_queue.fence_value);
@@ -683,125 +680,51 @@ void Graphics::WaitIdle(CommandQueue& command_queue)
 	}
 }
 
+//******************************************************************
+// @class     描画実行
+// @param[in] なし
+// @return    なし
+//******************************************************************
 void Graphics::Execute()
 {
-	// コマンド終了まで待つ
-	WaitIdle(m_graphics_queue);
-
-	UINT frame_buffer_index = m_dxgi_swap_chain->GetCurrentBackBufferIndex();
-	FrameResource& frame_resource = m_frame_resources.at(frame_buffer_index);
-
 	// コマンド実行
 	ID3D12CommandList* d3d_command_lists[] =
 	{
-		frame_resource.d3d_command_list.Get()
+		//frame_resource.d3d_command_list.Get()
+		d3d_command_list.Get(),
 	};
 
 	m_graphics_queue.d3d_command_queue->ExecuteCommandLists(_countof(d3d_command_lists), d3d_command_lists);
 
 	// 画面表示
 	m_dxgi_swap_chain->Present(SyncInterval, SyncInterval == 0 ? DXGI_PRESENT_ALLOW_TEARING : 0);
-}
 
-ID3D12GraphicsCommandList* Graphics::Begin()
-{
-	UINT frame_buffer_index = m_dxgi_swap_chain->GetCurrentBackBufferIndex();
-	FrameResource& frame_resource = m_frame_resources.at(frame_buffer_index);
-
-	// コマンドのリセット
-	frame_resource.d3d_command_allocator->Reset();
-	frame_resource.d3d_command_list->Reset(frame_resource.d3d_command_allocator.Get(), nullptr);
-
-	// ディスクリプタヒープをあらかじめ設定
-	ID3D12DescriptorHeap* d3d_descriptor_heaps[] =
-	{
-		m_shader_resource_descriptor_heap->GetD3DDescriptorHeap(),
-		m_sampler_descriptor_heap->GetD3DDescriptorHeap()
-	};
-	frame_resource.d3d_command_list->SetDescriptorHeaps(_countof(d3d_descriptor_heaps), d3d_descriptor_heaps);
-
-	// レンダーターゲット設定
-	{
-		// ビューポートの設定
-		D3D12_VIEWPORT d3d_viewport;
-		d3d_viewport.TopLeftX = 0;
-		d3d_viewport.TopLeftY = 0;
-		d3d_viewport.Width = this->screenWidth;
-		d3d_viewport.Height = this->screenHeight;
-		d3d_viewport.MinDepth = 0.0f;
-		d3d_viewport.MaxDepth = 1.0f;
-		frame_resource.d3d_command_list->RSSetViewports(1, &d3d_viewport);
-
-		// シザーの設定
-		D3D12_RECT scissor_rect;
-		scissor_rect.left = 0;
-		scissor_rect.top = 0;
-		scissor_rect.right = static_cast<LONG>(this->screenWidth);
-		scissor_rect.bottom = static_cast<LONG>(this->screenHeight);
-		frame_resource.d3d_command_list->RSSetScissorRects(1, &scissor_rect);
-
-		// 状態遷移バリアを張る
-		D3D12_RESOURCE_BARRIER d3d_resource_barrier{};
-		d3d_resource_barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		d3d_resource_barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		d3d_resource_barrier.Transition.pResource = frame_resource.d3d_rtv_resource.Get();
-		d3d_resource_barrier.Transition.Subresource = 0;
-		d3d_resource_barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-		d3d_resource_barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-		frame_resource.d3d_command_list->ResourceBarrier(1, &d3d_resource_barrier);
-
-		// レンダーターゲット設定
-		FLOAT clear_color[4] = { 0, 0, 1, 1 };
-		D3D12_CPU_DESCRIPTOR_HANDLE d3d_rtv_handle = frame_resource.rtv_descriptor->GetCpuHandle();
-		D3D12_CPU_DESCRIPTOR_HANDLE d3d_dsv_handle = frame_resource.dsv_descriptor->GetCpuHandle();
-		frame_resource.d3d_command_list->OMSetRenderTargets(1, &d3d_rtv_handle, false, &d3d_dsv_handle);
-		frame_resource.d3d_command_list->ClearRenderTargetView(d3d_rtv_handle, clear_color, 0, nullptr);
-		frame_resource.d3d_command_list->ClearDepthStencilView(d3d_dsv_handle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-	}
-	return frame_resource.d3d_command_list.Get();
-}
-
-void Graphics::End()
-{
-	UINT frame_buffer_index = m_dxgi_swap_chain->GetCurrentBackBufferIndex();
-	FrameResource& frame_resource = m_frame_resources.at(frame_buffer_index);
-
-	// 状態遷移バリアを張る
-	{
-		D3D12_RESOURCE_BARRIER d3d_resource_barrier{};
-		d3d_resource_barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		d3d_resource_barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		d3d_resource_barrier.Transition.pResource = frame_resource.d3d_rtv_resource.Get();
-		d3d_resource_barrier.Transition.Subresource = 0;
-		d3d_resource_barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-		d3d_resource_barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-
-		frame_resource.d3d_command_list->ResourceBarrier(1, &d3d_resource_barrier);
-	}
-
-	frame_resource.d3d_command_list->Close();
+	// コマンド終了まで待つ
+	WaitIdle(m_graphics_queue);
 }
 
 //TODO : UpdataConstantBuffer
-const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera& camera, const DirectX::XMFLOAT3& light_direction)
+//******************************************************************
+// @class     コンスタントバッファ更新
+// @param[in] camera　カメラ
+// @return    const Descriptor*
+//******************************************************************
+const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera& camera)
 {
 	LightManager& ligtManager = LightManager::Instance();
-
-	UINT       frame_buffer_index = m_dxgi_swap_chain->GetCurrentBackBufferIndex();
-	FrameResource& frame_resource = m_frame_resources.at(frame_buffer_index);
 
 	DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&camera.GetView());
 	DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&camera.GetProjection());
 	DirectX::XMMATRIX ViewProjection = DirectX::XMMatrixMultiply(View, Projection);
-	DirectX::XMStoreFloat4x4(&frame_resource.cb_scene_data->view_projection, ViewProjection);
+	DirectX::XMStoreFloat4x4(&cb_scene_data->view_projection, ViewProjection);
 
 	// カメラ
-	frame_resource.cb_scene_data->camera_position.x = camera.GetEye().x;
-	frame_resource.cb_scene_data->camera_position.y = camera.GetEye().y;
-	frame_resource.cb_scene_data->camera_position.z = camera.GetEye().z;
+	cb_scene_data->camera_position.x = camera.GetEye().x;
+	cb_scene_data->camera_position.y = camera.GetEye().y;
+	cb_scene_data->camera_position.z = camera.GetEye().z;
 
 	// ライト情報
-	frame_resource.cb_scene_data->ambientLightColor = ligtManager.GetAmbientColor();
+	cb_scene_data->ambientLightColor = ligtManager.GetAmbientColor();
 
 	for (Light* light : ligtManager.GetAllLight())
 	{
@@ -809,51 +732,199 @@ const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera& camera, cons
 		{
 		case	LightType::Directional:
 		{
-			frame_resource.cb_scene_data->directionalLightData.direction.x = light->GetDirection().x;
-			frame_resource.cb_scene_data->directionalLightData.direction.y = light->GetDirection().y;
-			frame_resource.cb_scene_data->directionalLightData.direction.z = light->GetDirection().z;
-			frame_resource.cb_scene_data->directionalLightData.direction.w = 0.0f;
-			frame_resource.cb_scene_data->directionalLightData.color = light->GetColor();
+			cb_scene_data->directionalLightData.direction.x = light->GetDirection().x;
+			cb_scene_data->directionalLightData.direction.y = light->GetDirection().y;
+			cb_scene_data->directionalLightData.direction.z = light->GetDirection().z;
+			cb_scene_data->directionalLightData.direction.w = 0.0f;
+			cb_scene_data->directionalLightData.color = light->GetColor();
 			break;
 		}
 		case	LightType::Point:
 		{
-			if (frame_resource.cb_scene_data->pointLightCount >= PointLightMax) break;
+			if (cb_scene_data->pointLightCount >= PointLightMax) break;
 
-			frame_resource.cb_scene_data->pointLightData[frame_resource.cb_scene_data->pointLightCount].position.x = light->GetPosition().x;
-			frame_resource.cb_scene_data->pointLightData[frame_resource.cb_scene_data->pointLightCount].position.y = light->GetPosition().y;
-			frame_resource.cb_scene_data->pointLightData[frame_resource.cb_scene_data->pointLightCount].position.z = light->GetPosition().z;
-			frame_resource.cb_scene_data->pointLightData[frame_resource.cb_scene_data->pointLightCount].position.w = 1.0f;
-			frame_resource.cb_scene_data->pointLightData[frame_resource.cb_scene_data->pointLightCount].color = light->GetColor();
-			frame_resource.cb_scene_data->pointLightData[frame_resource.cb_scene_data->pointLightCount].range = light->GetRange();
-			++frame_resource.cb_scene_data->pointLightCount;
+			cb_scene_data->pointLightData[cb_scene_data->pointLightCount].position.x = light->GetPosition().x;
+			cb_scene_data->pointLightData[cb_scene_data->pointLightCount].position.y = light->GetPosition().y;
+			cb_scene_data->pointLightData[cb_scene_data->pointLightCount].position.z = light->GetPosition().z;
+			cb_scene_data->pointLightData[cb_scene_data->pointLightCount].position.w = 1.0f;
+			cb_scene_data->pointLightData[cb_scene_data->pointLightCount].color = light->GetColor();
+			cb_scene_data->pointLightData[cb_scene_data->pointLightCount].range = light->GetRange();
+			++cb_scene_data->pointLightCount;
 			break;
 		}
 		case	LightType::Spot:
 		{
-			if (frame_resource.cb_scene_data->spotLightCount >= SpotLightMax) break;
+			if (cb_scene_data->spotLightCount >= SpotLightMax) break;
 
-			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].position.x = light->GetPosition().x;
-			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].position.y = light->GetPosition().y;
-			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].position.z = light->GetPosition().z;
-			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].position.w = 1.0f;
-			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].direction.x = light->GetDirection().x;
-			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].direction.y = light->GetDirection().y;
-			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].direction.z = light->GetDirection().z;
-			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].direction.w = 0.0f;
-			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].color = light->GetColor();
-			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].range = light->GetRange();
-			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].innerCorn = light->GetInnerCorn();
-			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].outerCorn = light->GetOuterCorn();
-			++frame_resource.cb_scene_data->spotLightCount;
+			cb_scene_data->spotLightData[cb_scene_data->spotLightCount].position.x = light->GetPosition().x;
+			cb_scene_data->spotLightData[cb_scene_data->spotLightCount].position.y = light->GetPosition().y;
+			cb_scene_data->spotLightData[cb_scene_data->spotLightCount].position.z = light->GetPosition().z;
+			cb_scene_data->spotLightData[cb_scene_data->spotLightCount].position.w = 1.0f;
+			cb_scene_data->spotLightData[cb_scene_data->spotLightCount].direction.x = light->GetDirection().x;
+			cb_scene_data->spotLightData[cb_scene_data->spotLightCount].direction.y = light->GetDirection().y;
+			cb_scene_data->spotLightData[cb_scene_data->spotLightCount].direction.z = light->GetDirection().z;
+			cb_scene_data->spotLightData[cb_scene_data->spotLightCount].direction.w = 0.0f;
+			cb_scene_data->spotLightData[cb_scene_data->spotLightCount].color = light->GetColor();
+			cb_scene_data->spotLightData[cb_scene_data->spotLightCount].range = light->GetRange();
+			cb_scene_data->spotLightData[cb_scene_data->spotLightCount].innerCorn = light->GetInnerCorn();
+			cb_scene_data->spotLightData[cb_scene_data->spotLightCount].outerCorn = light->GetOuterCorn();
+			++cb_scene_data->spotLightCount;
 			break;
 		}
 		}
 	}
 
-	return frame_resource.cbv_descriptor;
+	return cbv_descriptor;
 }
 
+//******************************************************************
+// @class     フレームバッファ用のレンダリングターゲットビューを作成
+// @param[in] なし
+// @return    なし
+//******************************************************************
+void Graphics::CreateRTVForFameBuffer()
+{
+	for (UINT i = 0; i < m_buffer_count; i++)
+	{
+		rtv_descriptor[i] = m_rtv_descriptor_heap->PopDescriptor();
+		m_dxgi_swap_chain->GetBuffer(i, IID_PPV_ARGS(d3d_rtv_resource[i].GetAddressOf()));
+		d3d_rtv_resource[i]->SetName(L"BackBuffer");
+		
+		m_d3d_device->CreateRenderTargetView(d3d_rtv_resource[i].Get(), nullptr, rtv_descriptor[i]->GetCpuHandle());
+	}
+}
+
+//******************************************************************
+// @class     フレームバッファ用の深度ステンシルビューを作成
+// @param[in] frameBufferWidth　　幅
+// @param[in] frameBufferHeight   高さ
+// @return    なし
+//******************************************************************
+void Graphics::CreateDSVForFrameBuffer(UINT frameBufferWidth, UINT frameBufferHeight)
+{
+	D3D12_HEAP_PROPERTIES d3d_heap_props{};
+	d3d_heap_props.Type = D3D12_HEAP_TYPE_DEFAULT;
+	d3d_heap_props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	d3d_heap_props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	d3d_heap_props.CreationNodeMask = 1;
+	d3d_heap_props.VisibleNodeMask = 1;
+
+	D3D12_RESOURCE_DESC d3d_resource_desc{};
+	d3d_resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	d3d_resource_desc.Alignment = 0;
+	d3d_resource_desc.Width = frameBufferWidth;
+	d3d_resource_desc.Height = frameBufferHeight;
+	d3d_resource_desc.DepthOrArraySize = 1;
+	d3d_resource_desc.MipLevels = 1;
+	d3d_resource_desc.Format = DXGI_FORMAT_D32_FLOAT;
+	d3d_resource_desc.SampleDesc.Count = 1;
+	d3d_resource_desc.SampleDesc.Quality = 0;
+	d3d_resource_desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	d3d_resource_desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+	D3D12_CLEAR_VALUE dsvClearValue;
+	dsvClearValue.Format = DXGI_FORMAT_D32_FLOAT;
+	dsvClearValue.DepthStencil.Depth = 1.0f;
+	dsvClearValue.DepthStencil.Stencil = 0;
+
+	HRESULT hr = m_d3d_device->CreateCommittedResource(
+		&d3d_heap_props,
+		D3D12_HEAP_FLAG_NONE,
+		&d3d_resource_desc,
+		D3D12_RESOURCE_STATE_DEPTH_WRITE,
+		&dsvClearValue,
+		IID_PPV_ARGS(d3d_dsv_resource.GetAddressOf()));
+	d3d_dsv_resource->SetName(L"DepthStencilView");
+
+	dsv_descriptor = m_dsv_descriptor_heap->PopDescriptor();
+	
+	m_d3d_device->CreateDepthStencilView(
+		d3d_dsv_resource.Get(),
+		nullptr,
+		dsv_descriptor->GetCpuHandle());
+}
+
+//******************************************************************
+// @class     フレームバッファ用のコンスタントバッファを作成
+// @param[in] なし
+// @return    なし
+//******************************************************************
+void Graphics::CreateConstantBuffer()
+{
+	D3D12_HEAP_PROPERTIES d3d_head_props{};
+	d3d_head_props.Type = D3D12_HEAP_TYPE_UPLOAD;
+	d3d_head_props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	d3d_head_props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	d3d_head_props.CreationNodeMask = 1;
+	d3d_head_props.VisibleNodeMask = 1;
+
+	D3D12_RESOURCE_DESC d3d_resource_desc{};
+	d3d_resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	d3d_resource_desc.Alignment = 0;
+	d3d_resource_desc.Width = ((sizeof(CbScene)) + 255) & ~255;
+	d3d_resource_desc.Height = 1;
+	d3d_resource_desc.DepthOrArraySize = 1;
+	d3d_resource_desc.MipLevels = 1;
+	d3d_resource_desc.Format = DXGI_FORMAT_UNKNOWN;
+	d3d_resource_desc.SampleDesc.Count = 1;
+	d3d_resource_desc.SampleDesc.Quality = 0;
+	d3d_resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	d3d_resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	HRESULT hr = m_d3d_device->CreateCommittedResource(
+		&d3d_head_props,
+		D3D12_HEAP_FLAG_NONE,
+		&d3d_resource_desc,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(d3d_cbv_resource.GetAddressOf())
+	);
+	COMPLETION_CHECK
+		d3d_cbv_resource->SetName(L"SceneConstatBuffer");
+
+	cbv_descriptor = m_shader_resource_descriptor_heap->PopDescriptor();
+
+	D3D12_CONSTANT_BUFFER_VIEW_DESC d3d_cbv_desc;
+	d3d_cbv_desc.BufferLocation = d3d_cbv_resource->GetGPUVirtualAddress();
+	d3d_cbv_desc.SizeInBytes = static_cast<UINT>(d3d_resource_desc.Width);
+	m_d3d_device->CreateConstantBufferView(
+		&d3d_cbv_desc,
+		cbv_descriptor->GetCpuHandle());
+
+	hr = d3d_cbv_resource->Map(0, nullptr, reinterpret_cast<void**>(&cb_scene_data));
+	COMPLETION_CHECK
+}
+
+//******************************************************************
+// @class     コマンドリストとコマンドアロケーターの作成
+// @param[in] なし
+// @return    なし
+//******************************************************************
+void Graphics::CreateCommand()
+{
+	HRESULT hr = m_d3d_device->CreateCommandAllocator(
+		D3D12_COMMAND_LIST_TYPE_DIRECT,
+		IID_PPV_ARGS(d3d_command_allocator.GetAddressOf()));
+	COMPLETION_CHECK
+		d3d_command_allocator->SetName(L"GraphicsCommandAllocator");
+
+	hr = m_d3d_device->CreateCommandList(
+		0,
+		D3D12_COMMAND_LIST_TYPE_DIRECT,
+		d3d_command_allocator.Get(),
+		nullptr,
+		IID_PPV_ARGS(d3d_command_list.GetAddressOf()));
+	COMPLETION_CHECK
+		d3d_command_list->Close();
+	d3d_command_list->SetName(L"GraphicsCommandList");
+}
+
+//******************************************************************
+// @class     テクスチャ読み込み
+// @param[in] filename　　    ファイル名
+// @param[in] d3d_resource    ID3D12Resource**
+// @return    HRESULT
+//******************************************************************
 HRESULT Graphics::LoadTexture(const char* filename, ID3D12Resource** d3d_resource)
 {
 	// マルチバイト文字からワイド文字へ変換
@@ -887,6 +958,15 @@ HRESULT Graphics::LoadTexture(const char* filename, ID3D12Resource** d3d_resourc
 	return hr;
 }
 
+//******************************************************************
+// @class     テクスチャ作成
+// @param[in] pixels　　    ピクセル
+// @param[in] width         幅
+// @param[in] height        高さ
+// @param[in] format        フォーマット
+// @param[in] d3d_resource  ID3D12Resource**
+// @return    HRESULT
+//******************************************************************
 HRESULT Graphics::CreateTexture(const BYTE* pixels, UINT width, UINT height, DXGI_FORMAT format, ID3D12Resource** d3d_resource)
 {
 	D3D12_HEAP_PROPERTIES d3d_heap_props = {};
@@ -925,6 +1005,11 @@ HRESULT Graphics::CreateTexture(const BYTE* pixels, UINT width, UINT height, DXG
 	return CopyImage(pixels, width, height, format, *d3d_resource);
 }
 
+//******************************************************************
+// @class     ダミーテクスチャ生成
+// @param[in] d3d_resource    ID3D12Resource**
+// @return    HRESULT
+//******************************************************************
 HRESULT Graphics::CreateDummyTexture(ID3D12Resource** d3d_resource)
 {
 	const UINT width = 8;
@@ -978,6 +1063,12 @@ HRESULT Graphics::CreateDummyTexture(ID3D12Resource** d3d_resource)
 	);
 }
 
+//******************************************************************
+// @class     バッファコピー
+// @param[in] d3d_src_resource    シェーダーリソース
+// @param[in] d3d_dst_resource    デプスステンシルビューリソース
+// @return    HRESULT
+//******************************************************************
 HRESULT Graphics::CopyBuffer(ID3D12Resource* d3d_src_resource, ID3D12Resource* d3d_dst_resource)
 {
 	D3D12_RESOURCE_BARRIER d3d_resource_barrier = {};
@@ -1011,6 +1102,15 @@ HRESULT Graphics::CopyBuffer(ID3D12Resource* d3d_src_resource, ID3D12Resource* d
 	return S_OK;
 }
 
+//******************************************************************
+// @class     イメージコピー
+// @param[in] pixels　　    ピクセル
+// @param[in] width         幅
+// @param[in] height        高さ
+// @param[in] format        フォーマット
+// @param[in] d3d_resource  ID3D12Resource*
+// @return    HRESULT
+//******************************************************************
 HRESULT Graphics::CopyImage(const BYTE* pixels, UINT width, UINT height, DXGI_FORMAT format, ID3D12Resource* d3d_resource)
 {
 	HRESULT hr = S_OK;
@@ -1118,6 +1218,11 @@ HRESULT Graphics::CopyImage(const BYTE* pixels, UINT width, UINT height, DXGI_FO
 	return S_OK;
 }
 
+//******************************************************************
+// @class     ビットあたりのピクセル数
+// @param[in] fmt    　フォーマット
+// @return    UINT
+//******************************************************************
 UINT Graphics::BitsPerPixel(DXGI_FORMAT fmt)
 {
 	switch (static_cast<int>(fmt))

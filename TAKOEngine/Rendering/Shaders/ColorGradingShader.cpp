@@ -117,7 +117,7 @@ ColorGradingShaderDX12::ColorGradingShaderDX12(ID3D12Device* device)
 		// レンダーターゲット数
 		d3d_graphics_pipeline_state_desc.NumRenderTargets = 1;
 		d3d_graphics_pipeline_state_desc.RTVFormats[0] = RenderTargetFormat;
-		d3d_graphics_pipeline_state_desc.DSVFormat = DepthStencilFormat;
+		d3d_graphics_pipeline_state_desc.DSVFormat     = DepthStencilFormat;
 
 		// マルチサンプリング
 		d3d_graphics_pipeline_state_desc.SampleDesc.Count = 1;

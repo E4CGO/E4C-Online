@@ -8,8 +8,10 @@
 #include <d3d12.h>
 #include <DirectXMath.h>
 
-#include "TAKOEngine/Rendering/Descriptor.h"
 #include "TAKOEngine/Rendering/RenderContext.h"
+#include "TAKOEngine/Rendering/GpuResourceUtils.h"
+#include "TAKOEngine/Rendering/Descriptor.h"
+#include "FrameBufferTexture.h"
 
 /**************************************************************************//**
 		@class		SpriteDX12
@@ -63,6 +65,7 @@ public:
 
 	//! コンストラクタ
 	SpriteDX12(UINT sprite_count, const char* filename = nullptr);
+	SpriteDX12(UINT sprite_count, FrameBufferTexture* frameBuffer);
 
 	//! デストラクタ
 	~SpriteDX12();
@@ -102,6 +105,9 @@ public:
 	const int GetSpriteCount() { return m_sprite_count; }
 
 private:
+	// フレームリソース生成
+	void CreateFrameResource();
+
 	// フィルター値計算
 	void CalcGaussianFilter(FrameResource& fram_resource, const GaussianFilterData& gaussianFilterData);
 

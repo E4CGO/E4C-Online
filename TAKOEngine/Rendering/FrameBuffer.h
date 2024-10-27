@@ -1,8 +1,17 @@
-#pragma once
+//! @file FrameBuffer.h
+//! @note
+
+#ifndef __GRAHICS_FRAME_BUFFER_H__
+#define __GRAHICS_FRAME_BUFFER_H__
 
 #include <wrl.h>
 #include <d3d11.h>
 
+//*******************************************************
+// @class FrameBuffer
+// @brief レンダータゲット作成&取得
+// @par   
+//*******************************************************
 class FrameBuffer
 {
 public:
@@ -53,3 +62,5 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> colorMap;
 	D3D11_TEXTURE2D_DESC texture2dDesc;
 };
+
+#endif // !__GRAHICS_FRAME_BUFFER_H__

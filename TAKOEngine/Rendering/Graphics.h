@@ -1,4 +1,8 @@
-#pragma once
+//! @file Grahics.h
+//! @note 
+
+#ifndef __GRAHICS_GRAHICS_H__
+#define __GRAHICS_GRAHICS_H__
 
 #include <wrl.h>
 #include <memory>
@@ -8,6 +12,7 @@
 #include <dxgi1_6.h>
 
 #include "TAKOEngine/Rendering/FrameBuffer.h"
+#include "TAKOEngine/Rendering/FrameBufferManager.h"
 #include "TAKOEngine/Rendering/RenderState.h"
 #include "TAKOEngine/Rendering/Gizmos.h"
 #include "TAKOEngine/Rendering/Shaders/ModelShader.h"
@@ -19,6 +24,8 @@
 #include "TAKOEngine/Rendering/Descriptor.h"
 #include "TAKOEngine/Rendering/ConstantBuffer.h"
 #include "TAKOEngine/Tool/ImGuiRenderer.h"
+
+#define MAX_BUFFER_COUNT (2)
 
 enum class ModelShaderId
 {
@@ -82,6 +89,19 @@ enum class FrameBufferId
 	EnumCount
 };
 
+enum class FrameBufferDX12Id
+{
+	Scene,        //シーン描画
+	Luminance,
+	GaussianBlur,
+
+	//Deferred Rendering用
+	Normal,       //法線
+	Position,     //座標系
+
+	EnumCount
+};
+
 // 垂直同期間隔設定
 static const int SyncInterval = 0;
 
@@ -89,7 +109,11 @@ static const int SyncInterval = 0;
 static const DXGI_FORMAT RenderTargetFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 static const DXGI_FORMAT DepthStencilFormat = DXGI_FORMAT_D32_FLOAT;
 
-// グラフィックス
+//*******************************************************
+// @class Graphics
+// @brief グラフィックスエンジン
+// @par   
+//*******************************************************
 class Graphics
 {
 public:
@@ -103,8 +127,8 @@ public:
 		return instance;
 	}
 
-	bool isDX12Active = false;
-	bool isDX11Active = true;
+	bool isDX12Active = true;
+	bool isDX11Active = false;
 
 	struct CommandQueue
 	{
@@ -128,6 +152,11 @@ public:
 	float GetScreenHeight() const { return screenHeight; }
 	// フレームバッファ取得
 	FrameBuffer* GetFrameBuffer(FrameBufferId frameBufferId) { return frameBuffers[static_cast<int>(frameBufferId)].get(); }
+	// DX12のフレームバッファ取得
+	FrameBufferDX12* GetFramBufferDX12(FrameBufferDX12Id frameBufferId) { return dx12_frameBuffers[static_cast<int>(frameBufferId)].get(); }
+	// DX12のフレームバッファマネージャー
+	FrameBufferManager* GetFramBufferManager() { return m_frambufferManager.get(); }
+
 	// レンダーステート取得
 	RenderState* GetRenderState() { return renderState.get(); }
 	//DX12のレンダーステート
@@ -168,14 +197,15 @@ public:
 	// ディスクリプタヒープ取得
 	DescriptorHeap* GetShaderResourceDescriptorHeap() const { return m_shader_resource_descriptor_heap.get(); }
 	DescriptorHeap* GetSamplerDescriptorHeap() const { return m_sampler_descriptor_heap.get(); }
+	DescriptorHeap* GetRenderTargetDescriptorHeap() const { return m_rtv_descriptor_heap.get(); }
+	DescriptorHeap* GetDepthStencilDescriptorHeap() const { return m_dsv_descriptor_heap.get(); }
 
 	DirectX::XMFLOAT3 GetScreenPosition(
 		const DirectX::XMFLOAT3 worldPosition,
 		const D3D11_VIEWPORT& viewport,
 		const  DirectX::XMMATRIX& View,
 		const  DirectX::XMMATRIX& Projection,
-		const DirectX::XMMATRIX World
-	);
+		const DirectX::XMMATRIX World);
 	DirectX::XMFLOAT3 GetScreenPosition(const DirectX::XMFLOAT3 worldPosition);
 
 	void WaitIdle();
@@ -187,14 +217,14 @@ public:
 	void Execute();
 
 	// 描画開始
-	ID3D12GraphicsCommandList* Begin();
+	void BeginRender();
 
 	// 描画終了
 	void End();
 
 	void FinishDX12();
 
-	const Descriptor* UpdateSceneConstantBuffer(const Camera& camera, const DirectX::XMFLOAT3& light_direction);
+	const Descriptor* UpdateSceneConstantBuffer(const Camera& camera);
 
 	// テクスチャ読み込み
 	HRESULT LoadTexture(const char* filename, ID3D12Resource** d3d_resource);
@@ -211,11 +241,35 @@ public:
 	//Sampler取得
 	SamplerManager* GetSampler(SamplerState state) { return m_sampler[static_cast<int>(state)].get(); }
 
+	// 現在のフレームバッファのレンダリングターゲットビューを取得
+	D3D12_CPU_DESCRIPTOR_HANDLE GetCurrentFrameBuffuerRTV() const
+	{
+		return rtv_descriptor[frame_buffer_index]->GetCpuHandle();
+	}
+
+	// フレームバッファへの描画時に使用されているデプスステンシルビューを取得
+	D3D12_CPU_DESCRIPTOR_HANDLE GetCurrentFrameBuffuerDSV() const
+	{
+		return dsv_descriptor->GetCpuHandle();
+	}
+
 private:
 	// イメージコピー
 	HRESULT CopyImage(const BYTE* pixels, UINT width, UINT height, DXGI_FORMAT format, ID3D12Resource* resource);
 
 	static UINT BitsPerPixel(DXGI_FORMAT fmt);
+
+	// フレームバッファ用のレンダリングターゲットビューを作成
+	void CreateRTVForFameBuffer();
+
+	// フレームバッファ用の深度ステンシルビューを作成
+	void CreateDSVForFrameBuffer(UINT frameBufferWidth, UINT frameBufferHeight);
+
+	// フレームバッファ用のコンスタントバッファを作成
+	void CreateConstantBuffer();
+
+	// コマンドリストとコマンドアロケーターの作成
+	void CreateCommand();
 
 private:
 	Microsoft::WRL::ComPtr<ID3D11Device> device;
@@ -225,6 +279,8 @@ private:
 	float screenWidth;
 	float screenHeight;
 	std::unique_ptr<FrameBuffer> frameBuffers[static_cast<int>(FrameBufferId::EnumCount)];
+	std::unique_ptr<FrameBufferDX12> dx12_frameBuffers[static_cast<int>(FrameBufferDX12Id::EnumCount)];
+	std::unique_ptr<FrameBufferManager> m_frambufferManager;
 	std::unique_ptr<RenderState> renderState;
 	std::unique_ptr<RenderStateDX12> m_renderStateDX12;
 	std::unique_ptr<Gizmos> gizmos;
@@ -244,18 +300,18 @@ private:
 
 	static Graphics* s_instance;
 
-	struct FrameResource
-	{
-		Microsoft::WRL::ComPtr<ID3D12CommandAllocator>		d3d_command_allocator;
-		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>	d3d_command_list;
-		Microsoft::WRL::ComPtr<ID3D12Resource>				d3d_rtv_resource;
-		Microsoft::WRL::ComPtr<ID3D12Resource>				d3d_dsv_resource;
-		Microsoft::WRL::ComPtr<ID3D12Resource>				d3d_cbv_resource;
-		const Descriptor* rtv_descriptor = nullptr;
-		const Descriptor* dsv_descriptor = nullptr;
-		const Descriptor* cbv_descriptor = nullptr;
-		CbScene* cb_scene_data = nullptr;
-	};
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator>		d3d_command_allocator;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>	d3d_command_list;
+	Microsoft::WRL::ComPtr<ID3D12Resource>				d3d_rtv_resource[MAX_BUFFER_COUNT];
+	Microsoft::WRL::ComPtr<ID3D12Resource>				d3d_dsv_resource;
+	Microsoft::WRL::ComPtr<ID3D12Resource>				d3d_cbv_resource;
+	const Descriptor* rtv_descriptor[MAX_BUFFER_COUNT] = { nullptr, nullptr };
+	const Descriptor* dsv_descriptor = nullptr;
+	const Descriptor* cbv_descriptor = nullptr;
+	CbScene* cb_scene_data = nullptr;
+
+	D3D12_VIEWPORT m_viewport;	//ビューポート
+	UINT frame_buffer_index  = 0;
 
 	Microsoft::WRL::ComPtr<ID3D12Device>				m_d3d_device;
 	Microsoft::WRL::ComPtr<IDXGIFactory4>				m_dxgi_factory;
@@ -264,13 +320,10 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>	m_d3d_resource_command_list;
 	CommandQueue										m_resource_queue;
 	CommandQueue										m_graphics_queue;
-	std::vector<FrameResource>							m_frame_resources;
 
 	std::unique_ptr<DescriptorHeap>						m_rtv_descriptor_heap;
 	std::unique_ptr<DescriptorHeap>						m_dsv_descriptor_heap;
-
 	std::shared_ptr<DescriptorHeap>						m_shader_resource_descriptor_heap;
-
 	std::unique_ptr<DescriptorHeap>						m_sampler_descriptor_heap;
 
 	std::unique_ptr<SamplerManager> m_sampler[static_cast<int>(SamplerState::EnumCount)];
@@ -282,3 +335,5 @@ private:
 
 	std::unique_ptr<ImGuiRenderer>						m_imgui_renderer;
 };
+
+#endif // !__GRAHICS_GRAHICS_H__

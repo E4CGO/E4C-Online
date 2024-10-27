@@ -32,6 +32,9 @@ void SceneTitle::Initialize()
 	//スキニング
 	m_skinning_pipeline = T_GRAPHICS.GetSkinningPipeline();
 
+	// フレームバッファマネージャー
+	m_framBuffer = T_GRAPHICS.GetFramBufferManager();
+
 	// モデル
 	{
 		// 背景
@@ -93,6 +96,9 @@ void SceneTitle::Initialize()
 		}
 		
 		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/button_agree.png");
+
+		// ルミナステクスチャ
+		//m_sprites[1] = std::make_unique<SpriteDX12>(1, &T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene)->GetRenderTargetTexture());
 	}
 
 	// 光
@@ -239,37 +245,51 @@ void SceneTitle::Render()
 
 void SceneTitle::RenderDX12()
 {
-	ID3D12GraphicsCommandList* d3d_command_list = TentacleLib::graphics.Begin();
+	T_GRAPHICS.BeginRender();
 	{
 		// シーン用定数バッファ更新
-		const Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
-			Camera::Instance(),
-			DirectX::XMFLOAT3(0, -1, 0));
+		const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
+			Camera::Instance());
 
 		// レンダーコンテキスト設定
 		RenderContextDX12 rc;
-		rc.d3d_command_list = d3d_command_list;
+		rc.d3d_command_list = m_framBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
 		//スキニング
 		test->UpdateFrameResource(test_transform);
 		m_skinning_pipeline->Compute(rc, test.get());
 
+		m_framBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_framBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_framBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+
 		// モデル描画
-		ModelShaderDX12* shader = TentacleLib::graphics.GetModelShaderDX12(ModelShaderDX12Id::ToonInstancing);
+		ModelShaderDX12* shader = T_GRAPHICS.GetModelShaderDX12(ModelShaderDX12Id::ToonInstancing);
 		if (test != nullptr)
 		{
 			shader->Render(rc, test.get());
 		}
 
+		m_framBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene)); 
+
+		// 画面に表示されるレンダリングターゲットに戻す
+		m_framBuffer->SetRenderTarget(T_GRAPHICS.GetCurrentFrameBuffuerRTV(), T_GRAPHICS.GetCurrentFrameBuffuerDSV());
+
+		//m_framBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance));
+		//m_framBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance));
+		//m_framBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance));
+
 		// スプライト描画
-		SpriteShaderDX12* sprite = TentacleLib::graphics.GetSpriteShaderDX12(SpriteShaderDX12Id::ColorGrading);
+		SpriteShaderDX12* sprite = T_GRAPHICS.GetSpriteShaderDX12(SpriteShaderDX12Id::LuminanceExtraction);
 		if (m_sprites[0] != nullptr)
 		{
 			m_sprites[0]->Begin(rc);
 			m_sprites[0]->Draw(0, 0, 100, 100, 0, 1, 1, 1, 1);
 			sprite->Render(rc, m_sprites[0].get());
 		}
+
+		//m_framBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance));
 
 		//EFFECTS.GetEffect(EffectManager::EFFECT_IDX::BOMB_EFFECT)->PlayDX12(DirectX::XMFLOAT3(0.f, 0.f, 0.f), 5.0f);
 
@@ -297,11 +317,10 @@ void SceneTitle::RenderDX12()
 				ImGui::End();
 			}
 
-			T_GRAPHICS.GetImGUIRenderer()->RenderDX12(d3d_command_list);
-		}
-
-		TentacleLib::graphics.End();
+			T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_framBuffer->GetCommandList());
+		}	
 	}
+	T_GRAPHICS.End();
 }
 
 void SceneTitle::DrawSceneGUI()

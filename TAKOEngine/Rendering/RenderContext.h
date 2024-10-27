@@ -1,9 +1,12 @@
-#pragma once
+//! @file RenderContext.h
+//! @note
+
+#ifndef __INCLUDE_RENDER_CONTEXT_H__
+#define __INCLUDE_RENDER_CONTEXT_H__
 
 #include <d3d12.h>
 
 #include "TAKOEngine/Rendering/Descriptor.h"
-
 #include "TAKOEngine/Editor/Camera/Camera.h"
 #include "TAKOEngine/Rendering/RenderState.h"
 #include "TAKOEngine/Rendering/MyRender.h"
@@ -208,3 +211,5 @@ struct RenderContextDX12
 	GaussianFilterData		gaussianFilterData;		 //	ガウスフィルター情報
 	ColorGradingData		colorGradingData;		 //	色調補正情報
 };
+
+#endif // !__INCLUDE_RENDER_CONTEXT_H__

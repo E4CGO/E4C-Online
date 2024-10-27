@@ -1,7 +1,16 @@
+//! @file FrameBuffer.cpp
+//! @note
+
 #include "Misc.h"
 #include "FrameBuffer.h"
 
-// コンストラクタ
+//******************************************************************
+// @brief       コンストラクタ
+// @param[in]   device     ID3D11Device*
+// @param[in]   swapchain  IDXGISwapChain*
+// @param[in]   format     深度ステンシルビューのフォーマット
+// @return      なし
+//******************************************************************
 FrameBuffer::FrameBuffer(ID3D11Device* device, IDXGISwapChain* swapchain, DXGI_FORMAT format)
 {
 	HRESULT hr = S_OK;
@@ -66,7 +75,14 @@ FrameBuffer::FrameBuffer(ID3D11Device* device, IDXGISwapChain* swapchain, DXGI_F
 	}
 }
 
-// コンストラクタ
+//******************************************************************
+// @brief       コンストラクタ
+// @param[in]   device  ID3D11Device*
+// @param[in]   width   レンダーターゲットの幅
+// @param[in]   height  レンダーターゲットの高さ
+// @param[in]   format  レンダーターゲットのフォーマット
+// @return      なし
+//******************************************************************
 FrameBuffer::FrameBuffer(ID3D11Device* device, UINT width, UINT height, DXGI_FORMAT format)
 {
 	HRESULT hr = S_OK;
@@ -145,7 +161,15 @@ FrameBuffer::FrameBuffer(ID3D11Device* device, UINT width, UINT height, DXGI_FOR
 	}
 }
 
-//レンダーターゲット&デプスステンシルビュークリア
+//******************************************************************
+// @brief       レンダーターゲット&デプスステンシルビュークリア
+// @param[in]   dc  ID3D11DeviceContext*
+// @param[in]   r   color(赤)
+// @param[in]   g   color(緑)
+// @param[in]   b   color(青)
+// @param[in]   a   color(透明度)
+// @return      なし
+//******************************************************************
 void FrameBuffer::Clear(ID3D11DeviceContext* dc, float r, float g, float b, float a)
 {
 	float color[4]{ r,g,b,a };
@@ -153,14 +177,24 @@ void FrameBuffer::Clear(ID3D11DeviceContext* dc, float r, float g, float b, floa
 	dc->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
-//レンダーターゲット&ビューポート設定
+//******************************************************************
+// @brief       レンダーターゲット&ビューポート設定
+// @param[in]   dc  ID3D11DeviceContext*
+// @return      なし
+//******************************************************************
 void FrameBuffer::SetRenderTarget(ID3D11DeviceContext* dc)
 {
 	dc->RSSetViewports(1, &viewport);
 	dc->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 }
 
-//G-Buffer用
+//******************************************************************
+// @brief       レンダーターゲット&ビューポート設定(G-Buffer用)
+// @param[in]   dc  ID3D11DeviceContext*
+// @param[in]   number  レンダーターゲットの数
+// @param[in]   rtv[]   レンダーターゲットの配列
+// @return      なし
+//******************************************************************
 void FrameBuffer::SetRenderTargets(ID3D11DeviceContext* dc, int number, ID3D11RenderTargetView* rtv[])
 {
 	ID3D11RenderTargetView* m_rtv[] =
@@ -174,6 +208,13 @@ void FrameBuffer::SetRenderTargets(ID3D11DeviceContext* dc, int number, ID3D11Re
 	dc->OMSetRenderTargets(number, m_rtv, depthStencilView.Get());
 }
 
+//******************************************************************
+// @brief       ビューポート設定
+// @param[in]   dc       ID3D11DeviceContext*
+// @param[in]   width  　ビューポートの幅
+// @param[in]   height   ビューポートの高さ
+// @return      なし
+//******************************************************************
 void FrameBuffer::SetViewport(ID3D11DeviceContext* dc, UINT width, UINT height)
 {
 	viewport.Width    = static_cast<float>(width);
