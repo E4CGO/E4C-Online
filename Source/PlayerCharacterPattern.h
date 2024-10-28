@@ -1,18 +1,18 @@
 //! @file PlayerCharacterPattern.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDED_PLAYER_CHARACTER_PATTERN_H__
 #define __INCLUDED_PLAYER_CHARACTER_PATTERN_H__
 
 #include <string>
 
-class PlayerCharacter;
+class Player;
 
 /**************************************************************************//**
 	@class	PlayerCharacterPattern
-	@brief	ƒLƒƒƒ‰ƒNƒ^[ƒpƒ^[ƒ“Šî’êƒNƒ‰ƒX
-	@par	[à–¾]
-		ƒpƒ^[ƒ“‚ğ‰‚¶‚ÄƒvƒŒƒCƒ„[ƒLƒƒƒ‰ƒNƒ^[‚ğİ’è‚·‚éŠî’êƒNƒ‰ƒX
+	@brief	ï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½^ï¿½[ï¿½pï¿½^ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½X
+	@par	[ï¿½ï¿½ï¿½ï¿½]
+		ï¿½pï¿½^ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Äƒvï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½^ï¿½[ï¿½ï¿½İ’è‚·ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½X
 *//***************************************************************************/
 class PlayerCharacterPattern
 {
@@ -20,13 +20,13 @@ public:
 	PlayerCharacterPattern() {};
 	virtual ~PlayerCharacterPattern() = default;
 
-	virtual void Execute(PlayerCharacter* player) = 0;
+	virtual void Execute(Player* player) = 0;
 };
 
 /**************************************************************************//**
 	@class	PlayerCharacterPatternGender
-	@brief	«•Ê‚É‚æ‚Á‚Äˆá‚¤ˆ—
-	@par	[à–¾]
+	@brief	ï¿½ï¿½ï¿½Ê‚É‚ï¿½ï¿½ï¿½Äˆá‚¤ï¿½ï¿½ï¿½ï¿½
+	@par	[ï¿½ï¿½ï¿½ï¿½]
 
 *//***************************************************************************/
 class PlayerCharacterPatternGender : public PlayerCharacterPattern
@@ -34,23 +34,23 @@ class PlayerCharacterPatternGender : public PlayerCharacterPattern
 public:
 	PlayerCharacterPatternGender(bool isMale) : PlayerCharacterPattern(), m_isMale(isMale) {}
 
-	void Execute(PlayerCharacter* player);
+	void Execute(Player* player);
 private:
 	bool m_isMale;
 };
 
 /**************************************************************************//**
 	@class	PlayerCharacterPatternSinglePart
-	@brief	’Pˆêƒ‚ƒfƒ‹‚ğÀ‘•‚·‚éˆ—
-	@par	[à–¾]
-		”Ä—pŒ^ˆ—
+	@brief	ï¿½Pï¿½êƒ‚ï¿½fï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½éˆï¿½ï¿½
+	@par	[ï¿½ï¿½ï¿½ï¿½]
+		ï¿½Ä—pï¿½^ï¿½ï¿½ï¿½ï¿½
 *//***************************************************************************/
 class PlayerCharacterPatternSingleModel : public PlayerCharacterPattern
 {
 public:
 	PlayerCharacterPatternSingleModel(const char* filename) : PlayerCharacterPattern(), m_filename(filename) {}
 
-	void Execute(PlayerCharacter* player) override;
+	void Execute(Player* player) override;
 private:
 	std::string m_filename;
 };

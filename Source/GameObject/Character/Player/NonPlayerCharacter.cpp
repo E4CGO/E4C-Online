@@ -1,4 +1,4 @@
-#include "PlayerCharacter.h"
+#include "NonPlayerCharacter.h"
 
 #include <profiler.h>
 #include <iostream>
@@ -8,19 +8,19 @@
 #include "TAKOEngine/Editor/Camera/Camera.h"
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 
-#include "GameObject/Character/Player/PlayerCharacterState.h"
+#include "GameObject/Character/Player/NonPlayerCharacterState.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 
 #include "GameData.h"
 
-PlayerCharacter::PlayerCharacter(uint64_t id, const char* name, uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]) : Character()
+NonPlayerCharacter::NonPlayerCharacter(uint64_t id, const char* name, uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]) : Character()
 {
 	moveSpeed = 10.0f;
 	turnSpeed = DirectX::XMConvertToRadians(720);
 	jumpSpeed = 20.0f;
 	dodgeSpeed = 20.0f;
 
-	stateMachine = new StateMachine<PlayerCharacter>;
+	stateMachine = new StateMachine<NonPlayerCharacter>;
 	RegisterCommonState();
 	stateMachine->SetState(static_cast<int>(State::Waiting));
 
@@ -35,7 +35,7 @@ PlayerCharacter::PlayerCharacter(uint64_t id, const char* name, uint8_t appearan
 	LoadAppearance(appearance);
 }
 
-PlayerCharacter::PlayerCharacter(PlayerCharacterData::CharacterInfo dataInfo) : Character()
+NonPlayerCharacter::NonPlayerCharacter(PlayerCharacterData::CharacterInfo dataInfo) : Character()
 {
 	moveSpeed = 10.0f;
 	turnSpeed = DirectX::XMConvertToRadians(720);
@@ -45,7 +45,7 @@ PlayerCharacter::PlayerCharacter(PlayerCharacterData::CharacterInfo dataInfo) : 
 	m_menuVisible = dataInfo.visible;
 	std::string m_SaveFile = dataInfo.save;
 
-	stateMachine = new StateMachine<PlayerCharacter>;
+	stateMachine = new StateMachine<NonPlayerCharacter>;
 	RegisterCommonState();
 	stateMachine->SetState(static_cast<int>(State::Waiting));
 
@@ -62,7 +62,7 @@ PlayerCharacter::PlayerCharacter(PlayerCharacterData::CharacterInfo dataInfo) : 
 	@param[in]	appearance
 	@return		なし
 *//***************************************************************************/
-void PlayerCharacter::LoadAppearance(uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM])
+void NonPlayerCharacter::LoadAppearance(uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM])
 {
 	ModelObject::CleanModels();
 
@@ -74,7 +74,7 @@ void PlayerCharacter::LoadAppearance(uint8_t appearance[PlayerCharacterData::APP
 	stateMachine->SetState(static_cast<int>(State::Waiting));
 }
 
-PlayerCharacter::~PlayerCharacter()
+NonPlayerCharacter::~NonPlayerCharacter()
 {
 	delete stateMachine;
 
@@ -85,21 +85,21 @@ PlayerCharacter::~PlayerCharacter()
 	m_pattackColliders.clear();
 }
 
-void PlayerCharacter::RegisterCommonState()
+void NonPlayerCharacter::RegisterCommonState()
 {
-	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Idle), new PlayerCharacterState::IdleState(this));
-	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Move), new PlayerCharacterState::MoveState(this));
-	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Jump), new PlayerCharacterState::JumpState(this));
-	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Fall), new PlayerCharacterState::FallState(this));
-	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Land), new PlayerCharacterState::LandState(this));
-	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Dodge), new PlayerCharacterState::DodgeState(this));
-	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Hurt), new PlayerCharacterState::HurtState(this));
-	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Death), new PlayerCharacterState::DeathState(this));
-	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Waiting), new PlayerCharacterState::WaitState(this));
-	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Ready), new PlayerCharacterState::ReadyState(this));
+	stateMachine->RegisterState(static_cast<int>(NonPlayerCharacter::State::Idle), new NonPlayerCharacterState::IdleState(this));
+	stateMachine->RegisterState(static_cast<int>(NonPlayerCharacter::State::Move), new NonPlayerCharacterState::MoveState(this));
+	stateMachine->RegisterState(static_cast<int>(NonPlayerCharacter::State::Jump), new NonPlayerCharacterState::JumpState(this));
+	stateMachine->RegisterState(static_cast<int>(NonPlayerCharacter::State::Fall), new NonPlayerCharacterState::FallState(this));
+	stateMachine->RegisterState(static_cast<int>(NonPlayerCharacter::State::Land), new NonPlayerCharacterState::LandState(this));
+	stateMachine->RegisterState(static_cast<int>(NonPlayerCharacter::State::Dodge), new NonPlayerCharacterState::DodgeState(this));
+	stateMachine->RegisterState(static_cast<int>(NonPlayerCharacter::State::Hurt), new NonPlayerCharacterState::HurtState(this));
+	stateMachine->RegisterState(static_cast<int>(NonPlayerCharacter::State::Death), new NonPlayerCharacterState::DeathState(this));
+	stateMachine->RegisterState(static_cast<int>(NonPlayerCharacter::State::Waiting), new NonPlayerCharacterState::WaitState(this));
+	stateMachine->RegisterState(static_cast<int>(NonPlayerCharacter::State::Ready), new NonPlayerCharacterState::ReadyState(this));
 }
 
-void PlayerCharacter::UpdateTarget()
+void NonPlayerCharacter::UpdateTarget()
 {
 	// レイの開始位置は足元より少し上
 	DirectX::XMFLOAT3 start = Camera::Instance().GetEye();
@@ -117,13 +117,13 @@ void PlayerCharacter::UpdateTarget()
 	}
 }
 
-void PlayerCharacter::UpdateColliders()
+void NonPlayerCharacter::UpdateColliders()
 {
 	collider->SetPosition(position + DirectX::XMFLOAT3{ 0, height * 0.5f, 0 } *scale);
 	collider->SetScale(DirectX::XMFLOAT3{ height * 0.3f, height * 0.3f, height * 0.3f } *scale);
 }
 
-bool  PlayerCharacter::CollisionVsEnemies(Collider* collider, int damage, bool power, float force, int effectIdx, float effectScale)
+bool  NonPlayerCharacter::CollisionVsEnemies(Collider* collider, int damage, bool power, float force, int effectIdx, float effectScale)
 {
 	bool isHit = false;
 	for (Enemy*& enemy : ENEMIES.GetAll())
@@ -150,7 +150,7 @@ bool  PlayerCharacter::CollisionVsEnemies(Collider* collider, int damage, bool p
 	return isHit;
 }
 
-void PlayerCharacter::UpdateInput()
+void NonPlayerCharacter::UpdateInput()
 {
 	float ax = 0.0f;
 	float ay = 0.0f;
@@ -291,7 +291,7 @@ void PlayerCharacter::UpdateInput()
 * 入力方向取得
 * 入力なし：キャラの向き
 */
-DirectX::XMFLOAT2 PlayerCharacter::GetInputDirection()
+DirectX::XMFLOAT2 NonPlayerCharacter::GetInputDirection()
 {
 	DirectX::XMFLOAT2 direction = {};
 	if (inputDirection.x == 0 && inputDirection.y == 0) // 方向入力なし
@@ -310,22 +310,22 @@ DirectX::XMFLOAT2 PlayerCharacter::GetInputDirection()
 }
 
 // スキルクールタイム管理
-float PlayerCharacter::GetSkillTimerTime(int idx)
+float NonPlayerCharacter::GetSkillTimerTime(int idx)
 {
 	if (skillTimer.find(idx) == skillTimer.end()) return 0.0f; // デフォルト
 	return skillTimer[idx].currentTimer;
 }
-float PlayerCharacter::GetSkillTimerRate(int idx)
+float NonPlayerCharacter::GetSkillTimerRate(int idx)
 {
 	if (skillTimer.find(idx) == skillTimer.end()) return 0.0f; // デフォルト
 	return skillTimer[idx].currentTimer / skillTimer[idx].time;
 }
-void PlayerCharacter::ResetSkillTimer(int idx)
+void NonPlayerCharacter::ResetSkillTimer(int idx)
 {
 	if (skillTimer.find(idx) == skillTimer.end()) return;
 	skillTimer[idx].currentTimer = skillTimer[idx].time;
 }
-void PlayerCharacter::UpdateSkillTimers(float elapsedTime)
+void NonPlayerCharacter::UpdateSkillTimers(float elapsedTime)
 {
 	for (std::pair<int, SkillTimer> timer : skillTimer)
 	{
@@ -334,7 +334,7 @@ void PlayerCharacter::UpdateSkillTimers(float elapsedTime)
 	}
 }
 
-void PlayerCharacter::Update(float elapsedTime)
+void NonPlayerCharacter::Update(float elapsedTime)
 {
 	{
 		ProfileScopedSection_2("input", ImGuiControl::Profiler::Red);
@@ -359,7 +359,7 @@ void PlayerCharacter::Update(float elapsedTime)
 	}
 }
 
-void PlayerCharacter::Render(const RenderContext& rc)
+void NonPlayerCharacter::Render(const RenderContext& rc)
 {
 	Character::Render(rc);
 
@@ -410,7 +410,7 @@ void PlayerCharacter::Render(const RenderContext& rc)
 #endif // _DEBUG
 }
 
-void PlayerCharacter::OnDamage(const HitResult& hit, int damage)
+void NonPlayerCharacter::OnDamage(const HitResult& hit, int damage)
 {
 	if (hurtCoolTime > 0.0f) return;
 	hp -= damage;
@@ -432,7 +432,7 @@ void PlayerCharacter::OnDamage(const HitResult& hit, int damage)
 	}
 }
 
-void PlayerCharacter::InputMove(float elapsedTime) {
+void NonPlayerCharacter::InputMove(float elapsedTime) {
 	if (inputDirection.x == 0 && inputDirection.y == 0) return; // 方向入力なし
 
 	// 移動処理
@@ -441,7 +441,7 @@ void PlayerCharacter::InputMove(float elapsedTime) {
 	TurnByInput();
 }
 
-void PlayerCharacter::Jump()
+void NonPlayerCharacter::Jump()
 {
 	if (!isGround) return;
 	if (input & Input_Jump)
@@ -450,7 +450,7 @@ void PlayerCharacter::Jump()
 	}
 }
 
-bool PlayerCharacter::InputDodge()
+bool NonPlayerCharacter::InputDodge()
 {
 	if (input & Input_Dodge)
 	{
@@ -464,31 +464,31 @@ bool PlayerCharacter::InputDodge()
 	return false;
 }
 
-void PlayerCharacter::FaceToCamera()
+void NonPlayerCharacter::FaceToCamera()
 {
 	if (!IsPlayer()) return;
 	DirectX::XMFLOAT3 front = Camera::Instance().GetFront();
 	Turn(1.0f, front.x, front.z, turnSpeed);
 }
 
-void PlayerCharacter::TurnByInput()
+void NonPlayerCharacter::TurnByInput()
 {
 	if (!IsPlayer()) return;
 	Turn(T_TIMER.Delta(), inputDirection.x, inputDirection.y, turnSpeed);
 }
 
-void PlayerCharacter::RecoverMp(float elapsedTime)
+void NonPlayerCharacter::RecoverMp(float elapsedTime)
 {
 	ModifyMp(elapsedTime * mpRecoverRate);
 }
-void PlayerCharacter::ModifyMp(float mp)
+void NonPlayerCharacter::ModifyMp(float mp)
 {
 	this->mp += mp;
 	if (this->mp >= maxMp) this->mp = maxMp;
 	if (this->mp < 0.0f) this->mp = 0.0f;
 }
 
-float PlayerCharacter::GetMpCost(int idx)
+float NonPlayerCharacter::GetMpCost(int idx)
 {
 	if (mpCost.find(idx) != mpCost.end())
 	{
@@ -498,7 +498,7 @@ float PlayerCharacter::GetMpCost(int idx)
 	return 0.0f;
 }
 
-void PlayerCharacter::SkillCost(int idx)
+void NonPlayerCharacter::SkillCost(int idx)
 {
 	// MP消費
 	ModifyMp(-GetMpCost(idx));

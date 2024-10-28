@@ -1,16 +1,16 @@
 //! @file PlayerCharacterPattern.cpp
-//! @note 
+//! @note
 
 #include "PlayerCharacterPattern.h"
 #include "GameObject/Character/Player/PlayerCharacter.h"
 
 /**************************************************************************//**
- 	@brief		«•Êˆ—
-	@param[in]	player	ƒvƒŒƒCƒ„[ŽQÆƒ|ƒCƒ“ƒ^
-	@param[in]	gender	«•Ê	0:’j«	1:—«
-	@return		‚È‚µ
+ 	@brief		æ€§åˆ¥å‡¦ç†
+	@param[in]	player	ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼å‚ç…§ãƒã‚¤ãƒ³ã‚¿
+	@param[in]	gender	æ€§åˆ¥	0:ç”·æ€§	1:å¥³æ€§
+	@return		ãªã—
 *//***************************************************************************/
-void PlayerCharacterPatternGender::Execute(PlayerCharacter* player)
+void PlayerCharacterPatternGender::Execute(Player* player)
 {
 	player->LoadModel("Data/Model/Character/BarbarianAnim.glb");
 	if (m_isMale) // MALE
@@ -19,18 +19,18 @@ void PlayerCharacterPatternGender::Execute(PlayerCharacter* player)
 		player->LoadModel("Data/Model/Character/BODY_BARB.glb");
 	}
 	else //FEMALE
-	{	
+	{
 		player->LoadModel("Data/Model/Character/HEAD_MAGE.glb");
 		player->LoadModel("Data/Model/Character/BODY_MAGE.glb");
 	}
 }
 
 /**************************************************************************//**
- 	@brief		’Pˆêƒ‚ƒfƒ‹ŽÀ‘•
-	@param[in]	player	ƒvƒŒƒCƒ„[ŽQÆƒ|ƒCƒ“ƒ^
-	@return		‚È‚µ
+ 	@brief		å˜ä¸€ãƒ¢ãƒ‡ãƒ«å®Ÿè£…
+	@param[in]	player	ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼å‚ç…§ãƒã‚¤ãƒ³ã‚¿
+	@return		ãªã—
 *//***************************************************************************/
-void PlayerCharacterPatternSingleModel::Execute(PlayerCharacter* player)
+void PlayerCharacterPatternSingleModel::Execute(Player* player)
 {
 	player->LoadModel(m_filename.c_str());
 }

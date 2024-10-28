@@ -1,5 +1,5 @@
 //! @file Character.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDED_CHARACTER_OBJECT_H__
 #define __INCLUDED_CHARACTER_OBJECT_H__
@@ -95,6 +95,10 @@ public:
 	int GetHp() { return hp; }
 	int GetMaxHp() { return maxHp; }
 	void ModifyHp(int hp);
+
+	//物理計算フラグ
+	void SetKinematic(bool value) { this->isKinematic = value; }
+
 protected:
 	// コライダー更新処理
 	virtual void UpdateColliders() {};
@@ -111,12 +115,14 @@ protected:
 
 	// 移動用
 	float acceleration = 100.0f;					// 加速度
-	float maxMoveSpeed = 100.0f;					// 最大スピード			
+	float maxMoveSpeed = 100.0f;					// 最大スピード
 	float moveVecX = 0.0f;							// 移動量X
 	float moveVecZ = 0.0f;							// 移動量Y
 	float airControl = 0.1f;						// 空気抵抗
 
 	float hurtCoolTime = 0.0f;						// 無敵時間
+
+	bool isKinematic = false;
 
 	// HP
 	int hp = 1;

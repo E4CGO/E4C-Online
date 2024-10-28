@@ -1,13 +1,13 @@
 //! @file PlayerCharacterData.cpp
-//! @note 
+//! @note
 
 #include "PlayerCharacterData.h"
 #include "GameObject/Character/Player/PlayerCharacter.h"
 
 /**************************************************************************//**
-	@brief		ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-	@note		ƒpƒ^[ƒ“ˆ—“o˜^
-				TODO::JSON‚É‚·‚é‚×‚«
+	@brief		ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+	@note		ãƒ‘ã‚¿ãƒ¼ãƒ³å‡¦ç†ç™»éŒ²
+				TODO::JSONã«ã™ã‚‹ã¹ã
 *//***************************************************************************/
 PlayerCharacterData::PlayerCharacterData()
 {
@@ -17,44 +17,42 @@ PlayerCharacterData::PlayerCharacterData()
 	m_pappearancePatterns[APPEARANCE_PATTERN::GENDER].push_back(new PlayerCharacterPatternGender(false));
 	m_pappearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/WEAPON_BARB.glb"));
 	m_pappearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/WEAPON_MAGE.glb"));
-
 }
 
 /**************************************************************************//**
-	@brief		ƒvƒŒƒCƒ„[ƒLƒƒƒ‰ƒNƒ^[‚ÉŠOŒ©İ’è‚ğÀ‘•‚·‚é
-	@param[in]	player			ƒvƒŒƒCƒ„[QÆƒ|ƒCƒ“ƒ^
-	@param[in]	appearance_idx	ŠOŒ©ƒCƒ“ƒfƒbƒNƒX
-	@param[in]	pattern_idx		ŠOŒ©ƒpƒ^[ƒ“
-	@retrun		‚È‚µ
+	@brief		ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã«å¤–è¦‹è¨­å®šã‚’å®Ÿè£…ã™ã‚‹
+	@param[in]	player			ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼å‚ç…§ãƒã‚¤ãƒ³ã‚¿
+	@param[in]	appearance_idx	å¤–è¦‹ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+	@param[in]	pattern_idx		å¤–è¦‹ãƒ‘ã‚¿ãƒ¼ãƒ³
+	@retrun		ãªã—
 *//***************************************************************************/
-void PlayerCharacterData::LoadAppearance(PlayerCharacter* player, uint8_t appearance_idx, uint8_t pattern_idx)
+void PlayerCharacterData::LoadAppearance(Player* player, uint8_t appearance_idx, uint8_t pattern_idx)
 {
 	if (m_pappearancePatterns.find(appearance_idx) == m_pappearancePatterns.end()) return;
 	if (m_pappearancePatterns[appearance_idx].size() <= pattern_idx) return;
 	m_pappearancePatterns[appearance_idx][pattern_idx]->Execute(player);
 }
 
-
 /**************************************************************************//**
-	@brief		// ŠOŒ©ƒpƒ^[ƒ“‚ğƒNƒŠƒA
-	@param[in]	‚È‚µ
-	@retrun		‚È‚µ
+	@brief		// å¤–è¦‹ãƒ‘ã‚¿ãƒ¼ãƒ³ã‚’ã‚¯ãƒªã‚¢
+	@param[in]	ãªã—
+	@retrun		ãªã—
 *//***************************************************************************/
 void PlayerCharacterData::ClearAppearancePatterns()
 {
 	for (auto& pair : m_pappearancePatterns)
 	{
 		for (PlayerCharacterPattern* ptr : pair.second) {
-			delete ptr;			// vector “à‚Ìƒ|ƒCƒ“ƒ^‚ğíœ
+			delete ptr;			// vector å†…ã®ãƒã‚¤ãƒ³ã‚¿ã‚’å‰Šé™¤
 		}
-		pair.second.clear();	// vector ‚Ìƒ|ƒCƒ“ƒ^‚ğƒNƒŠƒA
+		pair.second.clear();	// vector ã®ãƒã‚¤ãƒ³ã‚¿ã‚’ã‚¯ãƒªã‚¢
 	}
 	m_pappearancePatterns.clear();
 }
 
 /**************************************************************************//**
-	@brief		ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-	@note		ˆ—‚µ‚½ƒpƒ^[ƒ“‚ğ‰ğ•ú
+	@brief		ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+	@note		å‡¦ç†ã—ãŸãƒ‘ã‚¿ãƒ¼ãƒ³ã‚’è§£æ”¾
 *//***************************************************************************/
 PlayerCharacterData::~PlayerCharacterData()
 {

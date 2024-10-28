@@ -38,7 +38,6 @@ public:
 		LEFT_HAND_EQUIPMENT,	// 左手装備
 		RIGHT_HAND_EQUIPMENT,	// 右手装備
 
-
 		NUM						// カウント
 	};
 
@@ -77,18 +76,12 @@ public:
 		}
 	};
 
-	void LoadAppearance(PlayerCharacter* player, uint8_t appearance_idx, uint8_t pattern_idx);
+	void LoadAppearance(Player* player, uint8_t appearance_idx, uint8_t pattern_idx);
 	nlohmann::json GetCharacterInfos() const { return m_CharacterInfos; }
 	void SetCharacterInfos(nlohmann::json savedData) { m_CharacterInfos = savedData; }
 
 	std::vector<CharacterInfo> GetCharacterInfosData() const { return m_CharaterInfosData; }
 	void SetCharacterInfosData(std::vector<CharacterInfo> savedData) { m_CharaterInfosData = savedData; }
-
-	//void SetCharacterVisibility(bool visibility, int number) { this->m_CharaterInfosData[number].visible = visibility; }
-	//void SetCharacterGenderType(int characterNumber, int value) { this->m_CharaterInfosData[characterNumber].Character.genderType = value; }
-	//void SetCharacterHeadType(int characterNumber, int value) { this->m_CharaterInfosData[characterNumber].Character.headType = value; }
-	//void SetCharacterBodyType(int characterNumber, int value) { this->m_CharaterInfosData[characterNumber].Character.bodyType = value; }
-	//void SetCharacterWeaponType(int characterNumber, int value) { this->m_CharaterInfosData[characterNumber].Character.weaponType = value; }
 
 	void ParseData()
 	{
@@ -114,6 +107,8 @@ public:
 	}
 	// 外見パターンをクリア
 	void ClearAppearancePatterns();
+
+	int m_CurrentSaveState = 0;
 
 private:
 	std::unordered_map<uint8_t, std::vector<PlayerCharacterPattern*>> m_pappearancePatterns;

@@ -12,15 +12,15 @@
 
 class Enemy;
 
-class PlayerCharacter : public Character
+class NonPlayerCharacter : public Character
 {
 public:
 	// コンストラクタ(引数付き)
-	PlayerCharacter(uint64_t id, const char* name, uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
+	NonPlayerCharacter(uint64_t id, const char* name, uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
 	// コンストラクタ(引数付き)
-	PlayerCharacter(PlayerCharacterData::CharacterInfo dataInfo);
+	NonPlayerCharacter(PlayerCharacterData::CharacterInfo dataInfo);
 	// デストラクタ
-	~PlayerCharacter();
+	~NonPlayerCharacter();
 
 	// KayKit Adventurers
 	enum Animation
@@ -215,13 +215,13 @@ public:
 	// ステートを取得
 	int GetState() { return stateMachine->GetStateIndex(); }
 	// ステートマシンを取得
-	StateMachine<PlayerCharacter>* GetStateMachine() { return stateMachine; }
+	StateMachine<NonPlayerCharacter>* GetStateMachine() { return stateMachine; }
 
 	Collider* GetAttackCollider(int idx) { return m_pattackColliders[idx]; }
 	std::unordered_map<int, Collider*> GetAttackColliders() { return m_pattackColliders; }
 	void EnableAttackColliders(bool enable = true) { for (const std::pair<int, Collider*>& collider : m_pattackColliders) collider.second->SetEnable(enable); }
 
-	static DirectX::XMFLOAT4 GetColorSet(int idx) { return PlayerCharacter::colorSet[idx]; }
+	static DirectX::XMFLOAT4 GetColorSet(int idx) { return NonPlayerCharacter::colorSet[idx]; }
 protected:
 	void RegisterCommonState();
 	void UpdateTarget();													// 自機用アイム目標更新
@@ -283,7 +283,7 @@ protected:
 		{ 0.7f, 0.7f, 1.0f, 1.0f }, // BLUE
 	};
 
-	StateMachine<PlayerCharacter>* stateMachine;
+	StateMachine<NonPlayerCharacter>* stateMachine;
 
 	std::unordered_map<int, Collider*> m_pattackColliders; // 攻撃判定
 };

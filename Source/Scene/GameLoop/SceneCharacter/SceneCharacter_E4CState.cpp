@@ -60,7 +60,7 @@ void SceneCharacter_E4CState::InitState::Enter()
 
 		std::ofstream file_out("CharacterInfos.json");
 		if (file_out.is_open()) {
-			file_out << newSave[0].dump(4);
+			file_out << newSave[0].dump(4); //スペース
 			file_out.close();
 		}
 	}
@@ -94,26 +94,26 @@ void SceneCharacter_E4CState::CharacterSelectionState::Enter()
 	PLAYER_CHARACTER_DATA.ParseData();
 
 	btnCharacterLeft = new WidgetButtonImage("", "Data/Sprites/big_background.t.png", [&](WidgetButton*) {
-		owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::CHARACTERCREATION);
+		owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::CHARACTERCREATIONLEFT);
 		});
 	btnCharacterLeft->SetPosition({ SCREEN_W * 0.1f, SCREEN_H * 0.1f });
-	btnCharacterLeft->SetSize({ SCREEN_W * 0.2f, SCREEN_H * 0.8f });
+	btnCharacterLeft->SetSize({ SCREEN_W * 0.25f, SCREEN_H * 0.8f });
 	btnCharacterLeft->SetColor(DirectX::XMFLOAT4{ 1.0f, 1.0f, 1.0f, 0.5f });
 	UIManager::Instance().Register(btnCharacterLeft);
 
 	btnCharacterCenter = new WidgetButtonImage("", "Data/Sprites/big_background.t.png", [&](WidgetButton*) {
-		owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::CHARACTERCREATION);
+		owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::CHARACTERCREATIONCENTER);
 		});
 	btnCharacterCenter->SetPosition({ SCREEN_W * 0.4f, SCREEN_H * 0.1f });
-	btnCharacterCenter->SetSize({ SCREEN_W * 0.2f, SCREEN_H * 0.8f });
+	btnCharacterCenter->SetSize({ SCREEN_W * 0.25f, SCREEN_H * 0.8f });
 	btnCharacterCenter->SetColor(DirectX::XMFLOAT4{ 1.0f, 1.0f, 1.0f, 0.5f });
 	UIManager::Instance().Register(btnCharacterCenter);
 
 	btnCharacterRight = new WidgetButtonImage("", "Data/Sprites/big_background.t.png", [&](WidgetButton*) {
-		owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::CHARACTERCREATION);
+		owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::CHARACTERCREATIONRIGHT);
 		});
 	btnCharacterRight->SetPosition({ SCREEN_W * 0.7f, SCREEN_H * 0.1f });
-	btnCharacterRight->SetSize({ SCREEN_W * 0.2f, SCREEN_H * 0.8f });
+	btnCharacterRight->SetSize({ SCREEN_W * 0.25f, SCREEN_H * 0.8f });
 	btnCharacterRight->SetColor(DirectX::XMFLOAT4{ 1.0f, 1.0f, 1.0f, 0.5f });
 	UIManager::Instance().Register(btnCharacterRight);
 }
@@ -127,7 +127,7 @@ void SceneCharacter_E4CState::CharacterSelectionState::Exit()
 }
 
 // タイトルステート
-void SceneCharacter_E4CState::CharacterCreationState::Enter()
+void SceneCharacter_E4CState::CharacterCreationStateLeft::Enter()
 {
 	btnStartCharacter = new WidgetButtonImage("", "Data/Sprites/UI/start.png", [&](WidgetButton*) {
 		owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::START);
@@ -136,53 +136,87 @@ void SceneCharacter_E4CState::CharacterCreationState::Enter()
 	btnStartCharacter->SetSize({ 196.0f * 1.5f, 92.0f * 1.5f });
 	UIManager::Instance().Register(btnStartCharacter);
 
-	//if (btnCharacterLeft->IsHover())
-	//{
-	//	PLAYER_CHARACTER_DATA.SetCharacterVisibility(1, 0);
-	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.headType == 0)
-	//	{
-	//		PLAYER_CHARACTER_DATA.SetCharacterHeadType(0, 1);
-	//		owner->UpdateCurrentModel(0, 0, 1);
-	//	}
-	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.bodyType == 0)
-	//	{
-	//		PLAYER_CHARACTER_DATA.SetCharacterBodyType(0, 1);
-	//		owner->UpdateCurrentModel(0, 1, 1);
-	//	}
-	//}
-	//if (btnCharacterCenter->IsHover())
-	//{
-	//	PLAYER_CHARACTER_DATA.SetCharacterVisibility(1, 1);
-	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.headType == 0)
-	//	{
-	//		PLAYER_CHARACTER_DATA.SetCharacterHeadType(1, 1);
-	//		owner->UpdateCurrentModel(1, 0, 1);
-	//	}
-	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.bodyType == 0)
-	//	{
-	//		PLAYER_CHARACTER_DATA.SetCharacterBodyType(1, 1);
-	//		owner->UpdateCurrentModel(1, 1, 1);
-	//	}
-	//}
-	//if (btnCharacterRight->IsHover())
-	//{
-	//	PLAYER_CHARACTER_DATA.SetCharacterVisibility(1, 2);
-	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.headType == 0)
-	//	{
-	//		PLAYER_CHARACTER_DATA.SetCharacterHeadType(2, 1);
-	//		owner->UpdateCurrentModel(2, 0, 1);
-	//	}
-	//	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.bodyType == 0)
-	//	{
-	//		PLAYER_CHARACTER_DATA.SetCharacterBodyType(2, 1);
-	//		owner->UpdateCurrentModel(2, 1, 1);
-	//	}
-	//}
+	Camera& camera = Camera::Instance();
+
+	camera.SetLookAt(
+		{ 6.0, 2.0f, 9.0f },				// 視点
+		{ -3.0f, 0.0, 0.0f },					// 注視点
+		{ 0.036f, 0.999f, -0.035f }				// 上ベクトル
+	);
+
+	owner->cameraController->SyncCameraToController(camera);
+
+	owner->m_previewCharacters[1]->SetMenuVisibility(false);
+	owner->m_previewCharacters[2]->SetMenuVisibility(false);
 }
-void SceneCharacter_E4CState::CharacterCreationState::Execute(float elapsedTime)
+void SceneCharacter_E4CState::CharacterCreationStateLeft::Execute(float elapsedTime)
 {
 }
-void SceneCharacter_E4CState::CharacterCreationState::Exit()
+void SceneCharacter_E4CState::CharacterCreationStateLeft::Exit()
+{
+	UI.Clear();
+	SetCursor(::LoadCursor(NULL, IDC_HAND));
+}
+
+// タイトルステート
+void SceneCharacter_E4CState::CharacterCreationStateCenter::Enter()
+{
+	btnStartCharacter = new WidgetButtonImage("", "Data/Sprites/UI/start.png", [&](WidgetButton*) {
+		owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::START);
+		});
+	btnStartCharacter->SetPosition({ SCREEN_W * 0.5f - 163.0f * 0.5f * 1.5f, SCREEN_H * 0.8f });
+	btnStartCharacter->SetSize({ 196.0f * 1.5f, 92.0f * 1.5f });
+	UIManager::Instance().Register(btnStartCharacter);
+
+	Camera& camera = Camera::Instance();
+
+	camera.SetLookAt(
+		{ 0.0, 2.0f, 9.0f },				// 視点
+		{ 0.0f, 0.0, 0.0f },					// 注視点
+		{ 0.036f, 0.999f, -0.035f }				// 上ベクトル
+	);
+
+	owner->cameraController->SyncCameraToController(camera);
+
+	owner->m_previewCharacters[0]->SetMenuVisibility(false);
+	owner->m_previewCharacters[2]->SetMenuVisibility(false);
+}
+void SceneCharacter_E4CState::CharacterCreationStateCenter::Execute(float elapsedTime)
+{
+}
+void SceneCharacter_E4CState::CharacterCreationStateCenter::Exit()
+{
+	UI.Clear();
+	SetCursor(::LoadCursor(NULL, IDC_HAND));
+}
+
+// タイトルステート
+void SceneCharacter_E4CState::CharacterCreationStateRight::Enter()
+{
+	btnStartCharacter = new WidgetButtonImage("", "Data/Sprites/UI/start.png", [&](WidgetButton*) {
+		owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::START);
+		});
+	btnStartCharacter->SetPosition({ SCREEN_W * 0.5f - 163.0f * 0.5f * 1.5f, SCREEN_H * 0.8f });
+	btnStartCharacter->SetSize({ 196.0f * 1.5f, 92.0f * 1.5f });
+	UIManager::Instance().Register(btnStartCharacter);
+
+	Camera& camera = Camera::Instance();
+
+	camera.SetLookAt(
+		{ -6.0, 2.0f, 9.0f },				// 視点
+		{ 3.0f, 0.0, 0.0f },					// 注視点
+		{ 0.036f, 0.999f, -0.035f }				// 上ベクトル
+	);
+
+	owner->cameraController->SyncCameraToController(camera);
+
+	owner->m_previewCharacters[0]->SetMenuVisibility(false);
+	owner->m_previewCharacters[1]->SetMenuVisibility(false);
+}
+void SceneCharacter_E4CState::CharacterCreationStateRight::Execute(float elapsedTime)
+{
+}
+void SceneCharacter_E4CState::CharacterCreationStateRight::Exit()
 {
 	UI.Clear();
 	SetCursor(::LoadCursor(NULL, IDC_HAND));

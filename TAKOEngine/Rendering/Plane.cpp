@@ -6,7 +6,7 @@
 
 // コンストラクタ
 Plane::Plane(ID3D11Device* device, const char* filename, float scaling, std::array<DirectX::XMFLOAT3, 4> positions)
-	: ModelObject(filename, scaling)
+	: ModelObject(filename, scaling, ModelObject::RENDER_MODE::NOMODEL)
 {
 	HRESULT hr = S_OK;
 
@@ -85,7 +85,7 @@ Plane::Plane(ID3D11Device* device, const char* filename, float scaling, std::arr
 	mesh.material = new ModelResource::Material();
 
 	// テクスチャ生成
-	if (filename != nullptr)
+	if (filename != "")
 	{
 		// テクスチャファイル読み込み
 		D3D11_TEXTURE2D_DESC desc;

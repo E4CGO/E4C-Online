@@ -1,5 +1,5 @@
 //! @file GameObject.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDED_MODEL_OBJECT_H__
 #define __INCLUDED_MODEL_OBJECT_H__
@@ -8,7 +8,6 @@
 #include "TAKOEngine/Rendering/Model/ModelDX11.h"
 #include "TAKOEngine/Rendering/Model/NewModelDX11.h"
 #include "TAKOEngine/Rendering/Model/ModelDX12.h"
-
 
 /**************************************************************************//**
 	@class	ModelObject
@@ -24,6 +23,7 @@ public:
 		DX11GLTF,
 		DX12,
 		DX12GLTF,
+		NOMODEL,
 	};
 
 	// コンストラクタ
@@ -35,11 +35,12 @@ public:
 	// モデルを読み取り
 	void LoadModel(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX11);
 
+	void CleanModels();
+
 	// 更新処理
 	virtual void Update(float elapsedTime) override;
 	// 描画処理
 	virtual void Render(const RenderContext& rc) override;
-
 
 	// モデルを取得
 	std::unique_ptr<iModel>& GetModel(int idx = 0) { return m_pmodels[idx]; }
@@ -53,8 +54,7 @@ public:
 
 	// シェーダー設定
 	void SetShader(const ModelShaderId id) { m_shaderId = id; };
-	
-	
+
 	// アニメーション設定
 	void SetAnimation(const int index, const bool loop, const float blendSeconds = 0.2f);
 	// 個別モデルアニメーション設定

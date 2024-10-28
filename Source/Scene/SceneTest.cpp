@@ -7,12 +7,13 @@ void SceneTest::Initialize()
 	stage = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.1);
 	stage->Update(0);
 	MAPTILES.Register(stage);
+
 	PlayerCharacterData::CharacterInfo charInfo = {
 		true,			// visible
 		"",				// save
 		{				//Character
 			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-		}				
+		}
 	};
 
 	newPlayer = std::make_unique<PlayerCharacter>(charInfo);

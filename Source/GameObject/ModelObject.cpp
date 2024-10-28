@@ -1,5 +1,5 @@
 //! @file ModelObject.cpp
-//! @note 
+//! @note
 #include "ModelObject.h"
 #include "TAKOEngine/Physics/UnrotatedBoxCollider.h"
 #include "TAKOEngine/Physics/BoundingBoxCollider.h"
@@ -12,7 +12,7 @@
 #include "TAKOEngine/Rendering/Model/ModelDX12.h"
 
 /**************************************************************************//**
- 	@brief		コンストラクタ（引数付き）
+	@brief		コンストラクタ（引数付き）
 	@param[in]	filename	モデルファイルパス
 	@param[in]	scaling		モデルスケール
 	@param[in]	renderMode	レンダーボード
@@ -23,7 +23,7 @@ ModelObject::ModelObject(const char* filename, float scaling, ModelObject::RENDE
 }
 
 /**************************************************************************//**
- 	@brief		モデル生成
+	@brief		モデル生成
 	@param[in]	filename	戻るファイルパス
 	@param[in]	scaling		モデルスケール
 	@param[in]	renderMode	レンダーモード
@@ -44,11 +44,18 @@ void ModelObject::LoadModel(const char* filename, float scaling, ModelObject::RE
 		break;
 	case ModelObject::RENDER_MODE::DX12GLTF:
 		break;
+	case ModelObject::RENDER_MODE::NOMODEL:
+		break;
 	}
 }
 
+void ModelObject::CleanModels()
+{
+	m_pmodels.clear();
+}
+
 /**************************************************************************//**
- 	@brief		モデルアニメーション設定
+	@brief		モデルアニメーション設定
 	@param[in]	index			アニメーションインデックス
 	@param[in]	loop			ループフラグ
 	@param[in]	blendSeconds	ブレンドタイム（秒）
@@ -76,7 +83,7 @@ void ModelObject::SetModelAnimation(const int model_idx, const int animation_ind
 	m_pmodels[model_idx]->PlayAnimation(animation_index, loop, blendSeconds);
 }
 /**************************************************************************//**
- 	@brief	全てのモデルのアニメーション判定
+	@brief	全てのモデルのアニメーション判定
 	@return	アニメーション中判定
 *//***************************************************************************/
 bool ModelObject::IsPlayAnimaition(void)
@@ -98,7 +105,7 @@ bool ModelObject::IsPlayAnimaition(int idx)
 }
 
 /**************************************************************************//**
- 	@brief	更新処理
+	@brief	更新処理
 	@param[in]	elapsedTime 経過時間
 	@return なし
 *//***************************************************************************/
@@ -119,7 +126,7 @@ void ModelObject::Update(float elapsedTime)
 	}
 }
 /**************************************************************************//**
- 	@brief	描画処理
+	@brief	描画処理
 	@param[in]	rc	レンダーコンテクスト参照
 	@return なし
 *//***************************************************************************/
@@ -137,7 +144,7 @@ void ModelObject::Render(const RenderContext& rc)
 	}
 }
 /**************************************************************************//**
- 	@brief		コライダー設定
+	@brief		コライダー設定
 	@param[in]	collider	コライダータイプ
 	@param[in]	idx			モデルID
 	@return		なし
@@ -168,7 +175,7 @@ void ModelObject::SetCollider(Collider::COLLIDER_TYPE collider, int idx)
 	}
 }
 /**************************************************************************//**
- 	@brief		モデルノード座標を取得
+	@brief		モデルノード座標を取得
 	@param[in]	idx			モデルインデックス
 	@param[in]	nodeName	ノード名前
 	@param[in]	offset		オフセット
