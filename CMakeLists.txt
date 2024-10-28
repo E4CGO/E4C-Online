@@ -136,7 +136,10 @@ set(Source
     "Source/GameData.h"
     "Source/Main.cpp"
     "Source/Manager.h"
+    "Source/PlayerCharacterData.cpp"
     "Source/PlayerCharacterData.h"
+    "Source/PlayerCharacterPattern.cpp"
+    "Source/PlayerCharacterPattern.h"
 )
 source_group("Source" FILES ${Source})
 
@@ -236,8 +239,16 @@ set(Source__GameObject__Character__Player
     "Source/GameObject/Character/Player/KnightState.h"
     "Source/GameObject/Character/Player/Mage.cpp"
     "Source/GameObject/Character/Player/Mage.h"
+    "Source/GameObject/Character/Player/NonPlayerCharacter.cpp"
+    "Source/GameObject/Character/Player/NonPlayerCharacter.h"
+    "Source/GameObject/Character/Player/NonPlayerCharacterState.cpp"
+    "Source/GameObject/Character/Player/NonPlayerCharacterState.h"
     "Source/GameObject/Character/Player/Player.cpp"
     "Source/GameObject/Character/Player/Player.h"
+    "Source/GameObject/Character/Player/PlayerCharacter.cpp"
+    "Source/GameObject/Character/Player/PlayerCharacter.h"
+    "Source/GameObject/Character/Player/PlayerCharacterState.cpp"
+    "Source/GameObject/Character/Player/PlayerCharacterState.h"
     "Source/GameObject/Character/Player/PlayerManager.cpp"
     "Source/GameObject/Character/Player/PlayerManager.h"
     "Source/GameObject/Character/Player/PlayerState.cpp"
@@ -329,7 +340,6 @@ source_group("Source\\UI\\Widget" FILES ${Source__UI__Widget})
 
 set(TAKOEngine__AI
     "TAKOEngine/AI/BaseState.h"
-    "TAKOEngine/AI/StateMachine.cpp"
     "TAKOEngine/AI/StateMachine.h"
 )
 source_group("TAKOEngine\\AI" FILES ${TAKOEngine__AI})
