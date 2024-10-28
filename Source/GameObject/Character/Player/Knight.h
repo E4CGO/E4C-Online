@@ -7,9 +7,15 @@ public:
 	~Knight() = default;
 
 	void AttackCollision() override;
+	void RenderTrail();
 	void OnDamage(const HitResult& hit, int damage) override;
+	//Œ•‚Ì‹OÕƒm[ƒhæ“¾
+	const iModel::Node* GetSwordtrailNode();
 private:
 	void UpdateColliders() override;
+	//ƒ|ƒŠƒSƒ“‚ÌÅ‘å”
+	static const int MAX_POLYGON = 12;
+	XMFLOAT3 trailPosition[2][MAX_POLYGON];
 public:
 	enum AttackCollider
 	{

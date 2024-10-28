@@ -8,6 +8,7 @@
 #include <vector>
 #include "TAKOEngine/Rendering/Model/Model.h"
 #include "TAKOEngine/Editor/Camera/Camera.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 
 //*************************************************************
 // @class FrustumCulling
@@ -19,7 +20,7 @@ class FrustumCulling
 {
 public:
 	//視錐台カリングを行う関数
-	static void FrustumCullingFlag(const Camera& camera, const std::vector<iModel::Mesh>& meshes, std::vector<bool>& visibleObjects);
+	static void FrustumCullingFlag(const std::vector<iModel::Mesh>& meshes, std::vector<bool>& visibleObjects);
 
 private:
 	struct Frustum

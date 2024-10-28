@@ -52,7 +52,7 @@ private:
 	//スキニング
 	SkinningPipeline*	m_skinning_pipeline;
 	
-	Camera& camera = Camera::Instance();
+	Camera* maincamera;
 	std::unique_ptr<FreeCameraController> cameraController;
 
 	// Sprite Preload

@@ -18,6 +18,7 @@
 #include "TAKOEngine/Rendering/Descriptor.h"
 #include "TAKOEngine/Rendering/ConstantBuffer.h"
 #include "TAKOEngine/Tool/ImGuiRenderer.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 
 enum class ModelShaderId
 {
@@ -148,7 +149,6 @@ public:
 	// ディスクリプタヒープ取得
 	DescriptorHeap* GetShaderResourceDescriptorHeap() const { return m_shader_resource_descriptor_heap.get(); }
 	DescriptorHeap* GetSamplerDescriptorHeap() const { return m_sampler_descriptor_heap.get(); }
-
 	DirectX::XMFLOAT3 GetScreenPosition(
 		const DirectX::XMFLOAT3 worldPosition,
 		const D3D11_VIEWPORT& viewport,
@@ -215,7 +215,6 @@ private:
 
 	std::unique_ptr<DebugRenderer>					debugRenderer;
 	std::unique_ptr<LineRenderer>					lineRenderer;
-
 	//スキニング
 	std::unique_ptr<SkinningPipeline>	m_skinning_pipeline;
 

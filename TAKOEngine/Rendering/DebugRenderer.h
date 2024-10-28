@@ -17,6 +17,7 @@ public:
 
 	// ‹…•`‰æ
 	void DrawSphere(const DirectX::XMFLOAT3& center, float radius, const DirectX::XMFLOAT4& color);
+	void DrawSphere2(const std::vector<DirectX::XMFLOAT3>& center, float radius, const DirectX::XMFLOAT4& color);
 
 	// ‰~’Œ•`‰æ
 	void DrawCylinder(const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color);
@@ -44,6 +45,12 @@ private:
 	{
 		DirectX::XMFLOAT4	color;
 		DirectX::XMFLOAT3	center;
+		float				radius;
+	};
+	struct Sphere2
+	{
+		DirectX::XMFLOAT4	color;
+		std::vector<DirectX::XMFLOAT3>	center{};
 		float				radius;
 	};
 
@@ -76,6 +83,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState>	depthStencilState;
 
 	std::vector<Sphere>		spheres;
+	std::vector<Sphere2>		spheres2;
 	std::vector<Cylinder>	cylinders;
 	std::vector<Cube>	cubes;
 

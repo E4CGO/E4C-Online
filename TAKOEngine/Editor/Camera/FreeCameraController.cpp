@@ -1,6 +1,18 @@
 #include <imgui.h>
 #include "FreeCameraController.h"
+static FreeCameraController* instance = nullptr;
 
+// インスタンス取得
+FreeCameraController& FreeCameraController::Instance()
+{
+	return *instance;
+}
+
+FreeCameraController::FreeCameraController()
+{
+	// インスタンスポインタ設定
+	instance = this;
+}
 // 更新処理
 void FreeCameraController::Update(float elapsedTime)
 {

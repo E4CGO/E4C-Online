@@ -45,6 +45,7 @@ Framework::Framework(HWND hWnd)
 
 	// シーン初期化
 	SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTitle));
+	
 }
 
 // デストラクタ

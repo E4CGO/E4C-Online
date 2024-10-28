@@ -55,7 +55,7 @@ public:
 	void Render() override;
 private:
 
-	Camera& camera = Camera::Instance();
+	Camera* maincamera;
 	// シーンGUI描画
 	void DrawSceneGUI();
 	// プロパティGUI描画

@@ -1,4 +1,5 @@
 #include "TAKOEngine/Runtime/tentacle_lib.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 
 #include "LightManager.h"
 #include "DeferredRendering.h"
@@ -34,7 +35,7 @@ void DeferredRendering::Render()
 {
 	// 描画コンテキスト設定
 	RenderContext rc;
-	rc.camera        = &Camera::Instance();
+	rc.camera        =CameraManager::Instance().GetCamera();
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState   = T_GRAPHICS.GetRenderState();
 

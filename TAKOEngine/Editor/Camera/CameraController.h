@@ -7,9 +7,9 @@ class CameraController
 public:
 	CameraController() = default;
 	// カメラからコントローラーヘパラメータを同期する
-	void SyncCameraToController(const Camera& camera);
+	void SyncCameraToController(Camera* camera);
 	// コントローラーからカメラへパラメータを同期する
-	void SyncContrllerToCamera(Camera& camera);
+	void SyncContrllerToCamera(Camera* camera);
 	// 更新処理
 	virtual void Update(float elapsedTime = 0.0f) {};
 

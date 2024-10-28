@@ -22,7 +22,7 @@ public:
 	// 描画処理
 	void Render() override;
 private:
-	Camera& camera = Camera::Instance();
+	Camera* maincamera;
 	//std::unique_ptr<FreeCameraController> cameraController;
 	std::unique_ptr<ThridPersonCameraController> cameraController;
 

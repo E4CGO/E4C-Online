@@ -1,21 +1,16 @@
+
 #pragma once
 
 #include <DirectXMath.h>
-
+#include <vector>
 // カメラ
+
 class Camera
 {
-private:
-	Camera() = default;
-	~Camera() = default;
 public:
-	// インスタンス
-	static Camera& Instance()
-	{
-		static Camera instance;
-		return instance;
-	}
-
+	Camera() {};
+	~Camera() {};
+public:
 	// 指定方向を向く
 	void SetLookAt(const DirectX::XMFLOAT3& eye, const DirectX::XMFLOAT3& focus, const DirectX::XMFLOAT3& up);
 	
@@ -55,6 +50,17 @@ public:
 	//近平面までの距離を取得
 	const float& GetNearZ() { return nearZ; }
 
+	//インデックス取得
+	int& GetSegment() { return currentSegment; }
+
+	//動くカメラ
+	void MoveToCamera(const DirectX::XMFLOAT3& eye, const DirectX::XMFLOAT3& focus, float transitiontime, float transitionDuration, float elapsedTime);
+	//回転するカメラ
+	void RotateToCamera(const DirectX::XMFLOAT3& target, float& angle, float radius, float speed, float elapsedTime);
+	//始点、中点、終点のポイントを経由して移動するカメラ
+	void MovePointToCamera(const std::vector<DirectX::XMFLOAT3>& positions, const std::vector<DirectX::XMFLOAT3>& focusPoints,float& transitionTime, float transitionDuration, float elapsedTime);
+	//始点、終点のポイントを経由して移動するカメラ
+	void Move2PointToCamera(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const DirectX::XMFLOAT3& startFocus, const DirectX::XMFLOAT3& endFocus, float& transitionTime, float transitionDuration, float elapsedTime);
 private:
 	DirectX::XMFLOAT4X4 view;
 	DirectX::XMFLOAT4X4 projection;
@@ -70,4 +76,9 @@ private:
 	float aspect;
 	float nearZ;
 	float farZ;
+
+	std::vector<DirectX::XMFLOAT3> cameraPositions;  // カメラの各ポイントの位置
+	std::vector<DirectX::XMFLOAT3> cameraFocusPoints;  // カメラの各ポイントの注視点
+	
+	int currentSegment = 0;
 };

@@ -140,6 +140,27 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
 		context->Draw(sphereVertexCount, 0);
 	}
 	spheres.clear();
+	context->IASetVertexBuffers(0, 1, sphereVertexBuffer.GetAddressOf(), &stride, &offset);
+	for (const Sphere2& sphere : spheres2)
+	{
+		for (const DirectX::XMFLOAT3& center : sphere.center)  // 複数の中心を処理
+		{
+			// ワールドビュープロジェクション行列作成
+			DirectX::XMMATRIX S = DirectX::XMMatrixScaling(sphere.radius, sphere.radius, sphere.radius);
+			DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(center.x, center.y, center.z);
+			DirectX::XMMATRIX W = S * T;
+			DirectX::XMMATRIX WVP = W * VP;
+
+			// 定数バッファ更新
+			CbMesh cbMesh;
+			cbMesh.color = sphere.color;
+			DirectX::XMStoreFloat4x4(&cbMesh.wvp, WVP);
+
+			context->UpdateSubresource(constantBuffer.Get(), 0, 0, &cbMesh, 0, 0);
+			context->Draw(sphereVertexCount, 0);
+		}
+	}
+	spheres2.clear();
 
 	// 円柱描画
 	context->IASetVertexBuffers(0, 1, cylinderVertexBuffer.GetAddressOf(), &stride, &offset);
@@ -190,6 +211,14 @@ void DebugRenderer::DrawSphere(const DirectX::XMFLOAT3& center, float radius, co
 	sphere.radius = radius;
 	sphere.color = color;
 	spheres.emplace_back(sphere);
+}
+void DebugRenderer::DrawSphere2(const std::vector<DirectX::XMFLOAT3>& center, float radius, const DirectX::XMFLOAT4& color)
+{
+	Sphere2 sphere;
+	sphere.center = center;
+	sphere.radius = radius;
+	sphere.color = color;
+	spheres2.emplace_back(sphere);
 }
 
 // 円柱描画

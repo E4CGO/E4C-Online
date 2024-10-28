@@ -105,20 +105,20 @@ void ThridPersonCameraController::Update(float elapsedTime)
 	Offset = Offset + (DirectX::XMFLOAT3(cy, 0, -sy) * -offset.x);
 
 	focus = player->GetPosition() + DirectX::XMFLOAT3(0, player->GetHeight() * 1.1f, 0);
-	// RayCast 壁対策
-	{
-		HitResult hit;
-		DirectX::XMFLOAT3 end = focus + Offset;
-		if (MAPTILES.RayCast(focus, end, hit, true))
-		{
-			// カメラが壁に当たった
-			focus = hit.position;
-		}
-		else
-		{
-			focus = focus + Offset;
-		}
-	}
+	//// RayCast 壁対策
+	//{
+	//	HitResult hit;
+	//	DirectX::XMFLOAT3 end = focus + Offset;
+	//	if (MAPTILES.RayCast(focus, end, hit, true))
+	//	{
+	//		// カメラが壁に当たった
+	//		focus = hit.position;
+	//	}
+	//	else
+	//	{
+	//		focus = focus + Offset;
+	//	}
+	//}
 
 	// カメラ揺れ
 	if (shakeTimer > 0.0f)
@@ -144,10 +144,13 @@ void ThridPersonCameraController::Update(float elapsedTime)
 		DirectX::XMStoreFloat3(&end, Eye);
 		if (MAPTILES.RayCast(focus, end, hit, true))
 		{
-			// カメラが壁に当たった
-			float d = hit.distance * 0.95f;
-			if (d < 0.01f) d = 0.01f;
-			Eye = DirectX::XMVectorSubtract(Focus, DirectX::XMVectorScale(Front, d));
+			//// カメラが壁に当たった
+			//float d = hit.distance * 0.95f;
+			//if (d < 0.01f) d = 0.01f;
+			//Eye = DirectX::XMVectorSubtract(Focus, DirectX::XMVectorScale(Front, d));
+
+			Distance = DirectX::XMVectorSet(hit.distance * 0.95f, hit.distance * 0.95f, hit.distance * 0.95f, 0);
+			Eye = DirectX::XMVectorSubtract(Focus, DirectX::XMVectorMultiply(Front, Distance));
 		}
 	}
 

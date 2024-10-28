@@ -1,12 +1,12 @@
 #include "CameraController.h"
 
 // カメラからコントローラーへパラメータを同期する
-void CameraController::SyncCameraToController(const Camera& camera)
+void CameraController::SyncCameraToController(Camera* camera)
 {
-	eye = camera.GetEye();
-	focus = camera.GetFocus();
-	up = camera.GetUp();
-	right = camera.GetRight();
+	eye = camera->GetEye();
+	focus = camera->GetFocus();
+	up = camera->GetUp();
+	right = camera->GetRight();
 
 	// 視点から注視点までの距離算出
 	DirectX::XMVECTOR Eye = DirectX::XMLoadFloat3(&eye);
@@ -16,7 +16,7 @@ void CameraController::SyncCameraToController(const Camera& camera)
 	DirectX::XMStoreFloat(&distance, Distance);
 
 	// 回転角度を算出
-	const DirectX::XMFLOAT3& front = camera.GetFront();
+	const DirectX::XMFLOAT3& front = camera->GetFront();
 	angleX = ::asinf(-front.y);
 	if (up.y < 0)
 	{
@@ -37,7 +37,7 @@ void CameraController::SyncCameraToController(const Camera& camera)
 }
 
 // コントローラーからカメラへパラメータを同期する
-void CameraController::SyncContrllerToCamera(Camera& camera)
+void CameraController::SyncContrllerToCamera(Camera* camera)
 {
-	camera.SetLookAt(eye, focus, up);
+	camera->SetLookAt(eye, focus, up);
 }

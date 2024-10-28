@@ -10,11 +10,11 @@
 // @param[in]  visibleObjects  メッシュが視錐台内にあるかどうかのフラグを格納するブール値のリスト
 // @return     なし
 //*********************************************************************
-void FrustumCulling::FrustumCullingFlag(const Camera& camera, const std::vector<iModel::Mesh>& meshes, std::vector<bool>& visibleObjects)
+void FrustumCulling::FrustumCullingFlag(const std::vector<iModel::Mesh>& meshes, std::vector<bool>& visibleObjects)
 {
     // カメラのビュー行列と射影行列を取得
-    DirectX::XMFLOAT4X4 viewMatrix       = camera.GetView();
-    DirectX::XMFLOAT4X4 projectionMatrix = camera.GetProjection();
+    DirectX::XMFLOAT4X4 viewMatrix       = CameraManager::Instance().GetCamera()->GetView();
+    DirectX::XMFLOAT4X4 projectionMatrix = CameraManager::Instance().GetCamera()->GetProjection();
 
     // カメラの視錐台（フラスタム）を計算
     Frustum frustum;

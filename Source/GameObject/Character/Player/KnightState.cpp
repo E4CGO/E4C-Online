@@ -55,6 +55,8 @@ void KnightState::AttackNormalState_1::Execute(float elapsedTime)
 			owner->GetStateMachine()->ChangeSubState(Knight::ATTACK_STATE::ATTACK_2);
 		}
 	}
+
+	
 }
 //  ˆê”ÊUŒ‚2
 void KnightState::AttackNormalState_2::Enter()

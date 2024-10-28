@@ -92,6 +92,8 @@ namespace myRenderer
 			//深度ステンシル設定用
 			D3D11_TEXTURE2D_DESC texture2dDesc;
 			UINT width = 1024;
+
+			Camera* maincamera;
 		};
 	}
 }

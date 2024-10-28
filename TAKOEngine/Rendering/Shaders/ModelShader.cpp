@@ -187,7 +187,7 @@ void ModelShader::Draw(const RenderContext& rc, const iModel* model, DirectX::XM
 	std::vector<bool> visibleObjects(model->GetMeshes().size(), false);
 
 	// 視錐台カリングを実行して可視オブジェクトをマーク
-	FrustumCulling::FrustumCullingFlag(Camera::Instance(), model->GetMeshes(), visibleObjects);
+	FrustumCulling::FrustumCullingFlag(model->GetMeshes(), visibleObjects);
 	int culling = 0;
 
 	for (const ModelResource::Mesh& mesh : resource->GetMeshes())
