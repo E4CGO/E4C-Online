@@ -1,8 +1,14 @@
+#include "Constants.hlsli"
+
 struct VS_OUT
 {
-    float4 position : SV_POSITION;
-    float2 texcoord : TEXCOORD;
-    float4 color : COLOR;
+    float4 vertex	: SV_POSITION;
+	float2 texcoord	: TEXCOORD;
+	float3 normal	: NORMAL;
+	float3 position	: POSITION;
+	float3 tangent	: TANGENT;
+    float3 binormal : BINORMAL;
+    float4 color    : COLOR;
 };
 
 cbuffer CbScene : register(b0)
@@ -14,7 +20,8 @@ cbuffer CbScene : register(b0)
 cbuffer CbMesh : register(b1)
 {
     row_major float4x4 world_transform;
-    row_major float4x4 boneTransforms[255];
+    row_major float4x4 boneTransforms[MAX_BONES];
+    row_major float4x4 instancingTransform[MAX_INSTANCES];
 };
 
 cbuffer CbMaterial : register(b2)

@@ -1,5 +1,5 @@
 //! @file ModelShader.cpp
-//! @note 
+//! @note
 
 #include <cassert>
 #include "TAKOEngine/Runtime/tentacle_lib.h"
@@ -146,7 +146,7 @@ void ModelShader::Begin(const RenderContext& rc)
 	{
 		//バイアスの処理が４枚以上は考慮していないのでアサートで止めておく
 		assert(myRenderer::NUM_SHADOW_MAP <= 4);
-		(&cbShadowMap.shadowBias.x)[i]     = rc.shadowMapData.shadowBias[i];
+		(&cbShadowMap.shadowBias.x)[i] = rc.shadowMapData.shadowBias[i];
 		cbShadowMap.lightViewProjection[i] = rc.shadowMapData.lightViewProjection[i];
 	}
 	rc.deviceContext->UpdateSubresource(shadowMapConstantBuffer.Get(), 0, 0, &cbShadowMap, 0, 0);
@@ -210,7 +210,7 @@ void ModelShader::Draw(const RenderContext& rc, const iModel* model, DirectX::XM
 		cbMesh.materialColor.z *= color.z;
 		cbMesh.materialColor.w *= color.w;
 		cbMesh.linearGamma = model->GetLinearGamma();
-		cbMesh.shaderData  = rc.shaderData;
+		cbMesh.shaderData = rc.shaderData;
 		dc->UpdateSubresource(meshConstantBuffer.Get(), 0, 0, &cbMesh, 0, 0);
 
 		// スケルトン用定数バッファ更新
@@ -219,9 +219,9 @@ void ModelShader::Draw(const RenderContext& rc, const iModel* model, DirectX::XM
 		{
 			for (size_t i = 0; i < mesh.bones.size(); ++i)
 			{
-				DirectX::XMMATRIX worldTransform  = DirectX::XMLoadFloat4x4(&nodes.at(mesh.bones.at(i).nodeIndex).worldTransform);
+				DirectX::XMMATRIX worldTransform = DirectX::XMLoadFloat4x4(&nodes.at(mesh.bones.at(i).nodeIndex).worldTransform);
 				DirectX::XMMATRIX offsetTransform = DirectX::XMLoadFloat4x4(&mesh.bones.at(i).offsetTransform);
-				DirectX::XMMATRIX boneTransform   = offsetTransform * worldTransform;
+				DirectX::XMMATRIX boneTransform = offsetTransform * worldTransform;
 				DirectX::XMStoreFloat4x4(&cbSkeleton.boneTransforms[i], boneTransform);
 			}
 		}
@@ -237,4 +237,8 @@ void ModelShader::Draw(const RenderContext& rc, const iModel* model, DirectX::XM
 		// 描画
 		dc->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
 	}
+}
+
+void ModelShader::Draw(const RenderContext& rc, const ModelResource::Mesh& mesh)
+{
 }

@@ -56,7 +56,8 @@ StructuredBuffer<material_constants> materials : register(t0);
 float4 main(VS_OUT pin) : SV_TARGET
 {
     const float GAMMA = 2.2;
-    
+    float4 light_direction = float4(0.0f, -1.0f, 0.0f, 1.0f);
+
     material_constants m = materials[material];
         
     float4 basecolor_factor = m.pbr_metallic_roughness.basecolor_factor;

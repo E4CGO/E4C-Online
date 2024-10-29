@@ -3,11 +3,13 @@
 #include <WICTextureLoader12.h>
 
 #include "TAKOEngine/Rendering/Misc.h"
+#include "TAKOEngine/Rendering/LightManager.h"
 
 #include "TAKOEngine/Rendering/Shaders/PhongShader.h"
 #include "TAKOEngine/Rendering/Shaders/ToonShader.h"
 #include "TAKOEngine/Rendering/Shaders/SkydomeShader.h"
 #include "TAKOEngine/Rendering/Shaders/ShadowMapShader.h"
+#include "TAKOEngine/Rendering/Shaders//PlaneShader.h"
 
 #include "TAKOEngine/Rendering/Shaders/UVScrollShader.h"
 #include "TAKOEngine/Rendering/Shaders/MaskShader.h"
@@ -27,6 +29,12 @@ Graphics::~Graphics()
 
 void Graphics::FinishDX12()
 {
+	if (isDX12Active)
+	{
+		// IMGUI終了
+		m_imgui_renderer->FinalizeDX12();
+	}
+
 	CommandQueue* command_queues[] =
 	{
 		&m_graphics_queue,
@@ -545,15 +553,14 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 			&featureLevel,
 			immediateContext.GetAddressOf()
 		);
-
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 	adapter->Release();
 
 	// フレームバッファ作成
-	frameBuffers[static_cast<int>(FrameBufferId::Display)]      = std::make_unique<FrameBuffer>(device.Get(), swapchain.Get());
-	frameBuffers[static_cast<int>(FrameBufferId::Scene)]        = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight);
-	frameBuffers[static_cast<int>(FrameBufferId::Luminance)]    = std::make_unique<FrameBuffer>(device.Get(), screenWidth / 2, screenHeight / 2);
+	frameBuffers[static_cast<int>(FrameBufferId::Display)] = std::make_unique<FrameBuffer>(device.Get(), swapchain.Get());
+	frameBuffers[static_cast<int>(FrameBufferId::Scene)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight);
+	frameBuffers[static_cast<int>(FrameBufferId::Luminance)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth / 2, screenHeight / 2);
 	frameBuffers[static_cast<int>(FrameBufferId::GaussianBlur)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth / 2, screenHeight / 2);
 	frameBuffers[static_cast<int>(FrameBufferId::Normal)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
 	frameBuffers[static_cast<int>(FrameBufferId::Position)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT);
@@ -563,38 +570,46 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	m_renderStateDX12 = std::make_unique<RenderStateDX12>();
 
 	//サンプラーステート作成
-	m_sampler[static_cast<int>(SamplerState::PointWrap)]    = std::make_unique<SamplerManager>(SamplerState::PointWrap);
-	m_sampler[static_cast<int>(SamplerState::PointClamp)]   = std::make_unique<SamplerManager>(SamplerState::PointClamp);
-	m_sampler[static_cast<int>(SamplerState::LinearWrap)]   = std::make_unique<SamplerManager>(SamplerState::LinearWrap);
-	m_sampler[static_cast<int>(SamplerState::LinearClamp)]  = std::make_unique<SamplerManager>(SamplerState::LinearClamp);
+	m_sampler[static_cast<int>(SamplerState::PointWrap)] = std::make_unique<SamplerManager>(SamplerState::PointWrap);
+	m_sampler[static_cast<int>(SamplerState::PointClamp)] = std::make_unique<SamplerManager>(SamplerState::PointClamp);
+	m_sampler[static_cast<int>(SamplerState::LinearWrap)] = std::make_unique<SamplerManager>(SamplerState::LinearWrap);
+	m_sampler[static_cast<int>(SamplerState::LinearClamp)] = std::make_unique<SamplerManager>(SamplerState::LinearClamp);
 	m_sampler[static_cast<int>(SamplerState::LinearBorder)] = std::make_unique<SamplerManager>(SamplerState::LinearBorder);
-	m_sampler[static_cast<int>(SamplerState::ShadowMap)]    = std::make_unique<SamplerManager>(SamplerState::ShadowMap);
+	m_sampler[static_cast<int>(SamplerState::ShadowMap)] = std::make_unique<SamplerManager>(SamplerState::ShadowMap);
 
 	// ギズモ生成
 	gizmos = std::make_unique<Gizmos>(device.Get());
 
 	// モデルシェーダー生成
-	modelShaders[static_cast<int>(ModelShaderId::Phong)]     = std::make_unique<PhongShader>(device.Get());
-	modelShaders[static_cast<int>(ModelShaderId::Toon)]      = std::make_unique<ToonShader>(device.Get());
-	modelShaders[static_cast<int>(ModelShaderId::Skydome)]   = std::make_unique<SkydomeShader>(device.Get());
+	modelShaders[static_cast<int>(ModelShaderId::Phong)] = std::make_unique<PhongShader>(device.Get());
+	modelShaders[static_cast<int>(ModelShaderId::Toon)] = std::make_unique<ToonShader>(device.Get());
+	modelShaders[static_cast<int>(ModelShaderId::Skydome)] = std::make_unique<SkydomeShader>(device.Get());
 	modelShaders[static_cast<int>(ModelShaderId::ShadowMap)] = std::make_unique<ShadowMapShader>(device.Get());
+	modelShaders[static_cast<int>(ModelShaderId::Plane)] = std::make_unique<PlaneShader>(device.Get(), "Data/Shader/PlaneVS.cso", "Data/Shader/PlanePS.cso");
+	modelShaders[static_cast<int>(ModelShaderId::Portal)] = std::make_unique<PortalShader>(device.Get(), "Data/Shader/PortalVS.cso", "Data/Shader/PortalPS.cso");
 
 	// DX12のモデルシェーダー生成
-	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Lambert)] = std::make_unique<LambertShader>();
+
+	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Lambert)]           = std::make_unique<LambertShader>(m_d3d_device.Get());
+	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::LambertInstancing)] = std::make_unique<LambertShader>(m_d3d_device.Get(), true);
+	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Phong)]             = std::make_unique<PhongShaderDX12>(m_d3d_device.Get());
+	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::PhongInstancing)]   = std::make_unique<PhongShaderDX12>(m_d3d_device.Get(), true);
+	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Toon)]              = std::make_unique<ToonShaderDX12>(m_d3d_device.Get());
+	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::ToonInstancing)]    = std::make_unique<ToonShaderDX12>(m_d3d_device.Get(), true);
 
 	// スプライトシェーダー生成
-	spriteShaders[static_cast<int>(SpriteShaderId::Default)]             = std::make_unique<DefaultSpriteShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::UVScroll)]            = std::make_unique<UVScrollShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::Mask)]                = std::make_unique<MaskShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::ColorGrading)]        = std::make_unique<ColorGradingShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::GaussianBlur)]        = std::make_unique<GaussianBlurShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::Default)] = std::make_unique<DefaultSpriteShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::UVScroll)] = std::make_unique<UVScrollShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::Mask)] = std::make_unique<MaskShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::ColorGrading)] = std::make_unique<ColorGradingShader>(device.Get());
+	spriteShaders[static_cast<int>(SpriteShaderId::GaussianBlur)] = std::make_unique<GaussianBlurShader>(device.Get());
 	spriteShaders[static_cast<int>(SpriteShaderId::LuminanceExtraction)] = std::make_unique<LuminanceExtractionShader>(device.Get());
 	spriteShaders[static_cast<int>(SpriteShaderId::Finalpass)] = std::make_unique<FinalpassShader>(device.Get());
 	spriteShaders[static_cast<int>(SpriteShaderId::Deferred)] = std::make_unique<DeferredLightingShader>(device.Get());
 
 	// レンダラ
 	debugRenderer = std::make_unique<DebugRenderer>(device.Get());
-	lineRenderer  = std::make_unique<LineRenderer>(device.Get(), 1024);
+	lineRenderer = std::make_unique<LineRenderer>(device.Get(), 1024);
 
 	//スキニング
 	m_skinning_pipeline = std::make_unique<SkinningPipeline>(m_d3d_device.Get());
@@ -762,19 +777,74 @@ void Graphics::End()
 	frame_resource.d3d_command_list->Close();
 }
 
-const Descriptor* Graphics::UpdateSceneConstantBuffer(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection, const DirectX::XMFLOAT3& light_direction)
+//TODO : UpdataConstantBuffer
+const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera& camera, const DirectX::XMFLOAT3& light_direction)
 {
-	UINT frame_buffer_index = m_dxgi_swap_chain->GetCurrentBackBufferIndex();
+	LightManager& ligtManager = LightManager::Instance();
+
+	UINT       frame_buffer_index = m_dxgi_swap_chain->GetCurrentBackBufferIndex();
 	FrameResource& frame_resource = m_frame_resources.at(frame_buffer_index);
 
-	DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&view);
-	DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&projection);
+	DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&camera.GetView());
+	DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&camera.GetProjection());
 	DirectX::XMMATRIX ViewProjection = DirectX::XMMatrixMultiply(View, Projection);
 	DirectX::XMStoreFloat4x4(&frame_resource.cb_scene_data->view_projection, ViewProjection);
-	frame_resource.cb_scene_data->light_direction.x = light_direction.x;
-	frame_resource.cb_scene_data->light_direction.y = light_direction.y;
-	frame_resource.cb_scene_data->light_direction.z = light_direction.z;
-	frame_resource.cb_scene_data->light_direction.w = 0.0f;
+
+	// カメラ
+	frame_resource.cb_scene_data->camera_position.x = camera.GetEye().x;
+	frame_resource.cb_scene_data->camera_position.y = camera.GetEye().y;
+	frame_resource.cb_scene_data->camera_position.z = camera.GetEye().z;
+
+	// ライト情報
+	frame_resource.cb_scene_data->ambientLightColor = ligtManager.GetAmbientColor();
+
+	for (Light* light : ligtManager.GetAllLight())
+	{
+		switch (light->GetLightType())
+		{
+		case	LightType::Directional:
+		{
+			frame_resource.cb_scene_data->directionalLightData.direction.x = light->GetDirection().x;
+			frame_resource.cb_scene_data->directionalLightData.direction.y = light->GetDirection().y;
+			frame_resource.cb_scene_data->directionalLightData.direction.z = light->GetDirection().z;
+			frame_resource.cb_scene_data->directionalLightData.direction.w = 0.0f;
+			frame_resource.cb_scene_data->directionalLightData.color = light->GetColor();
+			break;
+		}
+		case	LightType::Point:
+		{
+			if (frame_resource.cb_scene_data->pointLightCount >= PointLightMax) break;
+
+			frame_resource.cb_scene_data->pointLightData[frame_resource.cb_scene_data->pointLightCount].position.x = light->GetPosition().x;
+			frame_resource.cb_scene_data->pointLightData[frame_resource.cb_scene_data->pointLightCount].position.y = light->GetPosition().y;
+			frame_resource.cb_scene_data->pointLightData[frame_resource.cb_scene_data->pointLightCount].position.z = light->GetPosition().z;
+			frame_resource.cb_scene_data->pointLightData[frame_resource.cb_scene_data->pointLightCount].position.w = 1.0f;
+			frame_resource.cb_scene_data->pointLightData[frame_resource.cb_scene_data->pointLightCount].color = light->GetColor();
+			frame_resource.cb_scene_data->pointLightData[frame_resource.cb_scene_data->pointLightCount].range = light->GetRange();
+			++frame_resource.cb_scene_data->pointLightCount;
+			break;
+		}
+		case	LightType::Spot:
+		{
+			if (frame_resource.cb_scene_data->spotLightCount >= SpotLightMax) break;
+
+			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].position.x = light->GetPosition().x;
+			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].position.y = light->GetPosition().y;
+			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].position.z = light->GetPosition().z;
+			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].position.w = 1.0f;
+			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].direction.x = light->GetDirection().x;
+			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].direction.y = light->GetDirection().y;
+			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].direction.z = light->GetDirection().z;
+			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].direction.w = 0.0f;
+			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].color = light->GetColor();
+			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].range = light->GetRange();
+			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].innerCorn = light->GetInnerCorn();
+			frame_resource.cb_scene_data->spotLightData[frame_resource.cb_scene_data->spotLightCount].outerCorn = light->GetOuterCorn();
+			++frame_resource.cb_scene_data->spotLightCount;
+			break;
+		}
+		}
+	}
 
 	return frame_resource.cbv_descriptor;
 }

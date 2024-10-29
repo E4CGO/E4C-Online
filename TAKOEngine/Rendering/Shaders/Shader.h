@@ -11,7 +11,6 @@
 #include "TAKOEngine/Rendering/Model/Model.h"
 #include "TAKOEngine/Rendering/Model/ModelDX12.h"
 #include "TAKOEngine/Rendering/Sprite.h"
-#include "TAKOEngine/Rendering/PipelineState.h"
 
 //********************************************************************
 // @class Shader

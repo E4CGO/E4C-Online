@@ -70,37 +70,51 @@ void SceneTitle::Initialize()
 		rouge->GetModel()->FindNode("Throwable")->visible = false;
 		shadowMapRenderer->ModelRegister(rouge->GetModel().get());
 
-		test = std::make_unique<ModelDX12>("Data/Model/Character/Barbarian.glb");
-		//test = std::make_unique<ModelDX12>("Data/Model/Character/test.glb");
+		//test = std::make_unique<ModelDX12>("Data/Model/Character/Barbarian.glb");
+		test = std::make_unique<ModelDX12>("Data/Model/Enemy/Goblin.glb");
 		test->PlayAnimation(0, true);
 
+		float posX = 0;
+		for (int i = 0; i < 3; ++i)
+		{
+			int id = test->AllocateInstancingIndex();
+			if (id < 0) continue;
+
+			DirectX::XMMATRIX m;
+			m = DirectX::XMMatrixScaling(1, 1, 1);
+			m *= DirectX::XMMatrixRotationY(DirectX::XMConvertToRadians(0));
+			m *= DirectX::XMMatrixTranslation(posX, 0, 0);
+
+			DirectX::XMFLOAT4X4 tm;
+			DirectX::XMStoreFloat4x4(&tm, m);
+			test->UpdateTransform(id, tm);
+
+			posX += 2;
+		}
+		
 		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/button_agree.png");
 	}
 
 	// 光
-	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
 	shadowMapRenderer->SetShadowLight(dl);
-	maincamera = new Camera();
-	CameraManager& cameraManager = CameraManager::Instance();
-	cameraManager.Register(maincamera);
-	cameraManager.SetCamera(0);
+
 	// カメラ設定
-	CameraManager::Instance().GetCamera()->SetPerspectiveFov(
+	camera.SetPerspectiveFov(
 		DirectX::XMConvertToRadians(45),		// 画角
 		SCREEN_W / SCREEN_H,					// 画面アスペクト比
 		0.1f,									// ニアクリップ
 		10000.0f								// ファークリップ
 	);
-	CameraManager::Instance().GetCamera()->SetLookAt(
+	camera.SetLookAt(
 		{ -5.661f, 2.5f, 5.584f },				// 視点
 		{ 0.0f, 2.0, 0.0f },					// 注視点
 		{ 0.036f, 0.999f, -0.035f }				// 上ベクトル
 	);
 	cameraController = std::make_unique<FreeCameraController>();
-	cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
+	cameraController->SyncCameraToController(camera);
 	cameraController->SetEnable(false);
 
 	// ステート
@@ -141,19 +155,6 @@ void SceneTitle::Initialize()
 		delete xhr;
 	}
 
-	{
-		HRESULT hr;
-
-		D3D11_BUFFER_DESC buffer_desc{};
-		buffer_desc.ByteWidth = sizeof(CbScene);
-		buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-		buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		buffer_desc.CPUAccessFlags = 0;
-		buffer_desc.MiscFlags = 0;
-		buffer_desc.StructureByteStride = 0;
-		hr = T_GRAPHICS.GetDevice()->CreateBuffer(&buffer_desc, nullptr, constant_buffers[1].GetAddressOf());
-		COMPLETION_CHECK
-	}
 }
 
 void SceneTitle::Finalize()
@@ -161,7 +162,6 @@ void SceneTitle::Finalize()
 	spritePreLoad.clear();
 	UI.Clear();
 	shadowMapRenderer->Clear();
-	CameraManager::Instance().Clear();
 }
 
 // 更新処理
@@ -186,7 +186,7 @@ void SceneTitle::Update(float elapsedTime)
 		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(test_position.x, test_position.y, test_position.z);
 		DirectX::XMMATRIX TRANSFORM = S * R * T;
 		DirectX::XMStoreFloat4x4(&test_transform, TRANSFORM);
-		test->SetTransformMatrix(test_transform);
+		//test->SetTransformMatrix(test_transform);
 		test->UpdateAnimation(elapsedTime);
 		test->UpdateTransform();
 	}
@@ -194,8 +194,7 @@ void SceneTitle::Update(float elapsedTime)
 #ifdef _DEBUG
 	// カメラ更新
 	cameraController->Update();
-	cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
-	CameraManager::Instance().Update();
+	cameraController->SyncContrllerToCamera(camera);
 #endif // _DEBUG
 
 	UI.Update(elapsedTime);
@@ -211,7 +210,7 @@ void SceneTitle::Render()
 
 	// 描画コンテキスト設定
 	RenderContext rc;
-	rc.camera = CameraManager::Instance().GetCamera();
+	rc.camera = &camera;
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
@@ -242,11 +241,9 @@ void SceneTitle::RenderDX12()
 {
 	ID3D12GraphicsCommandList* d3d_command_list = TentacleLib::graphics.Begin();
 	{
-	
 		// シーン用定数バッファ更新
 		const Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
-			CameraManager::Instance().GetCamera()->GetView(),
-			CameraManager::Instance().GetCamera()->GetProjection(),
+			Camera::Instance(),
 			DirectX::XMFLOAT3(0, -1, 0));
 
 		// レンダーコンテキスト設定
@@ -255,11 +252,11 @@ void SceneTitle::RenderDX12()
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
 		//スキニング
-		test->UpdateFrameResource();
+		test->UpdateFrameResource(test_transform);
 		m_skinning_pipeline->Compute(rc, test.get());
 
 		// モデル描画
-		ModelShaderDX12* shader = TentacleLib::graphics.GetModelShaderDX12(ModelShaderDX12Id::Lambert);
+		ModelShaderDX12* shader = TentacleLib::graphics.GetModelShaderDX12(ModelShaderDX12Id::ToonInstancing);
 		if (test != nullptr)
 		{
 			shader->Render(rc, test.get());
@@ -273,9 +270,9 @@ void SceneTitle::RenderDX12()
 			m_sprites[0]->End(d3d_command_list);
 		}
 
-		EFFECTS.GetEffect(EffectManager::EFFECT_IDX::BOMB_EFFECT)->PlayDX12(DirectX::XMFLOAT3(0.f, 0.f, 0.f), 5.0f);
+		//EFFECTS.GetEffect(EffectManager::EFFECT_IDX::BOMB_EFFECT)->PlayDX12(DirectX::XMFLOAT3(0.f, 0.f, 0.f), 5.0f);
 
-		EFFECTS.RenderDX12(CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
+		//EFFECTS.RenderDX12(camera.GetView(), camera.GetProjection());
 
 		// IMGUI描画処理
 		{
@@ -317,11 +314,11 @@ void SceneTitle::DrawSceneGUI()
 		if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			// カメラ
-			DirectX::XMFLOAT3 eye = CameraManager::Instance().GetCamera()->GetEye();
+			DirectX::XMFLOAT3 eye = camera.GetEye();
 			ImGui::DragFloat3("Eye", &eye.x, 0.01f, 100.0f);
-			DirectX::XMFLOAT3 focus = CameraManager::Instance().GetCamera()->GetFocus();
+			DirectX::XMFLOAT3 focus = camera.GetFocus();
 			ImGui::DragFloat3("Fcous", &focus.x, 0.01f, 100.0f);
-			DirectX::XMFLOAT3 up = CameraManager::Instance().GetCamera()->GetUp();
+			DirectX::XMFLOAT3 up = camera.GetUp();
 			ImGui::DragFloat3("Up", &up.x, 0.01f, 100.0f);
 		}
 

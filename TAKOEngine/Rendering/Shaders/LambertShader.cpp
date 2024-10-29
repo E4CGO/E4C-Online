@@ -3,9 +3,6 @@
 
 #include "TAKOEngine/Rendering/Misc.h"
 #include "TAKOEngine/Rendering/Graphics.h"
-#include "TAKOEngine/Rendering/Model/Model.h"
-#include "TAKOEngine/Rendering/Model/ModelDX12.h"
-#include "TAKOEngine/Rendering/GpuResourceUtils.h"
 #include "TAKOEngine/Rendering/Shaders/LambertShader.h"
 
 //***********************************************************
@@ -13,9 +10,8 @@
 // @param[in]   なし
 // @return      なし
 //***********************************************************
-LambertShader::LambertShader()
+LambertShader::LambertShader(ID3D12Device* device, bool instancing)
 {
-	ID3D12Device* device = Graphics::Instance().GetDeviceDX12();
 	Graphics&   graphics = Graphics::Instance();
 	const RenderStateDX12* renderState = graphics.GetRenderStateDX12();
 	
@@ -24,13 +20,13 @@ LambertShader::LambertShader()
 	// シェーダー
 	std::vector<BYTE> vsData, psData;
 	{
-		GpuResourceUtils::LoadShaderFile("Data/Shader/LambertDX12VS.cso", vsData);
+		if (!instancing) GpuResourceUtils::LoadShaderFile("Data/Shader/LambertDX12VS.cso", vsData);
+		else GpuResourceUtils::LoadShaderFile("Data/Shader/LambertInstancingVS.cso", vsData);
 		GpuResourceUtils::LoadShaderFile("Data/Shader/LambertDX12PS.cso", psData);
 	}
 
 	// ルートシグネチャの生成
 	{
-		// ルートシグネチャ生成
 		hr = device->CreateRootSignature(
 			0,
 			vsData.data(),
@@ -149,6 +145,15 @@ LambertShader::~LambertShader()
 //***********************************************************
 void LambertShader::Render(const RenderContextDX12& rc, ModelDX12* model)
 {
+	Graphics& graphics = Graphics::Instance();
+
+	// カメラに写っている範囲のオブジェクトをフラグでマークする配列を用意
+	std::vector<bool> visibleObjects(model->GetMeshes().size(), false);
+
+	// 視錐台カリングを実行して可視オブジェクトをマーク
+	FrustumCulling::FrustumCullingFlag(Camera::Instance(), model->GetMeshes(), visibleObjects);
+	int culling = 0;
+
 	// パイプライン設定
 	rc.d3d_command_list->SetGraphicsRootSignature(m_d3d_root_signature.Get());
 	rc.d3d_command_list->SetPipelineState(m_d3d_pipeline_state.Get());
@@ -156,12 +161,12 @@ void LambertShader::Render(const RenderContextDX12& rc, ModelDX12* model)
 	// シーン定数バッファ設定
 	rc.d3d_command_list->SetGraphicsRootDescriptorTable(0, rc.scene_cbv_descriptor->GetGpuHandle());
 
-	Graphics& graphics = Graphics::Instance();
-
-	for (ModelDX12::Mesh& mesh : model->GetMeshes())
+	for (const ModelDX12::Mesh& mesh : model->GetMeshes())
 	{
+		if (!visibleObjects[culling++]) continue;
+
 		const ModelResource::Mesh* res_mesh = mesh.mesh;
-		ModelDX12::Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
+		const ModelDX12::Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
 
 		// メッシュ定数バッファ設定
 		rc.d3d_command_list->SetGraphicsRootDescriptorTable(1, frame_resource.cbv_descriptor->GetGpuHandle());
@@ -184,6 +189,14 @@ void LambertShader::Render(const RenderContextDX12& rc, ModelDX12* model)
 		rc.d3d_command_list->SetGraphicsRootDescriptorTable(4, m_sampler->GetDescriptor()->GetGpuHandle());
 
 		// 描画
-		rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), 1, 0, 0, 0);
+		if (frame_resource.instancingCount == 0)
+		{
+			rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), 1, 0, 0, 0);
+		}
+		else
+		{
+			//インスタンシング
+			rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), frame_resource.instancingCount, 0, 0, 0);
+		}
 	}
 }

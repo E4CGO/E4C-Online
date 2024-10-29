@@ -36,18 +36,21 @@ public:
 	struct Material
 	{
 		std::string name;
-		std::string			textureFilename;
+		std::string	textureFilename;
 		std::string diffuseTextureFileName;
+		std::string normalTextureFileName;
 
 		DirectX::XMFLOAT4 color = { 1, 1, 1, 1 };
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> diffuseMap;
-		std::string normalTextureFileName;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> normalMap;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cbv_resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_srv_resource;
+		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_normal_srv_resource;
+		
 		const Descriptor* cbv_descriptor = nullptr;
 		const Descriptor* srv_descriptor = nullptr;
+		const Descriptor* srv_normal_descriptor = nullptr;
 
 		template<class Archive>
 		void serialize(Archive& archive);
@@ -115,8 +118,10 @@ public:
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_vb_resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_ib_resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cb_resource;
+		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_toon_srv_resource;
 
 		const Descriptor* srv_descriptor = nullptr;
+		const Descriptor* srv_toon_descriptor = nullptr;
 
 		D3D12_VERTEX_BUFFER_VIEW				d3d_vbv;
 		D3D12_INDEX_BUFFER_VIEW					d3d_ibv;
@@ -183,7 +188,9 @@ public:
 	// 各種データ取得
 	const std::vector<Mesh>& GetMeshes() const { return meshes; }
 	const std::vector<Node>& GetNodes() const { return nodes; }
+	void SetNodes(std::vector<Node> nodes) { this->nodes = nodes; }
 	const std::vector<Animation>& GetAnimations() const { return animations; }
+	void SetAnimations(std::vector<Animation> animations) { this->animations = animations; }
 	const std::vector<Material>& GetMaterials() const { return materials; }
 
 	// 読み込み

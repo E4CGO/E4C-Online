@@ -163,6 +163,9 @@ struct RenderContext
 	const RenderState* renderState;
 	const Camera* camera;
 
+	float timerGlobal;
+	float timerTick;
+
 	//	スクロールデータ
 	UVScrollData			uvScrollData;
 
