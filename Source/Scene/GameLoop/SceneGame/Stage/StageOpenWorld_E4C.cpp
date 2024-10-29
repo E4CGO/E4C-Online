@@ -39,27 +39,32 @@ void StageOpenWorld_E4C::Initialize()
 	player->SetPosition({ 5,	10, 5 });
 	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::State::Idle));
 
-	//teleporter = std::make_unique<Teleporter>("Data/Model/Cube/testCubes.glb", 1.0);
-	//teleporter->SetPosition({ 50, 0, 60 });
+	teleporter = std::make_unique<Teleporter>("Data/Model/Cube/testCubes.glb", 1.0);
+	teleporter->SetPosition({ 50, 0, 60 });
 
-	std::array<DirectX::XMFLOAT3, 4 > positions = {
-	DirectX::XMFLOAT3{ 10.0f, 10.0f, 5.0f},
-	DirectX::XMFLOAT3{ 10.0f, 20.0f, 5.0f },
-	DirectX::XMFLOAT3{ 5.0f, 10.0f, 5.0f },
-	DirectX::XMFLOAT3{ 5.0f, 20.0f, 5.0f }
-	};
+	{
 
-	plane = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "Data/Sprites/gem.png", 1.0f, positions);
+		std::array<DirectX::XMFLOAT3, 4 > positions = {
+		DirectX::XMFLOAT3{ 10.0f, 10.0f, 5.0f},
+		DirectX::XMFLOAT3{ 10.0f, 20.0f, 5.0f },
+		DirectX::XMFLOAT3{ 5.0f, 10.0f, 5.0f },
+		DirectX::XMFLOAT3{ 5.0f, 20.0f, 5.0f }
+		};
 
-	positions = {
-		DirectX::XMFLOAT3{ 15.0f, 15.0f, 5.0f},
-		DirectX::XMFLOAT3{ 15.0f, 25.0f, 5.0f },
-		DirectX::XMFLOAT3{ 25.0f, 15.0f, 5.0f },
-		DirectX::XMFLOAT3{ 25.0f, 25.0f, 5.0f }
-	};
+		plane = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "Data/Sprites/gem.png", 1.0f, positions);
+	}
 
-	portal = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, positions);
-	portal.get()->SetShader(ModelShaderId::Portal);
+	{
+		std::array<DirectX::XMFLOAT3, 4 >positions = {
+			DirectX::XMFLOAT3{ 15.0f, 15.0f, 5.0f},
+			DirectX::XMFLOAT3{ 15.0f, 25.0f, 5.0f },
+			DirectX::XMFLOAT3{ 25.0f, 15.0f, 5.0f },
+			DirectX::XMFLOAT3{ 25.0f, 25.0f, 5.0f }
+		};
+
+		portal = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, positions);
+		portal.get()->SetShader(ModelShaderId::Portal);
+	}
 
 	// 光
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
@@ -106,13 +111,13 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	cameraController->SyncContrllerToCamera(camera);
 
 	player->Update(elapsedTime);
-	//teleporter->Update(elapsedTime);
+	teleporter->Update(elapsedTime);
 	plane->Update(elapsedTime);
 	portal->Update(elapsedTime);
 
-	//teleporter->CheckPlayer(player->GetPosition(), elapsedTime);
+	teleporter->CheckPlayer(player->GetPosition(), elapsedTime);
 
-	//if (teleporter->GetPortalReady()) STAGES.stageNumber = 1;
+	if (teleporter->GetPortalReady()) STAGES.stageNumber = 1;
 
 	if (T_INPUT.KeyDown(VK_F2))
 	{
@@ -214,7 +219,7 @@ void StageOpenWorld_E4C::Render()
 		map->render(rc, world, animated_nodes);
 	}
 
-	//teleporter->Render(rc);
+	teleporter->Render(rc);
 	plane->Render(rc);
 	portal->Render(rc);
 }

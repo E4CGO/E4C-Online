@@ -76,7 +76,7 @@ public:
 		}
 	};
 
-	void LoadAppearance(Player* player, uint8_t appearance_idx, uint8_t pattern_idx);
+	void LoadAppearance(Character* chara, uint8_t appearance_idx, uint8_t pattern_idx);
 	nlohmann::json GetCharacterInfos() const { return m_CharacterInfos; }
 	void SetCharacterInfos(nlohmann::json savedData) { m_CharacterInfos = savedData; }
 

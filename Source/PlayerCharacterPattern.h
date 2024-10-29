@@ -6,7 +6,7 @@
 
 #include <string>
 
-class Player;
+class Character;
 
 /**************************************************************************//**
 	@class	PlayerCharacterPattern
@@ -20,7 +20,7 @@ public:
 	PlayerCharacterPattern() {};
 	virtual ~PlayerCharacterPattern() = default;
 
-	virtual void Execute(Player* player) = 0;
+	virtual void Execute(Character* chara) = 0;
 };
 
 /**************************************************************************//**
@@ -34,7 +34,7 @@ class PlayerCharacterPatternGender : public PlayerCharacterPattern
 public:
 	PlayerCharacterPatternGender(bool isMale) : PlayerCharacterPattern(), m_isMale(isMale) {}
 
-	void Execute(Player* player);
+	void Execute(Character* chara);
 private:
 	bool m_isMale;
 };
@@ -50,7 +50,7 @@ class PlayerCharacterPatternSingleModel : public PlayerCharacterPattern
 public:
 	PlayerCharacterPatternSingleModel(const char* filename) : PlayerCharacterPattern(), m_filename(filename) {}
 
-	void Execute(Player* player) override;
+	void Execute(Character* chara) override;
 private:
 	std::string m_filename;
 };

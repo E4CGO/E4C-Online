@@ -16,8 +16,8 @@ void SceneGame_E4C::Initialize()
 	stateMachine->RegisterState(GAME_STATE::DUNGEON, new SceneGame_E4CState::WaitingState(this));
 	stateMachine->SetState(GAME_STATE::OPENWORLD);
 
-	stageDungeon = std::make_unique<TestingStage>();
-	stageDungeon->Initialize();
+	//stageDungeon = std::make_unique<TestingStage>();
+	//stageDungeon->Initialize();
 
 	stageOpenWorld = std::make_unique<StageOpenWorld_E4C>();
 	stageOpenWorld->Initialize();
@@ -26,6 +26,8 @@ void SceneGame_E4C::Initialize()
 void SceneGame_E4C::Finalize()
 {
 	LightManager::Instance().Clear();
+	MAPTILES.Clear();
+	STAGES.Clear();
 }
 
 // 更新処理
