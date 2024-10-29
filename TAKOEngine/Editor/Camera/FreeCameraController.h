@@ -5,12 +5,12 @@
 class FreeCameraController : public CameraController
 {
 public:
-	// ƒCƒ“ƒXƒ^ƒ“ƒXæ“¾
+	// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹å–å¾—
 	static FreeCameraController& Instance();
 
 	FreeCameraController();
 
-	// XVˆ—
+	// æ›´æ–°å‡¦ç†
 	void Update(float elapsedTime = 0.0f) override;
 };
 

@@ -19,7 +19,7 @@ Knight::Knight() : Player("Data/Model/Character/Knight.glb", 1.0f)
 	model->FindNode("Round_Shield")->visible = false;
 	model->FindNode("Spike_Shield")->visible = false;
 
-	// UŒ‚”»’è
+	// æ”»æ’ƒåˆ¤å®š
 	attackColliders[AttackCollider::Sword_1] = new SphereCollider(0.3f);
 	attackColliders[AttackCollider::Sword_2] = new SphereCollider(0.3f);
 	attackColliders[AttackCollider::Sword_3] = new SphereCollider(0.3f);
@@ -47,16 +47,16 @@ void Knight::AttackCollision()
 	//Sword
 	switch (stateMachine->GetStateIndex())
 	{
-	case static_cast<int>(State::AttackNormal): // ˆê”ÊUŒ‚
+	case static_cast<int>(State::AttackNormal): // ä¸€èˆ¬æ”»æ’ƒ
 		for (int i = AttackCollider::Sword_1; i <= AttackCollider::Sword_3; i++)
 		{
 			CollisionVsEnemies(attackColliders[i], atk, true, 1.0f, EffectManager::EFFECT_IDX::HIT_SLASH_EFFECT, 0.4f);
 		}
 		break;
-	case static_cast<int>(State::AttackSpecial): // –hŒä
+	case static_cast<int>(State::AttackSpecial): // é˜²å¾¡
 		if (stateMachine->GetState()->GetSubStateIndex() == BLOCK_STATE::BLOCK_ATTACK) CollisionVsEnemies(attackColliders[AttackCollider::Shield], atk / 5, true, 4.0f);
 		break;
-	case static_cast<int>(State::Skill_1): // –hŒä
+	case static_cast<int>(State::Skill_1): // é˜²å¾¡
 		CollisionVsEnemies(attackColliders[AttackCollider::Shield], atk, true, 15.0f, EffectManager::EFFECT_IDX::HIT_SHOT_EFFECT, 0.5f);
 		break;
 	}
@@ -65,7 +65,7 @@ void Knight::RenderTrail()
 {
 	switch (stateMachine->GetStateIndex())
 	{
-	case static_cast<int>(State::AttackNormal): // ˆê”ÊUŒ‚
+	case static_cast<int>(State::AttackNormal): // ä¸€èˆ¬æ”»æ’ƒ
 		for (int i = AttackCollider::Sword_1; i <= AttackCollider::Sword_3; i++)
 		{
 			const iModel::Node* swordnode1 = this->GetSwordtrailNode();
@@ -81,7 +81,7 @@ void Knight::RenderTrail()
 					}
 				}
 				{
-					// Œ•‚ÌŒ´“_‚©‚çª–{‚Ææ’[‚Ü‚Å‚ÌƒIƒtƒZƒbƒg’l
+					// å‰£ã®åŸç‚¹ã‹ã‚‰æ ¹æœ¬ã¨å…ˆç«¯ã¾ã§ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆå€¤
 					DirectX::XMVECTOR RootOffset = DirectX::XMVectorSet(120.f, 0, 0, 0);
 					DirectX::XMVECTOR TipOffset = DirectX::XMVectorSet(-120.f, 0, 0, 0);
 
@@ -109,7 +109,7 @@ void Knight::RenderTrail()
 
 						for (int j = 0; j < division; ++j)
 						{
-							float t = j / static_cast<float>(division - 1); // division - 1‚ÅŠ„‚é‚±‚Æ‚ÅAt‚Ì’l‚ª0‚©‚ç1‚É‚È‚é‚æ‚¤‚É’²®
+							float t = j / static_cast<float>(division - 1); // division - 1ã§å‰²ã‚‹ã“ã¨ã§ã€tã®å€¤ãŒ0ã‹ã‚‰1ã«ãªã‚‹ã‚ˆã†ã«èª¿æ•´
 
 							DirectX::XMVECTOR Root = DirectX::XMVectorCatmullRom(Root0, Root1, Root2, Root3, t);
 							DirectX::XMVECTOR Tip = DirectX::XMVectorCatmullRom(Tips0, Tips1, Tips2, Tips3, t);
@@ -142,7 +142,7 @@ void Knight::OnDamage(const HitResult& hit, int damage)
 	float vz = hit.position.z - position.z;
 	Turn(1.0f, vx, vz, DirectX::XMConvertToRadians(360));
 
-	// ƒuƒ[ƒN
+	// ãƒ–ãƒ­ãƒ¼ã‚¯
 	if (
 		stateMachine->GetStateIndex() == static_cast<int>(State::AttackSpecial) &&
 		AngleBetweenXMFLOAT3(GetFront(), DirectX::XMFLOAT3{ vx, 0, vz }) <= DirectX::XMConvertToRadians(90)
@@ -167,10 +167,10 @@ void Knight::OnDamage(const HitResult& hit, int damage)
 
 void Knight::UpdateColliders()
 {
-	// “–‚½‚è”»’è
+	// å½“ãŸã‚Šåˆ¤å®š
 	Player::UpdateColliders();
 
-	// UŒ‚”»’è
+	// æ”»æ’ƒåˆ¤å®š
 	float Yoffset = 0.2f;
 	attackColliders[AttackCollider::Sword_1]->SetPosition(GetNodePosition("1H_Sword", DirectX::XMFLOAT3{ 0.0f, Yoffset, 0.0f }));
 	Yoffset += attackColliders[AttackCollider::Sword_1]->GetScale().x + attackColliders[AttackCollider::Sword_2]->GetScale().x;
@@ -181,7 +181,7 @@ void Knight::UpdateColliders()
 	attackColliders[AttackCollider::Shield]->SetPosition(GetNodePosition("Rectangle_Shield", DirectX::XMFLOAT3{ 0.0f, 0.0f, -0.1f }));
 }
 
-//Œ•‚Ì‹OÕƒm[ƒhæ“¾
+//å‰£ã®è»Œè·¡ãƒãƒ¼ãƒ‰å–å¾—
 const iModel::Node* Knight::GetSwordtrailNode()
 {
 	iModel::Node* node = model->FindNode("2H_Sword");

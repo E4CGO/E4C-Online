@@ -44,7 +44,7 @@ private:
 	float shakeTimer = 0.0;
 	float shakeRange = 0.0f;
 
-	// Smoth Camera
+	// スムーズカメラ
 	float angleXLerp = 0;
 	float angleYLerp = 0;
 	float distanceLerp;

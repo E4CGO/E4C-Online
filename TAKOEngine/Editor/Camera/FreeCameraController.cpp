@@ -2,7 +2,7 @@
 #include "FreeCameraController.h"
 static FreeCameraController* instance = nullptr;
 
-// ƒCƒ“ƒXƒ^ƒ“ƒXæ“¾
+// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹å–å¾—
 FreeCameraController& FreeCameraController::Instance()
 {
 	return *instance;
@@ -10,27 +10,27 @@ FreeCameraController& FreeCameraController::Instance()
 
 FreeCameraController::FreeCameraController()
 {
-	// ƒCƒ“ƒXƒ^ƒ“ƒXƒ|ƒCƒ“ƒ^İ’è
+	// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãƒã‚¤ãƒ³ã‚¿è¨­å®š
 	instance = this;
 }
-// XVˆ—
+// æ›´æ–°å‡¦ç†
 void FreeCameraController::Update(float elapsedTime)
 {
 	if (!enable) return;
-	// ƒfƒoƒbƒOƒEƒBƒ“ƒh‘€ì’†‚Íˆ—‚µ‚È‚¢
+	// ãƒ‡ãƒãƒƒã‚°ã‚¦ã‚£ãƒ³ãƒ‰æ“ä½œä¸­ã¯å‡¦ç†ã—ãªã„
 	if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) return;
 
-	// IMGUI‚Ìƒ}ƒEƒX“ü—Í’l‚ğg‚Á‚ÄƒJƒƒ‰‘€ì‚·‚éB
+	// IMGUIã®ãƒã‚¦ã‚¹å…¥åŠ›å€¤ã‚’ä½¿ã£ã¦ã‚«ãƒ¡ãƒ©æ“ä½œã™ã‚‹ã€‚
 	ImGuiIO io = ImGui::GetIO();
 
-	// ƒ}ƒEƒXƒJ[ƒ\ƒ‹‚ÌˆÚ“®—Ê‚ğ‹‚ß‚é
+	// ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ã®ç§»å‹•é‡ã‚’æ±‚ã‚ã‚‹
 	float moveX = io.MouseDelta.x * 0.02f;
 	float moveY = io.MouseDelta.y * 0.02f;
 
-	// ƒ}ƒEƒXƒ{ƒ^ƒ“‰Ÿ‰º’†
+	// ãƒã‚¦ã‚¹ãƒœã‚¿ãƒ³æŠ¼ä¸‹ä¸­
 	if (io.MouseDown[ImGuiMouseButton_Left])
 	{
-		// Y²‰ñ“]
+		// Yè»¸å›è»¢
 		angleY += moveX * 0.5f;
 		if (angleY > DirectX::XM_PI)
 		{
@@ -40,7 +40,7 @@ void FreeCameraController::Update(float elapsedTime)
 		{
 			angleY += DirectX::XM_2PI;
 		}
-		// X²‰ñ“]
+		// Xè»¸å›è»¢
 		angleX += moveY * 0.5f;
 		if (angleX > DirectX::XM_PI)
 		{
@@ -51,10 +51,10 @@ void FreeCameraController::Update(float elapsedTime)
 			angleX += DirectX::XM_2PI;
 		}
 	}
-	// ƒ}ƒEƒX’†ƒ{ƒ^ƒ“‰Ÿ‰º’†
+	// ãƒã‚¦ã‚¹ä¸­ãƒœã‚¿ãƒ³æŠ¼ä¸‹ä¸­
 	else if (io.MouseDown[ImGuiMouseButton_Middle])
 	{
-		// •½sˆÚ“®
+		// å¹³è¡Œç§»å‹•
 		float s = distance * 0.035f;
 		float x = moveX * s;
 		float y = moveY * s;
@@ -67,16 +67,16 @@ void FreeCameraController::Update(float elapsedTime)
 		focus.y += up.y * y;
 		focus.z += up.z * y;
 	}
-	// ƒ}ƒEƒX‰Eƒ{ƒ^ƒ“‰Ÿ‰º’†
+	// ãƒã‚¦ã‚¹å³ãƒœã‚¿ãƒ³æŠ¼ä¸‹ä¸­
 	else if (io.MouseDown[ImGuiMouseButton_Right])
 	{
-		// ƒY[ƒ€
+		// ã‚ºãƒ¼ãƒ 
 		distance += (-moveY - moveX) * distance * 0.1f;
 	}
-	// ƒ}ƒEƒX‚Ù[‚¢‚é
+	// ãƒã‚¦ã‚¹ã»ãƒ¼ã„ã‚‹
 	else if (io.MouseWheel != 0)
 	{
-		// ƒY[ƒ€
+		// ã‚ºãƒ¼ãƒ 
 		distance -= io.MouseWheel * distance * 0.1f;
 	}
 
@@ -85,21 +85,21 @@ void FreeCameraController::Update(float elapsedTime)
 	float sy = ::sinf(angleY);
 	float cy = ::cosf(angleY);
 
-	// ƒJƒƒ‰‚Ì•ûŒü‚ğZo
+	// ã‚«ãƒ¡ãƒ©ã®æ–¹å‘ã‚’ç®—å‡º
 	DirectX::XMVECTOR Front = DirectX::XMVectorSet(-cx * sy, -sx, -cx * cy, 0.0f);
 	DirectX::XMVECTOR Right = DirectX::XMVectorSet(cy, 0, -sy, 0.0f);
 	DirectX::XMVECTOR Up = DirectX::XMVector3Cross(Right, Front);
-	// ƒJƒƒ‰‚Ì‹“_&’‹“_‚ğZo
+	// ã‚«ãƒ¡ãƒ©ã®è¦–ç‚¹&æ³¨è¦–ç‚¹ã‚’ç®—å‡º
 	DirectX::XMVECTOR Focus = DirectX::XMLoadFloat3(&focus);
 	DirectX::XMVECTOR Distance = DirectX::XMVectorSet(distance, distance, distance, 0);
 	DirectX::XMVECTOR Eye = DirectX::XMVectorSubtract(Focus, DirectX::XMVectorMultiply(Front, Distance));
-	// ƒrƒ…[s—ñ‚©‚çƒ[ƒ‹ƒhs—ñ‚ğZo
+	// ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã‹ã‚‰ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—ã‚’ç®—å‡º
 	DirectX::XMMATRIX View = DirectX::XMMatrixLookAtLH(Eye, Focus, Up);
 	DirectX::XMMATRIX World = DirectX::XMMatrixTranspose(View);
-	// ƒ[ƒ‹ƒhs—ñ‚©‚ç•ûŒü‚ğZo
+	// ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—ã‹ã‚‰æ–¹å‘ã‚’ç®—å‡º
 	Right = DirectX::XMVector3TransformNormal(DirectX::XMVectorSet(1, 0, 0, 0), World);
 	Up = DirectX::XMVector3TransformNormal(DirectX::XMVectorSet(0, 1, 0, 0), World);
-	// Œ‹‰Ê‚ğŠi”[
+	// çµæœã‚’æ ¼ç´
 	DirectX::XMStoreFloat3(&eye, Eye);
 	DirectX::XMStoreFloat3(&up, Up);
 	DirectX::XMStoreFloat3(&right, Right);

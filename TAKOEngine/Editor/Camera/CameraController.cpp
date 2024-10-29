@@ -1,6 +1,6 @@
 #include "CameraController.h"
 
-// ƒJƒƒ‰‚©‚çƒRƒ“ƒgƒ[ƒ‰[‚Öƒpƒ‰ƒ[ƒ^‚ð“¯Šú‚·‚é
+// ã‚«ãƒ¡ãƒ©ã‹ã‚‰ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼ã¸ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’åŒæœŸã™ã‚‹
 void CameraController::SyncCameraToController(Camera* camera)
 {
 	eye = camera->GetEye();
@@ -8,14 +8,14 @@ void CameraController::SyncCameraToController(Camera* camera)
 	up = camera->GetUp();
 	right = camera->GetRight();
 
-	// Ž‹“_‚©‚ç’Ž‹“_‚Ü‚Å‚Ì‹——£ŽZo
+	// è¦–ç‚¹ã‹ã‚‰æ³¨è¦–ç‚¹ã¾ã§ã®è·é›¢ç®—å‡º
 	DirectX::XMVECTOR Eye = DirectX::XMLoadFloat3(&eye);
 	DirectX::XMVECTOR Focus = DirectX::XMLoadFloat3(&focus);
 	DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(Focus, Eye);
 	DirectX::XMVECTOR Distance = DirectX::XMVector3Length(Vec);
 	DirectX::XMStoreFloat(&distance, Distance);
 
-	// ‰ñ“]Šp“x‚ðŽZo
+	// å›žè»¢è§’åº¦ã‚’ç®—å‡º
 	const DirectX::XMFLOAT3& front = camera->GetFront();
 	angleX = ::asinf(-front.y);
 	if (up.y < 0)
@@ -36,7 +36,7 @@ void CameraController::SyncCameraToController(Camera* camera)
 	}
 }
 
-// ƒRƒ“ƒgƒ[ƒ‰[‚©‚çƒJƒƒ‰‚Öƒpƒ‰ƒ[ƒ^‚ð“¯Šú‚·‚é
+// ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼ã‹ã‚‰ã‚«ãƒ¡ãƒ©ã¸ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’åŒæœŸã™ã‚‹
 void CameraController::SyncContrllerToCamera(Camera* camera)
 {
 	camera->SetLookAt(eye, focus, up);
