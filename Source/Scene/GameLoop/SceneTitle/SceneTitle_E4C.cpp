@@ -4,6 +4,7 @@
 #include "TAKOEngine/GUI/UIManager.h"
 
 #include "TAKOEngine/Sound/Sound.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 
 #include <imgui.h>
 #include <string>

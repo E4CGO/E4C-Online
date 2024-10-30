@@ -3,7 +3,6 @@
 #include "TAKOEngine/Network/HttpRequest.h"
 #include "TAKOEngine/AI/BaseState.h"
 #include "Source/UI/Widget/WidgetButtonImage.h"
-#include "TAKOEngine/Editor/Camera/CameraManager.h"
 
 #include "Scene/GameLoop/SceneCharacter/SceneCharacter_E4C.h"
 

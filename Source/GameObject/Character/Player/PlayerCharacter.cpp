@@ -6,6 +6,7 @@
 #include "TAKOEngine/Physics/CollisionDataManager.h"
 #include "TAKOEngine/Effects/EffectManager.h"
 #include "TAKOEngine/Editor/Camera/Camera.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 
 #include "GameObject/Character/Player/PlayerCharacterState.h"

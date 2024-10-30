@@ -4,7 +4,6 @@
 #include "TAKOEngine/Rendering/SpriteDX12.h"
 #include "TAKOEngine/Tool/GLTFImporter.h"
 #include "TAKOEngine/Editor/Camera/FreeCameraController.h"
-#include "TAKOEngine/Editor/Camera/CameraManager.h"
 #include "TAKOEngine/AI/StateMachine.h"
 #include "PlayerCharacterData.h"
 #include "GameObject/Character/Player/NonPlayerCharacter.h"

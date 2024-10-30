@@ -2,6 +2,7 @@
 #include "TAKOEngine/Network/HttpRequest.h"
 #include "TAKOEngine/Rendering/ResourceManager.h"
 #include "TAKOEngine/GUI/UIManager.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 
 #include <imgui.h>
 #include <string>

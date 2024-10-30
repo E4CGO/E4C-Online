@@ -10,9 +10,6 @@ public:
 	void OnDamage(const HitResult& hit, int damage) override;
 private:
 	void UpdateColliders() override;
-	//ポリゴンの最大数
-	static const int MAX_POLYGON = 12;
-	XMFLOAT3 trailPosition[2][MAX_POLYGON];
 public:
 	enum AttackCollider
 	{

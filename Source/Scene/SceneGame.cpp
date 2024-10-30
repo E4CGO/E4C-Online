@@ -15,7 +15,6 @@
 #include "TAKOEngine/Effects/EffectManager.h"
 #include "TAKOEngine/Tool/Encode.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
-#include "TAKOEngine/Rendering/LineRenderer.h"
 
 
 #include "Scene/SceneManager.h"
@@ -353,7 +352,7 @@ void SceneGame::Render()
 	T_TEXT.Begin();
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Scene)->Clear(T_GRAPHICS.GetDeviceContext(), 0.2f, 0.2f, 0.2f, 1);
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Scene)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
-	LineRenderer* sword = Graphics::Instance().GetLineRenderer();
+
 	// 描画コンテキスト設定
 	RenderContext rc;
 	
@@ -380,7 +379,6 @@ void SceneGame::Render()
 		STAGES.Render(rc);						// ステージオブジェクト
 		EFFECTS.Render(CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection()); 	// エフェクト
 		CameraGUI();
-		sword->Render(rc.deviceContext, CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
 	}
 #ifdef _DEBUG
 	{

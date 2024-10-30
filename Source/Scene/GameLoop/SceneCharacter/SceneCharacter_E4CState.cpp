@@ -1,6 +1,8 @@
 #include "SceneCharacter_E4CState.h"
 
 #include "TAKOEngine/GUI/UIManager.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
+
 #include "PlayerCharacterData.h"
 
 #include "Scene/SceneManager.h"
