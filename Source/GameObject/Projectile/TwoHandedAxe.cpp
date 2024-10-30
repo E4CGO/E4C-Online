@@ -23,7 +23,7 @@ void TwoHandedAxe::Update(float elapsedTime)
 {
 	float Angle = rotateAngle * elapsedTime;
 
-	iModel::Node* node = model->GetRootNode();
+	iModel::Node* node = m_pmodels[0]->GetRootNode();
 	DirectX::XMVECTOR Q = DirectX::XMLoadFloat4(&node->rotation);
 	DirectX::XMVECTOR R = DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(0, 0, 1, 0), Angle);
 	Q = DirectX::XMQuaternionMultiply(R, Q);

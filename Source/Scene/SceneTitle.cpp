@@ -70,10 +70,28 @@ void SceneTitle::Initialize()
 		rouge->GetModel()->FindNode("Throwable")->visible = false;
 		shadowMapRenderer->ModelRegister(rouge->GetModel().get());
 
-		test = std::make_unique<ModelDX12>("Data/Model/Character/Barbarian.glb");
-		//test = std::make_unique<ModelDX12>("Data/Model/Character/test.glb");
+		//test = std::make_unique<ModelDX12>("Data/Model/Character/Barbarian.glb");
+		test = std::make_unique<ModelDX12>("Data/Model/Enemy/Goblin.glb");
 		test->PlayAnimation(0, true);
 
+		float posX = 0;
+		for (int i = 0; i < 3; ++i)
+		{
+			int id = test->AllocateInstancingIndex();
+			if (id < 0) continue;
+
+			DirectX::XMMATRIX m;
+			m = DirectX::XMMatrixScaling(1, 1, 1);
+			m *= DirectX::XMMatrixRotationY(DirectX::XMConvertToRadians(0));
+			m *= DirectX::XMMatrixTranslation(posX, 0, 0);
+
+			DirectX::XMFLOAT4X4 tm;
+			DirectX::XMStoreFloat4x4(&tm, m);
+			test->UpdateTransform(id, tm);
+
+			posX += 2;
+		}
+		
 		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/button_agree.png");
 	}
 
@@ -137,19 +155,6 @@ void SceneTitle::Initialize()
 		delete xhr;
 	}
 
-	/*{
-		HRESULT hr;
-
-		D3D11_BUFFER_DESC buffer_desc{};
-		buffer_desc.ByteWidth = sizeof(CbScene);
-		buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-		buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		buffer_desc.CPUAccessFlags = 0;
-		buffer_desc.MiscFlags = 0;
-		buffer_desc.StructureByteStride = 0;
-		hr = T_GRAPHICS.GetDevice()->CreateBuffer(&buffer_desc, nullptr, constant_buffers[1].GetAddressOf());
-		COMPLETION_CHECK
-	}*/
 }
 
 void SceneTitle::Finalize()
@@ -181,7 +186,7 @@ void SceneTitle::Update(float elapsedTime)
 		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(test_position.x, test_position.y, test_position.z);
 		DirectX::XMMATRIX TRANSFORM = S * R * T;
 		DirectX::XMStoreFloat4x4(&test_transform, TRANSFORM);
-		test->SetTransformMatrix(test_transform);
+		//test->SetTransformMatrix(test_transform);
 		test->UpdateAnimation(elapsedTime);
 		test->UpdateTransform();
 	}
@@ -247,11 +252,11 @@ void SceneTitle::RenderDX12()
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
 		//スキニング
-		test->UpdateFrameResource();
+		test->UpdateFrameResource(test_transform);
 		m_skinning_pipeline->Compute(rc, test.get());
 
 		// モデル描画
-		ModelShaderDX12* shader = TentacleLib::graphics.GetModelShaderDX12(ModelShaderDX12Id::Phong);
+		ModelShaderDX12* shader = TentacleLib::graphics.GetModelShaderDX12(ModelShaderDX12Id::ToonInstancing);
 		if (test != nullptr)
 		{
 			shader->Render(rc, test.get());

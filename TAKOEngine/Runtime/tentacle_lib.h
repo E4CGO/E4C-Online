@@ -4,6 +4,8 @@
 
 #define IM_ASSERT(_EXPR) ((void)(_EXPR))
 
+#pragma warning(disable : 4099)
+
 #include <unordered_map>
 
 #include "TAKOEngine/Rendering/Graphics.h"

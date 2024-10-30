@@ -30,10 +30,12 @@ public:
 	// モデル描画
 	virtual void Draw(const RenderContext& rc, const iModel* model, DirectX::XMFLOAT4 color = { 1, 1, 1, 1 });
 
+	virtual void Draw(const RenderContext& rc, const ModelResource::Mesh& mesh);
+
 protected:
 	// レンダーステート設定
 	virtual void SetRenderState(const RenderContext& rc) = 0;
-	
+
 	// シェーダーリソースビュー設定
 	virtual void SetShaderResourceView(const ModelResource::Mesh& mesh, ID3D11DeviceContext*& dc) = 0;
 
@@ -48,7 +50,8 @@ protected:
 		SpotLightData			spotLightData[SpotLightMax];	// スポットライト
 		int						pointLightCount;				// 点光源数
 		int						spotLightCount;					// スポットライト数
-		DirectX::XMFLOAT2		dummy;
+		float					timerGlobal;
+		float					timerTick;
 	};
 
 	struct CbMesh

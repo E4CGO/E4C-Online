@@ -237,10 +237,13 @@ void ModelDX12::UpdateTransform()
 			DirectX::XMStoreFloat4x4(&node.global_transform, LocalTransform);
 		}
 	}
+
+	// バウンディングボックス計算
+	ComputeWorldBounds();
 }
 
 // フレームリソース更新処理
-void ModelDX12::UpdateFrameResource()
+void ModelDX12::UpdateFrameResource(const DirectX::XMFLOAT4X4 transform)
 {
 	Graphics& graphics = Graphics::Instance();
 	DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&transform);
@@ -267,6 +270,39 @@ void ModelDX12::UpdateFrameResource()
 			DirectX::XMMATRIX GlobalTransform = DirectX::XMLoadFloat4x4(&mesh.node->global_transform);
 			DirectX::XMStoreFloat4x4(&frame_resource.cbv_data->world_transform, GlobalTransform * WorldTransform);
 		}
+		
+		bool updateBuffers = true; 
+		for (const ModelResource::Subset& subset : mesh.mesh->subsets)
+		{
+			if (updateBuffers)
+			{
+				frame_resource.instancingCount = 0; 
+				for (int i = 0; i < InstancingMax; ++i)
+				{
+					if (!exist[i])  continue;
+
+					frame_resource.cbv_data->transform[frame_resource.instancingCount++] = m_transform[i];
+				}
+				updateBuffers = false;
+			}
+		}
+	} 
+}
+
+// バウンディングボックス計算
+void ModelDX12::ComputeWorldBounds()
+{
+	Graphics& graphics = Graphics::Instance(); 
+
+	// バウンディングボックス
+	bounds.Center = bounds.Extents = { 0, 0, 0 };  
+	for (Mesh& mesh : m_meshes) 
+	{
+		const Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
+
+		DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&frame_resource.cbv_data->world_transform);
+		mesh.mesh->localBounds.Transform(mesh.worldBounds, WorldTransform); 
+		DirectX::BoundingBox::CreateMerged(bounds, bounds, mesh.worldBounds); 
 	}
 }
 
@@ -376,6 +412,38 @@ void ModelDX12::ComputeBlending(float elapsedTime)
 {
 }
 
-void ModelDX12::ComputeWorldBounds()
+//割り当てられた番号を返す
+int ModelDX12::AllocateInstancingIndex()
 {
+	for (int i = 0; i < InstancingMax; ++i)
+	{
+		if (!exist[i])
+		{
+			exist[i] = true;
+			return i;
+		}
+	}
+	return -1;
+}
+
+//割り当てられた番号を解放する
+void ModelDX12::FreeInstancingIndex(int instancingIndex)
+{
+	if (0 <= instancingIndex && instancingIndex < InstancingMax)
+		exist[instancingIndex] = false;
+}
+
+//行列計算
+void ModelDX12::UpdateTransform(int instancingIndex, const DirectX::XMFLOAT4X4& transform)
+{
+	if (0 <= instancingIndex && instancingIndex < InstancingMax)
+		this->m_transform[instancingIndex] = transform;
+}
+
+//現在の姿勢行列を取得
+const DirectX::XMFLOAT4X4& ModelDX12::GetTransform(int instancingIndex) const
+{
+	if (0 <= instancingIndex && instancingIndex < InstancingMax)
+		return m_transform[instancingIndex];
+	return m_transform[0];
 }

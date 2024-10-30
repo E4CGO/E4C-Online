@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 //#include <vector>
 #include <unordered_map>
@@ -9,30 +9,73 @@ template <typename T>
 class StateMachine
 {
 public:
-	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	StateMachine() {}
-	// ƒfƒXƒgƒ‰ƒNƒ^
-	~StateMachine();
-	// XVˆ—
-	void Update(float elapsedTime);
-	// ƒXƒe[ƒgƒZƒbƒg
-	void SetState(int setstate);
-	// ƒXƒe[ƒg•ÏX
-	void ChangeState(int newState);
-	// ƒXƒe[ƒg“o˜^
-	void RegisterState(int id, HierarchicalState<T>* state);
-	// Œ»İ‚ÌƒXƒe[ƒg”Ô†æ“¾
-	int GetStateIndex();
+	// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+	~StateMachine()
+	{
+		for (std::pair<int, State<T>*> state : statePool)
+		{
+			delete state.second;
+		}
+		statePool.clear();
+	}
+	// æ›´æ–°å‡¦ç†
+	void Update(float elapsedTime)
+	{
+		currentState->Execute(elapsedTime);
+	}
+	// ã‚¹ãƒ†ãƒ¼ãƒˆã‚»ãƒƒãƒˆ
+	void SetState(int newState)
+	{
+		if (statePool.find(newState) == statePool.end()) return;
+		currentState = statePool[newState];
+		currentState->Enter();
+	}
+	// ã‚¹ãƒ†ãƒ¼ãƒˆå¤‰æ›´
+	void ChangeState(int newState)
+	{
+		if (statePool.find(newState) == statePool.end()) return;
+		currentState->Exit();
 
-	// ‚Q‘w–ÚƒXƒe[ƒg•ÏX
-	void ChangeSubState(int newState);
-	// ‚Q‘w–ÚƒXƒe[ƒg“o˜^
-	void RegisterSubState(int index, int subIndex, State<T>* subState);
-	// ƒXƒe[ƒgæ“¾
+		SetState(newState);
+	}
+	// ã‚¹ãƒ†ãƒ¼ãƒˆç™»éŒ²
+	void RegisterState(int id, HierarchicalState<T>* state)
+	{
+		if (statePool.find(id) != statePool.end()) delete statePool[id];
+		statePool[id] = state;
+	}
+	// ç¾åœ¨ã®ã‚¹ãƒ†ãƒ¼ãƒˆç•ªå·å–å¾—
+	int GetStateIndex()
+	{
+		for (std::pair<int, State<T>*> state : statePool)
+		{
+			if (state.second == currentState)
+			{
+				return state.first;
+			}
+		}
+		return -1;
+	}
+
+	// ï¼’å±¤ç›®ã‚¹ãƒ†ãƒ¼ãƒˆå¤‰æ›´
+	void ChangeSubState(int newState)
+	{
+		currentState->ChangeSubState(newState);
+	}
+	// ï¼’å±¤ç›®ã‚¹ãƒ†ãƒ¼ãƒˆç™»éŒ²
+	void RegisterSubState(int index, int subIndex, State<T>* subState)
+	{
+		if (statePool.find(index) == statePool.end()) return;
+		statePool[index]->RegisterSubState(subIndex, subState);
+	}
+
+	// ã‚¹ãƒ†ãƒ¼ãƒˆå–å¾—
 	HierarchicalState<T>* GetState() { return currentState; }
 private:
-	// Œ»İ‚ÌƒXƒe[ƒg
+	// ç¾åœ¨ã®ã‚¹ãƒ†ãƒ¼ãƒˆ
 	HierarchicalState<T>* currentState = nullptr;
-	// ŠeƒXƒe[ƒg‚ğ•Û‚·‚é”z—ñ
+	// å„ã‚¹ãƒ†ãƒ¼ãƒˆã‚’ä¿æŒã™ã‚‹é…åˆ—
 	std::unordered_map<int, HierarchicalState<T>*> statePool;
 };

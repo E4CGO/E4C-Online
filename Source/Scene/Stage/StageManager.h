@@ -19,6 +19,8 @@ public:
 	Stage* GetStage() { return this->currentStage; }
 public:
 	Stage* currentStage;
+
+	int stageNumber = 0;
 };
 
 #define STAGES StageManager::Instance()

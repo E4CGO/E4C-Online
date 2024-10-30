@@ -11,6 +11,7 @@
 // @class PhongShader
 // @brief PhongShaderのパラーメータ設定クラス
 // @par   [説明]
+// @par   Phong反射描画
 //*******************************************************
 class PhongShader : public ModelShader
 {
@@ -29,12 +30,12 @@ private:
 // @class PhongShaderDX12
 // @brief PhongShaderDX12のパラーメータ設定クラス
 // @par   [説明]
-// @par   DX12でのShader描画
+// @par   DX12に対応したPhong反射描画
 //*******************************************************
 class PhongShaderDX12 : public ModelShaderDX12
 {
 public:
-	PhongShaderDX12(ID3D12Device* device);
+	PhongShaderDX12(ID3D12Device* device, bool instancing = false);
 	~PhongShaderDX12() override;
 
 	void Render(const RenderContextDX12& rc, ModelDX12* model) override;

@@ -6,10 +6,10 @@ Rogue::Rogue() : Player("Data/Model/Character/Rogue_Hooded.glb", 1.0f)
 	hp = maxHp = 150;
 	type = PLAYER_CLASS::ROGUE;
 
-	model->FindNode("1H_Crossbow")->visible = false;
-	model->FindNode("Knife")->visible = false;
-	model->FindNode("Knife_Offhand")->visible = false;
-	model->FindNode("Throwable")->visible = false;
+	m_pmodels[0]->FindNode("1H_Crossbow")->visible = false;
+	m_pmodels[0]->FindNode("Knife")->visible = false;
+	m_pmodels[0]->FindNode("Knife_Offhand")->visible = false;
+	m_pmodels[0]->FindNode("Throwable")->visible = false;
 
 	stateMachine->RegisterState(static_cast<int>(Player::State::AttackNormal), new RogueState::AttackNormalState(this));
 	stateMachine->RegisterState(static_cast<int>(Player::State::AttackSpecial), new RogueState::AttackSpecialState(this));
@@ -27,6 +27,6 @@ Rogue::Rogue() : Player("Data/Model/Character/Rogue_Hooded.glb", 1.0f)
 
 DirectX::XMFLOAT3 Rogue::GetShotPosition()
 {
-	DirectX::XMFLOAT4X4 transform = model->FindNode("2H_Crossbow")->worldTransform;
+	DirectX::XMFLOAT4X4 transform = m_pmodels[0]->FindNode("2H_Crossbow")->worldTransform;
 	return { transform._41, transform._42, transform._43 };
 }

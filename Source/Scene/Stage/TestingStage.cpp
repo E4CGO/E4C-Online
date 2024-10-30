@@ -13,11 +13,11 @@
 
 void TestingStage::Initialize()
 {
-	Stage::Initialize(); // ƒfƒtƒHƒ‹ƒg
+	Stage::Initialize(); // ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ
 
 	STAGES.SetStage(this);
 
-	// °
+	// åºŠ
 	MAPTILES.Register(new Map001);
 
 	key = STAGES.Register(new Map001Key);
@@ -30,7 +30,7 @@ void TestingStage::Initialize()
 	enemyList.push_back({ PHASE::NORMAL, 0.0, ENEMY_TYPE::SKELETON_MINION, { +1.0f, 20.0f, -22.0f } });
 	enemyList.push_back({ PHASE::NORMAL, 0.0, ENEMY_TYPE::SKELETON_MINION, { +1.0f, 20.0f, -22.0f } });
 
-	// KEY‚Ì‰ñ‚è
+	// KEYã®å›žã‚Š
 	DirectX::XMFLOAT3 pos = key->GetPosition();
 	float d = 5.0f;
 	for (int i = 0; i < 4; i++)
@@ -55,7 +55,7 @@ void TestingStage::Initialize()
 	}
 	// BOSS
 	enemyList.push_back({ PHASE::BOSS, 0.0, ENEMY_TYPE::SKELETON_MINION_BOSS, { 20.0f, 40.0f, -80.0f } });
-	// •ó” 
+	// å®ç®±
 	enemyList.push_back({ PHASE::VICKORY, 0.0f, ENEMY_TYPE::CHEST_COIN, { 20.0f, 20.0f, -80.0f } });
 }
 
@@ -63,15 +63,19 @@ void TestingStage::Update(float elapsedTime)
 {
 	Stage::Update(elapsedTime);
 
-	if (phase == PHASE::BOSS && ENEMIES.Count() == 0) // ƒ{ƒX•”‰®“G‘S–Å
+	if (phase == PHASE::BOSS && ENEMIES.Count() == 0) // ãƒœã‚¹éƒ¨å±‹æ•µå…¨æ»…
 	{
 		SetPhase(PHASE::VICKORY);
 	}
 }
 
+void TestingStage::Render()
+{
+}
+
 void TestingStage::OnPhase()
 {
-	if (phase == PHASE::BOSS) // ƒ{ƒXoŒ»ŽžEŒ»‘¶“G‚ðíœ
+	if (phase == PHASE::BOSS) // ãƒœã‚¹å‡ºç¾æ™‚ãƒ»ç¾å­˜æ•µã‚’å‰Šé™¤
 	{
 		ENEMIES.Clear();
 	}

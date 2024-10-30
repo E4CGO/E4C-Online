@@ -1,26 +1,28 @@
 #include "Graphics.h"
 #include "ResourceManager.h"
 
-// ƒ‚ƒfƒ‹ƒŠƒ\[ƒX“Ç‚İ‚İ
+// ãƒ¢ãƒ‡ãƒ«ãƒªã‚½ãƒ¼ã‚¹èª­ã¿è¾¼ã¿
 std::shared_ptr<ModelResource> ResourceManager::LoadModelResource(const char* filename)
 {
-	// ƒ‚ƒfƒ‹ŒŸõ
+	if (strlen(filename) == 0) return nullptr;
+
+	// ãƒ¢ãƒ‡ãƒ«æ¤œç´¢
 	ModelMap::iterator it = models.find(filename);
 	if (it != models.end())
 	{
-		// ƒŠƒ“ƒN(õ–½)‚ªØ‚ê‚Ä‚¢‚È‚¢‚©Šm”F
+		// ãƒªãƒ³ã‚¯(å¯¿å‘½)ãŒåˆ‡ã‚Œã¦ã„ãªã„ã‹ç¢ºèª
 		if (!it->second.expired())
 		{
-			// “Ç‚İ‚İÏ‚İƒ‚ƒfƒ‹‚ÌƒŠƒ\[ƒX‚ğ•Ô‚·
+			// èª­ã¿è¾¼ã¿æ¸ˆã¿ãƒ¢ãƒ‡ãƒ«ã®ãƒªã‚½ãƒ¼ã‚¹ã‚’è¿”ã™
 			return it->second.lock();
 		}
 	}
 
-	// V‹Kƒ‚ƒfƒ‹ƒŠƒ\[ƒXì¬&“Ç‚İ‚İ
+	// æ–°è¦ãƒ¢ãƒ‡ãƒ«ãƒªã‚½ãƒ¼ã‚¹ä½œæˆ&èª­ã¿è¾¼ã¿
 	std::shared_ptr<ModelResource> model = std::make_shared<ModelResource>();
 	model->Load(Graphics::Instance().GetDevice(), filename);
 
-	// ƒ}ƒbƒv‚É“o˜^
+	// ãƒãƒƒãƒ—ã«ç™»éŒ²
 	models[filename] = model;
 
 	return model;
@@ -28,19 +30,19 @@ std::shared_ptr<ModelResource> ResourceManager::LoadModelResource(const char* fi
 
 std::shared_ptr<Sprite> ResourceManager::LoadSpriteResource(const char* filename)
 {
-	// ƒXƒvƒ‰ƒCƒgŒŸõ
+	// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæ¤œç´¢
 	SpriteMap::iterator it = sprites.find(filename);
 	if (it != sprites.end())
 	{
-		// ƒŠƒ“ƒN(õ–½)‚ªØ‚ê‚Ä‚¢‚È‚¢‚©Šm”F
+		// ãƒªãƒ³ã‚¯(å¯¿å‘½)ãŒåˆ‡ã‚Œã¦ã„ãªã„ã‹ç¢ºèª
 		if (!it->second.expired())
 		{
-			// “Ç‚İ‚İÏ‚İƒXƒvƒ‰ƒCƒg‚ÌƒŠƒ\[ƒX‚ğ•Ô‚·
+			// èª­ã¿è¾¼ã¿æ¸ˆã¿ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ãƒªã‚½ãƒ¼ã‚¹ã‚’è¿”ã™
 			return it->second.lock();
 		}
 	}
 
-	// V‹KƒXƒvƒ‰ƒCƒgƒŠƒ\[ƒXì¬&“Ç‚İ‚İ
+	// æ–°è¦ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãƒªã‚½ãƒ¼ã‚¹ä½œæˆ&èª­ã¿è¾¼ã¿
 	std::shared_ptr<Sprite> sprite;
 	if (std::string(filename).length() == 0)
 	{
@@ -51,7 +53,7 @@ std::shared_ptr<Sprite> ResourceManager::LoadSpriteResource(const char* filename
 		sprite = std::make_shared<Sprite>(Graphics::Instance().GetDevice(), filename);
 	}
 
-	// ƒ}ƒbƒv‚É“o˜^
+	// ãƒãƒƒãƒ—ã«ç™»éŒ²
 	sprites[filename] = sprite;
 
 	return sprite;

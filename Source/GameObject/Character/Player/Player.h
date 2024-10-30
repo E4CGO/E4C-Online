@@ -1,4 +1,10 @@
-#pragma once
+//! @file Player.h
+//! @note 
+
+
+#ifndef __INCLUDED_PLAYER_H__
+#define __INCLUDED_PLAYER_H__
+
 
 #include "TAKOEngine/AI/StateMachine.h"
 
@@ -40,11 +46,13 @@ enum PLAYER_CLASS
 
 	End,
 	MAGE,
+
+	CUSTOMIZE
 };
 
 struct PLAYER_DATA
 {
-	int client_id = -1;
+	uint64_t client_id = 0;
 	DirectX::XMFLOAT3 position = {};
 	DirectX::XMFLOAT3 velocity = {};
 	DirectX::XMFLOAT3 target = {};
@@ -57,19 +65,37 @@ struct PLAYER_DATA
 	bool connected = true;
 };
 
+/**************************************************************************//**
+	@class	Player
+	@brief	プレイヤーキャラクタークラス
+	@par	[説明]
+			入力処理付き
+*//***************************************************************************/
 class Player : public Character
 {
 public:
+	// コンストラクタ
+	Player() : Character() {};
+	// コンストラクタ(引数付き)
 	Player(const char* filename, float scaling = 1.0f);
+	// デストラクタ
 	~Player();
 
+	// 更新処理
 	virtual void Update(float elapsedTime) override;
+
+	// 描画処理
 	void Render(const RenderContext& rc) override;
 
+	// 跳躍
 	void Jump();
+
+	// 移動入力処理
 	void InputMove(float elapsedTime);
 
+	// 入力方向を取得
 	DirectX::XMFLOAT2 GetInputDirection();
+
 	// 入力管理
 	void UpdateInput();						// キー入力
 	bool InputJump() { return (input & Input_Jump); }
@@ -87,22 +113,33 @@ public:
 	bool ReleaseSkill3() { return (input & Input_R_Skill_3) > 0; }
 	bool ReleaseSkill4() { return (input & Input_R_Skill_4) > 0; }
 
+	// 移動判定
 	bool IsMove() { return velocity.x != 0.0f || velocity.z != 0.0f; }
+	// 落下判定
 	bool IsFall() { return velocity.y < -2.0f; }
 
+	// カメラ―に向ける
 	void FaceToCamera();
+	// 入力向高に向ける
 	void TurnByInput();
 
+	// インポートデータ （ネットワーク用）
 	void ImportData(PLAYER_DATA data);
+	// エクスポートデータ （ネットワーク用）
 	void ExportData(PLAYER_DATA& data);
 
+	// クライアントIDを取得
 	int GetClientId() { return client_id; }
+	// クライアントIDを設定
 	void SetClientId(int id) { client_id = id; }
+	// クラスタイプを取得
 	int GetClassType() { return type; }
 
+	// 回転スピードを取得
 	float GetTurnSpeed() { return turnSpeed; }
+	// 回転スピードを設定
 	void SetTurnSpeed(float turnSpeed) { this->turnSpeed = turnSpeed; }
-
+	// ネームドを設定
 	void SetName(const char* name) { strcpy_s(this->name, 64, name); };
 
 	// MP管理
@@ -119,7 +156,9 @@ public:
 	// スキル
 	void SkillCost(int idx);
 
+	// 水平移動を停止
 	void StopMove() { velocity.x = velocity.z = 0.0f; }
+	// 落下移動を停止
 	void StopFall() { velocity.y = -gravity * T_TIMER.Delta() * 60.0f; }
 
 	float GetMpCost(int idx);
@@ -127,19 +166,27 @@ public:
 	// 自機判定
 	bool IsPlayer() { return GAME_DATA.GetClientId() == client_id; };
 
+	// ダメージコールバック
 	virtual void OnDamage(const HitResult& hit, int damage);
 
+	// ターゲットを取得
 	DirectX::XMFLOAT3 GetTarget() { return target; }
+	// 発射位置
 	virtual DirectX::XMFLOAT3 GetShotPosition() { return position + DirectX::XMFLOAT3{ 0, height * 0.5f, 0 }; }
-	//virtual DirectX::XMFLOAT3 GetShotAngle() { return angle; }
 
+	// ステートを取得
 	int GetState() { return stateMachine->GetStateIndex(); }
+
+	// ステートマシンを取得
 	StateMachine<Player>* GetStateMachine() { return stateMachine; }
 
+	// 攻撃コライダーを取得
 	Collider* GetAttackCollider(int idx) { return attackColliders[idx]; }
-	std::unordered_map<int, Collider*> GetAttackColliders() { return attackColliders; }
+	// 攻撃コライダーリsづとを取得
+	std::unordered_map<int, Collider*>& GetAttackColliders() { return attackColliders; }
+	// 攻撃コライダーの有効・無効化
 	void EnableAttackColliders(bool enable = true) { for (const std::pair<int, Collider*>& collider : attackColliders) collider.second->SetEnable(enable); }
-
+	// 色セットを取得
 	static DirectX::XMFLOAT4 GetColorSet(int idx) { return Player::colorSet[idx]; }
 protected:
 	void RegisterCommonState();
@@ -312,3 +359,4 @@ protected:
 
 	std::unordered_map<int, Collider*> attackColliders; // 攻撃判定
 };
+#endif

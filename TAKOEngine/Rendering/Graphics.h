@@ -25,6 +25,8 @@ enum class ModelShaderId
 	Toon,
 	Skydome,
 	ShadowMap,
+	Plane,
+	Portal,
 
 	EnumCount
 };
@@ -32,7 +34,11 @@ enum class ModelShaderId
 enum class ModelShaderDX12Id
 {
 	Lambert,
+	LambertInstancing,
 	Phong,
+	PhongInstancing,
+	Toon,
+	ToonInstancing,
 
 	EnumCount
 };

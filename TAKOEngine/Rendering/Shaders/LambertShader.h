@@ -18,7 +18,7 @@
 class LambertShader : public ModelShaderDX12
 {
 public:
-	LambertShader(ID3D12Device* device);
+	LambertShader(ID3D12Device* device, bool instancing = false);
 	~LambertShader() override;
 
 	void Render(const RenderContextDX12& rc, ModelDX12* model) override;

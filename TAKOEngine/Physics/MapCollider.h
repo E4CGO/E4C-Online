@@ -24,46 +24,52 @@ public:
 protected:
 	iModel* model;
 
-	struct Porigon
+	struct Polygon
 	{
 		DirectX::XMFLOAT3 position[3] = {};
 		DirectX::XMFLOAT3 normal = {};
 		int materialIndex = -1;
 	};
-	Liner8TreeManager<Porigon> tree;
+	Liner8TreeManager<Polygon> tree;
 	void CalcMapArea(
 		DirectX::XMFLOAT3& minPos,
 		DirectX::XMFLOAT3& maxPos
 	);
-	void RegisterPorigons();
-	bool ShpereVsPorigon(
+	void RegisterPolygons();
+	bool ShpereVsPolygon(
 		Collider*& other,
 		DirectX::XMFLOAT3& direction,
-		Porigon* porigon,
+		Polygon* polygon,
 		HitResult& result
 	);
-	bool RayVsPorigon(
+
+	bool RayVsPolygon(
 		const DirectX::XMFLOAT3& start,
 		const DirectX::XMFLOAT3& end,
-		Porigon* porigon,
+		Polygon* polygon,
 		HitResult& result
 	);
+	bool RayVsPolygon(
+		const DirectX::XMVECTOR& rayStart,
+		const DirectX::XMVECTOR& rayDirection,		// 要正規化
+		float rayDist,
+		Polygon* polygon,
+		HitResult& result
+	);
+
 	bool SearchChildren(	// 子空間探索
 		int Elem,
-		const DirectX::XMFLOAT3& start,
-		const DirectX::XMFLOAT3& end,
+		const DirectX::XMVECTOR& start,
+		const DirectX::XMVECTOR& rayDirection,		// 要正規化
+		float rayDist,
 		HitResult& result,
 		bool& hit
 	);
-	//bool SearchChildren(	// 子空間探索
-	//	
-	//	int Elem,
-	//	bool& hit
-	//);
 	bool SearchParent(	// 親空間探索
 		int Elem,
-		const DirectX::XMFLOAT3& start,
-		const DirectX::XMFLOAT3& end,
+		const DirectX::XMVECTOR& start,
+		const DirectX::XMVECTOR& rayDirection,		// 要正規化
+		float rayDist,
 		HitResult& result,
 		bool& hit
 	);

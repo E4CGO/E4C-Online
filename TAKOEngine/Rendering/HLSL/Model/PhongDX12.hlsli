@@ -1,4 +1,5 @@
 #include	"../Lighting/Light.hlsli"
+#include "Constants.hlsli"
 
 struct VS_OUT
 {
@@ -14,22 +15,22 @@ struct VS_OUT
 cbuffer CbScene : register(b0)
 {
     row_major float4x4 viewProjection;
-    float4 lightDirection;
     float4 cameraPosition;
     
-    //ライト情報
+    //繝ｩ繧､繝域ュ蝣ｱ
     float4               ambientLightColor;
     DirectionalLightData directionalLightData;
-    PointLightData       pointLightData[PointLightMax]; // 点光源情報
-    SpotLightData        spotLightData[SpotLightMax];   // スポットライト情報
-    int                  pointLightCount;               // 点光源数
-    int                  spotLightCount;                // スポットライト数
+    PointLightData       pointLightData[PointLightMax]; 	// 轤ｹ蜈画ｺ先ュ蝣ｱ
+    SpotLightData        spotLightData[SpotLightMax];   	// 繧ｹ繝昴ャ繝医Λ繧､繝域ュ蝣ｱ
+    int                  pointLightCount;               	// 轤ｹ蜈画ｺ先焚
+    int                  spotLightCount;                	// 繧ｹ繝昴ャ繝医Λ繧､繝域焚
 };
 
 cbuffer CbMesh : register(b1)
 {
     row_major float4x4 world_transform;
-    row_major float4x4 boneTransforms[255];
+    row_major float4x4 boneTransforms[MAX_BONES];
+    row_major float4x4 instancingTransform[MAX_INSTANCES];
 };
 
 cbuffer CbMaterial : register(b2)

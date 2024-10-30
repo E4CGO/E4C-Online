@@ -145,7 +145,15 @@ void ThridPersonCameraController::Update(float elapsedTime)
 		if (MAPTILES.RayCast(focus, end, hit, true))
 		{
 			// ƒJƒƒ‰‚ª•Ç‚É“–‚½‚Á‚½
+			float temp = hit.distance;
+			if (temp > XMFLOAT3Length(end - focus))
+			{
+				hit.distance = temp;
+			}
 			float d = hit.distance * 0.95f;
+			
+
+
 			if (d < 0.01f) d = 0.01f;
 			Eye = DirectX::XMVectorSubtract(Focus, DirectX::XMVectorScale(Front, d));
 		}
