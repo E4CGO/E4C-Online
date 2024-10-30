@@ -136,7 +136,10 @@ set(Source
     "Source/GameData.h"
     "Source/Main.cpp"
     "Source/Manager.h"
+    "Source/PlayerCharacterData.cpp"
     "Source/PlayerCharacterData.h"
+    "Source/PlayerCharacterPattern.cpp"
+    "Source/PlayerCharacterPattern.h"
 )
 source_group("Source" FILES ${Source})
 
@@ -236,8 +239,16 @@ set(Source__GameObject__Character__Player
     "Source/GameObject/Character/Player/KnightState.h"
     "Source/GameObject/Character/Player/Mage.cpp"
     "Source/GameObject/Character/Player/Mage.h"
+    "Source/GameObject/Character/Player/NonPlayerCharacter.cpp"
+    "Source/GameObject/Character/Player/NonPlayerCharacter.h"
+    "Source/GameObject/Character/Player/NonPlayerCharacterState.cpp"
+    "Source/GameObject/Character/Player/NonPlayerCharacterState.h"
     "Source/GameObject/Character/Player/Player.cpp"
     "Source/GameObject/Character/Player/Player.h"
+    "Source/GameObject/Character/Player/PlayerCharacter.cpp"
+    "Source/GameObject/Character/Player/PlayerCharacter.h"
+    "Source/GameObject/Character/Player/PlayerCharacterState.cpp"
+    "Source/GameObject/Character/Player/PlayerCharacterState.h"
     "Source/GameObject/Character/Player/PlayerManager.cpp"
     "Source/GameObject/Character/Player/PlayerManager.h"
     "Source/GameObject/Character/Player/PlayerState.cpp"
@@ -329,7 +340,6 @@ source_group("Source\\UI\\Widget" FILES ${Source__UI__Widget})
 
 set(TAKOEngine__AI
     "TAKOEngine/AI/BaseState.h"
-    "TAKOEngine/AI/StateMachine.cpp"
     "TAKOEngine/AI/StateMachine.h"
 )
 source_group("TAKOEngine\\AI" FILES ${TAKOEngine__AI})
@@ -462,6 +472,8 @@ source_group("TAKOEngine\\Runtime" FILES ${TAKOEngine__Runtime})
 set(TAKOEngine__Sound
     "TAKOEngine/Sound/Audio.cpp"
     "TAKOEngine/Sound/Audio.h"
+    "TAKOEngine/Sound/Sound.cpp"
+    "TAKOEngine/Sound/Sound.h"
 )
 source_group("TAKOEngine\\Sound" FILES ${TAKOEngine__Sound})
 
@@ -754,6 +766,7 @@ function(set_hlsl_properties target source_file shader_model shader_type entry_p
         VS_SHADER_MODEL ${shader_model} # Set the shader model
         VS_SHADER_TYPE ${shader_type} # Set the shader type
         VS_SHADER_ENTRYPOINT ${entry_point} # Set the entry point function name
+        VS_SHADER_OBJECT_FILE_NAME "$(OutDir)Data/Shader/%(Filename).cso"
     )
 endfunction()
 
@@ -966,6 +979,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/External/Effekseer170e/include/Effekseer"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/openssl/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/tinygltf"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/OpenAL/include"
 )
 
 # ###############################################################################
@@ -1088,14 +1102,14 @@ endforeach()
 set(SOURCE_DIR_DATA "${CMAKE_SOURCE_DIR}/Data")
 set(SOURCE_DIR_DEPENDENCY "${CMAKE_SOURCE_DIR}/Dependencies")
 
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
     ${SOURCE_DIR_DATA}
     ${CMAKE_BINARY_DIR}/Data
     COMMENT "Copying data directory to build folder"
 )
 
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
     ${SOURCE_DIR_DEPENDENCY}
     ${CMAKE_BINARY_DIR}
@@ -1103,7 +1117,7 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 )
 
 if(MSVC)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
         COMMAND if "$(Configuration)" == "Release" ${CMAKE_COMMAND} -E copy_directory_if_different
         ${SOURCE_DIR_DATA}
         ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/Data
@@ -1111,7 +1125,7 @@ if(MSVC)
 endif()
 
 if(MSVC)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
         COMMAND if "$(Configuration)" == "Debug" ${CMAKE_COMMAND} -E copy_directory_if_different
         ${SOURCE_DIR_DATA}
         ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/Data
@@ -1119,7 +1133,7 @@ if(MSVC)
 endif()
 
 if(MSVC)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
         COMMAND if "$(Configuration)" == "Release" ${CMAKE_COMMAND} -E copy_directory_if_different
         ${SOURCE_DIR_DEPENDENCY}
         ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/
@@ -1127,7 +1141,7 @@ if(MSVC)
 endif()
 
 if(MSVC)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
         COMMAND if "$(Configuration)" == "Debug" ${CMAKE_COMMAND} -E copy_directory_if_different
         ${SOURCE_DIR_DEPENDENCY}
         ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/
@@ -1138,12 +1152,11 @@ if(MSVC)
     foreach(CurrentShaderFile IN LISTS SHADER_NAMES)
         add_custom_command(
             TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/${CurrentShaderFile} ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/Data/Shader/
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/${CurrentShaderFile} ${CMAKE_BINARY_DIR}/Data/Shader
-            COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/${CurrentShaderFile}
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/Data/Shader/${CurrentShaderFile} ${CMAKE_BINARY_DIR}/Data/Shader
             COMMENT "Copying shaders ${CurrentShaderFile}")
     endforeach()
 endif()
+
 
 # ###############################################################################
 # Dependencies
@@ -1174,6 +1187,7 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "Crypt32"
     "libssl"
     "libcrypto"
+    "OpenAL32"
     ">"
     "$<$<CONFIG:Release>:"
     "SDL2"
@@ -1199,6 +1213,7 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "Crypt32"
     "libssl"
     "libcrypto"
+    "OpenAL32"
     ">"
     "kernel32"
     "user32"
@@ -1224,6 +1239,7 @@ target_link_directories(${PROJECT_NAME} PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtk/native/lib/x64/$<CONFIG>"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtex/native/lib/x64/$<CONFIG>"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/OpenAL/libs/Win64/"
     ">"
     "$<$<CONFIG:Release>:"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/nlohmann"
@@ -1235,5 +1251,6 @@ target_link_directories(${PROJECT_NAME} PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtk/native/lib/x64/$<CONFIG>"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/lib/x64"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/OpenAL/libs/Win64/"
     ">"
 )

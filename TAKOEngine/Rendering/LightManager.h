@@ -5,7 +5,6 @@
 #define __LIGHT_LIGHT_MANAGER_H__
 
 #include <vector>
-
 #include "TAKOEngine/Rendering/Light.h"
 #include "TAKOEngine/Rendering/RenderContext.h"
 

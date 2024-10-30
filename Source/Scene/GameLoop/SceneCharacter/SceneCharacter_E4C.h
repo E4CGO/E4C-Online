@@ -6,6 +6,8 @@
 #include "TAKOEngine/Editor/Camera/FreeCameraController.h"
 #include "TAKOEngine/AI/StateMachine.h"
 #include "PlayerCharacterData.h"
+#include "GameObject/Character/Player/NonPlayerCharacter.h"
+#include "GameObject/Character/Player/PlayerCharacter.h"
 
 #include <unordered_set>
 
@@ -42,9 +44,16 @@ public:
 	{
 		INIT,
 		CHARACTERSELECTION,
-		CHARACTERCREATION,
+		CHARACTERCREATIONLEFT,
+		CHARACTERCREATIONCENTER,
+		CHARACTERCREATIONRIGHT,
 		START
 	};
+
+	std::unique_ptr<FreeCameraController> cameraController;
+
+	std::vector<std::unique_ptr<NonPlayerCharacter>> m_previewCharacters;
+
 private:
 	std::unique_ptr<StateMachine<SceneCharacter_E4C>> stateMachine;
 
@@ -54,7 +63,6 @@ private:
 	FrameBufferManager* m_framBuffer;
 
 	Camera& camera = Camera::Instance();
-	std::unique_ptr<FreeCameraController> cameraController;
 
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {
@@ -65,17 +73,7 @@ private:
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
 	std::unique_ptr<SpriteDX12>			m_sprites[8];
 
-	std::shared_ptr<ModelObject> m_character_BARB_HEAD;
-	std::shared_ptr<ModelObject> m_character_BARB_BODY;
-	std::shared_ptr<ModelObject> m_character_BARB_WEAPON;
+	static const int m_maxCharacters;
 
-	std::shared_ptr<ModelObject> m_character_MAGE_HEAD;
-	std::shared_ptr<ModelObject> m_character_MAGE_BODY;
-	std::shared_ptr<ModelObject> m_character_MAGE_WEAPON;
-
-	std::vector<std::shared_ptr<ModelObject>> m_Characters_LEFT;
-	std::vector<std::shared_ptr<ModelObject>> m_Characters_CENTER;
-	std::vector<std::shared_ptr<ModelObject>> m_Characters_RIGHT;
-
-	static float time;
+	static float m_time;
 };
