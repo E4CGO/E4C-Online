@@ -490,6 +490,8 @@ set(TAKOEngine__Editor__Camera
     "TAKOEngine/Editor/Camera/Camera.h"
     "TAKOEngine/Editor/Camera/CameraController.cpp"
     "TAKOEngine/Editor/Camera/CameraController.h"
+    "TAKOEngine/Editor/Camera/CameraManager.cpp"
+    "TAKOEngine/Editor/Camera/CameraManager.h"
     "TAKOEngine/Editor/Camera/FreeCameraController.cpp"
     "TAKOEngine/Editor/Camera/FreeCameraController.h"
     "TAKOEngine/Editor/Camera/ThridPersonCameraController.cpp"

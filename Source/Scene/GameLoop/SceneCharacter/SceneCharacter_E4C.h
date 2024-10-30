@@ -12,6 +12,7 @@
 // テスト用
 #include "GameObject/ModelObject.h"
 #include "Scene/Scene.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 
 class SceneCharacter_E4C : public Scene
 {
@@ -50,7 +51,6 @@ private:
 
 	std::unique_ptr<myRenderer::shadow::ShadowMapRender> shadowMapRenderer = std::make_unique<myRenderer::shadow::ShadowMapRender>();
 
-	Camera& camera = Camera::Instance();
 	std::unique_ptr<FreeCameraController> cameraController;
 
 	// Sprite Preload
@@ -73,6 +73,9 @@ private:
 	std::vector<std::shared_ptr<ModelObject>> m_Characters_LEFT;
 	std::vector<std::shared_ptr<ModelObject>> m_Characters_CENTER;
 	std::vector<std::shared_ptr<ModelObject>> m_Characters_RIGHT;
+
+
+	Camera* mainCamera;  // メインカメラとして mainCamera を定義
 
 	static float time;
 };

@@ -4,6 +4,7 @@
 #include "TAKOEngine/Rendering/SpriteDX12.h"
 #include "TAKOEngine/Tool/GLTFImporter.h"
 #include "TAKOEngine/Editor/Camera/FreeCameraController.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 #include "TAKOEngine/AI/StateMachine.h"
 
 #include <unordered_set>
@@ -50,8 +51,8 @@ private:
 	std::unique_ptr<myRenderer::shadow::ShadowMapRender> shadowMapRenderer = std::make_unique<myRenderer::shadow::ShadowMapRender>();
 
 	//スキニング
-	SkinningPipeline*	m_skinning_pipeline;
-	
+	SkinningPipeline* m_skinning_pipeline;
+
 	Camera* maincamera;
 	std::unique_ptr<FreeCameraController> cameraController;
 
@@ -86,6 +87,9 @@ private:
 	DirectX::XMFLOAT3 test_scale = { 1, 1, 1 };
 
 	std::unique_ptr<SpriteDX12>			m_sprites[8];
+
+
+	Camera* mainCamera;  // メインカメラとして mainCamera を定義
 
 	static float time;
 };

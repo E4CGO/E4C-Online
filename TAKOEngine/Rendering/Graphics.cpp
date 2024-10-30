@@ -778,22 +778,22 @@ void Graphics::End()
 }
 
 //TODO : UpdataConstantBuffer
-const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera& camera, const DirectX::XMFLOAT3& light_direction)
+const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera, const DirectX::XMFLOAT3& light_direction)
 {
 	LightManager& ligtManager = LightManager::Instance();
 
 	UINT       frame_buffer_index = m_dxgi_swap_chain->GetCurrentBackBufferIndex();
 	FrameResource& frame_resource = m_frame_resources.at(frame_buffer_index);
 
-	DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&camera.GetView());
-	DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&camera.GetProjection());
+	DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&camera->GetView());
+	DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&camera->GetProjection());
 	DirectX::XMMATRIX ViewProjection = DirectX::XMMatrixMultiply(View, Projection);
 	DirectX::XMStoreFloat4x4(&frame_resource.cb_scene_data->view_projection, ViewProjection);
 
 	// カメラ
-	frame_resource.cb_scene_data->camera_position.x = camera.GetEye().x;
-	frame_resource.cb_scene_data->camera_position.y = camera.GetEye().y;
-	frame_resource.cb_scene_data->camera_position.z = camera.GetEye().z;
+	frame_resource.cb_scene_data->camera_position.x = camera->GetEye().x;
+	frame_resource.cb_scene_data->camera_position.y = camera->GetEye().y;
+	frame_resource.cb_scene_data->camera_position.z = camera->GetEye().z;
 
 	// ライト情報
 	frame_resource.cb_scene_data->ambientLightColor = ligtManager.GetAmbientColor();

@@ -4,6 +4,7 @@
 #include "TAKOEngine/Rendering/SpriteDX12.h"
 #include "TAKOEngine/Tool/GLTFImporter.h"
 #include "TAKOEngine/Editor/Camera/FreeCameraController.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 #include "TAKOEngine/AI/StateMachine.h"
 
 #include <unordered_set>
@@ -46,8 +47,9 @@ private:
 
 	std::unique_ptr<myRenderer::shadow::ShadowMapRender> shadowMapRenderer = std::make_unique<myRenderer::shadow::ShadowMapRender>();
 
-	Camera& camera = Camera::Instance();
 	std::unique_ptr<FreeCameraController> cameraController;
+
+	Camera* mainCamera;
 
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {

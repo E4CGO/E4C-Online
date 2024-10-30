@@ -4,6 +4,7 @@
 #include "TAKOEngine/Rendering/Misc.h"
 #include "TAKOEngine/Rendering/Graphics.h"
 #include "TAKOEngine/Rendering/Shaders/PhongShader.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 
 //********************************************************
 // @brief       レンダーステート設定
@@ -158,7 +159,7 @@ void PhongShaderDX12::Render(const RenderContextDX12& rc, ModelDX12* model)
 	std::vector<bool> visibleObjects(model->GetMeshes().size(), false);
 
 	// 視錐台カリングを実行して可視オブジェクトをマーク
-	FrustumCulling::FrustumCullingFlag(Camera::Instance(), model->GetMeshes(), visibleObjects);
+	FrustumCulling::FrustumCullingFlag(CameraManager::Instance().GetCamera(), model->GetMeshes(), visibleObjects);
 	int culling = 0;
 
 	//パイプライン設定

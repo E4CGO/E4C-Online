@@ -15,6 +15,7 @@
 #include "Map/MapTile.h"
 
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 #include "TAKOEngine/Tool/GLTFImporter.h"
 
 class StageOpenWorld_E4C : public Stage
@@ -36,7 +37,7 @@ public:
 	};
 private:
 
-	Camera& camera = Camera::Instance();
+	Camera* mainCamera;
 	std::unique_ptr<ThridPersonCameraController> cameraController;
 
 	MapTile* stage_collision;

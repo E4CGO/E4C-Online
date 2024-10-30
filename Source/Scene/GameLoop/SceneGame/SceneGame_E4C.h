@@ -3,6 +3,7 @@
 #include "Scene/Scene.h"
 #include "Scene/Stage/Stage.h"
 #include "TAKOEngine/AI/StateMachine.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 
 class SceneGame_E4C : public Scene
 {
