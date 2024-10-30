@@ -153,6 +153,12 @@ set(Source__GameObject
 source_group("Source\\GameObject" FILES ${Source__GameObject})
 
 set(Source__Map
+    "Source/Map/CrossRoom1.cpp"
+    "Source/Map/CrossRoom1.h"
+    "Source/Map/DungeonData.cpp"
+    "Source/Map/DungeonData.h"
+    "Source/Map/EndRoom1.cpp"
+    "Source/Map/EndRoom1.h"
     "Source/Map/Map001.cpp"
     "Source/Map/Map001.h"
     "Source/Map/Map001BossRoomTeleport.cpp"
@@ -163,12 +169,19 @@ set(Source__Map
     "Source/Map/MapTile.h"
     "Source/Map/MapTileManager.cpp"
     "Source/Map/MapTileManager.h"
+    "Source/Map/Passage1.cpp"
+    "Source/Map/Passage1.h"
+    "Source/Map/RoomBase.h"
+    "Source/Map/SimpleRoom1.cpp"
+    "Source/Map/SimpleRoom1.h"
 )
 source_group("Source\\Map" FILES ${Source__Map})
 
 set(Source__Scene
     "Source/Scene/Scene.cpp"
     "Source/Scene/Scene.h"
+    "Source/Scene/SceneDungeon.cpp"
+    "Source/Scene/SceneDungeon.h"
     "Source/Scene/SceneGame.cpp"
     "Source/Scene/SceneGame.h"
     "Source/Scene/SceneGameState.cpp"

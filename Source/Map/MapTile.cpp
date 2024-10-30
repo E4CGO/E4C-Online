@@ -6,7 +6,7 @@ MapTile::MapTile(const char* filename, float scaling, RoomBase* parent) :
 	this->parent = parent;
 
 	Update(0);// モデル更新
-	//SetCollider(Collider::COLLIDER_TYPE::MAP);
+	SetCollider(Collider::COLLIDER_TYPE::MAP);
 }
 
 void MapTile::UpdateTransform()
@@ -37,9 +37,17 @@ void MapTile::UpdateTransform()
 
 void MapTile::Update(float elapsedTime)
 {
-	UpdateTransform();
+	for (auto& model : m_pmodels)
+	{
+		if (model == nullptr) continue;
 
-	model->UpdateAnimation(elapsedTime * animationSpeed);
+		// 行列更新
+		UpdateTransform();
 
-	model->UpdateTransform(transform);
+		// アニメーション更新
+		model->UpdateAnimation(elapsedTime * m_animationSpeed);
+
+		// トランスフォーム更新
+		model->UpdateTransform(transform);
+	}
 }
