@@ -1,4 +1,4 @@
-//! @file SpriteShaderDX12.cpp
+Ôªø//! @file SpriteShaderDX12.cpp
 //! @note
 
 #include "TAKOEngine/Rendering/Misc.h"
@@ -6,9 +6,9 @@
 #include "SpriteShaderDX12.h"
 
 //**********************************************************************
-// @brief     ÉRÉìÉXÉgÉâÉNÉ^
+// @brief     „Ç≥„É≥„Çπ„Éà„É©„ÇØ„Çø
 // @param[in] device  ID3D12Device*
-// @return    Ç»Çµ
+// @return    „Å™„Åó
 //**********************************************************************
 DefaultSpriteShaderDX12::DefaultSpriteShaderDX12(ID3D12Device* device)
 {
@@ -17,14 +17,14 @@ DefaultSpriteShaderDX12::DefaultSpriteShaderDX12(ID3D12Device* device)
 
 	HRESULT hr = S_OK;
 
-	//ÉVÉFÅ[É_Å[
+	//„Ç∑„Çß„Éº„ÉÄ„Éº
 	std::vector<BYTE> vsData, psData;
 	{
 		GpuResourceUtils::LoadShaderFile("Data/Shader/SpriteVS.cso", vsData);
 		GpuResourceUtils::LoadShaderFile("Data/Shader/SpritePS.cso", psData);
 	}
 
-	// ÉãÅ[ÉgÉVÉOÉlÉ`ÉÉÇÃê∂ê¨
+	// „É´„Éº„Éà„Ç∑„Ç∞„Éç„ÉÅ„É£„ÅÆÁîüÊàê
 	{
 		hr = device->CreateRootSignature(
 			0,
@@ -35,11 +35,11 @@ DefaultSpriteShaderDX12::DefaultSpriteShaderDX12(ID3D12Device* device)
 		m_d3d_root_signature->SetName(L"DefaultSpriteShaderRootSignature");
 	}
 
-	// ÉpÉCÉvÉâÉCÉìÉXÉeÅ[ÉgÇÃê∂ê¨
+	// „Éë„Ç§„Éó„É©„Ç§„É≥„Çπ„ÉÜ„Éº„Éà„ÅÆÁîüÊàê
 	{
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC d3d_graphics_pipeline_state_desc = {};
 
-		// ÉãÅ[ÉgÉVÉOÉlÉ`ÉÉ
+		// „É´„Éº„Éà„Ç∑„Ç∞„Éç„ÉÅ„É£
 		d3d_graphics_pipeline_state_desc.pRootSignature = m_d3d_root_signature.Get();
 
 		d3d_graphics_pipeline_state_desc.VS.pShaderBytecode = vsData.data();
@@ -47,7 +47,7 @@ DefaultSpriteShaderDX12::DefaultSpriteShaderDX12(ID3D12Device* device)
 		d3d_graphics_pipeline_state_desc.PS.pShaderBytecode = psData.data();
 		d3d_graphics_pipeline_state_desc.PS.BytecodeLength  = psData.size();
 
-		// ì¸óÕÉåÉCÉAÉEÉg
+		// ÂÖ•Âäõ„É¨„Ç§„Ç¢„Ç¶„Éà
 		D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
@@ -57,16 +57,16 @@ DefaultSpriteShaderDX12::DefaultSpriteShaderDX12(ID3D12Device* device)
 		d3d_graphics_pipeline_state_desc.InputLayout.pInputElementDescs = inputElementDescs;
 		d3d_graphics_pipeline_state_desc.InputLayout.NumElements = _countof(inputElementDescs);
 
-		// ÉuÉåÉìÉhÉXÉeÅ[Ég
+		// „Éñ„É¨„É≥„Éâ„Çπ„ÉÜ„Éº„Éà
 		d3d_graphics_pipeline_state_desc.BlendState = renderState->GetBlendState(BlendState::Transparency);
 
-		// ê[ìxÉXÉeÉìÉVÉãÉXÉeÅ[Ég
+		// Ê∑±Â∫¶„Çπ„ÉÜ„É≥„Ç∑„É´„Çπ„ÉÜ„Éº„Éà
 		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthEnable = true;
 		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
 		d3d_graphics_pipeline_state_desc.DepthStencilState.StencilEnable = false;
 
-		// ÉâÉXÉ^ÉâÉCÉUÅ[ÉXÉeÅ[Ég
+		// „É©„Çπ„Çø„É©„Ç§„Ç∂„Éº„Çπ„ÉÜ„Éº„Éà
 		d3d_graphics_pipeline_state_desc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
 		d3d_graphics_pipeline_state_desc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
 		d3d_graphics_pipeline_state_desc.RasterizerState.FrontCounterClockwise = false;
@@ -79,26 +79,26 @@ DefaultSpriteShaderDX12::DefaultSpriteShaderDX12(ID3D12Device* device)
 		d3d_graphics_pipeline_state_desc.RasterizerState.ForcedSampleCount = 0;
 		d3d_graphics_pipeline_state_desc.RasterizerState.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
 
-		// ÉvÉäÉ~ÉeÉBÉuÉgÉ|ÉçÉWÅ[
+		// „Éó„É™„Éü„ÉÜ„Ç£„Éñ„Éà„Éù„É≠„Ç∏„Éº
 		d3d_graphics_pipeline_state_desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
-		// ÉXÉgÉäÉbÉvéûÇÃÉJÉbÉgíl
+		// „Çπ„Éà„É™„ÉÉ„ÉóÊôÇ„ÅÆ„Ç´„ÉÉ„ÉàÂÄ§
 		d3d_graphics_pipeline_state_desc.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
 
-		// ÉåÉìÉ_Å[É^Å[ÉQÉbÉgêî
+		// „É¨„É≥„ÉÄ„Éº„Çø„Éº„Ç≤„ÉÉ„ÉàÊï∞
 		d3d_graphics_pipeline_state_desc.NumRenderTargets = 1;
 		d3d_graphics_pipeline_state_desc.RTVFormats[0] = RenderTargetFormat;
 		d3d_graphics_pipeline_state_desc.DSVFormat = DepthStencilFormat;
 
-		// É}ÉãÉ`ÉTÉìÉvÉäÉìÉO
+		// „Éû„É´„ÉÅ„Çµ„É≥„Éó„É™„É≥„Ç∞
 		d3d_graphics_pipeline_state_desc.SampleDesc.Count = 1;
 		d3d_graphics_pipeline_state_desc.SampleDesc.Quality = 0;
 
-		// ÉAÉ_ÉvÉ^
+		// „Ç¢„ÉÄ„Éó„Çø
 		d3d_graphics_pipeline_state_desc.NodeMask = 0;
 		d3d_graphics_pipeline_state_desc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
-		// ÉpÉCÉvÉâÉCÉìÉXÉeÅ[Égê∂ê¨
+		// „Éë„Ç§„Éó„É©„Ç§„É≥„Çπ„ÉÜ„Éº„ÉàÁîüÊàê
 		hr = device->CreateGraphicsPipelineState(
 			&d3d_graphics_pipeline_state_desc,
 			IID_PPV_ARGS(m_d3d_pipeline_state.GetAddressOf()));
@@ -108,37 +108,37 @@ DefaultSpriteShaderDX12::DefaultSpriteShaderDX12(ID3D12Device* device)
 }
 
 //**********************************************************************
-// @brief     ÉfÉXÉgÉâÉNÉ^
-// @param[in] Ç»Çµ
-// @return    Ç»Çµ
+// @brief     „Éá„Çπ„Éà„É©„ÇØ„Çø
+// @param[in] „Å™„Åó
+// @return    „Å™„Åó
 //**********************************************************************
 DefaultSpriteShaderDX12::~DefaultSpriteShaderDX12()
 {
 }
 
 //***********************************************************
-// @brief       ï`âÊ
-// @param[in]   rc     ÉåÉìÉ_Å[ÉRÉìÉeÉLÉXÉg
-// @param[in]   sprite  ï`âÊëŒè€ÇÃÉXÉvÉâÉCÉgÉfÅ[É^ÇéwÇ∑É|ÉCÉìÉ^
-// @return      Ç»Çµ
+// @brief       ÊèèÁîª
+// @param[in]   rc     „É¨„É≥„ÉÄ„Éº„Ç≥„É≥„ÉÜ„Ç≠„Çπ„Éà
+// @param[in]   sprite  ÊèèÁîªÂØæË±°„ÅÆ„Çπ„Éó„É©„Ç§„Éà„Éá„Éº„Çø„ÇíÊåá„Åô„Éù„Ç§„É≥„Çø
+// @return      „Å™„Åó
 //***********************************************************
 void DefaultSpriteShaderDX12::Render(const RenderContextDX12& rc, SpriteDX12* sprite)
 {
 	Graphics& graphics = Graphics::Instance();
 	const SpriteDX12::FrameResource& frame_resource = sprite->m_frame_resources.at(graphics.GetCurrentBufferIndex()); 
 
-	//ÉpÉCÉvÉâÉCÉìê›íË
+	//„Éë„Ç§„Éó„É©„Ç§„É≥Ë®≠ÂÆö
 	rc.d3d_command_list->SetPipelineState(m_d3d_pipeline_state.Get());
 	rc.d3d_command_list->SetGraphicsRootSignature(m_d3d_root_signature.Get());
 
-	//ÉfÉBÉXÉNÉäÉvÉ^ÉeÅ[ÉuÉã
+	//„Éá„Ç£„Çπ„ÇØ„É™„Éó„Çø„ÉÜ„Éº„Éñ„É´
 	rc.d3d_command_list->SetGraphicsRootDescriptorTable(0, sprite->GetDescriptor()->GetGpuHandle());
 
-	//í∏ì_ÉoÉbÉtÉ@
+	//È†ÇÁÇπ„Éê„ÉÉ„Éï„Ç°
 	rc.d3d_command_list->IASetVertexBuffers(0, 1, &frame_resource.d3d_vbv);
 	rc.d3d_command_list->IASetIndexBuffer(&frame_resource.d3d_ibv);
 	rc.d3d_command_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	//ï`âÊ
+	//ÊèèÁîª
 	rc.d3d_command_list->DrawIndexedInstanced(sprite->GetSpriteCount() * 6, 1, 0, 0, 0);
 }

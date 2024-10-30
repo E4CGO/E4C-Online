@@ -1,4 +1,4 @@
-//! @file LuminanceExtractionShader.h
+ï»¿//! @file LuminanceExtractionShader.h
 //! @note 
 
 #ifndef __GRAHICS_LUMINANCE_EXTRACTION_SHADER_H__
@@ -9,7 +9,7 @@
 
 //********************************************************
 // @class LuminanceExtractionShader
-// @brief ‹P“xƒVƒF[ƒ_[
+// @brief è¼åº¦ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 // @par   DX11
 //********************************************************
 class LuminanceExtractionShader : public SpriteShader
@@ -21,15 +21,15 @@ private:
 private:
 	struct CBLuminanceExtraction
 	{
-		float				threshold;	// è‡’l
-		float				intensity;	// ƒuƒ‹[ƒ€‚Ì‹­“x
+		float				threshold;	// é–¾å€¤
+		float				intensity;	// ãƒ–ãƒ«ãƒ¼ãƒ ã®å¼·åº¦
 		DirectX::XMFLOAT2	dummy2;
 	};
 };
 
 //********************************************************
 // @class LuminanceExtractionShaderDX12
-// @brief ‹P“xƒVƒF[ƒ_[
+// @brief è¼åº¦ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 // @par   DX12
 //********************************************************
 class LuminanceExtractionShaderDX12 : public SpriteShaderDX12

@@ -259,36 +259,32 @@ SpriteDX12::SpriteDX12(UINT sprite_count, FrameBufferTexture* frameBuffer) : m_s
 
 	// テクスチャの生成
 	{
-		// フレームバッファのリソースを代入
 		m_d3d_texture = frameBuffer->Get();
 
-		// ダミーテクスチャ生成
-		hr = Graphics::Instance().CreateDummyTexture(m_d3d_texture.GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+		if (m_d3d_texture)
+		{
+			m_srv_descriptor = Graphics::Instance().GetShaderResourceDescriptorHeap()->PopDescriptor();
+			
+			// シェーダーリソースビューの生成
+			D3D12_RESOURCE_DESC d3d_resource_desc = m_d3d_texture->GetDesc();
 
-		// ディスクリプタ取得
-		m_srv_descriptor = Graphics::Instance().GetShaderResourceDescriptorHeap()->PopDescriptor();
+			D3D12_SHADER_RESOURCE_VIEW_DESC d3d_srv_desc = {};
+			d3d_srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+			d3d_srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+			d3d_srv_desc.Format = d3d_resource_desc.Format;
+			d3d_srv_desc.Texture2D.MipLevels = d3d_resource_desc.MipLevels;
+			d3d_srv_desc.Texture2D.MostDetailedMip = 0; 
 
-		// シェーダーリソースビューの生成
-		D3D12_RESOURCE_DESC d3d_resource_desc = m_d3d_texture->GetDesc();
+			// シェーダリソースビューを生成.
+			d3d_device->CreateShaderResourceView(
+				m_d3d_texture.Get(),
+				&d3d_srv_desc,
+				m_srv_descriptor->GetCpuHandle());
 
-		// シェーダーリソースビューの設定
-		D3D12_SHADER_RESOURCE_VIEW_DESC d3d_srv_desc = {};
-		d3d_srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-		d3d_srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		d3d_srv_desc.Format = d3d_resource_desc.Format;
-		d3d_srv_desc.Texture2D.MipLevels = d3d_resource_desc.MipLevels;
-		d3d_srv_desc.Texture2D.MostDetailedMip = 0;
-
-		// シェーダリソースビューを生成.
-		d3d_device->CreateShaderResourceView(
-			m_d3d_texture.Get(),
-			&d3d_srv_desc,
-			m_srv_descriptor->GetCpuHandle());
-
-		// テクスチャ情報の取得
-		m_texture_width  = static_cast<int>(d3d_resource_desc.Width);
-		m_texture_height = static_cast<int>(d3d_resource_desc.Height);
+			// テクスチャ情報の取得
+			m_texture_width  = static_cast<int>(d3d_resource_desc.Width);
+			m_texture_height = static_cast<int>(d3d_resource_desc.Height);
+		}
 	}
 
 	// フレームリソース生成
@@ -345,7 +341,7 @@ void SpriteDX12::Begin(const RenderContextDX12& rc)
 	CalcGaussianFilter(fram_resource, rc.gaussianFilterData);
 
 	// ColorGrading
-	fram_resource.cb_scene_data->hueShift = rc.colorGradingData.hueShift;
+	fram_resource.cb_scene_data->hueShift   = rc.colorGradingData.hueShift;
 	fram_resource.cb_scene_data->saturation = rc.colorGradingData.saturation;
 	fram_resource.cb_scene_data->brightness = rc.colorGradingData.brightness;
 }
@@ -367,10 +363,8 @@ void SpriteDX12::CalcGaussianFilter(FrameResource& fram_resource, const Gaussian
 	kernelSize = max(1, min(MaxKernelSize - 1, kernelSize));
 
 	fram_resource.cb_scene_data->kernelSize = static_cast<float>(kernelSize);
-	fram_resource.cb_scene_data->textureSize.x = 1.0f / (graphics.GetScreenWidth() / 2.0f);
-	fram_resource.cb_scene_data->textureSize.y = 1.0f / (graphics.GetScreenHeight() / 2.0f);
-	//fram_resource.cb_scene_data->textureSize.x = 1.0f / gaussianFilterData.textureSize.x;
-	//fram_resource.cb_scene_data->textureSize.y = 1.0f / gaussianFilterData.textureSize.y;
+	fram_resource.cb_scene_data->textureSize.x = 1.0f / gaussianFilterData.textureSize.x;
+	fram_resource.cb_scene_data->textureSize.y = 1.0f / gaussianFilterData.textureSize.y;
 
 	float deviationPow2 = 2.0f * gaussianFilterData.deviation * gaussianFilterData.deviation;
 	float sum = 0.0f;
@@ -413,11 +407,14 @@ void SpriteDX12::Draw(
 	float angle,
 	float r, float g, float b, float a)
 {
+	Graphics& graphics = Graphics::Instance();
+
 	Draw(
 		dx, dy, dw, dh,
 		0, 0, static_cast<float>(m_texture_width), static_cast<float>(m_texture_height),
 		angle,
-		r, g, b, a);
+		r, g, b, a, 
+		graphics.GetViwePort());
 }
 
 /**************************************************************************//**
@@ -443,15 +440,12 @@ void SpriteDX12::Draw(
 	float sx, float sy,
 	float sw, float sh,
 	float angle,
-	float r, float g, float b, float a)
+	float r, float g, float b, float a,
+	D3D12_VIEWPORT viewport)
 {
 	if (m_sprite_index >= m_sprite_count) return;
 
 	Graphics& graphics = Graphics::Instance();
-
-	// スクリーンサイズを取得する。
-	float screen_width = graphics.GetScreenWidth();
-	float screen_height = graphics.GetScreenHeight();
 
 	// スプライトを構成する４頂点のスクリーン座標を計算する
 	DirectX::XMFLOAT2 positions[] = {
@@ -496,6 +490,10 @@ void SpriteDX12::Draw(
 		p.x += mx;
 		p.y += my;
 	}
+
+	// 現在設定されているビューポートからスクリーンサイズを取得する
+	float screen_width  = viewport.Width;
+	float screen_height = viewport.Height;
 
 	// スクリーン座標系からNDC座標系へ変換する。
 	for (auto& p : positions)

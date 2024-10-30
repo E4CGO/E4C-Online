@@ -1,4 +1,4 @@
-//! @file SpriteShaderDX12.h
+ï»¿//! @file SpriteShaderDX12.h
 //! @note 
 
 #ifndef __GRAHICS_SPRITE_SHADER_DX12_H__
@@ -10,27 +10,27 @@
 
 //****************************************************
 // @class SpriteShaderDX12
-// @brief ƒXƒvƒ‰ƒCƒgƒVƒF[ƒ_[‚ÌŠî’êƒNƒ‰ƒX(DX12)
+// @brief ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®åŸºåº•ã‚¯ãƒ©ã‚¹(DX12)
 // @par   
 //****************************************************
 class SpriteShaderDX12
 {
 protected:
-	//ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	//ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	SpriteShaderDX12() {};
 
 public:
-	//ƒfƒXƒgƒ‰ƒNƒ^
+	//ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	virtual ~SpriteShaderDX12() {};
 
-	// •`‰æ
+	// æç”»
 	virtual void Render(const RenderContextDX12& rc, SpriteDX12* sprite) = 0;
 };
 
 //****************************************************
 // @class DefaultSpriteShaderDX12
-// @brief DX12‚Ì•`‰æƒeƒXƒg
-// @par   ƒeƒNƒXƒ`ƒƒ‚ğ‚»‚Ì‚Ü‚Ü•`‰æ‚·‚é
+// @brief DX12ã®æç”»ãƒ†ã‚¹ãƒˆ
+// @par   ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ãã®ã¾ã¾æç”»ã™ã‚‹
 //****************************************************
 class DefaultSpriteShaderDX12 : public SpriteShaderDX12
 {

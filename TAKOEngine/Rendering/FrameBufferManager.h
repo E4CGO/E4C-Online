@@ -1,4 +1,4 @@
-//! @file FrameBufferManager.h
+ï»¿//! @file FrameBufferManager.h
 //! @note 
 
 #ifndef __GRAHICS_FRAME_BUFFER_MANAGER_H__
@@ -8,7 +8,7 @@
 
 //*******************************************************
 // @class FrameBufferManager
-// @brief FrameBufferŠÇ—ƒNƒ‰ƒX
+// @brief FrameBufferç®¡ç†ã‚¯ãƒ©ã‚¹
 // @par   
 //*******************************************************
 class FrameBufferManager
@@ -16,60 +16,67 @@ class FrameBufferManager
 public:
 	FrameBufferManager() {};
 
-	// ‰Šú‰»
+	// åˆæœŸåŒ–
 	void Init(ID3D12GraphicsCommandList* commandList);
 
-	// ƒRƒ}ƒ“ƒhƒŠƒXƒg‚ğ•Â‚¶‚é
+	// ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã‚’é–‰ã˜ã‚‹
 	void Close();
 
-	// ƒRƒ}ƒ“ƒhƒŠƒXƒg‚ğƒŠƒZƒbƒg
+	// ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã‚’ãƒªã‚»ãƒƒãƒˆ
 	void Reset(ID3D12CommandAllocator* commandAllocator, ID3D12PipelineState* pipelineState); 
 
-	// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒgİ’è
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆè¨­å®š
 	void SetRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle, D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle);
 	void SetRenderTarget(FrameBufferDX12* renderTarget);
 
-	// •¡”–‡‚ÌƒŒƒ“ƒ_[ƒ^[ƒQƒbƒgİ’è
+	// è¤‡æ•°æšã®ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆè¨­å®š
 	void SetRenderTargets(UINT numRTV, FrameBufferDX12* renderTarget[]);
 
-	//ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚ÆƒfƒvƒXƒXƒeƒ“ƒVƒ‹ƒrƒ…[‚ğƒNƒŠƒA
+	//ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ãƒ‡ãƒ—ã‚¹ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒ“ãƒ¥ãƒ¼ã‚’ã‚¯ãƒªã‚¢
 	void Clear(FrameBufferDX12* renderTarget);
 
-	// •¡”–‡‚ÌƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚ÆƒfƒvƒXƒXƒeƒ“ƒVƒ‹ƒrƒ…[‚ğƒNƒŠƒA
+	// è¤‡æ•°æšã®ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ãƒ‡ãƒ—ã‚¹ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒ“ãƒ¥ãƒ¼ã‚’ã‚¯ãƒªã‚¢
 	void Clears(UINT numRTV, FrameBufferDX12* renderTarget[]);
 
-	// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Æ‚µ‚Äg—p‰Â”\‚É‚È‚é‚Ü‚Å‘Ò‚Â
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ã—ã¦ä½¿ç”¨å¯èƒ½ã«ãªã‚‹ã¾ã§å¾…ã¤
 	void WaitUntilToPossibleSetRenderTarget(FrameBufferDX12* renderTarget);
 
-	// •¡”–‡‚ÌƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚ªg—p‰Â”\‚É‚È‚é‚Ü‚Å‘Ò‚Â
+	// è¤‡æ•°æšã®ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆãŒä½¿ç”¨å¯èƒ½ã«ãªã‚‹ã¾ã§å¾…ã¤
 	void WaitUntilToPossibleSetRenderTargets(UINT numRTV, FrameBufferDX12* renderTarget[]);
 
-	// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ö‚Ì•`‚«‚İ‘Ò‚¿
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¸ã®æãè¾¼ã¿å¾…ã¡
 	void WaitUntilFinishDrawingToRenderTarget(FrameBufferDX12* renderTarget);
 
-	// •¡”–‡‚ÌƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ì•`‚«‚İ‘Ò‚¿
+	// è¤‡æ•°æšã®ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®æãè¾¼ã¿å¾…ã¡
 	void WaitUntilFinishDrawingToRenderTargets(UINT numRTV, FrameBufferDX12* renderTarget[]);
 
-	// ƒrƒ…[ƒ|[ƒg‚ÆƒVƒUƒŠƒ“ƒO‹éŒ`‚ğƒZƒbƒg‚Åİ’è
+	// ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆã¨ã‚·ã‚¶ãƒªãƒ³ã‚°çŸ©å½¢ã‚’ã‚»ãƒƒãƒˆã§è¨­å®š
 	void SetViewportAndScissor(D3D12_VIEWPORT& viewport);
 
-	// ƒfƒvƒXƒXƒeƒ“ƒVƒ‹ƒrƒ…[‚ğƒNƒŠƒA
+	// ãƒ‡ãƒ—ã‚¹ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒ“ãƒ¥ãƒ¼ã‚’ã‚¯ãƒªã‚¢
 	void ClearDepthStencilView(D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle, float clearValue);
 
-	// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚ÌƒNƒŠƒA
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®ã‚¯ãƒªã‚¢
 	void ClearRenderTargetView(D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle, const float* clearColor);
 
-	// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Æ‚µ‚Äg—p‰Â”\‚É‚È‚é‚Ü‚Å‘Ò‚Â
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ã—ã¦ä½¿ç”¨å¯èƒ½ã«ãªã‚‹ã¾ã§å¾…ã¤
 	void WaitUntilToPossibleSetRenderTarget(ID3D12Resource* renderTarget);
 
-	// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ö‚Ì•`‚«‚İ‘Ò‚¿
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¸ã®æãè¾¼ã¿å¾…ã¡
 	void WaitUntilFinishDrawingToRenderTarget(ID3D12Resource* renderTarget);
 
-	// ƒRƒ}ƒ“ƒhƒŠƒXƒgæ“¾
+	// ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆå–å¾—
 	ID3D12GraphicsCommandList* GetCommandList() { return m_commandList.Get(); }
+
+	D3D12_VIEWPORT GetViewport() const
+	{
+		return m_currentViewport;
+	}
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> m_commandList;
+
+	D3D12_VIEWPORT m_currentViewport{};				//ç¾åœ¨ã®ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆ
 };
 
 #endif // !__GRAHICS_FRAME_BUFFER_MANAGER_H__

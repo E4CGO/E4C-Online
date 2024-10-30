@@ -1,4 +1,4 @@
-//! @file FrameBufferDX12.h
+ï»¿//! @file FrameBufferDX12.h
 //! @note
 
 #ifndef __GRAHICS_FRAME_BUFFERDX12_H__
@@ -10,7 +10,7 @@
 
 //*******************************************************
 // @class FrameBufferDX12
-// @brief ƒŒƒ“ƒ_[ƒ^ƒQƒbƒgì¬
+// @brief ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ã‚²ãƒƒãƒˆä½œæˆ
 // @par   
 //*******************************************************
 class FrameBufferDX12
@@ -19,70 +19,70 @@ public:
 	FrameBufferDX12(ID3D12Device* device, const wchar_t* resourceName[2], UINT wight, UINT height, DXGI_FORMAT rtv_format = DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT dsv_format = DXGI_FORMAT_D32_FLOAT);
 	~FrameBufferDX12();
 
-	// ƒfƒvƒXƒXƒeƒ“ƒVƒ‹ƒoƒbƒtƒ@‚ª‘¶İ‚µ‚Ä‚¢‚é‚©”»’è
+	// ãƒ‡ãƒ—ã‚¹ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒãƒƒãƒ•ã‚¡ãŒå­˜åœ¨ã—ã¦ã„ã‚‹ã‹åˆ¤å®š
 	bool IsExsitDepthStencilBuffer() const
 	{
 		return d3d_dsv_resource;
 	}
 
-	// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚ÌƒNƒŠƒAƒJƒ‰[
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®ã‚¯ãƒªã‚¢ã‚«ãƒ©ãƒ¼
 	const float* GetRTVClearColor() const
 	{
 		return m_rtvClearColor;
 	}
 	
-	// [“xƒXƒeƒ“ƒVƒ‹‚ÌƒNƒŠƒAƒJƒ‰[
+	// æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ã®ã‚¯ãƒªã‚¢ã‚«ãƒ©ãƒ¼
 	float GetDSVClearValue() const
 	{
 		return m_dsvClearValue;
 	}
 
-	// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Æ‚È‚éƒeƒNƒXƒ`ƒƒ‚ğæ“¾
-	FrameBufferTexture& GetRenderTargetTexture()
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ãªã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’å–å¾—
+	FrameBufferTexture* GetRenderTargetTexture()
 	{
-		return m_renderTargetTexture;
+		return m_renderTargetTexture.get();
 	}
 
-	// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚ÌƒtƒH[ƒ}ƒbƒg‚ğæ“¾
-	DXGI_FORMAT GetRTVBufferFormat() const { return m_renderTargetTexture.GetFormat(); }
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’å–å¾—
+	DXGI_FORMAT GetRTVBufferFormat() const { return m_renderTargetTexture->GetFormat(); }
 
-	//ƒeƒNƒXƒ`ƒƒ•æ“¾
-	inline int GetWidth() const { return m_width; }
+	//ãƒ†ã‚¯ã‚¹ãƒãƒ£å¹…å–å¾—
+	inline float GetWidth() const { return m_width; }
 
-	//ƒeƒNƒXƒ`ƒƒ‚Ì‚‚³æ“¾
-	inline int GetHeight() const { return m_height; }
+	//ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®é«˜ã•å–å¾—
+	inline float GetHeight() const { return m_height; }
 
-	// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚ÌƒfƒBƒXƒNƒŠƒvƒ^æ“¾
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿å–å¾—
 	const Descriptor* GetRTVDescriptor() { return rtv_descriptor; }
 
-	// [“xƒXƒeƒ“ƒVƒ‹ƒoƒbƒtƒ@‚ÌƒfƒBƒXƒNƒŠƒvƒ^æ“¾
+	// æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒãƒƒãƒ•ã‚¡ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿å–å¾—
 	const Descriptor* GetDSVDescriptor() { return dsv_descriptor; }
 
 private:
-	// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Æ‚È‚éƒeƒNƒXƒ`ƒƒ‚ğì¬‚·‚é
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ãªã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã™ã‚‹
 	void CreateRenderTargetTexture(ID3D12Device* device, const wchar_t* resourceName, UINT wight, UINT height, DXGI_FORMAT format);
 
-	// [“xƒXƒeƒ“ƒVƒ‹ƒoƒbƒtƒ@‚Æ‚È‚éƒeƒNƒXƒ`ƒƒ‚ğì¬
+	// æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒãƒƒãƒ•ã‚¡ã¨ãªã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆ
 	void CreateDepthStencilTexture(ID3D12Device* device, const wchar_t* resourceName, UINT wight, UINT height, DXGI_FORMAT format);
 
-	// ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ğæ“¾
+	// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã‚’å–å¾—
 	void CreateDescriptorHeap();
 
-	// ƒfƒBƒXƒNƒŠƒvƒ^‚ğì¬‚·‚é
+	// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã‚’ä½œæˆã™ã‚‹
 	void CreateDescriptor(ID3D12Device* device);
 
 private:
-	FrameBufferTexture m_renderTargetTexture;
-	FrameBufferTexture m_depthStencilTexture;
+	std::unique_ptr<FrameBufferTexture> m_renderTargetTexture;
+	std::unique_ptr<FrameBufferTexture> m_depthStencilTexture;
 	Microsoft::WRL::ComPtr<ID3D12Resource> d3d_rtv_resource;
 	Microsoft::WRL::ComPtr<ID3D12Resource> d3d_dsv_resource;
 	const Descriptor* rtv_descriptor = nullptr;
 	const Descriptor* dsv_descriptor = nullptr;
 
-	int m_width  = 0;	//ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Ì•
-	int m_height = 0;	//ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Ì‚‚³
-	float m_rtvClearColor[4] = { 0.2f, 0.2f, 0.2f, 1.0f };	//ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒgƒrƒ…[‚ÌƒNƒŠƒAƒJƒ‰[
-	float m_dsvClearValue = 1.0f;							//DSV‚ÌƒNƒŠƒAƒJƒ‰[
+	float m_width  = 0;	//ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®å¹…
+	float m_height = 0;	//ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®é«˜ã•
+	float m_rtvClearColor[4] = { 0.2f, 0.2f, 0.2f, 1.0f };	//ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆãƒ“ãƒ¥ãƒ¼ã®ã‚¯ãƒªã‚¢ã‚«ãƒ©ãƒ¼
+	float m_dsvClearValue = 1.0f;							//DSVã®ã‚¯ãƒªã‚¢ã‚«ãƒ©ãƒ¼
 };
 
 #endif // !__GRAHICS_FRAME_BUFFERDX12_H__

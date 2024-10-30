@@ -1,4 +1,4 @@
-//! @file GaussianBlurShader.h
+ï»¿//! @file GaussianBlurShader.h
 //! @note
 
 #ifndef __GRAHICS_GAUSSIAN_BLUR_SHADER_H__
@@ -9,7 +9,7 @@
 
 //*******************************************************
 // @class GaussianBlurShader 
-// @brief ƒuƒ‰[
+// @brief ãƒ–ãƒ©ãƒ¼
 // @par   DX11
 //*******************************************************
 class GaussianBlurShader : public SpriteShader
@@ -27,13 +27,13 @@ private:
 	};
 private:
 	void UpdateConstantBuffer(const RenderContext& rc) override;
-	// ƒtƒBƒ‹ƒ^[’lŒvZ
+	// ãƒ•ã‚£ãƒ«ã‚¿ãƒ¼å€¤è¨ˆç®—
 	void CalcGaussianFilter(CBFilter& cbFilter, const GaussianFilterData& gaussianFilterData);
 };
 
 //*******************************************************
 // @class GaussianBlurShaderDX12
-// @brief ƒuƒ‰[
+// @brief ãƒ–ãƒ©ãƒ¼
 // @par   DX12
 //*******************************************************
 class GaussianBlurShaderDX12 : public SpriteShaderDX12

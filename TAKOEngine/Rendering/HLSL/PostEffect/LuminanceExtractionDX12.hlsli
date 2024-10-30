@@ -1,4 +1,4 @@
-// ’¸“_ƒVƒF[ƒ_[o—Íƒf[ƒ^
+ï»¿// é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼å‡ºåŠ›ãƒ‡ãƒ¼ã‚¿
 struct VS_OUT
 {
 	float4 position : SV_POSITION;
@@ -8,8 +8,8 @@ struct VS_OUT
 
 cbuffer CbScene : register(b0)
 {
-    float threshold; // ‚‹P“x’Šo‚Ì‚½‚ß‚Ìè‡’l
-    float intensity; // ƒuƒ‹[ƒ€‚Ì‹­“x
+    float threshold; // é«˜è¼åº¦æŠ½å‡ºã®ãŸã‚ã®é–¾å€¤
+    float intensity; // ãƒ–ãƒ«ãƒ¼ãƒ ã®å¼·åº¦
     float2 dummy;
 };
 

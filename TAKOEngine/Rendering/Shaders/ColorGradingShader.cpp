@@ -1,4 +1,4 @@
-//! @file ColorGradingShader.cpp
+ï»¿//! @file ColorGradingShader.cpp
 //! @note
 
 #include "TAKOEngine/Rendering/Misc.h"
@@ -6,13 +6,13 @@
 #include "ColorGradingShader.h"
 
 //**********************************************************************
-// @brief     ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// @brief     ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 // @param[in] device  ID3D11Device*
-// @return    ‚È‚µ
+// @return    ãªã—
 //**********************************************************************
 ColorGradingShader::ColorGradingShader(ID3D11Device* device) : SpriteShader(device, "Data/Shader/SpriteVS.cso", "Data/Shader/ColorGradingPS.cso")
 {
-	// ƒV[ƒ“—pƒoƒbƒtƒ@
+	// ã‚·ãƒ¼ãƒ³ç”¨ãƒãƒƒãƒ•ã‚¡
 	GpuResourceUtils::CreateConstantBuffer(
 		device,
 		sizeof(CBColorGrading),
@@ -21,9 +21,9 @@ ColorGradingShader::ColorGradingShader(ID3D11Device* device) : SpriteShader(devi
 }
 
 //**********************************************************************
-// @brief     ƒRƒ“ƒXƒ^ƒ“ƒgƒoƒbƒtƒ@XVŠÖ”
-// @param[in] rc  ƒŒƒ“ƒ_[ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-// @return    ‚È‚µ
+// @brief     ã‚³ãƒ³ã‚¹ã‚¿ãƒ³ãƒˆãƒãƒƒãƒ•ã‚¡æ›´æ–°é–¢æ•°
+// @param[in] rc  ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+// @return    ãªã—
 //**********************************************************************
 void ColorGradingShader::UpdateConstantBuffer(const RenderContext& rc)
 {
@@ -35,9 +35,9 @@ void ColorGradingShader::UpdateConstantBuffer(const RenderContext& rc)
 }
 
 //**********************************************************************
-// @brief     ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// @brief     ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 // @param[in] device  ID3D12Device*
-// @return    ‚È‚µ
+// @return    ãªã—
 //**********************************************************************
 ColorGradingShaderDX12::ColorGradingShaderDX12(ID3D12Device* device)
 {
@@ -46,14 +46,14 @@ ColorGradingShaderDX12::ColorGradingShaderDX12(ID3D12Device* device)
 
 	HRESULT hr = S_OK;
 
-	// ƒVƒF[ƒ_[
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 	std::vector<BYTE> vsData, psData;
 	{
 		GpuResourceUtils::LoadShaderFile("Data/Shader/ColorGradingDX12VS.cso", vsData);
 		GpuResourceUtils::LoadShaderFile("Data/Shader/ColorGradingDX12PS.cso", psData);
 	}
 
-	// ƒ‹[ƒgƒVƒOƒlƒNƒ`ƒƒ‚Ì¶¬
+	// ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒã‚¯ãƒãƒ£ã®ç”Ÿæˆ
 	{
 		hr = device->CreateRootSignature(
 			0,
@@ -64,11 +64,11 @@ ColorGradingShaderDX12::ColorGradingShaderDX12(ID3D12Device* device)
 		m_d3d_root_signature->SetName(L"ColorGradingShaderRootSignature");
 	}
 
-	// ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg‚Ì¶¬
+	// ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã®ç”Ÿæˆ
 	{
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC d3d_graphics_pipeline_state_desc = {};
 
-		// ƒ‹[ƒgƒVƒOƒlƒ`ƒƒ
+		// ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒãƒãƒ£
 		d3d_graphics_pipeline_state_desc.pRootSignature = m_d3d_root_signature.Get();
 
 		d3d_graphics_pipeline_state_desc.VS.pShaderBytecode = vsData.data();
@@ -76,7 +76,7 @@ ColorGradingShaderDX12::ColorGradingShaderDX12(ID3D12Device* device)
 		d3d_graphics_pipeline_state_desc.PS.pShaderBytecode = psData.data();
 		d3d_graphics_pipeline_state_desc.PS.BytecodeLength  = psData.size();
 
-		// “ü—ÍƒŒƒCƒAƒEƒg
+		// å…¥åŠ›ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆ
 		D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
@@ -86,16 +86,16 @@ ColorGradingShaderDX12::ColorGradingShaderDX12(ID3D12Device* device)
 		d3d_graphics_pipeline_state_desc.InputLayout.pInputElementDescs = inputElementDescs;
 		d3d_graphics_pipeline_state_desc.InputLayout.NumElements = _countof(inputElementDescs);
 
-		// ƒuƒŒƒ“ƒhƒXƒe[ƒg
+		// ãƒ–ãƒ¬ãƒ³ãƒ‰ã‚¹ãƒ†ãƒ¼ãƒˆ
 		d3d_graphics_pipeline_state_desc.BlendState = renderState->GetBlendState(BlendState::Transparency);
 
-		// [“xƒXƒeƒ“ƒVƒ‹ƒXƒe[ƒg
+		// æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ã‚¹ãƒ†ãƒ¼ãƒˆ
 		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthEnable    = true;
 		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthFunc      = D3D12_COMPARISON_FUNC_ALWAYS;
 		d3d_graphics_pipeline_state_desc.DepthStencilState.StencilEnable  = false;
 
-		// ƒ‰ƒXƒ^ƒ‰ƒCƒU[ƒXƒe[ƒg
+		// ãƒ©ã‚¹ã‚¿ãƒ©ã‚¤ã‚¶ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆ
 		d3d_graphics_pipeline_state_desc.RasterizerState.FillMode              = D3D12_FILL_MODE_SOLID;
 		d3d_graphics_pipeline_state_desc.RasterizerState.CullMode              = D3D12_CULL_MODE_NONE;
 		d3d_graphics_pipeline_state_desc.RasterizerState.FrontCounterClockwise = false;
@@ -108,26 +108,26 @@ ColorGradingShaderDX12::ColorGradingShaderDX12(ID3D12Device* device)
 		d3d_graphics_pipeline_state_desc.RasterizerState.ForcedSampleCount     = 0;
 		d3d_graphics_pipeline_state_desc.RasterizerState.ConservativeRaster    = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
 
-		// ƒvƒŠƒ~ƒeƒBƒuƒgƒ|ƒƒW[
+		// ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–ãƒˆãƒãƒ­ã‚¸ãƒ¼
 		d3d_graphics_pipeline_state_desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
-		// ƒXƒgƒŠƒbƒv‚ÌƒJƒbƒg’l
+		// ã‚¹ãƒˆãƒªãƒƒãƒ—æ™‚ã®ã‚«ãƒƒãƒˆå€¤
 		d3d_graphics_pipeline_state_desc.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
 
-		// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg”
+		// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆæ•°
 		d3d_graphics_pipeline_state_desc.NumRenderTargets = 1;
 		d3d_graphics_pipeline_state_desc.RTVFormats[0] = RenderTargetFormat;
 		d3d_graphics_pipeline_state_desc.DSVFormat     = DepthStencilFormat;
 
-		// ƒ}ƒ‹ƒ`ƒTƒ“ƒvƒŠƒ“ƒO
+		// ãƒãƒ«ãƒã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°
 		d3d_graphics_pipeline_state_desc.SampleDesc.Count = 1;
 		d3d_graphics_pipeline_state_desc.SampleDesc.Quality = 0;
 
-		// ƒAƒ_ƒvƒ^
+		// ã‚¢ãƒ€ãƒ—ã‚¿
 		d3d_graphics_pipeline_state_desc.NodeMask = 0;
 		d3d_graphics_pipeline_state_desc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
-		// ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg¶¬
+		// ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆç”Ÿæˆ
 		hr = device->CreateGraphicsPipelineState(
 			&d3d_graphics_pipeline_state_desc,
 			IID_PPV_ARGS(m_d3d_pipeline_state.GetAddressOf()));
@@ -137,29 +137,29 @@ ColorGradingShaderDX12::ColorGradingShaderDX12(ID3D12Device* device)
 }
 
 //***********************************************************
-// @brief       •`‰æ
-// @param[in]   rc      ƒŒƒ“ƒ_[ƒRƒ“ƒeƒLƒXƒg
-// @param[in]   sprite  •`‰æ‘ÎÛ‚ÌƒXƒvƒ‰ƒCƒgƒf[ƒ^‚ğw‚·ƒ|ƒCƒ“ƒ^
-// @return      ‚È‚µ
+// @brief       æç”»
+// @param[in]   rc      ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆ
+// @param[in]   sprite  æç”»å¯¾è±¡ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãƒ‡ãƒ¼ã‚¿ã‚’æŒ‡ã™ãƒã‚¤ãƒ³ã‚¿
+// @return      ãªã—
 //***********************************************************
 void ColorGradingShaderDX12::Render(const RenderContextDX12& rc, SpriteDX12* sprite)
 {
 	Graphics& graphics = Graphics::Instance();
 	const SpriteDX12::FrameResource& frame_resource = sprite->m_frame_resources.at(graphics.GetCurrentBufferIndex());
 
-	//ƒpƒCƒvƒ‰ƒCƒ“İ’è
+	//ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³è¨­å®š
 	rc.d3d_command_list->SetPipelineState(m_d3d_pipeline_state.Get());
 	rc.d3d_command_list->SetGraphicsRootSignature(m_d3d_root_signature.Get());
 
-	//ƒfƒBƒXƒNƒŠƒvƒ^ƒe[ƒuƒ‹
+	//ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ†ãƒ¼ãƒ–ãƒ«
 	rc.d3d_command_list->SetGraphicsRootDescriptorTable(0, frame_resource.cbv_descriptor->GetGpuHandle());
 	rc.d3d_command_list->SetGraphicsRootDescriptorTable(1, sprite->GetDescriptor()->GetGpuHandle());
 
-	//’¸“_ƒoƒbƒtƒ@
+	//é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡
 	rc.d3d_command_list->IASetVertexBuffers(0, 1, &frame_resource.d3d_vbv);
 	rc.d3d_command_list->IASetIndexBuffer(&frame_resource.d3d_ibv);
 	rc.d3d_command_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	//•`‰æ
+	//æç”»
 	rc.d3d_command_list->DrawIndexedInstanced(sprite->GetSpriteCount() * 6, 1, 0, 0, 0);
 }

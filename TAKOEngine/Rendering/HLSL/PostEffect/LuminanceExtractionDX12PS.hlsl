@@ -1,4 +1,4 @@
-#include "FilterFunctions.hlsli"
+ï»¿#include "FilterFunctions.hlsli"
 #include "LuminanceExtractionDX12.hlsli"
 
 Texture2D texture0 : register(t0);
@@ -8,13 +8,13 @@ float4 main(VS_OUT pin) : SV_TARGET
 {
     float4 color = texture0.Sample(sampler0, pin.texcoord) * pin.color;
 
-	// RGB > ‹P“x’l‚É•ÏŠ·
+	// RGB > è¼åº¦å€¤ã«å¤‰æ›
     float luminance = RGB2Luminance(color.rgb);
     
-	// è‡’l‚Æ‚Ì·‚ðŽZo
+	// é–¾å€¤ã¨ã®å·®ã‚’ç®—å‡º
     float contribution = max(0, luminance - threshold);
 
-	// o—Í‚·‚éF‚ð•â³‚·‚é
+	// å‡ºåŠ›ã™ã‚‹è‰²ã‚’è£œæ­£ã™ã‚‹
     if (luminance > 0)
     {
         contribution /= luminance;

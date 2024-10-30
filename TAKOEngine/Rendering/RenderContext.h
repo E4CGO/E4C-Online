@@ -6,7 +6,6 @@
 
 #include <d3d12.h>
 
-#include "TAKOEngine/Rendering/Descriptor.h"
 #include "TAKOEngine/Editor/Camera/Camera.h"
 #include "TAKOEngine/Rendering/RenderState.h"
 #include "TAKOEngine/Rendering/MyRender.h"
@@ -139,6 +138,13 @@ struct FinalpassnData
 	ID3D11ShaderResourceView* bloomTexture;
 };
 
+// ポストエフェクトの最終パス用情報
+struct FinalpassDataDX12
+{
+	//ブルームテクスチャ
+	const Descriptor* bloomTexture = nullptr;
+};
+
 //影情報
 struct ShadowMapData
 {
@@ -210,6 +216,7 @@ struct RenderContextDX12
 	LuminanceExtractionData	luminanceExtractionData; //	高輝度抽出用情報 
 	GaussianFilterData		gaussianFilterData;		 //	ガウスフィルター情報
 	ColorGradingData		colorGradingData;		 //	色調補正情報
+	FinalpassDataDX12		finalpassnData;			 //	最終パス情報
 };
 
 #endif // !__INCLUDE_RENDER_CONTEXT_H__

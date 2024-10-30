@@ -1,12 +1,12 @@
-//! @file FrameBufferManager.h
+ï»¿//! @file FrameBufferManager.h
 //! @note 
 
 #include "FrameBufferManager.h"
 
 //******************************************************************
-// @class     ‰Šú‰»
-// @param[in] commandList@ƒRƒ}ƒ“ƒhƒŠƒXƒg
-// @return    ‚È‚µ
+// @class     åˆæœŸåŒ–
+// @param[in] commandListã€€ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆ
+// @return    ãªã—
 //****************************************************************** 
 void FrameBufferManager::Init(ID3D12GraphicsCommandList* commandList)
 {
@@ -14,9 +14,9 @@ void FrameBufferManager::Init(ID3D12GraphicsCommandList* commandList)
 }
 
 //******************************************************************
-// @class     ƒRƒ}ƒ“ƒhƒŠƒXƒg‚ğ•Â‚¶‚é
-// @param[in] ‚È‚µ
-// @return    ‚È‚µ
+// @class     ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã‚’é–‰ã˜ã‚‹
+// @param[in] ãªã—
+// @return    ãªã—
 //****************************************************************** 
 void FrameBufferManager::Close()
 {
@@ -24,10 +24,10 @@ void FrameBufferManager::Close()
 }
 
 //******************************************************************
-// @class      ƒRƒ}ƒ“ƒhƒŠƒXƒg‚ğƒŠƒZƒbƒg
+// @class      ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã‚’ãƒªã‚»ãƒƒãƒˆ
 // @param[in] commandAllocator ID3D12CommandAllocator*
 // @param[in] pipelineState    ID3D12PipelineState*
-// @return    ‚È‚µ
+// @return    ãªã—
 //****************************************************************** 
 void FrameBufferManager::Reset(ID3D12CommandAllocator* commandAllocator, ID3D12PipelineState* pipelineState)
 {
@@ -35,31 +35,21 @@ void FrameBufferManager::Reset(ID3D12CommandAllocator* commandAllocator, ID3D12P
 }
 
 //******************************************************************
-// @class     ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒgİ’è
-// @param[in] renderTarget      ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg
-// @return    ‚È‚µ
+// @class     ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆè¨­å®š
+// @param[in] renderTarget      ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ
+// @return    ãªã—
 //****************************************************************** 
 void FrameBufferManager::SetRenderTarget(FrameBufferDX12* renderTarget)
 {
-	// ƒrƒ…[ƒ|[ƒg‚Ìİ’è
-	D3D12_VIEWPORT d3d_viewport;
-	d3d_viewport.TopLeftX = 0;
-	d3d_viewport.TopLeftY = 0;
-	d3d_viewport.Width    = static_cast<float>(renderTarget->GetWidth());
-	d3d_viewport.Height   = static_cast<float>(renderTarget->GetHeight());
-	d3d_viewport.MinDepth = 0.0f;
-	d3d_viewport.MaxDepth = 1.0f;
-	SetViewportAndScissor(d3d_viewport);
-
 	FrameBufferDX12* rtArray[] = { renderTarget };
 	SetRenderTargets(1, rtArray);
 }
 
 //******************************************************************
-// @class     ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒgİ’è
-// @param[in] rtvHandle      ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒgƒnƒ“ƒhƒ‹
-// @param[in] dsvHandle      ƒfƒvƒXƒXƒeƒ“ƒVƒ‹ƒnƒ“ƒhƒ‹
-// @return    ‚È‚µ
+// @class     ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆè¨­å®š
+// @param[in] rtvHandle      ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆãƒãƒ³ãƒ‰ãƒ«
+// @param[in] dsvHandle      ãƒ‡ãƒ—ã‚¹ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒãƒ³ãƒ‰ãƒ«
+// @return    ãªã—
 //****************************************************************** 
 void FrameBufferManager::SetRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle, D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle)
 {
@@ -67,24 +57,24 @@ void FrameBufferManager::SetRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle, 
 }
 
 //******************************************************************
-// @class     •¡”–‡‚ÌƒŒƒ“ƒ_[ƒ^[ƒQƒbƒgİ’è
-// @param[in] numRTV              ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg”
-// @param[in] renderTarget[]      ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ì”z—ñ
-// @return    ‚È‚µ
+// @class     è¤‡æ•°æšã®ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆè¨­å®š
+// @param[in] numRTV              ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆæ•°
+// @param[in] renderTarget[]      ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®é…åˆ—
+// @return    ãªã—
 //******************************************************************
 void FrameBufferManager::SetRenderTargets(UINT numRTV, FrameBufferDX12* renderTarget[])
 {
-	// ƒrƒ…[ƒ|[ƒg‚Ìİ’è
+	// ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆã®è¨­å®š
 	D3D12_VIEWPORT d3d_viewport;
 	d3d_viewport.TopLeftX = 0;
 	d3d_viewport.TopLeftY = 0;
-	d3d_viewport.Width   = static_cast<float>(renderTarget[0]->GetWidth());
-	d3d_viewport.Height  = static_cast<float>(renderTarget[0]->GetHeight());
+	d3d_viewport.Width    = renderTarget[0]->GetWidth();
+	d3d_viewport.Height   = renderTarget[0]->GetHeight();
 	d3d_viewport.MinDepth = 0.0f;
 	d3d_viewport.MaxDepth = 1.0f;
 	SetViewportAndScissor(d3d_viewport);
 
-	D3D12_CPU_DESCRIPTOR_HANDLE rtDSHandleTbl[32]{};
+	D3D12_CPU_DESCRIPTOR_HANDLE rtDSHandleTbl[10]{};
 	for (UINT rtNo = 0; rtNo < numRTV; rtNo++)
 	{
 		rtDSHandleTbl[rtNo] = renderTarget[rtNo]->GetRTVDescriptor()->GetCpuHandle();
@@ -92,21 +82,21 @@ void FrameBufferManager::SetRenderTargets(UINT numRTV, FrameBufferDX12* renderTa
 
 	if (renderTarget[0]->IsExsitDepthStencilBuffer())
 	{
-		// [“xƒoƒbƒtƒ@‚ª‚ ‚é
+		// æ·±åº¦ãƒãƒƒãƒ•ã‚¡ãŒã‚ã‚‹
 		D3D12_CPU_DESCRIPTOR_HANDLE dsDS = renderTarget[0]->GetDSVDescriptor()->GetCpuHandle();
 		m_commandList->OMSetRenderTargets(numRTV, rtDSHandleTbl, FALSE, &dsDS);
 	}
 	else
 	{
-		// [“xƒoƒbƒtƒ@‚ª‚È‚¢
+		// æ·±åº¦ãƒãƒƒãƒ•ã‚¡ãŒãªã„
 		m_commandList->OMSetRenderTargets(numRTV, rtDSHandleTbl, FALSE, nullptr);
 	}
 }
 
 //******************************************************************
-// @class      ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚ÆƒfƒvƒXƒXƒeƒ“ƒVƒ‹ƒrƒ…[‚ğƒNƒŠƒA
-// @param[in]  renderTarget      ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg
-// @return     ‚È‚µ
+// @class      ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ãƒ‡ãƒ—ã‚¹ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒ“ãƒ¥ãƒ¼ã‚’ã‚¯ãƒªã‚¢
+// @param[in]  renderTarget      ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ
+// @return     ãªã—
 //******************************************************************
 void FrameBufferManager::Clear(FrameBufferDX12* renderTarget)
 {
@@ -115,10 +105,10 @@ void FrameBufferManager::Clear(FrameBufferDX12* renderTarget)
 }
 
 //******************************************************************
-// @class     •¡”–‡‚ÌƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚ÆƒfƒvƒXƒXƒeƒ“ƒVƒ‹ƒrƒ…[‚ğƒNƒŠƒA
-// @param[in] numRTV              ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg”
-// @param[in] renderTarget[]      ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ì”z—ñ
-// @return    ‚È‚µ
+// @class     è¤‡æ•°æšã®ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ãƒ‡ãƒ—ã‚¹ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒ“ãƒ¥ãƒ¼ã‚’ã‚¯ãƒªã‚¢
+// @param[in] numRTV              ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆæ•°
+// @param[in] renderTarget[]      ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®é…åˆ—
+// @return    ãªã—
 //******************************************************************
 void FrameBufferManager::Clears(UINT numRTV, FrameBufferDX12* renderTarget[])
 {
@@ -134,20 +124,20 @@ void FrameBufferManager::Clears(UINT numRTV, FrameBufferDX12* renderTarget[])
 }
 
 //******************************************************************
-// @class     ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Æ‚µ‚Äg—p‰Â”\‚É‚È‚é‚Ü‚Å‘Ò‚Â
-// @param[in] renderTarget  ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg
-// @return    ‚È‚µ
+// @class     ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ã—ã¦ä½¿ç”¨å¯èƒ½ã«ãªã‚‹ã¾ã§å¾…ã¤
+// @param[in] renderTarget  ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ
+// @return    ãªã—
 //******************************************************************
 void FrameBufferManager::WaitUntilToPossibleSetRenderTarget(FrameBufferDX12* renderTarget)
 {
-	WaitUntilToPossibleSetRenderTarget(renderTarget->GetRenderTargetTexture().Get());
+	WaitUntilToPossibleSetRenderTarget(renderTarget->GetRenderTargetTexture()->Get());
 }
 
 //******************************************************************
-// @class     •¡”–‡‚ÌƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚ªg—p‰Â”\‚É‚È‚é‚Ü‚Å‘Ò‚Â
-// @param[in] numRTV              ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg”
-// @param[in] renderTarget[]      ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ì”z—ñ
-// @return    ‚È‚µ
+// @class     è¤‡æ•°æšã®ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆãŒä½¿ç”¨å¯èƒ½ã«ãªã‚‹ã¾ã§å¾…ã¤
+// @param[in] numRTV              ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆæ•°
+// @param[in] renderTarget[]      ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®é…åˆ—
+// @return    ãªã—
 //******************************************************************
 void FrameBufferManager::WaitUntilToPossibleSetRenderTargets(UINT numRTV, FrameBufferDX12* renderTarget[])
 {
@@ -158,20 +148,20 @@ void FrameBufferManager::WaitUntilToPossibleSetRenderTargets(UINT numRTV, FrameB
 }
 
 //******************************************************************
-// @class     ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ö‚Ì•`‚«‚İ‘Ò‚¿
-// @param[in] renderTarget  ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg
-// @return    ‚È‚µ
+// @class     ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¸ã®æãè¾¼ã¿å¾…ã¡
+// @param[in] renderTarget  ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ
+// @return    ãªã—
 //******************************************************************
 void FrameBufferManager::WaitUntilFinishDrawingToRenderTarget(FrameBufferDX12* renderTarget)
 {
-	WaitUntilFinishDrawingToRenderTarget(renderTarget->GetRenderTargetTexture().Get());
+	WaitUntilFinishDrawingToRenderTarget(renderTarget->GetRenderTargetTexture()->Get());
 }
 
 //******************************************************************
-// @class     •¡”–‡‚ÌƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ì•`‚«‚İ‘Ò‚¿
-// @param[in] numRTV              ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg”
-// @param[in] renderTarget[]      ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ì”z—ñ
-// @return    ‚È‚µ
+// @class     è¤‡æ•°æšã®ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®æãè¾¼ã¿å¾…ã¡
+// @param[in] numRTV              ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆæ•°
+// @param[in] renderTarget[]      ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®é…åˆ—
+// @return    ãªã—
 //******************************************************************
 void FrameBufferManager::WaitUntilFinishDrawingToRenderTargets(UINT numRTV, FrameBufferDX12* renderTarget[])
 {
@@ -182,10 +172,10 @@ void FrameBufferManager::WaitUntilFinishDrawingToRenderTargets(UINT numRTV, Fram
 }
 
 //******************************************************************
-// @class      ƒfƒvƒXƒXƒeƒ“ƒVƒ‹ƒrƒ…[‚ğƒNƒŠƒA
-// @param[in]  dsvHandle  ƒfƒvƒXƒXƒeƒ“ƒVƒ‹ƒrƒ…[‚ÌCPUƒnƒ“ƒhƒ‹
-// @param[in]  clearValue ƒfƒvƒXƒXƒeƒ“ƒVƒ‹ƒrƒ…[‚ÌƒNƒŠƒAƒJƒ‰[
-// @return     ‚È‚µ
+// @class      ãƒ‡ãƒ—ã‚¹ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒ“ãƒ¥ãƒ¼ã‚’ã‚¯ãƒªã‚¢
+// @param[in]  dsvHandle  ãƒ‡ãƒ—ã‚¹ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒ“ãƒ¥ãƒ¼ã®CPUãƒãƒ³ãƒ‰ãƒ«
+// @param[in]  clearValue ãƒ‡ãƒ—ã‚¹ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒ“ãƒ¥ãƒ¼ã®ã‚¯ãƒªã‚¢ã‚«ãƒ©ãƒ¼
+// @return     ãªã—
 //******************************************************************
 void FrameBufferManager::ClearDepthStencilView(D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle, float clearValue)
 {
@@ -199,10 +189,10 @@ void FrameBufferManager::ClearDepthStencilView(D3D12_CPU_DESCRIPTOR_HANDLE dsvHa
 }
 
 //******************************************************************
-// @class      ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚ğƒNƒŠƒA
-// @param[in]  dsvHandle  ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚ÌCPUƒnƒ“ƒhƒ‹
-// @param[in]  clearValue ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚ÌƒNƒŠƒAƒJƒ‰[
-// @return     ‚È‚µ
+// @class      ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã‚’ã‚¯ãƒªã‚¢
+// @param[in]  dsvHandle  ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®CPUãƒãƒ³ãƒ‰ãƒ«
+// @param[in]  clearValue ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®ã‚¯ãƒªã‚¢ã‚«ãƒ©ãƒ¼
+// @return     ãªã—
 //******************************************************************
 void FrameBufferManager::ClearRenderTargetView(D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle, const float* clearColor)
 {
@@ -210,9 +200,9 @@ void FrameBufferManager::ClearRenderTargetView(D3D12_CPU_DESCRIPTOR_HANDLE rtvHa
 }
 
 //******************************************************************
-// @class     ƒrƒ…[ƒ|[ƒg‚ÆƒVƒUƒŠƒ“ƒO‹éŒ`‚ğƒZƒbƒg‚Åİ’è
-// @param[in] viewport  ƒrƒ…[ƒ|[ƒg
-// @return    ‚È‚µ
+// @class     ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆã¨ã‚·ã‚¶ãƒªãƒ³ã‚°çŸ©å½¢ã‚’ã‚»ãƒƒãƒˆã§è¨­å®š
+// @param[in] viewport  ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆ
+// @return    ãªã—
 //******************************************************************
 void FrameBufferManager::SetViewportAndScissor(D3D12_VIEWPORT& viewport)
 {
@@ -224,16 +214,17 @@ void FrameBufferManager::SetViewportAndScissor(D3D12_VIEWPORT& viewport)
 	m_commandList->RSSetScissorRects(1, &scissorRect);
 
 	m_commandList->RSSetViewports(1, &viewport);
+	m_currentViewport = viewport;
 }
 
 //******************************************************************
-// @class     ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Æ‚µ‚Äg—p‰Â”\‚É‚È‚é‚Ü‚Å‘Ò‚Â
+// @class     ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ã—ã¦ä½¿ç”¨å¯èƒ½ã«ãªã‚‹ã¾ã§å¾…ã¤
 // @param[in] renderTarget  ID3D12Resource*
-// @return    ‚È‚µ
+// @return    ãªã—
 //******************************************************************
 void FrameBufferManager::WaitUntilToPossibleSetRenderTarget(ID3D12Resource* renderTarget)
 {
-	// ó‘Ô‘JˆÚƒoƒŠƒA‚ğ’£‚é
+	// çŠ¶æ…‹é·ç§»ãƒãƒªã‚¢ã‚’å¼µã‚‹
 	D3D12_RESOURCE_BARRIER d3d_resource_barrier{};
 	d3d_resource_barrier.Type  = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	d3d_resource_barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
@@ -246,13 +237,13 @@ void FrameBufferManager::WaitUntilToPossibleSetRenderTarget(ID3D12Resource* rend
 }
 
 //******************************************************************
-// @class     ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ö‚Ì•`‚«‚İ‘Ò‚¿
+// @class     ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¸ã®æãè¾¼ã¿å¾…ã¡
 // @param[in] renderTarget  ID3D12Resource*
-// @return    ‚È‚µ
+// @return    ãªã—
 //******************************************************************
 void FrameBufferManager::WaitUntilFinishDrawingToRenderTarget(ID3D12Resource* renderTarget)
 {
-	// ó‘Ô‘JˆÚƒoƒŠƒA‚ğ’£‚é
+	// çŠ¶æ…‹é·ç§»ãƒãƒªã‚¢ã‚’å¼µã‚‹
 	D3D12_RESOURCE_BARRIER d3d_resource_barrier{};
 	d3d_resource_barrier.Type  = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	d3d_resource_barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;

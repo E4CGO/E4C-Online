@@ -10,26 +10,24 @@
 class FrameBufferTexture
 {
 public:
-	FrameBufferTexture() {};
-	~FrameBufferTexture();
+	FrameBufferTexture() = default;
+	~FrameBufferTexture() = default;
 
 	void InitFromD3DResource(ID3D12Resource* texture);
 
-	// テクスチャのリソースを取得
-	ID3D12Resource* Get()
+	ID3D12Resource* Get() const
 	{
-		return m_texture;
+		return m_texture.Get();
 	}
 
-	// テクスチャのフォーマットを取得
 	DXGI_FORMAT GetFormat() const
 	{
 		return m_textureDesc.Format;
 	}
 
 private:
-	ID3D12Resource*     m_texture = nullptr;  //テクスチャ
-	D3D12_RESOURCE_DESC m_textureDesc = {};        //テクスチャ情報    
+	Microsoft::WRL::ComPtr<ID3D12Resource> m_texture = nullptr;
+	D3D12_RESOURCE_DESC m_textureDesc = {};        
 };
 
 #endif // !__GRAHICS_FRAME_BUFFER_TEXTURE_H__

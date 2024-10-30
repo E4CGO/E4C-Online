@@ -1,4 +1,4 @@
-#include "FilterFunctions.hlsli"
+ï»¿#include "FilterFunctions.hlsli"
 #include "ColorGradingDX12.hlsli"
 
 Texture2D texture0 : register(t0);
@@ -8,19 +8,19 @@ float4 main(VS_OUT pin) : SV_TARGET
 {
     float4 color = texture0.Sample(sampler0, pin.texcoord) * pin.color;
 	
-    // RGB > HSV‚É•ÏŠ·
+    // RGB > HSVã«å¤‰æ›
     color.rgb = RGB2HSV(color.rgb);
 
-	// F‘Š’²®
+	// è‰²ç›¸èª¿æ•´
     color.r += hueShift;
     
-	// Ê“x’²®
+	// å½©åº¦èª¿æ•´
     color.g *= saturation;
 
-	// –¾“x’²®
+	// æ˜åº¦èª¿æ•´
     color.b *= brightness;
 
-	// HSV > RGB‚É•ÏŠ·
+	// HSV > RGBã«å¤‰æ›
     color.rgb = HSV2RGB(color.rgb);
 
     return color;

@@ -1,4 +1,4 @@
-//! @file ColorGradingShader
+ï»¿//! @file ColorGradingShader
 //! @note
 
 #ifndef __GRAHICS_COLOR_GRADING_SHADER_H__
@@ -9,7 +9,7 @@
 
 //***************************************************
 // @class ColorGradingShader
-// @brief F’²•â³
+// @brief è‰²èª¿è£œæ­£
 // @par   DX11
 //***************************************************
 class ColorGradingShader : public SpriteShader
@@ -21,16 +21,16 @@ private:
 private:
 	struct CBColorGrading
 	{
-		float	hueShift;	// F‘Š’²®
-		float	saturation;	// Ê“x’²®
-		float	brightness;	// –¾“x’²®
+		float	hueShift;	// è‰²ç›¸èª¿æ•´
+		float	saturation;	// å½©åº¦èª¿æ•´
+		float	brightness;	// æ˜åº¦èª¿æ•´
 		float	dummy;
 	};
 };
 
 //***************************************************
 // @class ColorGradingShaderDX12
-// @brief F’²•â³
+// @brief è‰²èª¿è£œæ­£
 // @par   DX12
 //***************************************************
 class ColorGradingShaderDX12 : public SpriteShaderDX12

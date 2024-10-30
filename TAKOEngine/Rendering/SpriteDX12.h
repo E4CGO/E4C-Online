@@ -87,7 +87,8 @@ public:
 		float sx, float sy,
 		float sw, float sh,
 		float angle,
-		float r, float g, float b, float a);
+		float r, float g, float b, float a,
+		D3D12_VIEWPORT viewport);
 
 	// 描画終了
 	void End(ID3D12GraphicsCommandList* d3d_command_list);

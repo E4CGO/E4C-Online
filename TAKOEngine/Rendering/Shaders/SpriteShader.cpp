@@ -1,7 +1,16 @@
-#include "SpriteShader.h"
+//! @file SpriteShader.cpp
+//! @note 
 
 #include "TAKOEngine/Rendering/GpuResourceUtils.h"
+#include "SpriteShader.h"
 
+//**********************************************************************
+// @brief     コンストラクタ
+// @param[in] device  ID3D11Device*
+// @param[in] vs      VertexShaderの名前
+// @param[in] ps      PixelShaderの名前
+// @return    なし
+//**********************************************************************
 SpriteShader::SpriteShader(ID3D11Device* device, const char* vs, const char* ps)
 {
 	// ���̓��C�A�E�g
@@ -28,7 +37,11 @@ SpriteShader::SpriteShader(ID3D11Device* device, const char* vs, const char* ps)
 	);
 }
 
-// �`��J�n
+//**********************************************************************
+// @brief     描画開始
+// @param[in] rc  レンダーコンストラクタ
+// @return    なし
+//**********************************************************************
 void SpriteShader::Begin(const RenderContext& rc)
 {
 	rc.deviceContext->VSSetShader(vertexShader.Get(), nullptr, 0);
@@ -58,10 +71,21 @@ void SpriteShader::Begin(const RenderContext& rc)
 	rc.deviceContext->PSSetSamplers(0, _countof(samplerStates), samplerStates);
 }
 
+//**********************************************************************
+// @brief     描画終了
+// @param[in] rc  レンダーコンストラクタ
+// @return    なし
+//**********************************************************************
 void SpriteShader::End(const RenderContext& rc)
 {
 }
 
+//**********************************************************************
+// @brief     描画
+// @param[in] rc  レンダーコンストラクタ
+// @param[in] sprite   描画対象のスプライトデータを指すポインタ
+// @return    なし
+//**********************************************************************
 void SpriteShader::Draw(const RenderContext& rc, const Sprite* sprite)
 {
 	UpdateConstantBuffer(rc);

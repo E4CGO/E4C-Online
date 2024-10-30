@@ -71,6 +71,7 @@ enum class SpriteShaderDX12Id
 	LuminanceExtraction,
 	GaussianBlur,
 	ColorGrading,
+	Finalpass,
 
 	EnumCount
 };
@@ -251,6 +252,12 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCurrentFrameBuffuerDSV() const
 	{
 		return dsv_descriptor->GetCpuHandle();
+	}
+
+	// ビューポートを取得
+	D3D12_VIEWPORT GetViwePort()
+	{
+		return m_viewport;
 	}
 
 private:

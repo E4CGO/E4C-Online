@@ -1,17 +1,25 @@
-#pragma once
+ï»¿//! @file PostprocessingRenderer.h
+//! @note 
+
+#ifndef __GRAHICS_POSTPROCESSING_RENDERER_H__
+#define __GRAHICS_POSTPROCESSING_RENDERER_H__
 
 #include "Graphics.h"
 #include "Sprite.h"
 
-// ƒ|ƒXƒgƒvƒƒZƒX—p‚ÌƒŒƒ“ƒ_ƒ‰[
+//*******************************************************
+// @class PostprocessingRenderer
+// @brief ãƒã‚¹ãƒˆãƒ—ãƒ­ã‚»ã‚¹ç”¨ã®ãƒ¬ãƒ³ãƒ€ãƒ©ãƒ¼
+// @par   DX11 
+//*******************************************************
 class PostprocessingRenderer
 {
-	// ƒuƒ‹[ƒ€î•ñ
+	// ãƒ–ãƒ«ãƒ¼ãƒ æƒ…å ±
 	struct BloomData
 	{
-		//	‚‹P“x’Šo—pî•ñ
+		//	é«˜è¼åº¦æŠ½å‡ºç”¨æƒ…å ±
 		LuminanceExtractionData	luminanceExtractionData;
-		//	ƒKƒEƒXƒuƒ‰[—pî•ñ
+		//	ã‚¬ã‚¦ã‚¹ãƒ–ãƒ©ãƒ¼ç”¨æƒ…å ±
 		GaussianFilterData		gaussianFilterData;
 	};
 
@@ -19,10 +27,10 @@ public:
 	PostprocessingRenderer();
 	~PostprocessingRenderer();
 
-	//	•`‰æ
+	//	æç”»
 	void Render(ID3D11DeviceContext* deviceContext);
 
-	//	ƒfƒoƒbƒOî•ñ‚Ì•\¦
+	//	ãƒ‡ãƒãƒƒã‚°æƒ…å ±ã®è¡¨ç¤º
 	void DrawDebugGUI();
 
 	void SetBloom(const BloomData& bd) {
@@ -33,12 +41,71 @@ public:
 	}
 	void SetColoGrading(const ColorGradingData& cg) { colorGradingData = cg; }
 private:
-	// •`‰æ—pƒXƒvƒ‰ƒCƒg
+	// æç”»ç”¨ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
 	std::unique_ptr<Sprite>			renderSprite;
 
-	// ƒuƒ‹[ƒ€ƒf[ƒ^
+	// ãƒ–ãƒ«ãƒ¼ãƒ ãƒ‡ãƒ¼ã‚¿
 	BloomData						bloomData;
 
-	// F’²•â³ƒf[ƒ^
+	// è‰²èª¿è£œæ­£ãƒ‡ãƒ¼ã‚¿
 	ColorGradingData				colorGradingData;
 };
+
+//*******************************************************
+// @class PostprocessingRenderer
+// @brief ãƒã‚¹ãƒˆãƒ—ãƒ­ã‚»ã‚¹ç”¨ã®ãƒ¬ãƒ³ãƒ€ãƒ©ãƒ¼
+// @par   DX12 
+//*******************************************************
+class PostprocessingRendererDX12
+{
+	// ãƒ–ãƒ«ãƒ¼ãƒ æƒ…å ±
+	struct BloomData
+	{
+		//	é«˜è¼åº¦æŠ½å‡ºç”¨æƒ…å ±
+		LuminanceExtractionData	luminanceExtractionData;
+		
+		//	ã‚¬ã‚¦ã‚¹ãƒ–ãƒ©ãƒ¼ç”¨æƒ…å ±
+		GaussianFilterData		gaussianFilterData;
+	};
+
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£
+	enum class RenderTarget
+	{
+		Luminance,
+		GaussianBlur,
+		Finalpass,
+
+		EnumCount
+	};
+
+public:
+	PostprocessingRendererDX12();
+	~PostprocessingRendererDX12();
+
+	void Render(FrameBufferManager* framBuffer);
+
+	//	ãƒ‡ãƒãƒƒã‚°æƒ…å ±ã®è¡¨ç¤º
+	void DrawDebugGUI();
+
+	void SetBloom(const BloomData& bd) 
+	{
+		bloomData.gaussianFilterData.deviation = bd.gaussianFilterData.deviation;
+		bloomData.gaussianFilterData.kernelSize = bd.gaussianFilterData.kernelSize;
+		bloomData.luminanceExtractionData.intensity = bd.luminanceExtractionData.intensity;
+		bloomData.luminanceExtractionData.threshold = bd.luminanceExtractionData.threshold;
+	}
+	
+	void SetColoGrading(const ColorGradingData& cg) { colorGradingData = cg; }
+
+private:
+	// æç”»ç”¨ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
+	std::unique_ptr<SpriteDX12> 	renderSprite[static_cast<int>(RenderTarget::EnumCount)];
+
+	// ãƒ–ãƒ«ãƒ¼ãƒ ãƒ‡ãƒ¼ã‚¿
+	BloomData						bloomData;
+
+	// è‰²èª¿è£œæ­£ãƒ‡ãƒ¼ã‚¿
+	ColorGradingData				colorGradingData;
+};
+
+#endif // !__GRAHICS_POSTPROCESSING_RENDERER_H__

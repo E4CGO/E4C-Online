@@ -458,6 +458,10 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	}
 	adapter->Release();
 
+	// レンダーステート作成
+	renderState = std::make_unique<RenderState>(device.Get());
+	m_renderStateDX12 = std::make_unique<RenderStateDX12>();
+
 	// フレームバッファ作成
 	frameBuffers[static_cast<int>(FrameBufferId::Display)]      = std::make_unique<FrameBuffer>(device.Get(), swapchain.Get());
 	frameBuffers[static_cast<int>(FrameBufferId::Scene)]        = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight);
@@ -481,10 +485,6 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	dx12_frameBuffers[static_cast<int>(FrameBufferDX12Id::GaussianBlur)] = std::make_unique<FrameBufferDX12>(m_d3d_device.Get(), resourceName3, screenWidth / 2, screenHeight / 2);
 	dx12_frameBuffers[static_cast<int>(FrameBufferDX12Id::Normal)]       = std::make_unique<FrameBufferDX12>(m_d3d_device.Get(), resourceName4, screenWidth, screenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
 	dx12_frameBuffers[static_cast<int>(FrameBufferDX12Id::Position)]     = std::make_unique<FrameBufferDX12>(m_d3d_device.Get(), resourceName5, screenWidth, screenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT);
-
-	// レンダーステート作成
-	renderState = std::make_unique<RenderState>(device.Get());
-	m_renderStateDX12 = std::make_unique<RenderStateDX12>();
 
 	//サンプラーステート作成
 	m_sampler[static_cast<int>(SamplerState::PointWrap)]    = std::make_unique<SamplerManager>(SamplerState::PointWrap);
@@ -528,6 +528,7 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::LuminanceExtraction)] = std::make_unique<LuminanceExtractionShaderDX12>(m_d3d_device.Get());
 	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::GaussianBlur)]        = std::make_unique<GaussianBlurShaderDX12>(m_d3d_device.Get());
 	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::ColorGrading)]        = std::make_unique<ColorGradingShaderDX12>(m_d3d_device.Get());
+	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::Finalpass)]           = std::make_unique<FinalpassShaderDX12>(m_d3d_device.Get());
 
 	// レンダラ
 	debugRenderer = std::make_unique<DebugRenderer>(device.Get());

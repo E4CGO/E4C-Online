@@ -30,6 +30,7 @@ cbuffer CbScene : register(b0)
 #define ROOT_SIG "RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT), \
                   DescriptorTable(CBV(b0), visibility=SHADER_VISIBILITY_PIXEL), \
                   DescriptorTable(SRV(t0), visibility=SHADER_VISIBILITY_PIXEL), \
+                  DescriptorTable(SRV(t1), visibility=SHADER_VISIBILITY_PIXEL), \
                   StaticSampler(s0 ,\
                   filter = FILTER_MIN_MAG_MIP_LINEAR,\
                   addressU = TEXTURE_ADDRESS_CLAMP,\

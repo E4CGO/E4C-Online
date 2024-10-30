@@ -97,8 +97,11 @@ void SceneTitle::Initialize()
 		
 		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/button_agree.png");
 
-		// ルミナステクスチャ
-		//m_sprites[1] = std::make_unique<SpriteDX12>(1, &T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene)->GetRenderTargetTexture());
+		auto renderTargetTexture = T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene)->GetRenderTargetTexture();
+		if (renderTargetTexture != nullptr)
+		{
+			m_sprites[1] = std::make_unique<SpriteDX12>(1, renderTargetTexture);
+		}
 	}
 
 	// 光
@@ -256,43 +259,43 @@ void SceneTitle::RenderDX12()
 		rc.d3d_command_list = m_framBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
-		//スキニング
-		test->UpdateFrameResource(test_transform);
-		m_skinning_pipeline->Compute(rc, test.get());
-
-		m_framBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
-		m_framBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
-		m_framBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
-
-		// モデル描画
-		ModelShaderDX12* shader = T_GRAPHICS.GetModelShaderDX12(ModelShaderDX12Id::ToonInstancing);
-		if (test != nullptr)
+		// 3Dモデル描画
 		{
-			shader->Render(rc, test.get());
+			m_framBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+			m_framBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+			m_framBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+
+			//スキニング
+			test->UpdateFrameResource(test_transform);
+			m_skinning_pipeline->Compute(rc, test.get());
+
+			// モデル描画
+			ModelShaderDX12* shader = T_GRAPHICS.GetModelShaderDX12(ModelShaderDX12Id::ToonInstancing);
+			if (test != nullptr)
+			{
+				shader->Render(rc, test.get());
+			}
+
+			m_framBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 		}
 
-		m_framBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene)); 
-
-		// 画面に表示されるレンダリングターゲットに戻す
-		m_framBuffer->SetRenderTarget(T_GRAPHICS.GetCurrentFrameBuffuerRTV(), T_GRAPHICS.GetCurrentFrameBuffuerDSV());
-
-		//m_framBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance));
-		//m_framBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance));
-		//m_framBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance));
-
-		// スプライト描画
-		SpriteShaderDX12* sprite = T_GRAPHICS.GetSpriteShaderDX12(SpriteShaderDX12Id::LuminanceExtraction);
-		if (m_sprites[0] != nullptr)
+		// ポストエフェクト描画
 		{
-			m_sprites[0]->Begin(rc);
-			m_sprites[0]->Draw(0, 0, 100, 100, 0, 1, 1, 1, 1);
-			sprite->Render(rc, m_sprites[0].get());
+			postprocessingRenderer->Render(m_framBuffer);
 		}
 
-		//m_framBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance));
+		// 2D描画
+		{ 
+			SpriteShaderDX12* sprite = T_GRAPHICS.GetSpriteShaderDX12(SpriteShaderDX12Id::Default);
+			if (m_sprites[0] != nullptr)
+			{
+				m_sprites[0]->Begin(rc);
+				m_sprites[0]->Draw(0, 0, 100, 100, 0, 1, 1, 1, 1);
+				sprite->Render(rc, m_sprites[0].get());
+			}
+		}
 
 		//EFFECTS.GetEffect(EffectManager::EFFECT_IDX::BOMB_EFFECT)->PlayDX12(DirectX::XMFLOAT3(0.f, 0.f, 0.f), 5.0f);
-
 		//EFFECTS.RenderDX12(camera.GetView(), camera.GetProjection());
 
 		// IMGUI描画処理

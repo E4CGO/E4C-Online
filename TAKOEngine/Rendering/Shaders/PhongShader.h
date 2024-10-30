@@ -1,4 +1,4 @@
-//! @file PhongShader.h
+ï»¿//! @file PhongShader.h
 //! @note 
 
 #ifndef __GRAPHICS_PHONG_SHADER_H__
@@ -9,9 +9,9 @@
 
 //*******************************************************
 // @class PhongShader
-// @brief PhongShader‚Ìƒpƒ‰[ƒ[ƒ^İ’èƒNƒ‰ƒX
-// @par   [à–¾]
-// @par   Phong”½Ë•`‰æ
+// @brief PhongShaderã®ãƒ‘ãƒ©ãƒ¼ãƒ¡ãƒ¼ã‚¿è¨­å®šã‚¯ãƒ©ã‚¹
+// @par   [èª¬æ˜]
+// @par   Phongåå°„æç”»
 //*******************************************************
 class PhongShader : public ModelShader
 {
@@ -19,18 +19,18 @@ public:
 	PhongShader(ID3D11Device* device) : ModelShader(device, "Data/Shader/PhongVS.cso", "Data/Shader/PhongPS.cso") {};
 	~PhongShader() override = default;
 private:
-	// ƒŒƒ“ƒ_[ƒXƒe[ƒgİ’è
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆè¨­å®š
 	void SetRenderState(const RenderContext& rc) override;
 	
-	// ƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[İ’è
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼è¨­å®š
 	void SetShaderResourceView(const ModelResource::Mesh& mesh, ID3D11DeviceContext*& dc) override;
 };
 
 //*******************************************************
 // @class PhongShaderDX12
-// @brief PhongShaderDX12‚Ìƒpƒ‰[ƒ[ƒ^İ’èƒNƒ‰ƒX
-// @par   [à–¾]
-// @par   DX12‚É‘Î‰‚µ‚½Phong”½Ë•`‰æ
+// @brief PhongShaderDX12ã®ãƒ‘ãƒ©ãƒ¼ãƒ¡ãƒ¼ã‚¿è¨­å®šã‚¯ãƒ©ã‚¹
+// @par   [èª¬æ˜]
+// @par   DX12ã«å¯¾å¿œã—ãŸPhongåå°„æç”»
 //*******************************************************
 class PhongShaderDX12 : public ModelShaderDX12
 {

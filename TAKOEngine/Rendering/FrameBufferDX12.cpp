@@ -1,4 +1,4 @@
-//! @file FrameBufferDX12.cpp
+ï»¿//! @file FrameBufferDX12.cpp
 //! @note
 
 #include "Misc.h"
@@ -6,53 +6,56 @@
 #include "FrameBufferDX12.h"
 
 //******************************************************************
-// @brief       ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// @brief       ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 // @param[in]   device  ID3D12Device*
-// @param[in]   resourceName[]  ƒŠƒ\[ƒX‚Ì–¼‘O‚Ì”z—ñ@0:ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg, 1:[“xƒXƒeƒ“ƒVƒ‹ƒoƒbƒtƒ@
-// @param[in]   width   ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ì•
-// @param[in]   height  ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ì‚‚³
-// @param[in]   rtv_format  ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒgƒrƒ…[‚ÌƒtƒH[ƒ}ƒbƒg
-// @param[in]   dsv_format  [“xƒXƒeƒ“ƒVƒ‹ƒrƒ…[‚ÌƒtƒH[ƒ}ƒbƒg
-// @return      ‚È‚µ
+// @param[in]   resourceName[]  ãƒªã‚½ãƒ¼ã‚¹ã®åå‰ã®é…åˆ—ã€€0:ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ, 1:æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒãƒƒãƒ•ã‚¡
+// @param[in]   width   ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®å¹…
+// @param[in]   height  ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®é«˜ã•
+// @param[in]   rtv_format  ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆãƒ“ãƒ¥ãƒ¼ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ
+// @param[in]   dsv_format  æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒ“ãƒ¥ãƒ¼ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ
+// @return      ãªã—
 //******************************************************************
 FrameBufferDX12::FrameBufferDX12(ID3D12Device* device, const wchar_t* resourceName[2], UINT wight, UINT height, DXGI_FORMAT rtv_format, DXGI_FORMAT dsv_format)
 {
 	m_width = wight;
 	m_height = height;
 
-	// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Æ‚È‚éƒeƒNƒXƒ`ƒƒ‚ğì¬‚·‚é
+	m_renderTargetTexture = std::make_unique<FrameBufferTexture>();
+	m_depthStencilTexture = std::make_unique<FrameBufferTexture>();
+
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ãªã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã™ã‚‹
 	CreateRenderTargetTexture(device, resourceName[0], wight, height, rtv_format);
 
-	// [“xƒXƒeƒ“ƒVƒ‹ƒoƒbƒtƒ@‚Æ‚È‚éƒeƒNƒXƒ`ƒƒ‚ğì¬
+	// æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒãƒƒãƒ•ã‚¡ã¨ãªã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆ
 	if (dsv_format != DXGI_FORMAT_UNKNOWN)
 	{
 		CreateDepthStencilTexture(device, resourceName[1], wight, height, dsv_format);
 	}
 
-	// ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ğæ“¾
+	// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã‚’å–å¾—
 	CreateDescriptorHeap();
 
-	//  ƒfƒBƒXƒNƒŠƒvƒ^‚ğì¬‚·‚é
+	//  ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã‚’ä½œæˆã™ã‚‹
 	CreateDescriptor(device);
 }
 
 //******************************************************************
-// @class     ƒfƒXƒgƒ‰ƒNƒ^
-// @param[in] ‚È‚µ
-// @return    ‚È‚µ
+// @class     ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+// @param[in] ãªã—
+// @return    ãªã—
 //******************************************************************
 FrameBufferDX12::~FrameBufferDX12()
 {
 }
 
 //******************************************************************
-// @brief       ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Æ‚È‚éƒeƒNƒXƒ`ƒƒ‚ğì¬‚·‚é
+// @brief       ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ãªã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã™ã‚‹
 // @param[in]   device        ID3D12Device*
-// @param[in]   resourceName  ƒŠƒ\[ƒX‚Ì–¼‘O
-// @param[in]   width         ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ì•
-// @param[in]   height        ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ì‚‚³
-// @param[in]   format        ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒgƒrƒ…[‚ÌƒtƒH[ƒ}ƒbƒg
-// @return      ‚È‚µ
+// @param[in]   resourceName  ãƒªã‚½ãƒ¼ã‚¹ã®åå‰
+// @param[in]   width         ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®å¹…
+// @param[in]   height        ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®é«˜ã•
+// @param[in]   format        ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆãƒ“ãƒ¥ãƒ¼ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ
+// @return      ãªã—
 //******************************************************************
 void FrameBufferDX12::CreateRenderTargetTexture(ID3D12Device* device, const wchar_t* resourceName, UINT wight, UINT height, DXGI_FORMAT format)
 {
@@ -93,17 +96,17 @@ void FrameBufferDX12::CreateRenderTargetTexture(ID3D12Device* device, const wcha
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	d3d_rtv_resource->SetName(resourceName);
 	
-	m_renderTargetTexture.InitFromD3DResource(d3d_rtv_resource.Get());
+	m_renderTargetTexture->InitFromD3DResource(d3d_rtv_resource.Get());
 }
 
 //******************************************************************
-// @brief       [“xƒXƒeƒ“ƒVƒ‹ƒoƒbƒtƒ@‚Æ‚È‚éƒeƒNƒXƒ`ƒƒ‚ğì¬
+// @brief       æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒãƒƒãƒ•ã‚¡ã¨ãªã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆ
 // @param[in]   device        ID3D12Device*
-// @param[in]   resourceName  ƒŠƒ\[ƒX‚Ì–¼‘O
-// @param[in]   width         [“xƒXƒeƒ“ƒVƒ‹‚Ì•
-// @param[in]   height        [“xƒXƒeƒ“ƒVƒ‹‚Ì‚‚³
-// @param[in]   format        [“xƒXƒeƒ“ƒVƒ‹ƒrƒ…[‚ÌƒtƒH[ƒ}ƒbƒg
-// @return      ‚È‚µ
+// @param[in]   resourceName  ãƒªã‚½ãƒ¼ã‚¹ã®åå‰
+// @param[in]   width         æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ã®å¹…
+// @param[in]   height        æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ã®é«˜ã•
+// @param[in]   format        æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒ“ãƒ¥ãƒ¼ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ
+// @return      ãªã—
 //******************************************************************
 void FrameBufferDX12::CreateDepthStencilTexture(ID3D12Device* device, const wchar_t* resourceName, UINT wight, UINT height, DXGI_FORMAT format)
 {
@@ -142,13 +145,13 @@ void FrameBufferDX12::CreateDepthStencilTexture(ID3D12Device* device, const wcha
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	d3d_dsv_resource->SetName(resourceName);
 
-	m_depthStencilTexture.InitFromD3DResource(d3d_dsv_resource.Get());
+	m_depthStencilTexture->InitFromD3DResource(d3d_dsv_resource.Get());
 }
 
 //******************************************************************
-// @class     ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ğæ“¾
-// @param[in] ‚È‚µ
-// @return    ‚È‚µ
+// @class     ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã‚’å–å¾—
+// @param[in] ãªã—
+// @return    ãªã—
 //******************************************************************
 void FrameBufferDX12::CreateDescriptorHeap()
 {
@@ -163,13 +166,13 @@ void FrameBufferDX12::CreateDescriptorHeap()
 }
 
 //******************************************************************
-// @class     ƒfƒBƒXƒNƒŠƒvƒ^‚ğì¬‚·‚é
+// @class     ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã‚’ä½œæˆã™ã‚‹
 // @param[in] device  ID3D12Device*
-// @return    ‚È‚µ
+// @return    ãªã—
 //******************************************************************
 void FrameBufferDX12::CreateDescriptor(ID3D12Device* device)
 {
-	device->CreateRenderTargetView(m_renderTargetTexture.Get(), nullptr, rtv_descriptor->GetCpuHandle());
+	device->CreateRenderTargetView(m_renderTargetTexture->Get(), nullptr, rtv_descriptor->GetCpuHandle());
 	
 	if (d3d_dsv_resource)
 	{
