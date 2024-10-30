@@ -38,22 +38,6 @@ void SceneCharacter_E4C::Initialize()
 
 	m_previewCharacters.resize(m_maxCharacters);
 
-	for (size_t i = 0; i < m_maxCharacters; i++)
-	{
-		PlayerCharacterData::CharacterInfo charInfo = {
-		true,			// visible
-		"center",		// save
-		{				//Character
-			i, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-		}
-		};
-
-		m_previewCharacters[i] = std::make_unique<NonPlayerCharacter>(charInfo);
-		m_previewCharacters[i]->SetPosition({ 3.5f * i * -1.f + 3.5f, 0.0f, 5.0f });
-		m_previewCharacters[i]->SetKinematic(true);
-		m_previewCharacters[i]->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::State::Waiting));
-	}
-
 	// 光
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
 	Light* dl = new Light(LightType::Directional);
@@ -68,11 +52,7 @@ void SceneCharacter_E4C::Initialize()
 		0.1f,									// ニアクリップ
 		10000.0f								// ファークリップ
 	);
-	camera.SetLookAt(
-		{ 0, 3.0f, 13.0f },				// 視点
-		{ 0.0f, 0.0, 0.0f },					// 注視点
-		{ 0.036f, 0.999f, -0.035f }				// 上ベクトル
-	);
+
 	cameraController = std::make_unique<FreeCameraController>();
 	cameraController->SyncCameraToController(camera);
 	cameraController->SetEnable(false);
@@ -102,7 +82,8 @@ void SceneCharacter_E4C::Update(float elapsedTime)
 
 	for (auto& it : m_previewCharacters)
 	{
-		it->Update(elapsedTime);
+		if (it != nullptr)
+			it->Update(elapsedTime);
 	}
 
 	stateMachine->Update(elapsedTime);
@@ -110,7 +91,7 @@ void SceneCharacter_E4C::Update(float elapsedTime)
 #ifdef _DEBUG
 	// カメラ更新
 	cameraController->Update();
-	cameraController->SyncContrllerToCamera(camera);
+
 #endif // _DEBUG
 
 	UI.Update(elapsedTime);
@@ -139,8 +120,10 @@ void SceneCharacter_E4C::Render()
 
 	for (auto& it : m_previewCharacters)
 	{
-		if (it->GetMenuVisibility())
-			it->Render(rc);
+		if (it != nullptr) {
+			if (it->GetMenuVisibility())
+				it->Render(rc);
+		}
 	}
 
 	UI.Render(rc);
@@ -149,7 +132,7 @@ void SceneCharacter_E4C::Render()
 
 #ifdef _DEBUG
 	// DebugIMGUI
-	//DrawSceneGUI();
+	DrawSceneGUI();
 	//shadowMapRenderer->DrawDebugGUI();
 #endif // _DEBUG
 }
@@ -187,4 +170,25 @@ void SceneCharacter_E4C::UpdateCurrentModel(int characterNumber, int modelType, 
 
 void SceneCharacter_E4C::DrawSceneGUI()
 {
+	ImVec2 pos = ImGui::GetMainViewport()->Pos;
+	ImGui::SetNextWindowPos(ImVec2(pos.x + 10, pos.y + 10), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+
+	if (ImGui::Begin("Scene##Debug", nullptr, ImGuiWindowFlags_None))
+	{
+		if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			// カメラ
+			DirectX::XMFLOAT3 eye = camera.GetEye();
+			ImGui::DragFloat3("Eye", &eye.x, 0.01f, 100.0f);
+			DirectX::XMFLOAT3 focus = camera.GetFocus();
+			ImGui::DragFloat3("Fcous", &focus.x, 0.01f, 100.0f);
+			DirectX::XMFLOAT3 up = camera.GetUp();
+			ImGui::DragFloat3("Up", &up.x, 0.01f, 100.0f);
+
+			camera.SetLookAt(eye, focus, up);
+			cameraController->SyncCameraToController(camera);
+		}
+	}
+	ImGui::End();
 }

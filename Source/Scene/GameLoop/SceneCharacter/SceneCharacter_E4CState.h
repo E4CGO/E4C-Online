@@ -58,6 +58,8 @@ namespace SceneCharacter_E4CState
 		void Execute(float elapsedTime) override;
 		// ステートから出ていくときのメソッド
 		void Exit() override;
+
+		bool clicked = false;
 	};
 
 	// ログインステート
@@ -74,6 +76,8 @@ namespace SceneCharacter_E4CState
 		void Execute(float elapsedTime) override;
 		// ステートから出ていくときのメソッド
 		void Exit() override;
+
+		bool clicked = false;
 	};
 
 	// ログインステート
@@ -90,6 +94,8 @@ namespace SceneCharacter_E4CState
 		void Execute(float elapsedTime) override;
 		// ステートから出ていくときのメソッド
 		void Exit() override;
+
+		bool clicked = false;
 	};
 
 	// タイトルステート

@@ -62,6 +62,7 @@ void SceneTitle_E4CState::StartState::Exit()
 // タイトルステート
 void SceneTitle_E4CState::ExitState::Enter()
 {
+	PostMessage(TentacleLib::hWnd, WM_QUIT, 0, 0);
 }
 void SceneTitle_E4CState::ExitState::Execute(float elapsedTime)
 {

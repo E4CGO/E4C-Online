@@ -6,6 +6,8 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
+
 #include "TAKOEngine/Tool/Singleton.h"
 #include "json.hpp"
 #include "PlayerCharacterPattern.h"
@@ -46,6 +48,8 @@ public:
 		bool visible = false;
 
 		std::string save = "";
+
+		int GetGender() { return this->Character.pattern[APPEARANCE_PATTERN::GENDER]; }
 
 		struct Character
 		{
@@ -102,14 +106,88 @@ public:
 				json_array[i]["Visible"],
 				json_array[i]["Save"],
 				{
-					json_array[i]["Character"]["GenderType"],
-					json_array[i]["Character"]["HeadType"],
-					json_array[i]["Character"]["BodyType"],
-					json_array[i]["Character"]["WeaponType"],
+					json_array[i]["Character"]["GENDER"],
+					json_array[i]["Character"]["HAIR"],
+					json_array[i]["Character"]["HAIR_COLOR"],
+					json_array[i]["Character"]["EYE_COLOR"],
+					json_array[i]["Character"]["SKIN_COLOR"],
+					json_array[i]["Character"]["TOP"],
+					json_array[i]["Character"]["TOP_COLOR"],
+					json_array[i]["Character"]["BOTTOM"],
+					json_array[i]["Character"]["BOTTOM_COLOR"],
+					json_array[i]["Character"]["ARM_GEAR"],
+					json_array[i]["Character"]["ARM_GEAR_COLOR"],
+					json_array[i]["Character"]["LEFT_HAND_EQUIPMENT"],
+					json_array[i]["Character"]["RIGHT_HAND_EQUIPMENT"],
 				}
 			};
 		}
 	}
+
+	void ToJson(nlohmann::json& j, CharacterInfo charInfo)
+	{
+		j = nlohmann::json{
+		{"Character", {
+			{"ARM_GEAR",				charInfo.Character.pattern[GENDER]},
+			{"ARM_GEAR_COLOR",			charInfo.Character.pattern[HAIR]},
+			{"BOTTOM",					charInfo.Character.pattern[HAIR_COLOR]},
+			{"BOTTOM_COLOR",			charInfo.Character.pattern[EYE_COLOR]},
+			{"EYE_COLOR",				charInfo.Character.pattern[SKIN_COLOR]},
+			{"GENDER",					charInfo.Character.pattern[TOP]},
+			{"HAIR",					charInfo.Character.pattern[TOP_COLOR]},
+			{"HAIR_COLOR",				charInfo.Character.pattern[BOTTOM]},
+			{"LEFT_HAND_EQUIPMENT",		charInfo.Character.pattern[BOTTOM_COLOR]},
+			{"RIGHT_HAND_EQUIPMENT",	charInfo.Character.pattern[ARM_GEAR]},
+			{"SKIN_COLOR",				charInfo.Character.pattern[ARM_GEAR_COLOR]},
+			{"TOP",						charInfo.Character.pattern[LEFT_HAND_EQUIPMENT]},
+			{"TOP_COLOR",				charInfo.Character.pattern[RIGHT_HAND_EQUIPMENT]}
+		}},
+		{"Save", charInfo.save},
+		{"Visible", charInfo.visible}
+		};
+	}
+
+	void SaveData()
+	{
+		nlohmann::json newSave;
+		newSave[0]["Characters"];
+
+		for (auto& it : m_CharaterInfosData)
+		{
+			nlohmann::json newChara;
+
+			if (it.save == "")
+			{
+				CharacterInfo charInfo = {
+				false,			// visible
+				"",				// save
+				{				//Character
+					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+				}
+				};
+
+				ToJson(newChara, charInfo);
+
+				newSave[0]["Characters"].push_back(newChara);
+			}
+			else
+			{
+				CharacterInfo charInfo = it;
+
+				ToJson(newChara, charInfo);
+
+				newSave[0]["Characters"].push_back(newChara);
+			}
+		}
+
+		std::ofstream file_out("CharacterInfos.json");
+		if (file_out.is_open()) {
+			file_out.clear();
+			file_out << newSave[0].dump(4); //スペース
+			file_out.close();
+		}
+	}
+
 	// 外見パターンをクリア
 	void ClearAppearancePatterns();
 

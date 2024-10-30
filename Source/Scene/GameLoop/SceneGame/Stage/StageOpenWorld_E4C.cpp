@@ -25,7 +25,7 @@ void StageOpenWorld_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
 
-	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
+	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.025f);
 	stage_collision->Update(0);
 	MAPTILES.Register(stage_collision);
 
@@ -187,7 +187,7 @@ void StageOpenWorld_E4C::Render()
 		float scale_factor = 1.0f;
 
 		DirectX::XMMATRIX C{ DirectX::XMLoadFloat4x4(&coordinate_system_transforms[0]) * DirectX::XMMatrixScaling(scale_factor, scale_factor, scale_factor) };
-		DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(1.0, 1.0f, 1.0f) };
+		DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(2.5, 2.5f, 2.5f) };
 		DirectX::XMMATRIX R{ DirectX::XMMatrixRotationRollPitchYaw(0.0f, 0.0f, 0.0f) };
 		DirectX::XMMATRIX T{ DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f) };
 
@@ -218,9 +218,13 @@ void StageOpenWorld_E4C::Render()
 		map->render(rc, world, animated_nodes);
 	}
 
-	teleporter->Render(rc);
-	plane->Render(rc);
+	//teleporter->Render(rc);
+	//plane->Render(rc);
 	portal->Render(rc);
+
+	testModel->Render(rc);
+
+	//MAPTILES.Render(rc);
 }
 
 void StageOpenWorld_E4C::OnPhase()

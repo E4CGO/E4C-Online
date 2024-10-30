@@ -44,6 +44,8 @@ private:
 
 	MapTile* stage_collision = nullptr;
 
+	std::unique_ptr<ModelObject> testModel;
+
 	std::unique_ptr <Teleporter> teleporter;
 	std::unique_ptr <Plane> plane;
 	std::unique_ptr <Plane> portal;
