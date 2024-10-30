@@ -5,7 +5,7 @@
 
 #include "GameObject/ModelObject.h"
 #include "GameObject/GameObject.h"
-#include "GameObject/Character/Player/Barbarian.h"
+#include "GameObject/Character/Player/PlayerCharacter.h"
 #include "GameObject/Props/Teleporter.h"
 #include "TAKOEngine/Rendering/Shaders/PlaneShader.h"
 
@@ -42,7 +42,7 @@ private:
 
 	MapTile* stage_collision;
 
-	std::unique_ptr<Player> player;
+	std::unique_ptr<PlayerCharacter> player;
 
 	std::unique_ptr <Teleporter> teleporter;
 	std::unique_ptr <Plane> plane;

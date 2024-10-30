@@ -1,98 +1,134 @@
-#include "Player.h"
+#include "PlayerCharacter.h"
 
 #include <profiler.h>
 #include <iostream>
 
-#include "TAKOEngine/Physics/SphereCollider.h"
 #include "TAKOEngine/Physics/CollisionDataManager.h"
 #include "TAKOEngine/Effects/EffectManager.h"
 #include "TAKOEngine/Editor/Camera/Camera.h"
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
-#include "TAKOEngine/Editor/Camera/CameraManager.h"
 
-#include "GameObject/Character/Player/PlayerState.h"
+#include "GameObject/Character/Player/PlayerCharacterState.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
-
-#include "Map\MapTileManager.h"
 
 #include "GameData.h"
 
-Player::Player(const char* filename, float scaling) : Character(filename, scaling)
+PlayerCharacter::PlayerCharacter(uint64_t id, const char* name, uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]) : Character()
 {
 	moveSpeed = 10.0f;
 	turnSpeed = DirectX::XMConvertToRadians(720);
 	jumpSpeed = 20.0f;
 	dodgeSpeed = 20.0f;
 
-	stateMachine = new StateMachine<Player>;
+	stateMachine = new StateMachine<PlayerCharacter>;
 	RegisterCommonState();
 	stateMachine->SetState(static_cast<int>(State::Waiting));
 
 	mpCost[static_cast<int>(State::Dodge)] = 20.0f;
 
-	// Õ“Ë”»’è
+	// è¡çªåˆ¤å®š
 	SetCollider(Collider::COLLIDER_TYPE::SPHERE);
+
+	m_client_id = id;
+	this->name = name;
+
+	LoadAppearance(appearance);
 }
 
-Player::~Player()
+PlayerCharacter::PlayerCharacter(PlayerCharacterData::CharacterInfo dataInfo) : Character()
+{
+	moveSpeed = 10.0f;
+	turnSpeed = DirectX::XMConvertToRadians(720);
+	jumpSpeed = 20.0f;
+	dodgeSpeed = 20.0f;
+
+	m_menuVisible = dataInfo.visible;
+	std::string m_SaveFile = dataInfo.save;
+
+	stateMachine = new StateMachine<PlayerCharacter>;
+	RegisterCommonState();
+	stateMachine->SetState(static_cast<int>(State::Waiting));
+
+	mpCost[static_cast<int>(State::Dodge)] = 20.0f;
+
+	// è¡çªåˆ¤å®š
+	SetCollider(Collider::COLLIDER_TYPE::SPHERE);
+
+	LoadAppearance(dataInfo.Character.pattern);
+}
+
+/**************************************************************************//**
+	@brief		å¤–è¦‹ãƒ‘ã‚¿ãƒ¼ãƒ³ã‚’èª­ã¿å–ã‚‹
+	@param[in]	appearance
+	@return		ãªã—
+*//***************************************************************************/
+void PlayerCharacter::LoadAppearance(uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM])
+{
+	ModelObject::CleanModels();
+
+	for (uint8_t i = 0; i < PlayerCharacterData::APPEARANCE_PATTERN::NUM; i++)
+	{
+		PlayerCharacterData::Instance().LoadAppearance(reinterpret_cast<Player*>(this), i, appearance[i]);
+	}
+
+	stateMachine->SetState(static_cast<int>(State::Waiting));
+}
+
+PlayerCharacter::~PlayerCharacter()
 {
 	delete stateMachine;
 
-	for (const std::pair<int, Collider*>& collider : attackColliders)
+	for (const std::pair<int, Collider*>& collider : m_pattackColliders)
 	{
 		delete collider.second;
 	}
-	attackColliders.clear();
+	m_pattackColliders.clear();
 }
 
-void Player::RegisterCommonState()
+void PlayerCharacter::RegisterCommonState()
 {
-	stateMachine->RegisterState(static_cast<int>(State::Idle), new PlayerState::IdleState(this));
-	stateMachine->RegisterState(static_cast<int>(State::Move), new PlayerState::MoveState(this));
-	stateMachine->RegisterState(static_cast<int>(State::Jump), new PlayerState::JumpState(this));
-	stateMachine->RegisterState(static_cast<int>(State::Fall), new PlayerState::FallState(this));
-	stateMachine->RegisterState(static_cast<int>(State::Land), new PlayerState::LandState(this));
-	stateMachine->RegisterState(static_cast<int>(State::Dodge), new PlayerState::DodgeState(this));
-	stateMachine->RegisterState(static_cast<int>(State::Hurt), new PlayerState::HurtState(this));
-	stateMachine->RegisterState(static_cast<int>(State::Death), new PlayerState::DeathState(this));
-	stateMachine->RegisterState(static_cast<int>(State::Waiting), new PlayerState::WaitState(this));
-	stateMachine->RegisterState(static_cast<int>(State::Ready), new PlayerState::ReadyState(this));
+	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Idle), new PlayerCharacterState::IdleState(this));
+	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Move), new PlayerCharacterState::MoveState(this));
+	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Jump), new PlayerCharacterState::JumpState(this));
+	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Fall), new PlayerCharacterState::FallState(this));
+	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Land), new PlayerCharacterState::LandState(this));
+	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Dodge), new PlayerCharacterState::DodgeState(this));
+	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Hurt), new PlayerCharacterState::HurtState(this));
+	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Death), new PlayerCharacterState::DeathState(this));
+	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Waiting), new PlayerCharacterState::WaitState(this));
+	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Ready), new PlayerCharacterState::ReadyState(this));
 }
 
-void Player::UpdateTarget()
+void PlayerCharacter::UpdateTarget()
 {
-	// ƒŒƒC‚ÌŠJnˆÊ’u‚Í‘«Œ³‚æ‚è­‚µã
-	DirectX::XMFLOAT3 start = CameraManager::Instance().GetCamera()->GetEye();
-	// ƒŒƒC‚ÌI“_ˆÊ’u‚ÍˆÚ“®Œã‚ÌˆÊ’u
-	DirectX::XMFLOAT3 end = CameraManager::Instance().GetCamera()->GetFront() * 100.0f + start;
-	// ƒŒƒCƒLƒƒƒXƒg‚É‚æ‚é’n–Ê”»’è
+	// ãƒ¬ã‚¤ã®é–‹å§‹ä½ç½®ã¯è¶³å…ƒã‚ˆã‚Šå°‘ã—ä¸Š
+	DirectX::XMFLOAT3 start = Camera::Instance().GetEye();
+	// ãƒ¬ã‚¤ã®çµ‚ç‚¹ä½ç½®ã¯ç§»å‹•å¾Œã®ä½ç½®
+	DirectX::XMFLOAT3 end = Camera::Instance().GetFront() * 100.0f + start;
+	// ãƒ¬ã‚¤ã‚­ãƒ£ã‚¹ãƒˆã«ã‚ˆã‚‹åœ°é¢åˆ¤å®š
 	HitResult hit;
 	if (ENEMIES.RayCast(start, end, hit))
 	{
 		target = hit.position;
 	}
-	//else if (MAPTILES.RayCast(start, end, hit))
-	//{
-	//	target = hit.position;
-	//}
 	else
 	{
 		target = end;
 	}
 }
 
-void Player::UpdateColliders()
+void PlayerCharacter::UpdateColliders()
 {
 	collider->SetPosition(position + DirectX::XMFLOAT3{ 0, height * 0.5f, 0 } *scale);
 	collider->SetScale(DirectX::XMFLOAT3{ height * 0.3f, height * 0.3f, height * 0.3f } *scale);
 }
 
-bool  Player::CollisionVsEnemies(Collider* collider, int damage, bool power, float force, int effectIdx, float effectScale)
+bool  PlayerCharacter::CollisionVsEnemies(Collider* collider, int damage, bool power, float force, int effectIdx, float effectScale)
 {
 	bool isHit = false;
 	for (Enemy*& enemy : ENEMIES.GetAll())
 	{
-		if (enemy->GetHurtCoolTime() > 0.0f) continue; // –³“GŠÔ
+		if (enemy->GetHurtCoolTime() > 0.0f) continue; // ç„¡æ•µæ™‚é–“
 		for (std::pair<int, Collider*>enemyCollider : enemy->GetColliders())
 		{
 			HitResult hit;
@@ -114,14 +150,14 @@ bool  Player::CollisionVsEnemies(Collider* collider, int damage, bool power, flo
 	return isHit;
 }
 
-void Player::UpdateInput()
+void PlayerCharacter::UpdateInput()
 {
 	float ax = 0.0f;
 	float ay = 0.0f;
-	inputDirection = {}; // ƒ[ƒ
+	inputDirection = {}; // ã‚¼ãƒ­
 	if (GAME_SETTING.KeyboardInput)
 	{
-		// ƒL[ƒ{[ƒh
+		// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰
 		if (T_INPUT.KeyPress('W')) input |= Input_Up;
 		if (T_INPUT.KeyPress('S')) input |= Input_Down;
 		if ((input & (Input_Up | Input_Down)) == (Input_Up | Input_Down))
@@ -172,7 +208,7 @@ void Player::UpdateInput()
 		if (T_INPUT.KeyUp('3')) input |= Input_R_Skill_3;
 		if (T_INPUT.KeyUp('4')) input |= Input_R_Skill_4;
 
-		// “ü—Í‚É‚æ‚éˆÚ“®—ÊŒvZ
+		// å…¥åŠ›ã«ã‚ˆã‚‹ç§»å‹•é‡è¨ˆç®—
 		if (input & Input_Left) ax -= 1.0f;
 		if (input & Input_Right) ax += 1.0f;
 		if (input & Input_Up) ay += 1.0f;
@@ -180,7 +216,7 @@ void Player::UpdateInput()
 	}
 	else
 	{
-		// ƒQ[ƒ€ƒpƒbƒh
+		// ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰
 		if (T_INPUT.GamePadKeyDown(GAME_PAD_BTN::A)) input |= Input_Jump;
 		if (T_INPUT.GamePadKeyDown(GAME_PAD_BTN::B) && mp >= GetMpCost(static_cast<int>(State::Dodge))) input |= Input_Dodge;
 
@@ -217,31 +253,32 @@ void Player::UpdateInput()
 		if (T_INPUT.GamePadKeyUp(GAME_PAD_BTN::RSHOULDER)) input |= Input_R_Skill_2;
 		if (T_INPUT.GamePadKeyUp(GAME_PAD_BTN::RTRIGGER)) input |= Input_R_Skill_3;
 		if (T_INPUT.GamePadKeyUp(GAME_PAD_BTN::Y)) input |= Input_R_Skill_4;
-		//ˆÚ“®—ÊŒvZ
+		//ç§»å‹•é‡è¨ˆç®—
 		ax = T_INPUT.GetGamePadLAxis().x;
 		ay = T_INPUT.GetGamePadLAxis().y;
 	}
 
-	// ƒJƒƒ‰•ûŒü‚ÆƒXƒeƒBƒbƒN‚Ì“ü—Í’l‚É‚æ‚Á‚Äis•ûŒü‚ğŒvZ‚·‚é
-	const DirectX::XMFLOAT3& cameraRight = CameraManager::Instance().GetCamera()->GetRight();
-	const DirectX::XMFLOAT3& cameraFront = CameraManager::Instance().GetCamera()->GetFront();
+	// ã‚«ãƒ¡ãƒ©æ–¹å‘ã¨ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®å…¥åŠ›å€¤ã«ã‚ˆã£ã¦é€²è¡Œæ–¹å‘ã‚’è¨ˆç®—ã™ã‚‹
+	Camera& camera = Camera::Instance();
+	const DirectX::XMFLOAT3& cameraRight = camera.GetRight();
+	const DirectX::XMFLOAT3& cameraFront = camera.GetFront();
 
-	// ˆÚ“®ƒxƒNƒgƒ‹‚ÍXZ•½–Ê‚É…•½‚ÈƒxƒNƒgƒ‹‚É‚È‚é‚æ‚¤‚É‚·‚é
-	// ƒJƒƒ‰‰E•ûŒüƒxƒNƒgƒ‹‚ğXZ’PˆÊƒxƒNƒgƒ‹‚É•ÏŠ·
+	// ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«ã¯XZå¹³é¢ã«æ°´å¹³ãªãƒ™ã‚¯ãƒˆãƒ«ã«ãªã‚‹ã‚ˆã†ã«ã™ã‚‹
+	// ã‚«ãƒ¡ãƒ©å³æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã‚’XZå˜ä½ãƒ™ã‚¯ãƒˆãƒ«ã«å¤‰æ›
 	float cameraRightX = cameraRight.x;
 	float cameraRightZ = cameraRight.z;
 	float cameraRightLength = sqrtf(cameraRightX * cameraRightX + cameraRightZ * cameraRightZ);
 	if (cameraRightLength > 0.0f) {
-		// ’PˆÊƒxƒNƒgƒ‹‰»
+		// å˜ä½ãƒ™ã‚¯ãƒˆãƒ«åŒ–
 		cameraRightX /= cameraRightLength;
 		cameraRightZ /= cameraRightLength;
 	}
-	// ƒJƒƒ‰‘O•ûŒüƒxƒNƒgƒ‹‚ğXZ’PˆÊƒxƒNƒgƒ‹‚É•ÏŠ·
+	// ã‚«ãƒ¡ãƒ©å‰æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã‚’XZå˜ä½ãƒ™ã‚¯ãƒˆãƒ«ã«å¤‰æ›
 	float cameraFrontX = cameraFront.x;
 	float cameraFrontZ = cameraFront.z;
 	float cameraFrontLength = sqrtf(cameraFrontX * cameraFrontX + cameraFrontZ * cameraFrontZ);
 	if (cameraFrontLength > 0.0f) {
-		// ’PˆÊƒxƒNƒgƒ‹‰»
+		// å˜ä½ãƒ™ã‚¯ãƒˆãƒ«åŒ–
 		cameraFrontX /= cameraFrontLength;
 		cameraFrontZ /= cameraFrontLength;
 	}
@@ -251,44 +288,44 @@ void Player::UpdateInput()
 }
 
 /*
-* “ü—Í•ûŒüæ“¾
-* “ü—Í‚È‚µFƒLƒƒƒ‰‚ÌŒü‚«
+* å…¥åŠ›æ–¹å‘å–å¾—
+* å…¥åŠ›ãªã—ï¼šã‚­ãƒ£ãƒ©ã®å‘ã
 */
-DirectX::XMFLOAT2 Player::GetInputDirection()
+DirectX::XMFLOAT2 PlayerCharacter::GetInputDirection()
 {
 	DirectX::XMFLOAT2 direction = {};
-	if (inputDirection.x == 0 && inputDirection.y == 0) // •ûŒü“ü—Í‚È‚µ
+	if (inputDirection.x == 0 && inputDirection.y == 0) // æ–¹å‘å…¥åŠ›ãªã—
 	{
-		// ƒLƒƒƒ‰Œü‚«ˆË‘¶
+		// ã‚­ãƒ£ãƒ©å‘ãä¾å­˜
 		direction.x = sinf(angle.y);
 		direction.y = cosf(angle.y);
 	}
 	else
 	{
-		// “ü—ÍˆË‘¶
+		// å…¥åŠ›ä¾å­˜
 		direction.x = inputDirection.x;
 		direction.y = inputDirection.y;
 	}
 	return direction;
 }
 
-// ƒXƒLƒ‹ƒN[ƒ‹ƒ^ƒCƒ€ŠÇ—
-float Player::GetSkillTimerTime(int idx)
+// ã‚¹ã‚­ãƒ«ã‚¯ãƒ¼ãƒ«ã‚¿ã‚¤ãƒ ç®¡ç†
+float PlayerCharacter::GetSkillTimerTime(int idx)
 {
-	if (skillTimer.find(idx) == skillTimer.end()) return 0.0f; // ƒfƒtƒHƒ‹ƒg
+	if (skillTimer.find(idx) == skillTimer.end()) return 0.0f; // ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ
 	return skillTimer[idx].currentTimer;
 }
-float Player::GetSkillTimerRate(int idx)
+float PlayerCharacter::GetSkillTimerRate(int idx)
 {
-	if (skillTimer.find(idx) == skillTimer.end()) return 0.0f; // ƒfƒtƒHƒ‹ƒg
+	if (skillTimer.find(idx) == skillTimer.end()) return 0.0f; // ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ
 	return skillTimer[idx].currentTimer / skillTimer[idx].time;
 }
-void Player::ResetSkillTimer(int idx)
+void PlayerCharacter::ResetSkillTimer(int idx)
 {
 	if (skillTimer.find(idx) == skillTimer.end()) return;
 	skillTimer[idx].currentTimer = skillTimer[idx].time;
 }
-void Player::UpdateSkillTimers(float elapsedTime)
+void PlayerCharacter::UpdateSkillTimers(float elapsedTime)
 {
 	for (std::pair<int, SkillTimer> timer : skillTimer)
 	{
@@ -297,11 +334,11 @@ void Player::UpdateSkillTimers(float elapsedTime)
 	}
 }
 
-void Player::Update(float elapsedTime)
+void PlayerCharacter::Update(float elapsedTime)
 {
 	{
 		ProfileScopedSection_2("input", ImGuiControl::Profiler::Red);
-		if (IsPlayer()) // ©‹@ŒÀ’è ƒXƒe[ƒgŠÇ—
+		if (IsPlayer()) // è‡ªæ©Ÿé™å®š ã‚¹ãƒ†ãƒ¼ãƒˆç®¡ç†
 		{
 			input = 0;
 			UpdateTarget();
@@ -322,21 +359,21 @@ void Player::Update(float elapsedTime)
 	}
 }
 
-void Player::Render(const RenderContext& rc)
+void PlayerCharacter::Render(const RenderContext& rc)
 {
 	Character::Render(rc);
 
-	DirectX::XMFLOAT3 front = rc.camera->GetFront();
-	DirectX::XMFLOAT3 eye = rc.camera->GetEye();
+	DirectX::XMFLOAT3 front = Camera::Instance().GetFront();
+	DirectX::XMFLOAT3 eye = Camera::Instance().GetEye();
 	DirectX::XMFLOAT3 namePos = this->position + DirectX::XMFLOAT3{ 0, 2.2f, 0 };
 	float dot = XMFLOAT3Dot(front, namePos - eye);
 	if (dot < 0.0f) return;
 
-	// –¼‘O•\¦
+	// åå‰è¡¨ç¤º
 	DirectX::XMFLOAT3 pos = T_GRAPHICS.GetScreenPosition(namePos);
 	T_TEXT.Render(
 		FONT_ID::HGpop,
-		name,
+		name.c_str(),
 		pos.x, pos.y,
 		1.0f, 1.0f, 1.0f, 1.0f,
 		0.0f,
@@ -347,9 +384,9 @@ void Player::Render(const RenderContext& rc)
 
 #ifdef _DEBUG
 	collider->DrawDebugPrimitive({ 1, 1, 1, 1 });
-	if (client_id == GAME_DATA.GetClientId())
+	if (IsPlayer())
 	{
-		for (const std::pair<int, Collider*>& attackCollider : attackColliders)
+		for (const std::pair<int, Collider*>& attackCollider : m_pattackColliders)
 		{
 			DirectX::XMFLOAT4 color = { 1, 0, 0, 1 };
 			HitResult hit;
@@ -373,7 +410,7 @@ void Player::Render(const RenderContext& rc)
 #endif // _DEBUG
 }
 
-void Player::OnDamage(const HitResult& hit, int damage)
+void PlayerCharacter::OnDamage(const HitResult& hit, int damage)
 {
 	if (hurtCoolTime > 0.0f) return;
 	hp -= damage;
@@ -395,16 +432,16 @@ void Player::OnDamage(const HitResult& hit, int damage)
 	}
 }
 
-void Player::InputMove(float elapsedTime) {
-	if (inputDirection.x == 0 && inputDirection.y == 0) return; // •ûŒü“ü—Í‚È‚µ
+void PlayerCharacter::InputMove(float elapsedTime) {
+	if (inputDirection.x == 0 && inputDirection.y == 0) return; // æ–¹å‘å…¥åŠ›ãªã—
 
-	// ˆÚ“®ˆ—
+	// ç§»å‹•å‡¦ç†
 	Move(inputDirection.x, inputDirection.y, this->moveSpeed);
-	// ù‰ñˆ—
+	// æ—‹å›å‡¦ç†
 	TurnByInput();
 }
 
-void Player::Jump()
+void PlayerCharacter::Jump()
 {
 	if (!isGround) return;
 	if (input & Input_Jump)
@@ -413,7 +450,7 @@ void Player::Jump()
 	}
 }
 
-bool Player::InputDodge()
+bool PlayerCharacter::InputDodge()
 {
 	if (input & Input_Dodge)
 	{
@@ -427,32 +464,31 @@ bool Player::InputDodge()
 	return false;
 }
 
-void Player::FaceToCamera()
+void PlayerCharacter::FaceToCamera()
 {
 	if (!IsPlayer()) return;
-	DirectX::XMFLOAT3 front = CameraManager::Instance().GetCamera()->GetFront();
-	//DirectX::XMFLOAT3 front = Camera::Instance().GetFront();
+	DirectX::XMFLOAT3 front = Camera::Instance().GetFront();
 	Turn(1.0f, front.x, front.z, turnSpeed);
 }
 
-void Player::TurnByInput()
+void PlayerCharacter::TurnByInput()
 {
 	if (!IsPlayer()) return;
 	Turn(T_TIMER.Delta(), inputDirection.x, inputDirection.y, turnSpeed);
 }
 
-void Player::RecoverMp(float elapsedTime)
+void PlayerCharacter::RecoverMp(float elapsedTime)
 {
 	ModifyMp(elapsedTime * mpRecoverRate);
 }
-void Player::ModifyMp(float mp)
+void PlayerCharacter::ModifyMp(float mp)
 {
 	this->mp += mp;
 	if (this->mp >= maxMp) this->mp = maxMp;
 	if (this->mp < 0.0f) this->mp = 0.0f;
 }
 
-float Player::GetMpCost(int idx)
+float PlayerCharacter::GetMpCost(int idx)
 {
 	if (mpCost.find(idx) != mpCost.end())
 	{
@@ -462,44 +498,10 @@ float Player::GetMpCost(int idx)
 	return 0.0f;
 }
 
-void Player::SkillCost(int idx)
+void PlayerCharacter::SkillCost(int idx)
 {
-	// MPÁ”ï
+	// MPæ¶ˆè²»
 	ModifyMp(-GetMpCost(idx));
-	// ƒ^ƒCƒ}[
+	// ã‚¿ã‚¤ãƒãƒ¼
 	ResetSkillTimer(idx);
-}
-
-// Network
-void Player::ImportData(PLAYER_DATA data)
-{
-	if (IsPlayer()) return; // ©‹@ƒLƒƒƒ‰‚ÍXV‚µ‚È‚¢
-	position = data.position;
-	velocity = data.velocity;
-	target = data.target;
-	angle.y = data.angle;
-	m_color = data.color;
-	hp = data.hp;
-	maxHp = data.hp;
-	if (stateMachine->GetStateIndex() != data.state)
-	{
-		stateMachine->ChangeState(data.state);
-	}
-	if (stateMachine->GetState()->GetSubStateIndex() != data.subState)
-	{
-		stateMachine->ChangeSubState(data.subState);
-	}
-}
-void Player::ExportData(PLAYER_DATA& data)
-{
-	data.client_id = client_id;
-	data.position = position;
-	data.velocity = velocity;
-	data.target = target;
-	data.color = m_color;
-	data.angle = angle.y;
-	data.state = stateMachine->GetStateIndex();
-	data.hp = hp;
-	data.maxHp = hp;
-	data.subState = stateMachine->GetState()->GetSubStateIndex();
 }

@@ -45,13 +45,45 @@ namespace SceneCharacter_E4CState
 	};
 
 	// ログインステート
-	class CharacterCreationState : public HierarchicalState<SceneCharacter_E4C>
+	class CharacterCreationStateLeft : public HierarchicalState<SceneCharacter_E4C>
 	{
 	public:
 		// コンストラクタ
-		CharacterCreationState(SceneCharacter_E4C* scene) : HierarchicalState<SceneCharacter_E4C>(scene) {};
+		CharacterCreationStateLeft(SceneCharacter_E4C* scene) : HierarchicalState<SceneCharacter_E4C>(scene) {};
 		// デストラクタ
-		~CharacterCreationState() {}
+		~CharacterCreationStateLeft() {}
+		// ステートに入った時のメソッド
+		virtual void Enter() override;
+		// ステートで実行するメソッド
+		void Execute(float elapsedTime) override;
+		// ステートから出ていくときのメソッド
+		void Exit() override;
+	};
+
+	// ログインステート
+	class CharacterCreationStateCenter : public HierarchicalState<SceneCharacter_E4C>
+	{
+	public:
+		// コンストラクタ
+		CharacterCreationStateCenter(SceneCharacter_E4C* scene) : HierarchicalState<SceneCharacter_E4C>(scene) {};
+		// デストラクタ
+		~CharacterCreationStateCenter() {}
+		// ステートに入った時のメソッド
+		virtual void Enter() override;
+		// ステートで実行するメソッド
+		void Execute(float elapsedTime) override;
+		// ステートから出ていくときのメソッド
+		void Exit() override;
+	};
+
+	// ログインステート
+	class CharacterCreationStateRight : public HierarchicalState<SceneCharacter_E4C>
+	{
+	public:
+		// コンストラクタ
+		CharacterCreationStateRight(SceneCharacter_E4C* scene) : HierarchicalState<SceneCharacter_E4C>(scene) {};
+		// デストラクタ
+		~CharacterCreationStateRight() {}
 		// ステートに入った時のメソッド
 		virtual void Enter() override;
 		// ステートで実行するメソッド

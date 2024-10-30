@@ -12,8 +12,8 @@ private:
 	GameData();
 	~GameData() = default;
 public:
-	void SetClientId(int id) { client_id = id; }
-	int GetClientId() { return client_id; }
+	void SetClientId(uint64_t id) { client_id = id; }
+	uint64_t GetClientId() { return client_id; }
 	const char* GetName() { return name.c_str(); }
 
 	void SetOnline(bool online) { this->online = online; }
@@ -56,7 +56,7 @@ private:
 	bool LoadGameSetting();	// İ’èƒtƒ@ƒCƒ‹‚Ì“Ç‚İ‚İ
 private:
 	bool online = false;
-	int client_id = -1;
+	uint64_t client_id = 0;
 	bool isHost = false;
 	std::string name;
 	std::string ip;

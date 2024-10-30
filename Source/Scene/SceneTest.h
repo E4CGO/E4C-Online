@@ -1,8 +1,8 @@
 #pragma once
+
 #include "Scene/Scene.h"
-#include "GameObject/ModelObject.h"
-#include "GameObject/Character/Player/Knight.h"
 #include "GameObject/Character/Player/Barbarian.h"
+#include "GameObject/Character/Player/PlayerCharacter.h"
 #include "Map/MapTile.h"
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 
@@ -30,6 +30,8 @@ private:
 	//std::unique_ptr<ModelObject> knight;
 
 	std::unique_ptr<Player> player;
+
+	std::unique_ptr<PlayerCharacter> newPlayer;
 };
 
 class EmptyScene : public Scene

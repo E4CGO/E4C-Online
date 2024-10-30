@@ -13,11 +13,11 @@ Knight::Knight() : Player("Data/Model/Character/Knight.glb", 1.0f)
 	hp = maxHp = 180;
 	type = PLAYER_CLASS::KNIGHT;
 
-	model->FindNode("1H_Sword_Offhand")->visible = false;
-	model->FindNode("2H_Sword")->visible = false;
-	model->FindNode("Badge_Shield")->visible = false;
-	model->FindNode("Round_Shield")->visible = false;
-	model->FindNode("Spike_Shield")->visible = false;
+	m_pmodels[0]->FindNode("1H_Sword_Offhand")->visible = false;
+	m_pmodels[0]->FindNode("2H_Sword")->visible = false;
+	m_pmodels[0]->FindNode("Badge_Shield")->visible = false;
+	m_pmodels[0]->FindNode("Round_Shield")->visible = false;
+	m_pmodels[0]->FindNode("Spike_Shield")->visible = false;
 
 	// 攻撃判定
 	attackColliders[AttackCollider::Sword_1] = new SphereCollider(0.3f);
