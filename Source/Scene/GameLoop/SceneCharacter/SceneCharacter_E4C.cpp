@@ -13,7 +13,8 @@
 #include "GameData.h"
 
 //テスト用
-float SceneCharacter_E4C::time = { 0 };
+float SceneCharacter_E4C::m_time{ 0 };
+const int SceneCharacter_E4C::m_maxCharacters{ 3 };
 
 void SceneCharacter_E4C::Initialize()
 {
@@ -35,17 +36,23 @@ void SceneCharacter_E4C::Initialize()
 		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/UI/exit.png");
 	}
 
-	m_Characters_LEFT.resize(3);
-	m_Characters_CENTER.resize(3);
-	m_Characters_RIGHT.resize(3);
+	m_previewCharacters.resize(m_maxCharacters);
 
-	m_character_BARB_HEAD = std::make_shared<ModelObject>("Data/Model/Character/BODY_BARB.glb");
-	m_character_BARB_BODY = std::make_shared<ModelObject>("Data/Model/Character/HEAD_BARB.glb");
-	m_character_BARB_WEAPON = std::make_shared<ModelObject>("Data/Model/Character/WEAPON_BARB.glb");
+	for (size_t i = 0; i < m_maxCharacters; i++)
+	{
+		PlayerCharacterData::CharacterInfo charInfo = {
+		true,			// visible
+		"center",		// save
+		{				//Character
+			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+		}
+		};
 
-	m_character_MAGE_HEAD = std::make_shared<ModelObject>("Data/Model/Character/BODY_MAGE.glb");
-	m_character_MAGE_BODY = std::make_shared<ModelObject>("Data/Model/Character/HEAD_MAGE.glb");
-	m_character_MAGE_WEAPON = std::make_shared<ModelObject>("Data/Model/Character/WEAPON_MAGE.glb");
+		m_previewCharacters[i] = std::make_unique<NonPlayerCharacter>(charInfo);
+		m_previewCharacters[i]->SetPosition({ 3.5f * i * -1.f + 3.5f, 0.0f, 5.0f });
+		m_previewCharacters[i]->SetKinematic(true);
+		m_previewCharacters[i]->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::State::Waiting));
+	}
 
 	// 光
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
@@ -62,8 +69,8 @@ void SceneCharacter_E4C::Initialize()
 		10000.0f								// ファークリップ
 	);
 	camera.SetLookAt(
-		{ -5.661f, 2.5f, 5.584f },				// 視点
-		{ 0.0f, 2.0, 0.0f },					// 注視点
+		{ 0, 3.0f, 13.0f },				// 視点
+		{ 0.0f, 0.0, 0.0f },					// 注視点
 		{ 0.036f, 0.999f, -0.035f }				// 上ベクトル
 	);
 	cameraController = std::make_unique<FreeCameraController>();
@@ -74,7 +81,9 @@ void SceneCharacter_E4C::Initialize()
 	stateMachine = std::make_unique<StateMachine<SceneCharacter_E4C>>();
 	stateMachine->RegisterState(STATE::INIT, new SceneCharacter_E4CState::InitState(this));
 	stateMachine->RegisterState(STATE::CHARACTERSELECTION, new SceneCharacter_E4CState::CharacterSelectionState(this));
-	stateMachine->RegisterState(STATE::CHARACTERCREATION, new SceneCharacter_E4CState::CharacterCreationState(this));
+	stateMachine->RegisterState(STATE::CHARACTERCREATIONLEFT, new SceneCharacter_E4CState::CharacterCreationStateLeft(this));
+	stateMachine->RegisterState(STATE::CHARACTERCREATIONCENTER, new SceneCharacter_E4CState::CharacterCreationStateCenter(this));
+	stateMachine->RegisterState(STATE::CHARACTERCREATIONRIGHT, new SceneCharacter_E4CState::CharacterCreationStateRight(this));
 	stateMachine->RegisterState(STATE::START, new SceneCharacter_E4CState::StartState(this));
 	stateMachine->SetState(STATE::INIT);
 }
@@ -89,57 +98,14 @@ void SceneCharacter_E4C::Finalize()
 // 更新処理
 void SceneCharacter_E4C::Update(float elapsedTime)
 {
-	time += elapsedTime;
+	m_time += elapsedTime;
+
+	for (auto& it : m_previewCharacters)
+	{
+		it->Update(elapsedTime);
+	}
 
 	stateMachine->Update(elapsedTime);
-
-	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].visible != 0)
-	{
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.bodyType != 0)
-		{
-			m_Characters_LEFT[0]->Update(elapsedTime);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.headType != 0)
-		{
-			m_Characters_LEFT[1]->Update(elapsedTime);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.weaponType != 0)
-		{
-			m_Characters_LEFT[2]->Update(elapsedTime);
-		}
-	}
-
-	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].visible != 0)
-	{
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.bodyType != 0)
-		{
-			m_Characters_CENTER[0]->Update(elapsedTime);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.headType != 0)
-		{
-			m_Characters_CENTER[1]->Update(elapsedTime);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.weaponType != 0)
-		{
-			m_Characters_CENTER[2]->Update(elapsedTime);
-		}
-	}
-
-	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].visible != 0)
-	{
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.bodyType != 0)
-		{
-			m_Characters_RIGHT[0]->Update(elapsedTime);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.headType != 0)
-		{
-			m_Characters_RIGHT[1]->Update(elapsedTime);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.weaponType != 0)
-		{
-			m_Characters_RIGHT[2]->Update(elapsedTime);
-		}
-	}
 
 #ifdef _DEBUG
 	// カメラ更新
@@ -171,52 +137,10 @@ void SceneCharacter_E4C::Render()
 	shadowMapRenderer->Render();
 	rc.shadowMapData = shadowMapRenderer->GetShadowMapData();
 
-	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].visible != 0)
+	for (auto& it : m_previewCharacters)
 	{
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.headType != 0)
-		{
-			m_Characters_LEFT[0]->Render(rc);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.bodyType != 0)
-		{
-			m_Characters_LEFT[1]->Render(rc);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[0].Character.weaponType != 0)
-		{
-			m_Characters_LEFT[2]->Render(rc);
-		}
-	}
-
-	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].visible != 0)
-	{
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.headType != 0)
-		{
-			m_Characters_CENTER[0]->Render(rc);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.bodyType != 0)
-		{
-			m_Characters_CENTER[1]->Render(rc);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[1].Character.weaponType != 0)
-		{
-			m_Characters_CENTER[2]->Render(rc);
-		}
-	}
-
-	if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].visible != 0)
-	{
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.headType != 0)
-		{
-			m_Characters_RIGHT[0]->Render(rc);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.bodyType != 0)
-		{
-			m_Characters_RIGHT[1]->Render(rc);
-		}
-		if (PLAYER_CHARACTER_DATA.GetCharacterInfosData()[2].Character.weaponType != 0)
-		{
-			m_Characters_RIGHT[2]->Render(rc);
-		}
+		if (it->GetMenuVisibility())
+			it->Render(rc);
 	}
 
 	UI.Render(rc);
@@ -259,168 +183,6 @@ void SceneCharacter_E4C::RenderDX12()
 
 void SceneCharacter_E4C::UpdateCurrentModel(int characterNumber, int modelType, int value)
 {
-	switch (characterNumber)
-	{
-	case 0:
-		switch (modelType)
-		{
-		case 0:
-			switch (value)
-			{
-			case 0:
-				break;
-			case 1:
-				m_Characters_LEFT[0] = m_character_BARB_HEAD;
-				break;
-			case 2:
-				m_Characters_LEFT[0] = m_character_MAGE_HEAD;
-				break;
-			default:
-				break;
-			}
-			break;
-		case 1:
-			switch (value)
-			{
-			case 0:
-				break;
-			case 1:
-				m_Characters_LEFT[1] = m_character_BARB_BODY;
-				break;
-			case 2:
-				m_Characters_LEFT[1] = m_character_MAGE_BODY;
-				break;
-			default:
-				break;
-			}
-			break;
-		case 2:
-			switch (value)
-			{
-			case 0:
-				break;
-			case 1:
-				m_Characters_LEFT[2] = m_character_BARB_WEAPON;
-				break;
-			case 2:
-				m_Characters_LEFT[2] = m_character_MAGE_WEAPON;
-				break;
-			default:
-				break;
-			}
-			break;
-		default:
-			break;
-		}
-		break;
-	case 1:
-		switch (modelType)
-		{
-		case 0:
-			switch (value)
-			{
-			case 0:
-
-				break;
-			case 1:
-				m_Characters_CENTER[0] = m_character_BARB_HEAD;
-				break;
-			case 2:
-				m_Characters_CENTER[0] = m_character_MAGE_HEAD;
-				break;
-			default:
-				break;
-			}
-			break;
-		case 1:
-			switch (value)
-			{
-			case 0:
-
-				break;
-			case 1:
-				m_Characters_CENTER[1] = m_character_BARB_BODY;
-				break;
-			case 2:
-				m_Characters_CENTER[1] = m_character_MAGE_BODY;
-				break;
-			default:
-				break;
-			}
-			break;
-		case 2:
-			switch (value)
-			{
-			case 0:
-
-				break;
-			case 1:
-				m_Characters_CENTER[2] = m_character_BARB_WEAPON;
-				break;
-			case 2:
-				m_Characters_CENTER[2] = m_character_MAGE_WEAPON;
-				break;
-			default:
-				break;
-			}
-			break;
-		default:
-			break;
-		}
-	case 2:
-		switch (modelType)
-		{
-		case 0:
-			switch (value)
-			{
-			case 0:
-				break;
-			case 1:
-				m_Characters_RIGHT[0] = m_character_BARB_HEAD;
-				break;
-			case 2:
-				m_Characters_RIGHT[0] = m_character_MAGE_HEAD;
-				break;
-			default:
-				break;
-			}
-			break;
-		case 1:
-			switch (value)
-			{
-			case 0:
-
-				break;
-			case 1:
-				m_Characters_RIGHT[1] = m_character_BARB_BODY;
-				break;
-			case 2:
-				m_Characters_RIGHT[1] = m_character_MAGE_BODY;
-				break;
-			default:
-				break;
-			}
-			break;
-		case 2:
-			switch (value)
-			{
-			case 0:
-
-				break;
-			case 1:
-				m_Characters_RIGHT[2] = m_character_BARB_WEAPON;
-				break;
-			case 2:
-				m_Characters_RIGHT[2] = m_character_MAGE_WEAPON;
-				break;
-			default:
-				break;
-			}
-			break;
-		default:
-			break;
-		}
-	}
 }
 
 void SceneCharacter_E4C::DrawSceneGUI()

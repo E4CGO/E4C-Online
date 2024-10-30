@@ -15,7 +15,7 @@ MapCollider::MapCollider(iModel* model)
 		minPos.x - 1.0f, maxPos.x + 1.0f,
 		minPos.y - 50.0f, maxPos.y + 10.0f,
 		minPos.z - 1.0f, maxPos.z + 1.0f);// エリアを少し大きめに作成
-	RegisterPorigons();
+	RegisterPolygons();
 }
 
 MapCollider::~MapCollider()
@@ -228,8 +228,15 @@ bool MapCollider::RayCast(
 	int Elem = tree.GetLinerIndex(minX, maxX, minY, maxY, minZ, maxZ);
 
 	bool hit = false;
-	SearchChildren(Elem, start, end, result, hit);
-	SearchParent(Elem, start, end, result, hit);
+
+
+	DirectX::XMVECTOR rayStart = DirectX::XMLoadFloat3(&start);
+	DirectX::XMVECTOR rayEnd = DirectX::XMLoadFloat3(&end);
+	float rayDist = XMFLOAT3Length(end - start);
+	DirectX::XMVECTOR rayDirection = DirectX::XMVectorScale(DirectX::XMVectorSubtract(rayEnd, rayStart), 1.0f / rayDist);
+
+	SearchChildren(Elem, rayStart, rayDirection, rayDist, result, hit);
+	SearchParent(Elem, rayStart, rayDirection, rayDist, result, hit);
 	return hit;
 }
 
@@ -342,7 +349,7 @@ void MapCollider::CalcMapArea(
 	}
 }
 
-void MapCollider::RegisterPorigons()
+void MapCollider::RegisterPolygons()
 {
 	const ModelResource* resource = model->GetResource();
 	for (const ModelResource::Mesh& mesh : resource->GetMeshes())
@@ -386,138 +393,138 @@ void MapCollider::RegisterPorigons()
 			N = XMVector3TransformNormal(N, WorldTransform);
 			N = XMVector3Normalize(N);
 
-			// Porigon構造体に格納
-			Porigon* porigon = new Porigon;
-			XMStoreFloat3(&porigon->position[0], A);
+			// Polygon構造体に格納
+			Polygon* polygon = new Polygon;
+			XMStoreFloat3(&polygon->position[0], A);
 
 			//// 頂点の順番を補正
 			XMVECTOR WorldAB = XMVectorSubtract(B, A);
 			XMVECTOR WorldAC = XMVectorSubtract(C, A);
 			if (XMVectorGetX(XMVector3Dot(N, XMVector3Cross(WorldAB, WorldAC))) > 0)
 			{
-				XMStoreFloat3(&porigon->position[1], B);
-				XMStoreFloat3(&porigon->position[2], C);
+				XMStoreFloat3(&polygon->position[1], B);
+				XMStoreFloat3(&polygon->position[2], C);
 			}
 			else
 			{
-				XMStoreFloat3(&porigon->position[1], C);
-				XMStoreFloat3(&porigon->position[2], B);
+				XMStoreFloat3(&polygon->position[1], C);
+				XMStoreFloat3(&polygon->position[2], B);
 			}
 			
-			XMStoreFloat3(&porigon->normal, N);
-			porigon->materialIndex = mesh.materialIndex;
+			XMStoreFloat3(&polygon->normal, N);
+			polygon->materialIndex = mesh.materialIndex;
 
 
 			/////////// 8分木に登録 ////////////
 			// 頂点位置の最小値最大値
 			float minX, maxX;
-			if (porigon->position[0].x < porigon->position[1].x)
+			if (polygon->position[0].x < polygon->position[1].x)
 			{
-				if (porigon->position[0].x < porigon->position[2].x)
+				if (polygon->position[0].x < polygon->position[2].x)
 				{
-					minX = porigon->position[0].x;
-					maxX = porigon->position[1].x < porigon->position[2].x ?
-						porigon->position[2].x : porigon->position[1].x;
+					minX = polygon->position[0].x;
+					maxX = polygon->position[1].x < polygon->position[2].x ?
+						polygon->position[2].x : polygon->position[1].x;
 				}
 				else
 				{
-					minX = porigon->position[2].x;
-					maxX = porigon->position[1].x;
+					minX = polygon->position[2].x;
+					maxX = polygon->position[1].x;
 				}
 			}
 			else
 			{
-				if (porigon->position[1].x < porigon->position[2].x)
+				if (polygon->position[1].x < polygon->position[2].x)
 				{
-					minX = porigon->position[1].x;
-					maxX = porigon->position[0].x < porigon->position[2].x ?
-						porigon->position[2].x : porigon->position[0].x;
+					minX = polygon->position[1].x;
+					maxX = polygon->position[0].x < polygon->position[2].x ?
+						polygon->position[2].x : polygon->position[0].x;
 				}
 				else
 				{
-					minX = porigon->position[2].x;
-					maxX = porigon->position[0].x;
+					minX = polygon->position[2].x;
+					maxX = polygon->position[0].x;
 				}
 			}
 
 			float minY, maxY;
-			if (porigon->position[0].y < porigon->position[1].y)
+			if (polygon->position[0].y < polygon->position[1].y)
 			{
-				if (porigon->position[0].y < porigon->position[2].y)
+				if (polygon->position[0].y < polygon->position[2].y)
 				{
-					minY = porigon->position[0].y;
-					maxY = porigon->position[1].y < porigon->position[2].y ?
-						porigon->position[2].y : porigon->position[1].y;
+					minY = polygon->position[0].y;
+					maxY = polygon->position[1].y < polygon->position[2].y ?
+						polygon->position[2].y : polygon->position[1].y;
 				}
 				else
 				{
-					minY = porigon->position[2].y;
-					maxY = porigon->position[1].y;
+					minY = polygon->position[2].y;
+					maxY = polygon->position[1].y;
 				}
 			}
 			else
 			{
-				if (porigon->position[1].y < porigon->position[2].y)
+				if (polygon->position[1].y < polygon->position[2].y)
 				{
-					minY = porigon->position[1].y;
-					maxY = porigon->position[0].y < porigon->position[2].y ?
-						porigon->position[2].y : porigon->position[0].y;
+					minY = polygon->position[1].y;
+					maxY = polygon->position[0].y < polygon->position[2].y ?
+						polygon->position[2].y : polygon->position[0].y;
 				}
 				else
 				{
-					minY = porigon->position[2].y;
-					maxY = porigon->position[0].y;
+					minY = polygon->position[2].y;
+					maxY = polygon->position[0].y;
 				}
 			}
 
 			float minZ, maxZ;
-			if (porigon->position[0].z < porigon->position[1].z)
+			if (polygon->position[0].z < polygon->position[1].z)
 			{
-				if (porigon->position[0].z < porigon->position[2].z)
+				if (polygon->position[0].z < polygon->position[2].z)
 				{
-					minZ = porigon->position[0].z;
-					maxZ = porigon->position[1].z < porigon->position[2].z ?
-						porigon->position[2].z : porigon->position[1].z;
+					minZ = polygon->position[0].z;
+					maxZ = polygon->position[1].z < polygon->position[2].z ?
+						polygon->position[2].z : polygon->position[1].z;
 				}
 				else
 				{
-					minZ = porigon->position[2].z;
-					maxZ = porigon->position[1].z;
+					minZ = polygon->position[2].z;
+					maxZ = polygon->position[1].z;
 				}
 			}
 			else
 			{
-				if (porigon->position[1].z < porigon->position[2].z)
+				if (polygon->position[1].z < polygon->position[2].z)
 				{
-					minZ = porigon->position[1].z;
-					maxZ = porigon->position[0].z < porigon->position[2].z ?
-						porigon->position[2].z : porigon->position[0].z;
+					minZ = polygon->position[1].z;
+					maxZ = polygon->position[0].z < polygon->position[2].z ?
+						polygon->position[2].z : polygon->position[0].z;
 				}
 				else
 				{
-					minZ = porigon->position[2].z;
-					maxZ = porigon->position[0].z;
+					minZ = polygon->position[2].z;
+					maxZ = polygon->position[0].z;
 				}
 			}
 
 			// 登録
-			tree.Regist(minX, maxX, minY, maxY, minZ, maxZ, porigon);
+			tree.Regist(minX, maxX, minY, maxY, minZ, maxZ, polygon);
 		}
 	}
 }
 
-bool MapCollider::ShpereVsPorigon(
+bool MapCollider::ShpereVsPolygon(
 	Collider*& other,
 	DirectX::XMFLOAT3& direction,
-	Porigon* porigon,
+	Polygon* polygon,
 	HitResult& result
 )
 {
 	DirectX::XMVECTOR Vertex[3] =
 	{
-		XMLoadFloat3(&porigon->position[0]),
-		XMLoadFloat3(&porigon->position[1]),
-		XMLoadFloat3(&porigon->position[2])
+		XMLoadFloat3(&polygon->position[0]),
+		XMLoadFloat3(&polygon->position[1]),
+		XMLoadFloat3(&polygon->position[2])
 	};
 
 	DirectX::XMVECTOR Edge[3] =
@@ -528,7 +535,7 @@ bool MapCollider::ShpereVsPorigon(
 	};
 
 	// 面法線
-	XMVECTOR Normal = XMLoadFloat3(&porigon->normal);
+	XMVECTOR Normal = XMLoadFloat3(&polygon->normal);
 
 	// 平面と移動前後の球の距離を求める
 	XMFLOAT3 sphereCenter = other->GetPosition();
@@ -579,65 +586,129 @@ bool MapCollider::ShpereVsPorigon(
 	return false;
 }
 
-bool MapCollider::RayVsPorigon(
+//bool MapCollider::RayVsPolygon(
+//	const DirectX::XMFLOAT3& start,
+//	const DirectX::XMFLOAT3& end,
+//	Polygon* polygon,
+//	HitResult& result
+//)
+//{
+//	XMVECTOR Start = XMLoadFloat3(&start);
+//	XMVECTOR End = XMLoadFloat3(&end);
+//	XMVECTOR rayVec = XMVectorSubtract(End, Start);
+//	float length = XMVectorGetX(XMVector3Length(rayVec));
+//
+//	// 内積の結果がプラスならば裏向き
+//	XMVECTOR N = XMLoadFloat3(&polygon->normal);
+//	float dot = XMVectorGetX(XMVector3Dot(rayVec, N));
+//	if (dot >= 0.0f)	return false;
+//
+//	// レイの始点から平面の交点までの距離を算出
+//	XMVECTOR A = XMLoadFloat3(&polygon->position[0]);
+//	XMVECTOR B = XMLoadFloat3(&polygon->position[1]);
+//	XMVECTOR C = XMLoadFloat3(&polygon->position[2]);
+//	XMVECTOR SA = XMVectorSubtract(A, Start);
+//	float x = XMVectorGetX(XMVector3Dot(SA, N)) / dot;
+//	float distance = length * x;
+//
+//	// 交点までの距離が今までに計算した最近距離より
+//	// 大きい時はスキップ
+//	if (distance < 0.0f || distance > result.distance) return false;
+//
+//	// 平面上の交点P
+//	XMVECTOR P = XMVectorAdd(Start, XMVectorScale(rayVec, x));
+//
+//	// 交点が三角形の内側にあるか判定
+//	// １つめ
+//	XMVECTOR Cross1 = XMVector3Cross(XMVectorSubtract(A, P), XMVectorSubtract(B, A));
+//	float Dot1 = XMVectorGetX(XMVector3Dot(rayVec, Cross1));
+//	if (Dot1 > 0.0f) return false;
+//	// ２つめ
+//	XMVECTOR Cross2 = XMVector3Cross(XMVectorSubtract(B, P), XMVectorSubtract(C, B));
+//	float Dot2 = XMVectorGetX(XMVector3Dot(rayVec, Cross2));
+//	if (Dot2 > 0.0f) return false;
+//	// ３つめ
+//	XMVECTOR Cross3 = XMVector3Cross(XMVectorSubtract(C, P), XMVectorSubtract(A, C));
+//	float Dot3 = XMVectorGetX(XMVector3Dot(rayVec, Cross3));
+//	if (Dot3 > 0.0f) return false;
+//
+//	// ヒット情報保存
+//	XMStoreFloat3(&result.position, P);
+//	result.normal = polygon->normal;
+//	result.distance = distance;
+//	result.materialIndex = polygon->materialIndex;
+//
+//	return true;
+//}
+bool MapCollider::RayVsPolygon(
 	const DirectX::XMFLOAT3& start,
 	const DirectX::XMFLOAT3& end,
-	Porigon* porigon,
+	Polygon* polygon,
 	HitResult& result
 )
 {
-	XMVECTOR Start = XMLoadFloat3(&start);
-	XMVECTOR End = XMLoadFloat3(&end);
-	XMVECTOR rayVec = XMVectorSubtract(End, Start);
-	float length = XMVectorGetX(XMVector3Length(rayVec));
+	DirectX::XMVECTOR rayStart = DirectX::XMLoadFloat3(&start);
+	float rayDist = XMFLOAT3Length(end - start);
+	DirectX::XMVECTOR rayDirection = DirectX::XMVectorScale(DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&end), rayStart), 1.0f / rayDist);
 
-	// 内積の結果がプラスならば裏向き
-	XMVECTOR N = XMLoadFloat3(&porigon->normal);
-	float dot = XMVectorGetX(XMVector3Dot(rayVec, N));
-	if (dot >= 0.0f)	return false;
+	return RayVsPolygon(rayStart, rayDirection, rayDist, polygon, result);
+}
 
-	// レイの始点から平面の交点までの距離を算出
-	XMVECTOR A = XMLoadFloat3(&porigon->position[0]);
-	XMVECTOR B = XMLoadFloat3(&porigon->position[1]);
-	XMVECTOR C = XMLoadFloat3(&porigon->position[2]);
-	XMVECTOR SA = XMVectorSubtract(A, Start);
-	float x = XMVectorGetX(XMVector3Dot(SA, N)) / dot;
-	float distance = length * x;
+bool MapCollider::RayVsPolygon(
+	const DirectX::XMVECTOR& rayStart,
+	const DirectX::XMVECTOR& rayDirection,		// 要正規化
+	float rayDist,
+	Polygon* polygon,
+	HitResult& result
+)
+{
+	DirectX::XMVECTOR triangleVerts[3] = {
+		DirectX::XMLoadFloat3(&polygon->position[0]),
+		DirectX::XMLoadFloat3(&polygon->position[1]),
+		DirectX::XMLoadFloat3(&polygon->position[2]),
+	};
 
-	// 交点までの距離が今までに計算した最近距離より
-	// 大きい時はスキップ
-	if (distance < 0.0f || distance > result.distance) return false;
+	DirectX::XMVECTOR ab = DirectX::XMVectorSubtract(triangleVerts[1], triangleVerts[0]);
+	DirectX::XMVECTOR ac = DirectX::XMVectorSubtract(triangleVerts[2], triangleVerts[0]);
+	DirectX::XMVECTOR norm = DirectX::XMVector3Cross(ab, ac);
+	DirectX::XMVECTOR qp = DirectX::XMVectorSubtract(rayStart, DirectX::XMVectorAdd(rayStart, DirectX::XMVectorScale(rayDirection, rayDist)));
+	float d = DirectX::XMVectorGetX(DirectX::XMVector3Dot(norm, qp));
 
-	// 平面上の交点P
-	XMVECTOR P = XMVectorAdd(Start, XMVectorScale(rayVec, x));
+	if (d > 0.0f)	// 表側から交差しているときのみ判定を行う
+	{
+		if (fabs(d) > 1e-6f)	// 平行確認
+		{
+			DirectX::XMVECTOR ap = DirectX::XMVectorSubtract(rayStart, triangleVerts[0]);
 
-	// 交点が三角形の内側にあるか判定
-	// １つめ
-	XMVECTOR Cross1 = XMVector3Cross(XMVectorSubtract(A, P), XMVectorSubtract(B, A));
-	float Dot1 = XMVectorGetX(XMVector3Dot(rayVec, Cross1));
-	if (Dot1 > 0.0f) return false;
-	// ２つめ
-	XMVECTOR Cross2 = XMVector3Cross(XMVectorSubtract(B, P), XMVectorSubtract(C, B));
-	float Dot2 = XMVectorGetX(XMVector3Dot(rayVec, Cross2));
-	if (Dot2 > 0.0f) return false;
-	// ３つめ
-	XMVECTOR Cross3 = XMVector3Cross(XMVectorSubtract(C, P), XMVectorSubtract(A, C));
-	float Dot3 = XMVectorGetX(XMVector3Dot(rayVec, Cross3));
-	if (Dot3 > 0.0f) return false;
+			float t = DirectX::XMVectorGetX(DirectX::XMVector3Dot(norm, ap));
+			if (t >= 0.0f && t < d)		// レイの向きと長さ確認
+			{
+				DirectX::XMVECTOR e = DirectX::XMVector3Cross(qp, ap);
+				float v = DirectX::XMVectorGetX(DirectX::XMVector3Dot(ac, e));
+				if (v >= 0.0f && v <= d)
+				{
+					float w = -1 * DirectX::XMVectorGetX(DirectX::XMVector3Dot(ab, e));
+					if (w > 0.0f && v + w <= d)
+					{
+						result.distance = rayDist * t / d;
+						DirectX::XMStoreFloat3(&result.position, DirectX::XMVectorAdd(rayStart, DirectX::XMVectorScale(rayDirection, result.distance)));
 
-	// ヒット情報保存
-	XMStoreFloat3(&result.position, P);
-	result.normal = porigon->normal;
-	result.distance = distance;
-	result.materialIndex = porigon->materialIndex;
+						DirectX::XMStoreFloat3(&result.normal, DirectX::XMVector3Normalize(norm));
+						return true;
+					}
+				}
+			}
+		}
+	}
 
-	return true;
+	return false;
 }
 
 bool MapCollider::SearchChildren(	// 子空間探索
 	int Elem,
-	const DirectX::XMFLOAT3& start,
-	const DirectX::XMFLOAT3& end,
+	const DirectX::XMVECTOR& start,
+	const DirectX::XMVECTOR& rayDirection,		// 要正規化
+	float rayDist,
 	HitResult& result,
 	bool& hit
 )
@@ -652,7 +723,7 @@ bool MapCollider::SearchChildren(	// 子空間探索
 
 		for (int i = 0; i < 8; i++)
 		{
-			if (SearchChildren(childElem + i, start, end, result, hit))
+			if (SearchChildren(childElem + i, start, rayDirection, rayDist, result, hit))
 				break;
 		}
 	}
@@ -661,10 +732,10 @@ bool MapCollider::SearchChildren(	// 子空間探索
 	if (!tree.ppCellAry[Elem])	return hit;
 
 	// この空間に登録されているポリゴンとの当たり判定
-	Liner8TreeManager<Porigon>::OFT<Porigon>* oft = tree.ppCellAry[Elem]->pLatest;
+	Liner8TreeManager<Polygon>::OFT<Polygon>* oft = tree.ppCellAry[Elem]->pLatest;
 	while (oft)
 	{
-		if (RayVsPorigon(start, end, oft->m_pObject, result))
+		if (RayVsPolygon(start, rayDirection, rayDist, oft->m_pObject, result))
 		{
 			hit = true;
 		}
@@ -677,8 +748,9 @@ bool MapCollider::SearchChildren(	// 子空間探索
 
 bool MapCollider::SearchParent(		// 親空間探索
 	int Elem,
-	const DirectX::XMFLOAT3& start,
-	const DirectX::XMFLOAT3& end,
+	const DirectX::XMVECTOR& start,
+	const DirectX::XMVECTOR& rayDirection,		// 要正規化
+	float rayDist,
 	HitResult& result,
 	bool& hit
 )
@@ -698,10 +770,10 @@ bool MapCollider::SearchParent(		// 親空間探索
 			continue;
 		}
 
-		Liner8TreeManager<Porigon>::OFT<Porigon>* oft = tree.ppCellAry[parentElem]->pLatest;
+		Liner8TreeManager<Polygon>::OFT<Polygon>* oft = tree.ppCellAry[parentElem]->pLatest;
 		while (oft)
 		{
-			if (RayVsPorigon(start, end, oft->m_pObject, result))
+			if (RayVsPolygon(start, rayDirection, rayDist, oft->m_pObject, result))
 			{
 				hit = true;
 			}
