@@ -54,7 +54,7 @@ private:
 
 	NetworkController* networkController = nullptr;
 
-	Camera* mainCamera;  // メインカメラとして mainCamera を定義
+	
 	std::unique_ptr<ThridPersonCameraController> cameraController;
 
 	std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer = std::make_unique<PostprocessingRenderer>();;

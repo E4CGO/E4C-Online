@@ -75,5 +75,4 @@ private:
 	static const int m_maxCharacters;
 
 	static float m_time;
-	Camera* mainCamera;
 };

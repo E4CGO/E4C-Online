@@ -137,11 +137,7 @@ void SceneCharacter_E4CState::CharacterCreationStateLeft::Enter()
 	UIManager::Instance().Register(btnStartCharacter);
 
 	CameraManager& cameraManager = CameraManager::Instance();
-	mainCamera = new Camera();
-	cameraManager.Register(mainCamera);
-	cameraManager.SetCamera(0);
-
-
+	
 	CameraManager::Instance().GetCamera()->SetLookAt(
 		{ 6.0, 2.0f, 9.0f },			// 視点
 		{ -3.0f, 0.0, 0.0f },					// 注視点
@@ -173,11 +169,7 @@ void SceneCharacter_E4CState::CharacterCreationStateCenter::Enter()
 	UIManager::Instance().Register(btnStartCharacter);
 
 	CameraManager& cameraManager = CameraManager::Instance();
-	mainCamera = new Camera();
-	cameraManager.Register(mainCamera);
-	cameraManager.SetCamera(0);
-
-
+	
 	CameraManager::Instance().GetCamera()->SetLookAt(
 		{ 6.0, 2.0f, 9.0f },			// 視点
 		{ -3.0f, 0.0, 0.0f },					// 注視点
@@ -209,11 +201,7 @@ void SceneCharacter_E4CState::CharacterCreationStateRight::Enter()
 	UIManager::Instance().Register(btnStartCharacter);
 
 	CameraManager& cameraManager = CameraManager::Instance();
-	mainCamera = new Camera();
-	cameraManager.Register(mainCamera);
-	cameraManager.SetCamera(0);
-
-
+	
 	CameraManager::Instance().GetCamera()->SetLookAt(
 		{ 6.0, 2.0f, 9.0f },			// 視点
 		{ -3.0f, 0.0, 0.0f },					// 注視点

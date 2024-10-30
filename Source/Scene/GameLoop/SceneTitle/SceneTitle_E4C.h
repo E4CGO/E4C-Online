@@ -49,7 +49,6 @@ private:
 
 	std::unique_ptr<FreeCameraController> cameraController;
 
-	Camera* mainCamera;
 
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {

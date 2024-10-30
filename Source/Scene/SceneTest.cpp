@@ -40,7 +40,7 @@ void SceneTest::Initialize()
 	LightManager::Instance().Register(dl);
 
 	CameraManager& cameraManager = CameraManager::Instance();
-	mainCamera = new Camera();
+	Camera* mainCamera = new Camera();
 	cameraManager.Register(mainCamera);
 	cameraManager.SetCamera(0);
 

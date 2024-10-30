@@ -100,7 +100,7 @@ void SceneTitle::Initialize()
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
 	shadowMapRenderer->SetShadowLight(dl);
-	mainCamera = new Camera();
+	Camera* mainCamera = new Camera();
 	CameraManager& cameramanager = CameraManager::Instance();
 	cameramanager.Register(mainCamera);
 	cameramanager.SetCamera(0);

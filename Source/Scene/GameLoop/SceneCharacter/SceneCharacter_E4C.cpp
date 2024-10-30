@@ -59,7 +59,7 @@ void SceneCharacter_E4C::Initialize()
 	shadowMapRenderer->SetShadowLight(dl);
 
 	CameraManager& cameraManager = CameraManager::Instance();
-	mainCamera = new Camera();
+	Camera* mainCamera = new Camera();
 	cameraManager.Register(mainCamera);
 	cameraManager.SetCamera(0);
 

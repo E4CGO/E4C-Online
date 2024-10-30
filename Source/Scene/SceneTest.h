@@ -23,7 +23,6 @@ public:
 	// 描画処理
 	void Render() override;
 private:
-	Camera* mainCamera;
 	
 	std::unique_ptr<ThridPersonCameraController> cameraController;
 

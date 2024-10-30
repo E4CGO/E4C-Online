@@ -77,7 +77,7 @@ void SceneGame::Initialize()
 	shadowMapRenderer->SetShadowLight(dl);
 
 	// カメラ設定
-	mainCamera = new Camera();
+	Camera* mainCamera = new Camera();
 	cameraManger.Register(mainCamera);
 	cameraManger.SetCamera(0);
 	

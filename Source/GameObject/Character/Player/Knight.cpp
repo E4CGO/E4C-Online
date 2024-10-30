@@ -3,8 +3,6 @@
 #include "TAKOEngine/Physics/SphereCollider.h"
 #include "TAKOEngine/Effects/EffectManager.h"
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
-#include "TAKOEngine/Rendering/Model/Model.h"
-#include "TAKOEngine/Rendering/LineRenderer.h"
 
 #include "GameObject/Character/Player/KnightState.h"
 

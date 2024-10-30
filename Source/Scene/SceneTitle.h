@@ -53,7 +53,6 @@ private:
 	//スキニング
 	SkinningPipeline* m_skinning_pipeline;
 
-	Camera* maincamera;
 	std::unique_ptr<FreeCameraController> cameraController;
 
 	// Sprite Preload
@@ -88,8 +87,6 @@ private:
 
 	std::unique_ptr<SpriteDX12>			m_sprites[8];
 
-
-	Camera* mainCamera;  // メインカメラとして mainCamera を定義
 
 	static float time;
 };

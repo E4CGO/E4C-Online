@@ -61,7 +61,6 @@ namespace SceneCharacter_E4CState
 		void Execute(float elapsedTime) override;
 		// ステートから出ていくときのメソッド
 		void Exit() override;
-		Camera* mainCamera;
 	};
 
 	// ログインステート
@@ -78,7 +77,6 @@ namespace SceneCharacter_E4CState
 		void Execute(float elapsedTime) override;
 		// ステートから出ていくときのメソッド
 		void Exit() override;
-		Camera* mainCamera;
 	};
 
 	// ログインステート
@@ -95,7 +93,6 @@ namespace SceneCharacter_E4CState
 		void Execute(float elapsedTime) override;
 		// ステートから出ていくときのメソッド
 		void Exit() override;
-		Camera* mainCamera;
 	};
 
 	// タイトルステート
