@@ -1,35 +1,35 @@
-ï»¿#include "FilterFunctions.hlsli"
+#include "FilterFunctions.hlsli"
 #include "FinalpassDX12.hlsli"
 
-//ã‚·ãƒ¼ãƒ³ãƒ†ã‚¯ã‚¹ãƒãƒ£
+//ƒV[ƒ“ƒeƒNƒXƒ`ƒƒ
 Texture2D sceneTexture : register(t0);
 SamplerState sceneSampler : register(s0);
 
-// ãƒ–ãƒ«ãƒ¼ãƒ ãƒ†ã‚¯ã‚¹ãƒãƒ£
+// ƒuƒ‹[ƒ€ƒeƒNƒXƒ`ƒƒ
 Texture2D bloomTexture : register(t1);
 
 float4 main(VS_OUT pin) : SV_TARGET
 {
     float4 color = sceneTexture.Sample(sceneSampler, pin.texcoord) * pin.color;
 
-	// ãƒ–ãƒ«ãƒ¼ãƒ ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’åŠ ç®—ã™ã‚‹
+	// ƒuƒ‹[ƒ€ƒeƒNƒXƒ`ƒƒ‚ð‰ÁŽZ‚·‚é
     color.rgb += bloomTexture.Sample(sceneSampler, pin.texcoord).rgb;
     
-    // è‰²èª¿è£œæ­£å‡¦ç†
+    // F’²•â³ˆ—
 	{
-		// RGB > HSVã«å¤‰æ›
+		// RGB > HSV‚É•ÏŠ·
         color.rgb = RGB2HSV(color.rgb);
 
-        // è‰²ç›¸èª¿æ•´
+        // F‘Š’²®
         color.r += hueShift;
 
-        // å½©åº¦èª¿æ•´
+        // Ê“x’²®
         color.g *= saturation;
 
-        // æ˜Žåº¦èª¿æ•´
+        // –¾“x’²®
         color.b *= brightness;
         
-		// HSV > RGBã«å¤‰æ›
+		// HSV > RGB‚É•ÏŠ·
         color.rgb = HSV2RGB(color.rgb);
     }
 

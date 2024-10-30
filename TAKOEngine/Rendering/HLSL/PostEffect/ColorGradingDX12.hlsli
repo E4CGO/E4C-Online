@@ -1,4 +1,4 @@
-ï»¿// é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼å‡ºåŠ›ãƒ‡ãƒ¼ã‚¿
+// ’¸“_ƒVƒF[ƒ_[o—Íƒf[ƒ^
 struct VS_OUT
 {
 	float4 position : SV_POSITION;
@@ -9,21 +9,21 @@ struct VS_OUT
 #define	KERNEL_MAX 16
 cbuffer CbScene : register(b0)
 {
-    // è¼åº¦ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
-    float threshold; // é«˜è¼åº¦æŠ½å‡ºã®ãŸã‚ã®é–¾å€¤
-    float intensity; // ãƒ–ãƒ«ãƒ¼ãƒ ã®å¼·åº¦
+    // ‹P“xƒVƒF[ƒ_[
+    float threshold; // ‚‹P“x’Šo‚Ì‚½‚ß‚Ìè‡’l
+    float intensity; // ƒuƒ‹[ƒ€‚Ì‹­“x
     float2 dummy;
     
     // GaussianBlur
     float4 weights[KERNEL_MAX * KERNEL_MAX];
-    float2 textureSize;   // æšˆã™ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ã‚µã‚¤ã‚º
-    float  kernelSize;    // ã‚«ãƒ¼ãƒãƒ«ã‚µã‚¤ã‚º
+    float2 textureSize;   // ò‚·ƒeƒNƒXƒ`ƒƒ‚ÌƒTƒCƒY
+    float  kernelSize;    // ƒJ[ƒlƒ‹ƒTƒCƒY
     float  dummy1;
     
     // ColorGrading
-    float hueShift;	    // è‰²ç›¸èª¿æ•´
-	float saturation;	// å½©åº¦èª¿æ•´
-	float brightness;	// æ˜åº¦èª¿æ•´
+    float hueShift;	    // F‘Š’²®
+	float saturation;	// Ê“x’²®
+	float brightness;	// –¾“x’²®
 	float dummy2;
 };
 

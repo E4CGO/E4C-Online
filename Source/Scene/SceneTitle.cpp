@@ -96,12 +96,6 @@ void SceneTitle::Initialize()
 		}
 		
 		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/button_agree.png");
-
-		auto renderTargetTexture = T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene)->GetRenderTargetTexture();
-		if (renderTargetTexture != nullptr)
-		{
-			m_sprites[1] = std::make_unique<SpriteDX12>(1, renderTargetTexture);
-		}
 	}
 
 	// 光
