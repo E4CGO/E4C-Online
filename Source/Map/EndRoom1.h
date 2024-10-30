@@ -1,19 +1,17 @@
-#pragma once
+﻿#pragma once
 
 #include "RoomBase.h"
 
-class SimpleRoom1 : public RoomBase
+class EndRoom1 : public RoomBase
 {
 public:
-	// コンストラクタ（配列から生成を行う）
-	SimpleRoom1(
+	EndRoom1(
 		RoomBase* parent,
 		int pointIndex,
 		std::vector<int> roomTree,
 		int& treeIndex);
 
-	// コンストラクタ（乱数を用いて生成を行う）
-	SimpleRoom1(
+	EndRoom1(
 		RoomBase* parent,
 		int pointIndex);
 

@@ -84,4 +84,3 @@ template class StateMachine<Player>;
 template class StateMachine<Enemy>;
 template class StateMachine<SceneTitle>;
 template class StateMachine<SceneGame>;
-template class StateMachine<SceneDungeon>;

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 
@@ -13,6 +13,12 @@
 
 #include "Map/MapTile.h"
 
+#include "Map/RoomBase.h"
+#include "Map/SimpleRoom1.h"
+#include "Map/EndRoom1.h"
+#include "Map/CrossRoom1.h"
+#include "Map/Passage1.h"
+
 #include "Scene/Scene.h"
 #include "Scene/Stage/Stage.h"
 #include "TAKOEngine/Rendering/DeferredRendering.h"
@@ -23,42 +29,45 @@ public:
 	SceneDungeon();
 	~SceneDungeon() override {};
 
-	// ������
+	// 初期化
 	void Initialize() override;
 
-	// �I����
+	// 終了化
 	void Finalize() override;
 
-	// �X�V����
+	// 更新処理
 	void Update(float elapsedTime) override;
 
-	// �`�揈��
+	// 描画処理
 	void Render() override;
 
-	StateMachine<SceneDungeon>* GetStateMachine() { return stateMachine.get(); }
+	// ダンジョン生成（配列から生成を行う）
+	void GenerateDungeon(std::vector<int> roomTree);
+
+	// ダンジョン生成（乱数を用いて生成を行う）
+	std::vector<int> GenerateDungeon();
 
 private:
 	Camera& camera = Camera::Instance();
 
-	std::unique_ptr<ThridPersonCameraController> cameraController;
+	std::unique_ptr<FreeCameraController> cameraController;
 
 	std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer = std::make_unique<PostprocessingRenderer>();;
 
 	std::unique_ptr<myRenderer::shadow::ShadowMapRender> shadowMapRenderer = std::make_unique<myRenderer::shadow::ShadowMapRender>();
-
-	//std::unique_ptr<MapTile> stage;
-	std::unique_ptr<Player> player;
-
-	std::unique_ptr<StateMachine<SceneDungeon>> stateMachine;
 
 	//DeferredRendering
 	std::unique_ptr<DeferredRendering> deferredRendering = std::make_unique<DeferredRendering>();
 
 	WidgetMenu* menu;
 
+	RoomBase* rootRoom;
+
+	std::vector<int> roomTree;	// 部屋の配置用配列
+
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {
-		"",											// �}�X�N
+		"",											// マスク
 		"Data/Sprites/crosshair122.png",
 		"Data/Sprites/skill_icon.png",
 		"Data/Sprites/big_background.png",

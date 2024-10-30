@@ -1,36 +1,37 @@
 ﻿#include "Map/MapTileManager.h"
 #include "Map/MapTile.h"
 
-#include "Map/SimpleRoom1.h"
-
-#include "Map/EndRoom1.h"
 #include "Map/CrossRoom1.h"
+
+#include "Map/SimpleRoom1.h"
+#include "Map/EndRoom1.h"
 #include "Map/Passage1.h"
 
-// コンストラクタ（配列から生成を行う）
-SimpleRoom1::SimpleRoom1(RoomBase* parent, int pointIndex, std::vector<int> roomTree, int& treeIndex)
+CrossRoom1::CrossRoom1(RoomBase* parent, int pointIndex, std::vector<int> roomTree, int& treeIndex)
 {
-	// 親と接続点番号を代入
 	this->parent = parent;
 	this->parentConnectPointIndex = pointIndex;
 
-	// 深度を取得
 	depth = GetDepth();
 
-	// 部屋タイプを設定
-	roomType = DungeonData::SIMPLE_ROOM_1;
+	roomType = DungeonData::CROSS_ROOM_1;
 
 
-	// 接続点データを設定
+	// 接続点データ
 	CONNECTPOINT_DATA point1;
-	point1.position = { 12.0f, 0.0f, 8.0f };
+	point1.position = { 12.0f, 0.0f, 12.0f };
 	point1.angle = { 0.0f, DirectX::XMConvertToRadians(90.0f), 0.0f };
 	m_connectPointDatas.emplace_back(point1);
 
 	CONNECTPOINT_DATA point2;
-	point2.position = { -12.0f, 0.0f, 8.0f };
+	point2.position = { -12.0f, 0.0f, 12.0f };
 	point2.angle = { 0.0f, DirectX::XMConvertToRadians(-90.0f), 0.0f };
 	m_connectPointDatas.emplace_back(point2);
+
+	CONNECTPOINT_DATA point3;
+	point3.position = { 0.0f, 0.0f, 24.0f };
+	point3.angle = { 0.0f, 0.0f, 0.0f };
+	m_connectPointDatas.emplace_back(point3);
 
 
 	// 接続点の数だけ子を生成する
@@ -62,30 +63,31 @@ SimpleRoom1::SimpleRoom1(RoomBase* parent, int pointIndex, std::vector<int> room
 	}
 }
 
-// コンストラクタ（乱数を用いて生成を行う）
-SimpleRoom1::SimpleRoom1(RoomBase* parent, int pointIndex)
+CrossRoom1::CrossRoom1(RoomBase* parent, int pointIndex)
 {
-	// 親と接続点番号を代入
 	this->parent = parent;
 	this->parentConnectPointIndex = pointIndex;
 
-	// 深度を取得
 	depth = GetDepth();
 
-	// 部屋タイプを設定
-	roomType = DungeonData::SIMPLE_ROOM_1;
+	roomType = DungeonData::CROSS_ROOM_1;
 
 
-	// 接続点データを設定
+	// 接続点データ
 	CONNECTPOINT_DATA point1;
-	point1.position = { 12.0f, 0.0f, 8.0f };
+	point1.position = { 12.0f, 0.0f, 12.0f };
 	point1.angle = { 0.0f, DirectX::XMConvertToRadians(90.0f), 0.0f };
 	m_connectPointDatas.emplace_back(point1);
 
 	CONNECTPOINT_DATA point2;
-	point2.position = { -12.0f, 0.0f, 8.0f };
+	point2.position = { -12.0f, 0.0f, 12.0f };
 	point2.angle = { 0.0f, DirectX::XMConvertToRadians(-90.0f), 0.0f };
 	m_connectPointDatas.emplace_back(point2);
+
+	CONNECTPOINT_DATA point3;
+	point3.position = { 0.0f, 0.0f, 24.0f };
+	point3.angle = { 0.0f, 0.0f, 0.0f };
+	m_connectPointDatas.emplace_back(point3);
 
 
 	// 一定の深度まではランダムな部屋を生成する
@@ -93,8 +95,8 @@ SimpleRoom1::SimpleRoom1(RoomBase* parent, int pointIndex)
 	{
 		// 接続可能な部屋を設定
 		m_connectableRooms.emplace_back(DungeonData::SIMPLE_ROOM_1);
-		//m_connectableRooms.emplace_back(DungeonData::END_ROOM);
-		m_connectableRooms.emplace_back(DungeonData::CROSS_ROOM_1);
+		m_connectableRooms.emplace_back(DungeonData::END_ROOM);
+		//m_connectableRooms.emplace_back(DungeonData::CROSS_ROOM_1);
 		m_connectableRooms.emplace_back(DungeonData::PASSAGE_1);
 
 		// 接続可能な部屋の重みの合計
@@ -156,8 +158,25 @@ SimpleRoom1::SimpleRoom1(RoomBase* parent, int pointIndex)
 	}
 }
 
-void SimpleRoom1::PlaceMapTile()
+void CrossRoom1::PlaceMapTile()
 {
+	/*
+	
+	配置サンプル
+	■：床
+	□：接続点
+
+
+
+	　　　□
+	　　■■■
+	　■■■■■
+	□■■■■■□
+	  ■■■■■
+	  　■■■
+	　　　■
+	*/
+
 	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR, { 0.0f, 0.0f, 0.0f }));
 	m_tileDatas.emplace_back(TILE_DATA(TileType::WALL, { 0.0f, 0.0f, 0.0f },
 		DirectX::XMFLOAT3(0.0f, DirectX::XMConvertToRadians(90.0f), 0.0f)));
@@ -177,6 +196,16 @@ void SimpleRoom1::PlaceMapTile()
 		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
 		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
 		DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
+		DirectX::XMFLOAT3(0.0f, 0.0f, 16.0f),
+		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
+		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
+		DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
+		DirectX::XMFLOAT3(0.0f, 0.0f, 20.0f),
+		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
+		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
+		DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
 
 	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
 		DirectX::XMFLOAT3(4.0f, 0.0f, 4.0f),
@@ -193,12 +222,17 @@ void SimpleRoom1::PlaceMapTile()
 		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
 		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
 		DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
-
 	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
-		DirectX::XMFLOAT3(8.0f, 0.0f, 4.0f),
+		DirectX::XMFLOAT3(4.0f, 0.0f, 16.0f),
 		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
 		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
 		DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
+		DirectX::XMFLOAT3(4.0f, 0.0f, 20.0f),
+		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
+		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
+		DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
+
 	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
 		DirectX::XMFLOAT3(8.0f, 0.0f, 8.0f),
 		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
@@ -206,6 +240,11 @@ void SimpleRoom1::PlaceMapTile()
 		DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
 	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
 		DirectX::XMFLOAT3(8.0f, 0.0f, 12.0f),
+		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
+		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
+		DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
+		DirectX::XMFLOAT3(8.0f, 0.0f, 16.0f),
 		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
 		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
 		DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
@@ -225,12 +264,17 @@ void SimpleRoom1::PlaceMapTile()
 		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
 		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
 		DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
-
 	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
-		DirectX::XMFLOAT3(-8.0f, 0.0f, 4.0f),
+		DirectX::XMFLOAT3(-4.0f, 0.0f, 16.0f),
 		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
 		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
 		DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
+		DirectX::XMFLOAT3(-4.0f, 0.0f, 20.0f),
+		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
+		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
+		DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
+
 	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
 		DirectX::XMFLOAT3(-8.0f, 0.0f, 8.0f),
 		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
@@ -238,6 +282,11 @@ void SimpleRoom1::PlaceMapTile()
 		DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
 	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
 		DirectX::XMFLOAT3(-8.0f, 0.0f, 12.0f),
+		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
+		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
+		DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
+		DirectX::XMFLOAT3(-8.0f, 0.0f, 16.0f),
 		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
 		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
 		DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
@@ -255,12 +304,7 @@ void SimpleRoom1::PlaceMapTile()
 	//	DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
 	//	DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f)));
 
-	//// XとZの最小値、最大値を保存しておき
-	//// それを元に当たり判定を作成する
-	//float minX = INT_MAX;
-	//float maxX = INT_MIN;
-	//float minZ = INT_MAX;
-	//float maxZ = INT_MIN;
+
 
 	for (const TILE_DATA& tileData : m_tileDatas)
 	{
@@ -270,7 +314,6 @@ void SimpleRoom1::PlaceMapTile()
 		{
 		case TileType::FLOOR:
 			fileName = "Data/Model/Dungeon/Floor_Plain_Parent.glb";
-			//fileName = "Data/Model/Dungeon assets/SM_Wall_01a.fbx";
 			break;
 		case TileType::WALL:
 			fileName = "Data/Model/Dungeon/DoorWay Parent 006.glb";
@@ -279,14 +322,6 @@ void SimpleRoom1::PlaceMapTile()
 			fileName = "Data/Model/Dungeon/Floor_Plain_Parent.glb";
 			break;
 		}
-
-
-
-		//// XとZの最小値、最大値を保存しておく
-		//if (tileData.position.x < minX) minX = tileData.position.x;
-		//if (tileData.position.x > maxX) maxX = tileData.position.x;
-		//if (tileData.position.z < minZ) minZ = tileData.position.z;
-		//if (tileData.position.z > maxZ) maxZ = tileData.position.z;
 
 		MapTile* newTile = new MapTile(fileName.c_str(), 1.0f, this);
 		newTile->SetPosition(tileData.position);
@@ -297,9 +332,9 @@ void SimpleRoom1::PlaceMapTile()
 	}
 }
 
-int SimpleRoom1::DrawDebugGUI(int i)
+int CrossRoom1::DrawDebugGUI(int i)
 {
-	if (ImGui::TreeNode(("SimpleRoom1(" + std::to_string(i) + ")").c_str()))
+	if (ImGui::TreeNode(("CrossRoom1(" + std::to_string(i) + ")").c_str()))
 	{
 		DirectX::XMFLOAT3 debugAngle;
 		debugAngle.x = DirectX::XMConvertToDegrees(m_angle.x);

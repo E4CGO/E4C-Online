@@ -1,31 +1,45 @@
-#include "MapTile.h"
+ï»¿#include "MapTile.h"
 
-MapTile::MapTile(const char* filename, float scaling) : ModelObject(filename, scaling)
+MapTile::MapTile(const char* filename, float scaling, RoomBase* parent) :
+	ModelObject(filename, scaling)
 {
-	Update(0);// ƒ‚ƒfƒ‹XV
+	this->parent = parent;
+
+	Update(0);// ãƒ¢ãƒ‡ãƒ«æ›´æ–°
 	//SetCollider(Collider::COLLIDER_TYPE::MAP);
 }
 
-//MapTile::MapTile(const char* filename, RoomBase* parent, float scaling) : ModelObject(filename, scaling)
-//{
-//	this->parent = parent;
-//
-//	Update(0);
-//}
+void MapTile::UpdateTransform()
+{
+	// ã‚¹ã‚±ãƒ¼ãƒ«è¡Œåˆ—ç”Ÿæˆ
+	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
+	// å›žè»¢è¡Œåˆ—ç”Ÿæˆ
+	DirectX::XMMATRIX R = AnglesToMatrix(angle);
+	// ä½ç½®è¡Œåˆ—ç”Ÿæˆ
+	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 
-//MapTile::~MapTile()
-//{
-//	if (parent != nullptr) delete parent;
-//}
-//
-//void MapTile::Update(float elapsedTime)
-//{
-//	// s—ñXV
-//	UpdateTransform(parent->GetTransform());
-//
-//	// ƒAƒjƒ[ƒVƒ‡ƒ“XV
-//	model->UpdateAnimation(elapsedTime * animationSpeed);
-//
-//	// ƒgƒ‰ƒ“ƒXƒtƒH[ƒ€XV
-//	model->UpdateTransform(transform);
-//}
+	DirectX::XMMATRIX LocalTransform = S * R * T;
+
+	DirectX::XMMATRIX ParentTransform;
+	if (parent != nullptr)
+	{
+		DirectX::XMFLOAT4X4 parentTransform = parent->GetTransform();
+		ParentTransform = DirectX::XMLoadFloat4x4(&parentTransform);
+	}
+	else
+	{
+		ParentTransform = DirectX::XMMatrixIdentity();
+	}
+	DirectX::XMMATRIX GlobalTransform = LocalTransform * ParentTransform;
+
+	DirectX::XMStoreFloat4x4(&transform, GlobalTransform);
+}
+
+void MapTile::Update(float elapsedTime)
+{
+	UpdateTransform();
+
+	model->UpdateAnimation(elapsedTime * animationSpeed);
+
+	model->UpdateTransform(transform);
+}

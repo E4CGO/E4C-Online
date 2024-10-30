@@ -1,4 +1,4 @@
-#include "SceneDungeon.h"
+ï»¿#include "SceneDungeon.h"
 
 #include <locale.h>
 #include <profiler.h>
@@ -15,7 +15,6 @@
 #include "TAKOEngine/Tool/Encode.h"
 
 #include "Scene/SceneManager.h"
-#include "Scene/SceneDungeonState.h"
 #include "Scene/SceneTitle.h"
 #include "Scene/Stage/StageManager.h"
 #include "Scene/Stage/TestingStage.h"
@@ -31,8 +30,6 @@
 
 #include "GameData.h"
 
-using namespace SceneDungeonState;
-
 SceneDungeon::SceneDungeon()
 {
 
@@ -43,10 +40,6 @@ void SceneDungeon::Initialize()
 	ID3D11Device* device = T_GRAPHICS.GetDevice();
 	float screenWidth = T_GRAPHICS.GetScreenWidth();
 	float screenHeight = T_GRAPHICS.GetScreenHeight();
-
-	player = std::make_unique<Knight>();
-	player->SetPosition({ 0, 10, 0 });
-	player->GetStateMachine()->ChangeState(static_cast<int>(Player::State::Idle));
 
 	// Sprite Resource Preload
 	for (auto& filename : spriteList)
@@ -62,52 +55,37 @@ void SceneDungeon::Initialize()
 	//DeferredRendering
 	deferredRendering->Initialize();
 
-	//ƒVƒƒƒhƒEƒ}ƒbƒvƒŒƒ“ƒ_ƒ‰
+	//ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ãƒ¬ãƒ³ãƒ€ãƒ©
 	shadowMapRenderer->Initialize();
 
-	//ƒ‰ƒCƒgî•ñ
+	//ãƒ©ã‚¤ãƒˆæƒ…å ±
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
 	shadowMapRenderer->SetShadowLight(dl);
 
-	// ƒJƒƒ‰İ’è
+	// ã‚«ãƒ¡ãƒ©è¨­å®š
 	camera.SetPerspectiveFov(
-		DirectX::XMConvertToRadians(45),							// ‰æŠp
-		T_GRAPHICS.GetScreenWidth() / T_GRAPHICS.GetScreenHeight(),	// ‰æ–ÊƒAƒXƒyƒNƒg”ä
-		0.1f,														// ƒjƒAƒNƒŠƒbƒv
-		10000.0f);													// ƒtƒ@[ƒNƒŠƒbƒv
+		DirectX::XMConvertToRadians(45),							// ç”»è§’
+		T_GRAPHICS.GetScreenWidth() / T_GRAPHICS.GetScreenHeight(),	// ç”»é¢ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”
+		0.1f,														// ãƒ‹ã‚¢ã‚¯ãƒªãƒƒãƒ—
+		10000.0f);													// ãƒ•ã‚¡ãƒ¼ã‚¯ãƒªãƒƒãƒ—
 
 	camera.SetLookAt(
-		{ 0, 5.0f, 10.0f },	     // ‹“_
-		{ 0, 0, 0 },	         // ’‹“_
-		{ 0, 0.969f, -0.248f }); // ãƒxƒNƒgƒ‹
+		{ 0, 5.0f, 10.0f },	     // è¦–ç‚¹
+		{ 0, 0, 0 },	         // æ³¨è¦–ç‚¹
+		{ 0, 0.969f, -0.248f }); // ä¸Šãƒ™ã‚¯ãƒˆãƒ«
 
-	cameraController = std::make_unique<ThridPersonCameraController>();
+	cameraController = std::make_unique<FreeCameraController>();
 	cameraController->SyncCameraToController(camera);
 	cameraController->SetEnable(true);
-	cameraController->SetPlayer(player.get());
 
-	//ƒXƒe[ƒW
-	//MapTile* wall = new MapTile("Data/Model/Dungeon/WallParent004.glb", 10.0f);
+	//ã‚¹ãƒ†ãƒ¼ã‚¸
 	MapTile* floor = new MapTile("Data/Model/Dungeon/Floor_Plain_Parent.glb", 1.0f);
-	//MapTile* floor2 = new MapTile("Data/Model/Dungeon/Floor_Plain_Parent.glb", 1.0f);
-	//floor2->SetPosition({ 4, 0, 0 });
-	//stage = std::make_unique<MapTile>("Data/Model/Map/floor_dirt_large.gltf.glb", 1.0f);
-	//stage = std::make_unique<TestingStage>();
-
 	MAPTILES.Register(floor);
 
-	//for (int i = 0; i <= 0; i++)
-	//{
-	//	MapTile* newTile = new MapTile("Data/Model/Dungeon/Floor_Plain_Parent.glb", 1.0f);
-	//	newTile->SetPosition({ (4.0f * i), 0.0f, 0.0f });
-	//	newTile->Update(0);
-	//	MAPTILES.Register(newTile);
-	//}
-
-	//	ƒ‚ƒfƒ‹‚ğƒŒƒ“ƒ_ƒ‰[‚É“o˜^
+	//	ãƒ¢ãƒ‡ãƒ«ã‚’ãƒ¬ãƒ³ãƒ€ãƒ©ãƒ¼ã«ç™»éŒ²
 	iModel* list[] =
 	{
 		MAPTILES.get(0)->GetModel().get(),
@@ -115,15 +93,14 @@ void SceneDungeon::Initialize()
 	for (iModel* model : list)
 	{
 		if (!model) continue;
-		//shadowMapRenderer->ModelRegister(model);
 	}
 
-	stateMachine = std::make_unique<StateMachine<SceneDungeon>>();
-	stateMachine->RegisterState(DungeonState::GENERATE, new SceneDungeonState::GenerateState(this));
-	stateMachine->RegisterState(DungeonState::GAME, new SceneDungeonState::GameState(this));
-	stateMachine->SetState(DungeonState::GENERATE);
 
-	//stateMachine->Update(0);
+
+	// éƒ¨å±‹ã®ç”Ÿæˆã‚’é–‹å§‹ã™ã‚‹
+	roomTree = GenerateDungeon();
+
+	int a = 0;
 }
 
 void SceneDungeon::Finalize()
@@ -131,6 +108,9 @@ void SceneDungeon::Finalize()
 	modelPreLoad.clear();
 	spritePreLoad.clear();
 	shadowMapRenderer->Clear();
+
+	delete rootRoom;
+
 	CURSOR_ON;
 	PLAYERS.Clear();
 	MAPTILES.Clear();
@@ -143,18 +123,16 @@ void SceneDungeon::Finalize()
 
 void SceneDungeon::Update(float elapsedTime)
 {
-	stateMachine->Update(elapsedTime);
-	player->Update(elapsedTime);
+	rootRoom->Update(elapsedTime);
 
-	// G‚É—‚¿‚È‚¢‚æ‚¤‚É‚·‚é
-	DirectX::XMFLOAT3 playerPos = player->GetPosition();
-	player->SetPosition({ playerPos.x, 0.0f, playerPos.z });
+	std::vector<RoomBase*> roomList = rootRoom->GetAllChilds();
+	int a = 0;
 
 	MAPTILES.Update(elapsedTime);
 	COLLISION.Update(elapsedTime);
 	STAGES.Update(elapsedTime);
 
-	// ƒJƒƒ‰XV
+	// ã‚«ãƒ¡ãƒ©æ›´æ–°
 	cameraController->Update(elapsedTime);
 	cameraController->SyncContrllerToCamera(camera);
 }
@@ -165,32 +143,30 @@ void SceneDungeon::Render()
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Scene)->Clear(T_GRAPHICS.GetDeviceContext(), 0.2f, 0.2f, 0.2f, 1);
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Scene)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
 
-	// •`‰æƒRƒ“ƒeƒLƒXƒgİ’è
+	// æç”»ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆè¨­å®š
 	RenderContext rc;
 	rc.camera = &camera;
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
-	// ƒ‰ƒCƒg‚Ìî•ñ‚ğ‹l‚ß‚Ş
+	// ãƒ©ã‚¤ãƒˆã®æƒ…å ±ã‚’è©°ã‚è¾¼ã‚€
 	LightManager::Instance().PushRenderContext(rc);
 
-	//ƒVƒƒƒhƒEƒ}ƒbƒv•`‰æ
+	//ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—æç”»
 	shadowMapRenderer->Render();
 	rc.shadowMapData = shadowMapRenderer->GetShadowMapData();
 
-	// “à—e•`‰æ
+	// å†…å®¹æç”»
 	{
 		//Deferred Rendering
 		deferredRendering->SetDeferredRTV();
 
-		player->Render(rc);
-
-		//ƒIƒuƒWƒFƒNƒg•`‰æ
-		MAPTILES.Render(rc);					// ƒ}ƒbƒv
-		PLAYERS.Render(rc);						// ƒvƒŒƒCƒ„[
-		PROJECTILES.Render(rc);					// ”­Ë•¨
-		STAGES.Render(rc);						// ƒXƒe[ƒWƒIƒuƒWƒFƒNƒg
-		EFFECTS.Render(camera.GetView(), camera.GetProjection()); 	// ƒGƒtƒFƒNƒg
+		//ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆæç”»
+		MAPTILES.Render(rc);					// ãƒãƒƒãƒ—
+		PLAYERS.Render(rc);						// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼
+		PROJECTILES.Render(rc);					// ç™ºå°„ç‰©
+		STAGES.Render(rc);						// ã‚¹ãƒ†ãƒ¼ã‚¸ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+		EFFECTS.Render(camera.GetView(), camera.GetProjection()); 	// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
 	}
 #ifdef _DEBUG
 	{
@@ -198,12 +174,12 @@ void SceneDungeon::Render()
 	}
 #endif // _DEBUG
 
-	// ƒ‰ƒCƒ“ƒŒƒ“ƒ_ƒ‰•`‰æÀs
+	// ãƒ©ã‚¤ãƒ³ãƒ¬ãƒ³ãƒ€ãƒ©æç”»å®Ÿè¡Œ
 	T_GRAPHICS.GetLineRenderer()->Render(T_GRAPHICS.GetDeviceContext(), camera.GetView(), camera.GetProjection());
-	// ƒfƒoƒbƒOƒŒƒ“ƒ_ƒ‰•`‰æÀs
+	// ãƒ‡ãƒãƒƒã‚°ãƒ¬ãƒ³ãƒ€ãƒ©æç”»å®Ÿè¡Œ
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), camera.GetView(), camera.GetProjection());
 
-	//	ƒ|ƒXƒgƒvƒƒZƒXˆ—‚ğs‚¤
+	//	ãƒã‚¹ãƒˆãƒ—ãƒ­ã‚»ã‚¹å‡¦ç†ã‚’è¡Œã†
 	{
 		T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->Clear(T_GRAPHICS.GetDeviceContext(), 0.0f, 0.0f, 0.0f, 1.0f);
 		T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
@@ -213,13 +189,42 @@ void SceneDungeon::Render()
 	//DeferredRendering
 	deferredRendering->Render();
 
-	UI.Render(rc);						// ƒCƒ“ƒ^[ƒtƒF[ƒX
+	UI.Render(rc);						// ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ãƒ¼ã‚¹
 
 	T_TEXT.End();
 
 #ifdef _DEBUG
 	ProfileDrawUI();
+	rootRoom->DrawDebugGUI();
 	shadowMapRenderer->DrawDebugGUI();
 	deferredRendering->DrawDebugGUI();
 #endif // _DEBUG
+}
+
+void SceneDungeon::GenerateDungeon(std::vector<int> roomTree)
+{
+	int treeIndex = 0;
+	rootRoom = new SimpleRoom1(nullptr, -1, roomTree, treeIndex);
+
+	// éƒ¨å±‹ã®ãƒ¢ãƒ‡ãƒ«ã‚’é…ç½®
+	rootRoom->PlaceMapTile();
+	for (RoomBase* room : rootRoom->GetAllChilds())
+	{
+		room->PlaceMapTile();
+	}
+}
+
+std::vector<int> SceneDungeon::GenerateDungeon()
+{
+	std::vector<int> roomTree;
+
+	rootRoom = new SimpleRoom1(nullptr, -1);
+
+	// éƒ¨å±‹ã®ãƒ¢ãƒ‡ãƒ«ã‚’é…ç½®ã—ã¤ã¤é…åˆ—ã«ä¿å­˜
+	for (RoomBase* room : rootRoom->GetAll())
+	{
+		room->PlaceMapTile();
+		roomTree.emplace_back(room->GetRoomType());
+	}
+	return roomTree;
 }
