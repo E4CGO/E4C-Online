@@ -10,26 +10,26 @@
 
 class Enemy;
 
-static const uint32_t Input_Up = (1 << 0);			// ã
-static const uint32_t Input_Down = (1 << 1);		// ‰º
-static const uint32_t Input_Left = (1 << 2);		// ¶
-static const uint32_t Input_Right = (1 << 3);		// ‰E
-static const uint32_t Input_Jump = (1 << 4);		// ƒWƒƒƒ“ƒv
-static const uint32_t Input_Dodge = (1 << 5);		// ‰ñ”ğ
-static const uint32_t Input_Attack_N = (1 << 6);	// ˆê”ÊUŒ‚
-static const uint32_t Input_Attack_S = (1 << 7);	// “ÁêUŒ‚
-static const uint32_t Input_Skill_1 = (1 << 8);		// ƒXƒLƒ‹1
-static const uint32_t Input_Skill_2 = (1 << 9);		// ƒXƒLƒ‹2
-static const uint32_t Input_Skill_3 = (1 << 10);	// ƒXƒLƒ‹3
-static const uint32_t Input_Skill_4 = (1 << 11);	// ƒXƒLƒ‹4
-static const uint32_t Input_Menu = (1 << 12);		// ƒƒjƒ…[
+static const uint32_t Input_Up = (1 << 0);			// ä¸Š
+static const uint32_t Input_Down = (1 << 1);		// ä¸‹
+static const uint32_t Input_Left = (1 << 2);		// å·¦
+static const uint32_t Input_Right = (1 << 3);		// å³
+static const uint32_t Input_Jump = (1 << 4);		// ã‚¸ãƒ£ãƒ³ãƒ—
+static const uint32_t Input_Dodge = (1 << 5);		// å›é¿
+static const uint32_t Input_Attack_N = (1 << 6);	// ä¸€èˆ¬æ”»æ’ƒ
+static const uint32_t Input_Attack_S = (1 << 7);	// ç‰¹æ®Šæ”»æ’ƒ
+static const uint32_t Input_Skill_1 = (1 << 8);		// ã‚¹ã‚­ãƒ«1
+static const uint32_t Input_Skill_2 = (1 << 9);		// ã‚¹ã‚­ãƒ«2
+static const uint32_t Input_Skill_3 = (1 << 10);	// ã‚¹ã‚­ãƒ«3
+static const uint32_t Input_Skill_4 = (1 << 11);	// ã‚¹ã‚­ãƒ«4
+static const uint32_t Input_Menu = (1 << 12);		// ãƒ¡ãƒ‹ãƒ¥ãƒ¼
 
-static const uint32_t Input_R_Attack_N = (1 << 13);	// ˆê”ÊUŒ‚ƒŠƒŠ[ƒX
-static const uint32_t Input_R_Attack_S = (1 << 14);	// “ÁêUŒ‚ƒŠƒŠ[ƒX
-static const uint32_t Input_R_Skill_1 = (1 << 15);	// ƒXƒLƒ‹1ƒŠƒŠ[ƒX
-static const uint32_t Input_R_Skill_2 = (1 << 16);	// ƒXƒLƒ‹2ƒŠƒŠ[ƒX
-static const uint32_t Input_R_Skill_3 = (1 << 17);	// ƒXƒLƒ‹3ƒŠƒŠ[ƒX
-static const uint32_t Input_R_Skill_4 = (1 << 18);	// ƒXƒLƒ‹4ƒŠƒŠ[ƒX
+static const uint32_t Input_R_Attack_N = (1 << 13);	// ä¸€èˆ¬æ”»æ’ƒãƒªãƒªãƒ¼ã‚¹
+static const uint32_t Input_R_Attack_S = (1 << 14);	// ç‰¹æ®Šæ”»æ’ƒãƒªãƒªãƒ¼ã‚¹
+static const uint32_t Input_R_Skill_1 = (1 << 15);	// ã‚¹ã‚­ãƒ«1ãƒªãƒªãƒ¼ã‚¹
+static const uint32_t Input_R_Skill_2 = (1 << 16);	// ã‚¹ã‚­ãƒ«2ãƒªãƒªãƒ¼ã‚¹
+static const uint32_t Input_R_Skill_3 = (1 << 17);	// ã‚¹ã‚­ãƒ«3ãƒªãƒªãƒ¼ã‚¹
+static const uint32_t Input_R_Skill_4 = (1 << 18);	// ã‚¹ã‚­ãƒ«4ãƒªãƒªãƒ¼ã‚¹
 
 enum PLAYER_CLASS
 {
@@ -70,8 +70,8 @@ public:
 	void InputMove(float elapsedTime);
 
 	DirectX::XMFLOAT2 GetInputDirection();
-	// “ü—ÍŠÇ—
-	void UpdateInput();						// ƒL[“ü—Í
+	// å…¥åŠ›ç®¡ç†
+	void UpdateInput();						// ã‚­ãƒ¼å…¥åŠ›
 	bool InputJump() { return (input & Input_Jump); }
 	bool InputDodge();
 	bool InputAttackNormal() { return (input & Input_Attack_N) > 0; }
@@ -105,18 +105,18 @@ public:
 
 	void SetName(const char* name) { strcpy_s(this->name, 64, name); };
 
-	// MPŠÇ—
+	// MPç®¡ç†
 	void RecoverMp(float elapsedTime);
 	void ModifyMp(float mp);
 	float GetMp() { return mp; }
 	float GetMaxMp() { return maxMp; }
 
-	// ƒXƒLƒ‹ƒ^ƒCƒ}[
+	// ã‚¹ã‚­ãƒ«ã‚¿ã‚¤ãƒãƒ¼
 	float GetSkillTimerTime(int idx);
 	float GetSkillTimerRate(int idx);
 	void ResetSkillTimer(int idx);
 
-	// ƒXƒLƒ‹
+	// ã‚¹ã‚­ãƒ«
 	void SkillCost(int idx);
 
 	void StopMove() { velocity.x = velocity.z = 0.0f; }
@@ -124,7 +124,7 @@ public:
 
 	float GetMpCost(int idx);
 
-	// ©‹@”»’è
+	// è‡ªæ©Ÿåˆ¤å®š
 	bool IsPlayer() { return GAME_DATA.GetClientId() == client_id; };
 
 	virtual void OnDamage(const HitResult& hit, int damage);
@@ -143,10 +143,10 @@ public:
 	static DirectX::XMFLOAT4 GetColorSet(int idx) { return Player::colorSet[idx]; }
 protected:
 	void RegisterCommonState();
-	void UpdateTarget();													// ©‹@—pƒAƒCƒ€–Ú•WXV
-	virtual void UpdateColliders() override;								// Õ“Ë”»’è‚ÌXV
+	void UpdateTarget();													// è‡ªæ©Ÿç”¨ã‚¢ã‚¤ãƒ ç›®æ¨™æ›´æ–°
+	virtual void UpdateColliders() override;								// è¡çªåˆ¤å®šã®æ›´æ–°
 
-	void UpdateSkillTimers(float elapsedTime);								// ƒXƒLƒ‹ƒ^ƒCƒ}[
+	void UpdateSkillTimers(float elapsedTime);								// ã‚¹ã‚­ãƒ«ã‚¿ã‚¤ãƒãƒ¼
 
 	bool CollisionVsEnemies(
 		Collider* collider,
@@ -155,7 +155,7 @@ protected:
 		float force = 0.0f,
 		int effectIdx = -1,
 		float effectScale = 1.0f
-	); // ”Ä—p “G‚Æ‚Ì”»’è
+	); // æ±ç”¨ æ•µã¨ã®åˆ¤å®š
 public:
 	// KayKit Adventurers
 	enum Animation
@@ -256,8 +256,8 @@ public:
 		Skill_4,
 		Skill_3,
 
-		Waiting = 998,	// ‘Ò‹@
-		Ready = 999,	// ‘Ò‹@ (€”õŠ®—¹)
+		Waiting = 998,	// å¾…æ©Ÿ
+		Ready = 999,	// å¾…æ©Ÿ (æº–å‚™å®Œäº†)
 	};
 
 	enum COLOR_PATTERN {
@@ -268,14 +268,14 @@ public:
 		END
 	};
 protected:
-	uint32_t input = 0;						// ƒL[“ü—Í
-	DirectX::XMFLOAT2 inputDirection = {};	// ˆÚ“®•ûŒü
-	DirectX::XMFLOAT3 target = {};			// ƒAƒCƒ€–Ú•W
+	uint32_t input = 0;						// ã‚­ãƒ¼å…¥åŠ›
+	DirectX::XMFLOAT2 inputDirection = {};	// ç§»å‹•æ–¹å‘
+	DirectX::XMFLOAT3 target = {};			// ã‚¢ã‚¤ãƒ ç›®æ¨™
 
 	int client_id = -1;
 	float mp = 100.0f;
 	float maxMp = 100.0f;
-	float mpRecoverRate = 8.0f; // –ˆ•b‰ñ•œ—Ê
+	float mpRecoverRate = 8.0f; // æ¯ç§’å›å¾©é‡
 	PLAYER_CLASS type = PLAYER_CLASS::Null;
 	int atk = 10;
 	char name[64];
@@ -285,10 +285,10 @@ protected:
 	float jumpSpeed = 0.0f;
 	float dodgeSpeed = 0.0f;
 
-	// MPÁ”ï
+	// MPæ¶ˆè²»
 	std::unordered_map<int, float> mpCost;
 
-	// ƒXƒLƒ‹ƒN[ƒ‹ƒ^ƒCƒ€
+	// ã‚¹ã‚­ãƒ«ã‚¯ãƒ¼ãƒ«ã‚¿ã‚¤ãƒ 
 	struct SkillTimer {
 		float currentTimer;
 		float time;
@@ -310,5 +310,5 @@ protected:
 
 	StateMachine<Player>* stateMachine;
 
-	std::unordered_map<int, Collider*> attackColliders; // UŒ‚”»’è
+	std::unordered_map<int, Collider*> attackColliders; // æ”»æ’ƒåˆ¤å®š
 };

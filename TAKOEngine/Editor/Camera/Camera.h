@@ -3,7 +3,7 @@
 
 #include <DirectXMath.h>
 #include <vector>
-// ƒJƒƒ‰
+// ã‚«ãƒ¡ãƒ©
 
 class Camera
 {
@@ -11,55 +11,55 @@ public:
 	Camera() {};
 	~Camera() {};
 public:
-	// w’è•ûŒü‚ğŒü‚­
+	// æŒ‡å®šæ–¹å‘ã‚’å‘ã
 	void SetLookAt(const DirectX::XMFLOAT3& eye, const DirectX::XMFLOAT3& focus, const DirectX::XMFLOAT3& up);
 	
-	// ƒp[ƒXƒyƒNƒeƒBƒuİ’è
+	// ãƒ‘ãƒ¼ã‚¹ãƒšã‚¯ãƒ†ã‚£ãƒ–è¨­å®š
 	void SetPerspectiveFov(float fovY, float aspect, float nearZ, float farZ);
 	
-	// ƒrƒ…[s—ñæ“¾
+	// ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—å–å¾—
 	const DirectX::XMFLOAT4X4& GetView() const { return view; }
 
-	// ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñæ“¾
+	// ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—å–å¾—
 	const DirectX::XMFLOAT4X4& GetProjection() const { return projection; }
 	
-	// ‹“_æ“¾
+	// è¦–ç‚¹å–å¾—
 	const DirectX::XMFLOAT3& GetEye() const { return eye; }
 	
-	// ’‹“_æ“¾
+	// æ³¨è¦–ç‚¹å–å¾—
 	const DirectX::XMFLOAT3& GetFocus() const { return focus; }
 	
-	// ã•ûŒüæ“¾
+	// ä¸Šæ–¹å‘å–å¾—
 	const DirectX::XMFLOAT3& GetUp() const { return up; }
 	
-	// ‘O•ûŒüæ“¾
+	// å‰æ–¹å‘å–å¾—
 	const DirectX::XMFLOAT3& GetFront() const { return front; }
 	
-	// ‰E•ûŒüæ“¾
+	// å³æ–¹å‘å–å¾—
 	const DirectX::XMFLOAT3& GetRight() const { return right; }
 
-	//‹–ìŠpæ“¾
+	//è¦–é‡è§’å–å¾—
 	const float& GetFovY() { return fovY; }
 
-	//ƒAƒXƒyƒNƒg”äæ“¾
+	//ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”å–å¾—
 	const float& GetAspect() { return aspect; }
 
-	//‰“•½–Ê‚Ü‚Å‚Ì‹——£‚ğæ“¾
+	//é å¹³é¢ã¾ã§ã®è·é›¢ã‚’å–å¾—
 	const float& GetFarZ() { return farZ; }
 
-	//‹ß•½–Ê‚Ü‚Å‚Ì‹——£‚ğæ“¾
+	//è¿‘å¹³é¢ã¾ã§ã®è·é›¢ã‚’å–å¾—
 	const float& GetNearZ() { return nearZ; }
 
-	//ƒCƒ“ƒfƒbƒNƒXæ“¾
+	//ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹å–å¾—
 	int& GetSegment() { return currentSegment; }
 
-	//“®‚­ƒJƒƒ‰
+	//å‹•ãã‚«ãƒ¡ãƒ©
 	void MoveToCamera(const DirectX::XMFLOAT3& eye, const DirectX::XMFLOAT3& focus, float transitiontime, float transitionDuration, float elapsedTime);
-	//‰ñ“]‚·‚éƒJƒƒ‰
+	//å›è»¢ã™ã‚‹ã‚«ãƒ¡ãƒ©
 	void RotateToCamera(const DirectX::XMFLOAT3& target, float& angle, float radius, float speed, float elapsedTime);
-	//n“_A’†“_AI“_‚Ìƒ|ƒCƒ“ƒg‚ğŒo—R‚µ‚ÄˆÚ“®‚·‚éƒJƒƒ‰
+	//å§‹ç‚¹ã€ä¸­ç‚¹ã€çµ‚ç‚¹ã®ãƒã‚¤ãƒ³ãƒˆã‚’çµŒç”±ã—ã¦ç§»å‹•ã™ã‚‹ã‚«ãƒ¡ãƒ©
 	void MovePointToCamera(const std::vector<DirectX::XMFLOAT3>& positions, const std::vector<DirectX::XMFLOAT3>& focusPoints,float& transitionTime, float transitionDuration, float elapsedTime);
-	//n“_AI“_‚Ìƒ|ƒCƒ“ƒg‚ğŒo—R‚µ‚ÄˆÚ“®‚·‚éƒJƒƒ‰
+	//å§‹ç‚¹ã€çµ‚ç‚¹ã®ãƒã‚¤ãƒ³ãƒˆã‚’çµŒç”±ã—ã¦ç§»å‹•ã™ã‚‹ã‚«ãƒ¡ãƒ©
 	void Move2PointToCamera(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const DirectX::XMFLOAT3& startFocus, const DirectX::XMFLOAT3& endFocus, float& transitionTime, float transitionDuration, float elapsedTime);
 private:
 	DirectX::XMFLOAT4X4 view;
@@ -77,8 +77,8 @@ private:
 	float nearZ;
 	float farZ;
 
-	std::vector<DirectX::XMFLOAT3> cameraPositions;  // ƒJƒƒ‰‚ÌŠeƒ|ƒCƒ“ƒg‚ÌˆÊ’u
-	std::vector<DirectX::XMFLOAT3> cameraFocusPoints;  // ƒJƒƒ‰‚ÌŠeƒ|ƒCƒ“ƒg‚Ì’‹“_
+	std::vector<DirectX::XMFLOAT3> cameraPositions;  // ã‚«ãƒ¡ãƒ©ã®å„ãƒã‚¤ãƒ³ãƒˆã®ä½ç½®
+	std::vector<DirectX::XMFLOAT3> cameraFocusPoints;  // ã‚«ãƒ¡ãƒ©ã®å„ãƒã‚¤ãƒ³ãƒˆã®æ³¨è¦–ç‚¹
 	
 	int currentSegment = 0;
 };

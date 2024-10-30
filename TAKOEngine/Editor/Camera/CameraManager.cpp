@@ -1,15 +1,15 @@
 //! @file CameraManager.cpp
-//! @note ƒJƒƒ‰ŠÇ—
+//! @note ã‚«ãƒ¡ãƒ©ç®¡ç†
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
 /**************************************************************************//**
-		@brief		XV
-		@param[in]	‚È‚µ
-		@return		‚È‚µ
+		@brief		æ›´æ–°
+		@param[in]	ãªã—
+		@return		ãªã—
 *//***************************************************************************/
 void CameraManager::Update()
 {
 
-	//”jŠüˆ—
+	//ç ´æ£„å‡¦ç†
 	for (Camera* camera : removes)
 	{
 		auto it = std::find(cameras.begin(), cameras.end(), camera);
@@ -24,28 +24,28 @@ void CameraManager::Update()
 
 }
 /**************************************************************************//**
-		@brief		íœ
-		@param[in]	‚È‚µ
-		@return		‚È‚µ
+		@brief		å‰Šé™¤
+		@param[in]	ãªã—
+		@return		ãªã—
 *//***************************************************************************/
 void CameraManager::Remove(Camera* camera)
 {
-	//”jŠüƒŠƒXƒg‚É’Ç‰Á
+	//ç ´æ£„ãƒªã‚¹ãƒˆã«è¿½åŠ 
 	removes.insert(camera);
 }
 /**************************************************************************//**
-		@brief		“o˜^
-		@param[in]	‚È‚µ
-		@return		‚È‚µ
+		@brief		ç™»éŒ²
+		@param[in]	ãªã—
+		@return		ãªã—
 *//***************************************************************************/
 void CameraManager::Register(Camera* camera)
 {
 	cameras.emplace_back(camera);
 }
 /**************************************************************************//**
-		@brief		ƒNƒŠƒA
-		@param[in]	‚È‚µ
-		@return		‚È‚µ
+		@brief		ã‚¯ãƒªã‚¢
+		@param[in]	ãªã—
+		@return		ãªã—
 *//***************************************************************************/
 void CameraManager::Clear()
 {

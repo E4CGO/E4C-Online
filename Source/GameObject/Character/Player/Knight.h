@@ -9,11 +9,11 @@ public:
 	void AttackCollision() override;
 	void RenderTrail();
 	void OnDamage(const HitResult& hit, int damage) override;
-	//Œ•‚Ì‹OÕƒm[ƒhæ“¾
+	//å‰£ã®è»Œè·¡ãƒãƒ¼ãƒ‰å–å¾—
 	const iModel::Node* GetSwordtrailNode();
 private:
 	void UpdateColliders() override;
-	//ƒ|ƒŠƒSƒ“‚ÌÅ‘å”
+	//ãƒãƒªã‚´ãƒ³ã®æœ€å¤§æ•°
 	static const int MAX_POLYGON = 12;
 	XMFLOAT3 trailPosition[2][MAX_POLYGON];
 public:
@@ -25,14 +25,14 @@ public:
 		Shield
 	};
 
-	// ˆê”ÊUŒ‚iŒ•j
+	// ä¸€èˆ¬æ”»æ’ƒï¼ˆå‰£ï¼‰
 	enum ATTACK_STATE {
 		ATTACK_1,
 		ATTACK_2,
 		ATTACK_3,
 	};
 
-	// “ÁêUŒ‚i‚j
+	// ç‰¹æ®Šæ”»æ’ƒï¼ˆç›¾ï¼‰
 	enum BLOCK_STATE {
 		BLOCK_START,
 		BLOCK_ATTACK,

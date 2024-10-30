@@ -8,26 +8,26 @@
 
 WidgetEnemiesHp::WidgetEnemiesHp(DirectX::XMFLOAT2 size)
 {
-	this->gauge = RESOURCE.LoadSpriteResource(""); // ’·•ûŒ`
+	this->gauge = RESOURCE.LoadSpriteResource(""); // é•·æ–¹å½¢
 
-	this->size = size; // ƒQ[ƒWƒTƒCƒY
+	this->size = size; // ã‚²ãƒ¼ã‚¸ã‚µã‚¤ã‚º
 }
 WidgetEnemiesHp::WidgetEnemiesHp(float width, float height) :WidgetEnemiesHp(DirectX::XMFLOAT2{ width, height }) {}
 
 void WidgetEnemiesHp::Render(const RenderContext& rc)
 {
-	// ƒrƒ…[ƒ{[ƒh
+	// ãƒ“ãƒ¥ãƒ¼ãƒœãƒ¼ãƒ‰
 	D3D11_VIEWPORT viewport;
 	
 	UINT numViewports = 1;
 	rc.deviceContext->RSGetViewports(&numViewports, &viewport);
 
-	// •ÏŠ·s—ñ
+	// å¤‰æ›è¡Œåˆ—
 	DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&CameraManager::Instance().GetCamera()->GetView());
 	DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&CameraManager::Instance().GetCamera()->GetProjection());
 	DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
 
-	// ƒJƒƒ‰
+	// ã‚«ãƒ¡ãƒ©
 	DirectX::XMFLOAT3 front = CameraManager::Instance().GetCamera()->GetFront();
 	DirectX::XMFLOAT3 eye = CameraManager::Instance().GetCamera()->GetEye();
 
