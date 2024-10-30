@@ -3,6 +3,7 @@
 #include "TAKOEngine/Network/HttpRequest.h"
 #include "TAKOEngine/AI/BaseState.h"
 #include "Source/UI/Widget/WidgetButtonImage.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 
 #include "Scene/GameLoop/SceneCharacter/SceneCharacter_E4C.h"
 
@@ -24,6 +25,7 @@ namespace SceneCharacter_E4CState
 		void Exit() override;
 	private:
 		float timer = 0.0f;
+
 	};
 
 	// タイトルステート
@@ -42,6 +44,7 @@ namespace SceneCharacter_E4CState
 		void Exit() override;
 	private:
 		float timer = 0.0f;
+	
 	};
 
 	// ログインステート
@@ -58,6 +61,7 @@ namespace SceneCharacter_E4CState
 		void Execute(float elapsedTime) override;
 		// ステートから出ていくときのメソッド
 		void Exit() override;
+		Camera* mainCamera;
 	};
 
 	// ログインステート
@@ -74,6 +78,7 @@ namespace SceneCharacter_E4CState
 		void Execute(float elapsedTime) override;
 		// ステートから出ていくときのメソッド
 		void Exit() override;
+		Camera* mainCamera;
 	};
 
 	// ログインステート
@@ -90,6 +95,7 @@ namespace SceneCharacter_E4CState
 		void Execute(float elapsedTime) override;
 		// ステートから出ていくときのメソッド
 		void Exit() override;
+		Camera* mainCamera;
 	};
 
 	// タイトルステート

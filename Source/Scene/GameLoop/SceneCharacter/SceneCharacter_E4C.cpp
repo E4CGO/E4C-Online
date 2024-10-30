@@ -58,20 +58,25 @@ void SceneCharacter_E4C::Initialize()
 	LightManager::Instance().Register(dl);
 	shadowMapRenderer->SetShadowLight(dl);
 
+	CameraManager& cameraManager = CameraManager::Instance();
+	mainCamera = new Camera();
+	cameraManager.Register(mainCamera);
+	cameraManager.SetCamera(0);
+
 	// カメラ設定
-	camera.SetPerspectiveFov(
+	CameraManager::Instance().GetCamera()->SetPerspectiveFov(
 		DirectX::XMConvertToRadians(45),		// 画角
 		SCREEN_W / SCREEN_H,					// 画面アスペクト比
 		0.1f,									// ニアクリップ
 		10000.0f								// ファークリップ
 	);
-	camera.SetLookAt(
+	CameraManager::Instance().GetCamera()->SetLookAt(
 		{ 0, 3.0f, 13.0f },				// 視点
 		{ 0.0f, 0.0, 0.0f },					// 注視点
 		{ 0.036f, 0.999f, -0.035f }				// 上ベクトル
 	);
 	cameraController = std::make_unique<FreeCameraController>();
-	cameraController->SyncCameraToController(camera);
+	cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
 	cameraController->SetEnable(false);
 
 	// ステート
@@ -90,6 +95,7 @@ void SceneCharacter_E4C::Finalize()
 	spritePreLoad.clear();
 	UI.Clear();
 	shadowMapRenderer->Clear();
+	CameraManager::Instance().Clear();
 }
 
 // 更新処理
@@ -107,7 +113,7 @@ void SceneCharacter_E4C::Update(float elapsedTime)
 #ifdef _DEBUG
 	// カメラ更新
 	cameraController->Update();
-	cameraController->SyncContrllerToCamera(camera);
+	cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
 #endif // _DEBUG
 
 	UI.Update(elapsedTime);
@@ -123,7 +129,7 @@ void SceneCharacter_E4C::Render()
 
 	// 描画コンテキスト設定
 	RenderContext rc;
-	rc.camera = &camera;
+	rc.camera = CameraManager::Instance().GetCamera();
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
@@ -155,11 +161,11 @@ void SceneCharacter_E4C::RenderDX12()
 {
 	ID3D12GraphicsCommandList* d3d_command_list = TentacleLib::graphics.Begin();
 	{
-		Camera& camera = Camera::Instance();
+		
 
 		// シーン用定数バッファ更新
 		const Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
-			Camera::Instance(),
+			CameraManager::Instance().GetCamera(),
 			DirectX::XMFLOAT3(0, -1, 0));
 
 		// レンダーコンテキスト設定

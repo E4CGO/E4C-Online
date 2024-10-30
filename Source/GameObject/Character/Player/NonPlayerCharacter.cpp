@@ -7,6 +7,7 @@
 #include "TAKOEngine/Effects/EffectManager.h"
 #include "TAKOEngine/Editor/Camera/Camera.h"
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 
 #include "GameObject/Character/Player/NonPlayerCharacterState.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
@@ -102,9 +103,9 @@ void NonPlayerCharacter::RegisterCommonState()
 void NonPlayerCharacter::UpdateTarget()
 {
 	// レイの開始位置は足元より少し上
-	DirectX::XMFLOAT3 start = Camera::Instance().GetEye();
+	DirectX::XMFLOAT3 start = CameraManager::Instance().GetCamera()->GetEye();
 	// レイの終点位置は移動後の位置
-	DirectX::XMFLOAT3 end = Camera::Instance().GetFront() * 100.0f + start;
+	DirectX::XMFLOAT3 end = CameraManager::Instance().GetCamera()->GetFront() * 100.0f + start;
 	// レイキャストによる地面判定
 	HitResult hit;
 	if (ENEMIES.RayCast(start, end, hit))
@@ -259,9 +260,9 @@ void NonPlayerCharacter::UpdateInput()
 	}
 
 	// カメラ方向とスティックの入力値によって進行方向を計算する
-	Camera& camera = Camera::Instance();
-	const DirectX::XMFLOAT3& cameraRight = camera.GetRight();
-	const DirectX::XMFLOAT3& cameraFront = camera.GetFront();
+	
+	const DirectX::XMFLOAT3& cameraRight = CameraManager::Instance().GetCamera()->GetRight();
+	const DirectX::XMFLOAT3& cameraFront = CameraManager::Instance().GetCamera()->GetFront();
 
 	// 移動ベクトルはXZ平面に水平なベクトルになるようにする
 	// カメラ右方向ベクトルをXZ単位ベクトルに変換
@@ -363,8 +364,8 @@ void NonPlayerCharacter::Render(const RenderContext& rc)
 {
 	Character::Render(rc);
 
-	DirectX::XMFLOAT3 front = Camera::Instance().GetFront();
-	DirectX::XMFLOAT3 eye = Camera::Instance().GetEye();
+	DirectX::XMFLOAT3 front = CameraManager::Instance().GetCamera()->GetFront();
+	DirectX::XMFLOAT3 eye = CameraManager::Instance().GetCamera()->GetEye();
 	DirectX::XMFLOAT3 namePos = this->position + DirectX::XMFLOAT3{ 0, 2.2f, 0 };
 	float dot = XMFLOAT3Dot(front, namePos - eye);
 	if (dot < 0.0f) return;
@@ -467,7 +468,7 @@ bool NonPlayerCharacter::InputDodge()
 void NonPlayerCharacter::FaceToCamera()
 {
 	if (!IsPlayer()) return;
-	DirectX::XMFLOAT3 front = Camera::Instance().GetFront();
+	DirectX::XMFLOAT3 front = CameraManager::Instance().GetCamera()->GetFront();
 	Turn(1.0f, front.x, front.z, turnSpeed);
 }
 

@@ -7,10 +7,7 @@ public:
 	~Knight() = default;
 
 	void AttackCollision() override;
-	void RenderTrail();
 	void OnDamage(const HitResult& hit, int damage) override;
-	//剣の軌跡ノード取得
-	const iModel::Node* GetSwordtrailNode();
 private:
 	void UpdateColliders() override;
 	//ポリゴンの最大数

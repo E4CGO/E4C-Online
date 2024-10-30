@@ -4,6 +4,7 @@
 #include "TAKOEngine/Rendering/SpriteDX12.h"
 #include "TAKOEngine/Tool/GLTFImporter.h"
 #include "TAKOEngine/Editor/Camera/FreeCameraController.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 #include "TAKOEngine/AI/StateMachine.h"
 #include "PlayerCharacterData.h"
 #include "GameObject/Character/Player/NonPlayerCharacter.h"
@@ -54,12 +55,13 @@ public:
 
 	std::vector<std::unique_ptr<NonPlayerCharacter>> m_previewCharacters;
 
+	
 private:
 	std::unique_ptr<StateMachine<SceneCharacter_E4C>> stateMachine;
 
 	std::unique_ptr<myRenderer::shadow::ShadowMapRender> shadowMapRenderer = std::make_unique<myRenderer::shadow::ShadowMapRender>();
 
-	Camera& camera = Camera::Instance();
+	
 
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {
@@ -73,4 +75,5 @@ private:
 	static const int m_maxCharacters;
 
 	static float m_time;
+	Camera* mainCamera;
 };
