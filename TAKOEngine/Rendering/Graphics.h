@@ -34,8 +34,11 @@ enum class ModelShaderId
 enum class ModelShaderDX12Id
 {
 	Lambert,
+	LambertInstancing,
 	Phong,
+	PhongInstancing,
 	Toon,
+	ToonInstancing,
 
 	EnumCount
 };

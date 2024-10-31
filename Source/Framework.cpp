@@ -7,6 +7,9 @@
 #include "TAKOEngine/Tool/ImGuiRenderer.h"
 #include "TAKOEngine/Effects/EffectManager.h"
 
+#define MINIMP3_IMPLEMENTATION
+#include "TAKOEngine/Sound/Sound.h"
+
 #include "Scene/SceneGame.h"
 #include "Scene/SceneTitle.h"
 #include "Scene/SceneManager.h"
@@ -52,6 +55,7 @@ Framework::Framework(HWND hWnd)
 
 	// シーン初期化
 	SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTitle_E4C));
+	//SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTest));
 }
 
 // デストラクタ
@@ -71,6 +75,8 @@ Framework::~Framework()
 	}
 
 	Network::Finalize();
+
+	Sound::Instance().Finalize();
 }
 
 // 更新処理

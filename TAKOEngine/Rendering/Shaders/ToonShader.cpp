@@ -51,10 +51,11 @@ void ToonShader::SetShaderResourceView(const ModelResource::Mesh& mesh, ID3D11De
 
 //******************************************************
 // @brief       コンストラクタ
-// @param[in]   なし
+// @param[in]   device       ID3D12Device*
+// @param[in]   instancing  インスタンシング　ture : あり, false : なし
 // @return      なし
 //******************************************************
-ToonShaderDX12::ToonShaderDX12(ID3D12Device* device)
+ToonShaderDX12::ToonShaderDX12(ID3D12Device* device, bool instancing)
 {
 	Graphics& graphics = Graphics::Instance();
 	const RenderStateDX12* renderState = graphics.GetRenderStateDX12();
@@ -64,7 +65,8 @@ ToonShaderDX12::ToonShaderDX12(ID3D12Device* device)
 	// シェーダー
 	std::vector<BYTE> vsData, psData, gsData;
 	{
-		GpuResourceUtils::LoadShaderFile("Data/Shader/ToonDX12VS.cso", vsData);
+		if (!instancing) GpuResourceUtils::LoadShaderFile("Data/Shader/ToonDX12VS.cso", vsData);
+		else GpuResourceUtils::LoadShaderFile("Data/Shader/ToonInstancingVS.cso", vsData);
 		GpuResourceUtils::LoadShaderFile("Data/Shader/ToonDX12PS.cso", psData);
 		GpuResourceUtils::LoadShaderFile("Data/Shader/ToonDX12GS.cso", gsData);
 	}
@@ -165,6 +167,15 @@ ToonShaderDX12::~ToonShaderDX12()
 //***********************************************************
 void ToonShaderDX12::Render(const RenderContextDX12& rc, ModelDX12* model)
 {
+	Graphics& graphics = Graphics::Instance();
+
+	// カメラに写っている範囲のオブジェクトをフラグでマークする配列を用意
+	std::vector<bool> visibleObjects(model->GetMeshes().size(), false);
+
+	// 視錐台カリングを実行して可視オブジェクトをマーク
+	FrustumCulling::FrustumCullingFlag(Camera::Instance(), model->GetMeshes(), visibleObjects);
+	int culling = 0;
+
 	//パイプライン設定
 	rc.d3d_command_list->SetGraphicsRootSignature(m_d3d_root_signature.Get());
 	rc.d3d_command_list->SetPipelineState(m_d3d_pipeline_state.Get());
@@ -172,10 +183,10 @@ void ToonShaderDX12::Render(const RenderContextDX12& rc, ModelDX12* model)
 	//シーン定数バッファ設定
 	rc.d3d_command_list->SetGraphicsRootDescriptorTable(0, rc.scene_cbv_descriptor->GetGpuHandle());  //CbScene
 
-	Graphics& graphics = Graphics::Instance();
-
-	for (ModelDX12::Mesh& mesh : model->GetMeshes())
+	for (const ModelDX12::Mesh& mesh : model->GetMeshes())
 	{
+		if (!visibleObjects[culling++]) continue;
+
 		const ModelResource::Mesh* res_mesh = mesh.mesh;
 		const ModelDX12::Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
 
@@ -201,6 +212,14 @@ void ToonShaderDX12::Render(const RenderContextDX12& rc, ModelDX12* model)
 		rc.d3d_command_list->SetGraphicsRootDescriptorTable(5, m_sampler->GetDescriptor()->GetGpuHandle());
 
 		// 描画
-		rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), 1, 0, 0, 0);
+		if (frame_resource.instancingCount == 0)
+		{
+			rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), 1, 0, 0, 0);
+		}
+		else
+		{
+			//インスタンシング
+			rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), frame_resource.instancingCount, 0, 0, 0);
+		}
 	}
 }

@@ -4,13 +4,25 @@
 
 void SceneTest::Initialize()
 {
-	stage = new MapTile("Data/Model/Stage/BigMap.glb", 1000);
+	stage = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.1);
 	stage->Update(0);
 	MAPTILES.Register(stage);
 
-	player = std::make_unique<Knight>();
-	player->SetPosition({ 5, -50, 5 });
-	player->GetStateMachine()->ChangeState(static_cast<int>(Player::State::Idle));
+	PlayerCharacterData::CharacterInfo charInfo = {
+		true,			// visible
+		"",				// save
+		{				//Character
+			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+		}
+	};
+
+	newPlayer = std::make_unique<PlayerCharacter>(charInfo);
+	newPlayer->SetPosition({ 5,	100, 5 });
+	newPlayer->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::State::Idle));
+
+	//player = std::make_unique<Player>("Data/Model/Character/Barbarian.glb", 1.0f);
+	//player->SetPosition({ 5, 50, 5 });
+	//player->GetStateMachine()->ChangeState(static_cast<int>(Player::State::Idle));
 	//knight = std::make_unique<ModelObject>("Data/Model/Character/Knight.glb");
 	//knight->SetAnimation(22, true, 0.0f);
 	//knight->SetPosition({ 1.08f, 0.0f, 2.12f });
@@ -44,7 +56,7 @@ void SceneTest::Initialize()
 	cameraController->SyncCameraToController(camera);
 	//cameraController->SetEnable(false);
 	cameraController->SetEnable(true);
-	cameraController->SetPlayer(player.get());
+	cameraController->SetPlayer(newPlayer.get());
 }
 
 void SceneTest::Finalize()
@@ -61,7 +73,8 @@ void SceneTest::Update(float elapsedTime)
 
 	MAPTILES.Update(elapsedTime);
 
-	player->Update(elapsedTime);
+	//player->Update(elapsedTime);
+	newPlayer->Update(elapsedTime);
 }
 
 // 描画処理
@@ -81,8 +94,9 @@ void SceneTest::Render()
 
 	// 描画
 	//knight->Render(rc);
-	player->Render(rc);
+	//player->Render(rc);
 	MAPTILES.Render(rc);
+	newPlayer->Render(rc);
 
 	ProfileDrawUI();
 }

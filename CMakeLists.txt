@@ -136,7 +136,10 @@ set(Source
     "Source/GameData.h"
     "Source/Main.cpp"
     "Source/Manager.h"
+    "Source/PlayerCharacterData.cpp"
     "Source/PlayerCharacterData.h"
+    "Source/PlayerCharacterPattern.cpp"
+    "Source/PlayerCharacterPattern.h"
 )
 source_group("Source" FILES ${Source})
 
@@ -236,8 +239,16 @@ set(Source__GameObject__Character__Player
     "Source/GameObject/Character/Player/KnightState.h"
     "Source/GameObject/Character/Player/Mage.cpp"
     "Source/GameObject/Character/Player/Mage.h"
+    "Source/GameObject/Character/Player/NonPlayerCharacter.cpp"
+    "Source/GameObject/Character/Player/NonPlayerCharacter.h"
+    "Source/GameObject/Character/Player/NonPlayerCharacterState.cpp"
+    "Source/GameObject/Character/Player/NonPlayerCharacterState.h"
     "Source/GameObject/Character/Player/Player.cpp"
     "Source/GameObject/Character/Player/Player.h"
+    "Source/GameObject/Character/Player/PlayerCharacter.cpp"
+    "Source/GameObject/Character/Player/PlayerCharacter.h"
+    "Source/GameObject/Character/Player/PlayerCharacterState.cpp"
+    "Source/GameObject/Character/Player/PlayerCharacterState.h"
     "Source/GameObject/Character/Player/PlayerManager.cpp"
     "Source/GameObject/Character/Player/PlayerManager.h"
     "Source/GameObject/Character/Player/PlayerState.cpp"
@@ -329,7 +340,6 @@ source_group("Source\\UI\\Widget" FILES ${Source__UI__Widget})
 
 set(TAKOEngine__AI
     "TAKOEngine/AI/BaseState.h"
-    "TAKOEngine/AI/StateMachine.cpp"
     "TAKOEngine/AI/StateMachine.h"
 )
 source_group("TAKOEngine\\AI" FILES ${TAKOEngine__AI})
@@ -380,6 +390,8 @@ set(TAKOEngine__Physics
     "TAKOEngine/Physics/Collision.h"
     "TAKOEngine/Physics/CollisionDataManager.cpp"
     "TAKOEngine/Physics/CollisionDataManager.h"
+    "TAKOEngine/Physics/CollisionManager.cpp"
+    "TAKOEngine/Physics/CollisionManager.h"
     "TAKOEngine/Physics/Liner8TreeManager.h"
     "TAKOEngine/Physics/MapCollider.cpp"
     "TAKOEngine/Physics/MapCollider.h"
@@ -387,8 +399,13 @@ set(TAKOEngine__Physics
     "TAKOEngine/Physics/MapCollisionManager.h"
     "TAKOEngine/Physics/ModelCollider.cpp"
     "TAKOEngine/Physics/ModelCollider.h"
+    "TAKOEngine/Physics/OctreeNode.cpp"
+    "TAKOEngine/Physics/OctreeNode.h"
     "TAKOEngine/Physics/PlayerCollisionObject.cpp"
     "TAKOEngine/Physics/PlayerCollisionObject.h"
+    "TAKOEngine/Physics/QuadtreeNode.cpp"
+    "TAKOEngine/Physics/QuadtreeNode.h"
+    "TAKOEngine/Physics/RigidBody.h"
     "TAKOEngine/Physics/SphereCollider.cpp"
     "TAKOEngine/Physics/SphereCollider.h"
     "TAKOEngine/Physics/UnrotatedBoxCollider.cpp"
@@ -456,6 +473,8 @@ source_group("TAKOEngine\\Runtime" FILES ${TAKOEngine__Runtime})
 set(TAKOEngine__Sound
     "TAKOEngine/Sound/Audio.cpp"
     "TAKOEngine/Sound/Audio.h"
+    "TAKOEngine/Sound/Sound.cpp"
+    "TAKOEngine/Sound/Sound.h"
 )
 source_group("TAKOEngine\\Sound" FILES ${TAKOEngine__Sound})
 
@@ -590,6 +609,7 @@ set(TAKOEngine__Rendering__HLSL__Lighting
 source_group("TAKOEngine\\Rendering\\HLSL\\Lighting" FILES ${TAKOEngine__Rendering__HLSL__Lighting})
 
 set(TAKOEngine__Rendering__HLSL__Model
+    "TAKOEngine/Rendering/HLSL/Model/Constants.hlsli"
     "TAKOEngine/Rendering/HLSL/Model/DefaultModel.hlsli"
     "TAKOEngine/Rendering/HLSL/Model/DefaultModelPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/DefaultModelVS.hlsl"
@@ -597,12 +617,14 @@ set(TAKOEngine__Rendering__HLSL__Model
     "TAKOEngine/Rendering/HLSL/Model/LambertDX12.hlsli"
     "TAKOEngine/Rendering/HLSL/Model/LambertDX12PS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/LambertDX12VS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Model/LambertInstancingVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/LambertPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/LambertVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/Phong.hlsli"
     "TAKOEngine/Rendering/HLSL/Model/PhongDX12.hlsli"
     "TAKOEngine/Rendering/HLSL/Model/PhongDX12PS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/PhongDX12VS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Model/PhongInstancingVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/PhongPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/PhongVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/Skinning.hlsli"
@@ -612,6 +634,7 @@ set(TAKOEngine__Rendering__HLSL__Model
     "TAKOEngine/Rendering/HLSL/Model/ToonDX12GS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/ToonDX12PS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/ToonDX12VS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Model/ToonInstancingVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/ToonPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Model/ToonVS.hlsl"
 )
@@ -730,6 +753,7 @@ function(set_hlsl_properties target source_file shader_model shader_type entry_p
         VS_SHADER_MODEL ${shader_model} # Set the shader model
         VS_SHADER_TYPE ${shader_type} # Set the shader type
         VS_SHADER_ENTRYPOINT ${entry_point} # Set the entry point function name
+        VS_SHADER_OBJECT_FILE_NAME "$(OutDir)Data/Shader/%(Filename).cso"
     )
 endfunction()
 
@@ -752,16 +776,19 @@ set(SHADER_NAMES
     "DefaultModelVS.cso"
     "LambertDX12PS.cso"
     "LambertDX12VS.cso"
+    "LambertInstancingVS.cso"
     "LambertPS.cso"
     "LambertVS.cso"
     "PhongDX12PS.cso"
     "PhongDX12VS.cso"
+    "PhongInstancingVS.cso"
     "PhongPS.cso"
     "PhongVS.cso"
     "SkinningCS.cso"
     "ToonDX12GS.cso"
     "ToonDX12PS.cso"
     "ToonDX12VS.cso"
+    "ToonInstancingVS.cso"
     "ToonPS.cso"
     "ToonVS.cso"
     "BloomPS.cso"
@@ -797,16 +824,19 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/DefaultModelVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/LambertDX12PS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/LambertDX12VS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/LambertInstancingVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/LambertPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/LambertVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/PhongDX12PS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/PhongDX12VS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/PhongInstancingVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/PhongPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/PhongVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/SkinningCS.hlsl,5.0,Compute,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/ToonDX12GS.hlsl,5.0,Geometry,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/ToonDX12PS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/ToonDX12VS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/ToonInstancingVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/ToonPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/ToonVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/BloomPS.hlsl,5.0,Pixel,main"
@@ -920,6 +950,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/External/Effekseer170e/include/Effekseer"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/openssl/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/tinygltf"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/OpenAL/include"
 )
 
 # ###############################################################################
@@ -1042,14 +1073,14 @@ endforeach()
 set(SOURCE_DIR_DATA "${CMAKE_SOURCE_DIR}/Data")
 set(SOURCE_DIR_DEPENDENCY "${CMAKE_SOURCE_DIR}/Dependencies")
 
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
     ${SOURCE_DIR_DATA}
     ${CMAKE_BINARY_DIR}/Data
     COMMENT "Copying data directory to build folder"
 )
 
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
     ${SOURCE_DIR_DEPENDENCY}
     ${CMAKE_BINARY_DIR}
@@ -1057,7 +1088,7 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 )
 
 if(MSVC)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
         COMMAND if "$(Configuration)" == "Release" ${CMAKE_COMMAND} -E copy_directory_if_different
         ${SOURCE_DIR_DATA}
         ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/Data
@@ -1065,7 +1096,7 @@ if(MSVC)
 endif()
 
 if(MSVC)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
         COMMAND if "$(Configuration)" == "Debug" ${CMAKE_COMMAND} -E copy_directory_if_different
         ${SOURCE_DIR_DATA}
         ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/Data
@@ -1073,7 +1104,7 @@ if(MSVC)
 endif()
 
 if(MSVC)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
         COMMAND if "$(Configuration)" == "Release" ${CMAKE_COMMAND} -E copy_directory_if_different
         ${SOURCE_DIR_DEPENDENCY}
         ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/
@@ -1081,7 +1112,7 @@ if(MSVC)
 endif()
 
 if(MSVC)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
         COMMAND if "$(Configuration)" == "Debug" ${CMAKE_COMMAND} -E copy_directory_if_different
         ${SOURCE_DIR_DEPENDENCY}
         ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/
@@ -1092,12 +1123,11 @@ if(MSVC)
     foreach(CurrentShaderFile IN LISTS SHADER_NAMES)
         add_custom_command(
             TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/${CurrentShaderFile} ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/Data/Shader/
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/${CurrentShaderFile} ${CMAKE_BINARY_DIR}/Data/Shader
-            COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/${CurrentShaderFile}
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/Data/Shader/${CurrentShaderFile} ${CMAKE_BINARY_DIR}/Data/Shader
             COMMENT "Copying shaders ${CurrentShaderFile}")
     endforeach()
 endif()
+
 
 # ###############################################################################
 # Dependencies
@@ -1128,6 +1158,7 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "Crypt32"
     "libssl"
     "libcrypto"
+    "OpenAL32"
     ">"
     "$<$<CONFIG:Release>:"
     "SDL2"
@@ -1153,6 +1184,7 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "Crypt32"
     "libssl"
     "libcrypto"
+    "OpenAL32"
     ">"
     "kernel32"
     "user32"
@@ -1178,6 +1210,7 @@ target_link_directories(${PROJECT_NAME} PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtk/native/lib/x64/$<CONFIG>"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtex/native/lib/x64/$<CONFIG>"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/OpenAL/libs/Win64/"
     ">"
     "$<$<CONFIG:Release>:"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/nlohmann"
@@ -1189,5 +1222,6 @@ target_link_directories(${PROJECT_NAME} PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtk/native/lib/x64/$<CONFIG>"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/lib/x64"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/OpenAL/libs/Win64/"
     ">"
 )

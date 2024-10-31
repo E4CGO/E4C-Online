@@ -10,6 +10,7 @@
 AssimpImporter::AssimpImporter(const char* filename)
 	: filepath(filename)
 {
+	if (strlen(filename) == 0) return;
 	// 拡張子取得
 	std::string extension = filepath.extension().string();
 	std::transform(extension.begin(), extension.end(), extension.begin(), tolower);	// 小文字化
@@ -214,7 +215,8 @@ void AssimpImporter::LoadMeshes(MeshList& meshes, const NodeList& nodes, const a
 			}
 		}
 
-		// インデックスデータ
+    // インデックスデータ
+		int32_t indexOffset = mesh.indices.size();
 		for (uint32_t aFaceIndex = 0; aFaceIndex < aMesh->mNumFaces; ++aFaceIndex)
 		{
 			const aiFace& aFace = aMesh->mFaces[aFaceIndex];
@@ -223,6 +225,15 @@ void AssimpImporter::LoadMeshes(MeshList& meshes, const NodeList& nodes, const a
 			mesh.indices[index + 1] = aFace.mIndices[1];
 			mesh.indices[index + 2] = aFace.mIndices[0];
 		}
+
+		// �T�u�Z�b�g�f�[�^
+		ModelResource::Subset subset;
+		subset.startIndex = mesh.indices.size();
+		subset.indexCount = aMesh->mNumFaces * 3;
+		subset.materialIndex = mesh.materialIndex;
+		subset.material      = nullptr;
+
+		mesh.subsets.push_back(subset);
 
 		// スキニングデータ
 		if (aMesh->mNumBones > 0)

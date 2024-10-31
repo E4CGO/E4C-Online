@@ -1,4 +1,8 @@
-#pragma once
+//! @file GameObject.h
+//! @note 
+
+#ifndef __INCLUDED_GAME_OBJECT_H__
+#define __INCLUDED_GAME_OBJECT_H__
 
 #include "TAKOEngine/Runtime/tentacle_lib.h"
 #include "TAKOEngine/Physics/Collider.h"
@@ -6,12 +10,21 @@
 #include <DirectXMath.h>
 
 // モデル用オブジェクト
+
+
+/**************************************************************************//**
+	@class	GameObject
+	@brief	モデル用オブジェクト基底クラス
+	@par	[説明]
+*//***************************************************************************/
 class GameObject
 {
 public:
+	// コンストラクタ
 	GameObject() = default;
+	// デストラクタ
 	virtual ~GameObject() = default;
-
+	// トランスフォーム更新
 	void UpdateTransform();
 	// 更新処理
 	virtual void Update(float elapsedTime) = 0;
@@ -62,3 +75,4 @@ protected:
 		0, 0, 0, 1
 	};
 };
+#endif // __INCLUDED_GAME_OBJECT_H__
