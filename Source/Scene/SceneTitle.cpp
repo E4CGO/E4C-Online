@@ -33,7 +33,7 @@ void SceneTitle::Initialize()
 	m_skinning_pipeline = T_GRAPHICS.GetSkinningPipeline();
 
 	// フレームバッファマネージャー
-	m_framBuffer = T_GRAPHICS.GetFramBufferManager();
+	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
 
 	// モデル
 	{
@@ -250,14 +250,14 @@ void SceneTitle::RenderDX12()
 
 		// レンダーコンテキスト設定
 		RenderContextDX12 rc;
-		rc.d3d_command_list = m_framBuffer->GetCommandList();
+		rc.d3d_command_list = m_frameBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
 		// 3Dモデル描画
 		{
-			m_framBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
-			m_framBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
-			m_framBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+			m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+			m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+			m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 
 			//スキニング
 			test->UpdateFrameResource(test_transform);
@@ -270,12 +270,12 @@ void SceneTitle::RenderDX12()
 				shader->Render(rc, test.get());
 			}
 
-			m_framBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+			m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 		}
 
 		// ポストエフェクト描画
 		{
-			postprocessingRenderer->Render(m_framBuffer);
+			postprocessingRenderer->Render(m_frameBuffer);
 		}
 
 		// 2D描画
@@ -314,7 +314,7 @@ void SceneTitle::RenderDX12()
 				ImGui::End();
 			}
 
-			T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_framBuffer->GetCommandList());
+			T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
 		}	
 	}
 	T_GRAPHICS.End();

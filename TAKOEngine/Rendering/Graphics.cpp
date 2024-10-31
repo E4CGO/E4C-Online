@@ -471,8 +471,8 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	frameBuffers[static_cast<int>(FrameBufferId::Position)]     = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT);
 
 	// フレームバッファマネージャー
-	m_frambufferManager = std::make_unique<FrameBufferManager>();
-	m_frambufferManager->Init(d3d_command_list.Get());
+	m_framebufferManager = std::make_unique<FrameBufferManager>();
+	m_framebufferManager->Init(d3d_command_list.Get());
 
 	// フレームバッファ作成(DX12)
 	const wchar_t* resourceName1[] = { L"SceneRenderTarget", L"SceneDepthStencil" };
@@ -614,7 +614,7 @@ void Graphics::BeginRender()
 	d3d_command_allocator->Reset();
 
 	// コマンドリストをリセット
-	m_frambufferManager->Reset(d3d_command_allocator.Get(), nullptr);
+	m_framebufferManager->Reset(d3d_command_allocator.Get(), nullptr);
 
 	// ディスクリプタヒープをあらかじめ設定
 	ID3D12DescriptorHeap* d3d_descriptor_heaps[] =
@@ -625,17 +625,17 @@ void Graphics::BeginRender()
 	d3d_command_list->SetDescriptorHeaps(_countof(d3d_descriptor_heaps), d3d_descriptor_heaps);
 
 	// ビューポートを設定
-	m_frambufferManager->SetViewportAndScissor(m_viewport);
+	m_framebufferManager->SetViewportAndScissor(m_viewport);
 
 	// バックバッファがレンダリングターゲットとして設定可能になるまで待つ
-	m_frambufferManager->WaitUntilToPossibleSetRenderTarget(d3d_rtv_resource[frame_buffer_index].Get());
+	m_framebufferManager->WaitUntilToPossibleSetRenderTarget(d3d_rtv_resource[frame_buffer_index].Get());
 
 	// レンダーターゲットを設定
-	m_frambufferManager->SetRenderTarget(rtv_descriptor[frame_buffer_index]->GetCpuHandle(), dsv_descriptor->GetCpuHandle());
+	m_framebufferManager->SetRenderTarget(rtv_descriptor[frame_buffer_index]->GetCpuHandle(), dsv_descriptor->GetCpuHandle());
 
 	const float clearColor[] = { 0.0f, 0.0f, 1.0f, 1.0f };
-	m_frambufferManager->ClearRenderTargetView(rtv_descriptor[frame_buffer_index]->GetCpuHandle(), clearColor);
-	m_frambufferManager->ClearDepthStencilView(dsv_descriptor->GetCpuHandle(), 1.0f);
+	m_framebufferManager->ClearRenderTargetView(rtv_descriptor[frame_buffer_index]->GetCpuHandle(), clearColor);
+	m_framebufferManager->ClearDepthStencilView(dsv_descriptor->GetCpuHandle(), 1.0f);
 }
 
 //******************************************************************
@@ -646,10 +646,10 @@ void Graphics::BeginRender()
 void Graphics::End()
 {
 	// レンダーターゲットへの描き込み完了待ち
-	m_frambufferManager->WaitUntilFinishDrawingToRenderTarget(d3d_rtv_resource[frame_buffer_index].Get());
+	m_framebufferManager->WaitUntilFinishDrawingToRenderTarget(d3d_rtv_resource[frame_buffer_index].Get());
 	
 	// レンダリングコンテキストを閉じる
-	m_frambufferManager->Close();
+	m_framebufferManager->Close();
 }
 
 //******************************************************************

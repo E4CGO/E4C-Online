@@ -56,7 +56,7 @@ private:
 	SkinningPipeline*	m_skinning_pipeline;
 
 	// フレームバッファマネージャー
-	FrameBufferManager* m_framBuffer;
+	FrameBufferManager* m_frameBuffer;
 
 	Camera& camera = Camera::Instance();
 	std::unique_ptr<FreeCameraController> cameraController;

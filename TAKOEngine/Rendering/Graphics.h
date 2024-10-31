@@ -156,7 +156,7 @@ public:
 	// DX12のフレームバッファ取得
 	FrameBufferDX12* GetFramBufferDX12(FrameBufferDX12Id frameBufferId) { return dx12_frameBuffers[static_cast<int>(frameBufferId)].get(); }
 	// DX12のフレームバッファマネージャー
-	FrameBufferManager* GetFramBufferManager() { return m_frambufferManager.get(); }
+	FrameBufferManager* GetFrameBufferManager() { return m_framebufferManager.get(); }
 
 	// レンダーステート取得
 	RenderState* GetRenderState() { return renderState.get(); }
@@ -287,7 +287,7 @@ private:
 	float screenHeight;
 	std::unique_ptr<FrameBuffer> frameBuffers[static_cast<int>(FrameBufferId::EnumCount)];
 	std::unique_ptr<FrameBufferDX12> dx12_frameBuffers[static_cast<int>(FrameBufferDX12Id::EnumCount)];
-	std::unique_ptr<FrameBufferManager> m_frambufferManager;
+	std::unique_ptr<FrameBufferManager> m_framebufferManager;
 	std::unique_ptr<RenderState> renderState;
 	std::unique_ptr<RenderStateDX12> m_renderStateDX12;
 	std::unique_ptr<Gizmos> gizmos;

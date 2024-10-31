@@ -30,7 +30,7 @@ void SceneTitle_E4C::Initialize()
 	shadowMapRenderer->Initialize();
 
 	// フレームバッファマネージャー
-	m_framBuffer = T_GRAPHICS.GetFramBufferManager();
+	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
 
 	// モデル
 	{
@@ -141,7 +141,7 @@ void SceneTitle_E4C::RenderDX12()
 
 		// レンダーコンテキスト設定
 		RenderContextDX12 rc;
-		rc.d3d_command_list = m_framBuffer->GetCommandList();
+		rc.d3d_command_list = m_frameBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
 		// スプライト描画
@@ -149,7 +149,7 @@ void SceneTitle_E4C::RenderDX12()
 		{
 			m_sprites[0]->Begin(rc);
 			m_sprites[0]->Draw(0, 0, 100, 100, 0, 1, 1, 1, 1);
-			m_sprites[0]->End(m_framBuffer->GetCommandList());
+			m_sprites[0]->End(m_frameBuffer->GetCommandList());
 		}
 	}
 	TentacleLib::graphics.End();
