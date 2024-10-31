@@ -1,4 +1,5 @@
 #include "ThridPersonCameraController.h"
+#include "TAKOEngine/Tool/Mathf.h"
 
 #include <imgui.h>
 #include <algorithm>
@@ -34,6 +35,9 @@ void ThridPersonCameraController::Update(float elapsedTime)
 	if (!TentacleLib::isFocus()) return; // フォーカスしない
 	shakeTimer -= elapsedTime;
 	if (shakeTimer < 0.0f) shakeTimer = 0.0f;
+	DirectX::XMFLOAT3 PlayerPostion = player->GetPosition() + DirectX::XMFLOAT3(0, player->GetHeight() * 1.1f, 0);
+
+
 
 	float moveX = 0.0f;
 	float moveY = 0.0f;
@@ -104,7 +108,12 @@ void ThridPersonCameraController::Update(float elapsedTime)
 	Offset = Offset * offset.y;
 	Offset = Offset + (DirectX::XMFLOAT3(cy, 0, -sy) * -offset.x);
 
-	focus = player->GetPosition() + DirectX::XMFLOAT3(0, player->GetHeight() * 1.1f, 0);
+	focus = {
+		Mathf::Lerp(focus.x,PlayerPostion.x,5.f * elapsedTime),
+		Mathf::Lerp(focus.y,PlayerPostion.y,5.f * elapsedTime),
+		Mathf::Lerp(focus.z,PlayerPostion.z,5.f * elapsedTime)
+	};
+
 	// RayCast 壁対策
 	{
 		HitResult hit;
@@ -129,6 +138,10 @@ void ThridPersonCameraController::Update(float elapsedTime)
 
 		focus.y += shakeY;
 	}
+
+
+
+
 
 	// カメラの視点&注視点を算出
 	DirectX::XMVECTOR Focus = DirectX::XMLoadFloat3(&focus);

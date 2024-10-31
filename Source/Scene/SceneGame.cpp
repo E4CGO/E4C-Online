@@ -243,6 +243,8 @@ void SceneGame::Update(float elapsedTime)
 	if (T_INPUT.KeyPress(VK_SHIFT))
 	{
 		CameraManager::Instance().GetCamera()->MovePointToCamera(cameraPositions, cameraFocusPoints,transitionTime,transitionDuration,elapsedTime);
+
+		
 	}
 	else
 	{
@@ -383,7 +385,7 @@ void SceneGame::Render()
 #ifdef _DEBUG
 	{
 		PROJECTILES.DrawDebugPrimitive();
-		T_GRAPHICS.GetDebugRenderer()->DrawSphere2(cameraPositions,2,{1,0,0,1});
+		T_GRAPHICS.GetDebugRenderer()->DrawSphere(cameraPositions,2,{1,0,0,1});
 		
 	}
 #endif // _DEBUG
