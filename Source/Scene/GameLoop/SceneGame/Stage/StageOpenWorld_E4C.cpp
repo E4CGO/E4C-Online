@@ -26,7 +26,7 @@ void StageOpenWorld_E4C::Initialize()
 	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
 	stage_collision->Update(0);
 	MAPTILES.Register(stage_collision);
-	MAPTILES.CreateQuadtree(6);
+	MAPTILES.CreateSpatialIndex(5, 7);
 
 	map = std::make_unique<gltf_model>(T_GRAPHICS.GetDevice(), "Data/Model/Stage/Terrain_Reduced.glb");
 
@@ -98,7 +98,7 @@ void StageOpenWorld_E4C::Initialize()
 void StageOpenWorld_E4C::Update(float elapsedTime)
 {
 	{
-		//ProfileScopedSection_2("Camera", ImGuiControl::Profiler::Yellow);
+		ProfileScopedSection_2("Camera", ImGuiControl::Profiler::Yellow);
 		cameraController->Update(elapsedTime);
 	}
 	cameraController->SyncContrllerToCamera(camera);

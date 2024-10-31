@@ -1,16 +1,15 @@
-//! @file QuadtreeNode.cpp
-//! @note 四分木空間
-#include "TAKOEngine/Physics/QuadtreeNode.h"
-#include <profiler.h>
+//! @file OctreeNode.cpp
+//! @note 八分木空間
+#include "TAKOEngine/Physics/OctreeNode.h"
 
 /**************************************************************************//**
-	@brief		四分木空間の生成 インデックスの増加方向はｘ→ｚの順番
+	@brief		八分木空間の生成 インデックスの増加方向はｘ→y→ｚの順番
 	@param[in]	XMFLOAT3 center : ルート空間の中心座標
 				float halfSize : ルート空間の半辺長
 				uint32_t depth : 空間分割数
 	@return		なし
 *//***************************************************************************/
-void QuadtreeNodeManager::CreateQuadtree(DirectX::XMFLOAT3 center, float halfSize, uint32_t depth)
+void OctreeNodeManager::CreateOctree(DirectX::XMFLOAT3 center, float halfSize, uint32_t depth)
 {
 	// 最大階層数チェック
 	if (depth > MAX_DEPTH)
@@ -22,8 +21,8 @@ void QuadtreeNodeManager::CreateQuadtree(DirectX::XMFLOAT3 center, float halfSiz
 	this->m_depth = depth;
 
 	// ルート空間を登録
-	QuadtreeNode tmp(center, halfSize);
-	m_quadtreeNodes.push_back(tmp);
+	OctreeNode tmp(center, halfSize);
+	m_octreeNodes.push_back(tmp);
 
 	// ルート以下の全てのノードを作成
 	for (uint32_t level = 1; level <= depth; level++)
@@ -33,17 +32,29 @@ void QuadtreeNodeManager::CreateQuadtree(DirectX::XMFLOAT3 center, float halfSiz
 
 		for (uint32_t linerIndex = GetLevelStart(level - 1); linerIndex < GetLevelStart(level); linerIndex++)
 		{
-			tmp.SetCenter({ m_quadtreeNodes[linerIndex].GetCenter().x - nodeHalfSize, 0, m_quadtreeNodes[linerIndex].GetCenter().z - nodeHalfSize });
-			m_quadtreeNodes.push_back(tmp);
+			tmp.SetCenter({ m_octreeNodes[linerIndex].GetCenter().x - nodeHalfSize, m_octreeNodes[linerIndex].GetCenter().y - nodeHalfSize, m_octreeNodes[linerIndex].GetCenter().z - nodeHalfSize });
+			m_octreeNodes.push_back(tmp);
 
-			tmp.SetCenter({ m_quadtreeNodes[linerIndex].GetCenter().x + nodeHalfSize, 0, m_quadtreeNodes[linerIndex].GetCenter().z - nodeHalfSize });
-			m_quadtreeNodes.push_back(tmp);
+			tmp.SetCenter({ m_octreeNodes[linerIndex].GetCenter().x + nodeHalfSize, m_octreeNodes[linerIndex].GetCenter().y - nodeHalfSize, m_octreeNodes[linerIndex].GetCenter().z - nodeHalfSize });
+			m_octreeNodes.push_back(tmp);
 
-			tmp.SetCenter({ m_quadtreeNodes[linerIndex].GetCenter().x - nodeHalfSize, 0, m_quadtreeNodes[linerIndex].GetCenter().z + nodeHalfSize });
-			m_quadtreeNodes.push_back(tmp);
+			tmp.SetCenter({ m_octreeNodes[linerIndex].GetCenter().x - nodeHalfSize, m_octreeNodes[linerIndex].GetCenter().y + nodeHalfSize, m_octreeNodes[linerIndex].GetCenter().z - nodeHalfSize });
+			m_octreeNodes.push_back(tmp);
 
-			tmp.SetCenter({ m_quadtreeNodes[linerIndex].GetCenter().x + nodeHalfSize, 0, m_quadtreeNodes[linerIndex].GetCenter().z + nodeHalfSize });
-			m_quadtreeNodes.push_back(tmp);
+			tmp.SetCenter({ m_octreeNodes[linerIndex].GetCenter().x + nodeHalfSize, m_octreeNodes[linerIndex].GetCenter().y + nodeHalfSize, m_octreeNodes[linerIndex].GetCenter().z - nodeHalfSize });
+			m_octreeNodes.push_back(tmp);
+
+			tmp.SetCenter({ m_octreeNodes[linerIndex].GetCenter().x - nodeHalfSize, m_octreeNodes[linerIndex].GetCenter().y - nodeHalfSize, m_octreeNodes[linerIndex].GetCenter().z + nodeHalfSize });
+			m_octreeNodes.push_back(tmp);
+
+			tmp.SetCenter({ m_octreeNodes[linerIndex].GetCenter().x + nodeHalfSize, m_octreeNodes[linerIndex].GetCenter().y - nodeHalfSize, m_octreeNodes[linerIndex].GetCenter().z + nodeHalfSize });
+			m_octreeNodes.push_back(tmp);
+
+			tmp.SetCenter({ m_octreeNodes[linerIndex].GetCenter().x - nodeHalfSize, m_octreeNodes[linerIndex].GetCenter().y + nodeHalfSize, m_octreeNodes[linerIndex].GetCenter().z + nodeHalfSize });
+			m_octreeNodes.push_back(tmp);
+
+			tmp.SetCenter({ m_octreeNodes[linerIndex].GetCenter().x + nodeHalfSize, m_octreeNodes[linerIndex].GetCenter().y + nodeHalfSize, m_octreeNodes[linerIndex].GetCenter().z + nodeHalfSize });
+			m_octreeNodes.push_back(tmp);
 		}
 	}
 }
@@ -51,38 +62,38 @@ void QuadtreeNodeManager::CreateQuadtree(DirectX::XMFLOAT3 center, float halfSiz
 /**************************************************************************//**
 	@brief		モートンコード(あるの階層の空間番号)の生成
 	@param[in]	XMFLOAT3 point : モートンコードを求めたい座標
-				QuadtreeNode route : ルート空間
+				OctreeNode route : ルート空間
 				float halfSize : その階層の半辺長
 	@return		uint32_t
 *//***************************************************************************/
-uint32_t QuadtreeNodeManager::GetMortonCode(const DirectX::XMFLOAT3& point, const QuadtreeNode& route, float halfSize)
+uint32_t OctreeNodeManager::GetMortonCode(const DirectX::XMFLOAT3& point, const OctreeNode& route, float halfSize)
 {
 	float x = (point.x - (route.GetCenter().x - route.GetHalfSize())) / (2 * halfSize);
+	float y = (point.y - (route.GetCenter().y - route.GetHalfSize())) / (2 * halfSize);
 	float z = (point.z - (route.GetCenter().z - route.GetHalfSize())) / (2 * halfSize);
-	return bitSeparete(static_cast<uint32_t>(x)) + (bitSeparete(static_cast<uint32_t>(z)) << 1);
+	return bitSeparete(static_cast<uint32_t>(x)) + (bitSeparete(static_cast<uint32_t>(y)) << 1) + (bitSeparete(static_cast<uint32_t>(z)) << 2);
 }
-uint32_t QuadtreeNodeManager::bitSeparete(uint32_t n)
+uint32_t OctreeNodeManager::bitSeparete(uint32_t n)
 {
-	n = (n ^ (n << 8)) & 0x00ff00ff;
-	n = (n ^ (n << 4)) & 0x0f0f0f0f;
-	n = (n ^ (n << 2)) & 0x33333333;
-	n = (n ^ (n << 1)) & 0x55555555;
+	n = (n | n << 8) & 0x0000f00f;
+	n = (n | n << 4) & 0x000c30c3;
+	n = (n | n << 2) & 0x00249249;
 	return n;
 }
 
 /**************************************************************************//**
 	@brief		同階層の隣のモートンコードを取得
 	@param[in]	uint32_t before : 元のモートンコード（非線形化の各階層のモートンコード）
-				uint32_t shiftXZ : どの軸の隣のモートンコードが欲しいか指定　x=0, z=1
+				uint32_t shiftXYZ : どの軸の隣のモートンコードが欲しいか指定　x=0, y=1, z=2
 				bool minus : マイナス方向に進む場合にture
 	@return		int
 *//***************************************************************************/
-int QuadtreeNodeManager::GetNextMortonCode(uint32_t before, uint32_t shiftXZ, bool minus)
+int OctreeNodeManager::GetNextMortonCode(uint32_t before, uint32_t shiftXYZ, bool minus)
 {
 	int ret = before;
 
-	uint32_t filter = 0x01 << shiftXZ;
-	uint32_t value = 1 << shiftXZ;
+	uint32_t filter = 0x01 << shiftXYZ;
+	uint32_t value = 1 << shiftXYZ;
 
 	// beforeがfilterより大きい間ループする
 	while (before >= filter)
@@ -90,9 +101,9 @@ int QuadtreeNodeManager::GetNextMortonCode(uint32_t before, uint32_t shiftXZ, bo
 		// フィルターをかけて値をチェックし、breakする
 		if ((!(before & filter) && (!minus)) || ((before & filter) && minus))	break;
 
-		// beforeを2bit右シフトさせて再チェック。併せてモートンコードの更新用の差分値のvalueも更新する
-		before >>= 2;
-		value = value * 4 - filter;
+		// beforeを3bit右シフトさせて再チェック。併せてモートンコードの更新用の差分値のvalueも更新する
+		before >>= 3;
+		value = value * 8 - filter;
 	}
 
 	if (minus)
@@ -108,17 +119,17 @@ int QuadtreeNodeManager::GetNextMortonCode(uint32_t before, uint32_t shiftXZ, bo
 }
 
 /**************************************************************************//**
-	@brief		四分木空間へオブジェクトを登録する際の線形インデックスを取得
+	@brief		八分木空間へオブジェクトを登録する際の線形インデックスを取得
 	@param[in]	XMFLOAT3 minPoint : AABBの最小点
 				XMFLOAT3 maxPoint : AABBの最大点
 	@return		uint32_t
 *//***************************************************************************/
-uint32_t QuadtreeNodeManager::GetLinerIndexInsertObject(DirectX::XMFLOAT3 minPoint, DirectX::XMFLOAT3 maxPoint)
+uint32_t OctreeNodeManager::GetLinerIndexInsertObject(DirectX::XMFLOAT3 minPoint, DirectX::XMFLOAT3 maxPoint)
 {
 	// AABBの最小点のモートンコード
-	uint32_t mortonCodeMin = GetMortonCode(minPoint, m_quadtreeNodes.front(), m_quadtreeNodes.back().GetHalfSize());
+	uint32_t mortonCodeMin = GetMortonCode(minPoint, m_octreeNodes.front(), m_octreeNodes.back().GetHalfSize());
 	// AABBの最大点のモートンコード
-	uint32_t mortonCodeMax = GetMortonCode(maxPoint, m_quadtreeNodes.front(), m_quadtreeNodes.back().GetHalfSize());
+	uint32_t mortonCodeMax = GetMortonCode(maxPoint, m_octreeNodes.front(), m_octreeNodes.back().GetHalfSize());
 	// 上記二つのモートンコードの排他的論理和
 	uint32_t mortonCodeXOR = mortonCodeMin ^ mortonCodeMax;
 
@@ -128,28 +139,28 @@ uint32_t QuadtreeNodeManager::GetLinerIndexInsertObject(DirectX::XMFLOAT3 minPoi
 
 	while (mortonCodeXOR != 0)
 	{
-		// 下位2bitずつマスクして値をチェックする
-		if (mortonCodeXOR & 0x03)
+		// 下位3bitずつマスクして値をチェックする
+		if (mortonCodeXOR & 0x07)
 		{
 			// シフト数を上書き保存
 			shift = count;
 		}
-		// 排他的論理和を2bitシフトさせて再チェック
-		mortonCodeXOR >>= 2;
+		// 排他的論理和を3bitシフトさせて再チェック
+		mortonCodeXOR >>= 3;
 
 		count++;
 	}
 
 	// 線形（配列）のインデックスへ変換
-	return  (mortonCodeMin >> (shift * 2)) + GetLevelStart(m_depth - shift);
+	return  (mortonCodeMin >> (shift * 3)) + GetLevelStart(m_depth - shift);
 }
 
 /**************************************************************************//**
-	@brief		四分木空間へ三角形オブジェクトを登録
+	@brief		八分木空間へ三角形オブジェクトを登録
 	@param[in]	Triangle triangle : 登録する三角形
 	@return		bool : 登録成功時true
 *//***************************************************************************/
-bool QuadtreeNodeManager::InsertTriangleObject(Triangle& triangle)
+bool OctreeNodeManager::InsertTriangleObject(Triangle& triangle)
 {
 	// 三角形を含むAABBを構成する最小点と最大点を作成（y座標を除く）
 	DirectX::XMFLOAT3 minPoint = triangle.position[0];
@@ -173,6 +184,24 @@ bool QuadtreeNodeManager::InsertTriangleObject(Triangle& triangle)
 		maxPoint.x = triangle.position[2].x;
 	}
 
+	if (minPoint.y > triangle.position[1].y)
+	{
+		minPoint.y = triangle.position[1].y;
+	}
+	else if (maxPoint.y < triangle.position[1].y)
+	{
+		maxPoint.y = triangle.position[1].y;
+	}
+
+	if (minPoint.y > triangle.position[2].y)
+	{
+		minPoint.y = triangle.position[2].y;
+	}
+	else if (maxPoint.y < triangle.position[2].y)
+	{
+		maxPoint.y = triangle.position[2].y;
+	}
+
 	if (minPoint.z > triangle.position[1].z)
 	{
 		minPoint.z = triangle.position[1].z;
@@ -191,170 +220,186 @@ bool QuadtreeNodeManager::InsertTriangleObject(Triangle& triangle)
 		maxPoint.z = triangle.position[2].z;
 	}
 
-	// 最小点・最大点が四分木のルート空間の外にある場合、登録失敗
-	DirectX::XMFLOAT3 routeMinPoint = m_quadtreeNodes.front().GetCenter();
-	routeMinPoint.x -= m_quadtreeNodes.front().GetHalfSize();
-	routeMinPoint.z -= m_quadtreeNodes.front().GetHalfSize();
+	// 最小点・最大点が八分木のルート空間の外にある場合、登録失敗
+	DirectX::XMFLOAT3 routeMinPoint = m_octreeNodes.front().GetCenter();
+	routeMinPoint.x -= m_octreeNodes.front().GetHalfSize();
+	routeMinPoint.y -= m_octreeNodes.front().GetHalfSize();
+	routeMinPoint.z -= m_octreeNodes.front().GetHalfSize();
 
-	DirectX::XMFLOAT3 routeMaxPoint = m_quadtreeNodes.front().GetCenter();
-	routeMaxPoint.x += m_quadtreeNodes.front().GetHalfSize();
-	routeMaxPoint.z += m_quadtreeNodes.front().GetHalfSize();
+	DirectX::XMFLOAT3 routeMaxPoint = m_octreeNodes.front().GetCenter();
+	routeMaxPoint.x += m_octreeNodes.front().GetHalfSize();
+	routeMaxPoint.y += m_octreeNodes.front().GetHalfSize();
+	routeMaxPoint.z += m_octreeNodes.front().GetHalfSize();
 
 	if (minPoint.x < routeMinPoint.x)	return false;
+	if (minPoint.y < routeMinPoint.y)	return false;
 	if (minPoint.z < routeMinPoint.z)	return false;
 	if (maxPoint.x > routeMaxPoint.x)	return false;
+	if (maxPoint.y > routeMaxPoint.y)	return false;
 	if (maxPoint.z > routeMaxPoint.z)	return false;
 
 	// 線形（配列）のインデックスへ変換
 	int linerIndex = GetLinerIndexInsertObject(minPoint, maxPoint);
-	if (linerIndex >= m_quadtreeNodes.size()) return false;
+	if (linerIndex >= m_octreeNodes.size()) return false;
 
 	// 登録
-	m_quadtreeNodes[linerIndex].InsertTriangleObject(triangle);
+	m_octreeNodes[linerIndex].InsertTriangleObject(triangle);
 
 	return true;
 }
 
 /**************************************************************************//**
-	@brief		四分木空間へ球体オブジェクトを登録
+	@brief		八分木空間へ球体オブジェクトを登録
 	@param[in]	Sphere sphere : 登録する球体
 	@return		bool : 登録成功時true
 *//***************************************************************************/
-bool QuadtreeNodeManager::InsertSphereObject(Sphere& sphere)
+bool OctreeNodeManager::InsertSphereObject(Sphere& sphere)
 {
 	// 球を含むAABBを構成する最小点と最大点を作成
 	DirectX::XMFLOAT3 minPoint = {};
 	DirectX::XMFLOAT3 maxPoint = {};
 	sphere.GetBoundPoints(&minPoint, &maxPoint);
 
-	// 最小点・最大点が四分木のルート空間の外にある場合、登録失敗
-	DirectX::XMFLOAT3 routeMinPoint = m_quadtreeNodes.front().GetCenter();
-	routeMinPoint.x -= m_quadtreeNodes.front().GetHalfSize();
-	routeMinPoint.z -= m_quadtreeNodes.front().GetHalfSize();
+	// 最小点・最大点が八分木のルート空間の外にある場合、登録失敗
+	DirectX::XMFLOAT3 routeMinPoint = m_octreeNodes.front().GetCenter();
+	routeMinPoint.x -= m_octreeNodes.front().GetHalfSize();
+	routeMinPoint.y -= m_octreeNodes.front().GetHalfSize();
+	routeMinPoint.z -= m_octreeNodes.front().GetHalfSize();
 
-	DirectX::XMFLOAT3 routeMaxPoint = m_quadtreeNodes.front().GetCenter();
-	routeMaxPoint.x += m_quadtreeNodes.front().GetHalfSize();
-	routeMaxPoint.z += m_quadtreeNodes.front().GetHalfSize();
+	DirectX::XMFLOAT3 routeMaxPoint = m_octreeNodes.front().GetCenter();
+	routeMaxPoint.x += m_octreeNodes.front().GetHalfSize();
+	routeMaxPoint.y += m_octreeNodes.front().GetHalfSize();
+	routeMaxPoint.z += m_octreeNodes.front().GetHalfSize();
 
 	if (minPoint.x < routeMinPoint.x)	return false;
+	if (minPoint.y < routeMinPoint.y)	return false;
 	if (minPoint.z < routeMinPoint.z)	return false;
 	if (maxPoint.x > routeMaxPoint.x)	return false;
+	if (maxPoint.y > routeMaxPoint.y)	return false;
 	if (maxPoint.z > routeMaxPoint.z)	return false;
 
 	// 線形（配列）のインデックスへ変換
 	int linerIndex = GetLinerIndexInsertObject(minPoint, maxPoint);
-	if (linerIndex >= m_quadtreeNodes.size()) return false;
+	if (linerIndex >= m_octreeNodes.size()) return false;
 
 	// 登録
-	m_quadtreeNodes[linerIndex].InsertSphereObject(sphere);
+	m_octreeNodes[linerIndex].InsertSphereObject(sphere);
 
 	return true;
 }
 
 /**************************************************************************//**
-	@brief		四分木空間へAABBオブジェクトを登録
+	@brief		八分木空間へAABBオブジェクトを登録
 	@param[in]	AABB aabb : 登録するAABB
 	@return		bool : 登録成功時true
 *//***************************************************************************/
-bool QuadtreeNodeManager::InsertAABBObject(AABB& aabb)
+bool OctreeNodeManager::InsertAABBObject(AABB& aabb)
 {
 	// AABBを構成する最小点と最大点を作成（y座標を除く）
 	DirectX::XMFLOAT3 minPoint = { aabb.position.x - aabb.radii.x, 0.0f, aabb.position.z - aabb.radii.z };
 	DirectX::XMFLOAT3 maxPoint = { aabb.position.x + aabb.radii.x, 0.0f, aabb.position.z + aabb.radii.z };
 
-	// 最小点・最大点が四分木のルート空間の外にある場合、登録失敗
-	DirectX::XMFLOAT3 routeMinPoint = m_quadtreeNodes.front().GetCenter();
-	routeMinPoint.x -= m_quadtreeNodes.front().GetHalfSize();
-	routeMinPoint.z -= m_quadtreeNodes.front().GetHalfSize();
+	// 最小点・最大点が八分木のルート空間の外にある場合、登録失敗
+	DirectX::XMFLOAT3 routeMinPoint = m_octreeNodes.front().GetCenter();
+	routeMinPoint.x -= m_octreeNodes.front().GetHalfSize();
+	routeMinPoint.y -= m_octreeNodes.front().GetHalfSize();
+	routeMinPoint.z -= m_octreeNodes.front().GetHalfSize();
 
-	DirectX::XMFLOAT3 routeMaxPoint = m_quadtreeNodes.front().GetCenter();
-	routeMaxPoint.x += m_quadtreeNodes.front().GetHalfSize();
-	routeMaxPoint.z += m_quadtreeNodes.front().GetHalfSize();
+	DirectX::XMFLOAT3 routeMaxPoint = m_octreeNodes.front().GetCenter();
+	routeMaxPoint.x += m_octreeNodes.front().GetHalfSize();
+	routeMaxPoint.y += m_octreeNodes.front().GetHalfSize();
+	routeMaxPoint.z += m_octreeNodes.front().GetHalfSize();
 
 	if (minPoint.x < routeMinPoint.x)	return false;
+	if (minPoint.y < routeMinPoint.y)	return false;
 	if (minPoint.z < routeMinPoint.z)	return false;
 	if (maxPoint.x > routeMaxPoint.x)	return false;
+	if (maxPoint.y > routeMaxPoint.y)	return false;
 	if (maxPoint.z > routeMaxPoint.z)	return false;
 
 	// 線形（配列）のインデックスへ変換
 	int linerIndex = GetLinerIndexInsertObject(minPoint, maxPoint);
-	if (linerIndex >= m_quadtreeNodes.size()) return false;
+	if (linerIndex >= m_octreeNodes.size()) return false;
 
 	// 登録
-	m_quadtreeNodes[linerIndex].InsertAABBObject(aabb);
+	m_octreeNodes[linerIndex].InsertAABBObject(aabb);
 
 	return true;
 }
 
 /**************************************************************************//**
-	@brief		四分木空間へカプセルオブジェクトを登録
+	@brief		八分木空間へカプセルオブジェクトを登録
 	@param[in]	Capsule capsule : 登録するカプセル
 	@return		bool : 登録成功時true
 *//***************************************************************************/
-bool QuadtreeNodeManager::InsertCapsuleObject(Capsule& capsule)
+bool OctreeNodeManager::InsertCapsuleObject(Capsule& capsule)
 {
 	// カプセルを含むAABBを構成する最小点と最大点を作成（y座標を除く）
 	DirectX::XMFLOAT3 minPoint = {};
 	DirectX::XMFLOAT3 maxPoint = {};
 	capsule.GetBoundPoints(&minPoint, &maxPoint);
 
-	// 最小点・最大点が四分木のルート空間の外にある場合、登録失敗
-	DirectX::XMFLOAT3 routeMinPoint = m_quadtreeNodes.front().GetCenter();
-	routeMinPoint.x -= m_quadtreeNodes.front().GetHalfSize();
-	routeMinPoint.z -= m_quadtreeNodes.front().GetHalfSize();
+	// 最小点・最大点が八分木のルート空間の外にある場合、登録失敗
+	DirectX::XMFLOAT3 routeMinPoint = m_octreeNodes.front().GetCenter();
+	routeMinPoint.x -= m_octreeNodes.front().GetHalfSize();
+	routeMinPoint.y -= m_octreeNodes.front().GetHalfSize();
+	routeMinPoint.z -= m_octreeNodes.front().GetHalfSize();
 
-	DirectX::XMFLOAT3 routeMaxPoint = m_quadtreeNodes.front().GetCenter();
-	routeMaxPoint.x += m_quadtreeNodes.front().GetHalfSize();
-	routeMaxPoint.z += m_quadtreeNodes.front().GetHalfSize();
+	DirectX::XMFLOAT3 routeMaxPoint = m_octreeNodes.front().GetCenter();
+	routeMaxPoint.x += m_octreeNodes.front().GetHalfSize();
+	routeMaxPoint.y += m_octreeNodes.front().GetHalfSize();
+	routeMaxPoint.z += m_octreeNodes.front().GetHalfSize();
 
 	if (minPoint.x < routeMinPoint.x)	return false;
+	if (minPoint.y < routeMinPoint.y)	return false;
 	if (minPoint.z < routeMinPoint.z)	return false;
 	if (maxPoint.x > routeMaxPoint.x)	return false;
+	if (maxPoint.y > routeMaxPoint.y)	return false;
 	if (maxPoint.z > routeMaxPoint.z)	return false;
 
 	// 線形（配列）のインデックスへ変換
 	int linerIndex = GetLinerIndexInsertObject(minPoint, maxPoint);
-	if (linerIndex >= m_quadtreeNodes.size()) return false;
+	if (linerIndex >= m_octreeNodes.size()) return false;
 
 	// 登録
-	m_quadtreeNodes[linerIndex].InsertCapsuleObject(capsule);
+	m_octreeNodes[linerIndex].InsertCapsuleObject(capsule);
 
 	return true;
 }
 
 /**************************************************************************//**
-	@brief		オブジェクトを四分木空間から削除
+	@brief		オブジェクトを八分木空間から削除
 	@param[in]	なし
 	@return		なし
 *//***************************************************************************/
-// 全ての三角形オブジェクトを四分木空間から削除
-void QuadtreeNodeManager::ClearAllTriangleObject()
+// 全ての三角形オブジェクトを八分木空間から削除
+void OctreeNodeManager::ClearAllTriangleObject()
 {
-	for (auto it = m_quadtreeNodes.begin(); it != m_quadtreeNodes.end(); it++)
+	for (auto it = m_octreeNodes.begin(); it != m_octreeNodes.end(); it++)
 	{
 		it->ClearTriangleObject();
 	}
 }
-// 全ての球体オブジェクトを四分木空間から削除
-void QuadtreeNodeManager::ClearAllSphereObject()
+// 全ての球体オブジェクトを八分木空間から削除
+void OctreeNodeManager::ClearAllSphereObject()
 {
-	for (auto it = m_quadtreeNodes.begin(); it != m_quadtreeNodes.end(); it++)
+	for (auto it = m_octreeNodes.begin(); it != m_octreeNodes.end(); it++)
 	{
 		it->ClearSphereObject();
 	}
 }
-// 全てのAABBオブジェクトを四分木空間から削除
-void QuadtreeNodeManager::ClearAllAABBObject()
+// 全てのAABBオブジェクトを八分木空間から削除
+void OctreeNodeManager::ClearAllAABBObject()
 {
-	for (auto it = m_quadtreeNodes.begin(); it != m_quadtreeNodes.end(); it++)
+	for (auto it = m_octreeNodes.begin(); it != m_octreeNodes.end(); it++)
 	{
 		it->ClearAABBObject();
 	}
 }
-// 全てのカプセルオブジェクトを四分木空間から削除
-void QuadtreeNodeManager::ClearAllCapsuleObject()
+// 全てのカプセルオブジェクトを八分木空間から削除
+void OctreeNodeManager::ClearAllCapsuleObject()
 {
-	for (auto it = m_quadtreeNodes.begin(); it != m_quadtreeNodes.end(); it++)
+	for (auto it = m_octreeNodes.begin(); it != m_octreeNodes.end(); it++)
 	{
 		it->ClearCapsuleObject();
 	}
@@ -367,65 +412,113 @@ void QuadtreeNodeManager::ClearAllCapsuleObject()
 				HitResultVector result : ヒット結果記録用変数
 	@return		bool : 交差するときtrue
 *//***************************************************************************/
-bool QuadtreeNodeManager::IntersectVerticalRayVsTriangle(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayEnd, HitResultVector& result)
+bool OctreeNodeManager::IntersectVerticalRayVsTriangle(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayEnd, HitResultVector& result)
 {
-	bool ret = false;
-	int count = 0;
+	// 八分木空間の最小値
+	DirectX::XMFLOAT3 routeMinPoint = m_octreeNodes.front().GetCenter();
+	routeMinPoint.x -= m_octreeNodes.front().GetHalfSize();
+	routeMinPoint.y -= m_octreeNodes.front().GetHalfSize();
+	routeMinPoint.z -= m_octreeNodes.front().GetHalfSize();
+	// 制御用変数
+	bool ret = false;	// 全体の交差結果。一度でも三角形との交差が出ればtrue
+	bool hit = false;	// 階層ごとの交差結果。一度でも三角形の交差が出ればtrue
 
 	// レイの向きを用意し、併せてレイの長さでヒット情報の距離を初期化
 	DirectX::XMFLOAT3 rayDirection = { 0.0f, rayEnd.y - rayStart.y , 0.0f };
 	result.distance = fabsf(rayDirection.y);
 
-	// レイの始点のモートンコードと線形インデックスを算出
-	uint32_t mortonCode = GetMortonCode(rayStart, m_quadtreeNodes.front(), m_quadtreeNodes[GetLevelStart(m_depth)].GetHalfSize());
-	int linerIndex = GetLevelStart(m_depth) + mortonCode;
+	// y軸のレイの向きをプラス→１、ゼロ→０、マイナス→－１で記録
+	int directionY = rayDirection.y > 0.0f ? 1 : (rayDirection.y < 0.0f ? -1 : 0);
 
+	// 八分木の階層数分ループ処理
+	for (int level = m_depth; level >= 0; level--)
 	{
-		ProfileScopedSection_2("ray", ImGuiControl::Profiler::Green);
-		int level = m_depth;
+		// 現在の階層の線形インデックスを取得
+		int levelStart = GetLevelStart(level);
 
-		// 四分木の階層数分ループ処理
-		//for (int level = m_depth; level >= 0; level--)
-		while(1)
+		// レイの始点のモートンコードを算出
+		uint32_t mortonCode = GetMortonCode(rayStart, m_octreeNodes.front(), m_octreeNodes[levelStart].GetHalfSize());
+
+		// DDAを使ってレイで辿るノードを算出するための各変数の準備
+
+		// 空間の直方体のy軸の辺の長さ
+		float cubeSize = m_octreeNodes[levelStart].GetHalfSize() * 2;
+
+		// レイの始点が八分木の最小点を含むノードから数えて何個目のノードに居るか算出（０個目スタート）
+		uint32_t nowY = static_cast<uint32_t>((rayStart.y - routeMinPoint.y) / cubeSize);
+
+		// レイの終点が八分木の最小点を含むノードから数えて何個目のノードに居るか算出
+		uint32_t goalY = static_cast<uint32_t>((rayEnd.y - routeMinPoint.y) / cubeSize);
+
+		// レイの始点のノードの最小・最大座標の算出
+		float minY = routeMinPoint.y + nowY * cubeSize, maxY = minY + cubeSize;
+
+		// レイの始点において、レイが進む際、次のノードにぶつかるまでの距離を算出
+		float distY = directionY * (maxY - rayStart.y) + (1 - directionY) * cubeSize / 2;
+
+		// ループ処理で八分木の同一階層内のレイvs三角形の交差判定を行う
+		while (1)
 		{
-			QuadtreeNode targetNode = m_quadtreeNodes.at(linerIndex);
+			hit = false;
 
-			// 各ノードが持つ三角形全てとレイの当たり判定を行う
-			for (int i = 0; i < targetNode.GetTriangles().size(); i++)
+			// 線形（配列）のインデックスへ変換
+			uint32_t linerIndex = mortonCode + levelStart;
+
+			// 階層内に収まっているか確認
+			if (linerIndex <= GetLevelStart(level + 1) - 1)
 			{
-				//HitResultVector tmpResult;
-				DirectX::XMVECTOR triangleVerts[3] = {
-					DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[0]),
-					DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[1]),
-					DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[2])
-				};			
-				if (Collision::IntersectRayVsTriangle(DirectX::XMLoadFloat3(&rayStart), DirectX::XMLoadFloat3(&rayDirection), triangleVerts, result))
-				//if (Collision::IntersectRayVsTriangle(DirectX::XMLoadFloat3(&rayStart), DirectX::XMLoadFloat3(&rayDirection), triangleVerts, tmpResult))
+				OctreeNode targetNode = m_octreeNodes.at(linerIndex);
+
+				for (int i = 0; i < targetNode.GetTriangles().size(); i++)
 				{
-					//if (result.distance > tmpResult.distance)
-					//{
-					//	result.distance = tmpResult.distance;
-					//	result.normal = tmpResult.normal;
-					//	result.position = tmpResult.position;
-					//	result.triangleVerts[0] = tmpResult.triangleVerts[0];
-					//	result.triangleVerts[1] = tmpResult.triangleVerts[1];
-					//	result.triangleVerts[2] = tmpResult.triangleVerts[2];
-					//	result.materialIndex = targetNode.GetTriangles().at(i).materialIndex;
-					//	ret = true;
-					//}
-					ret = true;
+					HitResultVector tmpResult;
+					DirectX::XMVECTOR triangleVerts[3] = {
+						DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[0]),
+						DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[1]),
+						DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[2])
+					};
+					if (Collision::IntersectRayVsTriangle(DirectX::XMLoadFloat3(&rayStart), DirectX::XMLoadFloat3(&rayDirection), triangleVerts, tmpResult))
+					{
+						if (result.distance > tmpResult.distance)
+						{
+							result.distance = tmpResult.distance;
+							result.normal = tmpResult.normal;
+							result.position = tmpResult.position;
+							result.triangleVerts[0] = tmpResult.triangleVerts[0];
+							result.triangleVerts[1] = tmpResult.triangleVerts[1];
+							result.triangleVerts[2] = tmpResult.triangleVerts[2];
+							result.materialIndex = targetNode.GetTriangles().at(i).materialIndex;
+							ret = true;
+						}
+					}
 				}
-				count++;
+
+			}
+			else
+			{
+				// 階層外なら終了
+				break;
 			}
 
-			// 親階層にインデックスを移動
-			mortonCode >>= 2;
-			if (level > 0)
-				linerIndex = GetLevelStart(level - 1) + mortonCode;
-			else break;
-			level--;
+			// １度でもヒットしていたら、この階層のチェックは終了。（レイの開始点に近いノード順にチェックしているので）
+			if (hit) break;
+
+			// 終端の空間まで来ていたら処理を終了させる
+			if (nowY == goalY)	break;
+
+			// 既に見つかっている最短交差距離よりも探索する空間までの距離が長くなっていれば、
+			// これ以上進む必要はないため現在の階層の処理を終了させる
+			if (result.distance < distY)	break;
+
+			// 移動するのでdistYとnowYを更新する
+			distY += cubeSize;
+			nowY += directionY;
+
+			// 隣の空間のモートンコード（非線形）を算出し上書きする
+			mortonCode = GetNextMortonCode(mortonCode, 1, directionY == -1);
 		}
-	}result.materialIndex = count;
+	}
+
 	return ret;
 }
 
@@ -436,12 +529,13 @@ bool QuadtreeNodeManager::IntersectVerticalRayVsTriangle(const DirectX::XMFLOAT3
 				HitResultVector result : ヒット結果記録用変数
 	@return		bool : 交差するときtrue
 *//***************************************************************************/
-bool QuadtreeNodeManager::IntersectRayVsTriangle(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayEnd, HitResultVector& result)
+bool OctreeNodeManager::IntersectRayVsTriangle(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayEnd, HitResultVector& result)
 {
 	// 四分木空間の最小値（x,z座標）
-	DirectX::XMFLOAT3 routeMinPoint = m_quadtreeNodes.front().GetCenter();
-	routeMinPoint.x -= m_quadtreeNodes.front().GetHalfSize();
-	routeMinPoint.z -= m_quadtreeNodes.front().GetHalfSize();
+	DirectX::XMFLOAT3 routeMinPoint = m_octreeNodes.front().GetCenter();
+	routeMinPoint.x -= m_octreeNodes.front().GetHalfSize();
+	routeMinPoint.y -= m_octreeNodes.front().GetHalfSize();
+	routeMinPoint.z -= m_octreeNodes.front().GetHalfSize();
 	// 制御用変数
 	bool ret = false;	// 全体の交差結果。一度でも三角形との交差が出ればtrue
 	bool hit = false;	// 階層ごとの交差結果。一度でも三角形の交差が出ればtrue
@@ -453,6 +547,7 @@ bool QuadtreeNodeManager::IntersectRayVsTriangle(const DirectX::XMFLOAT3& raySta
 
 	// xz軸それぞれのレイの向きをプラス→１、ゼロ→０、マイナス→－１で記録
 	int directionX = rayDirection.x > 0.0f ? 1 : (rayDirection.x < 0.0f ? -1 : 0);
+	int directionY = rayDirection.y > 0.0f ? 1 : (rayDirection.y < 0.0f ? -1 : 0);
 	int directionZ = rayDirection.z > 0.0f ? 1 : (rayDirection.z < 0.0f ? -1 : 0);
 
 
@@ -463,34 +558,40 @@ bool QuadtreeNodeManager::IntersectRayVsTriangle(const DirectX::XMFLOAT3& raySta
 		int levelStart = GetLevelStart(level);
 
 		// レイの始点のモートンコードを算出
-		uint32_t mortonCode = GetMortonCode(rayStart, m_quadtreeNodes.front(), m_quadtreeNodes[levelStart].GetHalfSize());
+		uint32_t mortonCode = GetMortonCode(rayStart, m_octreeNodes.front(), m_octreeNodes[levelStart].GetHalfSize());
 
 		// DDAを使ってレイで辿るノードを算出するための各変数の準備
 
 		// 空間の直方体のxz軸の辺の長さ
-		float cubeSize = m_quadtreeNodes[levelStart].GetHalfSize() * 2;
+		float cubeSize = m_octreeNodes[levelStart].GetHalfSize() * 2;
 
-		// レイの傾きから一つノードを進めた時の次のノードまでの距離の増加量の定数「直方体のxz軸の辺の長さ/|レイの成分|」を算出
+		// レイの傾きから一つノードを進めた時の次のノードまでの距離の増加量の定数「直方体のxyz軸の辺の長さ/|レイの成分|」を算出
 		float dx = directionX != 0 ? cubeSize / fabsf(rayDirection.x) : 0.0f;
+		float dy = directionY != 0 ? cubeSize / fabsf(rayDirection.y) : 0.0f;
 		float dz = directionZ != 0 ? cubeSize / fabsf(rayDirection.z) : 0.0f;
 
 		// レイの始点が四分木の最小点を含むノードから数えて何個目のノードに居るか算出（０個目スタート）
 		uint32_t nowX = static_cast<uint32_t>((rayStart.x - routeMinPoint.x) / cubeSize);
+		uint32_t nowY = static_cast<uint32_t>((rayStart.y - routeMinPoint.y) / cubeSize);
 		uint32_t nowZ = static_cast<uint32_t>((rayStart.z - routeMinPoint.z) / cubeSize);
 
 		// レイの終点が四分木の最小点を含むノードから数えて何個目のノードに居るか算出
 		uint32_t goalX = static_cast<uint32_t>((rayEnd.x - routeMinPoint.x) / cubeSize);
+		uint32_t goalY = static_cast<uint32_t>((rayEnd.y - routeMinPoint.y) / cubeSize);
 		uint32_t goalZ = static_cast<uint32_t>((rayEnd.z - routeMinPoint.z) / cubeSize);
 
 		// レイの始点のノードの最小・最大座標の算出
 		float minX = routeMinPoint.x + nowX * cubeSize, maxX = minX + cubeSize;
+		float minY = routeMinPoint.y + nowY * cubeSize, maxY = minY + cubeSize;
 		float minZ = routeMinPoint.z + nowZ * cubeSize, maxZ = minZ + cubeSize;
 
 		// レイの始点において、レイが進む際、「次のノードにぶつかるまでの距離/|レイの成分|」を算出
 		float distX = directionX * (maxX - rayStart.x) + (1 - directionX) * cubeSize / 2;
+		float distY = directionY * (maxY - rayStart.y) + (1 - directionY) * cubeSize / 2;
 		float distZ = directionZ * (maxZ - rayStart.z) + (1 - directionZ) * cubeSize / 2;
 
 		float tx = directionX != 0 ? distX / fabsf(rayDirection.x) : FLT_MAX;
+		float ty = directionY != 0 ? distY / fabsf(rayDirection.y) : FLT_MAX;
 		float tz = directionZ != 0 ? distZ / fabsf(rayDirection.z) : FLT_MAX;
 
 
@@ -505,7 +606,7 @@ bool QuadtreeNodeManager::IntersectRayVsTriangle(const DirectX::XMFLOAT3& raySta
 			// 階層内に収まっているか確認
 			if (linerIndex <= GetLevelStart(level + 1) - 1)
 			{
-				QuadtreeNode targetNode = m_quadtreeNodes[linerIndex];
+				OctreeNode targetNode = m_octreeNodes[linerIndex];
 
 				// 各ノードが持つ三角形全てとレイの当たり判定を行う
 				for (int i = 0; i < targetNode.GetTriangles().size(); i++)
@@ -544,7 +645,7 @@ bool QuadtreeNodeManager::IntersectRayVsTriangle(const DirectX::XMFLOAT3& raySta
 
 			// DDAを用いて、次にチェックする隣の区画を算出し、そのノードを示すモートンコードを上書きする
 			// x方向
-			if (tx <= tz)
+			if (tx <= ty && tx <= tz)
 			{
 				// 終端の空間まで来ていたら現在の階層の処理を終了させる
 				if (nowX == goalX)	break;
@@ -559,6 +660,23 @@ bool QuadtreeNodeManager::IntersectRayVsTriangle(const DirectX::XMFLOAT3& raySta
 
 				// 隣の空間のモートンコード（非線形）を算出し上書きする
 				mortonCode = GetNextMortonCode(mortonCode, 0, directionX == -1);
+			}
+			// y方向
+			else if (ty <= tx && ty <= tz)
+			{
+				// 終端の空間まで来ていたら処理を終了させる
+				if (nowY == goalY)	break;
+
+				// 既に見つかっている最短交差距離よりも探索する空間までの距離が長くなっていれば、
+				// これ以上進む必要はないため現在の階層の処理を終了させる
+				if (result.distance < rayDist * ty)	break;
+
+				// 移動するのでtyとnowYを更新する
+				ty += dy;
+				nowY += directionY;
+
+				// 隣の空間のモートンコード（非線形）を算出し上書きする
+				mortonCode = GetNextMortonCode(mortonCode, 1, directionY == -1);
 			}
 			// z方向
 			else
@@ -575,7 +693,7 @@ bool QuadtreeNodeManager::IntersectRayVsTriangle(const DirectX::XMFLOAT3& raySta
 				nowZ += directionZ;
 
 				// 隣の空間のモートンコード（非線形）を算出し上書きする
-				mortonCode = GetNextMortonCode(mortonCode, 1, directionZ == -1);
+				mortonCode = GetNextMortonCode(mortonCode, 2, directionZ == -1);
 			}
 		}
 	}
@@ -592,15 +710,15 @@ bool QuadtreeNodeManager::IntersectRayVsTriangle(const DirectX::XMFLOAT3& raySta
 				vector<CrossedNode>* nodeList : 交差したノードリスト
 	@return		bool : 交差するときtrue
 *//***************************************************************************/
-bool QuadtreeNodeManager::IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayEnd, float radius, HitResultVector& result)
+bool OctreeNodeManager::IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayEnd, float radius, HitResultVector& result)
 {
-	std::vector<QuadtreeNodeManager::CrossedNode>	mortonList;	// 交差したノードを記録する
+	std::vector<OctreeNodeManager::CrossedNode>	mortonList;	// 交差したノードを記録する
 	return IntersectSphereCastVsTriangle(rayStart, rayEnd, radius, result, &mortonList);
 }
-bool QuadtreeNodeManager::IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayEnd, float radius, HitResultVector& result, std::vector<CrossedNode>* nodeList)
+bool OctreeNodeManager::IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayEnd, float radius, HitResultVector& result, std::vector<CrossedNode>* nodeList)
 {
-	// 四分木の最下層の辺長よりもスフィアキャストの半径が大きい場合、今回のアルゴリズムでは判定出来ないため、最下層を一つ上の階層に移動させる
-	float minSize = m_quadtreeNodes.back().GetHalfSize() * 2.0f;
+	// 八分木の最下層の辺長よりもスフィアキャストの半径が大きい場合、今回のアルゴリズムでは判定出来ないため、最下層を一つ上の階層に移動させる
+	float minSize = m_octreeNodes.back().GetHalfSize() * 2.0f;
 	uint32_t targetDepth = m_depth;
 	while (minSize < radius)
 	{
@@ -619,27 +737,32 @@ bool QuadtreeNodeManager::IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3&
 	DirectX::XMFLOAT3 rayDirection =
 	{
 		rayEnd.x - rayStart.x,
-		0.0f,
+		rayEnd.y - rayStart.y,
 		rayEnd.z - rayStart.z,
 	};
 	float rayDist = sqrtf(rayDirection.x * rayDirection.x + rayDirection.z * rayDirection.z);
 	rayDirection.x /= rayDist;
+	rayDirection.y /= rayDist;
 	rayDirection.z /= rayDist;
 	result.distance = rayDist;
+	// 横方向のレイの成分の大きさ
+	float horizontalRayDirection = sqrtf(rayDirection.x * rayDirection.x + rayDirection.z * rayDirection.z);
 
-	// 四分木空間の最小値（x,z座標）
-	DirectX::XMFLOAT3 routeMinPoint = m_quadtreeNodes.front().GetCenter();
-	routeMinPoint.x -= m_quadtreeNodes.front().GetHalfSize();
-	routeMinPoint.z -= m_quadtreeNodes.front().GetHalfSize();
+	// 八分木空間の最小値（x,z座標）
+	DirectX::XMFLOAT3 routeMinPoint = m_octreeNodes.front().GetCenter();
+	routeMinPoint.x -= m_octreeNodes.front().GetHalfSize();
+	routeMinPoint.y -= m_octreeNodes.front().GetHalfSize();
+	routeMinPoint.z -= m_octreeNodes.front().GetHalfSize();
 
 	// レイの向きを１・０・－１で記録
 	int directionX = rayDirection.x > 0.0f ? 1 : (rayDirection.x < 0.0f ? -1 : 0);
+	int directionY = rayDirection.y > 0.0f ? 1 : (rayDirection.y < 0.0f ? -1 : 0);
 	int directionZ = rayDirection.z > 0.0f ? 1 : (rayDirection.z < 0.0f ? -1 : 0);
 
 	// ノードを指定し、そのノード内の全ての三角形とスフィアキャストを行うラムダ式
 	auto IntersectShpereCastVsTriangleInTargetNode = [&](int linerIndex)
 	{
-		QuadtreeNode targetNode = m_quadtreeNodes[linerIndex];
+		OctreeNode targetNode = m_octreeNodes[linerIndex];
 
 		// 各ノードが持つ三角形全てとレイの当たり判定を行う
 		for (int i = 0; i < targetNode.GetTriangles().size(); i++)
@@ -699,14 +822,15 @@ bool QuadtreeNodeManager::IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3&
 		uint32_t levelStart = GetLevelStart(level);
 
 		// レイで辿るノードを算出するための各変数の準備
-		float cubeSize = m_quadtreeNodes[levelStart].GetHalfSize() * 2;
+		float cubeSize = m_octreeNodes[levelStart].GetHalfSize() * 2;
 
 		// レイの傾きから一つノードを進めた時の次のノードまでの距離の増加量の定数「直方体のxz軸の辺の長さ/|レイの成分|」を算出
 		float dx = directionX != 0 ? cubeSize / fabsf(rayDirection.x * rayDist) : 0.0f;
+		float dy = directionY != 0 ? cubeSize / fabsf(rayDirection.y * rayDist) : 0.0f;
 		float dz = directionZ != 0 ? cubeSize / fabsf(rayDirection.z * rayDist) : 0.0f;
 
 		// レイの始点の交差判定
-		uint32_t mortonCode = GetMortonCode(rayStart, m_quadtreeNodes.front(), m_quadtreeNodes[levelStart].GetHalfSize());
+		uint32_t mortonCode = GetMortonCode(rayStart, m_octreeNodes.front(), m_octreeNodes[levelStart].GetHalfSize());
 		if (!resisterAndIntersectShpereCastVsTriangleInTargetNode(mortonCode + levelStart))
 		{
 			continue;
@@ -714,13 +838,13 @@ bool QuadtreeNodeManager::IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3&
 
 		// レイの座標補正値
 		DirectX::XMFLOAT3 fixAddVec = {};
-		// 中心、左、右からのレイと四分木の交差判定
-		for (int i = 0; i < 3; i++)
+		// 中心、左、右、上、下からのレイと八分木の交差判定
+		for (int i = 0; i < 5; i++)
 		{
 			// レイの座標補正値を算出
 			if (i == 0)	// 中心
 			{
-				fixAddVec = { rayDirection.x * radius, 0.0f, rayDirection.z * radius };
+				fixAddVec = { rayDirection.x * radius, rayDirection.y * radius, rayDirection.z * radius };
 			}
 			else if (i == 1)	// 左
 			{
@@ -730,24 +854,37 @@ bool QuadtreeNodeManager::IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3&
 			{
 				fixAddVec = { -rayDirection.z * radius, 0.0f, rayDirection.x * radius };
 			}
+			else if (i == 3)	// 上
+			{
+				fixAddVec = { -rayDirection.x / horizontalRayDirection * rayDirection.y * radius, horizontalRayDirection * radius, -rayDirection.z / horizontalRayDirection * rayDirection.y * radius };
+			}
+			else if (i == 4)	// 下
+			{
+				fixAddVec = { rayDirection.x / horizontalRayDirection * rayDirection.y * radius, -horizontalRayDirection * radius, rayDirection.z / horizontalRayDirection * rayDirection.y * radius };
+			}
 
 			// 座標補正後のレイの始点のモートンコード
-			mortonCode = GetMortonCode(DirectX::XMFLOAT3{ rayStart.x + fixAddVec.x, 0.0f, rayStart.z + fixAddVec.z }, m_quadtreeNodes.front(), m_quadtreeNodes[levelStart].GetHalfSize());
+			mortonCode = GetMortonCode(DirectX::XMFLOAT3{ rayStart.x + fixAddVec.x, rayStart.y + fixAddVec.y, rayStart.z + fixAddVec.z }, m_octreeNodes.front(), m_octreeNodes[levelStart].GetHalfSize());
 
-			// レイの始点が四分木の最小点を含むノードから数えて何個目のノードに居るか算出（０個目スタート）
+			// レイの始点が八分木の最小点を含むノードから数えて何個目のノードに居るか算出（０個目スタート）
 			uint32_t nowX = static_cast<uint32_t>((rayStart.x + fixAddVec.x - routeMinPoint.x) / cubeSize);
+			uint32_t nowY = static_cast<uint32_t>((rayStart.y + fixAddVec.y - routeMinPoint.y) / cubeSize);
 			uint32_t nowZ = static_cast<uint32_t>((rayStart.z + fixAddVec.z - routeMinPoint.z) / cubeSize);
-			// レイの終点が四分木の最小点を含むノードから数えて何個目のノードに居るか算出
+			// レイの終点が八分木の最小点を含むノードから数えて何個目のノードに居るか算出
 			uint32_t goalX = static_cast<uint32_t>((rayEnd.x + fixAddVec.x - routeMinPoint.x) / cubeSize);
+			uint32_t goalY = static_cast<uint32_t>((rayEnd.y + fixAddVec.y - routeMinPoint.y) / cubeSize);
 			uint32_t goalZ = static_cast<uint32_t>((rayEnd.z + fixAddVec.z - routeMinPoint.z) / cubeSize);
 			// レイの始点のノードの最小・最大座標の算出
 			float minX = routeMinPoint.x + nowX * cubeSize, maxX = minX + cubeSize;
+			float minY = routeMinPoint.y + nowY * cubeSize, maxY = minY + cubeSize;
 			float minZ = routeMinPoint.z + nowZ * cubeSize, maxZ = minZ + cubeSize;
 			// レイが進む際、次のノードにぶつかるまでの距離（レイの比率）を算出
 			float distX = directionX * (maxX - (rayStart.x + fixAddVec.x)) + (1 - directionX) * cubeSize / 2;
+			float distY = directionY * (maxY - (rayStart.y + fixAddVec.y)) + (1 - directionY) * cubeSize / 2;
 			float distZ = directionZ * (maxZ - (rayStart.z + fixAddVec.z)) + (1 - directionZ) * cubeSize / 2;
 
 			float tx = directionX != 0 ? distX / fabsf(rayDirection.x * rayDist) : FLT_MAX;
+			float ty = directionY != 0 ? distY / fabsf(rayDirection.y * rayDist) : FLT_MAX;
 			float tz = directionZ != 0 ? distZ / fabsf(rayDirection.z * rayDist) : FLT_MAX;
 
 			// ループ処理で四分木の同一階層内のスフィアキャストvs三角形の交差判定を行う
@@ -766,7 +903,7 @@ bool QuadtreeNodeManager::IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3&
 
 				// DDAを用いて、次にチェックする隣の区画を算出し、そのノードを示すモートンコードを上書きする
 				// x方向
-				if (tx <= tz)
+				if (tx <= ty && tx <= tz)
 				{
 					// 終端の空間まで来ていたら現在の階層の処理を終了させる
 					if (nowX == goalX)	break;
@@ -781,6 +918,23 @@ bool QuadtreeNodeManager::IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3&
 
 					// 隣の空間のモートンコード（非線形）を算出し上書きする
 					mortonCode = GetNextMortonCode(mortonCode, 0, directionX == -1);
+				}
+				// y方向
+				else if (ty <= tx && ty <= tz)
+				{
+					// 終端の空間まで来ていたら処理を終了させる
+					if (nowY == goalY)	break;
+
+					// 既に見つかっている最短交差距離よりも探索する空間までの距離が長くなっていれば、
+					// これ以上進む必要はないため現在の階層の処理を終了させる
+					if (result.distance < rayDist * ty)	break;
+
+					// 移動するのでtyとnowYを更新する
+					ty += dy;
+					nowY += directionY;
+
+					// 隣の空間のモートンコード（非線形）を算出し上書きする
+					mortonCode = GetNextMortonCode(mortonCode, 1, directionY == -1);
 				}
 				// z方向
 				else
@@ -797,7 +951,7 @@ bool QuadtreeNodeManager::IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3&
 					nowZ += directionZ;
 
 					// 隣の空間のモートンコード（非線形）を算出し上書きする
-					mortonCode = GetNextMortonCode(mortonCode, 1, directionZ == -1);
+					mortonCode = GetNextMortonCode(mortonCode, 2, directionZ == -1);
 				}
 			}
 		}
@@ -805,64 +959,112 @@ bool QuadtreeNodeManager::IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3&
 		// ここまでで交差がなければ、スフィアキャストの終端の球と周囲の空間の判定を行う
 		if (!hitNowLevel)
 		{
-			uint32_t mortonCode = GetMortonCode(rayEnd, m_quadtreeNodes.front(), m_quadtreeNodes[levelStart].GetHalfSize());
+			uint32_t mortonCode = GetMortonCode(rayEnd, m_octreeNodes.front(), m_octreeNodes[levelStart].GetHalfSize());
 			uint32_t tmpMortonCode = mortonCode;
-			// レイの終点が四分木の最小点を含むノードから数えて何個目のノードに居るか算出
+			// レイの終点が八分木の最小点を含むノードから数えて何個目のノードに居るか算出
 			uint32_t endX = static_cast<uint32_t>((rayEnd.x - routeMinPoint.x) / cubeSize);
+			uint32_t endY = static_cast<uint32_t>((rayEnd.y - routeMinPoint.y) / cubeSize);
 			uint32_t endZ = static_cast<uint32_t>((rayEnd.z - routeMinPoint.z) / cubeSize);
 			// レイの終点のノードの最小・最大座標の算出
 			float minX = routeMinPoint.x + endX * cubeSize, maxX = minX + cubeSize;
+			float minY = routeMinPoint.y + endY * cubeSize, maxY = minY + cubeSize;
 			float minZ = routeMinPoint.z + endZ * cubeSize, maxZ = minZ + cubeSize;
 
-			// 8方向の隣接する空間をチェックする
-			float distLeft = rayEnd.x - minX;
-			float distRight = maxX - rayEnd.x;
-			float distDown = rayEnd.z - minZ;
-			float distUp = maxZ - rayEnd.z;
+			// 現在の階層の1辺の分割数
 			uint32_t divisions = 1 << level;
 
+			// 26方向の隣接する空間をチェックする
+
+			// 隣の空間までの距離
+			float distLeft = rayEnd.x - minX;
+			float distRight = maxX - rayEnd.x;
+			float distDown = rayEnd.y - minY;
+			float distUp = maxY - rayEnd.y;
+			float distFront = rayEnd.z - minZ;
+			float distBack = maxZ - rayEnd.z;
+			float sqDist[6] = { distLeft * distLeft ,distRight * distRight, distDown * distDown, distUp * distUp, distFront * distFront, distBack * distBack };
+			float sqRadius = radius * radius;
+			
+			// 隣の空間(1次元方向)のモートンコードの変化量
+			int32_t nextMortonCode[6] = {};
+			
 			if (distLeft < radius && endX > 0)
 			{
-				tmpMortonCode = GetNextMortonCode(mortonCode, 0, true);
-				resisterAndIntersectShpereCastVsTriangleInTargetNode(tmpMortonCode + levelStart);
-
-				if (distLeft * distLeft + distDown * distDown < radius * radius && endZ > 0)
-				{
-					resisterAndIntersectShpereCastVsTriangleInTargetNode(GetNextMortonCode(tmpMortonCode, 1, true) + levelStart);
-				}
-
-				if (distLeft * distLeft + distUp * distUp < radius * radius && endZ < divisions)
-				{
-					resisterAndIntersectShpereCastVsTriangleInTargetNode(GetNextMortonCode(tmpMortonCode, 1, false) + levelStart);
-				}
+				nextMortonCode[0] = GetNextMortonCode(mortonCode, 0, true) - mortonCode;
 			}
-
 			if (distRight < radius && endX < divisions)
 			{
-				tmpMortonCode = GetNextMortonCode(mortonCode, 0, false);
-				resisterAndIntersectShpereCastVsTriangleInTargetNode(tmpMortonCode + levelStart);
-
-				if (distRight * distRight + distDown * distDown < radius * radius && endZ > 0)
+				nextMortonCode[1] = GetNextMortonCode(mortonCode, 0, false) - mortonCode;
+			}
+			if (distDown < radius && endY > 0)
+			{
+				nextMortonCode[2] = GetNextMortonCode(mortonCode, 1, true) - mortonCode;
+			}
+			if (distUp < radius && endY < divisions)
+			{
+				nextMortonCode[3] = GetNextMortonCode(mortonCode, 1, false) - mortonCode;
+			}
+			if (distFront < radius && endZ > 0)
+			{
+				nextMortonCode[4] = GetNextMortonCode(mortonCode, 2, true) - mortonCode;
+			}
+			if (distBack < radius && endZ < divisions)
+			{
+				nextMortonCode[5] = GetNextMortonCode(mortonCode, 2, false) - mortonCode;
+			}
+			
+			// 1次元方向の空間をチェック
+			for (int i = 0; i < 6; i++)
+			{
+				if (nextMortonCode[i] != 0)
 				{
-					resisterAndIntersectShpereCastVsTriangleInTargetNode(GetNextMortonCode(tmpMortonCode, 1, true) + levelStart);
+					resisterAndIntersectShpereCastVsTriangleInTargetNode(mortonCode + nextMortonCode[i] + levelStart);
+				}
+			}
+			
+			// 2次元方向の空間をチェック
+			for (int i = 0; i < 6; i++)
+			{
+				if (nextMortonCode[i] == 0) continue;
+
+				int j = ((i / 2 + 1) & 3) * 2;
+				if (nextMortonCode[j] != 0)
+				{
+					if (sqDist[i] + sqDist[j] < sqRadius)
+					{
+						resisterAndIntersectShpereCastVsTriangleInTargetNode(mortonCode + nextMortonCode[i] + nextMortonCode[j] + levelStart);
+					}
 				}
 
-				if (distRight * distRight + distUp * distUp < radius * radius && endZ < divisions)
+				j++;
+				if (nextMortonCode[j] != 0)
 				{
-					resisterAndIntersectShpereCastVsTriangleInTargetNode(GetNextMortonCode(tmpMortonCode, 1, false) + levelStart);
+					if (sqDist[i] + sqDist[j] < sqRadius)
+					{
+						resisterAndIntersectShpereCastVsTriangleInTargetNode(mortonCode + nextMortonCode[i] + nextMortonCode[j] + levelStart);
+					}
 				}
 			}
 
-			if (distDown < radius && endZ > 0)
+			// 3次元方向の空間をチェック
+			for (int i = 0; i < 2; i++)
 			{
-				tmpMortonCode = GetNextMortonCode(mortonCode, 1, true);
-				resisterAndIntersectShpereCastVsTriangleInTargetNode(tmpMortonCode + levelStart);
-			}
+				if (nextMortonCode[i] == 0) continue;
 
-			if (distUp < radius && endZ < divisions)
-			{
-				tmpMortonCode = GetNextMortonCode(mortonCode, 1, false);
-				resisterAndIntersectShpereCastVsTriangleInTargetNode(tmpMortonCode + levelStart);
+				for (int j = 2; j < 4; j++)
+				{
+					if (nextMortonCode[j] == 0) continue;
+
+					for (int k = 4; k < 6; k++)
+					{
+						if (nextMortonCode[i] == 0) continue;
+
+						if (sqDist[i] + sqDist[j] + sqDist[k] < sqRadius)
+						{
+							resisterAndIntersectShpereCastVsTriangleInTargetNode(mortonCode + nextMortonCode[i] + nextMortonCode[j] + nextMortonCode[k] + levelStart);
+						}
+					}
+				}
 			}
 		}
 	}
@@ -881,7 +1083,7 @@ bool QuadtreeNodeManager::IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3&
 	@return		bool : 交差するときtrue
 *//***************************************************************************/
 // 全てのオブジェクトの押し戻し処理を実行
-void QuadtreeNodeManager::CollisionAllObjects(
+void OctreeNodeManager::CollisionAllObjects(
 	uint32_t target,
 	bool singleNode,
 	std::vector<Sphere*>* upperListSphere,
@@ -900,9 +1102,9 @@ void QuadtreeNodeManager::CollisionAllObjects(
 	CollisionAABBVsTriangle(target, singleNode, upperListAABB, upperListTriangle);
 }
 // 球体 VS 球体
-void QuadtreeNodeManager::CollisionSphereVsSphere(uint32_t target, bool singleNode, std::vector<Sphere*>* upperListSphere)
+void OctreeNodeManager::CollisionSphereVsSphere(uint32_t target, bool singleNode, std::vector<Sphere*>* upperListSphere)
 {
-	QuadtreeNode targetNode = m_quadtreeNodes[target];
+	OctreeNode targetNode = m_octreeNodes[target];
 	IntersectionResult result;
 
 	for (int i = 0; i < targetNode.GetSpheres().size(); i++)
@@ -911,10 +1113,10 @@ void QuadtreeNodeManager::CollisionSphereVsSphere(uint32_t target, bool singleNo
 		for (int j = i + 1; j < targetNode.GetSpheres().size(); j++)
 		{
 			if (Collision::IntersectSphereVsSphere(
-				DirectX::XMLoadFloat3(&targetNode.GetSpheres().at(i)->position), 
-				targetNode.GetSpheres().at(i)->radius, 
-				DirectX::XMLoadFloat3(&targetNode.GetSpheres().at(j)->position), 
-				targetNode.GetSpheres().at(j)->radius, 
+				DirectX::XMLoadFloat3(&targetNode.GetSpheres().at(i)->position),
+				targetNode.GetSpheres().at(i)->radius,
+				DirectX::XMLoadFloat3(&targetNode.GetSpheres().at(j)->position),
+				targetNode.GetSpheres().at(j)->radius,
 				&result))
 			{
 				// 押し戻し処理
@@ -933,9 +1135,9 @@ void QuadtreeNodeManager::CollisionSphereVsSphere(uint32_t target, bool singleNo
 		for (int j = 0; upperListSphere && j < upperListSphere->size(); j++)
 		{
 			if (Collision::IntersectSphereVsSphere(
-				DirectX::XMLoadFloat3(&targetNode.GetSpheres().at(i)->position), 
-				targetNode.GetSpheres().at(i)->radius, 
-				DirectX::XMLoadFloat3(&upperListSphere->at(j)->position), 
+				DirectX::XMLoadFloat3(&targetNode.GetSpheres().at(i)->position),
+				targetNode.GetSpheres().at(i)->radius,
+				DirectX::XMLoadFloat3(&upperListSphere->at(j)->position),
 				upperListSphere->at(j)->radius, &result))
 			{
 				// 押し戻し処理
@@ -967,9 +1169,9 @@ void QuadtreeNodeManager::CollisionSphereVsSphere(uint32_t target, bool singleNo
 			addUpperList = true;
 		}
 
-		for (int i = 1; i <= 4; i++)
+		for (int i = 1; i <= 8; i++)
 		{
-			uint32_t nextTarget = target * 4 + i;
+			uint32_t nextTarget = target * 8 + i;
 			CollisionSphereVsSphere(nextTarget, false, upperListSphere);
 		}
 
@@ -984,9 +1186,9 @@ void QuadtreeNodeManager::CollisionSphereVsSphere(uint32_t target, bool singleNo
 	}
 }
 // カプセル VS カプセル
-void QuadtreeNodeManager::CollisionCapsuleVsCapsule(uint32_t target, bool singleNode, std::vector<Capsule*>* upperListCapsule)
+void OctreeNodeManager::CollisionCapsuleVsCapsule(uint32_t target, bool singleNode, std::vector<Capsule*>* upperListCapsule)
 {
-	QuadtreeNode targetNode = m_quadtreeNodes[target];
+	OctreeNode targetNode = m_octreeNodes[target];
 	IntersectionResult result;
 
 	for (int i = 0; i < targetNode.GetCapsules().size(); i++)
@@ -1060,9 +1262,9 @@ void QuadtreeNodeManager::CollisionCapsuleVsCapsule(uint32_t target, bool single
 			addUpperList = true;
 		}
 
-		for (int i = 1; i <= 4; i++)
+		for (int i = 1; i <= 8; i++)
 		{
-			uint32_t nextTarget = target * 4 + i;
+			uint32_t nextTarget = target * 8 + i;
 			CollisionCapsuleVsCapsule(nextTarget, false, upperListCapsule);
 		}
 
@@ -1077,9 +1279,9 @@ void QuadtreeNodeManager::CollisionCapsuleVsCapsule(uint32_t target, bool single
 	}
 }
 // AABB VS AABB
-void QuadtreeNodeManager::CollisionAABBVsAABB(uint32_t target, bool singleNode, std::vector<AABB*>* upperListAABB)
+void OctreeNodeManager::CollisionAABBVsAABB(uint32_t target, bool singleNode, std::vector<AABB*>* upperListAABB)
 {
-	QuadtreeNode targetNode = m_quadtreeNodes[target];
+	OctreeNode targetNode = m_octreeNodes[target];
 	IntersectionResult result;
 
 	for (int i = 0; i < targetNode.GetAABBs().size(); i++)
@@ -1145,9 +1347,9 @@ void QuadtreeNodeManager::CollisionAABBVsAABB(uint32_t target, bool singleNode, 
 			addUpperList = true;
 		}
 
-		for (int i = 1; i <= 4; i++)
+		for (int i = 1; i <= 8; i++)
 		{
-			uint32_t nextTarget = target * 4 + i;
+			uint32_t nextTarget = target * 8 + i;
 			CollisionAABBVsAABB(nextTarget, false, upperListAABB);
 		}
 
@@ -1162,9 +1364,9 @@ void QuadtreeNodeManager::CollisionAABBVsAABB(uint32_t target, bool singleNode, 
 	}
 }
 // 球体 VS 三角形
-void QuadtreeNodeManager::CollisionSphereVsTriangle(uint32_t target, bool singleNode, std::vector<Sphere*>* upperListSphere, std::vector<Triangle>* upperListTriangle)
+void OctreeNodeManager::CollisionSphereVsTriangle(uint32_t target, bool singleNode, std::vector<Sphere*>* upperListSphere, std::vector<Triangle>* upperListTriangle)
 {
-	QuadtreeNode targetNode = m_quadtreeNodes[target];
+	OctreeNode targetNode = m_octreeNodes[target];
 	IntersectionResult result;
 
 	// 球体側の処理
@@ -1180,9 +1382,9 @@ void QuadtreeNodeManager::CollisionSphereVsTriangle(uint32_t target, bool single
 				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[2])
 			};
 			if (Collision::IntersectSphereVsTriangle(
-				DirectX::XMLoadFloat3(&targetNode.GetSpheres().at(i)->position), 
-				targetNode.GetSpheres().at(i)->radius, 
-				triPos, 
+				DirectX::XMLoadFloat3(&targetNode.GetSpheres().at(i)->position),
+				targetNode.GetSpheres().at(i)->radius,
+				triPos,
 				&result))
 			{
 				// 球体のみ押し戻し処理
@@ -1204,9 +1406,9 @@ void QuadtreeNodeManager::CollisionSphereVsTriangle(uint32_t target, bool single
 				DirectX::XMLoadFloat3(&upperListTriangle->at(j).position[2])
 			};
 			if (Collision::IntersectSphereVsTriangle(
-				DirectX::XMLoadFloat3(&targetNode.GetSpheres().at(i)->position), 
-				targetNode.GetSpheres().at(i)->radius, 
-				triPos, 
+				DirectX::XMLoadFloat3(&targetNode.GetSpheres().at(i)->position),
+				targetNode.GetSpheres().at(i)->radius,
+				triPos,
 				&result))
 			{
 				// 球体のみ押し戻し処理
@@ -1233,9 +1435,9 @@ void QuadtreeNodeManager::CollisionSphereVsTriangle(uint32_t target, bool single
 				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[2])
 			};
 			if (Collision::IntersectSphereVsTriangle(
-				DirectX::XMLoadFloat3(&upperListSphere->at(i)->position), 
-				upperListSphere->at(i)->radius, 
-				triPos, 
+				DirectX::XMLoadFloat3(&upperListSphere->at(i)->position),
+				upperListSphere->at(i)->radius,
+				triPos,
 				&result))
 			{
 				// 球体のみ押し戻し処理
@@ -1269,9 +1471,9 @@ void QuadtreeNodeManager::CollisionSphereVsTriangle(uint32_t target, bool single
 			addUpperList = true;
 		}
 
-		for (int i = 1; i <= 4; i++)
+		for (int i = 1; i <= 8; i++)
 		{
-			uint32_t nextTarget = target * 4 + i;
+			uint32_t nextTarget = target * 8 + i;
 			CollisionSphereVsTriangle(nextTarget, false, upperListSphere, upperListTriangle);
 		}
 
@@ -1290,9 +1492,9 @@ void QuadtreeNodeManager::CollisionSphereVsTriangle(uint32_t target, bool single
 	}
 }
 // カプセル VS 三角形
-void QuadtreeNodeManager::CollisionCapsuleVsTriangle(uint32_t target, bool singleNode, std::vector<Capsule*>* upperListCapsule, std::vector<Triangle>* upperListTriangle)
+void OctreeNodeManager::CollisionCapsuleVsTriangle(uint32_t target, bool singleNode, std::vector<Capsule*>* upperListCapsule, std::vector<Triangle>* upperListTriangle)
 {
-	QuadtreeNode targetNode = m_quadtreeNodes[target];
+	OctreeNode targetNode = m_octreeNodes[target];
 	IntersectionResult result;
 
 	// カプセル側の処理
@@ -1308,11 +1510,11 @@ void QuadtreeNodeManager::CollisionCapsuleVsTriangle(uint32_t target, bool singl
 				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[2])
 			};
 			if (Collision::IntersectCapsuleVsTriangle(
-				DirectX::XMLoadFloat3(&targetNode.GetCapsules().at(i)->position), 
-				DirectX::XMLoadFloat3(&targetNode.GetCapsules().at(i)->direction), 
-				targetNode.GetCapsules().at(i)->radius, 
-				targetNode.GetCapsules().at(i)->length, 
-				triPos, 
+				DirectX::XMLoadFloat3(&targetNode.GetCapsules().at(i)->position),
+				DirectX::XMLoadFloat3(&targetNode.GetCapsules().at(i)->direction),
+				targetNode.GetCapsules().at(i)->radius,
+				targetNode.GetCapsules().at(i)->length,
+				triPos,
 				&result))
 			{
 				// カプセルのみ押し戻し処理
@@ -1334,11 +1536,11 @@ void QuadtreeNodeManager::CollisionCapsuleVsTriangle(uint32_t target, bool singl
 				DirectX::XMLoadFloat3(&upperListTriangle->at(j).position[2])
 			};
 			if (Collision::IntersectCapsuleVsTriangle(
-				DirectX::XMLoadFloat3(&targetNode.GetCapsules().at(i)->position), 
-				DirectX::XMLoadFloat3(&targetNode.GetCapsules().at(i)->direction), 
-				targetNode.GetCapsules().at(i)->radius, 
-				targetNode.GetCapsules().at(i)->length, 
-				triPos, 
+				DirectX::XMLoadFloat3(&targetNode.GetCapsules().at(i)->position),
+				DirectX::XMLoadFloat3(&targetNode.GetCapsules().at(i)->direction),
+				targetNode.GetCapsules().at(i)->radius,
+				targetNode.GetCapsules().at(i)->length,
+				triPos,
 				&result))
 			{
 				// カプセルのみ押し戻し処理
@@ -1365,11 +1567,11 @@ void QuadtreeNodeManager::CollisionCapsuleVsTriangle(uint32_t target, bool singl
 				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[2])
 			};
 			if (Collision::IntersectCapsuleVsTriangle(
-				DirectX::XMLoadFloat3(&upperListCapsule->at(i)->position), 
-				DirectX::XMLoadFloat3(&upperListCapsule->at(i)->direction), 
-				upperListCapsule->at(i)->radius, 
-				upperListCapsule->at(i)->length, 
-				triPos, 
+				DirectX::XMLoadFloat3(&upperListCapsule->at(i)->position),
+				DirectX::XMLoadFloat3(&upperListCapsule->at(i)->direction),
+				upperListCapsule->at(i)->radius,
+				upperListCapsule->at(i)->length,
+				triPos,
 				&result))
 			{
 				// カプセルのみ押し戻し処理
@@ -1403,9 +1605,9 @@ void QuadtreeNodeManager::CollisionCapsuleVsTriangle(uint32_t target, bool singl
 			addUpperList = true;
 		}
 
-		for (int i = 1; i <= 4; i++)
+		for (int i = 1; i <= 8; i++)
 		{
-			uint32_t nextTarget = target * 4 + i;
+			uint32_t nextTarget = target * 8 + i;
 			CollisionCapsuleVsTriangle(nextTarget, false, upperListCapsule, upperListTriangle);
 		}
 
@@ -1424,9 +1626,9 @@ void QuadtreeNodeManager::CollisionCapsuleVsTriangle(uint32_t target, bool singl
 	}
 }
 // AABB VS 三角形
-void QuadtreeNodeManager::CollisionAABBVsTriangle(uint32_t target, bool singleNode, std::vector<AABB*>* upperListAABB, std::vector<Triangle>* upperListTriangle)
+void OctreeNodeManager::CollisionAABBVsTriangle(uint32_t target, bool singleNode, std::vector<AABB*>* upperListAABB, std::vector<Triangle>* upperListTriangle)
 {
-	QuadtreeNode targetNode = m_quadtreeNodes[target];
+	OctreeNode targetNode = m_octreeNodes[target];
 	IntersectionResult result;
 
 	// AABB側の処理
@@ -1442,9 +1644,9 @@ void QuadtreeNodeManager::CollisionAABBVsTriangle(uint32_t target, bool singleNo
 				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[2])
 			};
 			if (Collision::IntersectAABBVsTriangle(
-				DirectX::XMLoadFloat3(&targetNode.GetAABBs().at(i)->position), 
-				DirectX::XMLoadFloat3(&targetNode.GetAABBs().at(i)->radii), 
-				triPos, 
+				DirectX::XMLoadFloat3(&targetNode.GetAABBs().at(i)->position),
+				DirectX::XMLoadFloat3(&targetNode.GetAABBs().at(i)->radii),
+				triPos,
 				&result))
 			{
 				// AABBのみ押し戻し処理
@@ -1466,9 +1668,9 @@ void QuadtreeNodeManager::CollisionAABBVsTriangle(uint32_t target, bool singleNo
 				DirectX::XMLoadFloat3(&upperListTriangle->at(j).position[2])
 			};
 			if (Collision::IntersectAABBVsTriangle(
-				DirectX::XMLoadFloat3(&targetNode.GetAABBs().at(i)->position), 
-				DirectX::XMLoadFloat3(&targetNode.GetAABBs().at(i)->radii), 
-				triPos, 
+				DirectX::XMLoadFloat3(&targetNode.GetAABBs().at(i)->position),
+				DirectX::XMLoadFloat3(&targetNode.GetAABBs().at(i)->radii),
+				triPos,
 				&result))
 			{
 				// AABBのみ押し戻し処理
@@ -1495,9 +1697,9 @@ void QuadtreeNodeManager::CollisionAABBVsTriangle(uint32_t target, bool singleNo
 				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[2])
 			};
 			if (Collision::IntersectAABBVsTriangle(
-				DirectX::XMLoadFloat3(&upperListAABB->at(i)->position), 
-				DirectX::XMLoadFloat3(&upperListAABB->at(i)->radii), 
-				triPos, 
+				DirectX::XMLoadFloat3(&upperListAABB->at(i)->position),
+				DirectX::XMLoadFloat3(&upperListAABB->at(i)->radii),
+				triPos,
 				&result))
 			{
 				// AABBのみ押し戻し処理
@@ -1531,9 +1733,9 @@ void QuadtreeNodeManager::CollisionAABBVsTriangle(uint32_t target, bool singleNo
 			addUpperList = true;
 		}
 
-		for (int i = 1; i <= 4; i++)
+		for (int i = 1; i <= 8; i++)
 		{
-			uint32_t nextTarget = target * 4 + i;
+			uint32_t nextTarget = target * 8 + i;
 			CollisionAABBVsTriangle(nextTarget, false, upperListAABB, upperListTriangle);
 		}
 
@@ -1552,9 +1754,9 @@ void QuadtreeNodeManager::CollisionAABBVsTriangle(uint32_t target, bool singleNo
 	}
 }
 // 球体 VS カプセル
-void QuadtreeNodeManager::CollisionSphereVsCapsule(uint32_t target, bool singleNode, std::vector<Sphere*>* upperListSphere, std::vector<Capsule*>* upperListCapsule)
+void OctreeNodeManager::CollisionSphereVsCapsule(uint32_t target, bool singleNode, std::vector<Sphere*>* upperListSphere, std::vector<Capsule*>* upperListCapsule)
 {
-	QuadtreeNode targetNode = m_quadtreeNodes[target];
+	OctreeNode targetNode = m_octreeNodes[target];
 	IntersectionResult result;
 
 	// 球体側の処理
@@ -1564,12 +1766,12 @@ void QuadtreeNodeManager::CollisionSphereVsCapsule(uint32_t target, bool singleN
 		for (int j = 0; j < targetNode.GetCapsules().size(); j++)
 		{
 			if (Collision::IntersectSphereVsCapsule(
-				DirectX::XMLoadFloat3(&targetNode.GetSpheres().at(i)->position), 
-				targetNode.GetSpheres().at(i)->radius, 
-				DirectX::XMLoadFloat3(&targetNode.GetCapsules().at(j)->position), 
-				DirectX::XMLoadFloat3(&targetNode.GetCapsules().at(j)->direction), 
-				targetNode.GetCapsules().at(j)->length, 
-				targetNode.GetCapsules().at(j)->radius, 
+				DirectX::XMLoadFloat3(&targetNode.GetSpheres().at(i)->position),
+				targetNode.GetSpheres().at(i)->radius,
+				DirectX::XMLoadFloat3(&targetNode.GetCapsules().at(j)->position),
+				DirectX::XMLoadFloat3(&targetNode.GetCapsules().at(j)->direction),
+				targetNode.GetCapsules().at(j)->length,
+				targetNode.GetCapsules().at(j)->radius,
 				&result))
 			{
 				// 押し戻し処理
@@ -1588,12 +1790,12 @@ void QuadtreeNodeManager::CollisionSphereVsCapsule(uint32_t target, bool singleN
 		for (int j = 0; upperListCapsule && j < upperListCapsule->size(); j++)
 		{
 			if (Collision::IntersectSphereVsCapsule(
-				DirectX::XMLoadFloat3(&targetNode.GetSpheres().at(i)->position), 
-				targetNode.GetSpheres().at(i)->radius, 
-				DirectX::XMLoadFloat3(&upperListCapsule->at(j)->position), 
-				DirectX::XMLoadFloat3(&upperListCapsule->at(j)->direction), 
-				upperListCapsule->at(j)->length, 
-				upperListCapsule->at(j)->radius, 
+				DirectX::XMLoadFloat3(&targetNode.GetSpheres().at(i)->position),
+				targetNode.GetSpheres().at(i)->radius,
+				DirectX::XMLoadFloat3(&upperListCapsule->at(j)->position),
+				DirectX::XMLoadFloat3(&upperListCapsule->at(j)->direction),
+				upperListCapsule->at(j)->length,
+				upperListCapsule->at(j)->radius,
 				&result))
 			{
 				// 押し戻し処理
@@ -1617,12 +1819,12 @@ void QuadtreeNodeManager::CollisionSphereVsCapsule(uint32_t target, bool singleN
 		for (int j = 0; j < targetNode.GetCapsules().size(); j++)
 		{
 			if (Collision::IntersectSphereVsCapsule(
-				DirectX::XMLoadFloat3(&upperListSphere->at(i)->position), 
-				upperListSphere->at(i)->radius, 
-				DirectX::XMLoadFloat3(&targetNode.GetCapsules().at(j)->position), 
-				DirectX::XMLoadFloat3(&targetNode.GetCapsules().at(j)->direction), 
-				targetNode.GetCapsules().at(j)->length, 
-				targetNode.GetCapsules().at(j)->radius, 
+				DirectX::XMLoadFloat3(&upperListSphere->at(i)->position),
+				upperListSphere->at(i)->radius,
+				DirectX::XMLoadFloat3(&targetNode.GetCapsules().at(j)->position),
+				DirectX::XMLoadFloat3(&targetNode.GetCapsules().at(j)->direction),
+				targetNode.GetCapsules().at(j)->length,
+				targetNode.GetCapsules().at(j)->radius,
 				&result))
 			{
 				// 押し戻し処理
@@ -1659,9 +1861,9 @@ void QuadtreeNodeManager::CollisionSphereVsCapsule(uint32_t target, bool singleN
 			addUpperList = true;
 		}
 
-		for (int i = 1; i <= 4; i++)
+		for (int i = 1; i <= 8; i++)
 		{
-			uint32_t nextTarget = target * 4 + i;
+			uint32_t nextTarget = target * 8 + i;
 			CollisionSphereVsCapsule(nextTarget, false, upperListSphere, upperListCapsule);
 		}
 
@@ -1680,9 +1882,9 @@ void QuadtreeNodeManager::CollisionSphereVsCapsule(uint32_t target, bool singleN
 	}
 }
 // 球体 VS AABB
-void QuadtreeNodeManager::CollisionSphereVsAABB(uint32_t target, bool singleNode, std::vector<Sphere*>* upperListSphere, std::vector<AABB*>* upperListAABB)
+void OctreeNodeManager::CollisionSphereVsAABB(uint32_t target, bool singleNode, std::vector<Sphere*>* upperListSphere, std::vector<AABB*>* upperListAABB)
 {
-	QuadtreeNode targetNode = m_quadtreeNodes[target];
+	OctreeNode targetNode = m_octreeNodes[target];
 	IntersectionResult result;
 
 	// 球体側の処理
@@ -1692,10 +1894,10 @@ void QuadtreeNodeManager::CollisionSphereVsAABB(uint32_t target, bool singleNode
 		for (int j = 0; j < targetNode.GetAABBs().size(); j++)
 		{
 			if (Collision::IntersectSphereVsAABB(
-				DirectX::XMLoadFloat3(&targetNode.GetSpheres().at(i)->position), 
-				targetNode.GetSpheres().at(i)->radius, 
-				DirectX::XMLoadFloat3(&targetNode.GetAABBs().at(j)->position), 
-				DirectX::XMLoadFloat3(&targetNode.GetAABBs().at(j)->radii), 
+				DirectX::XMLoadFloat3(&targetNode.GetSpheres().at(i)->position),
+				targetNode.GetSpheres().at(i)->radius,
+				DirectX::XMLoadFloat3(&targetNode.GetAABBs().at(j)->position),
+				DirectX::XMLoadFloat3(&targetNode.GetAABBs().at(j)->radii),
 				&result))
 			{
 				// 押し戻し処理
@@ -1714,10 +1916,10 @@ void QuadtreeNodeManager::CollisionSphereVsAABB(uint32_t target, bool singleNode
 		for (int j = 0; upperListAABB && j < upperListAABB->size(); j++)
 		{
 			if (Collision::IntersectSphereVsAABB(
-				DirectX::XMLoadFloat3(&targetNode.GetSpheres().at(i)->position), 
-				targetNode.GetSpheres().at(i)->radius, 
-				DirectX::XMLoadFloat3(&upperListAABB->at(j)->position), 
-				DirectX::XMLoadFloat3(&upperListAABB->at(j)->radii), 
+				DirectX::XMLoadFloat3(&targetNode.GetSpheres().at(i)->position),
+				targetNode.GetSpheres().at(i)->radius,
+				DirectX::XMLoadFloat3(&upperListAABB->at(j)->position),
+				DirectX::XMLoadFloat3(&upperListAABB->at(j)->radii),
 				&result))
 			{
 				// 押し戻し処理
@@ -1741,10 +1943,10 @@ void QuadtreeNodeManager::CollisionSphereVsAABB(uint32_t target, bool singleNode
 		for (int j = 0; j < targetNode.GetAABBs().size(); j++)
 		{
 			if (Collision::IntersectSphereVsAABB(
-				DirectX::XMLoadFloat3(&upperListSphere->at(i)->position), 
-				upperListSphere->at(i)->radius, 
-				DirectX::XMLoadFloat3(&targetNode.GetAABBs().at(j)->position), 
-				DirectX::XMLoadFloat3(&targetNode.GetAABBs().at(j)->radii), 
+				DirectX::XMLoadFloat3(&upperListSphere->at(i)->position),
+				upperListSphere->at(i)->radius,
+				DirectX::XMLoadFloat3(&targetNode.GetAABBs().at(j)->position),
+				DirectX::XMLoadFloat3(&targetNode.GetAABBs().at(j)->radii),
 				&result))
 			{
 				// 押し戻し処理
@@ -1781,9 +1983,9 @@ void QuadtreeNodeManager::CollisionSphereVsAABB(uint32_t target, bool singleNode
 			addUpperList = true;
 		}
 
-		for (int i = 1; i <= 4; i++)
+		for (int i = 1; i <= 8; i++)
 		{
-			uint32_t nextTarget = target * 4 + i;
+			uint32_t nextTarget = target * 8 + i;
 			CollisionSphereVsAABB(nextTarget, false, upperListSphere, upperListAABB);
 		}
 
@@ -1802,9 +2004,9 @@ void QuadtreeNodeManager::CollisionSphereVsAABB(uint32_t target, bool singleNode
 	}
 }
 // カプセル VS AABB
-void QuadtreeNodeManager::CollisionCapsuleVsAABB(uint32_t target, bool singleNode, std::vector<Capsule*>* upperListCapsule, std::vector<AABB*>* upperListAABB)
+void OctreeNodeManager::CollisionCapsuleVsAABB(uint32_t target, bool singleNode, std::vector<Capsule*>* upperListCapsule, std::vector<AABB*>* upperListAABB)
 {
-	QuadtreeNode targetNode = m_quadtreeNodes[target];
+	OctreeNode targetNode = m_octreeNodes[target];
 	IntersectionResult result;
 
 	// AABB側の処理
@@ -1909,9 +2111,9 @@ void QuadtreeNodeManager::CollisionCapsuleVsAABB(uint32_t target, bool singleNod
 			addUpperList = true;
 		}
 
-		for (int i = 1; i <= 4; i++)
+		for (int i = 1; i <= 8; i++)
 		{
-			uint32_t nextTarget = target * 4 + i;
+			uint32_t nextTarget = target * 8 + i;
 			CollisionCapsuleVsAABB(nextTarget, false, upperListCapsule, upperListAABB);
 		}
 

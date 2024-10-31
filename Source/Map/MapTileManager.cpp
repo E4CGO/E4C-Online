@@ -14,19 +14,64 @@ bool MapTileManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFL
 	//	}
 	//}
 	//return hit.distance < FLT_MAX;
-	
-	HitResultVector result;
-	bool ret = quadtree.IntersectRayVsTriangle(start, end, result);
-	if (ret)
+	//
+	//HitResultVector result;
+	//bool ret = quadtree.IntersectRayVsTriangle(start, end, result);
+	//if (ret)
+	//{
+	//	XMStoreFloat3(&hit.position, result.position);
+	//	XMStoreFloat3(&hit.normal, result.normal);
+	//	hit.distance = result.distance;
+	//	hit.materialIndex = result.materialIndex;
+	//	XMStoreFloat3(&hit.triangleVerts[0], result.triangleVerts[0]);
+	//	XMStoreFloat3(&hit.triangleVerts[1], result.triangleVerts[1]);
+	//	XMStoreFloat3(&hit.triangleVerts[2], result.triangleVerts[2]);
+	//}
+	//return ret;
+
+	// 最小値最大値
+	float minX, maxX;
+	if (start.x < end.x)
 	{
-		XMStoreFloat3(&hit.position, result.position);
-		XMStoreFloat3(&hit.normal, result.normal);
-		hit.distance = result.distance;
-		hit.materialIndex = result.materialIndex;
-		XMStoreFloat3(&hit.triangleVerts[0], result.triangleVerts[0]);
-		XMStoreFloat3(&hit.triangleVerts[1], result.triangleVerts[1]);
-		XMStoreFloat3(&hit.triangleVerts[2], result.triangleVerts[2]);
+		minX = start.x;
+		maxX = end.x;
 	}
+	else
+	{
+		minX = end.x;
+		maxX = start.x;
+	}
+
+	float minY, maxY;
+	if (start.y < end.y)
+	{
+		minY = start.y;
+		maxY = end.y;
+	}
+	else
+	{
+		minY = end.y;
+		maxY = start.y;
+	}
+
+	float minZ, maxZ;
+	if (start.z < end.z)
+	{
+		minZ = start.z;
+		maxZ = end.z;
+	}
+	else
+	{
+		minZ = end.z;
+		maxZ = start.z;
+	}
+
+	// レイが通る空間の配列番号算出
+	int Elem = tree.GetLinerIndex(minX, maxX, minY, maxY, minZ, maxZ);
+
+	bool ret = false;
+	SearchChildren(Elem, start, end, hit, ret);
+	SearchParent(Elem, start, end, hit, ret);
 	return ret;
 }
 
@@ -105,14 +150,45 @@ void MapTileManager::CalcMapArea(DirectX::XMFLOAT3& minPos, DirectX::XMFLOAT3& m
 	}
 }
 
-// 四分木空間生成
-void MapTileManager::CreateQuadtree(DirectX::XMFLOAT3 center, float halfSize, uint32_t depth)
+void MapTileManager::CreateSpatialIndex(uint32_t quadDepth, uint32_t octDepth, DirectX::XMFLOAT3* minPos, DirectX::XMFLOAT3* maxPos)
 {
-	quadtree.CreateQuadtree(center, halfSize, depth);
+	XMFLOAT3 c_minPos, c_maxPos;
 
+	if (!minPos || !maxPos)
+	{
+		CalcMapArea(c_minPos, c_maxPos);
+	}
+	else
+	{
+		c_minPos = { minPos->x, minPos->y, minPos->z };
+		c_maxPos = { maxPos->x, maxPos->y, maxPos->z };
+	}
+
+	tree.Initialize(octDepth,
+		c_minPos.x - 1.0f, c_maxPos.x + 1.0f,
+		c_minPos.y - 20.0f, c_maxPos.y + 20.0f,
+		c_minPos.z - 1.0f, c_maxPos.z + 1.0f);	// エリアを少し大きめに作成
+
+	XMFLOAT3 center = (c_minPos + c_maxPos) * 0.5f;
+	XMFLOAT3 size = c_maxPos - c_minPos;
+	float quadHalfSize = max(size.x, size.z) * 0.5f;
+	float octHalfSize = max(size.y * 0.5f, quadHalfSize);
+	quadHalfSize += 1.0f;
+	octHalfSize += 1.0f;
+
+	quadtree.CreateQuadtree(center, quadHalfSize, quadDepth);
+	octree.CreateOctree(center, octHalfSize, octDepth);
+
+	InsertMapMesh();
+}
+
+// マップのメッシュを登録
+int MapTileManager::InsertMapMesh()
+{
+	int count = 0;
+	
 	for (ModelObject*& item : items)
 	{
-		int count = 0;
 		int nowMeshNum = 0;
 
 		// モデルのメッシュの三角形をワールド座標で四分木空間に登録
@@ -126,17 +202,12 @@ void MapTileManager::CreateQuadtree(DirectX::XMFLOAT3 center, float halfSize, ui
 			const std::vector<ModelResource::Vertex>& vertices = mesh.vertices;
 			const std::vector<UINT> indices = mesh.indices;
 
-			for (UINT i = 0; i < indices.size(); i += 3)//102837
-
-				//for (UINT i = 0; i < subset.indexCount; i += 3)
+			for (UINT i = 0; i < indices.size(); i += 3)
 			{
-				//UINT index = subset.startIndex + i;
-				UINT index = i;
-
 				// 三角形の頂点を抽出
-				const ModelResource::Vertex& a = vertices.at(indices.at(index + 0));
-				const ModelResource::Vertex& b = vertices.at(indices.at(index + 1));
-				const ModelResource::Vertex& c = vertices.at(indices.at(index + 2));
+				const ModelResource::Vertex& a = vertices.at(indices.at(i));
+				const ModelResource::Vertex& b = vertices.at(indices.at(i + 1));
+				const ModelResource::Vertex& c = vertices.at(indices.at(i + 2));
 
 				const DirectX::XMVECTOR A = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&a.position), WorldTransform);
 				const DirectX::XMVECTOR B = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&b.position), WorldTransform);
@@ -147,25 +218,123 @@ void MapTileManager::CreateQuadtree(DirectX::XMFLOAT3 center, float halfSize, ui
 				DirectX::XMStoreFloat3(&triangle.position[1], B);
 				DirectX::XMStoreFloat3(&triangle.position[2], C);
 				//triangle.materialIndex = mesh.materialIndex;
+				Triangle* p_triangle = new Triangle;
+				DirectX::XMStoreFloat3(&p_triangle->position[0], A);
+				DirectX::XMStoreFloat3(&p_triangle->position[1], B);
+				DirectX::XMStoreFloat3(&p_triangle->position[2], C);
 
-				// 三角形をワールド座標で四分木に登録
+				// 三角形をワールド座標で登録
 				quadtree.InsertTriangleObject(triangle);
-				//octotree->InsertTriangleObject(triangle);
+				octree.InsertTriangleObject(triangle);
+
+				XMFLOAT3 minPos, maxPos;
+				triangle.GetBoundPoints(&minPos, &maxPos);
+				tree.Regist(minPos.x, maxPos.x, minPos.y, maxPos.y, minPos.z, maxPos.z, p_triangle);
 
 				count++;
 			}
 			nowMeshNum++;
 		}
 	}
-}
-void MapTileManager::CreateQuadtree(uint32_t depth)
-{
-	DirectX::XMFLOAT3 minPos, maxPos;
-	CalcMapArea(minPos, maxPos);
 
-	XMFLOAT3 center = (minPos + maxPos) * 0.5f;
-	XMFLOAT3 size = maxPos - minPos;
-	float halfSize = max(size.x, max(size.y, size.z)) * 0.5f;
-	halfSize += 5.0f;
-	CreateQuadtree(center, halfSize, depth);
+	return count;
+}
+
+bool MapTileManager::SearchChildren(	// 子空間探索
+	int Elem,
+	const DirectX::XMFLOAT3& start,
+	const DirectX::XMFLOAT3& end,
+	HitResult& result,
+	bool& hit)
+{
+	// 空間外ならreturn
+	if (Elem < 0) return hit;
+
+	// 子空間が存在するなら子空間を探索
+	if ((Elem + 1) << 3 < tree.m_iCellNum)
+	{
+		int childElem = (Elem << 3) + 1;
+
+		for (int i = 0; i < 8; i++)
+		{
+			if (SearchChildren(childElem + i, start, end, result, hit))
+				break;
+		}
+	}
+
+	// この空間が存在しないならreturn
+	if (!tree.ppCellAry[Elem])	return hit;
+
+	// この空間に登録されているポリゴンとの当たり判定
+	Liner8TreeManager<Triangle>::OFT<Triangle>* oft = tree.ppCellAry[Elem]->pLatest;
+	while (oft)
+	{
+		XMFLOAT3 rayDirection = end - start;
+		float rayDist = XMFLOAT3Length(rayDirection);
+		rayDirection = XMFLOAT3Normalize(rayDirection);
+		XMFLOAT3 triangleVerts[3] = {
+			oft->m_pObject->position[0],
+			oft->m_pObject->position[1],
+			oft->m_pObject->position[2]
+		};
+		if (Collision::IntersectRayVsTriangle(start, rayDirection, rayDist, triangleVerts, result))
+		{
+			hit = true;
+		}
+		
+		oft = oft->m_pNext;
+	}
+
+	return hit;
+}
+
+bool MapTileManager::SearchParent(	// 親空間探索
+	int Elem,
+	const DirectX::XMFLOAT3& start,
+	const DirectX::XMFLOAT3& end,
+	HitResult& result,
+	bool& hit)
+{
+	// 空間外ならreturn
+	if (Elem <= 0) return hit;
+
+	int parentElem = (Elem - 1) >> 3;
+	while (1)
+	{
+		// この空間が存在しないなら親空間に移動
+		if (!tree.ppCellAry[parentElem])
+		{
+			// ルート空間ならbreak
+			if (parentElem == 0)	break;
+			parentElem = (parentElem - 1) >> 3;
+			continue;
+		}
+
+		Liner8TreeManager<Triangle>::OFT<Triangle>* oft = tree.ppCellAry[parentElem]->pLatest;
+		while (oft)
+		{
+			XMFLOAT3 rayDirection = end - start;
+			float rayDist = XMFLOAT3Length(rayDirection);
+			rayDirection = XMFLOAT3Normalize(rayDirection);
+			XMFLOAT3 triangleVerts[3] = {
+				oft->m_pObject->position[0],
+				oft->m_pObject->position[1],
+				oft->m_pObject->position[2]
+			};
+			if (Collision::IntersectRayVsTriangle(start, rayDirection, rayDist, triangleVerts, result))
+			{
+				hit = true;
+			}
+
+			oft = oft->m_pNext;
+		}
+
+		// ルート空間ならbreak
+		if (parentElem == 0)	break;
+
+		// 親空間に移動
+		parentElem = (parentElem - 1) >> 3;
+	}
+
+	return hit;
 }

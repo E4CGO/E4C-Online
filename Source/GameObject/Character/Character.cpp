@@ -159,8 +159,8 @@ void Character::UpdateVerticalMove(float elapsedTime)
 		DirectX::XMFLOAT3 end = { position.x, position.y + my, position.z };
 		// レイキャストによる地面判定
 		HitResult hit;
-		//if (MAPTILES.RayCast(start, end, hit))
-		if (MAPTILES.VerticalRayCast(start, end, hit))
+		if (MAPTILES.RayCast(start, end, hit))
+		//if (MAPTILES.VerticalRayCast(start, end, hit))
 		{
 			// 地面に接地している
 			position = hit.position;

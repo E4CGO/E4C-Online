@@ -597,54 +597,64 @@ bool MapCollider::RayCast(
 //	HitResult& result
 //)
 //{
-//	XMVECTOR Start = XMLoadFloat3(&start);
-//	XMVECTOR End = XMLoadFloat3(&end);
-//	XMVECTOR rayVec = XMVectorSubtract(End, Start);
-//	float length = XMVectorGetX(XMVector3Length(rayVec));
+//	XMFLOAT3 rayDirection = end - start;
+//	float rayDist = XMFLOAT3Length(rayDirection);
+//	XMFLOAT3Normalize(rayDirection);
+//	XMFLOAT3 triangleVerts[3] = {
+//		porigon->position[0],
+//		porigon->position[1],
+//		porigon->position[2]
+//	};
+//	return Collision::IntersectRayVsTriangle(start, rayDirection, rayDist, triangleVerts, result);
 //
-//	// 内積の結果がプラスならば裏向き
-//	XMVECTOR N = XMLoadFloat3(&porigon->normal);
-//	float dot = XMVectorGetX(XMVector3Dot(rayVec, N));
-//	if (dot >= 0.0f)	return false;
+//	//XMVECTOR Start = XMLoadFloat3(&start);
+//	//XMVECTOR End = XMLoadFloat3(&end);
+//	//XMVECTOR rayVec = XMVectorSubtract(End, Start);
+//	//float length = XMVectorGetX(XMVector3Length(rayVec));	
 //
-//	// レイの始点から平面の交点までの距離を算出
-//	XMVECTOR A = XMLoadFloat3(&porigon->position[0]);
-//	XMVECTOR B = XMLoadFloat3(&porigon->position[1]);
-//	XMVECTOR C = XMLoadFloat3(&porigon->position[2]);
-//	XMVECTOR SA = XMVectorSubtract(A, Start);
-//	float x = XMVectorGetX(XMVector3Dot(SA, N)) / dot;
-//	float distance = length * x;
+//	//// 内積の結果がプラスならば裏向き
+//	//XMVECTOR N = XMLoadFloat3(&porigon->normal);
+//	//float dot = XMVectorGetX(XMVector3Dot(rayVec, N));
+//	//if (dot >= 0.0f)	return false;
 //
-//	// 交点までの距離が今までに計算した最近距離より
-//	// 大きい時はスキップ
-//	if (distance < 0.0f || distance > result.distance) return false;
+//	//// レイの始点から平面の交点までの距離を算出
+//	//XMVECTOR A = XMLoadFloat3(&porigon->position[0]);
+//	//XMVECTOR B = XMLoadFloat3(&porigon->position[1]);
+//	//XMVECTOR C = XMLoadFloat3(&porigon->position[2]);
+//	//XMVECTOR SA = XMVectorSubtract(A, Start);
+//	//float x = XMVectorGetX(XMVector3Dot(SA, N)) / dot;
+//	//float distance = length * x;
 //
-//	// 平面上の交点P
-//	XMVECTOR P = XMVectorAdd(Start, XMVectorScale(rayVec, x));
+//	//// 交点までの距離が今までに計算した最近距離より
+//	//// 大きい時はスキップ
+//	//if (distance < 0.0f || distance > result.distance) return false;
 //
-//	// 交点が三角形の内側にあるか判定
-//	// １つめ
-//	XMVECTOR Cross1 = XMVector3Cross(XMVectorSubtract(A, P), XMVectorSubtract(B, A));
-//	float Dot1 = XMVectorGetX(XMVector3Dot(rayVec, Cross1));
-//	if (Dot1 > 0.0f) return false;
-//	// ２つめ
-//	XMVECTOR Cross2 = XMVector3Cross(XMVectorSubtract(B, P), XMVectorSubtract(C, B));
-//	float Dot2 = XMVectorGetX(XMVector3Dot(rayVec, Cross2));
-//	if (Dot2 > 0.0f) return false;
-//	// ３つめ
-//	XMVECTOR Cross3 = XMVector3Cross(XMVectorSubtract(C, P), XMVectorSubtract(A, C));
-//	float Dot3 = XMVectorGetX(XMVector3Dot(rayVec, Cross3));
-//	if (Dot3 > 0.0f) return false;
+//	//// 平面上の交点P
+//	//XMVECTOR P = XMVectorAdd(Start, XMVectorScale(rayVec, x));
 //
-//	// ヒット情報保存
-//	XMStoreFloat3(&result.position, P);
-//	result.normal = porigon->normal;
-//	result.distance = distance;
-//	result.materialIndex = porigon->materialIndex;
+//	//// 交点が三角形の内側にあるか判定
+//	//// １つめ
+//	//XMVECTOR Cross1 = XMVector3Cross(XMVectorSubtract(A, P), XMVectorSubtract(B, A));
+//	//float Dot1 = XMVectorGetX(XMVector3Dot(rayVec, Cross1));
+//	//if (Dot1 > 0.0f) return false;
+//	//// ２つめ
+//	//XMVECTOR Cross2 = XMVector3Cross(XMVectorSubtract(B, P), XMVectorSubtract(C, B));
+//	//float Dot2 = XMVectorGetX(XMVector3Dot(rayVec, Cross2));
+//	//if (Dot2 > 0.0f) return false;
+//	//// ３つめ
+//	//XMVECTOR Cross3 = XMVector3Cross(XMVectorSubtract(C, P), XMVectorSubtract(A, C));
+//	//float Dot3 = XMVectorGetX(XMVector3Dot(rayVec, Cross3));
+//	//if (Dot3 > 0.0f) return false;
 //
-//	return true;
+//	//// ヒット情報保存
+//	//XMStoreFloat3(&result.position, P);
+//	//result.normal = porigon->normal;
+//	//result.distance = distance;
+//	//result.materialIndex = porigon->materialIndex;
+//
+//	//return true;
 //}
-
+//
 //bool MapCollider::SearchChildren(	// 子空間探索
 //	int Elem,
 //	const DirectX::XMFLOAT3& start,

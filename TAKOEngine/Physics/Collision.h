@@ -39,6 +39,20 @@ struct Triangle
 {
 	DirectX::XMFLOAT3	position[3] = {};
 	int					materialIndex = -1;
+
+	// 三角形に外接するAABBを構成する最小点と最大点を取得する
+	void GetBoundPoints(DirectX::XMFLOAT3* minPoint, DirectX::XMFLOAT3* maxPoint)
+	{
+		if (minPoint && maxPoint)
+		{
+			minPoint->x = min(min(position[0].x, position[1].x), position[2].x);
+			minPoint->y = min(min(position[0].y, position[1].y), position[2].y);
+			minPoint->z = min(min(position[0].z, position[1].z), position[2].z);
+			maxPoint->x = max(max(position[0].x, position[1].x), position[2].x);
+			maxPoint->y = max(max(position[0].y, position[1].y), position[2].y);
+			maxPoint->z = max(max(position[0].z, position[1].z), position[2].z);
+		}
+	}
 };
 struct Sphere
 {
