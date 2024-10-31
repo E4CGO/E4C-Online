@@ -691,7 +691,6 @@ void Graphics::Execute()
 	// コマンド実行
 	ID3D12CommandList* d3d_command_lists[] =
 	{
-		//frame_resource.d3d_command_list.Get()
 		d3d_command_list.Get(),
 	};
 
@@ -714,10 +713,8 @@ const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera& camera)
 {
 	LightManager& ligtManager = LightManager::Instance();
 
-	DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&camera.GetView());
-	DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&camera.GetProjection());
-	DirectX::XMMATRIX ViewProjection = DirectX::XMMatrixMultiply(View, Projection);
-	DirectX::XMStoreFloat4x4(&cb_scene_data->view_projection, ViewProjection);
+	cb_scene_data->view = camera.GetView();
+	cb_scene_data->projection = camera.GetProjection();
 
 	// カメラ
 	cb_scene_data->camera_position.x = camera.GetEye().x;

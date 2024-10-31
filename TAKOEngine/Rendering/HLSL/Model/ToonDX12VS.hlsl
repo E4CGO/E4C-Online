@@ -23,6 +23,7 @@ VS_OUT main(
 #endif
     
     VS_OUT vout;
+    float4x4 viewProjection = mul(view, Projection);
     vout.vertex   = mul(float4(p, 1.0f), mul(world_transform, viewProjection));
     vout.texcoord = texcoord;
     vout.normal   = normal;

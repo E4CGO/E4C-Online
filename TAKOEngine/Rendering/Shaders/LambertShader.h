@@ -4,10 +4,6 @@
 #ifndef __GRAPHICS_LAMBERT_SHADER_H__
 #define __GRAPHICS_LAMBERT_SHADER_H__
 
-#include <memory>
-#include <d3d12.h>
-#include <wrl.h>
-
 #include "ModelShaderDX12.h"
 
 //****************************************************

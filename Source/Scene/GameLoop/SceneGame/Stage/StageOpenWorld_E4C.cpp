@@ -192,9 +192,8 @@ void StageOpenWorld_E4C::Render()
 
 		// シーン用定数バッファ更新
 		CbScene cbScene{};
-		DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&rc.camera->GetView());
-		DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&rc.camera->GetProjection());
-		DirectX::XMStoreFloat4x4(&cbScene.view_projection, V * P);
+		cbScene.view = rc.camera->GetView();
+		cbScene.projection = rc.camera->GetProjection();
 
 		const DirectX::XMFLOAT3& eye = rc.camera->GetEye();
 		cbScene.camera_position.x = eye.x;
