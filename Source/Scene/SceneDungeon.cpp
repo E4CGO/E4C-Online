@@ -58,6 +58,20 @@ void SceneDungeon::Initialize()
 	//シャドウマップレンダラ
 	shadowMapRenderer->Initialize();
 
+	PlayerCharacterData::CharacterInfo charaInfo = {
+		true,
+		"",
+		{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+		}
+	};
+
+	player = std::make_unique<PlayerCharacter>(charaInfo);
+	player->SetPosition({ 0.0f, 0.0f, 0.0f });
+	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::State::Idle));
+	//player->SetKinematic(true);
+
+
 	//ライト情報
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
 	Light* dl = new Light(LightType::Directional);
@@ -77,30 +91,27 @@ void SceneDungeon::Initialize()
 		{ 0, 0, 0 },	         // 注視点
 		{ 0, 0.969f, -0.248f }); // 上ベクトル
 
-	cameraController = std::make_unique<FreeCameraController>();
-	cameraController->SyncCameraToController(camera);
-	cameraController->SetEnable(true);
+	//cameraController = std::make_unique<FreeCameraController>();
+	//cameraController->SyncCameraToController(camera);
+	//cameraController->SetEnable(true);
 
-	//ステージ
-	MapTile* floor = new MapTile("Data/Model/Dungeon/Floor_Plain_Parent.glb", 1.0f);
-	MAPTILES.Register(floor);
-
-	//	モデルをレンダラーに登録
-	iModel* list[] =
-	{
-		MAPTILES.get(0)->GetModel().get(),
-	};
-	for (iModel* model : list)
-	{
-		if (!model) continue;
-	}
+	cameraControllerP = std::make_unique<ThridPersonCameraController>();
+	cameraControllerP->SyncCameraToController(camera);
+	cameraControllerP->SetEnable(true);
+	cameraControllerP->SetPlayer(player.get());
 
 
 
 	// 部屋の生成を開始する
 	roomTree = GenerateDungeon();
 
-	int a = 0;
+	// 出口を生成する
+	int exitNum = (std::rand() % rootRoom->GetFarthestChild().size());
+	RoomBase* exitRoom = rootRoom->GetFarthestChild().at(exitNum);
+	exitRoom->PlaceExit();
+
+	//MapTile* a = new MapTile("Data/Model/Stage/BigMap.glb");
+	//MAPTILES.Register(a);
 }
 
 void SceneDungeon::Finalize()
@@ -123,18 +134,17 @@ void SceneDungeon::Finalize()
 
 void SceneDungeon::Update(float elapsedTime)
 {
-	rootRoom->Update(elapsedTime);
+	// カメラ更新
+	cameraControllerP->Update(elapsedTime);
+	cameraControllerP->SyncContrllerToCamera(camera);
 
-	std::vector<RoomBase*> roomList = rootRoom->GetAllChilds();
-	int a = 0;
+	player->Update(elapsedTime);
+	rootRoom->Update(elapsedTime);
 
 	MAPTILES.Update(elapsedTime);
 	COLLISION.Update(elapsedTime);
 	STAGES.Update(elapsedTime);
 
-	// カメラ更新
-	cameraController->Update(elapsedTime);
-	cameraController->SyncContrllerToCamera(camera);
 }
 
 void SceneDungeon::Render()
@@ -152,6 +162,7 @@ void SceneDungeon::Render()
 	// ライトの情報を詰め込む
 	LightManager::Instance().PushRenderContext(rc);
 
+
 	//シャドウマップ描画
 	shadowMapRenderer->Render();
 	rc.shadowMapData = shadowMapRenderer->GetShadowMapData();
@@ -161,9 +172,10 @@ void SceneDungeon::Render()
 		//Deferred Rendering
 		deferredRendering->SetDeferredRTV();
 
+		player->Render(rc);
 		//オブジェクト描画
 		MAPTILES.Render(rc);					// マップ
-		PLAYERS.Render(rc);						// プレイヤー
+		//PLAYERS.Render(rc);					// プレイヤー
 		PROJECTILES.Render(rc);					// 発射物
 		STAGES.Render(rc);						// ステージオブジェクト
 		EFFECTS.Render(camera.GetView(), camera.GetProjection()); 	// エフェクト

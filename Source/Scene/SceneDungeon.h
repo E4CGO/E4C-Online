@@ -8,8 +8,8 @@
 #include "UI/Widget/WidgetMenu.h"
 
 #include "GameObject/ModelObject.h"
-#include "GameObject/Character/Player/Knight.h"
-#include "GameObject/Character/Player/Barbarian.h"
+#include "GameObject/Character/Player/PlayerCharacter.h"
+#include "GameObject/Props/Teleporter.h"
 
 #include "Map/MapTile.h"
 
@@ -50,7 +50,8 @@ public:
 private:
 	Camera& camera = Camera::Instance();
 
-	std::unique_ptr<FreeCameraController> cameraController;
+	//std::unique_ptr<FreeCameraController> cameraController;
+	std::unique_ptr<ThridPersonCameraController> cameraControllerP;
 
 	std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer = std::make_unique<PostprocessingRenderer>();;
 
@@ -58,6 +59,8 @@ private:
 
 	//DeferredRendering
 	std::unique_ptr<DeferredRendering> deferredRendering = std::make_unique<DeferredRendering>();
+
+	std::unique_ptr<PlayerCharacter> player;
 
 	WidgetMenu* menu;
 

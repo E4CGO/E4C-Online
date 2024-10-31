@@ -27,7 +27,7 @@ void StageOpenWorld_E4C::Initialize()
 
 	map = std::make_unique<gltf_model>(T_GRAPHICS.GetDevice(), "Data/Model/Stage/Terrain_Map.glb");
 
-	PlayerCharacterData::CharacterInfo charInfo = {
+	PlayerCharacterData::CharacterInfo charaInfo = {
 		true,			// visible
 		"",				// save
 		{				//Character
@@ -35,7 +35,7 @@ void StageOpenWorld_E4C::Initialize()
 		}
 	};
 
-	player = std::make_unique<PlayerCharacter>(charInfo);
+	player = std::make_unique<PlayerCharacter>(charaInfo);
 	player->SetPosition({ 5,	10, 5 });
 	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::State::Idle));
 

@@ -6,7 +6,8 @@ MapTile::MapTile(const char* filename, float scaling, RoomBase* parent) :
 	this->parent = parent;
 
 	Update(0);// モデル更新
-	SetCollider(Collider::COLLIDER_TYPE::MAP);
+	//SetCollider(Collider::COLLIDER_TYPE::MAP);
+	SetCollider(Collider::COLLIDER_TYPE::MODEL);
 }
 
 void MapTile::UpdateTransform()

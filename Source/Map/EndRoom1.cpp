@@ -91,7 +91,8 @@ void EndRoom1::PlaceMapTile()
 			fileName = "Data/Model/Dungeon/Floor_Plain_Parent.glb";
 			break;
 		case TileType::WALL:
-			fileName = "Data/Model/Dungeon/DoorWay Parent 006.glb";
+			//fileName = "Data/Model/Dungeon/DoorWay Parent 006.glb";
+			continue;
 			break;
 		default:
 			fileName = "Data/Model/Dungeon/Floor_Plain_Parent.glb";
@@ -105,6 +106,13 @@ void EndRoom1::PlaceMapTile()
 		newTile->SetColor(tileData.color);
 		MAPTILES.Register(newTile);
 	}
+}
+
+void EndRoom1::PlaceExit()
+{
+	MapTile* exit = new MapTile("Data/Model/Cube/testCubes.glb", 1.0f, this);
+	exit->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 8.0f));
+	MAPTILES.Register(exit);
 }
 
 int EndRoom1::DrawDebugGUI(int i)

@@ -211,6 +211,9 @@ public:
 	// 部屋タイルを配置
 	virtual void PlaceMapTile() {}
 
+	// 出口を配置
+	virtual void PlaceExit() {}
+
 	// GUI
 	virtual int DrawDebugGUI(int i = 0) { return i; }
 

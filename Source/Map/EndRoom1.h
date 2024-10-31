@@ -17,5 +17,7 @@ public:
 
 	void PlaceMapTile() override;
 
+	void PlaceExit() override;
+
 	int DrawDebugGUI(int i = 0) override;
 };

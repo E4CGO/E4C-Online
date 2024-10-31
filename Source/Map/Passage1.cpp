@@ -180,7 +180,8 @@ void Passage1::PlaceMapTile()
 			fileName = "Data/Model/Dungeon/Floor_Plain_Parent.glb";
 			break;
 		case TileType::WALL:
-			fileName = "Data/Model/Dungeon/DoorWay Parent 006.glb";
+			//fileName = "Data/Model/Dungeon/DoorWay Parent 006.glb";
+			continue;
 			break;
 		default:
 			fileName = "Data/Model/Dungeon/Floor_Plain_Parent.glb";

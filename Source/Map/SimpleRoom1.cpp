@@ -270,10 +270,11 @@ void SimpleRoom1::PlaceMapTile()
 		{
 		case TileType::FLOOR:
 			fileName = "Data/Model/Dungeon/Floor_Plain_Parent.glb";
-			//fileName = "Data/Model/Dungeon assets/SM_Wall_01a.fbx";
+			//fileName = "Data/Model/Stage/BigMap.glb";
 			break;
 		case TileType::WALL:
-			fileName = "Data/Model/Dungeon/DoorWay Parent 006.glb";
+			//fileName = "Data/Model/Dungeon/DoorWay Parent 006.glb";
+			continue;
 			break;
 		default:
 			fileName = "Data/Model/Dungeon/Floor_Plain_Parent.glb";
