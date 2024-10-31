@@ -53,6 +53,7 @@ void SceneGame_E4C::Render()
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
+
 	if (stageNumber == 0)
 	{
 		stageOpenWorld->Render();
@@ -62,5 +63,5 @@ void SceneGame_E4C::Render()
 		STAGES.Render(rc);
 	}
 
-	ProfileDrawUI();
+	//ProfileDrawUI();
 }

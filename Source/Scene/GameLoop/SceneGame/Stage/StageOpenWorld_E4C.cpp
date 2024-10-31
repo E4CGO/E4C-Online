@@ -105,8 +105,26 @@ void StageOpenWorld_E4C::Initialize()
 
 void StageOpenWorld_E4C::Update(float elapsedTime)
 {
-	cameraController->Update(elapsedTime);
-	cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
+	std::vector<DirectX::XMFLOAT3> cameraFocusPoints = {
+		{CameraManager::Instance().GetCamera()->GetFocus().x, CameraManager::Instance().GetCamera()->GetFocus().y, CameraManager::Instance().GetCamera()->GetFocus().z},
+		{CameraManager::Instance().GetCamera()->GetFocus().x, CameraManager::Instance().GetCamera()->GetFocus().y, CameraManager::Instance().GetCamera()->GetFocus().z},
+		{CameraManager::Instance().GetCamera()->GetFocus().x, CameraManager::Instance().GetCamera()->GetFocus().y, CameraManager::Instance().GetCamera()->GetFocus().z},
+		{CameraManager::Instance().GetCamera()->GetFocus().x, CameraManager::Instance().GetCamera()->GetFocus().y, CameraManager::Instance().GetCamera()->GetFocus().z}
+		//{CameraManager::Instance().GetCamera()->GetFocus().x, CameraManager::Instance().GetCamera()->GetFocus().y, CameraManager::Instance().GetCamera()->GetFocus().z}
+	};
+	// ゲームループ内で
+
+	if (T_INPUT.KeyPress(VK_SHIFT))
+	{
+		CameraManager::Instance().GetCamera()->MovePointToCamera(cameraPositions, cameraFocusPoints, transitionTime, transitionDuration, elapsedTime);
+	}
+	else
+	{
+		cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
+		CameraManager::Instance().GetCamera()->GetSegment() = 0;
+		cameraController->Update(elapsedTime);
+		transitionTime = 0;
+	}
 
 	player->Update(elapsedTime);
 	//teleporter->Update(elapsedTime);
@@ -137,6 +155,12 @@ void StageOpenWorld_E4C::Render()
 {
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->Clear(T_GRAPHICS.GetDeviceContext(), 0.2f, 0.2f, 0.2f, 1);
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
+#ifdef _DEBUG
+	{
+		T_GRAPHICS.GetDebugRenderer()->DrawSphere(cameraPositions, 2, { 1,0,0,1 });
+
+	}
+#endif // _DEBUG
 
 	// 描画コンテキスト設定
 	RenderContext rc;
@@ -220,6 +244,19 @@ void StageOpenWorld_E4C::Render()
 	//teleporter->Render(rc);
 	plane->Render(rc);
 	//portal->Render(rc);
+	if (ImGui::TreeNode("Camera Positions"))
+	{
+		for (size_t i = 0; i < cameraPositions.size(); ++i)
+		{
+			std::string label = "Position " + std::to_string(i);  // 各カメラポジションのラベル
+			ImGui::DragFloat3(label.c_str(), &cameraPositions[i].x, 1.0f, -FLT_MAX, FLT_MAX);  // カメラポジションの設定
+		}
+		ImGui::TreePop();
+	}
+	// デバッグレンダラ描画実行
+	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
+	
+
 }
 
 void StageOpenWorld_E4C::OnPhase()

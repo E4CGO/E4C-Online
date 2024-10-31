@@ -49,4 +49,16 @@ private:
 
 	std::unique_ptr<gltf_model> map;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constant_buffers[8];
+
+
+	float transitionTime = 0.0f;
+	float transitionDuration = 2.f;  // 5•b‚©‚¯‚ÄˆÚ“®
+	int currentSegment = 0;
+	
+	std::vector<DirectX::XMFLOAT3> cameraPositions = {
+		{0,3,0},
+		{10,3,0},
+		{5,3,4},
+		{8,3,8}
+	};
 };

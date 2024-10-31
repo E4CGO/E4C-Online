@@ -185,3 +185,4 @@ void Camera::MovePointToCamera(const std::vector<DirectX::XMFLOAT3>& positions, 
 		currentSegment = nextSegment;  // 次のセグメントに移動
 	}
 }
+
