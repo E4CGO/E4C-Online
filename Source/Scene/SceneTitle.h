@@ -49,9 +49,15 @@ private:
 	//シャドウマップレンダラ
 	std::unique_ptr<myRenderer::shadow::ShadowMapRender> shadowMapRenderer = std::make_unique<myRenderer::shadow::ShadowMapRender>();
 
+	// ポストエフェクト
+	std::unique_ptr<PostprocessingRendererDX12>	postprocessingRenderer = std::make_unique<PostprocessingRendererDX12>();
+
 	//スキニング
 	SkinningPipeline*	m_skinning_pipeline;
-	
+
+	// フレームバッファマネージャー
+	FrameBufferManager* m_frameBuffer;
+
 	Camera& camera = Camera::Instance();
 	std::unique_ptr<FreeCameraController> cameraController;
 

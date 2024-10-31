@@ -1,17 +1,27 @@
-#include "SpriteShader.h"
+//! @file SpriteShader.cpp
+//! @note 
 
 #include "TAKOEngine/Rendering/GpuResourceUtils.h"
+#include "SpriteShader.h"
 
+//**********************************************************************
+// @brief     コンストラクタ
+// @param[in] device  ID3D11Device*
+// @param[in] vs      VertexShaderの名前
+// @param[in] ps      PixelShaderの名前
+// @return    なし
+//**********************************************************************
 SpriteShader::SpriteShader(ID3D11Device* device, const char* vs, const char* ps)
 {
-	// ���̓��C�A�E�g
+	// 入力レイアウト
 	D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
-	// ���_�V�F�[�_�[
+
+	// 頂点シェーダー
 	GpuResourceUtils::LoadVertexShader(
 		device,
 		vs,
@@ -20,7 +30,8 @@ SpriteShader::SpriteShader(ID3D11Device* device, const char* vs, const char* ps)
 		inputLayout.GetAddressOf(),
 		vertexShader.GetAddressOf()
 	);
-	// �s�N�Z���V�F�[�_�[
+
+	// ピクセルシェーダー
 	GpuResourceUtils::LoadPixelShader(
 		device,
 		ps,
@@ -28,7 +39,11 @@ SpriteShader::SpriteShader(ID3D11Device* device, const char* vs, const char* ps)
 	);
 }
 
-// �`��J�n
+//**********************************************************************
+// @brief     描画開始
+// @param[in] rc  レンダーコンストラクタ
+// @return    なし
+//**********************************************************************
 void SpriteShader::Begin(const RenderContext& rc)
 {
 	rc.deviceContext->VSSetShader(vertexShader.Get(), nullptr, 0);
@@ -50,7 +65,7 @@ void SpriteShader::Begin(const RenderContext& rc)
 	rc.deviceContext->OMSetDepthStencilState(rc.renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
 	rc.deviceContext->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullBack));
 
-	// �T���v���X�e�[�g
+	// サンプラステート
 	ID3D11SamplerState* samplerStates[] =
 	{
 		rc.renderState->GetSamplerState(SamplerState::LinearClamp)
@@ -58,10 +73,21 @@ void SpriteShader::Begin(const RenderContext& rc)
 	rc.deviceContext->PSSetSamplers(0, _countof(samplerStates), samplerStates);
 }
 
+//**********************************************************************
+// @brief     描画終了
+// @param[in] rc  レンダーコンストラクタ
+// @return    なし
+//**********************************************************************
 void SpriteShader::End(const RenderContext& rc)
 {
 }
 
+//**********************************************************************
+// @brief     描画
+// @param[in] rc  レンダーコンストラクタ
+// @param[in] sprite   描画対象のスプライトデータを指すポインタ
+// @return    なし
+//**********************************************************************
 void SpriteShader::Draw(const RenderContext& rc, const Sprite* sprite)
 {
 	UpdateConstantBuffer(rc);

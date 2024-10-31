@@ -1,8 +1,17 @@
-#pragma once
+//! @file SpriteShader.h
+//! @note
+
+#ifndef __GRAHICS_SPRITE_SHADER_H__
+#define __GRAHICS_SPRITE_SHADER_H__
 
 #include "TAKOEngine/Rendering/Sprite.h"
 #include "TAKOEngine/Rendering/Shaders/Shader.h"
 
+//******************************************************************
+//  @class  SpriteShader
+//  @brief  Shaderの派生クラス
+//  @par    他のシェーダーの基底クラス
+//******************************************************************
 class SpriteShader : public Shader
 {
 public:
@@ -27,8 +36,15 @@ protected:
 	Microsoft::WRL::ComPtr<ID3D11InputLayout>			inputLayout;
 };
 
+//******************************************************************
+//  @class  DefaultSpriteShader
+//  @brief  SpriteShaderの派生クラス
+//  @par    
+//******************************************************************
 class DefaultSpriteShader : public SpriteShader
 {
 public:
 	DefaultSpriteShader(ID3D11Device* device) : SpriteShader(device, "Data/Shader/SpriteVS.cso", "Data/Shader/SpritePS.cso") {}
 };
+
+#endif // !__GRAHICS_SPRITE_SHADER_H__
