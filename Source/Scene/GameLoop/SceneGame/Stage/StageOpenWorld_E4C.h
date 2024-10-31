@@ -36,8 +36,6 @@ public:
 		NORMAL,
 	};
 private:
-
-	Camera* mainCamera;
 	std::unique_ptr<ThridPersonCameraController> cameraController;
 
 	MapTile* stage_collision;

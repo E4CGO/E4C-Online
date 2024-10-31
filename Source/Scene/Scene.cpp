@@ -14,7 +14,7 @@ void ModelTestScene::Initialize()
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 	float screenWidth = Graphics::Instance().GetScreenWidth();
 	float screenHeight = Graphics::Instance().GetScreenHeight();
-	maincamera = new Camera();
+	Camera *maincamera = new Camera();
 	CameraManager& cameraManger = CameraManager::Instance();
 	cameraManger.Register(maincamera);
 	cameraManger.SetCamera(0);
@@ -124,9 +124,9 @@ void ModelTestScene::Render()
 	// ライトのデバッグプリミティブの描画
 	LightManager::Instance().DrawDebugGUI();
 	// ラインレンダラ描画実行
-	T_GRAPHICS.GetLineRenderer()->Render(T_GRAPHICS.GetDeviceContext(), maincamera->GetView(), maincamera->GetProjection());
+	T_GRAPHICS.GetLineRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
 	// デバッグレンダラ描画実行
-	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), maincamera->GetView(), maincamera->GetProjection());
+	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
 
 	// 書き込み先をバックバッファに変えてオフスクリーンレンダリングの結果を描画する
 	{

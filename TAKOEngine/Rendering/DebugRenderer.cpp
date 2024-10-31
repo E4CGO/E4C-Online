@@ -140,7 +140,7 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
 		context->Draw(sphereVertexCount, 0);
 	}
 	spheres.clear();
-	
+
 	// ‰~’Œ•`‰æ
 	context->IASetVertexBuffers(0, 1, cylinderVertexBuffer.GetAddressOf(), &stride, &offset);
 	for (const Cylinder& cylinder : cylinders)
@@ -191,9 +191,9 @@ void DebugRenderer::DrawSphere(const DirectX::XMFLOAT3& center, float radius, co
 	sphere.color = color;
 	spheres.emplace_back(sphere);
 }
-void DebugRenderer::DrawSphere(const std::vector<DirectX::XMFLOAT3>& center, float radius, const DirectX::XMFLOAT4& color)
+void DebugRenderer::DrawSphere(const std::vector<DirectX::XMFLOAT3>& centers, float radius, const DirectX::XMFLOAT4& color)
 {
-	for (auto& center : center)
+	for (const DirectX::XMFLOAT3& center : centers)
 	{
 		DrawSphere(center, radius, color);
 	}
