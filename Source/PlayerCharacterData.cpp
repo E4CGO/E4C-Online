@@ -12,9 +12,10 @@
 PlayerCharacterData::PlayerCharacterData()
 {
 	ClearAppearancePatterns();
-
 	m_pappearancePatterns[APPEARANCE_PATTERN::GENDER].push_back(new PlayerCharacterPatternGender(true));
 	m_pappearancePatterns[APPEARANCE_PATTERN::GENDER].push_back(new PlayerCharacterPatternGender(false));
+
+	m_pappearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternNone);
 	m_pappearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/WEAPON_BARB.glb"));
 	m_pappearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/WEAPON_MAGE.glb"));
 }
@@ -26,11 +27,11 @@ PlayerCharacterData::PlayerCharacterData()
 	@param[in]	pattern_idx		外見パターン
 	@retrun		なし
 *//***************************************************************************/
-void PlayerCharacterData::LoadAppearance(Player* player, uint8_t appearance_idx, uint8_t pattern_idx)
+void PlayerCharacterData::LoadAppearance(Character* chara, uint8_t appearance_idx, uint8_t pattern_idx)
 {
 	if (m_pappearancePatterns.find(appearance_idx) == m_pappearancePatterns.end()) return;
 	if (m_pappearancePatterns[appearance_idx].size() <= pattern_idx) return;
-	m_pappearancePatterns[appearance_idx][pattern_idx]->Execute(player);
+	m_pappearancePatterns[appearance_idx][pattern_idx]->Execute(chara);
 }
 
 /**************************************************************************//**

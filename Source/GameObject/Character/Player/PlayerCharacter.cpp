@@ -1,3 +1,6 @@
+//! @file PlayerCharacter.cpp
+//! @note 
+
 #include "PlayerCharacter.h"
 
 #include <profiler.h>
@@ -13,7 +16,7 @@
 
 #include "GameData.h"
 
-PlayerCharacter::PlayerCharacter(uint64_t id, const char* name, uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]) : Character()
+PlayerCharacter::PlayerCharacter(uint64_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]) : Character()
 {
 	moveSpeed = 10.0f;
 	turnSpeed = DirectX::XMConvertToRadians(720);
@@ -30,7 +33,7 @@ PlayerCharacter::PlayerCharacter(uint64_t id, const char* name, uint8_t appearan
 	SetCollider(Collider::COLLIDER_TYPE::SPHERE);
 
 	m_client_id = id;
-	this->name = name;
+	this->m_name = name;
 
 	LoadAppearance(appearance);
 }
@@ -62,13 +65,13 @@ PlayerCharacter::PlayerCharacter(PlayerCharacterData::CharacterInfo dataInfo) : 
 	@param[in]	appearance
 	@return		なし
 *//***************************************************************************/
-void PlayerCharacter::LoadAppearance(uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM])
+void PlayerCharacter::LoadAppearance(const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM])
 {
 	ModelObject::CleanModels();
 
 	for (uint8_t i = 0; i < PlayerCharacterData::APPEARANCE_PATTERN::NUM; i++)
 	{
-		PlayerCharacterData::Instance().LoadAppearance(reinterpret_cast<Player*>(this), i, appearance[i]);
+		PlayerCharacterData::Instance().LoadAppearance(this, i, appearance[i]);
 	}
 
 	stateMachine->SetState(static_cast<int>(State::Waiting));
@@ -370,17 +373,17 @@ void PlayerCharacter::Render(const RenderContext& rc)
 	if (dot < 0.0f) return;
 
 	// 名前表示
-	DirectX::XMFLOAT3 pos = T_GRAPHICS.GetScreenPosition(namePos);
-	T_TEXT.Render(
-		FONT_ID::HGpop,
-		name.c_str(),
-		pos.x, pos.y,
-		1.0f, 1.0f, 1.0f, 1.0f,
-		0.0f,
-		FONT_ALIGN::BOTTOM,
-		0.5f,
-		1
-	);
+	//DirectX::XMFLOAT3 pos = T_GRAPHICS.GetScreenPosition(namePos);
+	//T_TEXT.Render(
+	//	FONT_ID::HGpop,
+	//	m_name.c_str(),
+	//	pos.x, pos.y,
+	//	1.0f, 1.0f, 1.0f, 1.0f,
+	//	0.0f,
+	//	FONT_ALIGN::BOTTOM,
+	//	0.5f,
+	//	1
+	//);
 
 #ifdef _DEBUG
 	collider->DrawDebugPrimitive({ 1, 1, 1, 1 });

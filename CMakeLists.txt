@@ -166,6 +166,12 @@ set(Source__Map
 )
 source_group("Source\\Map" FILES ${Source__Map})
 
+set(Source__Network
+    "Source/Network/OnlineController.cpp"
+    "Source/Network/OnlineController.h"
+)
+source_group("Source\\Network" FILES ${Source__Network})
+
 set(Source__Scene
     "Source/Scene/Scene.cpp"
     "Source/Scene/Scene.h"
@@ -247,6 +253,8 @@ set(Source__GameObject__Character__Player
     "Source/GameObject/Character/Player/Player.h"
     "Source/GameObject/Character/Player/PlayerCharacter.cpp"
     "Source/GameObject/Character/Player/PlayerCharacter.h"
+    "Source/GameObject/Character/Player/PlayerCharacterManager.cpp"
+    "Source/GameObject/Character/Player/PlayerCharacterManager.h"
     "Source/GameObject/Character/Player/PlayerCharacterState.cpp"
     "Source/GameObject/Character/Player/PlayerCharacterState.h"
     "Source/GameObject/Character/Player/PlayerManager.cpp"
@@ -259,6 +267,30 @@ set(Source__GameObject__Character__Player
     "Source/GameObject/Character/Player/RogueState.h"
 )
 source_group("Source\\GameObject\\Character\\Player" FILES ${Source__GameObject__Character__Player})
+
+set(Source__Network__TCPCommand
+    "Source/Network/TCPCommand/TCPChat.cpp"
+    "Source/Network/TCPCommand/TCPChat.h"
+    "Source/Network/TCPCommand/TCPClientData.cpp"
+    "Source/Network/TCPCommand/TCPClientData.h"
+    "Source/Network/TCPCommand/TCPCommand.cpp"
+    "Source/Network/TCPCommand/TCPCommand.h"
+    "Source/Network/TCPCommand/TCPLogin.cpp"
+    "Source/Network/TCPCommand/TCPLogin.h"
+    "Source/Network/TCPCommand/TCPRoom.cpp"
+    "Source/Network/TCPCommand/TCPRoom.h"
+    "Source/Network/TCPCommand/TCPToken.cpp"
+    "Source/Network/TCPCommand/TCPToken.h"
+)
+source_group("Source\\Network\\TCPCommand" FILES ${Source__Network__TCPCommand})
+
+set(Source__Network__UDPCommand
+    "Source/Network/UDPCommand/UDPCommand.cpp"
+    "Source/Network/UDPCommand/UDPCommand.h"
+    "Source/Network/UDPCommand/UDPSync.cpp"
+    "Source/Network/UDPCommand/UDPSync.h"
+)
+source_group("Source\\Network\\UDPCommand" FILES ${Source__Network__UDPCommand})
 
 set(Source__Scene__Stage
     "Source/Scene/Stage/Stage.cpp"
@@ -497,6 +529,8 @@ set(TAKOEngine__Tool
     "TAKOEngine/Tool/Timer.h"
     "TAKOEngine/Tool/TransformUtils.cpp"
     "TAKOEngine/Tool/TransformUtils.h"
+    "TAKOEngine/Tool/U8Buffer.cpp"
+    "TAKOEngine/Tool/U8Buffer.h"
     "TAKOEngine/Tool/XMFLOAT.h"
 )
 source_group("TAKOEngine\\Tool" FILES ${TAKOEngine__Tool})
@@ -711,6 +745,7 @@ set(ALL_FILES
     ${TAKOEngine}
     ${Source__GameObject}
     ${Source__Map}
+    ${Source__Network}
     ${Source__Scene}
     ${Source__UI}
     ${Source__GameObject__Character}
@@ -718,6 +753,8 @@ set(ALL_FILES
     ${Source__GameObject__Props}
     ${Source__GameObject__Character__Enemy}
     ${Source__GameObject__Character__Player}
+    ${Source__Network__TCPCommand}
+    ${Source__Network__UDPCommand}
     ${Source__Scene__GameLoop}
     ${Source__Scene__Stage}
     ${Source__Scene__GameLoop__SceneCharacter}
@@ -997,6 +1034,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     "_CONSOLE"
     "UNICODE"
     "_UNICODE"
+    "WIN32_LEAN_AND_MEAN"
 )
 
 # ###############################################################################
