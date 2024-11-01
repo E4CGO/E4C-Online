@@ -2,7 +2,6 @@
 
 #include "TAKOEngine/Network/Network.h"
 #include <vector>
-#include <WS2tcpip.h>
 #include "TAKOEngine/Runtime/tentacle_lib.h"
 
 #pragma comment(lib, "ws2_32.lib")

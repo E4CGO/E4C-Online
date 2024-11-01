@@ -19,7 +19,7 @@ class Stage
 {
 public:
 	Stage() = default;
-	~Stage() {};
+	virtual ~Stage() = default;
 
 	virtual void Initialize();
 

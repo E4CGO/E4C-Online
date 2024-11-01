@@ -1,6 +1,17 @@
-#pragma once
-#include "SpriteShader.h"
+ï»¿//! @file FinalpassShader.h
+//! @note 
 
+#ifndef __GRAHICS_FINALPASS_SHADER_H__
+#define __GRAHICS_FINALPASS_SHADER_H__
+
+#include "SpriteShader.h"
+#include "SpriteShaderDX12.h"
+
+//***************************************************
+// @class FinalpassShader
+// @brief æœ€çµ‚åˆæˆ
+// @par   DX11
+//***************************************************
 class FinalpassShader : public SpriteShader
 {
 public:
@@ -12,10 +23,30 @@ private:
 private:
 	struct CBFinalpass
 	{
-		//	F’²•â³
-		float	hueShift;	// F‘Š’²®
-		float	saturation;	// Ê“x’²®
-		float	brightness;	// –¾“x’²®
+		//	è‰²èª¿è£œæ­£
+		float	hueShift;	// è‰²ç›¸èª¿æ•´
+		float	saturation;	// å½©åº¦èª¿æ•´
+		float	brightness;	// æ˜åº¦èª¿æ•´
 		float	dummy;
 	};
 };
+
+//***************************************************
+// @class FinalpassShaderDX12
+// @brief æœ€çµ‚åˆæˆ
+// @par   DX12
+//***************************************************
+class FinalpassShaderDX12 : public SpriteShaderDX12
+{
+public:
+	FinalpassShaderDX12(ID3D12Device* device);
+	~FinalpassShaderDX12() override {};
+
+	void Render(const RenderContextDX12& rc, SpriteDX12* sprite) override;
+
+private:
+	Microsoft::WRL::ComPtr<ID3D12PipelineState>		m_d3d_pipeline_state;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature>		m_d3d_root_signature;
+};
+
+#endif // !__GRAHICS_FINALPASS_SHADER_H__

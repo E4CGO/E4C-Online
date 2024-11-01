@@ -76,7 +76,12 @@ public:
 		}
 	};
 
-	void LoadAppearance(Player* player, uint8_t appearance_idx, uint8_t pattern_idx);
+	const CharacterInfo& GetCurrentCharacter() const
+	{
+		return m_CharaterInfosData[m_CurrentSaveState];
+	}
+
+	void LoadAppearance(Character* chara, uint8_t appearance_idx, uint8_t pattern_idx);
 	nlohmann::json GetCharacterInfos() const { return m_CharacterInfos; }
 	void SetCharacterInfos(nlohmann::json savedData) { m_CharacterInfos = savedData; }
 
@@ -109,7 +114,6 @@ public:
 	void ClearAppearancePatterns();
 
 	int m_CurrentSaveState = 0;
-
 private:
 	std::unordered_map<uint8_t, std::vector<PlayerCharacterPattern*>> m_pappearancePatterns;
 

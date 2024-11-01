@@ -166,6 +166,12 @@ set(Source__Map
 )
 source_group("Source\\Map" FILES ${Source__Map})
 
+set(Source__Network
+    "Source/Network/OnlineController.cpp"
+    "Source/Network/OnlineController.h"
+)
+source_group("Source\\Network" FILES ${Source__Network})
+
 set(Source__Scene
     "Source/Scene/Scene.cpp"
     "Source/Scene/Scene.h"
@@ -247,6 +253,8 @@ set(Source__GameObject__Character__Player
     "Source/GameObject/Character/Player/Player.h"
     "Source/GameObject/Character/Player/PlayerCharacter.cpp"
     "Source/GameObject/Character/Player/PlayerCharacter.h"
+    "Source/GameObject/Character/Player/PlayerCharacterManager.cpp"
+    "Source/GameObject/Character/Player/PlayerCharacterManager.h"
     "Source/GameObject/Character/Player/PlayerCharacterState.cpp"
     "Source/GameObject/Character/Player/PlayerCharacterState.h"
     "Source/GameObject/Character/Player/PlayerManager.cpp"
@@ -259,6 +267,30 @@ set(Source__GameObject__Character__Player
     "Source/GameObject/Character/Player/RogueState.h"
 )
 source_group("Source\\GameObject\\Character\\Player" FILES ${Source__GameObject__Character__Player})
+
+set(Source__Network__TCPCommand
+    "Source/Network/TCPCommand/TCPChat.cpp"
+    "Source/Network/TCPCommand/TCPChat.h"
+    "Source/Network/TCPCommand/TCPClientData.cpp"
+    "Source/Network/TCPCommand/TCPClientData.h"
+    "Source/Network/TCPCommand/TCPCommand.cpp"
+    "Source/Network/TCPCommand/TCPCommand.h"
+    "Source/Network/TCPCommand/TCPLogin.cpp"
+    "Source/Network/TCPCommand/TCPLogin.h"
+    "Source/Network/TCPCommand/TCPRoom.cpp"
+    "Source/Network/TCPCommand/TCPRoom.h"
+    "Source/Network/TCPCommand/TCPToken.cpp"
+    "Source/Network/TCPCommand/TCPToken.h"
+)
+source_group("Source\\Network\\TCPCommand" FILES ${Source__Network__TCPCommand})
+
+set(Source__Network__UDPCommand
+    "Source/Network/UDPCommand/UDPCommand.cpp"
+    "Source/Network/UDPCommand/UDPCommand.h"
+    "Source/Network/UDPCommand/UDPSync.cpp"
+    "Source/Network/UDPCommand/UDPSync.h"
+)
+source_group("Source\\Network\\UDPCommand" FILES ${Source__Network__UDPCommand})
 
 set(Source__Scene__Stage
     "Source/Scene/Stage/Stage.cpp"
@@ -417,6 +449,12 @@ set(TAKOEngine__Rendering
     "TAKOEngine/Rendering/Descriptor.h"
     "TAKOEngine/Rendering/FrameBuffer.cpp"
     "TAKOEngine/Rendering/FrameBuffer.h"
+    "TAKOEngine/Rendering/FrameBufferDX12.cpp"
+    "TAKOEngine/Rendering/FrameBufferDX12.h"
+    "TAKOEngine/Rendering/FrameBufferManager.cpp"
+    "TAKOEngine/Rendering/FrameBufferManager.h"
+    "TAKOEngine/Rendering/FrameBufferTexture.cpp"
+    "TAKOEngine/Rendering/FrameBufferTexture.h"
     "TAKOEngine/Rendering/FrustumCulling.cpp"
     "TAKOEngine/Rendering/FrustumCulling.h"
     "TAKOEngine/Rendering/Gizmos.cpp"
@@ -491,6 +529,8 @@ set(TAKOEngine__Tool
     "TAKOEngine/Tool/Timer.h"
     "TAKOEngine/Tool/TransformUtils.cpp"
     "TAKOEngine/Tool/TransformUtils.h"
+    "TAKOEngine/Tool/U8Buffer.cpp"
+    "TAKOEngine/Tool/U8Buffer.h"
     "TAKOEngine/Tool/XMFLOAT.h"
 )
 source_group("TAKOEngine\\Tool" FILES ${TAKOEngine__Tool})
@@ -559,6 +599,8 @@ set(TAKOEngine__Rendering__Shaders
     "TAKOEngine/Rendering/Shaders/SkydomeShader.h"
     "TAKOEngine/Rendering/Shaders/SpriteShader.cpp"
     "TAKOEngine/Rendering/Shaders/SpriteShader.h"
+    "TAKOEngine/Rendering/Shaders/SpriteShaderDX12.cpp"
+    "TAKOEngine/Rendering/Shaders/SpriteShaderDX12.h"
     "TAKOEngine/Rendering/Shaders/ToonShader.cpp"
     "TAKOEngine/Rendering/Shaders/ToonShader.h"
     "TAKOEngine/Rendering/Shaders/UVScrollShader.cpp"
@@ -638,15 +680,27 @@ source_group("TAKOEngine\\Rendering\\HLSL\\Model" FILES ${TAKOEngine__Rendering_
 set(TAKOEngine__Rendering__HLSL__PostEffect
     "TAKOEngine/Rendering/HLSL/PostEffect/BloomPS.hlsl"
     "TAKOEngine/Rendering/HLSL/PostEffect/ColorGrading.hlsli"
+    "TAKOEngine/Rendering/HLSL/PostEffect/ColorGradingDX12.hlsli"
+    "TAKOEngine/Rendering/HLSL/PostEffect/ColorGradingDX12PS.hlsl"
+    "TAKOEngine/Rendering/HLSL/PostEffect/ColorGradingDX12VS.hlsl"
     "TAKOEngine/Rendering/HLSL/PostEffect/ColorGradingPS.hlsl"
     "TAKOEngine/Rendering/HLSL/PostEffect/FilterFunctions.hlsli"
     "TAKOEngine/Rendering/HLSL/PostEffect/Finalpass.hlsli"
+    "TAKOEngine/Rendering/HLSL/PostEffect/FinalpassDX12.hlsli"
+    "TAKOEngine/Rendering/HLSL/PostEffect/FinalpassDX12PS.hlsl"
+    "TAKOEngine/Rendering/HLSL/PostEffect/FinalpassDX12VS.hlsl"
     "TAKOEngine/Rendering/HLSL/PostEffect/FinalpassPS.hlsl"
     "TAKOEngine/Rendering/HLSL/PostEffect/FullScreenQuad.hlsli"
     "TAKOEngine/Rendering/HLSL/PostEffect/FullScreenQuadVS.hlsl"
     "TAKOEngine/Rendering/HLSL/PostEffect/GaussianBlur.hlsli"
+    "TAKOEngine/Rendering/HLSL/PostEffect/GaussianBlurDX12.hlsli"
+    "TAKOEngine/Rendering/HLSL/PostEffect/GaussianBlurDX12PS.hlsl"
+    "TAKOEngine/Rendering/HLSL/PostEffect/GaussianBlurDX12VS.hlsl"
     "TAKOEngine/Rendering/HLSL/PostEffect/GaussianBlurPS.hlsl"
     "TAKOEngine/Rendering/HLSL/PostEffect/LuminanceExtraction.hlsli"
+    "TAKOEngine/Rendering/HLSL/PostEffect/LuminanceExtractionDX12.hlsli"
+    "TAKOEngine/Rendering/HLSL/PostEffect/LuminanceExtractionDX12PS.hlsl"
+    "TAKOEngine/Rendering/HLSL/PostEffect/LuminanceExtractionDX12VS.hlsl"
     "TAKOEngine/Rendering/HLSL/PostEffect/LuminanceExtractionPS.hlsl"
     "TAKOEngine/Rendering/HLSL/PostEffect/Mask.hlsli"
     "TAKOEngine/Rendering/HLSL/PostEffect/MaskPS.hlsl"
@@ -693,6 +747,7 @@ set(ALL_FILES
     ${TAKOEngine}
     ${Source__GameObject}
     ${Source__Map}
+    ${Source__Network}
     ${Source__Scene}
     ${Source__UI}
     ${Source__GameObject__Character}
@@ -700,6 +755,8 @@ set(ALL_FILES
     ${Source__GameObject__Props}
     ${Source__GameObject__Character__Enemy}
     ${Source__GameObject__Character__Player}
+    ${Source__Network__TCPCommand}
+    ${Source__Network__UDPCommand}
     ${Source__Scene__GameLoop}
     ${Source__Scene__Stage}
     ${Source__Scene__GameLoop__SceneCharacter}
@@ -787,10 +844,18 @@ set(SHADER_NAMES
     "ToonPS.cso"
     "ToonVS.cso"
     "BloomPS.cso"
+    "ColorGradingDX12PS.cso"
+    "ColorGradingDX12VS.cso"
     "ColorGradingPS.cso"
+    "FinalpassDX12PS.cso"
+    "FinalpassDX12VS.cso"
     "FinalpassPS.cso"
     "FullScreenQuadVS.cso"
+    "GaussianBlurDX12PS.cso"
+    "GaussianBlurDX12VS.cso"
     "GaussianBlurPS.cso"
+    "LuminanceExtractionDX12PS.cso"
+    "LuminanceExtractionDX12VS.cso"
     "LuminanceExtractionPS.cso"
     "MaskPS.cso"
     "PlanePS.cso"
@@ -835,10 +900,18 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/ToonPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/ToonVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/BloomPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/ColorGradingDX12PS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/ColorGradingDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/ColorGradingPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/FinalpassDX12PS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/FinalpassDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/FinalpassPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/FullScreenQuadVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/GaussianBlurDX12PS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/GaussianBlurDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/GaussianBlurPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/LuminanceExtractionDX12PS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/LuminanceExtractionDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/LuminanceExtractionPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/MaskPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlanePS.hlsl,5.0,Pixel,main"
@@ -963,6 +1036,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     "_CONSOLE"
     "UNICODE"
     "_UNICODE"
+    "WIN32_LEAN_AND_MEAN"
 )
 
 # ###############################################################################

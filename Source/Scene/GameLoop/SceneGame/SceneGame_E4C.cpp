@@ -1,3 +1,9 @@
+//! @file SceneGame_E4C.cpp
+//! @note 
+
+#include "SceneGame_E4C.h"
+
+#include <iostream>
 #include <profiler.h>
 #include "Map/MapTileManager.h"
 #include "TAKOEngine/Tool/GLTFImporter.h"
@@ -5,10 +11,12 @@
 
 #include "Source/Scene/Stage/StageManager.h"
 
-#include "SceneGame_E4C.h"
 #include "SceneGame_E4CState.h"
 #include "Scene/GameLoop/SceneGame/Stage/StageOpenWorld_E4C.h"
 #include "Scene/Stage/TestingStage.h"
+
+#include "GameObject/Character/Player/PlayerCharacterManager.h"
+#include "TAKOEngine/Tool/Console.h"
 
 void SceneGame_E4C::Initialize()
 {
@@ -25,15 +33,33 @@ void SceneGame_E4C::Initialize()
 	cameraManager.Register(mainCamera);
 	cameraManager.SetCamera(0);
 
-	stageOpenWorld = std::make_unique<StageOpenWorld_E4C>();
+	//Console::Instance().Open();
+
+	stageOpenWorld = std::make_unique<StageOpenWorld_E4C>(this);
 	stageOpenWorld->Initialize();
 
-	
+
+	m_ponlineController = new Online::OnlineController;
+	if (m_ponlineController->Initialize())
+	{
+		if (m_ponlineController->Login()) {
+			while (m_ponlineController->GetState() != Online::OnlineController::STATE::LOGINED)
+			{
+				// 待つ
+				std::cout << ".";
+			}
+		}
+	}
 }
 
 void SceneGame_E4C::Finalize()
 {
+	delete m_ponlineController;
+	Console::Instance().Close();
 	LightManager::Instance().Clear();
+	MAPTILES.Clear();
+	STAGES.Clear();
+	PlayerCharacterManager::Instance().Clear();
 	CameraManager::Instance().Clear();
 }
 
@@ -61,7 +87,6 @@ void SceneGame_E4C::Render()
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
-
 	if (stageNumber == 0)
 	{
 		stageOpenWorld->Render();
@@ -71,5 +96,5 @@ void SceneGame_E4C::Render()
 		STAGES.Render(rc);
 	}
 
-	//ProfileDrawUI();
+	ProfileDrawUI();
 }

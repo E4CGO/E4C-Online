@@ -1,7 +1,5 @@
 #include "Network.h"
 
-#include <WS2tcpip.h>
-
 // ‰Šú‰»
 bool Network::Initialize()
 {

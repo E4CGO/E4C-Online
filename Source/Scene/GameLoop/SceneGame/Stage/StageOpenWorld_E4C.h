@@ -18,13 +18,14 @@
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
 #include "TAKOEngine/Tool/GLTFImporter.h"
 
+class SceneGame_E4C;
+
 class StageOpenWorld_E4C : public Stage
 {
 public:
-	StageOpenWorld_E4C() = default;
+	StageOpenWorld_E4C(SceneGame_E4C* scene) : m_scene(scene), Stage() {};
 
 	void Initialize() override;
-
 
 	void Update(float elapsedTime) override;
 
@@ -37,11 +38,11 @@ public:
 		NORMAL,
 	};
 private:
+	SceneGame_E4C* m_scene;
+
 	std::unique_ptr<ThridPersonCameraController> cameraController;
 
-	MapTile* stage_collision;
-
-	std::unique_ptr<PlayerCharacter> player;
+	MapTile* stage_collision = nullptr;
 
 	std::unique_ptr <Teleporter> teleporter;
 	std::unique_ptr <Plane> plane;
