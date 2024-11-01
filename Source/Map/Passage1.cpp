@@ -65,7 +65,7 @@ Passage1::Passage1(RoomBase* parent, int pointIndex)
 
 	// 接続点データ
 	CONNECTPOINT_DATA point1;
-	point1.position = { 0.0f, 0.0f, 24.0f };
+	point1.position = { 0.0f, 3.0f, 24.0f };
 	point1.angle = { 0.0f, 0.0f, 0.0f };
 	m_connectPointDatas.emplace_back(point1);
 
@@ -140,32 +140,64 @@ Passage1::Passage1(RoomBase* parent, int pointIndex)
 
 void Passage1::PlaceMapTile()
 {
-	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR, { 0.0f, 0.0f, 0.0f }));
-	m_tileDatas.emplace_back(TILE_DATA(TileType::WALL, { 0.0f, 0.0f, 0.0f },
-		DirectX::XMFLOAT3(0.0f, DirectX::XMConvertToRadians(90.0f), 0.0f)));
+	//m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR, { 0.0f, 0.0f, 0.0f }));
+	//m_tileDatas.emplace_back(TILE_DATA(TileType::WALL, { 0.0f, 0.0f, 0.0f },
+	//	DirectX::XMFLOAT3(0.0f, DirectX::XMConvertToRadians(90.0f), 0.0f)));
+
+	//m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
+	//	DirectX::XMFLOAT3(0.0f, 0.0f, 4.0f),
+	//	DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
+	//	DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
+	//	DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
+	//m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
+	//	DirectX::XMFLOAT3(0.0f, 0.0f, 8.0f),
+	//	DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
+	//	DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
+	//	DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
+	//m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
+	//	DirectX::XMFLOAT3(0.0f, 0.0f, 12.0f),
+	//	DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
+	//	DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
+	//	DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
+	//m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
+	//	DirectX::XMFLOAT3(0.0f, 0.0f, 16.0f),
+	//	DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
+	//	DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
+	//	DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
+	//m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
+	//	DirectX::XMFLOAT3(0.0f, 0.0f, 20.0f),
+	//	DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
+	//	DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
+	//	DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
+
+	m_tileDatas.emplace_back(TILE_DATA(TileType::STAIR,
+		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
+		DirectX::XMFLOAT3(0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f)));
+	//m_tileDatas.emplace_back(TILE_DATA(TileType::WALL, { 0.0f, 0.0f, 0.0f },
+	//	DirectX::XMFLOAT3(0.0f, DirectX::XMConvertToRadians(90.0f), 0.0f)));
 
 	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
-		DirectX::XMFLOAT3(0.0f, 0.0f, 4.0f),
+		DirectX::XMFLOAT3(0.0f, 3.0f, 4.0f),
 		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
 		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
 		DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
 	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
-		DirectX::XMFLOAT3(0.0f, 0.0f, 8.0f),
+		DirectX::XMFLOAT3(0.0f, 3.0f, 8.0f),
 		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
 		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
 		DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
 	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
-		DirectX::XMFLOAT3(0.0f, 0.0f, 12.0f),
+		DirectX::XMFLOAT3(0.0f, 3.0f, 12.0f),
 		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
 		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
 		DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
 	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
-		DirectX::XMFLOAT3(0.0f, 0.0f, 16.0f),
+		DirectX::XMFLOAT3(0.0f, 3.0f, 16.0f),
 		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
 		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
 		DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
 	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
-		DirectX::XMFLOAT3(0.0f, 0.0f, 20.0f),
+		DirectX::XMFLOAT3(0.0f, 3.0f, 20.0f),
 		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
 		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
 		DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
@@ -182,6 +214,9 @@ void Passage1::PlaceMapTile()
 		case TileType::WALL:
 			//fileName = "Data/Model/Dungeon/DoorWay Parent 006.glb";
 			continue;
+			break;
+		case TileType::STAIR:
+			fileName = "Data/Model/Dungeon/Stair Parent 001.glb";
 			break;
 		default:
 			fileName = "Data/Model/Dungeon/Floor_Plain_Parent.glb";

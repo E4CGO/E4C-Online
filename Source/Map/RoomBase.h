@@ -21,6 +21,7 @@ public:
 	{
 		FLOOR = 0,
 		WALL,
+		STAIR,
 	};
 
 	// 配置するタイルデータ

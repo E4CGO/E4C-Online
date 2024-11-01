@@ -12,6 +12,7 @@ public:
 	void UpdateTransform() override;
 
 	void Update(float elapsedTime) override;
+
 protected:
 	RoomBase* parent = nullptr;
 };

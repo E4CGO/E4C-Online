@@ -29,7 +29,7 @@ DungeonData::DungeonData()
 	// PASSAGE_1
 	{
 		RoomGenerateSetting setting;
-		setting.weight = 20;
+		setting.weight = 60;
 		m_roomGenerateSettings.at(PASSAGE_1) = setting;
 	}
 
