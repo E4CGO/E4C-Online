@@ -26,5 +26,11 @@ public:
 		HitResult& result
 	) override;
 
+	void SetRadius(float _radius) { radius = _radius; }
+	float GetRadius() const { return radius; }
+
 	void DrawDebugPrimitive(DirectX::XMFLOAT4 color = { 1, 1, 1, 1 }) override;
+
+private:
+	float radius;
 };

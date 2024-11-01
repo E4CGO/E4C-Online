@@ -3,66 +3,48 @@
 // ÉåÉCÉLÉÉÉXÉg
 bool MapTileManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, HitResult& hit, bool camera)
 {
-	//HitResult temp;
-	//hit.distance = FLT_MAX;
-	//for (ModelObject*& item : items)
-	//{
-	//	if (item->GetCollider() == nullptr) continue;
-	//	if (item->GetCollider()->RayCast(start, end, temp) && (temp.distance < hit.distance))
-	//	{
-	//		hit = temp; // ç≈íZ
-	//	}
-	//}
-	//return hit.distance < FLT_MAX;
-	//
-	//HitResultVector result;
-	//bool ret = quadtree.IntersectRayVsTriangle(start, end, result);
-	//if (ret)
-	//{
-	//	XMStoreFloat3(&hit.position, result.position);
-	//	XMStoreFloat3(&hit.normal, result.normal);
-	//	hit.distance = result.distance;
-	//	hit.materialIndex = result.materialIndex;
-	//	XMStoreFloat3(&hit.triangleVerts[0], result.triangleVerts[0]);
-	//	XMStoreFloat3(&hit.triangleVerts[1], result.triangleVerts[1]);
-	//	XMStoreFloat3(&hit.triangleVerts[2], result.triangleVerts[2]);
-	//}
-	//return ret;
+	XMFLOAT3 rayDirection = end - start;
+	float rayDist = XMFLOAT3Length(rayDirection);
+	rayDirection = XMFLOAT3Normalize(rayDirection);
 
+	RayCast(start, rayDirection, rayDist, hit, camera);
+}
+bool MapTileManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& direction, float dist, HitResult& hit, bool camera)
+{
 	// ç≈è¨ílç≈ëÂíl
 	float minX, maxX;
-	if (start.x < end.x)
+	if (direction.x > 0.0f)
 	{
 		minX = start.x;
-		maxX = end.x;
+		maxX = start.x + direction.x * dist;
 	}
 	else
 	{
-		minX = end.x;
+		minX = start.x + direction.x * dist;
 		maxX = start.x;
 	}
 
 	float minY, maxY;
-	if (start.y < end.y)
+	if (direction.y > 0.0f)
 	{
 		minY = start.y;
-		maxY = end.y;
+		maxY = start.y + direction.y * dist;
 	}
 	else
 	{
-		minY = end.y;
+		minY = start.y + direction.y * dist;
 		maxY = start.y;
 	}
 
 	float minZ, maxZ;
-	if (start.z < end.z)
+	if (direction.z > 0.0f)
 	{
 		minZ = start.z;
-		maxZ = end.z;
+		maxZ = start.z + direction.z * dist;
 	}
 	else
 	{
-		minZ = end.z;
+		minZ = start.z + direction.z * dist;
 		maxZ = start.z;
 	}
 
@@ -70,8 +52,8 @@ bool MapTileManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFL
 	int Elem = tree.GetLinerIndex(minX, maxX, minY, maxY, minZ, maxZ);
 
 	bool ret = false;
-	SearchChildren(Elem, start, end, hit, ret);
-	SearchParent(Elem, start, end, hit, ret);
+	SearchChildren(Elem, start, direction, dist, hit, ret);
+	SearchParent(Elem, start, direction, dist, hit, ret);
 	return ret;
 }
 
@@ -243,7 +225,8 @@ int MapTileManager::InsertMapMesh()
 bool MapTileManager::SearchChildren(	// éqãÛä‘íTçı
 	int Elem,
 	const DirectX::XMFLOAT3& start,
-	const DirectX::XMFLOAT3& end,
+	const DirectX::XMFLOAT3& direction,
+	float dist,
 	HitResult& result,
 	bool& hit)
 {
@@ -257,7 +240,7 @@ bool MapTileManager::SearchChildren(	// éqãÛä‘íTçı
 
 		for (int i = 0; i < 8; i++)
 		{
-			if (SearchChildren(childElem + i, start, end, result, hit))
+			if (SearchChildren(childElem + i, start, direction, dist, result, hit))
 				break;
 		}
 	}
@@ -269,15 +252,12 @@ bool MapTileManager::SearchChildren(	// éqãÛä‘íTçı
 	Liner8TreeManager<Triangle>::OFT<Triangle>* oft = tree.ppCellAry[Elem]->pLatest;
 	while (oft)
 	{
-		XMFLOAT3 rayDirection = end - start;
-		float rayDist = XMFLOAT3Length(rayDirection);
-		rayDirection = XMFLOAT3Normalize(rayDirection);
 		XMFLOAT3 triangleVerts[3] = {
 			oft->m_pObject->position[0],
 			oft->m_pObject->position[1],
 			oft->m_pObject->position[2]
 		};
-		if (Collision::IntersectRayVsTriangle(start, rayDirection, rayDist, triangleVerts, result))
+		if (Collision::IntersectRayVsTriangle(start, direction, dist, triangleVerts, result))
 		{
 			hit = true;
 		}
@@ -291,7 +271,8 @@ bool MapTileManager::SearchChildren(	// éqãÛä‘íTçı
 bool MapTileManager::SearchParent(	// êeãÛä‘íTçı
 	int Elem,
 	const DirectX::XMFLOAT3& start,
-	const DirectX::XMFLOAT3& end,
+	const DirectX::XMFLOAT3& direction,
+	float dist,
 	HitResult& result,
 	bool& hit)
 {
@@ -313,15 +294,12 @@ bool MapTileManager::SearchParent(	// êeãÛä‘íTçı
 		Liner8TreeManager<Triangle>::OFT<Triangle>* oft = tree.ppCellAry[parentElem]->pLatest;
 		while (oft)
 		{
-			XMFLOAT3 rayDirection = end - start;
-			float rayDist = XMFLOAT3Length(rayDirection);
-			rayDirection = XMFLOAT3Normalize(rayDirection);
 			XMFLOAT3 triangleVerts[3] = {
 				oft->m_pObject->position[0],
 				oft->m_pObject->position[1],
 				oft->m_pObject->position[2]
 			};
-			if (Collision::IntersectRayVsTriangle(start, rayDirection, rayDist, triangleVerts, result))
+			if (Collision::IntersectRayVsTriangle(start, direction, dist, triangleVerts, result))
 			{
 				hit = true;
 			}

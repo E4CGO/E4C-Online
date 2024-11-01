@@ -17,9 +17,16 @@ protected:
 public:
 	// レイキャスト
 	bool RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, HitResult& hit, bool camera = false);
+	bool RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& direction, float dist, HitResult& hit, bool camera = false);
 	// 垂直レイキャスト
 	bool VerticalRayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, HitResult& hit);
 	
+	// オブジェクトのコリダーを押し戻す
+	bool IntersectColliderVsMap(Collider* collider);
+
+	// 球の押し戻し
+	bool IntersectSphereVsMap(const DirectX::XMVECTOR& spherePos, float radius);
+
 	// 空間生成
 	void CreateSpatialIndex(uint32_t quadDepth = 1, uint32_t octDepth = 1, DirectX::XMFLOAT3* minPos = nullptr, DirectX::XMFLOAT3* maxPos = nullptr);
 
@@ -42,13 +49,15 @@ protected:
 	bool SearchChildren(	// 子空間探索
 		int Elem,
 		const DirectX::XMFLOAT3& start,
-		const DirectX::XMFLOAT3& end,
+		const DirectX::XMFLOAT3& direction,
+		float dist, 
 		HitResult& result,
 		bool& hit);
 	bool SearchParent(	// 親空間探索
 		int Elem,
 		const DirectX::XMFLOAT3& start,
-		const DirectX::XMFLOAT3& end,
+		const DirectX::XMFLOAT3& direction,
+		float dist,
 		HitResult& result,
 		bool& hit);
 
