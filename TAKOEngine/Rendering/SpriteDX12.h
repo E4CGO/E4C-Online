@@ -8,7 +8,10 @@
 #include <d3d12.h>
 #include <DirectXMath.h>
 
+#include "TAKOEngine/Rendering/RenderContext.h"
+#include "TAKOEngine/Rendering/GpuResourceUtils.h"
 #include "TAKOEngine/Rendering/Descriptor.h"
+#include "FrameBufferTexture.h"
 
 /**************************************************************************//**
 		@class		SpriteDX12
@@ -17,15 +20,58 @@
 *//***************************************************************************/
 class SpriteDX12
 {
+private:
+	struct CbSpriteData
+	{
+		// 輝度シェーダー
+		float threshold;	// 閾値
+		float intensity;	// ブルームの強度
+		DirectX::XMFLOAT2 dummy;
+
+		// GaussianBlur
+		DirectX::XMFLOAT4 weights[MaxKernelSize * MaxKernelSize];  // 重さ
+		DirectX::XMFLOAT2 textureSize;   // 暈すテクスチャのサイズ
+		float kernelSize;                // カーネルサイズ
+		float dummy1;
+
+		// ColorGrading
+		float hueShift;	    // 色相調整
+		float saturation;	// 彩度調整
+		float brightness;	// 明度調整
+		float dummy2;
+	};
+
+	struct Vertex
+	{
+		DirectX::XMFLOAT3	position;
+		DirectX::XMFLOAT4	color;
+		DirectX::XMFLOAT2	texcoord;
+	};
+
 public:
+	struct FrameResource
+	{
+		Microsoft::WRL::ComPtr<ID3D12Resource>			d3d_vb_resource;
+		Microsoft::WRL::ComPtr<ID3D12Resource>			d3d_ib_resource;
+		D3D12_VERTEX_BUFFER_VIEW						d3d_vbv;
+		D3D12_INDEX_BUFFER_VIEW							d3d_ibv;
+		Vertex* vertex_data = nullptr;
+
+		Microsoft::WRL::ComPtr<ID3D12Resource>			d3d_cbv_resource;
+		const Descriptor* cbv_descriptor = nullptr;
+		CbSpriteData* cb_scene_data = nullptr;
+	};
+	std::vector<FrameResource>	m_frame_resources;
+
 	//! コンストラクタ
 	SpriteDX12(UINT sprite_count, const char* filename = nullptr);
+	SpriteDX12(UINT sprite_count, FrameBufferTexture* frameBuffer);
 
 	//! デストラクタ
 	~SpriteDX12();
 
 	// 描画開始
-	void Begin(ID3D12GraphicsCommandList* d3d_command_list);
+	void Begin(const RenderContextDX12& rc);
 
 	// 描画登録
 	void Draw(
@@ -41,7 +87,8 @@ public:
 		float sx, float sy,
 		float sw, float sh,
 		float angle,
-		float r, float g, float b, float a);
+		float r, float g, float b, float a,
+		D3D12_VIEWPORT viewport);
 
 	// 描画終了
 	void End(ID3D12GraphicsCommandList* d3d_command_list);
@@ -52,27 +99,20 @@ public:
 	// テクスチャ高さ取得
 	int GetTextureHeight() const { return m_texture_height; }
 
-private:
+	// ディスクリプタ取得
+	const Descriptor* GetDescriptor() { return m_srv_descriptor; }
 
-	struct Vertex
-	{
-		DirectX::XMFLOAT3	position;
-		DirectX::XMFLOAT4	color;
-		DirectX::XMFLOAT2	texcoord;
-	};
-
-	struct FrameResource
-	{
-		Microsoft::WRL::ComPtr<ID3D12Resource>			d3d_vb_resource;
-		Microsoft::WRL::ComPtr<ID3D12Resource>			d3d_ib_resource;
-		D3D12_VERTEX_BUFFER_VIEW						d3d_vbv;
-		D3D12_INDEX_BUFFER_VIEW							d3d_ibv;
-		Vertex* vertex_data = nullptr;
-	};
+	// スプライトカウント取得
+	const int GetSpriteCount() { return m_sprite_count; }
 
 private:
+	// フレームリソース生成
+	void CreateFrameResource();
 
-	std::vector<FrameResource>							m_frame_resources;
+	// フィルター値計算
+	void CalcGaussianFilter(FrameResource& fram_resource, const GaussianFilterData& gaussianFilterData);
+
+private:
 	Microsoft::WRL::ComPtr<ID3D12Resource>				m_d3d_texture;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState>			m_d3d_pipeline_state;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature>			m_d3d_root_signature;

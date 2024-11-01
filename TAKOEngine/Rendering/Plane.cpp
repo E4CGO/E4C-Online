@@ -82,7 +82,7 @@ Plane::Plane(ID3D11Device* device, const char* filename, float scaling, std::arr
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 
-	mesh.material = new ModelResource::Material();
+	mesh.material = new ModelResource::Material;
 
 	// テクスチャ生成
 	if (filename != "")

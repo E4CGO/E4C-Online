@@ -2,8 +2,6 @@
 
 #include <DirectXMath.h>
 
-#include "RenderContext.h"
-
 //TODO::SetCbScene
 struct CbScene
 {
@@ -13,9 +11,9 @@ struct CbScene
 	//ライト情報
 	DirectX::XMFLOAT4		ambientLightColor;
 	DirectionalLightData	directionalLightData;
-	PointLightData			pointLightData[PointLightMax];			// 点光源情報
-	SpotLightData			spotLightData[SpotLightMax];			// スポットライト情報
-	int						pointLightCount = 0;				// 点光源数
+	PointLightData			pointLightData[PointLightMax];	// 点光源情報
+	SpotLightData			spotLightData[SpotLightMax];	// スポットライト情報
+	int						pointLightCount = 0;			// 点光源数
 	int						spotLightCount = 0;				// スポットライト数
 };
 

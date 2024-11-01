@@ -1,6 +1,7 @@
 #include "Sprite.hlsli"
 
 // 頂点シェーダーエントリポイント
+[RootSignature(ROOT_SIG)]
 VS_OUT main(float4 position : POSITION, float4 color : COLOR, float2 texcoord : TEXCOORD)
 {
 	VS_OUT vout;
@@ -9,5 +10,5 @@ VS_OUT main(float4 position : POSITION, float4 color : COLOR, float2 texcoord : 
 	vout.color = color;
 	vout.texcoord = texcoord;
 
-	return vout;
+    return vout;
 }

@@ -21,7 +21,14 @@ public:
 			DirectX::XMFLOAT3{1.0f, -1.0f, 0.0f},
 			DirectX::XMFLOAT3{-1.0f, -1.0f, 0.0f},
 		});
-	virtual ~Plane() = default;
+	virtual ~Plane()
+	{
+		if (mesh.material != nullptr)
+		{
+			delete mesh.material;
+			mesh.material = nullptr;
+		}
+	}
 
 	virtual void Update(float elapsedTime) override;
 

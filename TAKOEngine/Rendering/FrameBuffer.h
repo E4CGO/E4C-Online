@@ -1,43 +1,52 @@
-#pragma once
+ï»¿//! @file FrameBuffer.h
+//! @note
+
+#ifndef __GRAHICS_FRAME_BUFFER_H__
+#define __GRAHICS_FRAME_BUFFER_H__
 
 #include <wrl.h>
 #include <d3d11.h>
 
+//*******************************************************
+// @class FrameBuffer
+// @brief ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ã‚²ãƒƒãƒˆä½œæˆ&å–å¾—
+// @par   
+//*******************************************************
 class FrameBuffer
 {
 public:
 	FrameBuffer(ID3D11Device* device, IDXGISwapChain* swapchain, DXGI_FORMAT format = DXGI_FORMAT_D24_UNORM_S8_UINT);
 	FrameBuffer(ID3D11Device* device, UINT width, UINT height, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM);
 
-	// ƒJƒ‰[ƒ}ƒbƒvæ“¾
+	// ã‚«ãƒ©ãƒ¼ãƒãƒƒãƒ—å–å¾—
 	ID3D11ShaderResourceView* GetColorMap() const { return colorMap.Get(); }
 	const Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& GetShaderResourceView() const { return colorMap; }
 
-	// ƒNƒŠƒA
+	// ã‚¯ãƒªã‚¢
 	void Clear(ID3D11DeviceContext* dc, float r, float g, float b, float a);
 
-	//ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒgİ’è	
+	//ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆè¨­å®š	
 	void SetRenderTarget(ID3D11DeviceContext* dc);
 
-	//G-Buffer—pƒŒƒ“ƒ_[ƒ^[ƒQƒbƒgİ’è	
+	//G-Bufferç”¨ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆè¨­å®š	
 	void SetRenderTargets(ID3D11DeviceContext* dc, int number, ID3D11RenderTargetView* rtv[]);
 
-	//ƒrƒ…[ƒ|[ƒgİ’è
+	//ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆè¨­å®š
 	void SetViewport(ID3D11DeviceContext* dc, UINT width, UINT height);
 
-	// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒgƒrƒ…[æ“¾
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆãƒ“ãƒ¥ãƒ¼å–å¾—
 	ID3D11RenderTargetView* GetRenderTargetView() const { return renderTargetView.Get(); }
 
-	// ƒfƒvƒXƒXƒeƒ“ƒVƒ‹ƒrƒ…[æ“¾
+	// ãƒ‡ãƒ—ã‚¹ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒ“ãƒ¥ãƒ¼å–å¾—
 	ID3D11DepthStencilView* GetDepthStencilView() const { return depthStencilView.Get(); }
 
-	//ƒrƒ…[ƒ|[ƒgæ“¾
+	//ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆå–å¾—
 	const D3D11_VIEWPORT& GetViewport() { return viewport; }
 
-	//ƒeƒNƒXƒ`ƒƒ•æ“¾
+	//ãƒ†ã‚¯ã‚¹ãƒãƒ£å¹…å–å¾—
 	inline int GetWidth() const { return texture2dDesc.Width; }
 
-	//ƒeƒNƒXƒ`ƒƒ‚Ì‚‚³æ“¾
+	//ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®é«˜ã•å–å¾—
 	inline int GetHeight() const { return texture2dDesc.Height; }
 
 	enum class DeferredRTV
@@ -53,3 +62,5 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> colorMap;
 	D3D11_TEXTURE2D_DESC texture2dDesc;
 };
+
+#endif // !__GRAHICS_FRAME_BUFFER_H__
