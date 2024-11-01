@@ -5,14 +5,9 @@
 #pragma once
 #endif
 
-#ifndef _WINDOWS_
-#define WIN32_LEAN_AND_MEAN
+#include <WinSock2.h>
 #include <windows.h>
-#undef WIN32_LEAN_AND_MEAN
-#endif
-
-#include <winsock2.h>
-#include <WS2tcpip.h>
+#include <ws2tcpip.h>
 
 #pragma comment( lib, "WS2_32" )
 

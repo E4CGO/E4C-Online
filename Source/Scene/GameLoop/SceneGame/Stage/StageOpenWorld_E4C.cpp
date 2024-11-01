@@ -15,6 +15,10 @@
 #include "TAKOEngine/Tool/GLTFImporter.h"
 #include "TAKOEngine/Tool/Timer.h"
 
+#include "GameObject/Character/Player/PlayerCharacterManager.h"
+
+#include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
+
 static float timer = 0;
 
 void StageOpenWorld_E4C::Initialize()
@@ -27,17 +31,12 @@ void StageOpenWorld_E4C::Initialize()
 
 	map = std::make_unique<gltf_model>(T_GRAPHICS.GetDevice(), "Data/Model/Stage/Terrain_Map.glb");
 
-	PlayerCharacterData::CharacterInfo charInfo = {
-		true,			// visible
-		"",				// save
-		{				//Character
-			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-		}
-	};
-
-	player = std::make_unique<PlayerCharacter>(charInfo);
+	const PlayerCharacterData::CharacterInfo info = PlayerCharacterData::Instance().GetCurrentCharacter();
+	PlayerCharacter* player = PlayerCharacterManager::Instance().UpdatePlayerData(0, "", info.Character.pattern);
 	player->SetPosition({ 5,	10, 5 });
 	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::State::Idle));
+	
+
 
 	teleporter = std::make_unique<Teleporter>("Data/Model/Cube/testCubes.glb", 1.0);
 	teleporter->SetPosition({ 50, 0, 60 });
@@ -88,7 +87,7 @@ void StageOpenWorld_E4C::Initialize()
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(camera);
 	cameraController->SetEnable(true);
-	cameraController->SetPlayer(player.get());
+	cameraController->SetPlayer(player);
 
 	{
 		HRESULT hr;
@@ -110,12 +109,12 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	cameraController->Update(elapsedTime);
 	cameraController->SyncContrllerToCamera(camera);
 
-	player->Update(elapsedTime);
+	PlayerCharacterManager::Instance().Update(elapsedTime);
 	teleporter->Update(elapsedTime);
 	plane->Update(elapsedTime);
 	portal->Update(elapsedTime);
 
-	teleporter->CheckPlayer(player->GetPosition(), elapsedTime);
+	teleporter->CheckPlayer(PlayerCharacterManager::Instance().GetPlayerCharacterById(GAME_DATA.GetClientId())->GetPosition(), elapsedTime);
 
 	if (teleporter->GetPortalReady()) STAGES.stageNumber = 1;
 
@@ -129,7 +128,7 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 			}
 		};
 		//player->
-		player->LoadAppearance(charInfo.Character.pattern);
+		PlayerCharacterManager::Instance().GetPlayerCharacterById(GAME_DATA.GetClientId())->LoadAppearance(charInfo.Character.pattern);
 	}
 
 	timer += elapsedTime;
@@ -153,7 +152,7 @@ void StageOpenWorld_E4C::Render()
 	LightManager::Instance().PushRenderContext(rc);
 
 	// 描画
-	player->Render(rc);
+	PlayerCharacterManager::Instance().Render(rc);
 
 	float time = 0;
 

@@ -7,7 +7,7 @@
 /**************************************************************************//**
  	@brief		性別処理
 	@param[in]	player	プレイヤー参照ポインタ
-	@param[in]	gender	性別	0:男性	1:女性
+	@param[in]	gender	性別	TRUE：男性	FALSE:女性
 	@return		なし
 *//***************************************************************************/
 void PlayerCharacterPatternGender::Execute(Character* chara)

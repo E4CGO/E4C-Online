@@ -1,8 +1,6 @@
 #pragma once
 
-#undef _WINSOCKAPI_
-#define _WINSOCKAPI_
-#include <windows.h>
+#include "TAKOEngine/Network/WinSock2Wrapper.h"
 #include <crtdbg.h>
 
 #define USEDX12

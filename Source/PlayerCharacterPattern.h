@@ -10,9 +10,9 @@ class Character;
 
 /**************************************************************************//**
 	@class	PlayerCharacterPattern
-	@brief	�L�����N�^�[�p�^�[�����N���X
-	@par	[����]
-		�p�^�[���������ăv���C���[�L�����N�^�[��ݒ肷����N���X
+	@brief	プレイヤーキャラクターパターン基底クラス
+	@par	[説明]
+		プレイヤーの外見パターンでキャラクター要素を登録する基底クラス
 *//***************************************************************************/
 class PlayerCharacterPattern
 {
@@ -24,10 +24,26 @@ public:
 };
 
 /**************************************************************************//**
-	@class	PlayerCharacterPatternGender
-	@brief	���ʂɂ���ĈႤ����
-	@par	[����]
+	@class	PlayerCharacterPatternNone
+	@brief	なにもしないパターン
+	@par	[説明]
+		例：何も持っていないパターン
+*//***************************************************************************/
+class PlayerCharacterPatternNone : public PlayerCharacterPattern
+{
+public:
+	PlayerCharacterPatternNone() {};
+	virtual ~PlayerCharacterPatternNone() = default;
 
+	virtual void Execute(Character* chara) {};
+};
+
+
+/**************************************************************************//**
+	@class	PlayerCharacterPatternGender
+	@brief	性別パターン
+	@par	[説明]
+		男性・女性の体・顔・モーションパーツ
 *//***************************************************************************/
 class PlayerCharacterPatternGender : public PlayerCharacterPattern
 {
@@ -41,9 +57,9 @@ private:
 
 /**************************************************************************//**
 	@class	PlayerCharacterPatternSinglePart
-	@brief	�P�ꃂ�f�����������鏈��
-	@par	[����]
-		�ėp�^����
+	@brief	単一モデル実装
+	@par	[説明]
+		単一のモデルを実装するパターン
 *//***************************************************************************/
 class PlayerCharacterPatternSingleModel : public PlayerCharacterPattern
 {

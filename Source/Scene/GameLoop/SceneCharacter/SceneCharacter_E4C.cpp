@@ -41,7 +41,7 @@ void SceneCharacter_E4C::Initialize()
 		true,			// visible
 		"center",		// save
 		{				//Character
-			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+			i, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 		}
 		};
 
