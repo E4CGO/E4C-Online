@@ -22,10 +22,10 @@ namespace SceneGame_E4CState
 		// ステートから出ていくときのメソッド
 		void Exit() override;
 	private:
-		WidgetText* connecting;
-		WidgetText* connectionCount;
-		WidgetText* description;
-		WidgetText* charaDescription;
+		//WidgetText* connecting;
+		//WidgetText* connectionCount;
+		//WidgetText* description;
+		//WidgetText* charaDescription;
 	};
 	// 準備完了ステート（カウントダウン）
 	class ReadyState : public HierarchicalState<SceneGame_E4C>
@@ -92,6 +92,6 @@ namespace SceneGame_E4CState
 		// ステートから出ていくときのメソッド
 		void Exit() override;
 	private:
-		float timer = 5.0f;
+		//float timer = 5.0f;
 	};
 }
