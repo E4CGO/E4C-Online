@@ -62,8 +62,6 @@ private:
 	// フレームバッファマネージャー
 	FrameBufferManager* m_frameBuffer;
 
-	Camera& camera = Camera::Instance();
-
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {
 		"",											// マスク

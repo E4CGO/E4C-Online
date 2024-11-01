@@ -4,6 +4,7 @@
 #include "TAKOEngine/GUI/UIManager.h"
 
 #include "TAKOEngine/Sound/Sound.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 
 #include <imgui.h>
 #include <string>
@@ -45,20 +46,25 @@ void SceneTitle_E4C::Initialize()
 	LightManager::Instance().Register(dl);
 	shadowMapRenderer->SetShadowLight(dl);
 
+	CameraManager& cameramanager = CameraManager::Instance();
+	Camera*mainCamera = new Camera();
+	cameramanager.Register(mainCamera);
+	cameramanager.SetCamera(0);
+
 	// カメラ設定
-	camera.SetPerspectiveFov(
+	CameraManager::Instance().GetCamera()->SetPerspectiveFov(
 		DirectX::XMConvertToRadians(45),		// 画角
 		SCREEN_W / SCREEN_H,					// 画面アスペクト比
 		0.1f,									// ニアクリップ
 		10000.0f								// ファークリップ
 	);
-	camera.SetLookAt(
+	CameraManager::Instance().GetCamera()->SetLookAt(
 		{ -5.661f, 2.5f, 5.584f },				// 視点
 		{ 0.0f, 2.0, 0.0f },					// 注視点
 		{ 0.036f, 0.999f, -0.035f }				// 上ベクトル
 	);
 	cameraController = std::make_unique<FreeCameraController>();
-	cameraController->SyncCameraToController(camera);
+	cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
 	cameraController->SetEnable(false);
 
 	// ステート
@@ -79,6 +85,7 @@ void SceneTitle_E4C::Finalize()
 	UI.Clear();
 	shadowMapRenderer->Clear();
 	Sound::Instance().StopAudio(0);
+	CameraManager::Instance().Clear();
 }
 
 // 更新処理
@@ -91,7 +98,7 @@ void SceneTitle_E4C::Update(float elapsedTime)
 #ifdef _DEBUG
 	// カメラ更新
 	cameraController->Update();
-	cameraController->SyncContrllerToCamera(camera);
+	cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
 #endif // _DEBUG
 
 	UI.Update(elapsedTime);
@@ -107,7 +114,7 @@ void SceneTitle_E4C::Render()
 
 	// 描画コンテキスト設定
 	RenderContext rc;
-	rc.camera = &camera;
+	rc.camera = CameraManager::Instance().GetCamera();
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
@@ -133,11 +140,10 @@ void SceneTitle_E4C::RenderDX12()
 {
 	TentacleLib::graphics.BeginRender();
 	{
-		Camera& camera = Camera::Instance();
-
+		
 		// シーン用定数バッファ更新
 		const Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
-			Camera::Instance());
+			CameraManager::Instance().GetCamera());
 
 		// レンダーコンテキスト設定
 		RenderContextDX12 rc;

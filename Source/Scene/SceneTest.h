@@ -5,6 +5,7 @@
 #include "GameObject/Character/Player/PlayerCharacter.h"
 #include "Map/MapTile.h"
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 
 class SceneTest : public Scene
 {
@@ -22,12 +23,11 @@ public:
 	// 描画処理
 	void Render() override;
 private:
-	Camera& camera = Camera::Instance();
-	//std::unique_ptr<FreeCameraController> cameraController;
+	
 	std::unique_ptr<ThridPersonCameraController> cameraController;
 
 	MapTile* stage;
-	//std::unique_ptr<ModelObject> knight;
+	
 
 	std::unique_ptr<Player> player;
 

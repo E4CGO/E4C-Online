@@ -57,6 +57,7 @@ PlayerCharacter* PlayerCharacterManager::UpdatePlayerData(const uint64_t client_
 		// プレイヤーデータ更新
 		player->SetName(name);
 		player->LoadAppearance(appearance);
+		return player;
 	}
 }
 

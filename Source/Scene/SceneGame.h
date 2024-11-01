@@ -2,6 +2,7 @@
 
 #include "TAKOEngine/Network/NetworkController.h"
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
+#include "TAKOEngine/Editor/Camera/Camera.h"
 
 #include <string>
 #include <unordered_set>
@@ -33,6 +34,13 @@ public:
 	void UpdateConnection();
 	bool UpdateGame(float elapsedTime);
 
+	//カメラの移動値や回転角を保存する
+	void SaveSettings();
+	//保存したカメラの移動値や回転角を出力する
+	void LoadSettings();
+	//カメラのパラメータを触れるようにする
+	void CameraGUI();
+
 	StateMachine<SceneGame>* GetStateMachine() { return stateMachine.get(); }
 	NetworkController* GetNetworkController() { return networkController; }
 
@@ -46,8 +54,7 @@ private:
 
 	NetworkController* networkController = nullptr;
 
-	Camera& camera = Camera::Instance();
-
+	
 	std::unique_ptr<ThridPersonCameraController> cameraController;
 
 	std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer = std::make_unique<PostprocessingRenderer>();
@@ -102,4 +109,35 @@ private:
 		//"Data/Model/Enemy/character_skeleton_warrior.gltf",
 	};
 	std::unordered_set<std::shared_ptr<ModelResource>> modelPreLoad;
+
+	enum CameraMovePar
+	{
+		MoveEyeX,
+		MoveEyeY,
+		MoveEyeZ,
+		MoveDuration,
+		MoveMax
+	};
+	enum CameraRotatePar
+	{
+		Angle,
+		Radius,
+		Speed,
+		RotateMax
+	};
+	float settingValue;
+	float MovePar[CameraMovePar::MoveMax] = { settingValue,settingValue,settingValue,settingValue };
+	float RotatePar[CameraRotatePar::RotateMax] = { settingValue,settingValue,settingValue };
+
+	float transitionTime = 0.0f;
+	float transitionDuration = 2.f;  // 5秒かけて移動
+	int currentSegment = 0;
+	std::vector<DirectX::XMFLOAT3> cameraPositions = {
+	{0,0,0},
+	{5.0f, -1.0f, 2.0f},
+	{2.0f, 3.0f, 4.0f},
+	{3.f,2.f,2.f},
+	{0.f,0.f,1.f}
+	};
+	Camera* mainCamera;
 };

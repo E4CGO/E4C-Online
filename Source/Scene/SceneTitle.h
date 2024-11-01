@@ -4,6 +4,7 @@
 #include "TAKOEngine/Rendering/SpriteDX12.h"
 #include "TAKOEngine/Tool/GLTFImporter.h"
 #include "TAKOEngine/Editor/Camera/FreeCameraController.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 #include "TAKOEngine/AI/StateMachine.h"
 
 #include <unordered_set>
@@ -58,7 +59,6 @@ private:
 	// フレームバッファマネージャー
 	FrameBufferManager* m_frameBuffer;
 
-	Camera& camera = Camera::Instance();
 	std::unique_ptr<FreeCameraController> cameraController;
 
 	// Sprite Preload
@@ -92,6 +92,7 @@ private:
 	DirectX::XMFLOAT3 test_scale = { 1, 1, 1 };
 
 	std::unique_ptr<SpriteDX12>			m_sprites[8];
+
 
 	static float time;
 };

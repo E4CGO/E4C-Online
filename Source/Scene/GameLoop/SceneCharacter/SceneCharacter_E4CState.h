@@ -24,6 +24,7 @@ namespace SceneCharacter_E4CState
 		void Exit() override;
 	private:
 		float timer = 0.0f;
+
 	};
 
 	// タイトルステート
@@ -42,6 +43,7 @@ namespace SceneCharacter_E4CState
 		void Exit() override;
 	private:
 		float timer = 0.0f;
+	
 	};
 
 	// ログインステート

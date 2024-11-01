@@ -1,6 +1,8 @@
 #include "SceneCharacter_E4CState.h"
 
 #include "TAKOEngine/GUI/UIManager.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
+
 #include "PlayerCharacterData.h"
 
 #include "Scene/SceneManager.h"
@@ -136,15 +138,15 @@ void SceneCharacter_E4CState::CharacterCreationStateLeft::Enter()
 	btnStartCharacter->SetSize({ 196.0f * 1.5f, 92.0f * 1.5f });
 	UIManager::Instance().Register(btnStartCharacter);
 
-	Camera& camera = Camera::Instance();
-
-	camera.SetLookAt(
-		{ 6.0, 2.0f, 9.0f },				// 視点
+	CameraManager& cameraManager = CameraManager::Instance();
+	
+	CameraManager::Instance().GetCamera()->SetLookAt(
+		{ 6.0, 2.0f, 9.0f },			// 視点
 		{ -3.0f, 0.0, 0.0f },					// 注視点
 		{ 0.036f, 0.999f, -0.035f }				// 上ベクトル
 	);
 
-	owner->cameraController->SyncCameraToController(camera);
+	owner->cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
 
 	owner->m_previewCharacters[1]->SetMenuVisibility(false);
 	owner->m_previewCharacters[2]->SetMenuVisibility(false);
@@ -168,15 +170,15 @@ void SceneCharacter_E4CState::CharacterCreationStateCenter::Enter()
 	btnStartCharacter->SetSize({ 196.0f * 1.5f, 92.0f * 1.5f });
 	UIManager::Instance().Register(btnStartCharacter);
 
-	Camera& camera = Camera::Instance();
-
-	camera.SetLookAt(
-		{ 0.0, 2.0f, 9.0f },				// 視点
-		{ 0.0f, 0.0, 0.0f },					// 注視点
+	CameraManager& cameraManager = CameraManager::Instance();
+	
+	CameraManager::Instance().GetCamera()->SetLookAt(
+		{ 6.0, 2.0f, 9.0f },			// 視点
+		{ -3.0f, 0.0, 0.0f },					// 注視点
 		{ 0.036f, 0.999f, -0.035f }				// 上ベクトル
 	);
 
-	owner->cameraController->SyncCameraToController(camera);
+	owner->cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
 
 	owner->m_previewCharacters[0]->SetMenuVisibility(false);
 	owner->m_previewCharacters[2]->SetMenuVisibility(false);
@@ -200,15 +202,15 @@ void SceneCharacter_E4CState::CharacterCreationStateRight::Enter()
 	btnStartCharacter->SetSize({ 196.0f * 1.5f, 92.0f * 1.5f });
 	UIManager::Instance().Register(btnStartCharacter);
 
-	Camera& camera = Camera::Instance();
-
-	camera.SetLookAt(
-		{ -6.0, 2.0f, 9.0f },				// 視点
-		{ 3.0f, 0.0, 0.0f },					// 注視点
+	CameraManager& cameraManager = CameraManager::Instance();
+	
+	CameraManager::Instance().GetCamera()->SetLookAt(
+		{ 6.0, 2.0f, 9.0f },			// 視点
+		{ -3.0f, 0.0, 0.0f },					// 注視点
 		{ 0.036f, 0.999f, -0.035f }				// 上ベクトル
 	);
 
-	owner->cameraController->SyncCameraToController(camera);
+	owner->cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
 
 	owner->m_previewCharacters[0]->SetMenuVisibility(false);
 	owner->m_previewCharacters[1]->SetMenuVisibility(false);

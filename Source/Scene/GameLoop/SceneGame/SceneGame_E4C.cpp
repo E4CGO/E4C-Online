@@ -8,6 +8,7 @@
 #include "Map/MapTileManager.h"
 #include "TAKOEngine/Tool/GLTFImporter.h"
 
+
 #include "Source/Scene/Stage/StageManager.h"
 
 #include "SceneGame_E4CState.h"
@@ -26,6 +27,11 @@ void SceneGame_E4C::Initialize()
 
 	//stageDungeon = std::make_unique<TestingStage>();
 	//stageDungeon->Initialize();
+
+	CameraManager& cameraManager = CameraManager::Instance();
+	Camera* mainCamera = new Camera();
+	cameraManager.Register(mainCamera);
+	cameraManager.SetCamera(0);
 
 	//Console::Instance().Open();
 
@@ -54,12 +60,12 @@ void SceneGame_E4C::Finalize()
 	MAPTILES.Clear();
 	STAGES.Clear();
 	PlayerCharacterManager::Instance().Clear();
+	CameraManager::Instance().Clear();
 }
 
 // 更新処理
 void SceneGame_E4C::Update(float elapsedTime)
 {
-
 	stateMachine->Update(elapsedTime);
 
 	stageNumber = STAGES.stageNumber;

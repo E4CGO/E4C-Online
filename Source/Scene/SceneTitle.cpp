@@ -94,7 +94,7 @@ void SceneTitle::Initialize()
 
 			posX += 2;
 		}
-		
+
 		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/button_agree.png");
 	}
 
@@ -103,21 +103,27 @@ void SceneTitle::Initialize()
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
 	shadowMapRenderer->SetShadowLight(dl);
+	Camera* mainCamera = new Camera();
+	CameraManager& cameramanager = CameraManager::Instance();
+	cameramanager.Register(mainCamera);
+	cameramanager.SetCamera(0);
+
 
 	// カメラ設定
-	camera.SetPerspectiveFov(
+
+	CameraManager::Instance().GetCamera()->SetPerspectiveFov(
 		DirectX::XMConvertToRadians(45),		// 画角
 		SCREEN_W / SCREEN_H,					// 画面アスペクト比
 		0.1f,									// ニアクリップ
 		10000.0f								// ファークリップ
 	);
-	camera.SetLookAt(
+	CameraManager::Instance().GetCamera()->SetLookAt(
 		{ -5.661f, 2.5f, 5.584f },				// 視点
 		{ 0.0f, 2.0, 0.0f },					// 注視点
 		{ 0.036f, 0.999f, -0.035f }				// 上ベクトル
 	);
 	cameraController = std::make_unique<FreeCameraController>();
-	cameraController->SyncCameraToController(camera);
+	cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
 	cameraController->SetEnable(false);
 
 	// ステート
@@ -197,7 +203,7 @@ void SceneTitle::Update(float elapsedTime)
 #ifdef _DEBUG
 	// カメラ更新
 	cameraController->Update();
-	cameraController->SyncContrllerToCamera(camera);
+	cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
 #endif // _DEBUG
 
 	UI.Update(elapsedTime);
@@ -213,7 +219,7 @@ void SceneTitle::Render()
 
 	// 描画コンテキスト設定
 	RenderContext rc;
-	rc.camera = &camera;
+	rc.camera = CameraManager::Instance().GetCamera();
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
@@ -245,8 +251,9 @@ void SceneTitle::RenderDX12()
 	T_GRAPHICS.BeginRender();
 	{
 		// シーン用定数バッファ更新
-		const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
-			Camera::Instance());
+		const Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
+			CameraManager::Instance().GetCamera()
+		);
 
 		// レンダーコンテキスト設定
 		RenderContextDX12 rc;
@@ -279,7 +286,7 @@ void SceneTitle::RenderDX12()
 		}
 
 		// 2D描画
-		{ 
+		{
 			SpriteShaderDX12* sprite = T_GRAPHICS.GetSpriteShaderDX12(SpriteShaderDX12Id::Default);
 			if (m_sprites[0] != nullptr)
 			{
@@ -315,7 +322,7 @@ void SceneTitle::RenderDX12()
 			}
 
 			T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
-		}	
+		}
 	}
 	T_GRAPHICS.End();
 }
@@ -331,11 +338,11 @@ void SceneTitle::DrawSceneGUI()
 		if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			// カメラ
-			DirectX::XMFLOAT3 eye = camera.GetEye();
+			DirectX::XMFLOAT3 eye = CameraManager::Instance().GetCamera()->GetEye();
 			ImGui::DragFloat3("Eye", &eye.x, 0.01f, 100.0f);
-			DirectX::XMFLOAT3 focus = camera.GetFocus();
+			DirectX::XMFLOAT3 focus = CameraManager::Instance().GetCamera()->GetFocus();
 			ImGui::DragFloat3("Fcous", &focus.x, 0.01f, 100.0f);
-			DirectX::XMFLOAT3 up = camera.GetUp();
+			DirectX::XMFLOAT3 up = CameraManager::Instance().GetCamera()->GetUp();
 			ImGui::DragFloat3("Up", &up.x, 0.01f, 100.0f);
 		}
 

@@ -1,6 +1,7 @@
 #include "Map/MapTileManager.h"
 #include "Scene/Stage/Stage.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 
 void Stage::Initialize()
 {

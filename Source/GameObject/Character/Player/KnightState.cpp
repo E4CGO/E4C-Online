@@ -2,7 +2,7 @@
 #include "Knight.h"
 #include "Player.h"
 
-// ˆê”ÊUŒ‚ƒXƒe[ƒg
+// ä¸€èˆ¬æ”»æ’ƒã‚¹ãƒ†ãƒ¼ãƒˆ
 void KnightState::AttackNormalState::Enter()
 {
 	owner->SetAnimationSpeed(1.5f);
@@ -13,11 +13,11 @@ void KnightState::AttackNormalState::Execute(float elapsedTime)
 {
 	subState->Execute(elapsedTime);
 
-	// ”½d—Í
+	// åé‡åŠ›
 	owner->StopFall();
 	owner->StopMove();
 
-	if (!owner->GetModel()->IsPlayAnimation()) // UŒ‚ƒ‚[ƒVƒ‡ƒ“I‚í‚è
+	if (!owner->GetModel()->IsPlayAnimation()) // æ”»æ’ƒãƒ¢ãƒ¼ã‚·ãƒ§ãƒ³çµ‚ã‚ã‚Š
 	{
 		owner->GetStateMachine()->ChangeState(static_cast<int>(Player::State::Idle));
 	}
@@ -29,7 +29,7 @@ void KnightState::AttackNormalState::Exit()
 	owner->GetAttackCollider(Knight::AttackCollider::Sword_2)->SetEnable(false);
 	owner->GetAttackCollider(Knight::AttackCollider::Sword_3)->SetEnable(false);
 }
-//  ˆê”ÊUŒ‚1
+//  ä¸€èˆ¬æ”»æ’ƒ1
 void KnightState::AttackNormalState_1::Enter()
 {
 	owner->GetModel()->PlayAnimation(Player::Animation::OneHanded_Melee_Attack_Slice_Diagonal, false, 0.05f);
@@ -50,13 +50,15 @@ void KnightState::AttackNormalState_1::Execute(float elapsedTime)
 		owner->GetAttackCollider(Knight::AttackCollider::Sword_1)->SetEnable(false);
 		owner->GetAttackCollider(Knight::AttackCollider::Sword_2)->SetEnable(false);
 		owner->GetAttackCollider(Knight::AttackCollider::Sword_3)->SetEnable(false);
-		if (owner->InputAttackNormal()) // ƒAƒjƒ[ƒVƒ‡ƒ“75%Š®¬
+		if (owner->InputAttackNormal()) // ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³75%å®Œæˆ
 		{
 			owner->GetStateMachine()->ChangeSubState(Knight::ATTACK_STATE::ATTACK_2);
 		}
 	}
+
+	
 }
-//  ˆê”ÊUŒ‚2
+//  ä¸€èˆ¬æ”»æ’ƒ2
 void KnightState::AttackNormalState_2::Enter()
 {
 	owner->GetModel()->PlayAnimation(Player::Animation::OneHanded_Melee_Attack_Chop, false, 0.05f);
@@ -75,13 +77,13 @@ void KnightState::AttackNormalState_2::Execute(float elapsedTime)
 		owner->GetAttackCollider(Knight::AttackCollider::Sword_1)->SetEnable(false);
 		owner->GetAttackCollider(Knight::AttackCollider::Sword_2)->SetEnable(false);
 		owner->GetAttackCollider(Knight::AttackCollider::Sword_3)->SetEnable(false);
-		if (owner->InputAttackNormal()) // ƒAƒjƒ[ƒVƒ‡ƒ“75%Š®¬
+		if (owner->InputAttackNormal()) // ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³75%å®Œæˆ
 		{
 			owner->GetStateMachine()->ChangeSubState(Knight::ATTACK_STATE::ATTACK_3);
 		}
 	}
 }
-//  ˆê”ÊUŒ‚3
+//  ä¸€èˆ¬æ”»æ’ƒ3
 void KnightState::AttackNormalState_3::Enter()
 {
 	owner->SetAnimationSpeed(1.2f);
@@ -103,7 +105,7 @@ void KnightState::AttackNormalState_3::Execute(float elapsedTime)
 		owner->GetAttackCollider(Knight::AttackCollider::Sword_3)->SetEnable(false);
 	}
 }
-// “ÁŽêUŒ‚ƒXƒe[ƒg
+// ç‰¹æ®Šæ”»æ’ƒã‚¹ãƒ†ãƒ¼ãƒˆ
 void KnightState::AttackSpecialState::Enter()
 {
 	owner->SetAnimationSpeed(2.0f);
@@ -113,9 +115,9 @@ void KnightState::AttackSpecialState::Execute(float elapsedTime)
 {
 	subState->Execute(elapsedTime);
 
-	if (owner->ReleaseAttackSpecial()) // ƒŠƒŠ[ƒX
+	if (owner->ReleaseAttackSpecial()) // ãƒªãƒªãƒ¼ã‚¹
 	{
-		owner->GetStateMachine()->ChangeState(static_cast<int>(Player::State::Idle));	// ‘Ò‹@‚É–ß‚é
+		owner->GetStateMachine()->ChangeState(static_cast<int>(Player::State::Idle));	// å¾…æ©Ÿã«æˆ»ã‚‹
 		return;
 	}
 }
@@ -133,7 +135,7 @@ void KnightState::AttackSpecialStateStart::Execute(float elapsedTime)
 {
 	if (!owner->IsPlayer()) return;
 	PlayerState::PlayerTransition(owner, flag_Skill_1);
-	if (!owner->GetModel()->IsPlayAnimation())  //ƒAƒjƒ[ƒVƒ‡ƒ“I—¹
+	if (!owner->GetModel()->IsPlayAnimation())  //ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³çµ‚äº†
 	{
 		owner->GetStateMachine()->ChangeSubState(Knight::BLOCK_STATE::BLOCKING);
 	}
@@ -164,7 +166,7 @@ void KnightState::AttackSpecialStateAttack::Execute(float elapsedTime)
 		owner->GetAttackCollider(Knight::AttackCollider::Shield)->SetEnable(true);
 	}
 
-	if (!owner->GetModel()->IsPlayAnimation())  //ƒAƒjƒ[ƒVƒ‡ƒ“I—¹
+	if (!owner->GetModel()->IsPlayAnimation())  //ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³çµ‚äº†
 	{
 		owner->GetStateMachine()->ChangeSubState(Knight::BLOCK_STATE::BLOCKING);
 	}
@@ -181,12 +183,12 @@ void KnightState::AttackSpecialStateHit::Enter()
 void KnightState::AttackSpecialStateHit::Execute(float elapsedTime)
 {
 	if (!owner->IsPlayer()) return;
-	if (!owner->GetModel()->IsPlayAnimation())  //ƒAƒjƒ[ƒVƒ‡ƒ“I—¹
+	if (!owner->GetModel()->IsPlayAnimation())  //ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³çµ‚äº†
 	{
 		owner->GetStateMachine()->ChangeSubState(Knight::BLOCK_STATE::BLOCKING);
 	}
 }
-// ƒXƒLƒ‹_1ƒXƒe[ƒg
+// ã‚¹ã‚­ãƒ«_1ã‚¹ãƒ†ãƒ¼ãƒˆ
 void KnightState::Skill1State::Enter()
 {
 	owner->SetAnimationSpeed(2.0f);
@@ -198,7 +200,7 @@ void KnightState::Skill1State::Enter()
 	DirectX::XMFLOAT3 impulse = { inputDirection.x, 0, inputDirection.y };
 	owner->AddImpulse(impulse * 20.0f);
 
-	// ‚Õ“Ë”»’è
+	// ç›¾è¡çªåˆ¤å®š
 	owner->GetAttackCollider(Knight::AttackCollider::Shield)->SetEnable(true);
 
 	owner->SkillCost(static_cast<int>(Player::State::Skill_1));
