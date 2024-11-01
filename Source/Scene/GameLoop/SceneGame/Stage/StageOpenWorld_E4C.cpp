@@ -70,6 +70,7 @@ void StageOpenWorld_E4C::Initialize()
 	Camera* mainCamera = new Camera();
 	cameraManager.Register(mainCamera);
 	cameraManager.SetCamera(0);
+	
 	// カメラ設定
 	CameraManager::Instance().GetCamera()->SetPerspectiveFov(
 		DirectX::XMConvertToRadians(45),							// 画角
@@ -82,6 +83,7 @@ void StageOpenWorld_E4C::Initialize()
 		{ 0, 0, 0 },	// 注視点
 		{ 0, 0.969f, -0.248f } // 上ベクトル
 	);
+	
 
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
@@ -121,10 +123,11 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	else
 	{
 		cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
-		CameraManager::Instance().GetCamera()->GetSegment() = 0;
 		cameraController->Update(elapsedTime);
+		CameraManager::Instance().GetCamera()->GetSegment() = 0;
 		transitionTime = 0;
 	}
+	
 
 	player->Update(elapsedTime);
 	//teleporter->Update(elapsedTime);
@@ -158,7 +161,7 @@ void StageOpenWorld_E4C::Render()
 #ifdef _DEBUG
 	{
 		T_GRAPHICS.GetDebugRenderer()->DrawSphere(cameraPositions, 2, { 1,0,0,1 });
-
+		T_GRAPHICS.GetDebugRenderer()->DrawSphere(CameraManager::Instance().GetCamera(0)->GetEye(), 2, {1,1,0,1});
 	}
 #endif // _DEBUG
 

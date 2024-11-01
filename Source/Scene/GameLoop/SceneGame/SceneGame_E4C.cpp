@@ -27,6 +27,7 @@ void SceneGame_E4C::Initialize()
 void SceneGame_E4C::Finalize()
 {
 	LightManager::Instance().Clear();
+	CameraManager::Instance().Clear();
 }
 
 // 更新処理
