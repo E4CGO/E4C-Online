@@ -17,11 +17,18 @@ void SceneGame_E4C::Initialize()
 	stateMachine->RegisterState(GAME_STATE::DUNGEON, new SceneGame_E4CState::WaitingState(this));
 	stateMachine->SetState(GAME_STATE::OPENWORLD);
 
-	stageDungeon = std::make_unique<TestingStage>();
-	stageDungeon->Initialize();
+	//stageDungeon = std::make_unique<TestingStage>();
+	//stageDungeon->Initialize();
+
+	CameraManager& cameraManager = CameraManager::Instance();
+	Camera* mainCamera = new Camera();
+	cameraManager.Register(mainCamera);
+	cameraManager.SetCamera(0);
 
 	stageOpenWorld = std::make_unique<StageOpenWorld_E4C>();
 	stageOpenWorld->Initialize();
+
+	
 }
 
 void SceneGame_E4C::Finalize()

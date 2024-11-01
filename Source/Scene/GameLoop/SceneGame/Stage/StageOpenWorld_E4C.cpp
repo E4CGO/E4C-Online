@@ -66,10 +66,7 @@ void StageOpenWorld_E4C::Initialize()
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
-	CameraManager& cameraManager = CameraManager::Instance();
-	Camera* mainCamera = new Camera();
-	cameraManager.Register(mainCamera);
-	cameraManager.SetCamera(0);
+	
 	
 	// カメラ設定
 	CameraManager::Instance().GetCamera()->SetPerspectiveFov(

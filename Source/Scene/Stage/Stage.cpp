@@ -11,7 +11,6 @@ void Stage::Initialize()
 
 	MAPTILES.Clear();
 	ENEMIES.Clear();
-	CameraManager::Instance().Clear();
 	enemyList.clear();
 }
 
