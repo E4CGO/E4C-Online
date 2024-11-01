@@ -228,6 +228,8 @@ protected:
 		0, 0, 0, 1
 	};
 
+	DirectX::XMFLOAT2 sides[4];	// 当たり判定用の辺
+
 	std::vector<TILE_DATA> m_tileDatas;
 	std::vector<CONNECTPOINT_DATA> m_connectPointDatas;
 	std::vector<DungeonData::RoomType> m_connectableRooms;
