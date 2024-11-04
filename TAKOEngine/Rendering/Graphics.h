@@ -24,6 +24,7 @@
 #include "TAKOEngine/Rendering/Descriptor.h"
 #include "TAKOEngine/Rendering/ConstantBuffer.h"
 #include "TAKOEngine/Tool/ImGuiRenderer.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 
 #define MAX_BUFFER_COUNT (2)
 
@@ -225,7 +226,7 @@ public:
 
 	void FinishDX12();
 
-	const Descriptor* UpdateSceneConstantBuffer(const Camera& camera);
+	const Descriptor* UpdateSceneConstantBuffer(const Camera* camera);
 
 	// テクスチャ読み込み
 	HRESULT LoadTexture(const char* filename, ID3D12Resource** d3d_resource);
@@ -299,7 +300,6 @@ private:
 
 	std::unique_ptr<DebugRenderer>					debugRenderer;
 	std::unique_ptr<LineRenderer>					lineRenderer;
-
 	//スキニング
 	std::unique_ptr<SkinningPipeline>	m_skinning_pipeline;
 

@@ -17,6 +17,7 @@ public:
 
 	// ‹…•`‰æ
 	void DrawSphere(const DirectX::XMFLOAT3& center, float radius, const DirectX::XMFLOAT4& color);
+	void DrawSphere(const std::vector<DirectX::XMFLOAT3>& centers, float radius, const DirectX::XMFLOAT4& color);
 
 	// ‰~’Œ•`‰æ
 	void DrawCylinder(const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color);

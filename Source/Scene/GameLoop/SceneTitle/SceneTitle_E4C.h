@@ -49,7 +49,6 @@ private:
 	// フレームバッファマネージャー
 	FrameBufferManager* m_frameBuffer;
 
-	Camera& camera = Camera::Instance();
 	std::unique_ptr<FreeCameraController> cameraController;
 
 	// Sprite Preload

@@ -3,6 +3,8 @@
 #include <fstream>
 
 #include "TAKOEngine/GUI/UIManager.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
+
 #include "PlayerCharacterData.h"
 
 #include "Scene/SceneManager.h"
@@ -254,9 +256,10 @@ void SceneCharacter_E4CState::CharacterCreationState::Enter()
 		cameraSettings.at(SceneCharacter_E4CState::currentState).at(0),
 		cameraSettings.at(SceneCharacter_E4CState::currentState).at(1),
 		cameraSettings.at(SceneCharacter_E4CState::currentState).at(2)
+	CameraManager& cameraManager = CameraManager::Instance();
 	);
 
-	owner->cameraController->SyncCameraToController(camera);
+	owner->cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
 
 	auto CurrentData = PLAYER_CHARACTER_DATA.GetCharacterInfosData();
 
@@ -320,6 +323,7 @@ void SceneCharacter_E4CState::CharacterCreationState::Enter()
 		(SCREEN_W - size.x) / 1.2f,
 		(SCREEN_H - size.y) / 2.0f
 	};
+	owner->cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
 
 	float optionHeight = size.y / 5.0f;
 	DirectX::XMFLOAT2 optionPos = { position.x + 20.0f, 20.0f };

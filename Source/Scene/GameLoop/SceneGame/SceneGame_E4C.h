@@ -33,9 +33,6 @@ private:
 		DUNGEON,
 	};
 
-	std::unique_ptr<Stage> stageOpenWorld;
-	std::unique_ptr<Stage> stageDungeon;
-
 	std::unique_ptr<StateMachine<SceneGame_E4C>> stateMachine;
 
 	int stageNumber = 0;
