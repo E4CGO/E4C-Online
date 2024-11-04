@@ -12,10 +12,13 @@
 
 #include "GameData.h"
 
-//テスト用
+// ディフォルト値
 float SceneCharacter_E4C::m_time{ 0 };
 const int SceneCharacter_E4C::m_maxCharacters{ 3 };
 
+/**************************************************************************//**
+	@brief	初期化
+*//***************************************************************************/
 void SceneCharacter_E4C::Initialize()
 {
 	// Sprite Resource Preload
@@ -66,6 +69,9 @@ void SceneCharacter_E4C::Initialize()
 	stateMachine->SetState(STATE::INIT);
 }
 
+/**************************************************************************//**
+	@brief 終わり
+*//***************************************************************************/
 void SceneCharacter_E4C::Finalize()
 {
 	spritePreLoad.clear();
@@ -73,7 +79,10 @@ void SceneCharacter_E4C::Finalize()
 	shadowMapRenderer->Clear();
 }
 
-// 更新処理
+/**************************************************************************//**
+	@brief		 更新処理
+	@param[in]    elapsedTime
+*//***************************************************************************/
 void SceneCharacter_E4C::Update(float elapsedTime)
 {
 	m_time += elapsedTime;
@@ -95,7 +104,9 @@ void SceneCharacter_E4C::Update(float elapsedTime)
 	UI.Update(elapsedTime);
 }
 
-// 描画処理
+/**************************************************************************//**
+	@brief	 描画処理
+*//***************************************************************************/
 void SceneCharacter_E4C::Render()
 {
 	T_TEXT.Begin();
@@ -135,6 +146,9 @@ void SceneCharacter_E4C::Render()
 #endif // _DEBUG
 }
 
+/**************************************************************************//**
+	@brief	DX12描画処理
+*//***************************************************************************/
 void SceneCharacter_E4C::RenderDX12()
 {
 	TentacleLib::graphics.BeginRender();
@@ -161,10 +175,19 @@ void SceneCharacter_E4C::RenderDX12()
 	TentacleLib::graphics.End();
 }
 
+/**************************************************************************//**
+	@brief		キャラコントロール
+	@param[in]    characterNumber
+	@param[in]    modelType
+	@param[in]    value
+*//***************************************************************************/
 void SceneCharacter_E4C::UpdateCurrentModel(int characterNumber, int modelType, int value)
 {
 }
 
+/**************************************************************************//**
+	@brief	ディバッグ描画
+*//***************************************************************************/
 void SceneCharacter_E4C::DrawSceneGUI()
 {
 	ImVec2 pos = ImGui::GetMainViewport()->Pos;

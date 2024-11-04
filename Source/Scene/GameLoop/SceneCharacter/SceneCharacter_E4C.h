@@ -1,4 +1,10 @@
-#pragma once
+//! @file SceneCharacter_E4C.h
+//! @note　シーンキャラクリ
+
+#ifndef __SCENE_CHARACTER_E4C_H__
+#define __SCENE_CHARACTER_E4C_H__
+
+#include <unordered_set>
 
 #include "TAKOEngine/Rendering/Model/ModelDX12.h"
 #include "TAKOEngine/Rendering/SpriteDX12.h"
@@ -8,13 +14,13 @@
 #include "PlayerCharacterData.h"
 #include "GameObject/Character/Player/NonPlayerCharacter.h"
 #include "GameObject/Character/Player/PlayerCharacter.h"
-
-#include <unordered_set>
-
-// テスト用
-#include "GameObject/ModelObject.h"
 #include "Scene/Scene.h"
 
+/**************************************************************************//**
+	@class	SceneCharacter_E4C
+	@brief	キャラクリを管理するシーン
+	@par    [説明]
+*//***************************************************************************/
 class SceneCharacter_E4C : public Scene
 {
 public:
@@ -75,3 +81,5 @@ private:
 
 	static float m_time;
 };
+
+#endif // __SCENE_CHARACTER_E4C_H__

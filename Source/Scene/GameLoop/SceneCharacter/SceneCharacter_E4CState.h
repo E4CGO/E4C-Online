@@ -12,6 +12,7 @@
 
 namespace SceneCharacter_E4CState
 {
+	// UIとプレイヤーデーター変数
 	static WidgetButtonImage* btnCharacterLeft = nullptr;
 	static WidgetButtonImage* btnCharacterCenter = nullptr;
 	static WidgetButtonImage* btnCharacterRight = nullptr;
@@ -53,7 +54,11 @@ namespace SceneCharacter_E4CState
 		{{3.5f, 0.0f, 5.0f}, {0.0f, 0.0f, 5.0f}, {-3.5f, 0.0f, 5.0f},}
 	};
 
-	// タイトルステート
+	/**************************************************************************//**
+		@class	InitState
+		@brief	初期化とJSONからデーターを読み込み
+		@par    [説明]
+	*//***************************************************************************/
 	class InitState : public HierarchicalState<SceneCharacter_E4C>
 	{
 	public:
@@ -71,7 +76,11 @@ namespace SceneCharacter_E4CState
 		float timer = 0.0f;
 	};
 
-	// タイトルステート
+	/**************************************************************************//**
+		@class	CharacterSelectionState
+		@brief	キャラセレクト
+		@par    [説明]
+	*//***************************************************************************/
 	class CharacterSelectionState : public HierarchicalState<SceneCharacter_E4C>
 	{
 	public:
@@ -92,7 +101,11 @@ namespace SceneCharacter_E4CState
 		void setCurrentStateRight();
 	};
 
-	// ログインステート
+	/**************************************************************************//**
+		@class	CharacterCreationState
+		@brief	キャラクリ
+		@par    [説明]
+	*//***************************************************************************/
 	class CharacterCreationState : public HierarchicalState<SceneCharacter_E4C>
 	{
 	public:
@@ -110,7 +123,11 @@ namespace SceneCharacter_E4CState
 		bool clicked = false;
 	};
 
-	// タイトルステート
+	/**************************************************************************//**
+		@class	StartState
+		@brief	ゲームを始める
+		@par    [説明]
+	*//***************************************************************************/
 	class StartState : public HierarchicalState<SceneCharacter_E4C>
 	{
 	public:

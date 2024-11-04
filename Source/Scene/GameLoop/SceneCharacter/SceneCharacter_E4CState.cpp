@@ -8,8 +8,9 @@
 #include "Scene/SceneManager.h"
 #include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
 
-#include "Source/UI/Widget/WidgetDragFloat.h"
 #include "Source/UI/Widget/WidgetButton.h"
+#include "Source/UI/Widget/WidgetDragFloat.h"
+#include "Source/UI/Widget/WidgetUpDown.h"
 
 using namespace SceneCharacter_E4CState;
 
@@ -18,6 +19,9 @@ inline bool FileExist(const std::string& name) {
 	return f.good();
 }
 
+/**************************************************************************//**
+	@brief    データーを読み込みまたはデーターを初期化
+*//***************************************************************************/
 void SceneCharacter_E4CState::InitState::Enter()
 {
 	if (!FileExist("CharacterInfos.json"))
@@ -104,16 +108,25 @@ void SceneCharacter_E4CState::InitState::Enter()
 	PLAYER_CHARACTER_DATA.ParseData();
 }
 
+/**************************************************************************//**
+	@brief		キャラクリに移動
+	@param[in]    elapsedTime
+*//***************************************************************************/
 void SceneCharacter_E4CState::InitState::Execute(float elapsedTime)
 {
 	owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::CHARACTERSELECTION);
 }
 
+/**************************************************************************//**
+	@brief	終わり
+*//***************************************************************************/
 void SceneCharacter_E4CState::InitState::Exit()
 {
 }
 
-// タイトルステート
+/**************************************************************************//**
+	@brief	全てキャラを描画と選択
+*//***************************************************************************/
 void SceneCharacter_E4CState::CharacterSelectionState::Enter()
 {
 	Camera& camera = Camera::Instance();
@@ -185,34 +198,54 @@ void SceneCharacter_E4CState::CharacterSelectionState::Enter()
 			it->SetMenuVisibility(true);
 	}
 }
+/**************************************************************************//**
+	@brief		実行
+	@param[in]    elapsedTime
+*//***************************************************************************/
+
 void SceneCharacter_E4CState::CharacterSelectionState::Execute(float elapsedTime)
 {
 }
+/**************************************************************************//**
+	@brief	終わり
+*//***************************************************************************/
+
 void SceneCharacter_E4CState::CharacterSelectionState::Exit()
 {
 	UI.Clear();
 	SetCursor(::LoadCursor(NULL, IDC_HAND));
 }
 
+/**************************************************************************//**
+	@brief	左キャラを選択
+*//***************************************************************************/
 void SceneCharacter_E4CState::CharacterSelectionState::setCurrentStateLeft()
 {
 	SceneCharacter_E4CState::currentState = 0;
 	owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::CHARACTERCREATION);
 }
 
+/**************************************************************************//**
+	@brief	中キャラを選択
+*//***************************************************************************/
 void SceneCharacter_E4CState::CharacterSelectionState::setCurrentStateCenter()
 {
 	SceneCharacter_E4CState::currentState = 1;
 	owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::CHARACTERCREATION);
 }
 
+/**************************************************************************//**
+	@brief	右キャラを選択
+*//***************************************************************************/
 void SceneCharacter_E4CState::CharacterSelectionState::setCurrentStateRight()
 {
 	SceneCharacter_E4CState::currentState = 2;
 	owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::CHARACTERCREATION);
 }
 
-// タイトルステート
+/**************************************************************************//**
+	@brief	キャラクリ
+*//***************************************************************************/
 void SceneCharacter_E4CState::CharacterCreationState::Enter()
 {
 	Camera& camera = Camera::Instance();
@@ -277,29 +310,35 @@ void SceneCharacter_E4CState::CharacterCreationState::Enter()
 	SceneCharacter_E4CState::btnStartCharacter->SetSize({ 196.0f * 1.5f, 92.0f * 1.5f });
 	UIManager::Instance().Register(SceneCharacter_E4CState::btnStartCharacter);
 
-	WidgetDragFloat* drag = new WidgetDragFloat("GENDER", &SceneCharacter_E4CState::currentCharacterInfo.Character.pattern[PlayerCharacterData::APPEARANCE_PATTERN::GENDER], 0.0f, 1.5f);
-	WidgetDragFloat* drag2 = new WidgetDragFloat("WEAPON", &SceneCharacter_E4CState::currentCharacterInfo.Character.pattern[PlayerCharacterData::APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT], 0.0f, 2.5f);
+	WidgetUpDown* GenderSelector = new WidgetUpDown("GENDER", &SceneCharacter_E4CState::currentCharacterInfo.Character.pattern[PlayerCharacterData::APPEARANCE_PATTERN::GENDER], 0, 1);
+	WidgetUpDown* WeaponSelector = new WidgetUpDown("WEAPON", &SceneCharacter_E4CState::currentCharacterInfo.Character.pattern[PlayerCharacterData::APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT], 0, 2);
 
-	SceneCharacter_E4CState::background = RESOURCE.LoadSpriteResource("Data/Sprites/bar_ready.png");
+	SceneCharacter_E4CState::background = RESOURCE.LoadSpriteResource("Data/Sprites/UI/keybinds/key_Left.png");
 	DirectX::XMFLOAT2 size = SceneCharacter_E4CState::background->GetTextureSize() * 0.2f;
 
 	DirectX::XMFLOAT2 position = {
-	(SCREEN_W - size.x) / 2.0f,
-	(SCREEN_H - size.y) / 2.0f
+		(SCREEN_W - size.x) / 1.2f,
+		(SCREEN_H - size.y) / 2.0f
 	};
 
-	float optionHeight = size.y / 10.0f;
+	float optionHeight = size.y / 5.0f;
 	DirectX::XMFLOAT2 optionPos = { position.x + 20.0f, 20.0f };
+	DirectX::XMFLOAT2 optionPos2 = { position.x + 20.0f, 120.0f };
 
-	drag->SetSize({ size.x - 40.0f , optionHeight });
-	drag2->SetSize({ size.x - 40.0f , optionHeight });
-	drag->SetPosition(optionPos);
-	drag2->SetPosition({ optionPos.x, optionPos.y + 60.0f });
+	GenderSelector->SetSize({ size.x - 40.0f , optionHeight });
+	WeaponSelector->SetSize({ size.x - 40.0f , optionHeight });
 
-	UIManager::Instance().Register(drag);
-	UIManager::Instance().Register(drag2);
-	
+	GenderSelector->SetPosition(optionPos);
+	WeaponSelector->SetPosition(optionPos2);
+
+	UIManager::Instance().Register(GenderSelector);
+	UIManager::Instance().Register(WeaponSelector);
 }
+
+/**************************************************************************//**
+	@brief		キャラ設定を変わる
+	@param[in]    elapsedTime
+*//***************************************************************************/
 void SceneCharacter_E4CState::CharacterCreationState::Execute(float elapsedTime)
 {
 	for (size_t i = 0; i < PlayerCharacterData::APPEARANCE_PATTERN::NUM; i++)
@@ -311,6 +350,10 @@ void SceneCharacter_E4CState::CharacterCreationState::Execute(float elapsedTime)
 		}
 	}
 }
+
+/**************************************************************************//**
+	@brief	終わり、データーをPLAYER_CHARACTER_DATAとJSONにセーブ
+*//***************************************************************************/
 void SceneCharacter_E4CState::CharacterCreationState::Exit()
 {
 	auto CurrentData = PLAYER_CHARACTER_DATA.GetCharacterInfosData();
@@ -327,15 +370,25 @@ void SceneCharacter_E4CState::CharacterCreationState::Exit()
 	SetCursor(::LoadCursor(NULL, IDC_HAND));
 }
 
-// タイトルステート
+/**************************************************************************//**
+	@brief	ゲームを始まり
+*//***************************************************************************/
 void SceneCharacter_E4CState::StartState::Enter()
 {
-	PLAYER_CHARACTER_DATA.SaveData();
 }
+
+/**************************************************************************//**
+	@brief		シーンゲームに移動
+	@param[in]    elapsedTime
+*//***************************************************************************/
 void SceneCharacter_E4CState::StartState::Execute(float elapsedTime)
 {
 	SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame_E4C));
 }
+
+/**************************************************************************//*
+	@brief	終わり
+*//***************************************************************************/
 void SceneCharacter_E4CState::StartState::Exit()
 {
 	UI.Clear();

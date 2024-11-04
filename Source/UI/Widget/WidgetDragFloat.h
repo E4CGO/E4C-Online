@@ -29,7 +29,6 @@ class WidgetDragFloat : public Widget
 {
 public:
 	WidgetDragFloat(const char* label, float* value, float minValue, float maxValue);
-	WidgetDragFloat(const char* label, uint8_t* uvalue, float minValue, float maxValue);
 	~WidgetDragFloat() { delete bar; };
 
 	void Update(float elapsedTime) override;
@@ -40,8 +39,6 @@ public:
 private:
 	std::string label;
 	float* value;
-	uint8_t* uvalue;
-	float newrate;
 	float minValue;
 	float maxValue;
 	WidgetDragBar* bar;
