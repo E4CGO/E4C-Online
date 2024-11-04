@@ -21,9 +21,13 @@ void SceneGame_E4C::Initialize()
 	//stageDungeon->Initialize();
 
 	CameraManager& cameraManager = CameraManager::Instance();
+	Camera* DebugCamera = new Camera();
+	cameraManager.Register(DebugCamera);
+	cameraManager.SetCamera(0);
+
 	Camera* mainCamera = new Camera();
 	cameraManager.Register(mainCamera);
-	cameraManager.SetCamera(0);
+	cameraManager.SetCamera(1);
 
 	stageOpenWorld = std::make_unique<StageOpenWorld_E4C>();
 	stageOpenWorld->Initialize();

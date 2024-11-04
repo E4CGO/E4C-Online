@@ -37,6 +37,8 @@ public:
 		NORMAL,
 	};
 private:
+	std::unique_ptr<FreeCameraController> DebugcameraController;
+
 	std::unique_ptr<ThridPersonCameraController> cameraController;
 
 	MapTile* stage_collision;
@@ -61,4 +63,7 @@ private:
 		{5,3,4},
 		{8,3,8}
 	};
+
+
+	bool DebugCameraMode = false;
 };
