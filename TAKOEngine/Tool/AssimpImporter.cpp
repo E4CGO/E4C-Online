@@ -215,7 +215,7 @@ void AssimpImporter::LoadMeshes(MeshList& meshes, const NodeList& nodes, const a
 			}
 		}
 
-    // インデックスデータ
+		// インデックスデータ
 		int32_t indexOffset = mesh.indices.size();
 		for (uint32_t aFaceIndex = 0; aFaceIndex < aMesh->mNumFaces; ++aFaceIndex)
 		{
@@ -226,12 +226,12 @@ void AssimpImporter::LoadMeshes(MeshList& meshes, const NodeList& nodes, const a
 			mesh.indices[index + 2] = aFace.mIndices[0];
 		}
 
-		// �T�u�Z�b�g�f�[�^
+		// サブセットデータ
 		ModelResource::Subset subset;
 		subset.startIndex = mesh.indices.size();
 		subset.indexCount = aMesh->mNumFaces * 3;
 		subset.materialIndex = mesh.materialIndex;
-		subset.material      = nullptr;
+		subset.material = nullptr;
 
 		mesh.subsets.push_back(subset);
 
