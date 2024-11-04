@@ -24,21 +24,21 @@ void StageOpenWorld_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
 
-	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
+	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.025f);
 	stage_collision->Update(0);
 	MAPTILES.Register(stage_collision);
 
 	map = std::make_unique<gltf_model>(T_GRAPHICS.GetDevice(), "Data/Model/Stage/Terrain_Map.glb");
 
-	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
-	player->SetPosition({ 5.0f, 0.0f, 5.0f });
+	const PlayerCharacterData::CharacterInfo info = PlayerCharacterData::Instance().GetCurrentCharacter();
+	PlayerCharacter* player = PlayerCharacterManager::Instance().UpdatePlayerData(0, "", info.Character.pattern);
+	player->SetPosition({ 5,	10, 5 });
 	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::State::Idle));
 
 	teleporter = std::make_unique<Teleporter>("Data/Model/Cube/testCubes.glb", 1.0);
 	teleporter->SetPosition({ 50, 0, 60 });
 
 	{
-
 		std::array<DirectX::XMFLOAT3, 4 > positions = {
 		DirectX::XMFLOAT3{ 10.0f, 10.0f, 5.0f},
 		DirectX::XMFLOAT3{ 10.0f, 20.0f, 5.0f },
@@ -136,19 +136,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 
 	if (teleporter->GetPortalReady()) STAGES.ChangeStage(new TestingStage);
 
-	if (T_INPUT.KeyDown(VK_F2))
-	{
-		PlayerCharacterData::CharacterInfo charInfo = {
-			true,			// visible
-			"",				// save
-			{				//Character
-				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
-			}
-		};
-		//player->
-		PlayerCharacterManager::Instance().GetPlayerCharacterById(GAME_DATA.GetClientId())->LoadAppearance(charInfo.Character.pattern);
-	}
-
 	timer += elapsedTime;
 }
 
@@ -211,7 +198,7 @@ void StageOpenWorld_E4C::Render()
 		float scale_factor = 1.0f;
 
 		DirectX::XMMATRIX C{ DirectX::XMLoadFloat4x4(&coordinate_system_transforms[0]) * DirectX::XMMatrixScaling(scale_factor, scale_factor, scale_factor) };
-		DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(1.0, 1.0f, 1.0f) };
+		DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(2.5, 2.5f, 2.5f) };
 		DirectX::XMMATRIX R{ DirectX::XMMatrixRotationRollPitchYaw(0.0f, 0.0f, 0.0f) };
 		DirectX::XMMATRIX T{ DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f) };
 
@@ -246,6 +233,7 @@ void StageOpenWorld_E4C::Render()
 	plane->Render(rc);
 	portal->Render(rc);
 
+	//MAPTILES.Render(rc);
 	//if (ImGui::TreeNode("Camera Positions"))
 	//{
 	//	for (size_t i = 0; i < cameraPositions.size(); ++i)
