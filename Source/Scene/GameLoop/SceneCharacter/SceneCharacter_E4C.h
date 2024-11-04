@@ -54,13 +54,13 @@ public:
 
 	std::vector<std::unique_ptr<NonPlayerCharacter>> m_previewCharacters;
 
-	
 private:
 	std::unique_ptr<StateMachine<SceneCharacter_E4C>> stateMachine;
 
 	std::unique_ptr<myRenderer::shadow::ShadowMapRender> shadowMapRenderer = std::make_unique<myRenderer::shadow::ShadowMapRender>();
 
-	
+	// フレームバッファマネージャー
+	FrameBufferManager* m_frameBuffer;
 
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {

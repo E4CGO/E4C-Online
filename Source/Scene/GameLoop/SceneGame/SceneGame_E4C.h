@@ -4,6 +4,7 @@
 #include "Scene/Stage/Stage.h"
 #include "TAKOEngine/AI/StateMachine.h"
 
+#include "Network/OnlineController.h"
 
 class SceneGame_E4C : public Scene
 {
@@ -22,7 +23,8 @@ public:
 	void Render() override;
 
 	StateMachine<SceneGame_E4C>* GetStateMachine() { return stateMachine.get(); }
-
+	
+	Online::OnlineController* GetOnlineController() { return m_ponlineController; };
 private:
 
 	enum GAME_STATE
@@ -37,4 +39,6 @@ private:
 	std::unique_ptr<StateMachine<SceneGame_E4C>> stateMachine;
 
 	int stageNumber = 0;
+
+	Online::OnlineController* m_ponlineController;
 };

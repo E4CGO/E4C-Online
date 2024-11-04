@@ -7,21 +7,21 @@
 /**************************************************************************//**
  	@brief		性別処理
 	@param[in]	player	プレイヤー参照ポインタ
-	@param[in]	gender	性別	0:男性	1:女性
+	@param[in]	gender	性別	TRUE：男性	FALSE:女性
 	@return		なし
 *//***************************************************************************/
-void PlayerCharacterPatternGender::Execute(Player* player)
+void PlayerCharacterPatternGender::Execute(Character* chara)
 {
-	player->LoadModel("Data/Model/Character/BarbarianAnim.glb");
+	chara->LoadModel("Data/Model/Character/BarbarianAnim.glb");
 	if (m_isMale) // MALE
 	{
-		player->LoadModel("Data/Model/Character/HEAD_BARB.glb");
-		player->LoadModel("Data/Model/Character/BODY_BARB.glb");
+		chara->LoadModel("Data/Model/Character/HEAD_BARB.glb");
+		chara->LoadModel("Data/Model/Character/BODY_BARB.glb");
 	}
 	else //FEMALE
 	{
-		player->LoadModel("Data/Model/Character/HEAD_MAGE.glb");
-		player->LoadModel("Data/Model/Character/BODY_MAGE.glb");
+		chara->LoadModel("Data/Model/Character/HEAD_MAGE.glb");
+		chara->LoadModel("Data/Model/Character/BODY_MAGE.glb");
 	}
 }
 
@@ -30,7 +30,7 @@ void PlayerCharacterPatternGender::Execute(Player* player)
 	@param[in]	player	プレイヤー参照ポインタ
 	@return		なし
 *//***************************************************************************/
-void PlayerCharacterPatternSingleModel::Execute(Player* player)
+void PlayerCharacterPatternSingleModel::Execute(Character* chara)
 {
-	player->LoadModel(m_filename.c_str());
+	chara->LoadModel(m_filename.c_str());
 }

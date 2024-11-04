@@ -15,6 +15,10 @@
 #include "TAKOEngine/Tool/GLTFImporter.h"
 #include "TAKOEngine/Tool/Timer.h"
 
+#include "GameObject/Character/Player/PlayerCharacterManager.h"
+
+#include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
+
 static float timer = 0;
 
 void StageOpenWorld_E4C::Initialize()
@@ -27,39 +31,39 @@ void StageOpenWorld_E4C::Initialize()
 
 	map = std::make_unique<gltf_model>(T_GRAPHICS.GetDevice(), "Data/Model/Stage/Terrain_Map.glb");
 
-	PlayerCharacterData::CharacterInfo charInfo = {
-		true,			// visible
-		"",				// save
-		{				//Character
-			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-		}
-	};
-
-	player = std::make_unique<PlayerCharacter>(charInfo);
+	const PlayerCharacterData::CharacterInfo info = PlayerCharacterData::Instance().GetCurrentCharacter();
+	PlayerCharacter* player = PlayerCharacterManager::Instance().UpdatePlayerData(0, "", info.Character.pattern);
 	player->SetPosition({ 5,	10, 5 });
 	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::State::Idle));
+	
 
-	//teleporter = std::make_unique<Teleporter>("Data/Model/Cube/testCubes.glb", 1.0);
-	//teleporter->SetPosition({ 50, 0, 60 });
 
-	std::array<DirectX::XMFLOAT3, 4 > positions = {
-	DirectX::XMFLOAT3{ 10.0f, 10.0f, 5.0f},
-	DirectX::XMFLOAT3{ 10.0f, 20.0f, 5.0f },
-	DirectX::XMFLOAT3{ 5.0f, 10.0f, 5.0f },
-	DirectX::XMFLOAT3{ 5.0f, 20.0f, 5.0f }
-	};
+	teleporter = std::make_unique<Teleporter>("Data/Model/Cube/testCubes.glb", 1.0);
+	teleporter->SetPosition({ 50, 0, 60 });
 
-	plane = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "Data/Sprites/gem.png", 1.0f, positions);
+	{
 
-	positions = {
-		DirectX::XMFLOAT3{ 15.0f, 15.0f, 5.0f},
-		DirectX::XMFLOAT3{ 15.0f, 25.0f, 5.0f },
-		DirectX::XMFLOAT3{ 25.0f, 15.0f, 5.0f },
-		DirectX::XMFLOAT3{ 25.0f, 25.0f, 5.0f }
-	};
+		std::array<DirectX::XMFLOAT3, 4 > positions = {
+		DirectX::XMFLOAT3{ 10.0f, 10.0f, 5.0f},
+		DirectX::XMFLOAT3{ 10.0f, 20.0f, 5.0f },
+		DirectX::XMFLOAT3{ 5.0f, 10.0f, 5.0f },
+		DirectX::XMFLOAT3{ 5.0f, 20.0f, 5.0f }
+		};
 
-	//portal = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, positions);
-	//portal.get()->SetShader(ModelShaderId::Portal);
+		plane = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "Data/Sprites/gem.png", 1.0f, positions);
+	}
+
+	{
+		std::array<DirectX::XMFLOAT3, 4 >positions = {
+			DirectX::XMFLOAT3{ 15.0f, 15.0f, 5.0f},
+			DirectX::XMFLOAT3{ 15.0f, 25.0f, 5.0f },
+			DirectX::XMFLOAT3{ 25.0f, 15.0f, 5.0f },
+			DirectX::XMFLOAT3{ 25.0f, 25.0f, 5.0f }
+		};
+
+		portal = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, positions);
+		portal.get()->SetShader(ModelShaderId::Portal);
+	}
 
 	// 光
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
@@ -69,29 +73,23 @@ void StageOpenWorld_E4C::Initialize()
 	
 	
 	// カメラ設定
-	for (int i = 0; i < CameraManager::Instance().GetCameraCount(); i++)
-	{
-		CameraManager::Instance().GetCamera(i)->SetPerspectiveFov(
-			DirectX::XMConvertToRadians(45),							// 画角
-			T_GRAPHICS.GetScreenWidth() / T_GRAPHICS.GetScreenHeight(),	// 画面アスペクト比
-			0.1f,														// ニアクリップ
-			10000.0f													// ファークリップ
-		);
-		CameraManager::Instance().GetCamera(i)->SetLookAt(
-			{ 0, 5.0f, 10.0f },	// 視点
-			{ 0, 0, 0 },	// 注視点
-			{ 0, 0.969f, -0.248f } // 上ベクトル
-		);
-	}
-
-	DebugcameraController = std::make_unique<FreeCameraController>();
-	DebugcameraController->SyncCameraToController(CameraManager::Instance().GetCamera(0));
-	DebugcameraController->SetEnable(true);
+	CameraManager::Instance().GetCamera()->SetPerspectiveFov(
+		DirectX::XMConvertToRadians(45),							// 画角
+		T_GRAPHICS.GetScreenWidth() / T_GRAPHICS.GetScreenHeight(),	// 画面アスペクト比
+		0.1f,														// ニアクリップ
+		10000.0f													// ファークリップ
+	);
+	CameraManager::Instance().GetCamera()->SetLookAt(
+		{ 0, 5.0f, 10.0f },	// 視点
+		{ 0, 0, 0 },	// 注視点
+		{ 0, 0.969f, -0.248f } // 上ベクトル
+	);
+	
 
 	cameraController = std::make_unique<ThridPersonCameraController>();
-	cameraController->SyncCameraToController(CameraManager::Instance().GetCamera(1));
+	cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
 	cameraController->SetEnable(true);
-	cameraController->SetPlayer(player.get());
+	cameraController->SetPlayer(player);
 
 	{
 		HRESULT hr;
@@ -111,40 +109,35 @@ void StageOpenWorld_E4C::Initialize()
 void StageOpenWorld_E4C::Update(float elapsedTime)
 {
 	std::vector<DirectX::XMFLOAT3> cameraFocusPoints = {
-		{CameraManager::Instance().GetCamera(1)->GetFocus().x, CameraManager::Instance().GetCamera(1)->GetFocus().y, CameraManager::Instance().GetCamera(1)->GetFocus().z},
-		{CameraManager::Instance().GetCamera(1)->GetFocus().x, CameraManager::Instance().GetCamera(1)->GetFocus().y, CameraManager::Instance().GetCamera(1)->GetFocus().z},
-		{CameraManager::Instance().GetCamera(1)->GetFocus().x, CameraManager::Instance().GetCamera(1)->GetFocus().y, CameraManager::Instance().GetCamera(1)->GetFocus().z},
-		{CameraManager::Instance().GetCamera(1)->GetFocus().x, CameraManager::Instance().GetCamera(1)->GetFocus().y, CameraManager::Instance().GetCamera(1)->GetFocus().z}
+		{CameraManager::Instance().GetCamera()->GetFocus().x, CameraManager::Instance().GetCamera()->GetFocus().y, CameraManager::Instance().GetCamera()->GetFocus().z},
+		{CameraManager::Instance().GetCamera()->GetFocus().x, CameraManager::Instance().GetCamera()->GetFocus().y, CameraManager::Instance().GetCamera()->GetFocus().z},
+		{CameraManager::Instance().GetCamera()->GetFocus().x, CameraManager::Instance().GetCamera()->GetFocus().y, CameraManager::Instance().GetCamera()->GetFocus().z},
+		{CameraManager::Instance().GetCamera()->GetFocus().x, CameraManager::Instance().GetCamera()->GetFocus().y, CameraManager::Instance().GetCamera()->GetFocus().z}
 		//{CameraManager::Instance().GetCamera()->GetFocus().x, CameraManager::Instance().GetCamera()->GetFocus().y, CameraManager::Instance().GetCamera()->GetFocus().z}
 	};
 	// ゲームループ内で
 
 	if (T_INPUT.KeyPress(VK_SHIFT))
 	{
-		CameraManager::Instance().GetCamera(1)->MovePointToCamera(cameraPositions, cameraFocusPoints, transitionTime, transitionDuration, elapsedTime);
+		CameraManager::Instance().GetCamera()->MovePointToCamera(cameraPositions, cameraFocusPoints, transitionTime, transitionDuration, elapsedTime);
 	}
 	else
 	{
-		cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera(1));
+		cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
 		cameraController->Update(elapsedTime);
-		CameraManager::Instance().GetCamera(1)->GetSegment() = 0;
+		CameraManager::Instance().GetCamera()->GetSegment() = 0;
 		transitionTime = 0;
-
-		DebugcameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera(0));
-		DebugcameraController->Update(elapsedTime);
-		
 	}
 	
 
-
-	player->Update(elapsedTime);
-	//teleporter->Update(elapsedTime);
+	PlayerCharacterManager::Instance().Update(elapsedTime);
+	teleporter->Update(elapsedTime);
 	plane->Update(elapsedTime);
 	//portal->Update(elapsedTime);
 
-	//teleporter->CheckPlayer(player->GetPosition(), elapsedTime);
+	teleporter->CheckPlayer(PlayerCharacterManager::Instance().GetPlayerCharacterById(GAME_DATA.GetClientId())->GetPosition(), elapsedTime);
 
-	//if (teleporter->GetPortalReady()) STAGES.stageNumber = 1;
+	if (teleporter->GetPortalReady()) STAGES.stageNumber = 1;
 
 	if (T_INPUT.KeyDown(VK_F2))
 	{
@@ -156,7 +149,7 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 			}
 		};
 		//player->
-		player->LoadAppearance(charInfo.Character.pattern);
+		PlayerCharacterManager::Instance().GetPlayerCharacterById(GAME_DATA.GetClientId())->LoadAppearance(charInfo.Character.pattern);
 	}
 
 	timer += elapsedTime;
@@ -169,22 +162,13 @@ void StageOpenWorld_E4C::Render()
 #ifdef _DEBUG
 	{
 		T_GRAPHICS.GetDebugRenderer()->DrawSphere(cameraPositions, 2, { 1,0,0,1 });
-		T_GRAPHICS.GetDebugRenderer()->DrawSphere(CameraManager::Instance().GetCamera(1)->GetEye(), 2, {1,1,0,1});
+		T_GRAPHICS.GetDebugRenderer()->DrawSphere(CameraManager::Instance().GetCamera(0)->GetEye(), 2, {1,1,0,1});
 	}
 #endif // _DEBUG
 
 	// 描画コンテキスト設定
 	RenderContext rc;
-	if (DebugCameraMode == true)
-	{
-		rc.camera = CameraManager::Instance().GetCamera(0);
-		T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera(0)->GetView(), CameraManager::Instance().GetCamera(0)->GetProjection());
-	}
-	else
-	{
-		rc.camera = CameraManager::Instance().GetCamera(1);
-		T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera(1)->GetView(), CameraManager::Instance().GetCamera(1)->GetProjection());
-	}
+	rc.camera = CameraManager::Instance().GetCamera();
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
@@ -195,7 +179,7 @@ void StageOpenWorld_E4C::Render()
 	LightManager::Instance().PushRenderContext(rc);
 
 	// 描画
-	player->Render(rc);
+	PlayerCharacterManager::Instance().Render(rc);
 
 	float time = 0;
 
@@ -261,7 +245,7 @@ void StageOpenWorld_E4C::Render()
 		map->render(rc, world, animated_nodes);
 	}
 
-	//teleporter->Render(rc);
+	teleporter->Render(rc);
 	plane->Render(rc);
 	//portal->Render(rc);
 	if (ImGui::TreeNode("Camera Positions"))
@@ -272,14 +256,9 @@ void StageOpenWorld_E4C::Render()
 			ImGui::DragFloat3(label.c_str(), &cameraPositions[i].x, 1.0f, -FLT_MAX, FLT_MAX);  // カメラポジションの設定
 		}
 		ImGui::TreePop();
-
-		ImGui::Checkbox("📷", &DebugCameraMode);
-
-
 	}
 	// デバッグレンダラ描画実行
-	
-	
+	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
 	
 
 }

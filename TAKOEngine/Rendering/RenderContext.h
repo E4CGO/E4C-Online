@@ -1,8 +1,10 @@
-#pragma once
+//! @file RenderContext.h
+//! @note
+
+#ifndef __INCLUDE_RENDER_CONTEXT_H__
+#define __INCLUDE_RENDER_CONTEXT_H__
 
 #include <d3d12.h>
-
-#include "TAKOEngine/Rendering/Descriptor.h"
 
 #include "TAKOEngine/Editor/Camera/Camera.h"
 #include "TAKOEngine/Rendering/RenderState.h"
@@ -115,7 +117,7 @@ struct GaussianFilterData
 {
 	int					kernelSize = 8;		// カーネルサイズ
 	float				deviation = 10.0f;	// 標準偏差
-	DirectX::XMFLOAT2	textureSize;			// 暈すテクスチャのサイズ
+	DirectX::XMFLOAT2	textureSize = {};	// 暈すテクスチャのサイズ
 };
 
 // ガウスフィルターの最大カーネルサイズ
@@ -134,6 +136,13 @@ struct FinalpassnData
 {
 	//	ブルームテクスチャ
 	ID3D11ShaderResourceView* bloomTexture;
+};
+
+// ポストエフェクトの最終パス用情報
+struct FinalpassDataDX12
+{
+	//ブルームテクスチャ
+	const Descriptor* bloomTexture = nullptr;
 };
 
 //影情報
@@ -199,7 +208,15 @@ struct RenderContextDX12
 	ID3D12GraphicsCommandList* d3d_command_list = nullptr;
 	const Descriptor* scene_cbv_descriptor = nullptr;
 
-	DirectX::XMFLOAT4X4			view;
-	DirectX::XMFLOAT4X4			projection;
-	DirectX::XMFLOAT4			light_direction;
+	DirectX::XMFLOAT4X4	view;
+	DirectX::XMFLOAT4X4	projection;
+	DirectX::XMFLOAT4	light_direction;
+
+	// スプライトシェーダー情報
+	LuminanceExtractionData	luminanceExtractionData; //	高輝度抽出用情報 
+	GaussianFilterData		gaussianFilterData;		 //	ガウスフィルター情報
+	ColorGradingData		colorGradingData;		 //	色調補正情報
+	FinalpassDataDX12		finalpassnData;			 //	最終パス情報
 };
+
+#endif // !__INCLUDE_RENDER_CONTEXT_H__
