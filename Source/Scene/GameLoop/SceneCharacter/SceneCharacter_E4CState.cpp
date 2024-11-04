@@ -131,13 +131,11 @@ void SceneCharacter_E4CState::InitState::Exit()
 *//***************************************************************************/
 void SceneCharacter_E4CState::CharacterSelectionState::Enter()
 {
-	Camera& camera = Camera::Instance();
-
-	camera.SetLookAt(
+	CameraManager::Instance().GetCamera()->SetLookAt(
 		SceneCharacter_E4CState::cameraSettings.back().at(0), SceneCharacter_E4CState::cameraSettings.back().at(1), SceneCharacter_E4CState::cameraSettings.back().at(2)
 	);
 
-	owner->cameraController->SyncCameraToController(camera);
+	owner->cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
 
 	SceneCharacter_E4CState::btnCharacterLeft = new WidgetButtonImage("", "Data/Sprites/big_background.t.png", [&](WidgetButton*) {
 		setCurrentStateLeft();
@@ -250,13 +248,10 @@ void SceneCharacter_E4CState::CharacterSelectionState::setCurrentStateRight()
 *//***************************************************************************/
 void SceneCharacter_E4CState::CharacterCreationState::Enter()
 {
-	Camera& camera = Camera::Instance();
-
-	camera.SetLookAt(
+	CameraManager::Instance().GetCamera()->SetLookAt(
 		cameraSettings.at(SceneCharacter_E4CState::currentState).at(0),
 		cameraSettings.at(SceneCharacter_E4CState::currentState).at(1),
 		cameraSettings.at(SceneCharacter_E4CState::currentState).at(2)
-	CameraManager& cameraManager = CameraManager::Instance();
 	);
 
 	owner->cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());

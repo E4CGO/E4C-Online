@@ -30,8 +30,9 @@ void StageOpenWorld_E4C::Initialize()
 
 	map = std::make_unique<gltf_model>(T_GRAPHICS.GetDevice(), "Data/Model/Stage/Terrain_Map.glb");
 
-	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
-	player->SetPosition({ 5.0f, 0.0f, 5.0f });
+	const PlayerCharacterData::CharacterInfo info = PlayerCharacterData::Instance().GetCurrentCharacter();
+	PlayerCharacter* player = PlayerCharacterManager::Instance().UpdatePlayerData(0, "", info.Character.pattern);
+	player->SetPosition({ 5,	10, 5 });
 	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::State::Idle));
 
 	teleporter = std::make_unique<Teleporter>("Data/Model/Cube/testCubes.glb", 1.0);
@@ -131,24 +132,9 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	plane->Update(elapsedTime);
 	portal->Update(elapsedTime);
 
-	Locator->Update(elapsedTime);
-
 	teleporter->CheckPlayer(PlayerCharacterManager::Instance().GetPlayerCharacterById(GAME_DATA.GetClientId())->GetPosition(), elapsedTime);
 
 	if (teleporter->GetPortalReady()) STAGES.ChangeStage(new TestingStage);
-
-	if (T_INPUT.KeyDown(VK_F2))
-	{
-		PlayerCharacterData::CharacterInfo charInfo = {
-			true,			// visible
-			"",				// save
-			{				//Character
-				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
-			}
-		};
-		//player->
-		PlayerCharacterManager::Instance().GetPlayerCharacterById(GAME_DATA.GetClientId())->LoadAppearance(charInfo.Character.pattern);
-	}
 
 	timer += elapsedTime;
 }
@@ -243,10 +229,11 @@ void StageOpenWorld_E4C::Render()
 		map->render(rc, world, animated_nodes);
 	}
 
-	//teleporter->Render(rc);
-	//plane->Render(rc);
+	teleporter->Render(rc);
+	plane->Render(rc);
 	portal->Render(rc);
 
+	//MAPTILES.Render(rc);
 	//if (ImGui::TreeNode("Camera Positions"))
 	//{
 	//	for (size_t i = 0; i < cameraPositions.size(); ++i)

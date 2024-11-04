@@ -164,8 +164,6 @@ void SceneCharacter_E4C::RenderDX12()
 {
 	TentacleLib::graphics.BeginRender();
 	{
-		
-
 		// シーン用定数バッファ更新
 		const Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
 			CameraManager::Instance().GetCamera());
@@ -210,15 +208,15 @@ void SceneCharacter_E4C::DrawSceneGUI()
 		if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			// カメラ
-			DirectX::XMFLOAT3 eye = camera.GetEye();
+			DirectX::XMFLOAT3 eye = CameraManager::Instance().GetCamera()->GetEye();
 			ImGui::DragFloat3("Eye", &eye.x, 0.01f, 100.0f);
-			DirectX::XMFLOAT3 focus = camera.GetFocus();
+			DirectX::XMFLOAT3 focus = CameraManager::Instance().GetCamera()->GetFocus();
 			ImGui::DragFloat3("Fcous", &focus.x, 0.01f, 100.0f);
-			DirectX::XMFLOAT3 up = camera.GetUp();
+			DirectX::XMFLOAT3 up = CameraManager::Instance().GetCamera()->GetUp();
 			ImGui::DragFloat3("Up", &up.x, 0.01f, 100.0f);
 
-			camera.SetLookAt(eye, focus, up);
-			cameraController->SyncCameraToController(camera);
+			CameraManager::Instance().GetCamera()->SetLookAt(eye, focus, up);
+			cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
 		}
 	}
 	ImGui::End();
