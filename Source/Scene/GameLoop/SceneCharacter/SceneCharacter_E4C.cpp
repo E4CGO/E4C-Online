@@ -61,9 +61,7 @@ void SceneCharacter_E4C::Initialize()
 	stateMachine = std::make_unique<StateMachine<SceneCharacter_E4C>>();
 	stateMachine->RegisterState(STATE::INIT, new SceneCharacter_E4CState::InitState(this));
 	stateMachine->RegisterState(STATE::CHARACTERSELECTION, new SceneCharacter_E4CState::CharacterSelectionState(this));
-	stateMachine->RegisterState(STATE::CHARACTERCREATIONLEFT, new SceneCharacter_E4CState::CharacterCreationStateLeft(this));
-	stateMachine->RegisterState(STATE::CHARACTERCREATIONCENTER, new SceneCharacter_E4CState::CharacterCreationStateCenter(this));
-	stateMachine->RegisterState(STATE::CHARACTERCREATIONRIGHT, new SceneCharacter_E4CState::CharacterCreationStateRight(this));
+	stateMachine->RegisterState(STATE::CHARACTERCREATION, new SceneCharacter_E4CState::CharacterCreationState(this));
 	stateMachine->RegisterState(STATE::START, new SceneCharacter_E4CState::StartState(this));
 	stateMachine->SetState(STATE::INIT);
 }
@@ -159,7 +157,6 @@ void SceneCharacter_E4C::RenderDX12()
 			m_sprites[0]->Draw(0, 0, 100, 100, 0, 1, 1, 1, 1);
 			m_sprites[0]->End(m_frameBuffer->GetCommandList());
 		}
-
 	}
 	TentacleLib::graphics.End();
 }

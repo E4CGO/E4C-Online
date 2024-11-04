@@ -84,7 +84,10 @@ public:
 	{
 		return m_CharaterInfosData[m_CurrentSaveState];
 	}
-
+	void SetCurrentCharacter(int index)
+	{
+		m_CurrentSaveState = index;
+	}
 	void LoadAppearance(Character* chara, uint8_t appearance_idx, uint8_t pattern_idx);
 	nlohmann::json GetCharacterInfos() const { return m_CharacterInfos; }
 	void SetCharacterInfos(nlohmann::json savedData) { m_CharacterInfos = savedData; }
@@ -128,19 +131,19 @@ public:
 	{
 		j = nlohmann::json{
 		{"Character", {
-			{"ARM_GEAR",				charInfo.Character.pattern[GENDER]},
-			{"ARM_GEAR_COLOR",			charInfo.Character.pattern[HAIR]},
-			{"BOTTOM",					charInfo.Character.pattern[HAIR_COLOR]},
-			{"BOTTOM_COLOR",			charInfo.Character.pattern[EYE_COLOR]},
-			{"EYE_COLOR",				charInfo.Character.pattern[SKIN_COLOR]},
-			{"GENDER",					charInfo.Character.pattern[TOP]},
-			{"HAIR",					charInfo.Character.pattern[TOP_COLOR]},
-			{"HAIR_COLOR",				charInfo.Character.pattern[BOTTOM]},
-			{"LEFT_HAND_EQUIPMENT",		charInfo.Character.pattern[BOTTOM_COLOR]},
-			{"RIGHT_HAND_EQUIPMENT",	charInfo.Character.pattern[ARM_GEAR]},
-			{"SKIN_COLOR",				charInfo.Character.pattern[ARM_GEAR_COLOR]},
-			{"TOP",						charInfo.Character.pattern[LEFT_HAND_EQUIPMENT]},
-			{"TOP_COLOR",				charInfo.Character.pattern[RIGHT_HAND_EQUIPMENT]}
+			{"GENDER",					charInfo.Character.pattern[GENDER]},
+			{"HAIR",					charInfo.Character.pattern[HAIR]},
+			{"HAIR_COLOR",				charInfo.Character.pattern[HAIR_COLOR]},
+			{"EYE_COLOR",				charInfo.Character.pattern[EYE_COLOR]},
+			{"SKIN_COLOR",				charInfo.Character.pattern[SKIN_COLOR]},
+			{"TOP",						charInfo.Character.pattern[TOP]},
+			{"TOP_COLOR",				charInfo.Character.pattern[TOP_COLOR]},
+			{"BOTTOM",					charInfo.Character.pattern[BOTTOM]},
+			{"BOTTOM_COLOR",			charInfo.Character.pattern[BOTTOM_COLOR]},
+			{"ARM_GEAR",				charInfo.Character.pattern[ARM_GEAR]},
+			{"ARM_GEAR_COLOR",			charInfo.Character.pattern[ARM_GEAR_COLOR]},
+			{"LEFT_HAND_EQUIPMENT",		charInfo.Character.pattern[LEFT_HAND_EQUIPMENT]},
+			{"RIGHT_HAND_EQUIPMENT",	charInfo.Character.pattern[RIGHT_HAND_EQUIPMENT]}
 		}},
 		{"Save", charInfo.save},
 		{"Visible", charInfo.visible}
@@ -191,12 +194,13 @@ public:
 	// 外見パターンをクリア
 	void ClearAppearancePatterns();
 
-	int m_CurrentSaveState = 0;
 private:
-	std::unordered_map<uint8_t, std::vector<PlayerCharacterPattern*>> m_pappearancePatterns;
+	std::unordered_map<uint8_t, std::vector<PlayerCharacterPattern*>> m_pAppearancePatterns;
 
 	nlohmann::json m_CharacterInfos;
 	std::vector<CharacterInfo> m_CharaterInfosData;
+
+	int m_CurrentSaveState = 0;
 };
 
 #define PLAYER_CHARACTER_DATA PlayerCharacterData::Instance()

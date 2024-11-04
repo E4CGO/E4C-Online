@@ -31,18 +31,17 @@ void StageOpenWorld_E4C::Initialize()
 
 	map = std::make_unique<gltf_model>(T_GRAPHICS.GetDevice(), "Data/Model/Stage/Terrain_Map.glb");
 
+	Locator = std::make_unique<ModelObject>("Data/Model/Enemy/Locator_15m.glb", 2.5f);
+
 	const PlayerCharacterData::CharacterInfo info = PlayerCharacterData::Instance().GetCurrentCharacter();
 	PlayerCharacter* player = PlayerCharacterManager::Instance().UpdatePlayerData(0, "", info.Character.pattern);
 	player->SetPosition({ 5,	10, 5 });
 	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::State::Idle));
-	
-
 
 	teleporter = std::make_unique<Teleporter>("Data/Model/Cube/testCubes.glb", 1.0);
 	teleporter->SetPosition({ 50, 0, 60 });
 
 	{
-
 		std::array<DirectX::XMFLOAT3, 4 > positions = {
 		DirectX::XMFLOAT3{ 10.0f, 10.0f, 5.0f},
 		DirectX::XMFLOAT3{ 10.0f, 20.0f, 5.0f },
@@ -113,6 +112,8 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	teleporter->Update(elapsedTime);
 	plane->Update(elapsedTime);
 	portal->Update(elapsedTime);
+
+	Locator->Update(elapsedTime);
 
 	teleporter->CheckPlayer(PlayerCharacterManager::Instance().GetPlayerCharacterById(GAME_DATA.GetClientId())->GetPosition(), elapsedTime);
 
@@ -222,7 +223,7 @@ void StageOpenWorld_E4C::Render()
 	//plane->Render(rc);
 	portal->Render(rc);
 
-	testModel->Render(rc);
+	Locator->Render(rc);
 
 	//MAPTILES.Render(rc);
 }

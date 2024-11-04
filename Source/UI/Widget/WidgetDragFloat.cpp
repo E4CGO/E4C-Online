@@ -36,6 +36,11 @@ WidgetDragFloat::WidgetDragFloat(const char* label, float* value, float minValue
 	bar = new WidgetDragBar((*value - minValue) / (maxValue - minValue));
 }
 
+WidgetDragFloat::WidgetDragFloat(const char* label, uint8_t* uvalue, float minValue, float maxValue) : label(label), uvalue(uvalue), minValue(minValue), maxValue(maxValue)
+{
+	bar = new WidgetDragBar((*uvalue - minValue) / (maxValue - minValue));
+}
+
 void WidgetDragFloat::SetPosition(const DirectX::XMFLOAT2& position)
 {
 	Widget::SetPosition(position);
@@ -50,8 +55,16 @@ void WidgetDragFloat::SetSize(const DirectX::XMFLOAT2& size)
 void WidgetDragFloat::Update(float elapsedTime)
 {
 	bar->Update(elapsedTime);
+	if (value != nullptr)
+	{
+		*this->value = minValue + (maxValue - minValue) * bar->GetRate();
+	}
+	else
+	{
+		newrate = bar->GetRate();
 
-	*this->value = minValue + (maxValue - minValue) * bar->GetRate();
+		*this->uvalue = minValue + (maxValue - minValue) * newrate;
+	}
 }
 
 void WidgetDragFloat::Render(const RenderContext& rc)

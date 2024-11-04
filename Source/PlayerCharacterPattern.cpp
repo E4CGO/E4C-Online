@@ -32,5 +32,5 @@ void PlayerCharacterPatternGender::Execute(Character* chara)
 void PlayerCharacterPatternSingleModel::Execute(Character* chara)
 {
 	if (m_filename != "")
-		player->LoadModel(m_filename.c_str());
+		chara->LoadModel(m_filename.c_str());
 }

@@ -51,5 +51,7 @@ private:
 	std::unique_ptr <Plane> portal;
 
 	std::unique_ptr<gltf_model> map;
+
+	std::unique_ptr<ModelObject> Locator;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constant_buffers[8];
 };
