@@ -15,8 +15,6 @@ void TestingStage::Initialize()
 {
 	Stage::Initialize(); // デフォルト
 
-	STAGES.SetStage(this);
-
 	// 床
 	MAPTILES.Register(new Map001);
 

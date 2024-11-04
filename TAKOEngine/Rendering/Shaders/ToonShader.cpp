@@ -1,4 +1,4 @@
-//! @file ToonShader.cpp
+ï»¿//! @file ToonShader.cpp
 //! @note
 
 #include "TAKOEngine/Rendering/Misc.h"
@@ -8,9 +8,9 @@
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
 
 //*******************************************************
-// @brief     ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// @brief     ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 // @param[in] device  ID3D11Device*
-// @return    ‚È‚µ
+// @return    ãªã—
 //*******************************************************
 ToonShader::ToonShader(ID3D11Device* device) : ModelShader(device, "Data/Shader/ToonVS.cso", "Data/Shader/ToonPS.cso")
 {
@@ -19,14 +19,14 @@ ToonShader::ToonShader(ID3D11Device* device) : ModelShader(device, "Data/Shader/
 }
 
 //*******************************************************
-// @brief       ƒŒƒ“ƒ_[ƒXƒe[ƒgİ’è
-// @param[in]   rc  ƒŒƒ“ƒ_[ƒRƒ“ƒeƒLƒXƒg
-// @return      ‚È‚µ
+// @brief       ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆè¨­å®š
+// @param[in]   rc  ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆ
+// @return      ãªã—
 //*******************************************************
 void ToonShader::SetRenderState(const RenderContext& rc)
 {
 	ID3D11DeviceContext* dc = rc.deviceContext;
-	// ƒŒƒ“ƒ_[ƒXƒe[ƒgİ’è
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆè¨­å®š
 	const float blend_factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	dc->OMSetBlendState(rc.renderState->GetBlendState(BlendState::OIT), blend_factor, 0xFFFFFFFF);
 	dc->OMSetDepthStencilState(rc.renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
@@ -34,14 +34,14 @@ void ToonShader::SetRenderState(const RenderContext& rc)
 }
 
 //******************************************************
-// @brief       ƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[İ’è
-// @param[in]   mash ƒVƒF[ƒ_[ƒŠƒ\[ƒX‚Æ‚µ‚Äİ’è‚·‚éƒƒbƒVƒ…ƒf[ƒ^
-// @param[in]   dc   ƒfƒoƒCƒXƒRƒ“ƒeƒLƒXƒg
-// @return      ‚È‚µ
+// @brief       ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼è¨­å®š
+// @param[in]   mash ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ã¨ã—ã¦è¨­å®šã™ã‚‹ãƒ¡ãƒƒã‚·ãƒ¥ãƒ‡ãƒ¼ã‚¿
+// @param[in]   dc   ãƒ‡ãƒã‚¤ã‚¹ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆ
+// @return      ãªã—
 //******************************************************
 void ToonShader::SetShaderResourceView(const ModelResource::Mesh& mesh, ID3D11DeviceContext*& dc)
 {
-	// ƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[İ’è
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼è¨­å®š
 	ID3D11ShaderResourceView* srvs[] =
 	{
 		mesh.material->diffuseMap.Get(),
@@ -51,10 +51,10 @@ void ToonShader::SetShaderResourceView(const ModelResource::Mesh& mesh, ID3D11De
 }
 
 //******************************************************
-// @brief       ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// @brief       ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 // @param[in]   device       ID3D12Device*
-// @param[in]   instancing  ƒCƒ“ƒXƒ^ƒ“ƒVƒ“ƒO@ture : ‚ ‚è, false : ‚È‚µ
-// @return      ‚È‚µ
+// @param[in]   instancing  ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚·ãƒ³ã‚°ã€€ture : ã‚ã‚Š, false : ãªã—
+// @return      ãªã—
 //******************************************************
 ToonShaderDX12::ToonShaderDX12(ID3D12Device* device, bool instancing)
 {
@@ -63,7 +63,7 @@ ToonShaderDX12::ToonShaderDX12(ID3D12Device* device, bool instancing)
 
 	HRESULT hr = S_OK;
 
-	// ƒVƒF[ƒ_[
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 	std::vector<BYTE> vsData, psData, gsData;
 	{
 		if (!instancing) GpuResourceUtils::LoadShaderFile("Data/Shader/ToonDX12VS.cso", vsData);
@@ -72,7 +72,7 @@ ToonShaderDX12::ToonShaderDX12(ID3D12Device* device, bool instancing)
 		GpuResourceUtils::LoadShaderFile("Data/Shader/ToonDX12GS.cso", gsData);
 	}
 
-	//ƒ‹[ƒgƒVƒOƒlƒNƒ`ƒƒ¶¬
+	//ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒã‚¯ãƒãƒ£ç”Ÿæˆ
 	{
 		hr = device->CreateRootSignature(
 			0,
@@ -83,11 +83,11 @@ ToonShaderDX12::ToonShaderDX12(ID3D12Device* device, bool instancing)
 		m_d3d_root_signature->SetName(L"ToonShaderRootSignature");
 	}
 
-	//ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg‚Ì¶¬
+	//ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã®ç”Ÿæˆ
 	{
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC pipeline_state_desc = {};
 
-		// ƒ‹[ƒgƒVƒOƒlƒNƒ`ƒƒ
+		// ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒã‚¯ãƒãƒ£
 		pipeline_state_desc.pRootSignature = m_d3d_root_signature.Get();
 
 		pipeline_state_desc.VS.pShaderBytecode = vsData.data();
@@ -97,7 +97,7 @@ ToonShaderDX12::ToonShaderDX12(ID3D12Device* device, bool instancing)
 		pipeline_state_desc.GS.pShaderBytecode = gsData.data();
 		pipeline_state_desc.GS.BytecodeLength  = gsData.size();
 
-		// “ü—ÍƒŒƒCƒAƒEƒg
+		// å…¥åŠ›ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆ
 		D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
 		{
 			{ "POSITION",     0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
@@ -111,35 +111,35 @@ ToonShaderDX12::ToonShaderDX12(ID3D12Device* device, bool instancing)
 		pipeline_state_desc.InputLayout.pInputElementDescs = inputElementDescs;
 		pipeline_state_desc.InputLayout.NumElements = _countof(inputElementDescs);
 
-		//ƒuƒŒƒ“ƒhƒXƒe[ƒg
+		//ãƒ–ãƒ¬ãƒ³ãƒ‰ã‚¹ãƒ†ãƒ¼ãƒˆ
 		pipeline_state_desc.BlendState = renderState->GetBlendState(BlendState::Transparency);
 
-		//[“xƒXƒeƒ“ƒVƒ‹ƒXƒe[ƒg
+		//æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ã‚¹ãƒ†ãƒ¼ãƒˆ
 		pipeline_state_desc.DepthStencilState = renderState->GetDepthState(DepthState::TestAndWrite);
 
-		//ƒ‰ƒXƒ^ƒ‰ƒCƒU[ƒXƒe[ƒg
+		//ãƒ©ã‚¹ã‚¿ãƒ©ã‚¤ã‚¶ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆ
 		pipeline_state_desc.RasterizerState = renderState->GetRasterizer(RasterizerState::SolidCullBack);
 
-		//ƒvƒŠƒ~ƒeƒBƒuƒgƒ|ƒƒW[
+		//ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–ãƒˆãƒãƒ­ã‚¸ãƒ¼
 		pipeline_state_desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
-		//ƒXƒgƒŠƒbƒvƒX‚ÌƒJƒbƒg’l
+		//ã‚¹ãƒˆãƒªãƒƒãƒ—ã‚¹æ™‚ã®ã‚«ãƒƒãƒˆå€¤
 		pipeline_state_desc.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
 
-		//ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg”
+		//ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆæ•°
 		pipeline_state_desc.NumRenderTargets = 1;
 		pipeline_state_desc.RTVFormats[0]    = RenderTargetFormat;
 		pipeline_state_desc.DSVFormat        = DepthStencilFormat;
 
-		//ƒ}ƒ‹ƒ`ƒTƒ“ƒvƒŠƒ“ƒO
+		//ãƒãƒ«ãƒã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°
 		pipeline_state_desc.SampleDesc.Count   = 1;
 		pipeline_state_desc.SampleDesc.Quality = 0;
 
-		//ƒAƒ_ƒvƒ^
+		//ã‚¢ãƒ€ãƒ—ã‚¿
 		pipeline_state_desc.NodeMask = 0;
 		pipeline_state_desc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
-		//ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg‚Ì¶¬
+		//ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã®ç”Ÿæˆ
 		hr = device->CreateGraphicsPipelineState(
 			&pipeline_state_desc,
 			IID_PPV_ARGS(m_d3d_pipeline_state.GetAddressOf()));
@@ -147,41 +147,41 @@ ToonShaderDX12::ToonShaderDX12(ID3D12Device* device, bool instancing)
 		m_d3d_pipeline_state->SetName(L"ToonShaderPipelineState");
 	}
 
-	//ƒTƒ“ƒvƒ‰[ƒXƒe[ƒgİ’è
+	//ã‚µãƒ³ãƒ—ãƒ©ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆè¨­å®š
 	m_sampler = graphics.GetSampler(SamplerState::LinearClamp);
 }
 
 //***********************************************************
-// @brief       ƒfƒXƒgƒ‰ƒNƒ^
-// @param[in]   ‚È‚µ
-// @return      ‚È‚µ
+// @brief       ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+// @param[in]   ãªã—
+// @return      ãªã—
 //***********************************************************
 ToonShaderDX12::~ToonShaderDX12()
 {
 }
 
 //***********************************************************
-// @brief       •`‰æ
-// @param[in]   rc     ƒŒƒ“ƒ_[ƒRƒ“ƒeƒLƒXƒg
-// @param[in]   model  •`‰æ‘ÎÛ‚Ìƒ‚ƒfƒ‹ƒf[ƒ^‚ğw‚·ƒ|ƒCƒ“ƒ^
-// @return      ‚È‚µ
+// @brief       æç”»
+// @param[in]   rc     ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆ
+// @param[in]   model  æç”»å¯¾è±¡ã®ãƒ¢ãƒ‡ãƒ«ãƒ‡ãƒ¼ã‚¿ã‚’æŒ‡ã™ãƒã‚¤ãƒ³ã‚¿
+// @return      ãªã—
 //***********************************************************
 void ToonShaderDX12::Render(const RenderContextDX12& rc, ModelDX12* model)
 {
 	Graphics& graphics = Graphics::Instance();
 
-	// ƒJƒƒ‰‚ÉÊ‚Á‚Ä‚¢‚é”ÍˆÍ‚ÌƒIƒuƒWƒFƒNƒg‚ğƒtƒ‰ƒO‚Åƒ}[ƒN‚·‚é”z—ñ‚ğ—pˆÓ
+	// ã‚«ãƒ¡ãƒ©ã«å†™ã£ã¦ã„ã‚‹ç¯„å›²ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ãƒ•ãƒ©ã‚°ã§ãƒãƒ¼ã‚¯ã™ã‚‹é…åˆ—ã‚’ç”¨æ„
 	std::vector<bool> visibleObjects(model->GetMeshes().size(), false);
 
-	// ‹‘äƒJƒŠƒ“ƒO‚ğÀs‚µ‚Ä‰Â‹ƒIƒuƒWƒFƒNƒg‚ğƒ}[ƒN
+	// è¦–éŒå°ã‚«ãƒªãƒ³ã‚°ã‚’å®Ÿè¡Œã—ã¦å¯è¦–ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ãƒãƒ¼ã‚¯
 	FrustumCulling::FrustumCullingFlag(CameraManager::Instance().GetCamera(), model->GetMeshes(), visibleObjects);
 	int culling = 0;
 
-	//ƒpƒCƒvƒ‰ƒCƒ“İ’è
+	//ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³è¨­å®š
 	rc.d3d_command_list->SetGraphicsRootSignature(m_d3d_root_signature.Get());
 	rc.d3d_command_list->SetPipelineState(m_d3d_pipeline_state.Get());
 
-	//ƒV[ƒ“’è”ƒoƒbƒtƒ@İ’è
+	//ã‚·ãƒ¼ãƒ³å®šæ•°ãƒãƒƒãƒ•ã‚¡è¨­å®š
 	rc.d3d_command_list->SetGraphicsRootDescriptorTable(0, rc.scene_cbv_descriptor->GetGpuHandle());  //CbScene
 
 	for (const ModelDX12::Mesh& mesh : model->GetMeshes())
@@ -191,35 +191,35 @@ void ToonShaderDX12::Render(const RenderContextDX12& rc, ModelDX12* model)
 		const ModelResource::Mesh* res_mesh = mesh.mesh;
 		const ModelDX12::Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
 
-		// ƒƒbƒVƒ…’è”ƒoƒbƒtƒ@İ’è
+		// ãƒ¡ãƒƒã‚·ãƒ¥å®šæ•°ãƒãƒƒãƒ•ã‚¡è¨­å®š
 		rc.d3d_command_list->SetGraphicsRootDescriptorTable(1, frame_resource.cbv_descriptor->GetGpuHandle());  //CbMesh
 
-		// ’¸“_ƒoƒbƒtƒ@İ’è
+		// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡è¨­å®š
 		rc.d3d_command_list->IASetVertexBuffers(0, 1, mesh.bones.empty() ? &mesh.mesh->d3d_vbv : &frame_resource.d3d_vbv);
 		rc.d3d_command_list->IASetIndexBuffer(&res_mesh->d3d_ibv);
 		rc.d3d_command_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		// ƒTƒuƒZƒbƒg
+		// ã‚µãƒ–ã‚»ãƒƒãƒˆ
 		const ModelResource::Material* material = res_mesh->material;
 
-		// ƒ}ƒeƒŠƒAƒ‹’è”ƒoƒbƒtƒ@İ’è
+		// ãƒãƒ†ãƒªã‚¢ãƒ«å®šæ•°ãƒãƒƒãƒ•ã‚¡è¨­å®š
 		rc.d3d_command_list->SetGraphicsRootDescriptorTable(2, material->cbv_descriptor->GetGpuHandle());  //CbMaterial
 
-		// ƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[İ’è
-		rc.d3d_command_list->SetGraphicsRootDescriptorTable(3, material->srv_descriptor->GetGpuHandle());      //ƒfƒBƒtƒ…[ƒYƒeƒNƒXƒ`ƒƒ
-		rc.d3d_command_list->SetGraphicsRootDescriptorTable(4, mesh.mesh->srv_toon_descriptor->GetGpuHandle()); //toonƒeƒNƒXƒ`ƒƒ
+		// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼è¨­å®š
+		rc.d3d_command_list->SetGraphicsRootDescriptorTable(3, material->srv_descriptor->GetGpuHandle());      //ãƒ‡ã‚£ãƒ•ãƒ¥ãƒ¼ã‚ºãƒ†ã‚¯ã‚¹ãƒãƒ£
+		rc.d3d_command_list->SetGraphicsRootDescriptorTable(4, mesh.mesh->srv_toon_descriptor->GetGpuHandle()); //toonãƒ†ã‚¯ã‚¹ãƒãƒ£
 
-		//ƒTƒ“ƒvƒ‰[ƒXƒe[ƒgİ’è
+		//ã‚µãƒ³ãƒ—ãƒ©ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆè¨­å®š
 		rc.d3d_command_list->SetGraphicsRootDescriptorTable(5, m_sampler->GetDescriptor()->GetGpuHandle());
 
-		// •`‰æ
+		// æç”»
 		if (frame_resource.instancingCount == 0)
 		{
 			rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), 1, 0, 0, 0);
 		}
 		else
 		{
-			//ƒCƒ“ƒXƒ^ƒ“ƒVƒ“ƒO
+			//ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚·ãƒ³ã‚°
 			rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), frame_resource.instancingCount, 0, 0, 0);
 		}
 	}

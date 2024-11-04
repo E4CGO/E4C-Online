@@ -15,6 +15,7 @@
 #include "Scene/GameLoop/SceneGame/Stage/StageOpenWorld_E4C.h"
 #include "Scene/Stage/TestingStage.h"
 
+#include "Scene/Stage/StageManager.h"
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "TAKOEngine/Tool/Console.h"
 
@@ -25,9 +26,6 @@ void SceneGame_E4C::Initialize()
 	stateMachine->RegisterState(GAME_STATE::DUNGEON, new SceneGame_E4CState::WaitingState(this));
 	stateMachine->SetState(GAME_STATE::OPENWORLD);
 
-	//stageDungeon = std::make_unique<TestingStage>();
-	//stageDungeon->Initialize();
-
 	CameraManager& cameraManager = CameraManager::Instance();
 	Camera* mainCamera = new Camera();
 	cameraManager.Register(mainCamera);
@@ -35,20 +33,18 @@ void SceneGame_E4C::Initialize()
 
 	//Console::Instance().Open();
 
-	stageOpenWorld = std::make_unique<StageOpenWorld_E4C>(this);
-	stageOpenWorld->Initialize();
+	// 選択した自機
+	const PlayerCharacterData::CharacterInfo info = PlayerCharacterData::Instance().GetCurrentCharacter();
+	PlayerCharacter* player = PlayerCharacterManager::Instance().UpdatePlayerData(0, "", info.Character.pattern);
+	player->Show();
+	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::State::Idle));
 
+	STAGES.ChangeStage(new StageOpenWorld_E4C(this));
 
 	m_ponlineController = new Online::OnlineController;
 	if (m_ponlineController->Initialize())
 	{
-		if (m_ponlineController->Login()) {
-			while (m_ponlineController->GetState() != Online::OnlineController::STATE::LOGINED)
-			{
-				// 待つ
-				std::cout << ".";
-			}
-		}
+		m_ponlineController->Login();
 	}
 }
 
@@ -57,27 +53,18 @@ void SceneGame_E4C::Finalize()
 	delete m_ponlineController;
 	Console::Instance().Close();
 	LightManager::Instance().Clear();
-	MAPTILES.Clear();
-	STAGES.Clear();
-	PlayerCharacterManager::Instance().Clear();
 	CameraManager::Instance().Clear();
+	STAGES.Clear();
+	MAPTILES.Clear();
+	PlayerCharacterManager::Instance().Clear();
 }
 
 // 更新処理
 void SceneGame_E4C::Update(float elapsedTime)
 {
+	STAGES.Update(elapsedTime);
+
 	stateMachine->Update(elapsedTime);
-
-	stageNumber = STAGES.stageNumber;
-
-	if (stageNumber == 0)
-	{
-		stageOpenWorld->Update(elapsedTime);
-	}
-	if (stageNumber == 1)
-	{
-		stageDungeon->Update(elapsedTime);
-	}
 }
 
 // 描画処理
@@ -87,14 +74,7 @@ void SceneGame_E4C::Render()
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
-	if (stageNumber == 0)
-	{
-		stageOpenWorld->Render();
-	}
-	if (stageNumber == 1)
-	{
-		STAGES.Render(rc);
-	}
+	STAGES.Render();
 
 	ProfileDrawUI();
 }

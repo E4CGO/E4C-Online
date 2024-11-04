@@ -1,7 +1,14 @@
-#pragma once
+Ôªø//! @file Stage.h
+//! @note 
+
+#ifndef __INCLUDED_STAGE_H__
+#define __INCLUDED_STAGE_H__
+
+
 
 #include <DirectXMath.h>
 #include <vector>
+
 
 struct ENEMY_LIST_DATA
 {
@@ -12,9 +19,11 @@ struct ENEMY_LIST_DATA
 	DirectX::XMFLOAT3 rotation = {};
 };
 
-/*
-* ÉXÉeÅ[ÉWä«óùópÅEÉzÉXÉg
-*/
+/**************************************************************************//**
+	@class	Stage
+	@brief	„Çπ„ÉÜ„Éº„Ç∏
+	@par	[Ë™¨Êòé]
+*//***************************************************************************/
 class Stage
 {
 public:
@@ -22,6 +31,8 @@ public:
 	virtual ~Stage() = default;
 
 	virtual void Initialize();
+
+	virtual void Finalize();
 
 	virtual void Update(float elapsedTime);
 
@@ -33,6 +44,9 @@ public:
 
 	void Finish() { finish = true; }
 	bool IsFinish() { return finish; }
+
+	bool IsReady() { return m_ready; }
+	void SetReady() { m_ready = true; }
 protected:
 	virtual void OnPhase() {}
 protected:
@@ -42,4 +56,8 @@ protected:
 
 	std::vector<ENEMY_LIST_DATA> enemyList;
 	int pointer = 0;
+
+	bool m_ready = false;;
 };
+
+#endif // !__INCLUDED_STAGE_H__
