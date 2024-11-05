@@ -61,8 +61,8 @@ void StageOpenWorld_E4C::Initialize()
 			DirectX::XMFLOAT3{ 25.0f, 25.0f, 5.0f }
 		};
 
-		portal = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, positions);
-		portal.get()->SetShader(ModelShaderId::Portal);
+		/*portal = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, positions);
+		portal.get()->SetShader(ModelShaderId::Portal);*/
 	}
 
 	// 光
@@ -71,23 +71,28 @@ void StageOpenWorld_E4C::Initialize()
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
 	
-	
-	// カメラ設定
-	CameraManager::Instance().GetCamera()->SetPerspectiveFov(
-		DirectX::XMConvertToRadians(45),							// 画角
-		T_GRAPHICS.GetScreenWidth() / T_GRAPHICS.GetScreenHeight(),	// 画面アスペクト比
-		0.1f,														// ニアクリップ
-		10000.0f													// ファークリップ
-	);
-	CameraManager::Instance().GetCamera()->SetLookAt(
-		{ 0, 5.0f, 10.0f },	// 視点
-		{ 0, 0, 0 },	// 注視点
-		{ 0, 0.969f, -0.248f } // 上ベクトル
-	);
+	for (int i = 0; i < CameraManager::Instance().GetCameraCount(); i++)
+	{
+		// カメラ設定
+		CameraManager::Instance().GetCamera(i)->SetPerspectiveFov(
+			DirectX::XMConvertToRadians(45),							// 画角
+			T_GRAPHICS.GetScreenWidth() / T_GRAPHICS.GetScreenHeight(),	// 画面アスペクト比
+			0.1f,														// ニアクリップ
+			10000.0f													// ファークリップ
+		);
+		CameraManager::Instance().GetCamera(i)->SetLookAt(
+			{ 0, 5.0f, 10.0f },	// 視点
+			{ 0, 0, 0 },	// 注視点
+			{ 0, 0.969f, -0.248f } // 上ベクトル
+		);
+	}
+	debugCameraController = std::make_unique<FreeCameraController>();
+	debugCameraController->SyncCameraToController(CameraManager::Instance().GetCamera(0));
+	debugCameraController->SetEnable(true);
 	
 
 	cameraController = std::make_unique<ThridPersonCameraController>();
-	cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
+	cameraController->SyncCameraToController(CameraManager::Instance().GetCamera(1));
 	cameraController->SetEnable(true);
 	cameraController->SetPlayer(player);
 
@@ -109,24 +114,27 @@ void StageOpenWorld_E4C::Initialize()
 void StageOpenWorld_E4C::Update(float elapsedTime)
 {
 	std::vector<DirectX::XMFLOAT3> cameraFocusPoints = {
-		{CameraManager::Instance().GetCamera()->GetFocus().x, CameraManager::Instance().GetCamera()->GetFocus().y, CameraManager::Instance().GetCamera()->GetFocus().z},
-		{CameraManager::Instance().GetCamera()->GetFocus().x, CameraManager::Instance().GetCamera()->GetFocus().y, CameraManager::Instance().GetCamera()->GetFocus().z},
-		{CameraManager::Instance().GetCamera()->GetFocus().x, CameraManager::Instance().GetCamera()->GetFocus().y, CameraManager::Instance().GetCamera()->GetFocus().z},
-		{CameraManager::Instance().GetCamera()->GetFocus().x, CameraManager::Instance().GetCamera()->GetFocus().y, CameraManager::Instance().GetCamera()->GetFocus().z}
+		{CameraManager::Instance().GetCamera(1)->GetFocus().x, CameraManager::Instance().GetCamera(1)->GetFocus().y, CameraManager::Instance().GetCamera(1)->GetFocus().z},
+		{CameraManager::Instance().GetCamera(1)->GetFocus().x, CameraManager::Instance().GetCamera(1)->GetFocus().y, CameraManager::Instance().GetCamera(1)->GetFocus().z},
+		{CameraManager::Instance().GetCamera(1)->GetFocus().x, CameraManager::Instance().GetCamera(1)->GetFocus().y, CameraManager::Instance().GetCamera(1)->GetFocus().z},
+		{CameraManager::Instance().GetCamera(1)->GetFocus().x, CameraManager::Instance().GetCamera(1)->GetFocus().y, CameraManager::Instance().GetCamera(1)->GetFocus().z}
 		//{CameraManager::Instance().GetCamera()->GetFocus().x, CameraManager::Instance().GetCamera()->GetFocus().y, CameraManager::Instance().GetCamera()->GetFocus().z}
 	};
 	// ゲームループ内で
 
 	if (T_INPUT.KeyPress(VK_SHIFT))
 	{
-		CameraManager::Instance().GetCamera()->MovePointToCamera(cameraPositions, cameraFocusPoints, transitionTime, transitionDuration, elapsedTime);
+		CameraManager::Instance().GetCamera(1)->MovePointToCamera(cameraPositions, cameraFocusPoints, transitionTime, transitionDuration, elapsedTime);
 	}
 	else
 	{
-		cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
+		cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera(1));
 		cameraController->Update(elapsedTime);
-		CameraManager::Instance().GetCamera()->GetSegment() = 0;
+		CameraManager::Instance().GetCamera(1)->GetSegment() = 0;
 		transitionTime = 0;
+
+		debugCameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera(0));
+		debugCameraController->Update(elapsedTime);
 	}
 	
 
@@ -162,13 +170,23 @@ void StageOpenWorld_E4C::Render()
 #ifdef _DEBUG
 	{
 		T_GRAPHICS.GetDebugRenderer()->DrawSphere(cameraPositions, 2, { 1,0,0,1 });
-		T_GRAPHICS.GetDebugRenderer()->DrawSphere(CameraManager::Instance().GetCamera(0)->GetEye(), 2, {1,1,0,1});
+		T_GRAPHICS.GetDebugRenderer()->DrawSphere(CameraManager::Instance().GetCamera(1)->GetEye(), 2, {1,1,0,1});
 	}
 #endif // _DEBUG
 
 	// 描画コンテキスト設定
 	RenderContext rc;
-	rc.camera = CameraManager::Instance().GetCamera();
+
+	if (debugCameraMode == true)
+	{
+		rc.camera = CameraManager::Instance().GetCamera(0);
+		T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera(0)->GetView(), CameraManager::Instance().GetCamera(0)->GetProjection());
+	}
+	else
+	{
+		rc.camera = CameraManager::Instance().GetCamera(1);
+		T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera(1)->GetView(), CameraManager::Instance().GetCamera(1)->GetProjection());
+	}
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
@@ -256,9 +274,10 @@ void StageOpenWorld_E4C::Render()
 			ImGui::DragFloat3(label.c_str(), &cameraPositions[i].x, 1.0f, -FLT_MAX, FLT_MAX);  // カメラポジションの設定
 		}
 		ImGui::TreePop();
+
+		ImGui::Checkbox("DebugCameraMode", &debugCameraMode);
 	}
-	// デバッグレンダラ描画実行
-	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
+	
 	
 
 }

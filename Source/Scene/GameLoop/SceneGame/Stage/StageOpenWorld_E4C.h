@@ -41,6 +41,7 @@ private:
 	SceneGame_E4C* m_scene;
 
 	std::unique_ptr<ThridPersonCameraController> cameraController;
+	std::unique_ptr<FreeCameraController>debugCameraController;
 
 	MapTile* stage_collision = nullptr;
 
@@ -62,4 +63,6 @@ private:
 		{5,3,4},
 		{8,3,8}
 	};
+
+	bool debugCameraMode = false;
 };
