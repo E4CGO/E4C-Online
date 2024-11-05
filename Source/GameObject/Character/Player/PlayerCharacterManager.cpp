@@ -1,4 +1,7 @@
-﻿#include "PlayerCharacterManager.h"
+﻿//! @file PlayerCharacterManager.cpp
+//! @note 
+
+#include "PlayerCharacterManager.h"
 
 /**************************************************************************//**
 	@brief		プレイヤーキャラクター更新処理

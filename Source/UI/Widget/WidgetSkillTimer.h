@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <memory>
 
@@ -14,92 +14,92 @@ public:
 	void Render(const RenderContext& rc);
 private:
 	enum ICON {
-		ICON_ROCK,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_Šâ.png
-		ICON_FLAG,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_Šø.png
-		ICON_HAND,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_Žè.png
-		ICON_BOOK,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_–{.png
-		ICON_ARROW,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_–î.png
-		ICON_WING,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_—ƒ.png
-		ICON_BUG,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_ƒoƒO.png
-		ICON_BUFF,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_ƒoƒt.png
-		ICON_TALK,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_ƒtƒLƒ_ƒV.png
+		ICON_ROCK,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_å²©.png
+		ICON_FLAG,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_æ——.png
+		ICON_HAND,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_æ‰‹.png
+		ICON_BOOK,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_æœ¬.png
+		ICON_ARROW,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_çŸ¢.png
+		ICON_WING,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_ç¿¼.png
+		ICON_BUG,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_ãƒã‚°.png
+		ICON_BUFF,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_ãƒãƒ•.png
+		ICON_TALK,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_ãƒ•ã‚­ãƒ€ã‚·.png
 
-		ICON_FEATHER,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_‰Hª.png
-		ICON_GEAR,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_Ž•ŽÔ.png
-		ICON_HEAL,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_Ž¡—Ã.png
-		ICON_EXPERIMENT,	// ƒXƒLƒ‹ƒAƒCƒRƒ“_ŽÀŒ±.png
-		ICON_IMPACT,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_ÕŒ‚.png
-		ICON_SNIPER,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_‘_Œ‚.png
-		ICON_NINJA,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_”Ep.png
-		ICON_BOMB,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_”š’e.png
-		ICON_RELOAD,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_ƒŠƒ[ƒh.png
+		ICON_FEATHER,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_ç¾½æ ¹.png
+		ICON_GEAR,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_æ­¯è»Š.png
+		ICON_HEAL,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_æ²»ç™‚.png
+		ICON_EXPERIMENT,	// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_å®Ÿé¨“.png
+		ICON_IMPACT,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_è¡æ’ƒ.png
+		ICON_SNIPER,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_ç‹™æ’ƒ.png
+		ICON_NINJA,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_å¿è¡“.png
+		ICON_BOMB,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_çˆ†å¼¾.png
+		ICON_RELOAD,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_ãƒªãƒ­ãƒ¼ãƒ‰.png
 
-		ICON_BLOCK,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_–hŒä.png
-		ICON_NONE,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_–³’n.png
-		ICON_SLASH_1,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_ŽaŒ‚1.png
-		ICON_MAGIC_1,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_–‚–@1.png
-		ICON_MAGIC_10,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_–‚–@10.png
-		ICON_MAGIC_11,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_–‚–@11.png
-		ICON_MAGIC_12,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_–‚–@12.png
-		ICON_MAGIC_13,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_–‚–@13.png
-		ICON_CC,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_ó‘ÔˆÙí.png
+		ICON_BLOCK,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_é˜²å¾¡.png
+		ICON_NONE,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_ç„¡åœ°.png
+		ICON_SLASH_1,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_æ–¬æ’ƒ1.png
+		ICON_MAGIC_1,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_é­”æ³•1.png
+		ICON_MAGIC_10,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_é­”æ³•10.png
+		ICON_MAGIC_11,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_é­”æ³•11.png
+		ICON_MAGIC_12,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_é­”æ³•12.png
+		ICON_MAGIC_13,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_é­”æ³•13.png
+		ICON_CC,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_çŠ¶æ…‹ç•°å¸¸.png
 
-		ICON_MAGIC_14,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_–‚–@14.png
-		ICON_SLASH_2,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_ŽaŒ‚2.png
-		ICON_MAGIC_2,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_–‚–@2.png
-		ICON_SLASH_3,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_ŽaŒ‚3.png
-		ICON_MAGIC_3,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_–‚–@3.png
-		ICON_SLASH_4,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_ŽaŒ‚4.png
-		ICON_MAGIC_4,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_–‚–@4.png
-		ICON_SLASH_5,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_ŽaŒ‚5.png
-		ICON_AIR_ATTACK,	// ƒXƒLƒ‹ƒAƒCƒRƒ“_‘Î‹óUŒ‚.png
+		ICON_MAGIC_14,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_é­”æ³•14.png
+		ICON_SLASH_2,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_æ–¬æ’ƒ2.png
+		ICON_MAGIC_2,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_é­”æ³•2.png
+		ICON_SLASH_3,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_æ–¬æ’ƒ3.png
+		ICON_MAGIC_3,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_é­”æ³•3.png
+		ICON_SLASH_4,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_æ–¬æ’ƒ4.png
+		ICON_MAGIC_4,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_é­”æ³•4.png
+		ICON_SLASH_5,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_æ–¬æ’ƒ5.png
+		ICON_AIR_ATTACK,	// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_å¯¾ç©ºæ”»æ’ƒ.png
 
-		ICON_MAGIC_5,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_–‚–@5.png
-		ICON_SLASH_6,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_ŽaŒ‚6.png
-		ICON_MAGIC_6,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_–‚–@6.png
-		ICON_MAGIC_7,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_–‚–@7.png
-		ICON_MAGIC_8,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_–‚–@8.png
-		ICON_MAGIC_9,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_–‚–@9.png
-		ICON_MIKO,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_‚¨âP‚¢.png
-		ICON_DEBUFF,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_ƒfƒoƒt.png
-		ICON_SCYTHE,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_‘åŠ™UŒ‚.png
+		ICON_MAGIC_5,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_é­”æ³•5.png
+		ICON_SLASH_6,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_æ–¬æ’ƒ6.png
+		ICON_MAGIC_6,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_é­”æ³•6.png
+		ICON_MAGIC_7,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_é­”æ³•7.png
+		ICON_MAGIC_8,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_é­”æ³•8.png
+		ICON_MAGIC_9,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_é­”æ³•9.png
+		ICON_MIKO,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_ãŠç¥“ã„.png
+		ICON_DEBUFF,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_ãƒ‡ãƒãƒ•.png
+		ICON_SCYTHE,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_å¤§éŽŒæ”»æ’ƒ.png
 
-		ICON_SKULL,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_ƒhƒNƒ.png
-		ICON_PUNCH,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_ƒpƒ“ƒ`.png
-		ICON_BREATH,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_ƒuƒŒƒX.png
-		ICON_RING,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_ƒŠƒ“ƒO.png
-		ICON_HEALER,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_‰ñ•œ–ð.png
-		ICON_BOW,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_‹|UŒ‚.png
-		ICON_SWORD,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_Œ•UŒ‚.png
-		ICON_RRIDENT,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_ŽO³‘„.png
-		ICON_CLAYMORE,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_‘åŒ•UŒ‚.png
+		ICON_SKULL,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_ãƒ‰ã‚¯ãƒ­.png
+		ICON_PUNCH,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_ãƒ‘ãƒ³ãƒ.png
+		ICON_BREATH,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_ãƒ–ãƒ¬ã‚¹.png
+		ICON_RING,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_ãƒªãƒ³ã‚°.png
+		ICON_HEALER,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_å›žå¾©å½¹.png
+		ICON_BOW,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_å¼“æ”»æ’ƒ.png
+		ICON_SWORD,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_å‰£æ”»æ’ƒ.png
+		ICON_RRIDENT,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_ä¸‰å‰æ§.png
+		ICON_CLAYMORE,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_å¤§å‰£æ”»æ’ƒ.png
 
-		ICON_GUN,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_eUŒ‚.png
-		ICON_LAMP,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_Æ‚ç‚·.png
-		ICON_HAMMER,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_’ÆUŒ‚.png
-		ICON_KATANA,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_“UŒ‚.png
-		ICON_AXE,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_•€UŒ‚.png
-		ICON_ITEM_BAG,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_“¹‹ï‘Ü.png
-		ICON_SPECIAL_1,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_•KŽE‹Z1.png
-		ICON_SPECIAL_10,	// ƒXƒLƒ‹ƒAƒCƒRƒ“_•KŽE‹Z10.png
-		ICON_SUMMON,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_–‚•¨¢Š«.png
+		ICON_GUN,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_éŠƒæ”»æ’ƒ.png
+		ICON_LAMP,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_ç…§ã‚‰ã™.png
+		ICON_HAMMER,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_æ§Œæ”»æ’ƒ.png
+		ICON_KATANA,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_åˆ€æ”»æ’ƒ.png
+		ICON_AXE,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_æ–§æ”»æ’ƒ.png
+		ICON_ITEM_BAG,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_é“å…·è¢‹.png
+		ICON_SPECIAL_1,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_å¿…æ®ºæŠ€1.png
+		ICON_SPECIAL_10,	// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_å¿…æ®ºæŠ€10.png
+		ICON_SUMMON,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_é­”ç‰©å¬å–š.png
 
-		ICON_SPECIAL_2,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_•KŽE‹Z2.png
-		ICON_SPECIAL_3,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_•KŽE‹Z3.png
-		ICON_SPECIAL_4,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_•KŽE‹Z4.png
-		ICON_SPECIAL_5,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_•KŽE‹Z5.png
-		ICON_SPECIAL_6,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_•KŽE‹Z6.png
-		ICON_SPECIAL_7,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_•KŽE‹Z7.png
-		ICON_SPECIAL_8,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_•KŽE‹Z8.png
-		ICON_SPECIAL_9,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_•KŽE‹Z9.png
-		ICON_MAGIC_EFFECT,	// ƒXƒLƒ‹ƒAƒCƒRƒ“_–‚–@Œø‰Ê.png
+		ICON_SPECIAL_2,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_å¿…æ®ºæŠ€2.png
+		ICON_SPECIAL_3,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_å¿…æ®ºæŠ€3.png
+		ICON_SPECIAL_4,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_å¿…æ®ºæŠ€4.png
+		ICON_SPECIAL_5,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_å¿…æ®ºæŠ€5.png
+		ICON_SPECIAL_6,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_å¿…æ®ºæŠ€6.png
+		ICON_SPECIAL_7,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_å¿…æ®ºæŠ€7.png
+		ICON_SPECIAL_8,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_å¿…æ®ºæŠ€8.png
+		ICON_SPECIAL_9,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_å¿…æ®ºæŠ€9.png
+		ICON_MAGIC_EFFECT,	// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_é­”æ³•åŠ¹æžœ.png
 
-		ICON_MAGIC_ATTACK,	// ƒXƒLƒ‹ƒAƒCƒRƒ“_–‚–@UŒ‚.png
-		ICON_COUNTER,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_ƒJƒEƒ“ƒ^[.png
-		ICON_KNIFE,			// ƒXƒLƒ‹ƒAƒCƒRƒ“_ƒiƒCƒtUŒ‚.png
-		ICON_LOCKON,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_ƒƒbƒNƒIƒ“.png
-		ICON_HARISEN,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_ƒnƒŠƒZƒ“UŒ‚.png
-		ICON_HALBERD,		// ƒXƒLƒ‹ƒAƒCƒRƒ“_ƒnƒ‹ƒo[ƒhUŒ‚.png
+		ICON_MAGIC_ATTACK,	// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_é­”æ³•æ”»æ’ƒ.png
+		ICON_COUNTER,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_ã‚«ã‚¦ãƒ³ã‚¿ãƒ¼.png
+		ICON_KNIFE,			// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_ãƒŠã‚¤ãƒ•æ”»æ’ƒ.png
+		ICON_LOCKON,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_ãƒ­ãƒƒã‚¯ã‚ªãƒ³.png
+		ICON_HARISEN,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_ãƒãƒªã‚»ãƒ³æ”»æ’ƒ.png
+		ICON_HALBERD,		// ã‚¹ã‚­ãƒ«ã‚¢ã‚¤ã‚³ãƒ³_ãƒãƒ«ãƒãƒ¼ãƒ‰æ”»æ’ƒ.png
 	};
 	const int lineBreak = 9;
 

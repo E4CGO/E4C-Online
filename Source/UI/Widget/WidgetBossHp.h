@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "TAKOEngine/GUI/Widget.h"
 
@@ -20,6 +20,6 @@ private:
 	std::shared_ptr<Sprite> gauge;
 	std::shared_ptr<Sprite> gaugeFrame;
 
-	// •`‰æ—p
+	// æç”»ç”¨
 	float tempHp = 0;
 };

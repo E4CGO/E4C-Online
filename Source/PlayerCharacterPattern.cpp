@@ -6,8 +6,7 @@
 
 /**************************************************************************//**
  	@brief		性別処理
-	@param[in]	player	プレイヤー参照ポインタ
-	@param[in]	gender	性別	TRUE：男性	FALSE:女性
+	@param[in]	chara	プレイヤー参照ポインタ
 	@return		なし
 *//***************************************************************************/
 void PlayerCharacterPatternGender::Execute(Character* chara)
@@ -27,7 +26,7 @@ void PlayerCharacterPatternGender::Execute(Character* chara)
 
 /**************************************************************************//**
  	@brief		単一モデル実装
-	@param[in]	player	プレイヤー参照ポインタ
+	@param[in]	chara	プレイヤー参照ポインタ
 	@return		なし
 *//***************************************************************************/
 void PlayerCharacterPatternSingleModel::Execute(Character* chara)
