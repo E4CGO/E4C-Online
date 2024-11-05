@@ -16,6 +16,4 @@ public:
 		int pointIndex);
 
 	void PlaceMapTile() override;
-
-	int DrawDebugGUI(int i = 0) override;
 };

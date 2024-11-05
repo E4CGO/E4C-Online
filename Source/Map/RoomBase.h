@@ -93,21 +93,9 @@ public:
 			DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(data.position.x, data.position.y, data.position.z);
 
 			DirectX::XMMATRIX LocalTransform = S * R * T;
-			DirectX::XMMATRIX ParentTransform;
-			if (parentConnectPointIndex > -1)
-			{
-				DirectX::XMFLOAT4X4 parentTransform = parent->GetConnectPointData(parentConnectPointIndex).transform;
-				//DirectX::XMFLOAT4X4 parentTransform = parent->GetNextPosTranform();
-				ParentTransform = DirectX::XMLoadFloat4x4(&parentTransform);
-			}
-			else
-			{
-				ParentTransform = DirectX::XMMatrixIdentity();
-			}
+			DirectX::XMMATRIX ParentTransform = DirectX::XMLoadFloat4x4(&m_transform);
 			DirectX::XMMATRIX GlobalTransform = LocalTransform * ParentTransform;
 			DirectX::XMStoreFloat4x4(&data.transform, GlobalTransform);
-
-			int a = 0;
 		}
 	}
 
@@ -216,7 +204,77 @@ public:
 	virtual void PlaceExit() {}
 
 	// GUI
-	virtual int DrawDebugGUI(int i = 0) { return i; }
+	virtual int DrawDebugGUI(int i = 0)
+	{
+		std::string nameStr = "";
+
+		switch (roomType)
+		{
+		case DungeonData::SIMPLE_ROOM_1: nameStr = "SimpleRoom1";	break;
+		case DungeonData::END_ROOM:		 nameStr = "EndRoom";		break;
+		case DungeonData::CROSS_ROOM_1:	 nameStr = "CrossRoom1";	break;
+		case DungeonData::PASSAGE_1:	 nameStr = "Passage1";		break;
+		default: break;
+		}
+
+		if (ImGui::TreeNode((nameStr + "(" + std::to_string(i) + ")").c_str()))
+		{
+			DirectX::XMFLOAT3 debugAngle;
+			debugAngle.x = DirectX::XMConvertToDegrees(m_angle.x);
+			debugAngle.y = DirectX::XMConvertToDegrees(m_angle.y);
+			debugAngle.z = DirectX::XMConvertToDegrees(m_angle.z);
+			ImGui::DragFloat3("Angle", &debugAngle.x);
+			m_angle.x = DirectX::XMConvertToRadians(debugAngle.x);
+			m_angle.y = DirectX::XMConvertToRadians(debugAngle.y);
+			m_angle.z = DirectX::XMConvertToRadians(debugAngle.z);
+
+			//ImGui::Text(("MapTileSize: " + std::to_string(mapTiles.size())).c_str());
+			ImGui::Text(("ParentConnectPointIndex: " + std::to_string(parentConnectPointIndex)).c_str());
+			ImGui::Text(("Depth: " + std::to_string(depth)).c_str());
+
+			// 接続点
+			if (m_connectPointDatas.size() > 0)
+			{
+				if (ImGui::TreeNode("ConnectPoints"))
+				{
+					for (int j = 0; j < m_connectPointDatas.size(); j++)
+					{
+						if (ImGui::TreeNode(("Point(" + std::to_string(j) + ")").c_str()))
+						{
+							ImGui::PushID(j);
+							ImGui::DragFloat3("Position", &m_connectPointDatas[j].position.x);
+							DirectX::XMFLOAT3 debugConnectAngle;
+							debugConnectAngle.x = DirectX::XMConvertToDegrees(m_connectPointDatas[j].angle.x);
+							debugConnectAngle.y = DirectX::XMConvertToDegrees(m_connectPointDatas[j].angle.y);
+							debugConnectAngle.z = DirectX::XMConvertToDegrees(m_connectPointDatas[j].angle.z);
+							ImGui::DragFloat3("Angle", &debugConnectAngle.x);
+							m_connectPointDatas[j].angle.x = DirectX::XMConvertToRadians(debugConnectAngle.x);
+							m_connectPointDatas[j].angle.y = DirectX::XMConvertToRadians(debugConnectAngle.y);
+							m_connectPointDatas[j].angle.z = DirectX::XMConvertToRadians(debugConnectAngle.z);
+							ImGui::PopID();
+							ImGui::TreePop();
+						}
+					}
+					ImGui::TreePop();
+				}
+			}
+
+			// 子
+			if (childs.size() > 0)
+			{
+				if (ImGui::TreeNode("Childs"))
+				{
+					for (RoomBase* child : childs)
+					{
+						i = child->DrawDebugGUI(++i);
+					}
+					ImGui::TreePop();
+				}
+			}
+			ImGui::TreePop();
+		}
+		return i;
+	}
 
 protected:
 	DirectX::XMFLOAT3 m_position = { 0.0f, 0.0f, 0.0f };
@@ -229,11 +287,11 @@ protected:
 		0, 0, 0, 1
 	};
 
-	DirectX::XMFLOAT2 sides[4];	// 当たり判定用の辺
-
 	std::vector<TILE_DATA> m_tileDatas;
 	std::vector<CONNECTPOINT_DATA> m_connectPointDatas;
 	std::vector<DungeonData::RoomType> m_connectableRooms;
+
+	//std::vector<MapTile*> mapTiles;
 
 	int parentConnectPointIndex = -1;
 	int depth = 0;

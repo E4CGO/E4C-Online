@@ -20,9 +20,4 @@ public:
 	void Update(float elapsedTime) override;
 
 	void PlaceMapTile() override;
-
-	int DrawDebugGUI(int i = 0) override;
-
-private:
-	std::vector<MapTile*> tiles;
 };

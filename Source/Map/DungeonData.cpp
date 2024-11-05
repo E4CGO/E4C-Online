@@ -22,14 +22,14 @@ DungeonData::DungeonData()
 	// CROSS_ROOM_1
 	{
 		RoomGenerateSetting setting;
-		setting.weight = 10;
+		setting.weight = 20;
 		m_roomGenerateSettings.at(CROSS_ROOM_1) = setting;
 	}
 
 	// PASSAGE_1
 	{
 		RoomGenerateSetting setting;
-		setting.weight = 60;
+		setting.weight = 50;
 		m_roomGenerateSettings.at(PASSAGE_1) = setting;
 	}
 

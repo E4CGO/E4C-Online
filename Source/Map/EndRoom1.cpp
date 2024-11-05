@@ -114,20 +114,3 @@ void EndRoom1::PlaceExit()
 	exit->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 8.0f));
 	MAPTILES.Register(exit);
 }
-
-int EndRoom1::DrawDebugGUI(int i)
-{
-	if (ImGui::TreeNode(("EndRoom1(" + std::to_string(i) + ")").c_str()))
-	{
-		DirectX::XMFLOAT3 debugAngle;
-		debugAngle.x = DirectX::XMConvertToDegrees(m_angle.x);
-		debugAngle.y = DirectX::XMConvertToDegrees(m_angle.y);
-		debugAngle.z = DirectX::XMConvertToDegrees(m_angle.z);
-		ImGui::DragFloat3("Angle", &debugAngle.x);
-		m_angle.x = DirectX::XMConvertToRadians(debugAngle.x);
-		m_angle.y = DirectX::XMConvertToRadians(debugAngle.y);
-		m_angle.z = DirectX::XMConvertToRadians(debugAngle.z);
-		ImGui::TreePop();
-	}
-	return i;
-}

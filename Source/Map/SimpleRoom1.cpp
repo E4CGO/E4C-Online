@@ -322,7 +322,8 @@ void SimpleRoom1::PlaceMapTile()
 		newTile->SetAngle(tileData.angle);
 		newTile->SetScale(tileData.scale);
 		newTile->SetColor(tileData.color);
-		tiles.emplace_back(newTile);
+		MAPTILES.Register(newTile);
+		//mapTiles.emplace_back(newTile);
 
 		//// MapTileManagerに登録してあるモデル（この部屋以外のモデル）
 		//// と衝突判定を行う
@@ -342,53 +343,8 @@ void SimpleRoom1::PlaceMapTile()
 	//int a = 0;
 
 	// 最後にMapTileManagerに登録する
-	for (MapTile* tile : tiles)
-	{
-		MAPTILES.Register(tile);
-	}
-}
-
-int SimpleRoom1::DrawDebugGUI(int i)
-{
-	if (ImGui::TreeNode(("SimpleRoom1(" + std::to_string(i) + ")").c_str()))
-	{
-		DirectX::XMFLOAT3 debugAngle;
-		debugAngle.x = DirectX::XMConvertToDegrees(m_angle.x);
-		debugAngle.y = DirectX::XMConvertToDegrees(m_angle.y);
-		debugAngle.z = DirectX::XMConvertToDegrees(m_angle.z);
-		ImGui::DragFloat3("Angle", &debugAngle.x);
-		m_angle.x = DirectX::XMConvertToRadians(debugAngle.x);
-		m_angle.y = DirectX::XMConvertToRadians(debugAngle.y);
-		m_angle.z = DirectX::XMConvertToRadians(debugAngle.z);
-
-		if (ImGui::TreeNode("ConnectPoints"))
-		{
-			for (int j = 0; j < m_connectPointDatas.size(); j++)
-			{
-				if (ImGui::TreeNode(("Point(" + std::to_string(j) + ")").c_str()))
-				{
-					ImGui::PushID(j);
-					ImGui::DragFloat3("Position", &m_connectPointDatas[j].position.x);
-					DirectX::XMFLOAT3 debugConnectAngle;
-					debugConnectAngle.x = DirectX::XMConvertToDegrees(m_connectPointDatas[j].angle.x);
-					debugConnectAngle.y = DirectX::XMConvertToDegrees(m_connectPointDatas[j].angle.y);
-					debugConnectAngle.z = DirectX::XMConvertToDegrees(m_connectPointDatas[j].angle.z);
-					ImGui::DragFloat3("Angle", &debugConnectAngle.x);
-					m_connectPointDatas[j].angle.x = DirectX::XMConvertToRadians(debugConnectAngle.x);
-					m_connectPointDatas[j].angle.y = DirectX::XMConvertToRadians(debugConnectAngle.y);
-					m_connectPointDatas[j].angle.z = DirectX::XMConvertToRadians(debugConnectAngle.z);
-					ImGui::PopID();
-					ImGui::TreePop();
-				}
-			}
-			ImGui::TreePop();
-		}
-		ImGui::TreePop();
-	}
-
-	for (RoomBase* child : childs)
-	{
-		i = child->DrawDebugGUI(++i);
-	}
-	return i;
+	//for (MapTile* tile : mapTiles)
+	//{
+	//	MAPTILES.Register(tile);
+	//}
 }
