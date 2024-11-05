@@ -28,6 +28,7 @@ NonPlayerCharacter::NonPlayerCharacter(uint64_t id, const char* name, uint8_t ap
 
 	// 衝突判定
 	SetCollider(Collider::COLLIDER_TYPE::SPHERE);
+	collider->SetScale(DirectX::XMFLOAT3{ height * 0.3f, height * 0.3f, height * 0.3f } *scale);
 
 	m_client_id = id;
 	this->name = name;
@@ -120,7 +121,7 @@ void NonPlayerCharacter::UpdateTarget()
 void NonPlayerCharacter::UpdateColliders()
 {
 	collider->SetPosition(position + DirectX::XMFLOAT3{ 0, height * 0.5f, 0 } *scale);
-	collider->SetScale(DirectX::XMFLOAT3{ height * 0.3f, height * 0.3f, height * 0.3f } *scale);
+	//collider->SetScale(DirectX::XMFLOAT3{ height * 0.3f, height * 0.3f, height * 0.3f } *scale);
 }
 
 bool  NonPlayerCharacter::CollisionVsEnemies(Collider* collider, int damage, bool power, float force, int effectIdx, float effectScale)

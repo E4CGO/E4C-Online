@@ -61,6 +61,11 @@ public:
 		return false;
 	};
 
+	virtual bool CollisionVsMap(bool wallCheck = false) 
+	{
+		return false;
+	};
+
 	virtual bool RayCast(
 		const DirectX::XMFLOAT3& start,
 		const DirectX::XMFLOAT3& end,

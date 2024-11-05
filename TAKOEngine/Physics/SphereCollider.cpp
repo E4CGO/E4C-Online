@@ -2,6 +2,7 @@
 
 #include <DirectXCollision.h>
 #include "SphereCollider.h"
+#include "Source/Map/MapTileManager.h"
 
 SphereCollider::SphereCollider(float _radius)
 {
@@ -34,6 +35,21 @@ bool SphereCollider::CollisionVsShpere(
 	}
 	return false;
 }
+
+bool SphereCollider::CollisionVsMap(bool wallCheck)
+{
+	Sphere sphere;
+	sphere.position = position;
+	sphere.radius = radius;
+
+	if (MAPTILES.IntersectSphereVsMap(sphere, wallCheck))
+	{
+		position = sphere.position;
+		return true;
+	}
+	return false;
+};
+
 
 bool SphereCollider::RayCast(
 	const DirectX::XMFLOAT3& start,

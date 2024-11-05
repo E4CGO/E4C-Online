@@ -1,17 +1,17 @@
-#include "MapTileManager.h"
+ï»¿#include "MapTileManager.h"
 
-// ƒŒƒCƒLƒƒƒXƒg
+// ãƒ¬ã‚¤ã‚­ãƒ£ã‚¹ãƒˆ
 bool MapTileManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, HitResult& hit, bool camera)
 {
 	XMFLOAT3 rayDirection = end - start;
 	float rayDist = XMFLOAT3Length(rayDirection);
 	rayDirection = XMFLOAT3Normalize(rayDirection);
 
-	RayCast(start, rayDirection, rayDist, hit, camera);
+	return RayCast(start, rayDirection, rayDist, hit, camera);
 }
 bool MapTileManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& direction, float dist, HitResult& hit, bool camera)
 {
-	// Å¬’lÅ‘å’l
+	// æœ€å°å€¤æœ€å¤§å€¤
 	float minX, maxX;
 	if (direction.x > 0.0f)
 	{
@@ -48,7 +48,7 @@ bool MapTileManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFL
 		maxZ = start.z;
 	}
 
-	// ƒŒƒC‚ª’Ê‚é‹óŠÔ‚Ì”z—ñ”Ô†Zo
+	// ãƒ¬ã‚¤ãŒé€šã‚‹ç©ºé–“ã®é…åˆ—ç•ªå·ç®—å‡º
 	int Elem = tree.GetLinerIndex(minX, maxX, minY, maxY, minZ, maxZ);
 
 	bool ret = false;
@@ -57,7 +57,7 @@ bool MapTileManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFL
 	return ret;
 }
 
-// ‚’¼ƒŒƒCƒLƒƒƒXƒg
+// å‚ç›´ãƒ¬ã‚¤ã‚­ãƒ£ã‚¹ãƒˆ
 bool MapTileManager::VerticalRayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, HitResult& hit)
 {
 	HitResultVector result;
@@ -74,7 +74,24 @@ bool MapTileManager::VerticalRayCast(const DirectX::XMFLOAT3& start, const Direc
 	return ret;
 }
 
-// ƒ}ƒbƒvƒTƒCƒYŒvZ
+// çƒã®æŠ¼ã—æˆ»ã—
+bool MapTileManager::IntersectSphereVsMap(Sphere& sphere, bool wallCheck)
+{
+	XMFLOAT3 minPos, maxPos;
+	sphere.GetBoundPoints(&minPos, &maxPos);
+
+	//çƒã®ç©ºé–“é…åˆ—ç•ªå·
+	int Elem = tree.GetLinerIndex(minPos.x, maxPos.x, minPos.y, maxPos.y, minPos.z, maxPos.z);
+
+	DirectX::XMVECTOR position = DirectX::XMLoadFloat3(&sphere.position);
+	bool ret = false;
+	SearchChildren(Elem, position, sphere.radius, wallCheck, ret);
+	SearchParent(Elem, position, sphere.radius, wallCheck, ret);
+
+	return ret;
+}
+
+// ãƒãƒƒãƒ—ã‚µã‚¤ã‚ºè¨ˆç®—
 void MapTileManager::CalcMapArea(DirectX::XMFLOAT3& minPos, DirectX::XMFLOAT3& maxPos)
 {
 	minPos = { FLT_MAX, FLT_MAX , FLT_MAX };
@@ -87,12 +104,12 @@ void MapTileManager::CalcMapArea(DirectX::XMFLOAT3& minPos, DirectX::XMFLOAT3& m
 		const ModelResource* resource = item->GetModel()->GetResource();
 		for (const ModelResource::Mesh& mesh : resource->GetMeshes())
 		{
-			// ƒƒbƒVƒ…ƒm[ƒhæ“¾
+			// ãƒ¡ãƒƒã‚·ãƒ¥ãƒãƒ¼ãƒ‰å–å¾—
 			const iModel::Node& node = item->GetModel()->GetNodes().at(mesh.nodeIndex);
-			// ƒ[ƒ‹ƒhs—ñ
+			// ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—
 			XMMATRIX WorldTransform = XMLoadFloat4x4(&node.worldTransform);
 
-			// ’¸“_ƒf[ƒ^æ“¾
+			// é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿å–å¾—
 			const std::vector<ModelResource::Vertex>& vertices = mesh.vertices;
 
 			for (UINT i = 1; i < vertices.size(); i++)
@@ -149,7 +166,7 @@ void MapTileManager::CreateSpatialIndex(uint32_t quadDepth, uint32_t octDepth, D
 	tree.Initialize(octDepth,
 		c_minPos.x - 1.0f, c_maxPos.x + 1.0f,
 		c_minPos.y - 20.0f, c_maxPos.y + 20.0f,
-		c_minPos.z - 1.0f, c_maxPos.z + 1.0f);	// ƒGƒŠƒA‚ğ­‚µ‘å‚«‚ß‚Éì¬
+		c_minPos.z - 1.0f, c_maxPos.z + 1.0f);	// ã‚¨ãƒªã‚¢ã‚’å°‘ã—å¤§ãã‚ã«ä½œæˆ
 
 	XMFLOAT3 center = (c_minPos + c_maxPos) * 0.5f;
 	XMFLOAT3 size = c_maxPos - c_minPos;
@@ -164,7 +181,7 @@ void MapTileManager::CreateSpatialIndex(uint32_t quadDepth, uint32_t octDepth, D
 	InsertMapMesh();
 }
 
-// ƒ}ƒbƒv‚ÌƒƒbƒVƒ…‚ğ“o˜^
+// ãƒãƒƒãƒ—ã®ãƒ¡ãƒƒã‚·ãƒ¥ã‚’ç™»éŒ²
 int MapTileManager::InsertMapMesh()
 {
 	int count = 0;
@@ -173,11 +190,11 @@ int MapTileManager::InsertMapMesh()
 	{
 		int nowMeshNum = 0;
 
-		// ƒ‚ƒfƒ‹‚ÌƒƒbƒVƒ…‚ÌOŠpŒ`‚ğƒ[ƒ‹ƒhÀ•W‚Ål•ª–Ø‹óŠÔ‚É“o˜^
+		// ãƒ¢ãƒ‡ãƒ«ã®ãƒ¡ãƒƒã‚·ãƒ¥ã®ä¸‰è§’å½¢ã‚’ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ã§å››åˆ†æœ¨ç©ºé–“ã«ç™»éŒ²
 		const ModelResource* resource = item->GetModel()->GetResource();
 		for (const ModelResource::Mesh& mesh : resource->GetMeshes())
 		{
-			// ƒƒbƒVƒ…ƒm[ƒhæ“¾
+			// ãƒ¡ãƒƒã‚·ãƒ¥ãƒãƒ¼ãƒ‰å–å¾—
 			const iModel::Node& node = item->GetModel()->GetNodes().at(mesh.nodeIndex);
 
 			DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&node.worldTransform);
@@ -186,7 +203,7 @@ int MapTileManager::InsertMapMesh()
 
 			for (UINT i = 0; i < indices.size(); i += 3)
 			{
-				// OŠpŒ`‚Ì’¸“_‚ğ’Šo
+				// ä¸‰è§’å½¢ã®é ‚ç‚¹ã‚’æŠ½å‡º
 				const ModelResource::Vertex& a = vertices.at(indices.at(i));
 				const ModelResource::Vertex& b = vertices.at(indices.at(i + 1));
 				const ModelResource::Vertex& c = vertices.at(indices.at(i + 2));
@@ -205,7 +222,7 @@ int MapTileManager::InsertMapMesh()
 				DirectX::XMStoreFloat3(&p_triangle->position[1], B);
 				DirectX::XMStoreFloat3(&p_triangle->position[2], C);
 
-				// OŠpŒ`‚ğƒ[ƒ‹ƒhÀ•W‚Å“o˜^
+				// ä¸‰è§’å½¢ã‚’ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ã§ç™»éŒ²
 				quadtree.InsertTriangleObject(triangle);
 				octree.InsertTriangleObject(triangle);
 
@@ -222,7 +239,7 @@ int MapTileManager::InsertMapMesh()
 	return count;
 }
 
-bool MapTileManager::SearchChildren(	// q‹óŠÔ’Tõ
+bool MapTileManager::SearchChildren(	// å­ç©ºé–“æ¢ç´¢
 	int Elem,
 	const DirectX::XMFLOAT3& start,
 	const DirectX::XMFLOAT3& direction,
@@ -230,10 +247,10 @@ bool MapTileManager::SearchChildren(	// q‹óŠÔ’Tõ
 	HitResult& result,
 	bool& hit)
 {
-	// ‹óŠÔŠO‚È‚çreturn
+	// ç©ºé–“å¤–ãªã‚‰return
 	if (Elem < 0) return hit;
 
-	// q‹óŠÔ‚ª‘¶İ‚·‚é‚È‚çq‹óŠÔ‚ğ’Tõ
+	// å­ç©ºé–“ãŒå­˜åœ¨ã™ã‚‹ãªã‚‰å­ç©ºé–“ã‚’æ¢ç´¢
 	if ((Elem + 1) << 3 < tree.m_iCellNum)
 	{
 		int childElem = (Elem << 3) + 1;
@@ -245,19 +262,14 @@ bool MapTileManager::SearchChildren(	// q‹óŠÔ’Tõ
 		}
 	}
 
-	// ‚±‚Ì‹óŠÔ‚ª‘¶İ‚µ‚È‚¢‚È‚çreturn
+	// ã“ã®ç©ºé–“ãŒå­˜åœ¨ã—ãªã„ãªã‚‰return
 	if (!tree.ppCellAry[Elem])	return hit;
 
-	// ‚±‚Ì‹óŠÔ‚É“o˜^‚³‚ê‚Ä‚¢‚éƒ|ƒŠƒSƒ“‚Æ‚Ì“–‚½‚è”»’è
+	// ã“ã®ç©ºé–“ã«ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ãƒãƒªã‚´ãƒ³ã¨ã®å½“ãŸã‚Šåˆ¤å®š
 	Liner8TreeManager<Triangle>::OFT<Triangle>* oft = tree.ppCellAry[Elem]->pLatest;
 	while (oft)
 	{
-		XMFLOAT3 triangleVerts[3] = {
-			oft->m_pObject->position[0],
-			oft->m_pObject->position[1],
-			oft->m_pObject->position[2]
-		};
-		if (Collision::IntersectRayVsTriangle(start, direction, dist, triangleVerts, result))
+		if (Collision::IntersectRayVsTriangle(start, direction, dist, oft->m_pObject->position, result))
 		{
 			hit = true;
 		}
@@ -267,8 +279,72 @@ bool MapTileManager::SearchChildren(	// q‹óŠÔ’Tõ
 
 	return hit;
 }
+bool MapTileManager::SearchChildren(
+	int Elem,
+	DirectX::XMVECTOR& spherePos,
+	float radius,
+	bool wallCheck,
+	bool& hit)
+{
+	// ç©ºé–“å¤–ãªã‚‰return
+	if (Elem < 0) return hit;
 
-bool MapTileManager::SearchParent(	// e‹óŠÔ’Tõ
+	// å­ç©ºé–“ãŒå­˜åœ¨ã™ã‚‹ãªã‚‰å­ç©ºé–“ã‚’æ¢ç´¢
+	if ((Elem + 1) << 3 < tree.m_iCellNum)
+	{
+		int childElem = (Elem << 3) + 1;
+
+		for (int i = 0; i < 8; i++)
+		{
+			if (SearchChildren(childElem + i, spherePos, radius, wallCheck, hit))
+				break;
+		}
+	}
+
+	// ã“ã®ç©ºé–“ãŒå­˜åœ¨ã—ãªã„ãªã‚‰return
+	if (!tree.ppCellAry[Elem])	return hit;
+
+	// ã“ã®ç©ºé–“ã«ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ãƒãƒªã‚´ãƒ³ã¨ã®å½“ãŸã‚Šåˆ¤å®š
+	Liner8TreeManager<Triangle>::OFT<Triangle>* oft = tree.ppCellAry[Elem]->pLatest;
+	IntersectionResult result;
+	
+	while (oft)
+	{
+		DirectX::XMVECTOR triPos[3] =
+		{
+			DirectX::XMLoadFloat3(&oft->m_pObject->position[0]),
+			DirectX::XMLoadFloat3(&oft->m_pObject->position[1]),
+			DirectX::XMLoadFloat3(&oft->m_pObject->position[2])
+		};
+
+		if(wallCheck)
+		{
+			if (Collision::IntersectSphereVsTriangle(spherePos, radius, triPos, &result, true))
+			{
+				// wallCheckãŒtrueã®ã¨ãã¯å£ã«å½“ãŸã£ã¦ã„ã‚‹æ™‚true
+				if (result.normal.m128_f32[1] < 0.4f)	// 66åº¦ä»¥ä¸Šã®å£
+				{
+					hit = true;
+				}
+			}
+		}
+		else
+		{
+			if (Collision::IntersectSphereVsTriangle(spherePos, radius, triPos, &result, true))
+			{
+				// çƒä½“ã®ã¿æŠ¼ã—æˆ»ã—å‡¦ç†
+				spherePos = DirectX::XMVectorAdd(spherePos, DirectX::XMVectorScale(result.normal, result.penetration));
+				hit = true;
+			}
+		}
+		
+		oft = oft->m_pNext;
+	}
+
+	return hit;
+}
+
+bool MapTileManager::SearchParent(	// è¦ªç©ºé–“æ¢ç´¢
 	int Elem,
 	const DirectX::XMFLOAT3& start,
 	const DirectX::XMFLOAT3& direction,
@@ -276,16 +352,16 @@ bool MapTileManager::SearchParent(	// e‹óŠÔ’Tõ
 	HitResult& result,
 	bool& hit)
 {
-	// ‹óŠÔŠO‚È‚çreturn
+	// ç©ºé–“å¤–ãªã‚‰return
 	if (Elem <= 0) return hit;
 
 	int parentElem = (Elem - 1) >> 3;
 	while (1)
 	{
-		// ‚±‚Ì‹óŠÔ‚ª‘¶İ‚µ‚È‚¢‚È‚çe‹óŠÔ‚ÉˆÚ“®
+		// ã“ã®ç©ºé–“ãŒå­˜åœ¨ã—ãªã„ãªã‚‰è¦ªç©ºé–“ã«ç§»å‹•
 		if (!tree.ppCellAry[parentElem])
 		{
-			// ƒ‹[ƒg‹óŠÔ‚È‚çbreak
+			// ãƒ«ãƒ¼ãƒˆç©ºé–“ãªã‚‰break
 			if (parentElem == 0)	break;
 			parentElem = (parentElem - 1) >> 3;
 			continue;
@@ -294,12 +370,7 @@ bool MapTileManager::SearchParent(	// e‹óŠÔ’Tõ
 		Liner8TreeManager<Triangle>::OFT<Triangle>* oft = tree.ppCellAry[parentElem]->pLatest;
 		while (oft)
 		{
-			XMFLOAT3 triangleVerts[3] = {
-				oft->m_pObject->position[0],
-				oft->m_pObject->position[1],
-				oft->m_pObject->position[2]
-			};
-			if (Collision::IntersectRayVsTriangle(start, direction, dist, triangleVerts, result))
+			if (Collision::IntersectRayVsTriangle(start, direction, dist, oft->m_pObject->position, result))
 			{
 				hit = true;
 			}
@@ -307,10 +378,76 @@ bool MapTileManager::SearchParent(	// e‹óŠÔ’Tõ
 			oft = oft->m_pNext;
 		}
 
-		// ƒ‹[ƒg‹óŠÔ‚È‚çbreak
+		// ãƒ«ãƒ¼ãƒˆç©ºé–“ãªã‚‰break
 		if (parentElem == 0)	break;
 
-		// e‹óŠÔ‚ÉˆÚ“®
+		// è¦ªç©ºé–“ã«ç§»å‹•
+		parentElem = (parentElem - 1) >> 3;
+	}
+
+	return hit;
+}
+bool MapTileManager::SearchParent(	// çƒæ¢ç´¢
+	int Elem,
+	DirectX::XMVECTOR& spherePos,
+	float radius,
+	bool wallCheck,
+	bool& hit)
+{
+	// ç©ºé–“å¤–ãªã‚‰return
+	if (Elem <= 0) return hit;
+
+	int parentElem = (Elem - 1) >> 3;
+	while (1)
+	{
+		// ã“ã®ç©ºé–“ãŒå­˜åœ¨ã—ãªã„ãªã‚‰è¦ªç©ºé–“ã«ç§»å‹•
+		if (!tree.ppCellAry[parentElem])
+		{
+			// ãƒ«ãƒ¼ãƒˆç©ºé–“ãªã‚‰break
+			if (parentElem == 0)	break;
+			parentElem = (parentElem - 1) >> 3;
+			continue;
+		}
+
+		Liner8TreeManager<Triangle>::OFT<Triangle>* oft = tree.ppCellAry[parentElem]->pLatest;
+		IntersectionResult result;
+		while (oft)
+		{
+			DirectX::XMVECTOR triPos[3] =
+			{
+				DirectX::XMLoadFloat3(&oft->m_pObject->position[0]),
+				DirectX::XMLoadFloat3(&oft->m_pObject->position[1]),
+				DirectX::XMLoadFloat3(&oft->m_pObject->position[2])
+			};
+			
+			if (wallCheck)
+			{
+				if (Collision::IntersectSphereVsTriangle(spherePos, radius, triPos, &result, true))
+				{
+					// wallCheckãŒtrueã®ã¨ãã¯å£ã«å½“ãŸã£ã¦ã„ã‚‹æ™‚true
+					if (result.normal.m128_f32[1] < 0.4f)	// 66åº¦ä»¥ä¸Šã®å£
+					{
+						hit = true;
+					}
+				}
+			}
+			else
+			{
+				if (Collision::IntersectSphereVsTriangle(spherePos, radius, triPos, &result, true))
+				{
+					// çƒä½“ã®ã¿æŠ¼ã—æˆ»ã—å‡¦ç†
+					spherePos = DirectX::XMVectorAdd(spherePos, DirectX::XMVectorScale(result.normal, result.penetration));
+					hit = true;
+				}
+			}
+
+			oft = oft->m_pNext;
+		}
+
+		// ãƒ«ãƒ¼ãƒˆç©ºé–“ãªã‚‰break
+		if (parentElem == 0)	break;
+
+		// è¦ªç©ºé–“ã«ç§»å‹•
 		parentElem = (parentElem - 1) >> 3;
 	}
 

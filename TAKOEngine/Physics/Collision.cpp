@@ -1,4 +1,4 @@
-//! @file Cillision.cpp
+//! @file Collision.cpp
 //! @note “–‚½‚è”»’èˆ—‘‚Ü‚Æ‚ß
 
 #include "Collision.h"

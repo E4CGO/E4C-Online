@@ -1,4 +1,4 @@
-//! @file Cillision.h
+//! @file Collision.h
 //! @note “–‚½‚è”»’èˆ—‘‚Ü‚Æ‚ß
  
 #ifndef __Collision_H__

@@ -31,6 +31,7 @@ PlayerCharacter::PlayerCharacter(uint64_t id, const char* name, const uint8_t ap
 
 	// 衝突判定
 	SetCollider(Collider::COLLIDER_TYPE::SPHERE);
+	collider->SetScale(DirectX::XMFLOAT3{ height * 0.3f, height * 0.3f, height * 0.3f } *scale);
 
 	m_client_id = id;
 	this->m_name = name;
@@ -122,8 +123,13 @@ void PlayerCharacter::UpdateTarget()
 
 void PlayerCharacter::UpdateColliders()
 {
-	collider->SetPosition(position + DirectX::XMFLOAT3{ 0, height * 0.5f, 0 } *scale);
-	collider->SetScale(DirectX::XMFLOAT3{ height * 0.3f, height * 0.3f, height * 0.3f } *scale);
+	collider->SetPosition(position + DirectX::XMFLOAT3{ 0, height * 0.3f, 0 } *scale);
+	//if (collider->CollisionVsMap())
+	//{
+	//	position = collider->GetPosition();
+	//	position.y -= height * 0.3f * scale.y;
+	//}
+	//collider->SetScale(DirectX::XMFLOAT3{ height * 0.3f, height * 0.3f, height * 0.3f } *scale);
 }
 
 bool  PlayerCharacter::CollisionVsEnemies(Collider* collider, int damage, bool power, float force, int effectIdx, float effectScale)

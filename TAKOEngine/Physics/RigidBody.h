@@ -1,7 +1,7 @@
-//! @file RigidBody.h
-//! @note „‘Ì‚Ì•¨—ˆ—
+ï»¿//! @file RigidBody.h
+//! @note å‰›ä½“ã®ç‰©ç†å‡¦ç†
 
-#ifndef __Rigid_Body_H__
+#ifndef __RIGID_BODY_H__
 #define __Rigid_Body_H__
 
 #include <DirectXMath.h>

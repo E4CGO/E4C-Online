@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "TAKOEngine/Tool/Singleton.h"
 
@@ -15,50 +15,65 @@ protected:
 	MapTileManager() = default;
 	~MapTileManager() { tree.Finalize(); }
 public:
-	// ƒŒƒCƒLƒƒƒXƒg
+	// ãƒ¬ã‚¤ã‚­ãƒ£ã‚¹ãƒˆ
 	bool RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, HitResult& hit, bool camera = false);
 	bool RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& direction, float dist, HitResult& hit, bool camera = false);
-	// ‚’¼ƒŒƒCƒLƒƒƒXƒg
+	// å‚ç›´ãƒ¬ã‚¤ã‚­ãƒ£ã‚¹ãƒˆ
 	bool VerticalRayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, HitResult& hit);
 	
-	// ƒIƒuƒWƒFƒNƒg‚ÌƒRƒŠƒ_[‚ğ‰Ÿ‚µ–ß‚·
-	bool IntersectColliderVsMap(Collider* collider);
+	// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚³ãƒªãƒ€ãƒ¼ã‚’æŠ¼ã—æˆ»ã™
+	//bool IntersectColliderVsMap(Collider* collider);
 
-	// ‹…‚Ì‰Ÿ‚µ–ß‚µ
-	bool IntersectSphereVsMap(const DirectX::XMVECTOR& spherePos, float radius);
+	// çƒã®æŠ¼ã—æˆ»ã—
+	bool IntersectSphereVsMap(Sphere& sphere, bool wallCheck = false);
 
-	// ‹óŠÔ¶¬
+	// ç©ºé–“ç”Ÿæˆ
 	void CreateSpatialIndex(uint32_t quadDepth = 1, uint32_t octDepth = 1, DirectX::XMFLOAT3* minPos = nullptr, DirectX::XMFLOAT3* maxPos = nullptr);
 
-	// l•ª–Ø‹óŠÔ‚ÖOŠpŒ`ƒIƒuƒWƒFƒNƒg‚ğ“o˜^
+	// å››åˆ†æœ¨ç©ºé–“ã¸ä¸‰è§’å½¢ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç™»éŒ²
 	bool InsertTriangleObject(Triangle& triangle) { quadtree.InsertTriangleObject(triangle); }
-	// l•ª–Ø‹óŠÔ‚Ö‹…‘ÌƒIƒuƒWƒFƒNƒg‚ğ“o˜^
+	// å››åˆ†æœ¨ç©ºé–“ã¸çƒä½“ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç™»éŒ²
 	bool InsertSphereObject(Sphere& sphere) { quadtree.InsertSphereObject(sphere); }
-	// l•ª–Ø‹óŠÔ‚ÖAABBƒIƒuƒWƒFƒNƒg‚ğ“o˜^
+	// å››åˆ†æœ¨ç©ºé–“ã¸AABBã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç™»éŒ²
 	bool InsertAABBObject(AABB& aabb) { quadtree.InsertAABBObject(aabb); }
-	// l•ª–Ø‹óŠÔ‚ÖƒJƒvƒZƒ‹ƒIƒuƒWƒFƒNƒg‚ğ“o˜^
+	// å››åˆ†æœ¨ç©ºé–“ã¸ã‚«ãƒ—ã‚»ãƒ«ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç™»éŒ²
 	bool InsertCapsuleObject(Capsule& capsule) { quadtree.InsertCapsuleObject(capsule); }
 
 protected:
-	// ƒ}ƒbƒvƒTƒCƒYŒvZ
+	// ãƒãƒƒãƒ—ã‚µã‚¤ã‚ºè¨ˆç®—
 	void CalcMapArea(DirectX::XMFLOAT3& minPos, DirectX::XMFLOAT3& maxPos);
 
-	// ƒ}ƒbƒv‚ÌƒƒbƒVƒ…‚ğ“o˜^(•Ô‚è’l‚ÍƒƒbƒVƒ…‚ÌOŠpŒ`‚Ì”)
+	// ãƒãƒƒãƒ—ã®ãƒ¡ãƒƒã‚·ãƒ¥ã‚’ç™»éŒ²(è¿”ã‚Šå€¤ã¯ãƒ¡ãƒƒã‚·ãƒ¥ã®ä¸‰è§’å½¢ã®æ•°)
 	int InsertMapMesh();
 
-	bool SearchChildren(	// q‹óŠÔ’Tõ
+	// å­ç©ºé–“æ¢ç´¢
+	bool SearchChildren(	// ãƒ¬ã‚¤æ¢ç´¢
 		int Elem,
 		const DirectX::XMFLOAT3& start,
 		const DirectX::XMFLOAT3& direction,
 		float dist, 
 		HitResult& result,
 		bool& hit);
-	bool SearchParent(	// e‹óŠÔ’Tõ
+	bool SearchChildren(	// çƒæ¢ç´¢
+		int Elem,
+		DirectX::XMVECTOR& spherePos,
+		float radius,
+		bool wallCheck,
+		bool& hit);
+
+	// è¦ªç©ºé–“æ¢ç´¢
+	bool SearchParent(	// ãƒ¬ã‚¤æ¢ç´¢
 		int Elem,
 		const DirectX::XMFLOAT3& start,
 		const DirectX::XMFLOAT3& direction,
 		float dist,
 		HitResult& result,
+		bool& hit);
+	bool SearchParent(	// çƒæ¢ç´¢
+		int Elem,
+		DirectX::XMVECTOR& spherePos,
+		float radius,
+		bool wallCheck,
 		bool& hit);
 
 private:
