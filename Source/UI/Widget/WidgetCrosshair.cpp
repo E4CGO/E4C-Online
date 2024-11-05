@@ -1,39 +1,54 @@
-#include "TAKOEngine/Runtime/tentacle_lib.h"
+﻿//! @file WidgetCrosshair.cpp
+//! @note 
 
 #include "WidgetCrosshair.h"
+#include "TAKOEngine/Runtime/tentacle_lib.h"
 #include <iostream>
 
 static WidgetCrosshair* instance = nullptr;
-// �C���X�^���X�擾
+// インスタンス取得
+
+/**************************************************************************//**
+ 	@brief	インスタンスを取得
+	@return	UIインスタンス
+*//***************************************************************************/
 WidgetCrosshair& WidgetCrosshair::Instance()
 {
 	return *instance;
 }
 
+/**************************************************************************//**
+ 	@brief	コンストラクタ
+*//***************************************************************************/
 WidgetCrosshair::WidgetCrosshair() : WidgetImage("Data/Sprites/crosshair122.png")
 {
-	// �C���X�^���X�|�C���^�ݒ�
+	// インスタンスポインタ設定
 	instance = this;
 
-	size.x = size.y = SCREEN_W * 0.04f;
-	position = DirectX::XMFLOAT2{ SCREEN_W * 0.5f - size.x * 0.5f, SCREEN_H * 0.5f - size.y * 0.5f };
-	color.w = 0.0f;
+	m_size.x = m_size.y = SCREEN_W * 0.04f;
+	m_position = DirectX::XMFLOAT2{ SCREEN_W * 0.5f - m_size.x * 0.5f, SCREEN_H * 0.5f - m_size.y * 0.5f };
+	m_color.w = 0.0f;
 }
 
+/**************************************************************************//**
+ 	@brief		更新処理
+	@param[in]	elapsedTime	経過時間
+	@return		なし
+*//***************************************************************************/
 void WidgetCrosshair::Update(float elapsedTime)
 {
-	angle += DirectX::XMConvertToRadians(90) * elapsedTime;
-	if (angle > DirectX::XM_PI) angle -= DirectX::XM_2PI;
-	if (angle < -DirectX::XM_PI) angle += DirectX::XM_2PI;
+	m_angle += DirectX::XMConvertToRadians(90) * elapsedTime;
+	if (m_angle > DirectX::XM_PI) m_angle -= DirectX::XM_2PI;
+	if (m_angle < -DirectX::XM_PI) m_angle += DirectX::XM_2PI;
 
-	if (!enable)
+	if (!m_enable)
 	{
-		color.w -= elapsedTime * 2.0f;
-		if (color.w < 0.0f)  color.w = 0.0f;
+		m_color.w -= elapsedTime * 2.0f;
+		if (m_color.w < 0.0f)  m_color.w = 0.0f;
 	}
 	else
 	{
-		color.w += elapsedTime * 2.0f;
-		if (color.w > 1.0f)  color.w = 1.0f;
+		m_color.w += elapsedTime * 2.0f;
+		if (m_color.w > 1.0f)  m_color.w = 1.0f;
 	}
 }

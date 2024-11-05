@@ -1,4 +1,4 @@
-#include "WidgetSkillTimer.h"
+Ôªø#include "WidgetSkillTimer.h"
 
 #include "TAKOEngine/Rendering/ResourceManager.h"
 #include "TAKOEngine/Tool/XMFLOAT.h"
@@ -13,8 +13,8 @@ WidgetSkillTimer::WidgetSkillTimer()
 	skillIcons = RESOURCE.LoadSpriteResource("Data/Sprites/skill_icon.png");
 	mask = RESOURCE.LoadSpriteResource("");
 
-	size = { 64.0f, 64.0f };
-	position = {
+	m_size = { 64.0f, 64.0f };
+	m_position = {
 		SCREEN_W * 0.5f,
 		SCREEN_H - 100.0f
 	};
@@ -22,7 +22,7 @@ WidgetSkillTimer::WidgetSkillTimer()
 
 void WidgetSkillTimer::Render(const RenderContext& rc)
 {
-	// ÉfÉtÉHÉãÉgÅFñ≥ín
+	// „Éá„Éï„Ç©„É´„ÉàÔºöÁÑ°Âú∞
 	int skill_1_icon = ICON::ICON_NONE;
 	int skill_2_icon = ICON::ICON_NONE;
 	int skill_3_icon = ICON::ICON_NONE;
@@ -49,13 +49,13 @@ void WidgetSkillTimer::Render(const RenderContext& rc)
 		break;
 	}
 
-	DrawIcon(rc, skill_1_icon, position + DirectX::XMFLOAT2{ -size.x * 4.0f, 0.0f }, static_cast<int>(Player::State::Skill_1), "[1]");
-	DrawIcon(rc, skill_2_icon, position + DirectX::XMFLOAT2{ -size.x * 3.0f, 0.0f }, static_cast<int>(Player::State::Skill_2), "[2]");
-	DrawIcon(rc, skill_3_icon, position + DirectX::XMFLOAT2{ -size.x * 2.0f, 0.0f }, static_cast<int>(Player::State::Skill_3), "[3]");
-	DrawIcon(rc, skill_4_icon, position + DirectX::XMFLOAT2{ -size.x * 1.0f, 0.0f }, static_cast<int>(Player::State::Skill_4), "[4]");
+	DrawIcon(rc, skill_1_icon, m_position + DirectX::XMFLOAT2{ -m_size.x * 4.0f, 0.0f }, static_cast<int>(Player::State::Skill_1), "[1]");
+	DrawIcon(rc, skill_2_icon, m_position + DirectX::XMFLOAT2{ -m_size.x * 3.0f, 0.0f }, static_cast<int>(Player::State::Skill_2), "[2]");
+	DrawIcon(rc, skill_3_icon, m_position + DirectX::XMFLOAT2{ -m_size.x * 2.0f, 0.0f }, static_cast<int>(Player::State::Skill_3), "[3]");
+	DrawIcon(rc, skill_4_icon, m_position + DirectX::XMFLOAT2{ -m_size.x * 1.0f, 0.0f }, static_cast<int>(Player::State::Skill_4), "[4]");
 
-	DrawIcon(rc, normal_attack_icon, position + DirectX::XMFLOAT2{ 0.0f + 64.0f / 2.0f, 0.0f }, static_cast<int>(Player::State::AttackNormal), "[LMB]");
-	DrawIcon(rc, special_attack_icon, position + DirectX::XMFLOAT2{ size.x + 64.0f / 2.0f, 0.0f }, static_cast<int>(Player::State::AttackSpecial), "[RMB]");
+	DrawIcon(rc, normal_attack_icon, m_position + DirectX::XMFLOAT2{ 0.0f + 64.0f / 2.0f, 0.0f }, static_cast<int>(Player::State::AttackNormal), "[LMB]");
+	DrawIcon(rc, special_attack_icon, m_position + DirectX::XMFLOAT2{ m_size.x + 64.0f / 2.0f, 0.0f }, static_cast<int>(Player::State::AttackSpecial), "[RMB]");
 }
 
 void WidgetSkillTimer::DrawIcon(
@@ -66,20 +66,20 @@ void WidgetSkillTimer::DrawIcon(
 	const char* key
 )
 {
-	// îwåi
+	// ËÉåÊôØ
 	mask->Render(
 		rc.deviceContext,
 		pos.x, pos.y, 0.0f,
-		size.x, size.y + 20.0f,
+		m_size.x, m_size.y + 20.0f,
 		0,
 		0.0f, 0.0f, 0.0f, 0.6f
 	);
-	// ÉAÉCÉRÉì
+	// „Ç¢„Ç§„Ç≥„É≥
 	float coolTime = player->GetSkillTimerTime(skillTimerIdx);
 	skillIcons->Render(
 		rc.deviceContext,
 		pos.x, pos.y, 0.0f,
-		size.x, size.y,
+		m_size.x, m_size.y,
 		static_cast<float>(imageIdx % lineBreak) * 512.0f, static_cast<float>(imageIdx / lineBreak) * 512.0f,
 		512.0f, 512.0f,
 		0,
@@ -89,13 +89,13 @@ void WidgetSkillTimer::DrawIcon(
 		1.0f
 	);
 
-	// ï∂éöÅEÉ^ÉCÉ}Å[
-	if (coolTime > 0.0f) // ïbêîï\é¶
+	// ÊñáÂ≠ó„Éª„Çø„Ç§„Éû„Éº
+	if (coolTime > 0.0f) // ÁßíÊï∞Ë°®Á§∫
 	{
 		T_TEXT.Render(
 			FONT_ID::MsGothic,
 			std::to_string(static_cast<int>(std::ceilf(coolTime))).c_str(),
-			pos.x + (size.x * 0.46f), pos.y + size.y + 9.0f,
+			pos.x + (m_size.x * 0.46f), pos.y + m_size.y + 9.0f,
 			1.0f, 0.5f, 0.5f, 1.0f,
 			0.0f,
 			FONT_ALIGN::CENTER,
@@ -109,7 +109,7 @@ void WidgetSkillTimer::DrawIcon(
 		T_TEXT.Render(
 			FONT_ID::MsGothic,
 			key,
-			pos.x + (size.x * 0.46f), pos.y + size.y + 9.0f,
+			pos.x + (m_size.x * 0.46f), pos.y + m_size.y + 9.0f,
 			1.0f, 1.0f, 1.0f, 1.0f,
 			0.0f,
 			FONT_ALIGN::CENTER,

@@ -1,4 +1,8 @@
-#pragma once
+//! @file ObjectManager.h
+//! @note 
+
+#ifndef __INCLUDED_OBJECT_MANAGER__
+#define __INCLUDED_OBJECT_MANAGER__
 
 #include <set>
 #include "Manager.h"
@@ -81,3 +85,5 @@ public:
 protected:
 	std::set<T*> removes;
 };
+
+#endif // !__INCLUDED_OBJECT_MANAGER__
