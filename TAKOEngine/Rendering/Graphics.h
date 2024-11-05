@@ -47,6 +47,7 @@ enum class ModelShaderDX12Id
 	PhongInstancing,
 	Toon,
 	ToonInstancing,
+	Skydome,
 
 	EnumCount
 };
@@ -229,6 +230,7 @@ public:
 
 	// テクスチャ読み込み
 	HRESULT LoadTexture(const char* filename, ID3D12Resource** d3d_resource);
+	HRESULT LoadCubeTexture(const std::wstring& filename, ID3D12Resource** d3d_resource);
 
 	// テクスチャ作成
 	HRESULT CreateTexture(const BYTE* pixels, UINT width, UINT height, DXGI_FORMAT format, ID3D12Resource** d3d_resource);
@@ -263,6 +265,9 @@ public:
 private:
 	// イメージコピー
 	HRESULT CopyImage(const BYTE* pixels, UINT width, UINT height, DXGI_FORMAT format, ID3D12Resource* resource);
+
+	// キューブマップ用イメージコピー
+	HRESULT CopyImageForCubeMap(const D3D12_SUBRESOURCE_DATA* subresources, UINT width, UINT height, DXGI_FORMAT format, ID3D12Resource* d3d_resource);
 
 	static UINT BitsPerPixel(DXGI_FORMAT fmt);
 
