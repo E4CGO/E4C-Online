@@ -83,14 +83,17 @@ void PlayerCharacterManager::SyncPlayer(const uint64_t client_id, const PlayerCh
 		player->Stop();
 		player->AddImpulse({ data.velocity[0], data.velocity[1], data.velocity[2] });
 		player->SetAngle({ 0.0f, data.rotate, 0.0f });
-		player->GetStateMachine()->ChangeState(data.state);
+		if (data.state != static_cast<uint8_t>(player->GetStateMachine()->GetStateIndex()))
+		{
+			player->GetStateMachine()->ChangeState(data.state);
+		}
 		player->Show();
 	}
 }
 
 
 /**************************************************************************//**
- 	@brief		プレイヤーキャラクターを削除
+	@brief		プレイヤーキャラクターを削除
 	@param[in]	client_id クライアントID
 	@return		なし
 *//***************************************************************************/

@@ -3,6 +3,8 @@
 // レイキャスト
 bool MapTileManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, HitResult& hit, bool camera)
 {
+	if (start == end) return false;
+
 	HitResult temp;
 	hit.distance = FLT_MAX;
 	for (ModelObject*& item : items)
