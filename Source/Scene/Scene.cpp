@@ -4,6 +4,7 @@
 #include "TAKOEngine/Runtime/tentacle_lib.h"
 #include "TAKOEngine/Rendering/Model/ModelResource.h"
 #include "TAKOEngine/Tool/TransformUtils.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 
 #include "Scene/Scene.h"
 
@@ -13,29 +14,32 @@ void ModelTestScene::Initialize()
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 	float screenWidth = Graphics::Instance().GetScreenWidth();
 	float screenHeight = Graphics::Instance().GetScreenHeight();
-
+	Camera *maincamera = new Camera();
+	CameraManager& cameraManger = CameraManager::Instance();
+	cameraManger.Register(maincamera);
+	cameraManger.SetCamera(0);
 	// カメラ設定
-	camera.SetPerspectiveFov(
+	CameraManager::Instance().GetCamera()->SetPerspectiveFov(
 		DirectX::XMConvertToRadians(45),	// 画角
 		screenWidth / screenHeight,			// 画面アスペクト比
 		0.1f,								// ニアクリップ
 		10000.0f							// ファークリップ
 	);
-	camera.SetLookAt(
+	CameraManager::Instance().GetCamera()->SetLookAt(
 		{ 0, 8, 15 },	// 視点
 		{ 0, 2, 0 },	// 注視点
 		{ 0, 1, 0 }		// 上ベクトル
 	);
 
 	// モデル作成
-	//model = std::make_unique<Model>(device, "Data/Model/Slime/Slime.fbx", 1.0f);
+	//model = std::make_unique<iModel>(device, "Data/Model/Slime/Slime.fbx", 1.0f);
 	//model = std::make_unique<Model>(device, "Data/Model/Mari.O/Mari-O.fbx", 1.0f);
 	//model = std::make_unique<Model>(device, "Data/Model/Cube/testCubes.glb", 1.0f);
 	//model->PlayAnimation(1, true);
 	//model = std::make_unique<Model>(device, "Data/Model/MariLuiHouse/MariLuiHouse.fbx", 1.0f);
 	//model->SetLinearGamma(2.2f);
 
-	cameraController.SyncCameraToController(camera);
+	cameraController.SyncCameraToController(CameraManager::Instance().GetCamera());
 
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
 	Light* dl = new Light(LightType::Directional);
@@ -76,8 +80,8 @@ void ModelTestScene::Update(float elapsedTime)
 {
 	// カメラ処理更新
 	cameraController.Update();
-	cameraController.SyncContrllerToCamera(camera);
-
+	cameraController.SyncContrllerToCamera(CameraManager::Instance().GetCamera());
+	CameraManager::Instance().Update();
 	// ワールド行列計算
 	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
 	DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(angle.x, angle.y, angle.z);
@@ -100,7 +104,7 @@ void ModelTestScene::Render()
 
 	// 描画コンテキスト設定
 	RenderContext rc;
-	rc.camera = &camera;
+	rc.camera = CameraManager::Instance().GetCamera();
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
@@ -120,9 +124,9 @@ void ModelTestScene::Render()
 	// ライトのデバッグプリミティブの描画
 	LightManager::Instance().DrawDebugGUI();
 	// ラインレンダラ描画実行
-	T_GRAPHICS.GetLineRenderer()->Render(T_GRAPHICS.GetDeviceContext(), camera.GetView(), camera.GetProjection());
+	T_GRAPHICS.GetLineRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
 	// デバッグレンダラ描画実行
-	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), camera.GetView(), camera.GetProjection());
+	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
 
 	// 書き込み先をバックバッファに変えてオフスクリーンレンダリングの結果を描画する
 	{
@@ -159,7 +163,7 @@ void ModelTestScene::DrawSceneGUI()
 
 	if (ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_None))
 	{
-		DirectX::XMFLOAT3 eye = camera.GetEye();
+		DirectX::XMFLOAT3 eye = CameraManager::Instance().GetCamera()->GetEye();
 		ImGui::DragFloat3("Eye", &eye.x, 0.01f, 100.0f);
 
 		if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))

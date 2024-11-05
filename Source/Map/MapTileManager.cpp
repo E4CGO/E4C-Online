@@ -249,6 +249,7 @@ bool MapTileManager::SearchChildren(	// 子空間探索
 {
 	// 空間外ならreturn
 	if (Elem < 0) return hit;
+	if (Elem > tree.m_iPow[tree.m_uiLevel]) return hit;
 
 	// 子空間が存在するなら子空間を探索
 	if ((Elem + 1) << 3 < tree.m_iCellNum)

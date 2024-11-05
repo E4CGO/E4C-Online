@@ -191,6 +191,13 @@ void DebugRenderer::DrawSphere(const DirectX::XMFLOAT3& center, float radius, co
 	sphere.color = color;
 	spheres.emplace_back(sphere);
 }
+void DebugRenderer::DrawSphere(const std::vector<DirectX::XMFLOAT3>& centers, float radius, const DirectX::XMFLOAT4& color)
+{
+	for (const DirectX::XMFLOAT3& center : centers)
+	{
+		DrawSphere(center, radius, color);
+	}
+}
 
 // ‰~’Œ•`‰æ
 void DebugRenderer::DrawCylinder(const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color)
