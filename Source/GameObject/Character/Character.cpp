@@ -210,9 +210,9 @@ void Character::UpdateVerticalMove(float elapsedTime)
 			// 地面に接地している
 			position = hit.position;
 			// 回転
-			angle.x += hit.rotation.x;
-			angle.y += hit.rotation.y;
-			angle.z += hit.rotation.z;
+			//angle.x += hit.rotation.x;
+			//angle.y += hit.rotation.y;
+			//angle.z += hit.rotation.z;
 
 			normal = hit.normal;
 
@@ -244,9 +244,9 @@ void Character::UpdateVerticalMove(float elapsedTime)
 			// 地面に接地している
 			position = hit.position;
 			// 回転
-			angle.x += hit.rotation.x;
-			angle.y += hit.rotation.y;
-			angle.z += hit.rotation.z;
+			//angle.x += hit.rotation.x;
+			//angle.y += hit.rotation.y;
+			//angle.z += hit.rotation.z;
 
 			normal = hit.normal;
 

@@ -7,7 +7,8 @@
 
 //***********************************************************
 // @brief       コンストラクタ
-// @param[in]   なし
+// @param[in]   device　    ID3D12Device*
+// @param[in]   instancing インスタンシング　ture : あり, false : なし
 // @return      なし
 //***********************************************************
 LambertShader::LambertShader(ID3D12Device* device, bool instancing)

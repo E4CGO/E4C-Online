@@ -3,16 +3,16 @@
 #include <DirectXCollision.h>
 #include "SphereCollider.h"
 
-SphereCollider::SphereCollider(float radius)
+SphereCollider::SphereCollider(float _radius)
 {
-	scale = { radius, radius, radius };
+	radius = _radius;
 	type = COLLIDER_TYPE::SPHERE;
 }
 
 void SphereCollider::DrawDebugPrimitive(DirectX::XMFLOAT4 color)
 {
 	if (!enable) return;
-	T_GRAPHICS.GetDebugRenderer()->DrawSphere(position, scale.x, color);
+	T_GRAPHICS.GetDebugRenderer()->DrawSphere(position, radius, color);
 }
 
 bool SphereCollider::CollisionVsShpere(

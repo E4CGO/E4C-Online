@@ -6,13 +6,13 @@
 
 #include <string>
 
-class Player;
+class Character;
 
 /**************************************************************************//**
 	@class	PlayerCharacterPattern
-	@brief	�L�����N�^�[�p�^�[�����N���X
-	@par	[����]
-		�p�^�[���������ăv���C���[�L�����N�^�[��ݒ肷����N���X
+	@brief	プレイヤーキャラクターパターン基底クラス
+	@par	[説明]
+		プレイヤーの外見パターンでキャラクター要素を登録する基底クラス
 *//***************************************************************************/
 class PlayerCharacterPattern
 {
@@ -20,37 +20,53 @@ public:
 	PlayerCharacterPattern() {};
 	virtual ~PlayerCharacterPattern() = default;
 
-	virtual void Execute(Player* player) = 0;
+	virtual void Execute(Character* chara) = 0;
 };
 
 /**************************************************************************//**
-	@class	PlayerCharacterPatternGender
-	@brief	���ʂɂ���ĈႤ����
-	@par	[����]
+	@class	PlayerCharacterPatternNone
+	@brief	なにもしないパターン
+	@par	[説明]
+		例：何も持っていないパターン
+*//***************************************************************************/
+class PlayerCharacterPatternNone : public PlayerCharacterPattern
+{
+public:
+	PlayerCharacterPatternNone() {};
+	virtual ~PlayerCharacterPatternNone() = default;
 
+	virtual void Execute(Character* chara) {};
+};
+
+
+/**************************************************************************//**
+	@class	PlayerCharacterPatternGender
+	@brief	性別パターン
+	@par	[説明]
+		男性・女性の体・顔・モーションパーツ
 *//***************************************************************************/
 class PlayerCharacterPatternGender : public PlayerCharacterPattern
 {
 public:
 	PlayerCharacterPatternGender(bool isMale) : PlayerCharacterPattern(), m_isMale(isMale) {}
 
-	void Execute(Player* player);
+	void Execute(Character* chara);
 private:
 	bool m_isMale;
 };
 
 /**************************************************************************//**
 	@class	PlayerCharacterPatternSinglePart
-	@brief	�P�ꃂ�f�����������鏈��
-	@par	[����]
-		�ėp�^����
+	@brief	単一モデル実装
+	@par	[説明]
+		単一のモデルを実装するパターン
 *//***************************************************************************/
 class PlayerCharacterPatternSingleModel : public PlayerCharacterPattern
 {
 public:
 	PlayerCharacterPatternSingleModel(const char* filename) : PlayerCharacterPattern(), m_filename(filename) {}
 
-	void Execute(Player* player) override;
+	void Execute(Character* chara) override;
 private:
 	std::string m_filename;
 };

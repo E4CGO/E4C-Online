@@ -112,6 +112,8 @@ void SceneDungeon::Initialize()
 
 	//MapTile* a = new MapTile("Data/Model/Stage/BigMap.glb");
 	//MAPTILES.Register(a);
+
+	MAPTILES.CreateSpatialIndex(5, 7);
 }
 
 void SceneDungeon::Finalize()
@@ -144,7 +146,7 @@ void SceneDungeon::Update(float elapsedTime)
 	rootRoom->Update(elapsedTime);
 
 	MAPTILES.Update(elapsedTime);
-	COLLISION.Update(elapsedTime);
+	//COLLISION.Update(elapsedTime);
 	STAGES.Update(elapsedTime);
 
 }

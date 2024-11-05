@@ -1,10 +1,12 @@
-#pragma once
+//! @file PlayerCharacter.h
+//! @note 
 
-#include "TAKOEngine/AI/StateMachine.h"
+#ifndef __INCLUDED_PLAYER_CHARACTER_H__
+#define __INCLUDED_PLAYER_CHARACTER_H__
 
-#include <memory>
 #include <unordered_map>
 
+#include "TAKOEngine/AI/StateMachine.h"
 #include "GameObject/Character/Character.h"
 #include "GameObject/Character/Player/Player.h"
 #include "GameData.h"
@@ -16,11 +18,26 @@ class PlayerCharacter : public Character
 {
 public:
 	// コンストラクタ(引数付き)
-	PlayerCharacter(uint64_t id, const char* name, uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
+	PlayerCharacter(uint64_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
 	// コンストラクタ(引数付き)
 	PlayerCharacter(PlayerCharacterData::CharacterInfo dataInfo);
 	// デストラクタ
 	~PlayerCharacter();
+
+
+#pragma pack(push, 1)
+	// 同期用
+	struct SYNC_DATA
+	{
+		uint64_t client_id;
+		uint64_t sync_count_id;
+		float position[3];
+		float velocity[3];
+		float rotate;
+		uint8_t state;
+	};
+#pragma pack(pop)
+
 
 	// KayKit Adventurers
 	enum Animation
@@ -138,7 +155,7 @@ public:
 	void Render(const RenderContext& rc) override;
 
 	// 外見パターンを読み取る
-	void LoadAppearance(uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
+	void LoadAppearance(const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
 
 	void Jump();
 	void InputMove(float elapsedTime);
@@ -174,7 +191,18 @@ public:
 	float GetTurnSpeed() { return turnSpeed; }
 	void SetTurnSpeed(float turnSpeed) { this->turnSpeed = turnSpeed; }
 
-	void SetName(const char* name) { this->name = name; }
+	const std::string& GetName() { return m_name; }
+	void SetName(const char* name) { this->m_name = name; }
+
+	bool CheckSync(uint64_t sync_count_id)
+	{
+		if (sync_count_id > m_sync_count_id)
+		{
+			m_sync_count_id = sync_count_id;
+			return true;
+		}
+		return false;
+	}
 
 	void SetMenuVisibility(bool value) { this->m_menuVisible = value; }
 	bool GetMenuVisibility() { return this->m_menuVisible; }
@@ -221,6 +249,23 @@ public:
 	std::unordered_map<int, Collider*> GetAttackColliders() { return m_pattackColliders; }
 	void EnableAttackColliders(bool enable = true) { for (const std::pair<int, Collider*>& collider : m_pattackColliders) collider.second->SetEnable(enable); }
 
+
+	// 同期用データを取得
+	void GetSyncData(SYNC_DATA& data)
+	{
+		data.client_id = m_client_id;
+		data.sync_count_id = m_sync_count_id;
+		data.position[0] = position.x;
+		data.position[1] = position.y;
+		data.position[2] = position.z;
+		data.velocity[0] = velocity.x;
+		data.velocity[1] = velocity.y;
+		data.velocity[2] = velocity.z;
+		data.rotate = angle.y;
+		data.state = static_cast<uint8_t>(stateMachine->GetStateIndex());
+		m_sync_count_id++;
+	}
+
 	static DirectX::XMFLOAT4 GetColorSet(int idx) { return PlayerCharacter::colorSet[idx]; }
 protected:
 	void RegisterCommonState();
@@ -240,6 +285,7 @@ protected:
 
 private:
 	uint64_t m_client_id = 0;
+	uint64_t m_sync_count_id = 0;
 
 	uint32_t input = 0;						// キー入力
 	DirectX::XMFLOAT2 inputDirection = {};	// 移動方向
@@ -253,7 +299,7 @@ private:
 	float mpRecoverRate = 8.0f; // 毎秒回復量
 	PLAYER_CLASS type = PLAYER_CLASS::Null;
 	int atk = 10;
-	std::string name;
+	std::string m_name;
 
 	float moveSpeed = 0.0f;
 	float turnSpeed = 0.0f;
@@ -287,3 +333,5 @@ protected:
 
 	std::unordered_map<int, Collider*> m_pattackColliders; // 攻撃判定
 };
+
+#endif // __INCLUDED_PLAYER_CHARACTER_H__

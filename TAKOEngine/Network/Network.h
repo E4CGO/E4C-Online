@@ -1,5 +1,8 @@
 #pragma once
 
+
+#include "TAKOEngine/Network/WinSock2Wrapper.h"
+
 class Network
 {
 public:

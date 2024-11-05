@@ -1,9 +1,16 @@
-#include "PostprocessingRenderer.h"
+ï»¿//! @file PostprocessingRenderer.h
+//! @note 
 
 #include <imgui.h>
 
 #include "TAKOEngine/Runtime/tentacle_lib.h"
+#include "PostprocessingRenderer.h"
 
+//******************************************************************
+// @brief       ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+// @param[in]   ãªã—
+// @return      ãªã—
+//******************************************************************
 PostprocessingRenderer::PostprocessingRenderer()
 {
 	Graphics& graphics = Graphics::Instance();
@@ -14,13 +21,23 @@ PostprocessingRenderer::PostprocessingRenderer()
 	bloomData.gaussianFilterData.textureSize.y = graphics.GetScreenHeight() / 2.0f;
 }
 
+//******************************************************************
+// @brief       ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+// @param[in]   ãªã—
+// @return      ãªã—
+//******************************************************************
 PostprocessingRenderer::~PostprocessingRenderer()
 {
 }
 
+//******************************************************************
+// @brief       æç”»
+// @param[in]   deviceContextã€€ãƒ‡ãƒã‚¤ã‚¹ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆ
+// @return      ãªã—
+//******************************************************************
 void PostprocessingRenderer::Render(ID3D11DeviceContext* deviceContext)
 {
-	// Œ»İİ’è‚³‚ê‚Ä‚¢‚éƒoƒbƒtƒ@‚ğ‘Ş”ğ‚µ‚Ä‰Šú‰»‚µ‚Ä
+	// ç¾åœ¨è¨­å®šã•ã‚Œã¦ã„ã‚‹ãƒãƒƒãƒ•ã‚¡ã‚’é€€é¿ã—ã¦åˆæœŸåŒ–ã—ã¦
 	UINT			cachedViewportCount{ D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE };
 	D3D11_VIEWPORT	cachedViewports[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView>	cachedRenderTargetView;
@@ -40,18 +57,18 @@ void PostprocessingRenderer::Render(ID3D11DeviceContext* deviceContext)
 	rc.luminanceExtractionData = bloomData.luminanceExtractionData;
 	rc.gaussianFilterData = bloomData.gaussianFilterData;
 
-	//	‚‹P“x’Šo—pƒoƒbƒtƒ@‚É•`‰ææ‚ğ•ÏX‚µ‚Ä‚‹P“x’Šo
+	//	é«˜è¼åº¦æŠ½å‡ºç”¨ãƒãƒƒãƒ•ã‚¡ã«æç”»å…ˆã‚’å¤‰æ›´ã—ã¦é«˜è¼åº¦æŠ½å‡º
 	{
-		//	•`‰ææ‚ğ•ÏX
+		//	æç”»å…ˆã‚’å¤‰æ›´
 		T_GRAPHICS.GetFrameBuffer(FrameBufferId::Luminance)->Clear(T_GRAPHICS.GetDeviceContext(), 0.0f, 0.0f, 0.0f, 0.0f);
 		T_GRAPHICS.GetFrameBuffer(FrameBufferId::Luminance)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
 
 		rc.deviceContext->RSSetViewports(cachedViewportCount, cachedViewports);
 
-		//	‚‹P“x’Šoˆ—
+		//	é«˜è¼åº¦æŠ½å‡ºå‡¦ç†
 		SpriteShader* shader = T_GRAPHICS.GetSpriteShader(SpriteShaderId::LuminanceExtraction);
 		shader->Begin(rc);
-		//	•`‰æ‘ÎÛ‚ğ•ÏX
+		//	æç”»å¯¾è±¡ã‚’å¤‰æ›´
 		renderSprite->SetShaderResourceView(
 			T_GRAPHICS.GetFrameBuffer(FrameBufferId::Scene)->GetShaderResourceView(),
 			static_cast<UINT>(T_GRAPHICS.GetScreenWidth()),
@@ -70,19 +87,19 @@ void PostprocessingRenderer::Render(ID3D11DeviceContext* deviceContext)
 		shader->End(rc);
 	}
 
-	// ’Šo‚µ‚½‚‹P“x•`‰æ‘ÎÛ‚ğò‚µ‚Ä‘‚«‚Ş
+	// æŠ½å‡ºã—ãŸé«˜è¼åº¦æç”»å¯¾è±¡ã‚’æšˆã—ã¦æ›¸ãè¾¼ã‚€
 	{
-		//	•`‰ææ‚ğ•ÏX
+		//	æç”»å…ˆã‚’å¤‰æ›´
 		T_GRAPHICS.GetFrameBuffer(FrameBufferId::GaussianBlur)->Clear(T_GRAPHICS.GetDeviceContext(), 0.0f, 0.0f, 0.0f, 0.0f);
 		T_GRAPHICS.GetFrameBuffer(FrameBufferId::GaussianBlur)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
 
 		rc.deviceContext->RSSetViewports(cachedViewportCount, cachedViewports);
 
-		//	‚‹P“x’Šoˆ—
+		//	é«˜è¼åº¦æŠ½å‡ºå‡¦ç†
 		SpriteShader* shader = T_GRAPHICS.GetSpriteShader(SpriteShaderId::GaussianBlur);
 		shader->Begin(rc);
 
-		//	•`‰æ‘ÎÛ‚ğ•ÏX
+		//	æç”»å¯¾è±¡ã‚’å¤‰æ›´
 		renderSprite->SetShaderResourceView(
 			T_GRAPHICS.GetFrameBuffer(FrameBufferId::Luminance)->GetShaderResourceView(),
 			static_cast<UINT>(T_GRAPHICS.GetFrameBuffer(FrameBufferId::Luminance)->GetViewport().Width),
@@ -102,15 +119,15 @@ void PostprocessingRenderer::Render(ID3D11DeviceContext* deviceContext)
 		shader->End(rc);
 	}
 
-	//	Œ³‚Ìƒoƒbƒtƒ@‚É–ß‚·
+	//	å…ƒã®ãƒãƒƒãƒ•ã‚¡ã«æˆ»ã™
 	{
 		deviceContext->RSSetViewports(cachedViewportCount, cachedViewports);
 		deviceContext->OMSetRenderTargets(1, cachedRenderTargetView.GetAddressOf(), cachedDepthStencilView.Get());
 	}
 
-	// ’Šo‚µ‚½‚‹P“x•`‰æ‘ÎÛ‚ğ‘‚«‚Ş
+	// æŠ½å‡ºã—ãŸé«˜è¼åº¦æç”»å¯¾è±¡ã‚’æ›¸ãè¾¼ã‚€
 	{
-		//	‚‹P“x’Šoˆ—
+		//	é«˜è¼åº¦æŠ½å‡ºå‡¦ç†
 		SpriteShader* shader = T_GRAPHICS.GetSpriteShader(SpriteShaderId::Finalpass);
 		shader->Begin(rc);
 
@@ -128,7 +145,7 @@ void PostprocessingRenderer::Render(ID3D11DeviceContext* deviceContext)
 			1, 1, 1, 1
 		);
 
-		//	ƒVƒF[ƒ_[‚É“n‚·ƒeƒNƒXƒ`ƒƒ‚ğİ’è
+		//	ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã«æ¸¡ã™ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’è¨­å®š
 		rc.finalpassnData.bloomTexture = T_GRAPHICS.GetFrameBuffer(FrameBufferId::GaussianBlur)->GetShaderResourceView().Get();
 		rc.colorGradingData = colorGradingData;
 
@@ -138,7 +155,11 @@ void PostprocessingRenderer::Render(ID3D11DeviceContext* deviceContext)
 	}
 }
 
-//	ƒfƒoƒbƒOî•ñ‚Ì•\¦
+//******************************************************************
+// @brief       ãƒ‡ãƒãƒƒã‚°æƒ…å ±ã®è¡¨ç¤º
+// @param[in]   ãªã—
+// @return      ãªã—
+//******************************************************************
 void PostprocessingRenderer::DrawDebugGUI()
 {
 	if (ImGui::TreeNode("PostProcess"))
@@ -158,6 +179,151 @@ void PostprocessingRenderer::DrawDebugGUI()
 			ImGui::SliderFloat("brightness", &colorGradingData.brightness, 0.0f, 2.0f);
 			ImGui::TreePop();
 		}
+
+		ImGui::TreePop();
+	}
+}
+
+//******************************************************************
+// @brief       ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+// @param[in]   ãªã—
+// @return      ãªã—
+//******************************************************************
+PostprocessingRendererDX12::PostprocessingRendererDX12()
+{
+	Graphics& graphics = Graphics::Instance();
+
+	renderSprite[static_cast<int>(RenderTarget::Luminance)] = std::make_unique<SpriteDX12>(1, T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene)->GetRenderTargetTexture());
+	renderSprite[static_cast<int>(RenderTarget::GaussianBlur)] = std::make_unique<SpriteDX12>(1, T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance)->GetRenderTargetTexture());
+	renderSprite[static_cast<int>(RenderTarget::Finalpass)] = std::make_unique<SpriteDX12>(1, T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene)->GetRenderTargetTexture());
+
+	bloomData.gaussianFilterData.textureSize.x = static_cast<float>(renderSprite[static_cast<int>(RenderTarget::GaussianBlur)]->GetTextureWidth());
+	bloomData.gaussianFilterData.textureSize.y = static_cast<float>(renderSprite[static_cast<int>(RenderTarget::GaussianBlur)]->GetTextureHeight());
+}
+
+//******************************************************************
+// @brief       ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+// @param[in]   ãªã—
+// @return      ãªã—
+//******************************************************************
+PostprocessingRendererDX12::~PostprocessingRendererDX12()
+{
+}
+
+//******************************************************************
+// @brief       æç”»
+// @param[in]   framBufferã€€ãƒ•ãƒ¬ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡
+// @return      ãªã—
+//******************************************************************
+void PostprocessingRendererDX12::Render(FrameBufferManager* framBuffer)
+{
+	RenderContextDX12 rc;
+	rc.d3d_command_list = framBuffer->GetCommandList();
+	rc.luminanceExtractionData = bloomData.luminanceExtractionData;
+	rc.gaussianFilterData      = bloomData.gaussianFilterData;
+
+	// é«˜è¼åº¦æŠ½å‡ºç”¨ãƒãƒƒãƒ•ã‚¡ã«æç”»å…ˆã‚’å¤‰æ›´ã—ã¦é«˜è¼åº¦æŠ½å‡º
+	{
+		framBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance));
+		framBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance));
+		framBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance));
+
+		// é«˜è¼åº¦æŠ½å‡ºå‡¦ç†
+		SpriteShaderDX12* shader = T_GRAPHICS.GetSpriteShaderDX12(SpriteShaderDX12Id::LuminanceExtraction);
+		renderSprite[static_cast<int>(RenderTarget::Luminance)]->Begin(rc);
+		renderSprite[static_cast<int>(RenderTarget::Luminance)]->Draw(
+			0, 0,
+			T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance)->GetWidth(),
+			T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance)->GetHeight(),
+			0, 0,
+			T_GRAPHICS.GetScreenWidth(), 
+			T_GRAPHICS.GetScreenHeight(),
+			0,
+			1, 1, 1, 1,
+			framBuffer->GetViewport());
+		
+		shader->Render(rc, renderSprite[static_cast<int>(RenderTarget::Luminance)].get());
+
+		framBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance));
+	}
+
+	// æŠ½å‡ºã—ãŸé«˜è¼åº¦æç”»å¯¾è±¡ã‚’æšˆã—ã¦æ›¸ãè¾¼ã‚€
+	{
+		framBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::GaussianBlur));
+		framBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::GaussianBlur));
+		framBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::GaussianBlur));
+
+		SpriteShaderDX12* shader = T_GRAPHICS.GetSpriteShaderDX12(SpriteShaderDX12Id::GaussianBlur);
+		renderSprite[static_cast<int>(RenderTarget::GaussianBlur)]->Begin(rc);
+		renderSprite[static_cast<int>(RenderTarget::GaussianBlur)]->Draw(
+			0, 0,
+			T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::GaussianBlur)->GetWidth(),
+			T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::GaussianBlur)->GetHeight(),
+			0, 0,
+			T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance)->GetWidth(),
+			T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance)->GetHeight(),
+			0,
+			1, 1, 1, 1,
+			framBuffer->GetViewport());
+		shader->Render(rc, renderSprite[static_cast<int>(RenderTarget::GaussianBlur)].get());
+
+		framBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::GaussianBlur));
+	}
+
+	// å…ƒã®ãƒãƒƒãƒ•ã‚¡ã«æˆ»ã™
+	{
+		D3D12_VIEWPORT view = T_GRAPHICS.GetViwePort();
+		framBuffer->SetViewportAndScissor(view);
+		framBuffer->SetRenderTarget(T_GRAPHICS.GetCurrentFrameBuffuerRTV(), T_GRAPHICS.GetCurrentFrameBuffuerDSV());
+	}
+
+	// æŠ½å‡ºã—ãŸé«˜è¼åº¦æç”»å¯¾è±¡ã‚’æ›¸ãè¾¼ã‚€
+	{
+		SpriteShaderDX12* shader = T_GRAPHICS.GetSpriteShaderDX12(SpriteShaderDX12Id::Finalpass);
+		renderSprite[static_cast<int>(RenderTarget::Finalpass)]->Begin(rc);
+		renderSprite[static_cast<int>(RenderTarget::Finalpass)]->Draw(
+			0, 0,
+			T_GRAPHICS.GetScreenWidth(), T_GRAPHICS.GetScreenHeight(),
+			0, 0,
+			T_GRAPHICS.GetScreenWidth(), T_GRAPHICS.GetScreenHeight(),
+			0,
+			1, 1, 1, 1,
+			framBuffer->GetViewport());
+		
+		rc.finalpassnData.bloomTexture = renderSprite[static_cast<int>(RenderTarget::GaussianBlur)]->GetDescriptor();
+		rc.colorGradingData = colorGradingData;
+
+		shader->Render(rc, renderSprite[static_cast<int>(RenderTarget::Finalpass)].get());
+	}
+}
+
+//******************************************************************
+// @brief       ãƒ‡ãƒãƒƒã‚°æƒ…å ±ã®è¡¨ç¤º
+// @param[in]   ãªã—
+// @return      ãªã—
+//******************************************************************
+void PostprocessingRendererDX12::DrawDebugGUI()
+{
+	if (ImGui::TreeNode("PostProcess"))
+	{
+		if (ImGui::TreeNode("Bloom"))
+		{
+			ImGui::SliderInt("kernelSize", &bloomData.gaussianFilterData.kernelSize, 1, MaxKernelSize - 1);
+			ImGui::SliderFloat("deviation", &bloomData.gaussianFilterData.deviation, 1.0f, 10.0f);
+			ImGui::SliderFloat("threshold", &bloomData.luminanceExtractionData.threshold, 0.0f, 1.0f);
+			ImGui::SliderFloat("intensity", &bloomData.luminanceExtractionData.intensity, 0.0f, 10.0f);
+			ImGui::TreePop();
+		}
+		SetBloom(bloomData);
+
+		if (ImGui::TreeNode("ColorGrading"))
+		{
+			ImGui::SliderFloat("hueShift", &colorGradingData.hueShift, 0.0f, 360.0f);
+			ImGui::SliderFloat("saturation", &colorGradingData.saturation, 0.0f, 2.0f);
+			ImGui::SliderFloat("brightness", &colorGradingData.brightness, 0.0f, 2.0f);
+			ImGui::TreePop();
+		}
+		SetColoGrading(colorGradingData);
 
 		ImGui::TreePop();
 	}

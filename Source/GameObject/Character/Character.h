@@ -78,7 +78,8 @@ public:
 	const DirectX::XMFLOAT3& GetScale() const { return scale; }
 	// スケール設定
 	void SetScale(const DirectX::XMFLOAT3& scale) { this->scale = scale; }
-
+	// 摩擦設定
+	void SetFriction(const float friction) { this->friction = friction; }
 	// 最大スピードを取得
 	const float GetMaxMoveSpeed() { return maxMoveSpeed; }
 

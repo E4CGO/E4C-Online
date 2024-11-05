@@ -143,5 +143,5 @@ float3 HSV2RGB(float3 hsv)
 float RGB2Luminance(float3 rgb)
 {
     static const float3 luminanceValue = float3(0.299f, 0.587f, 0.114f);
-    return max(0.00001, dot(luminanceValue, rgb));
+    return max(0.00001f, dot(luminanceValue, rgb));
 }

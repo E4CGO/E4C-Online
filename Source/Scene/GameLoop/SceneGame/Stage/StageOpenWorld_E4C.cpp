@@ -15,6 +15,10 @@
 #include "TAKOEngine/Tool/GLTFImporter.h"
 #include "TAKOEngine/Tool/Timer.h"
 
+#include "GameObject/Character/Player/PlayerCharacterManager.h"
+
+#include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
+
 static float timer = 0;
 
 void StageOpenWorld_E4C::Initialize()
@@ -24,42 +28,43 @@ void StageOpenWorld_E4C::Initialize()
 	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
 	stage_collision->Update(0);
 	MAPTILES.Register(stage_collision);
+	MAPTILES.CreateSpatialIndex(5, 7);
 
 	map = std::make_unique<gltf_model>(T_GRAPHICS.GetDevice(), "Data/Model/Stage/Terrain_Map.glb");
 
-	PlayerCharacterData::CharacterInfo charaInfo = {
-		true,			// visible
-		"",				// save
-		{				//Character
-			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-		}
-	};
-
-	player = std::make_unique<PlayerCharacter>(charaInfo);
+	const PlayerCharacterData::CharacterInfo info = PlayerCharacterData::Instance().GetCurrentCharacter();
+	PlayerCharacter* player = PlayerCharacterManager::Instance().UpdatePlayerData(0, "", info.Character.pattern);
 	player->SetPosition({ 5,	10, 5 });
 	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::State::Idle));
+	
 
-	//teleporter = std::make_unique<Teleporter>("Data/Model/Cube/testCubes.glb", 1.0);
-	//teleporter->SetPosition({ 50, 0, 60 });
 
-	std::array<DirectX::XMFLOAT3, 4 > positions = {
-	DirectX::XMFLOAT3{ 10.0f, 10.0f, 5.0f},
-	DirectX::XMFLOAT3{ 10.0f, 20.0f, 5.0f },
-	DirectX::XMFLOAT3{ 5.0f, 10.0f, 5.0f },
-	DirectX::XMFLOAT3{ 5.0f, 20.0f, 5.0f }
-	};
+	teleporter = std::make_unique<Teleporter>("Data/Model/Cube/testCubes.glb", 1.0);
+	teleporter->SetPosition({ 50, 0, 60 });
 
-	plane = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "Data/Sprites/gem.png", 1.0f, positions);
+	{
 
-	positions = {
-		DirectX::XMFLOAT3{ 15.0f, 15.0f, 5.0f},
-		DirectX::XMFLOAT3{ 15.0f, 25.0f, 5.0f },
-		DirectX::XMFLOAT3{ 25.0f, 15.0f, 5.0f },
-		DirectX::XMFLOAT3{ 25.0f, 25.0f, 5.0f }
-	};
+		std::array<DirectX::XMFLOAT3, 4 > positions = {
+		DirectX::XMFLOAT3{ 10.0f, 10.0f, 5.0f},
+		DirectX::XMFLOAT3{ 10.0f, 20.0f, 5.0f },
+		DirectX::XMFLOAT3{ 5.0f, 10.0f, 5.0f },
+		DirectX::XMFLOAT3{ 5.0f, 20.0f, 5.0f }
+		};
 
-	portal = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, positions);
-	portal.get()->SetShader(ModelShaderId::Portal);
+		plane = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "Data/Sprites/gem.png", 1.0f, positions);
+	}
+
+	{
+		std::array<DirectX::XMFLOAT3, 4 >positions = {
+			DirectX::XMFLOAT3{ 15.0f, 15.0f, 5.0f},
+			DirectX::XMFLOAT3{ 15.0f, 25.0f, 5.0f },
+			DirectX::XMFLOAT3{ 25.0f, 15.0f, 5.0f },
+			DirectX::XMFLOAT3{ 25.0f, 25.0f, 5.0f }
+		};
+
+		//portal = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, positions);
+		//portal.get()->SetShader(ModelShaderId::Portal);
+	}
 
 	// 光
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
@@ -83,7 +88,7 @@ void StageOpenWorld_E4C::Initialize()
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(camera);
 	cameraController->SetEnable(true);
-	cameraController->SetPlayer(player.get());
+	cameraController->SetPlayer(player);
 
 	{
 		HRESULT hr;
@@ -105,14 +110,14 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	cameraController->Update(elapsedTime);
 	cameraController->SyncContrllerToCamera(camera);
 
-	player->Update(elapsedTime);
-	//teleporter->Update(elapsedTime);
+	PlayerCharacterManager::Instance().Update(elapsedTime);
+	teleporter->Update(elapsedTime);
 	plane->Update(elapsedTime);
-	portal->Update(elapsedTime);
+	//portal->Update(elapsedTime);
 
-	//teleporter->CheckPlayer(player->GetPosition(), elapsedTime);
+	teleporter->CheckPlayer(PlayerCharacterManager::Instance().GetPlayerCharacterById(GAME_DATA.GetClientId())->GetPosition(), elapsedTime);
 
-	//if (teleporter->GetPortalReady()) STAGES.stageNumber = 1;
+	if (teleporter->GetPortalReady()) STAGES.stageNumber = 1;
 
 	if (T_INPUT.KeyDown(VK_F2))
 	{
@@ -124,7 +129,7 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 			}
 		};
 		//player->
-		player->LoadAppearance(charInfo.Character.pattern);
+		PlayerCharacterManager::Instance().GetPlayerCharacterById(GAME_DATA.GetClientId())->LoadAppearance(charInfo.Character.pattern);
 	}
 
 	timer += elapsedTime;
@@ -148,7 +153,7 @@ void StageOpenWorld_E4C::Render()
 	LightManager::Instance().PushRenderContext(rc);
 
 	// 描画
-	player->Render(rc);
+	PlayerCharacterManager::Instance().Render(rc);
 
 	float time = 0;
 
@@ -214,9 +219,9 @@ void StageOpenWorld_E4C::Render()
 		map->render(rc, world, animated_nodes);
 	}
 
-	//teleporter->Render(rc);
+	teleporter->Render(rc);
 	plane->Render(rc);
-	portal->Render(rc);
+	//portal->Render(rc);
 }
 
 void StageOpenWorld_E4C::OnPhase()

@@ -3,7 +3,8 @@
 #include "TAKOEngine/Runtime/tentacle_lib.h"
 
 #include <windowsx.h>
-
+#include "TAKOEngine/Network/WinSock2Wrapper.h"
+#include <mmsystem.h> 
 Input::~Input()
 {
 }
