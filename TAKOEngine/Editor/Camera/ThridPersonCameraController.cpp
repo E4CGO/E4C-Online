@@ -116,16 +116,20 @@ void ThridPersonCameraController::Update(float elapsedTime)
 
 	// RayCast •Ç‘Îô
 	{
-		HitResult hit;
-		DirectX::XMFLOAT3 end = focus + Offset;
-		if (MAPTILES.RayCast(focus, end, hit, true))
+		if (Offset.x != 0.0f || Offset.y != 0.0f || Offset.x != 0.0f)
 		{
-			// ƒJƒƒ‰‚ª•Ç‚É“–‚½‚Á‚½
-			focus = hit.position;
-		}
-		else
-		{
-			focus = focus + Offset;
+			HitResult hit;
+			DirectX::XMFLOAT3 end = focus + Offset;
+
+			if (MAPTILES.RayCast(focus, end, hit, true))
+			{
+				// ƒJƒƒ‰‚ª•Ç‚É“–‚½‚Á‚½
+				focus = hit.position;
+			}
+			else
+			{
+				focus = focus + Offset;
+			}
 		}
 	}
 
@@ -164,7 +168,7 @@ void ThridPersonCameraController::Update(float elapsedTime)
 				hit.distance = temp;
 			}
 			float d = hit.distance * 0.95f;
-			
+
 
 
 			if (d < 0.01f) d = 0.01f;

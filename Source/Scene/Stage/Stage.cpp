@@ -1,7 +1,7 @@
 #include "Map/MapTileManager.h"
 #include "Scene/Stage/Stage.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
-#include "TAKOEngine/Editor/Camera/CameraManager.h"
+#include "TAKOEngine/Rendering/LightManager.h"
 
 void Stage::Initialize()
 {
@@ -11,6 +11,14 @@ void Stage::Initialize()
 
 	MAPTILES.Clear();
 	ENEMIES.Clear();
+	enemyList.clear();
+}
+
+void Stage::Finalize()
+{
+	MAPTILES.Clear();
+	ENEMIES.Clear();
+	LightManager::Instance().Clear();
 	enemyList.clear();
 }
 

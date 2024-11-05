@@ -367,6 +367,8 @@ set(Source__UI__Widget
     "Source/UI/Widget/WidgetSkillTimer.h"
     "Source/UI/Widget/WidgetText.cpp"
     "Source/UI/Widget/WidgetText.h"
+    "Source/UI/Widget/WidgetUpDown.cpp"
+    "Source/UI/Widget/WidgetUpDown.h"
 )
 source_group("Source\\UI\\Widget" FILES ${Source__UI__Widget})
 

@@ -5,13 +5,12 @@
 #include "GameObject/Character/Player/PlayerCharacter.h"
 
 /**************************************************************************//**
- 	@brief		性別処理
+	@brief		性別処理
 	@param[in]	chara	プレイヤー参照ポインタ
 	@return		なし
 *//***************************************************************************/
 void PlayerCharacterPatternGender::Execute(Character* chara)
 {
-	chara->LoadModel("Data/Model/Character/BarbarianAnim.glb");
 	if (m_isMale) // MALE
 	{
 		chara->LoadModel("Data/Model/Character/HEAD_BARB.glb");
@@ -25,11 +24,12 @@ void PlayerCharacterPatternGender::Execute(Character* chara)
 }
 
 /**************************************************************************//**
- 	@brief		単一モデル実装
+	@brief		単一モデル実装
 	@param[in]	chara	プレイヤー参照ポインタ
 	@return		なし
 *//***************************************************************************/
 void PlayerCharacterPatternSingleModel::Execute(Character* chara)
 {
-	chara->LoadModel(m_filename.c_str());
+	if (m_filename != "")
+		chara->LoadModel(m_filename.c_str());
 }

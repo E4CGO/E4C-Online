@@ -52,6 +52,7 @@ PlayerCharacter* PlayerCharacterManager::UpdatePlayerData(const uint64_t client_
 	{
 		// 新プレイヤー
 		player = new PlayerCharacter(client_id, name, appearance);
+		player->Hide();
 		Register(player);
 		return player;
 	}
@@ -74,7 +75,6 @@ void PlayerCharacterManager::SyncPlayer(const uint64_t client_id, const PlayerCh
 {
 	PlayerCharacter* player = GetPlayerCharacterById(client_id);
 	if (player == nullptr) return;
-
 	std::lock_guard<std::mutex> lock(m_mut);
 	// 補間？
 	if (player->CheckSync(data.sync_count_id))
@@ -84,6 +84,7 @@ void PlayerCharacterManager::SyncPlayer(const uint64_t client_id, const PlayerCh
 		player->AddImpulse({ data.velocity[0], data.velocity[1], data.velocity[2] });
 		player->SetAngle({ 0.0f, data.rotate, 0.0f });
 		player->GetStateMachine()->ChangeState(data.state);
+		player->Show();
 	}
 }
 

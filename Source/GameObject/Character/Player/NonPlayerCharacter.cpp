@@ -69,7 +69,7 @@ void NonPlayerCharacter::LoadAppearance(uint8_t appearance[PlayerCharacterData::
 
 	for (uint8_t i = 0; i < PlayerCharacterData::APPEARANCE_PATTERN::NUM; i++)
 	{
-		PlayerCharacterData::Instance().LoadAppearance(reinterpret_cast<Player*>(this), i, appearance[i]);
+		PlayerCharacterData::Instance().LoadAppearance(this, i, appearance[i]);
 	}
 
 	stateMachine->SetState(static_cast<int>(State::Waiting));
