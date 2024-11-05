@@ -91,14 +91,14 @@ void SceneDungeon::Initialize()
 		{ 0, 0, 0 },	         // 注視点
 		{ 0, 0.969f, -0.248f }); // 上ベクトル
 
-	//cameraController = std::make_unique<FreeCameraController>();
-	//cameraController->SyncCameraToController(camera);
-	//cameraController->SetEnable(true);
+	cameraController = std::make_unique<FreeCameraController>();
+	cameraController->SyncCameraToController(camera);
+	cameraController->SetEnable(true);
 
-	cameraControllerP = std::make_unique<ThridPersonCameraController>();
-	cameraControllerP->SyncCameraToController(camera);
-	cameraControllerP->SetEnable(true);
-	cameraControllerP->SetPlayer(player.get());
+	//cameraControllerP = std::make_unique<ThridPersonCameraController>();
+	//cameraControllerP->SyncCameraToController(camera);
+	//cameraControllerP->SetEnable(true);
+	//cameraControllerP->SetPlayer(player.get());
 
 
 
@@ -135,8 +135,10 @@ void SceneDungeon::Finalize()
 void SceneDungeon::Update(float elapsedTime)
 {
 	// カメラ更新
-	cameraControllerP->Update(elapsedTime);
-	cameraControllerP->SyncContrllerToCamera(camera);
+	cameraController->Update(elapsedTime);
+	cameraController->SyncContrllerToCamera(camera);
+	//cameraControllerP->Update(elapsedTime);
+	//cameraControllerP->SyncContrllerToCamera(camera);
 
 	player->Update(elapsedTime);
 	rootRoom->Update(elapsedTime);

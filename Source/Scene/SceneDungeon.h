@@ -50,8 +50,8 @@ public:
 private:
 	Camera& camera = Camera::Instance();
 
-	//std::unique_ptr<FreeCameraController> cameraController;
-	std::unique_ptr<ThridPersonCameraController> cameraControllerP;
+	std::unique_ptr<FreeCameraController> cameraController;
+	//std::unique_ptr<ThridPersonCameraController> cameraControllerP;
 
 	std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer = std::make_unique<PostprocessingRenderer>();;
 
