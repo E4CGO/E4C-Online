@@ -36,7 +36,7 @@ void SceneTitle_E4C::Initialize()
 	// モデル
 	{
 		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/UI/start.png");
-		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/UI/exit.png");
+		m_sprites[1] = std::make_unique<SpriteDX12>(1, "Data/Sprites/UI/exit.png");
 	}
 
 	// 光
@@ -138,11 +138,10 @@ void SceneTitle_E4C::Render()
 
 void SceneTitle_E4C::RenderDX12()
 {
-	TentacleLib::graphics.BeginRender();
+	T_GRAPHICS.BeginRender();
 	{
-		
 		// シーン用定数バッファ更新
-		const Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
+		const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
 			CameraManager::Instance().GetCamera());
 
 		// レンダーコンテキスト設定
@@ -158,7 +157,7 @@ void SceneTitle_E4C::RenderDX12()
 			m_sprites[0]->End(m_frameBuffer->GetCommandList());
 		}
 	}
-	TentacleLib::graphics.End();
+	T_GRAPHICS.End();
 }
 
 void SceneTitle_E4C::DrawSceneGUI()

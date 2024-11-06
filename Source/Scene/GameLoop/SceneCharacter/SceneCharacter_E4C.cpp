@@ -43,7 +43,7 @@ void SceneCharacter_E4C::Initialize()
 	// モデル
 	{
 		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/UI/start.png");
-		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/UI/exit.png");
+		m_sprites[1] = std::make_unique<SpriteDX12>(1, "Data/Sprites/UI/exit.png");
 	}
 
 	m_previewCharacters.resize(m_maxCharacters);

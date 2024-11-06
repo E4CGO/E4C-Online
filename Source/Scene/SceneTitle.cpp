@@ -259,8 +259,7 @@ void SceneTitle::RenderDX12()
 	{
 		// シーン用定数バッファ更新
 		const Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
-			CameraManager::Instance().GetCamera()
-		);
+			CameraManager::Instance().GetCamera());
 
 		// レンダーコンテキスト設定
 		RenderContextDX12 rc;
