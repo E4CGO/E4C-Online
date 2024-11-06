@@ -228,6 +228,7 @@ void Passage1::PlaceMapTile()
 		newTile->SetAngle(tileData.angle);
 		newTile->SetScale(tileData.scale);
 		newTile->SetColor(tileData.color);
+		newTile->Update(0);
 		MAPTILES.Register(newTile);
 	}
 }

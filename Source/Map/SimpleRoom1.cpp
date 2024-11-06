@@ -317,11 +317,17 @@ void SimpleRoom1::PlaceMapTile()
 		//newTile->SetColor(tileData.color);
 		//MAPTILES.Register(newTile);
 
+		if (tileData.position.x > 1.0f)
+		{
+			int a = 0;
+		}
+
 		MapTile* newTile = new MapTile(fileName.c_str(), 1.0f, this);
 		newTile->SetPosition(tileData.position);
 		newTile->SetAngle(tileData.angle);
 		newTile->SetScale(tileData.scale);
 		newTile->SetColor(tileData.color);
+		newTile->Update(0);
 		MAPTILES.Register(newTile);
 		//mapTiles.emplace_back(newTile);
 

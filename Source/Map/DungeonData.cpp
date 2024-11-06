@@ -36,5 +36,5 @@ DungeonData::DungeonData()
 
 
 	// ダンジョンの生成設定
-	m_dungeonGenerateSettings.maxDepth = 0;
+	m_dungeonGenerateSettings.maxDepth = 3;
 }

@@ -214,6 +214,7 @@ void SceneDungeon::Render()
 	rootRoom->DrawDebugGUI();
 	shadowMapRenderer->DrawDebugGUI();
 	deferredRendering->DrawDebugGUI();
+	player->DrawDebugGUI();
 #endif // _DEBUG
 }
 
@@ -226,6 +227,7 @@ void SceneDungeon::GenerateDungeon(std::vector<int> roomTree)
 	rootRoom->PlaceMapTile();
 	for (RoomBase* room : rootRoom->GetAllChilds())
 	{
+		room->Update(0);
 		room->PlaceMapTile();
 	}
 }
@@ -239,6 +241,7 @@ std::vector<int> SceneDungeon::GenerateDungeon()
 	// 部屋のモデルを配置しつつ配列に保存
 	for (RoomBase* room : rootRoom->GetAll())
 	{
+		room->Update(0);
 		room->PlaceMapTile();
 		roomTree.emplace_back(room->GetRoomType());
 	}
