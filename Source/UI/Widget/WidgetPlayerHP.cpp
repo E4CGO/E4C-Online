@@ -1,4 +1,4 @@
-#include <string>
+Ôªø#include <string>
 
 #include "TAKOEngine/Rendering/ResourceManager.h"
 
@@ -13,21 +13,21 @@ WidgetPlayerHP::WidgetPlayerHP() : Widget()
 	gauge = RESOURCE.LoadSpriteResource("Data/Sprites/Gauge/Hp_line_white.png");
 	gaugeFrame = RESOURCE.LoadSpriteResource("Data/Sprites/Gauge/Hp_frame.png");
 
-	position = { 10.0f, 40.0f };
-	size = { 512.0f, 32.0f };
+	m_position = { 10.0f, 40.0f };
+	m_size = { 512.0f, 32.0f };
 
 	tempHp = static_cast<float>(player->GetHp());
 }
 
 void WidgetPlayerHP::Update(float elapsedTime)
 {
-	// tempHPçXêV
+	// tempHPÊõ¥Êñ∞
 	float hp = static_cast<float>(player->GetHp());
-	if (hp > tempHp) // âÒïú
+	if (hp > tempHp) // ÂõûÂæ©
 	{
 		tempHp = static_cast<float>(player->GetHp());
 	}
-	else if (hp < tempHp) // É_ÉÅÅ[ÉW
+	else if (hp < tempHp) // „ÉÄ„É°„Éº„Ç∏
 	{
 		tempHp -= min(elapsedTime * max(10.0f, tempHp - hp), tempHp - hp);
 	}
@@ -35,7 +35,7 @@ void WidgetPlayerHP::Update(float elapsedTime)
 
 void WidgetPlayerHP::Render(const RenderContext& rc)
 {
-	// MPÉQÅ[ÉW
+	// MP„Ç≤„Éº„Ç∏
 	DirectX::XMFLOAT3 mpColor;
 	switch (player->GetClassType())
 	{
@@ -52,8 +52,8 @@ void WidgetPlayerHP::Render(const RenderContext& rc)
 	float mpRate = player->GetMp() / player->GetMaxMp();
 	gauge->Render(
 		rc.deviceContext,
-		position.x, position.y + size.y + 3.0f, 0.0f,
-		size.x * mpRate, size.y,
+		m_position.x, m_position.y + m_size.y + 3.0f, 0.0f,
+		m_size.x * mpRate, m_size.y,
 		0, 0,
 		1024.0f * mpRate, 64.0f,
 		0,
@@ -61,16 +61,16 @@ void WidgetPlayerHP::Render(const RenderContext& rc)
 	);
 	gaugeFrame->Render(
 		rc.deviceContext,
-		position.x, position.y + size.y + 3.0f, 0.0f,
-		size.x, size.y
+		m_position.x, m_position.y + m_size.y + 3.0f, 0.0f,
+		m_size.x, m_size.y
 	);
 
-	// MPï∂éö
+	// MPÊñáÂ≠ó
 	std::string mp = std::to_string(static_cast<int>(player->GetMp())) + "/" + std::to_string(static_cast<int>(player->GetMaxMp()));
 	T_TEXT.Render(
 		FONT_ID::MsGothic,
 		mp.c_str(),
-		position.x + (size.x * 0.5f), position.y + size.y + 3.0f + (size.y * 0.5f),
+		m_position.x + (m_size.x * 0.5f), m_position.y + m_size.y + 3.0f + (m_size.y * 0.5f),
 		1.0f, 1.0f, 1.0f, 1.0f,
 		0.0f,
 		FONT_ALIGN::CENTER,
@@ -78,12 +78,12 @@ void WidgetPlayerHP::Render(const RenderContext& rc)
 		1
 	);
 
-	// HPÉQÅ[ÉW
+	// HP„Ç≤„Éº„Ç∏
 	float tempHpRate = tempHp / static_cast<float>(player->GetMaxHp());
 	gauge->Render(
 		rc.deviceContext,
-		position.x, position.y, 0,
-		size.x * tempHpRate, size.y,
+		m_position.x, m_position.y, 0,
+		m_size.x * tempHpRate, m_size.y,
 		0, 0,
 		1024.0f * tempHpRate, 64.0f,
 		0,
@@ -91,7 +91,7 @@ void WidgetPlayerHP::Render(const RenderContext& rc)
 	);
 
 	float hpRate = static_cast<float>(player->GetHp()) / static_cast<float>(player->GetMaxHp());
-	DirectX::XMFLOAT3 hpColor = { 0.1f, 1.0f, 0.1f }; // ÉfÉtÉHÉãÉgóŒ
+	DirectX::XMFLOAT3 hpColor = { 0.1f, 1.0f, 0.1f }; // „Éá„Éï„Ç©„É´„ÉàÁ∑ë
 	if (hpRate < 0.3)
 	{
 		hpColor.x = 1.0f;
@@ -102,8 +102,8 @@ void WidgetPlayerHP::Render(const RenderContext& rc)
 	}
 	gauge->Render(
 		rc.deviceContext,
-		position.x, position.y, 0,
-		size.x * hpRate, size.y,
+		m_position.x, m_position.y, 0,
+		m_size.x * hpRate, m_size.y,
 		0, 0,
 		1024.0f * hpRate, 64.0f,
 		0,
@@ -112,16 +112,16 @@ void WidgetPlayerHP::Render(const RenderContext& rc)
 
 	gaugeFrame->Render(
 		rc.deviceContext,
-		position.x, position.y, 0,
-		size.x, size.y
+		m_position.x, m_position.y, 0,
+		m_size.x, m_size.y
 	);
 
-	// HPÉQÅ[ÉWï∂éö
+	// HP„Ç≤„Éº„Ç∏ÊñáÂ≠ó
 	std::string hp = std::to_string(player->GetHp()) + "/" + std::to_string(player->GetMaxHp());
 	T_TEXT.Render(
 		FONT_ID::MsGothic,
 		hp.c_str(),
-		position.x + (size.x * 0.5f), position.y + (size.y * 0.5f),
+		m_position.x + (m_size.x * 0.5f), m_position.y + (m_size.y * 0.5f),
 		1.0f, 1.0f, 1.0f, 1.0f,
 		0.0f,
 		FONT_ALIGN::CENTER,

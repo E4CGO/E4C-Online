@@ -56,7 +56,7 @@ private:
 };
 
 /**************************************************************************//**
-	@class	PlayerCharacterPatternSinglePart
+	@class	PlayerCharacterPatternSingleModel
 	@brief	単一モデル実装
 	@par	[説明]
 		単一のモデルを実装するパターン

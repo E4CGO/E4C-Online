@@ -185,7 +185,7 @@ public:
 	void TurnByInput();
 
 	uint64_t GetClientId() { return m_client_id; }
-	void SetClientId(int id) { m_client_id = id; }
+	void SetClientId(const uint64_t id) { m_client_id = id; }
 	int GetClassType() { return type; }
 
 	float GetTurnSpeed() { return turnSpeed; }

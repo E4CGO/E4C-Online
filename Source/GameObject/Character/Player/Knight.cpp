@@ -17,7 +17,7 @@ Knight::Knight() : Player("Data/Model/Character/Knight.glb", 1.0f)
 	m_pmodels[0]->FindNode("Round_Shield")->visible = false;
 	m_pmodels[0]->FindNode("Spike_Shield")->visible = false;
 
-	// UŒ‚”»’è
+	// æ”»æ’ƒåˆ¤å®š
 	attackColliders[AttackCollider::Sword_1] = new SphereCollider(0.3f);
 	attackColliders[AttackCollider::Sword_2] = new SphereCollider(0.3f);
 	attackColliders[AttackCollider::Sword_3] = new SphereCollider(0.3f);
@@ -45,21 +45,20 @@ void Knight::AttackCollision()
 	//Sword
 	switch (stateMachine->GetStateIndex())
 	{
-	case static_cast<int>(State::AttackNormal): // ˆê”ÊUŒ‚
+	case static_cast<int>(State::AttackNormal): // ä¸€èˆ¬æ”»æ’ƒ
 		for (int i = AttackCollider::Sword_1; i <= AttackCollider::Sword_3; i++)
 		{
 			CollisionVsEnemies(attackColliders[i], atk, true, 1.0f, EffectManager::EFFECT_IDX::HIT_SLASH_EFFECT, 0.4f);
 		}
 		break;
-	case static_cast<int>(State::AttackSpecial): // –hŒä
+	case static_cast<int>(State::AttackSpecial): // é˜²å¾¡
 		if (stateMachine->GetState()->GetSubStateIndex() == BLOCK_STATE::BLOCK_ATTACK) CollisionVsEnemies(attackColliders[AttackCollider::Shield], atk / 5, true, 4.0f);
 		break;
-	case static_cast<int>(State::Skill_1): // –hŒä
+	case static_cast<int>(State::Skill_1): // é˜²å¾¡
 		CollisionVsEnemies(attackColliders[AttackCollider::Shield], atk, true, 15.0f, EffectManager::EFFECT_IDX::HIT_SHOT_EFFECT, 0.5f);
 		break;
 	}
 }
-
 void Knight::OnDamage(const HitResult& hit, int damage)
 {
 	if (hurtCoolTime > 0.0f) return;
@@ -70,7 +69,7 @@ void Knight::OnDamage(const HitResult& hit, int damage)
 	float vz = hit.position.z - position.z;
 	Turn(1.0f, vx, vz, DirectX::XMConvertToRadians(360));
 
-	// ƒuƒ[ƒN
+	// ãƒ–ãƒ­ãƒ¼ã‚¯
 	if (
 		stateMachine->GetStateIndex() == static_cast<int>(State::AttackSpecial) &&
 		AngleBetweenXMFLOAT3(GetFront(), DirectX::XMFLOAT3{ vx, 0, vz }) <= DirectX::XMConvertToRadians(90)
@@ -95,10 +94,10 @@ void Knight::OnDamage(const HitResult& hit, int damage)
 
 void Knight::UpdateColliders()
 {
-	// “–‚½‚è”»’è
+	// å½“ãŸã‚Šåˆ¤å®š
 	Player::UpdateColliders();
 
-	// UŒ‚”»’è
+	// æ”»æ’ƒåˆ¤å®š
 	float Yoffset = 0.2f;
 	attackColliders[AttackCollider::Sword_1]->SetPosition(GetNodePosition("1H_Sword", DirectX::XMFLOAT3{ 0.0f, Yoffset, 0.0f }));
 	Yoffset += attackColliders[AttackCollider::Sword_1]->GetScale().x + attackColliders[AttackCollider::Sword_2]->GetScale().x;

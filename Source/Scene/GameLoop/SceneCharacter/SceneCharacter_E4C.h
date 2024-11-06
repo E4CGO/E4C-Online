@@ -1,4 +1,10 @@
-#pragma once
+//! @file SceneCharacter_E4C.h
+//! @note　シーンキャラクリ
+
+#ifndef __SCENE_CHARACTER_E4C_H__
+#define __SCENE_CHARACTER_E4C_H__
+
+#include <unordered_set>
 
 #include "TAKOEngine/Rendering/Model/ModelDX12.h"
 #include "TAKOEngine/Rendering/SpriteDX12.h"
@@ -8,13 +14,13 @@
 #include "PlayerCharacterData.h"
 #include "GameObject/Character/Player/NonPlayerCharacter.h"
 #include "GameObject/Character/Player/PlayerCharacter.h"
-
-#include <unordered_set>
-
-// テスト用
-#include "GameObject/ModelObject.h"
 #include "Scene/Scene.h"
 
+/**************************************************************************//**
+	@class	SceneCharacter_E4C
+	@brief	キャラクリを管理するシーン
+	@par    [説明]
+*//***************************************************************************/
 class SceneCharacter_E4C : public Scene
 {
 public:
@@ -44,9 +50,7 @@ public:
 	{
 		INIT,
 		CHARACTERSELECTION,
-		CHARACTERCREATIONLEFT,
-		CHARACTERCREATIONCENTER,
-		CHARACTERCREATIONRIGHT,
+		CHARACTERCREATION,
 		START
 	};
 
@@ -62,18 +66,29 @@ private:
 	// フレームバッファマネージャー
 	FrameBufferManager* m_frameBuffer;
 
-	Camera& camera = Camera::Instance();
-
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {
 		"",											// マスク
 		// Setting UI
 	};
-
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
 	std::unique_ptr<SpriteDX12>			m_sprites[8];
+
+	// Model Preload
+	std::unordered_set<const char*> modelList = {
+		"Data/Model/Character/WEAPON_BARB.glb",
+		"Data/Model/Character/WEAPON_MAGE.glb",
+		"Data/Model/Character/HEAD_BARB.glb",
+		"Data/Model/Character/BODY_BARB.glb",
+		"Data/Model/Character/HEAD_MAGE.glb",
+		"Data/Model/Character/BODY_MAGE.glb",
+	};
+	std::unordered_set<std::shared_ptr<ModelResource>> modelPreLoad;
+
 
 	static const int m_maxCharacters;
 
 	static float m_time;
 };
+
+#endif // __SCENE_CHARACTER_E4C_H__

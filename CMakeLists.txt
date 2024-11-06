@@ -367,6 +367,8 @@ set(Source__UI__Widget
     "Source/UI/Widget/WidgetSkillTimer.h"
     "Source/UI/Widget/WidgetText.cpp"
     "Source/UI/Widget/WidgetText.h"
+    "Source/UI/Widget/WidgetUpDown.cpp"
+    "Source/UI/Widget/WidgetUpDown.h"
 )
 source_group("Source\\UI\\Widget" FILES ${Source__UI__Widget})
 
@@ -540,6 +542,8 @@ set(TAKOEngine__Editor__Camera
     "TAKOEngine/Editor/Camera/Camera.h"
     "TAKOEngine/Editor/Camera/CameraController.cpp"
     "TAKOEngine/Editor/Camera/CameraController.h"
+    "TAKOEngine/Editor/Camera/CameraManager.cpp"
+    "TAKOEngine/Editor/Camera/CameraManager.h"
     "TAKOEngine/Editor/Camera/FreeCameraController.cpp"
     "TAKOEngine/Editor/Camera/FreeCameraController.h"
     "TAKOEngine/Editor/Camera/ThridPersonCameraController.cpp"
