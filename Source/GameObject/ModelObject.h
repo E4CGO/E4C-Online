@@ -98,7 +98,7 @@ protected:
 	std::unique_ptr<Collider> collider = nullptr;
 
 	// シェーダーID
-	ModelShaderId m_shaderId = ModelShaderId::Toon;
+	ModelShaderId m_shaderId = ModelShaderId::Phong;
 
 	// モデルリスト
 	std::vector<std::unique_ptr<iModel>> m_pmodels;

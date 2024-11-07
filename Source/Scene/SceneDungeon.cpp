@@ -237,6 +237,12 @@ std::vector<int> SceneDungeon::GenerateDungeon()
 	std::vector<AABB> roomAABBs;
 
 	rootRoom = new SimpleRoom1(nullptr, -1, roomAABBs);
+
+	rootRoom->PlaceMapTile();
+	for (RoomBase* room : rootRoom->GetAllChilds())
+	{
+		room->PlaceMapTile();
+	}
 	
 	return roomTree;
 
