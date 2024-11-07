@@ -18,7 +18,7 @@ void SceneTest::Initialize()
 
 	newPlayer = std::make_unique<PlayerCharacter>(charInfo);
 	newPlayer->SetPosition({ 5,	100, 5 });
-	newPlayer->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::State::Idle));
+	newPlayer->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 
 	//player = std::make_unique<Player>("Data/Model/Character/Barbarian.glb", 1.0f);
 	//player->SetPosition({ 5, 50, 5 });
@@ -39,21 +39,26 @@ void SceneTest::Initialize()
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
 
+	CameraManager& cameraManager = CameraManager::Instance();
+	Camera* mainCamera = new Camera();
+	cameraManager.Register(mainCamera);
+	cameraManager.SetCamera(0);
+
 	// カメラ設定
-	camera.SetPerspectiveFov(
+	CameraManager::Instance().GetCamera()->SetPerspectiveFov(
 		DirectX::XMConvertToRadians(45),							// 画角
 		T_GRAPHICS.GetScreenWidth() / T_GRAPHICS.GetScreenHeight(),	// 画面アスペクト比
 		0.1f,														// ニアクリップ
 		10000.0f													// ファークリップ
 	);
-	camera.SetLookAt(
+	CameraManager::Instance().GetCamera()->SetLookAt(
 		{ 0, 5.0f, 10.0f },	// 視点
 		{ 0, 0, 0 },	// 注視点
 		{ 0, 0.969f, -0.248f } // 上ベクトル
 	);
 
 	cameraController = std::make_unique<ThridPersonCameraController>();
-	cameraController->SyncCameraToController(camera);
+	cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
 	//cameraController->SetEnable(false);
 	cameraController->SetEnable(true);
 	cameraController->SetPlayer(newPlayer.get());
@@ -62,6 +67,7 @@ void SceneTest::Initialize()
 void SceneTest::Finalize()
 {
 	LightManager::Instance().Clear();
+	CameraManager::Instance().Clear();
 	MAPTILES.Clear();
 }
 
@@ -69,7 +75,7 @@ void SceneTest::Finalize()
 void SceneTest::Update(float elapsedTime)
 {
 	cameraController->Update(elapsedTime);
-	cameraController->SyncContrllerToCamera(camera);
+	cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
 
 	MAPTILES.Update(elapsedTime);
 
@@ -85,7 +91,7 @@ void SceneTest::Render()
 
 	// 描画コンテキスト設定
 	RenderContext rc;
-	rc.camera = &camera;
+	rc.camera = CameraManager::Instance().GetCamera();
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 

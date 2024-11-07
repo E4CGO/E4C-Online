@@ -11,7 +11,6 @@
 #include <mutex>
 #include "TAKOEngine/Network/TCPSocket.h"
 #include "TAKOEngine/Network/UDPSocket.h"
-#include "PlayerCharacterData.h"
 
 namespace Online
 {
@@ -19,34 +18,44 @@ namespace Online
 	//const static char* SV_IP = "34.82.222.201";
 
 	const static char* port = "9000";
-
+	/**************************************************************************//**
+		@enum	TCP_CMD
+		@brief	TCP接続コマンド
+		@par	[説明]
+			コマンドによって送信・受信処理分け
+	*//***************************************************************************/
 	enum TCP_CMD : uint8_t
 	{
-		TOKEN = 0,		// 接続トークンの受信
-		LOGIN,			// キャラデータ（名前）を送信
+		TOKEN = 0,		/*!< 接続トークンの受信	*/
+		LOGIN,			/*!< キャラデータ（名前）を送信 */
 
-		CLIENT_DATA,	// 他のキャラクターのデータ（部屋別）
-		ROOM_NEW,		// 部屋の作成（仮）
-		ROOM_IN,		// 入室処理
-		ROOM_OUT,		// 退室処理
+		CLIENT_DATA,	/*!< 同室キャラクターのデータ受信 */
+		ROOM_NEW,		/*!< 部屋の作成（仮）*/
+		ROOM_IN,		/*!< 入室処理 */
+		ROOM_OUT,		/*!< 退室処理 */
 
-		CHAT,			// チャット
+		CHAT,			/*!< チャット */
 
-		PING = 255,		// 接続チェック
+		PING = 255,		/*!< 接続チェック */
 	};
-
+	/**************************************************************************//**
+		@enum	UDP_CMD
+		@brief	UDP接続コマンド
+		@par	[説明]
+			コマンドによって送信・受信処理分け
+	*//***************************************************************************/
 	enum UDP_CMD : uint8_t
 	{
-		SYNC = 0,		// 基本同期通信
-		DAMAGE			// ダメージ判定
+		SYNC = 0,		/*!< 基本同期通信 */
+		DAMAGE			/*!< ダメージ判定 */
 	};
-
 
 	class TCPCommand;
 	class UDPCommand;
+
 	/**************************************************************************//**
 		@class		OnlineController
-		@brief		OnlineGameの基底クラス
+		@brief		OnlineGameのコントロールクラス
 		@par		[説明]
 						クラスサ
 	*//***************************************************************************/
@@ -58,17 +67,22 @@ namespace Online
 		// デストラクタ
 		~OnlineController();
 
+		/**************************************************************************//**
+			@enum	STATE
+			@brief	オンライン接続のステート
+			@par	[説明]
+		*//***************************************************************************/
 		enum STATE : uint8_t
 		{
-			DEFAULT = 0,	// 初期状態
-			INIT,			// 初期化
-			OFFLINE,		// オフライン
-			CONNNETED,		// 接続完了
-			LOGIN,			// ログイン開始
-			LOGINED,		// ログイン完了
-			SYNC,			// 同期中
-			END,			// 終了
-			ERR,			// エラー
+			DEFAULT = 0,	/*!< 初期状態 */
+			INIT,			/*!< 初期化 */
+			OFFLINE,		/*!< オフライン */
+			CONNNETED,		/*!< 接続完了 */
+			LOGIN,			/*!< ログイン開始 */
+			LOGINED,		/*!< ログイン完了 */
+			SYNC,			/*!< 同期中 */
+			END,			/*!< 終了 */
+			ERR,			/*!< エラー */
 		};
 #pragma pack(push, 1)
 		struct DATA_HEADER {
@@ -112,11 +126,13 @@ namespace Online
 		// 同期開始
 		void BeginSync()
 		{
+			if (m_state != STATE::LOGINED) return;
 			if (!m_udpSendThread.joinable())
 			{
 				m_udpSendThread = std::thread(&OnlineController::UDPSendThread, this);
 			}
 			m_udpRecvThread = std::thread(&OnlineController::UDPRecvThread, this);
+			m_state = STATE::SYNC;
 		}
 	private:
 		// TCP受信

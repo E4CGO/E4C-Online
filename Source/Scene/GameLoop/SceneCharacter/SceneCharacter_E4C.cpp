@@ -2,6 +2,7 @@
 #include "TAKOEngine/Network/HttpRequest.h"
 #include "TAKOEngine/Rendering/ResourceManager.h"
 #include "TAKOEngine/GUI/UIManager.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 
 #include <imgui.h>
 #include <string>
@@ -12,10 +13,13 @@
 
 #include "GameData.h"
 
-//テスト用
+// ディフォルト値
 float SceneCharacter_E4C::m_time{ 0 };
 const int SceneCharacter_E4C::m_maxCharacters{ 3 };
 
+/**************************************************************************//**
+	@brief	初期化
+*//***************************************************************************/
 void SceneCharacter_E4C::Initialize()
 {
 	// Sprite Resource Preload
@@ -23,6 +27,12 @@ void SceneCharacter_E4C::Initialize()
 	{
 		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
 	}
+	// Model Resource Preload
+	for (auto& filename : modelList)
+	{
+		modelPreLoad.insert(RESOURCE.LoadModelResource(filename));
+	}
+
 
 	//シャドウマップレンダラ
 	shadowMapRenderer->Initialize();
@@ -38,22 +48,6 @@ void SceneCharacter_E4C::Initialize()
 
 	m_previewCharacters.resize(m_maxCharacters);
 
-	for (size_t i = 0; i < m_maxCharacters; i++)
-	{
-		PlayerCharacterData::CharacterInfo charInfo = {
-		true,			// visible
-		"center",		// save
-		{				//Character
-			i, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-		}
-		};
-
-		m_previewCharacters[i] = std::make_unique<NonPlayerCharacter>(charInfo);
-		m_previewCharacters[i]->SetPosition({ 3.5f * i * -1.f + 3.5f, 0.0f, 5.0f });
-		m_previewCharacters[i]->SetKinematic(true);
-		m_previewCharacters[i]->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::State::Waiting));
-	}
-
 	// 光
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
 	Light* dl = new Light(LightType::Directional);
@@ -61,48 +55,59 @@ void SceneCharacter_E4C::Initialize()
 	LightManager::Instance().Register(dl);
 	shadowMapRenderer->SetShadowLight(dl);
 
+	CameraManager& cameraManager = CameraManager::Instance();
+	Camera* mainCamera = new Camera();
+	cameraManager.Register(mainCamera);
+	cameraManager.SetCamera(0);
+
 	// カメラ設定
-	camera.SetPerspectiveFov(
+	CameraManager::Instance().GetCamera()->SetPerspectiveFov(
 		DirectX::XMConvertToRadians(45),		// 画角
 		SCREEN_W / SCREEN_H,					// 画面アスペクト比
 		0.1f,									// ニアクリップ
 		10000.0f								// ファークリップ
 	);
-	camera.SetLookAt(
+	CameraManager::Instance().GetCamera()->SetLookAt(
 		{ 0, 3.0f, 13.0f },				// 視点
 		{ 0.0f, 0.0, 0.0f },					// 注視点
 		{ 0.036f, 0.999f, -0.035f }				// 上ベクトル
 	);
 	cameraController = std::make_unique<FreeCameraController>();
-	cameraController->SyncCameraToController(camera);
+	cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
 	cameraController->SetEnable(false);
 
 	// ステート
 	stateMachine = std::make_unique<StateMachine<SceneCharacter_E4C>>();
 	stateMachine->RegisterState(STATE::INIT, new SceneCharacter_E4CState::InitState(this));
 	stateMachine->RegisterState(STATE::CHARACTERSELECTION, new SceneCharacter_E4CState::CharacterSelectionState(this));
-	stateMachine->RegisterState(STATE::CHARACTERCREATIONLEFT, new SceneCharacter_E4CState::CharacterCreationStateLeft(this));
-	stateMachine->RegisterState(STATE::CHARACTERCREATIONCENTER, new SceneCharacter_E4CState::CharacterCreationStateCenter(this));
-	stateMachine->RegisterState(STATE::CHARACTERCREATIONRIGHT, new SceneCharacter_E4CState::CharacterCreationStateRight(this));
+	stateMachine->RegisterState(STATE::CHARACTERCREATION, new SceneCharacter_E4CState::CharacterCreationState(this));
 	stateMachine->RegisterState(STATE::START, new SceneCharacter_E4CState::StartState(this));
 	stateMachine->SetState(STATE::INIT);
 }
 
+/**************************************************************************//**
+	@brief 終わり
+*//***************************************************************************/
 void SceneCharacter_E4C::Finalize()
 {
 	spritePreLoad.clear();
 	UI.Clear();
 	shadowMapRenderer->Clear();
+	CameraManager::Instance().Clear();
 }
 
-// 更新処理
+/**************************************************************************//**
+	@brief		 更新処理
+	@param[in]    elapsedTime
+*//***************************************************************************/
 void SceneCharacter_E4C::Update(float elapsedTime)
 {
 	m_time += elapsedTime;
 
 	for (auto& it : m_previewCharacters)
 	{
-		it->Update(elapsedTime);
+		if (it != nullptr)
+			it->Update(elapsedTime);
 	}
 
 	stateMachine->Update(elapsedTime);
@@ -110,13 +115,15 @@ void SceneCharacter_E4C::Update(float elapsedTime)
 #ifdef _DEBUG
 	// カメラ更新
 	cameraController->Update();
-	cameraController->SyncContrllerToCamera(camera);
+	cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
 #endif // _DEBUG
 
 	UI.Update(elapsedTime);
 }
 
-// 描画処理
+/**************************************************************************//**
+	@brief	 描画処理
+*//***************************************************************************/
 void SceneCharacter_E4C::Render()
 {
 	T_TEXT.Begin();
@@ -126,7 +133,7 @@ void SceneCharacter_E4C::Render()
 
 	// 描画コンテキスト設定
 	RenderContext rc;
-	rc.camera = &camera;
+	rc.camera = CameraManager::Instance().GetCamera();
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
@@ -139,8 +146,10 @@ void SceneCharacter_E4C::Render()
 
 	for (auto& it : m_previewCharacters)
 	{
-		if (it->GetMenuVisibility())
-			it->Render(rc);
+		if (it != nullptr) {
+			if (it->GetMenuVisibility())
+				it->Render(rc);
+		}
 	}
 
 	UI.Render(rc);
@@ -149,20 +158,21 @@ void SceneCharacter_E4C::Render()
 
 #ifdef _DEBUG
 	// DebugIMGUI
-	//DrawSceneGUI();
+	DrawSceneGUI();
 	//shadowMapRenderer->DrawDebugGUI();
 #endif // _DEBUG
 }
 
+/**************************************************************************//**
+	@brief	DX12描画処理
+*//***************************************************************************/
 void SceneCharacter_E4C::RenderDX12()
 {
 	TentacleLib::graphics.BeginRender();
 	{
-		Camera& camera = Camera::Instance();
-
 		// シーン用定数バッファ更新
 		const Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
-			Camera::Instance());
+			CameraManager::Instance().GetCamera());
 
 		// レンダーコンテキスト設定
 		RenderContextDX12 rc;
@@ -176,15 +186,44 @@ void SceneCharacter_E4C::RenderDX12()
 			m_sprites[0]->Draw(0, 0, 100, 100, 0, 1, 1, 1, 1);
 			m_sprites[0]->End(m_frameBuffer->GetCommandList());
 		}
-
 	}
 	TentacleLib::graphics.End();
 }
 
+/**************************************************************************//**
+	@brief		キャラコントロール
+	@param[in]    characterNumber
+	@param[in]    modelType
+	@param[in]    value
+*//***************************************************************************/
 void SceneCharacter_E4C::UpdateCurrentModel(int characterNumber, int modelType, int value)
 {
 }
 
+/**************************************************************************//**
+	@brief	ディバッグ描画
+*//***************************************************************************/
 void SceneCharacter_E4C::DrawSceneGUI()
 {
+	ImVec2 pos = ImGui::GetMainViewport()->Pos;
+	ImGui::SetNextWindowPos(ImVec2(pos.x + 10, pos.y + 10), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+
+	if (ImGui::Begin("Scene##Debug", nullptr, ImGuiWindowFlags_None))
+	{
+		if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			// カメラ
+			DirectX::XMFLOAT3 eye = CameraManager::Instance().GetCamera()->GetEye();
+			ImGui::DragFloat3("Eye", &eye.x, 0.01f, 100.0f);
+			DirectX::XMFLOAT3 focus = CameraManager::Instance().GetCamera()->GetFocus();
+			ImGui::DragFloat3("Fcous", &focus.x, 0.01f, 100.0f);
+			DirectX::XMFLOAT3 up = CameraManager::Instance().GetCamera()->GetUp();
+			ImGui::DragFloat3("Up", &up.x, 0.01f, 100.0f);
+
+			CameraManager::Instance().GetCamera()->SetLookAt(eye, focus, up);
+			cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
+		}
+	}
+	ImGui::End();
 }

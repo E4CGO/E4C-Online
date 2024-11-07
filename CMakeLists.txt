@@ -260,16 +260,12 @@ set(Source__GameObject__Character__Player
     "Source/GameObject/Character/Player/Mage.h"
     "Source/GameObject/Character/Player/NonPlayerCharacter.cpp"
     "Source/GameObject/Character/Player/NonPlayerCharacter.h"
-    "Source/GameObject/Character/Player/NonPlayerCharacterState.cpp"
-    "Source/GameObject/Character/Player/NonPlayerCharacterState.h"
     "Source/GameObject/Character/Player/Player.cpp"
     "Source/GameObject/Character/Player/Player.h"
     "Source/GameObject/Character/Player/PlayerCharacter.cpp"
     "Source/GameObject/Character/Player/PlayerCharacter.h"
     "Source/GameObject/Character/Player/PlayerCharacterManager.cpp"
     "Source/GameObject/Character/Player/PlayerCharacterManager.h"
-    "Source/GameObject/Character/Player/PlayerCharacterState.cpp"
-    "Source/GameObject/Character/Player/PlayerCharacterState.h"
     "Source/GameObject/Character/Player/PlayerManager.cpp"
     "Source/GameObject/Character/Player/PlayerManager.h"
     "Source/GameObject/Character/Player/PlayerState.cpp"
@@ -280,6 +276,16 @@ set(Source__GameObject__Character__Player
     "Source/GameObject/Character/Player/RogueState.h"
 )
 source_group("Source\\GameObject\\Character\\Player" FILES ${Source__GameObject__Character__Player})
+
+set(Source__GameObject__Character__Player__State
+    "Source/GameObject/Character/Player/State/NonPlayerCharacterState.cpp"
+    "Source/GameObject/Character/Player/State/NonPlayerCharacterState.h"
+    "Source/GameObject/Character/Player/State/PlayerCharacterState.cpp"
+    "Source/GameObject/Character/Player/State/PlayerCharacterState.h"
+    "Source/GameObject/Character/Player/State/PlayerCharacterSwordState.cpp"
+    "Source/GameObject/Character/Player/State/PlayerCharacterSwordState.h"
+)
+source_group("Source\\GameObject\\Character\\Player\\State" FILES ${Source__GameObject__Character__Player__State})
 
 set(Source__Network__TCPCommand
     "Source/Network/TCPCommand/TCPChat.cpp"
@@ -380,6 +386,8 @@ set(Source__UI__Widget
     "Source/UI/Widget/WidgetSkillTimer.h"
     "Source/UI/Widget/WidgetText.cpp"
     "Source/UI/Widget/WidgetText.h"
+    "Source/UI/Widget/WidgetUpDown.cpp"
+    "Source/UI/Widget/WidgetUpDown.h"
 )
 source_group("Source\\UI\\Widget" FILES ${Source__UI__Widget})
 
@@ -560,6 +568,8 @@ set(TAKOEngine__Editor__Camera
     "TAKOEngine/Editor/Camera/Camera.h"
     "TAKOEngine/Editor/Camera/CameraController.cpp"
     "TAKOEngine/Editor/Camera/CameraController.h"
+    "TAKOEngine/Editor/Camera/CameraManager.cpp"
+    "TAKOEngine/Editor/Camera/CameraManager.h"
     "TAKOEngine/Editor/Camera/FreeCameraController.cpp"
     "TAKOEngine/Editor/Camera/FreeCameraController.h"
     "TAKOEngine/Editor/Camera/ThridPersonCameraController.cpp"
@@ -773,6 +783,7 @@ set(ALL_FILES
     ${Source__GameObject__Props}
     ${Source__GameObject__Character__Enemy}
     ${Source__GameObject__Character__Player}
+    ${Source__GameObject__Character__Player__State}
     ${Source__Network__TCPCommand}
     ${Source__Network__UDPCommand}
     ${Source__Scene__GameLoop}

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <string>
 
@@ -14,7 +14,7 @@ public:
 private:
 	void NameWithToken();
 private:
-	// “ü—Í
+	// å…¥åŠ›
 	char address[32];
 	char name[32];
 	char port[16];

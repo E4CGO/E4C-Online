@@ -13,7 +13,7 @@ namespace Online
 {
 	/**************************************************************************//**
 		@brief		ログイン受信関数
-		@param[in]	size_t データサイズ
+		@param[in]	size データサイズ
 		@return		成功判定
 	*//***************************************************************************/
 	bool TCPLogin::Receive(size_t size)
@@ -22,13 +22,11 @@ namespace Online
 
 		std::cout << "LOGIN: " << PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetName().c_str() << std::endl;
 
-		m_pcontroller->BeginSync();
-
 		return true;
 	}
 	/**************************************************************************//**
 		@brief		ログイン受信関数
-		@param[in]	size_t データサイズ
+		@param[in]	data データ参照ポインタ
 		@return		成功判断
 	*//***************************************************************************/
 	bool TCPLogin::Send(void* data)

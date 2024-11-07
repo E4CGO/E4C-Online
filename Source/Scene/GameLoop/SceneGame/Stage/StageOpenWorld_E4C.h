@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <memory>
 #include <array>
@@ -15,6 +15,7 @@
 #include "Map/MapTile.h"
 
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 #include "TAKOEngine/Tool/GLTFImporter.h"
 
 class SceneGame_E4C;
@@ -22,7 +23,7 @@ class SceneGame_E4C;
 class StageOpenWorld_E4C : public Stage
 {
 public:
-	StageOpenWorld_E4C(SceneGame_E4C* scene) : m_scene(scene), Stage() {};
+	StageOpenWorld_E4C(SceneGame_E4C* scene) : m_pScene(scene), Stage() {};
 
 	void Initialize() override;
 
@@ -37,17 +38,24 @@ public:
 		NORMAL,
 	};
 private:
-	SceneGame_E4C* m_scene;
+	SceneGame_E4C* m_pScene;
 
-	Camera& camera = Camera::Instance();
 	std::unique_ptr<ThridPersonCameraController> cameraController;
 
 	MapTile* stage_collision = nullptr;
+
+	std::unique_ptr<ModelObject> testModel;
 
 	std::unique_ptr <Teleporter> teleporter;
 	std::unique_ptr <Plane> plane;
 	std::unique_ptr <Plane> portal;
 
 	std::unique_ptr<gltf_model> map;
+
+	std::unique_ptr<ModelObject> Locator;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constant_buffers[8];
+
+	float transitionTime = 0.0f;
+	float transitionDuration = 2.f;  // 5秒かけて移動
+	int currentSegment = 0;
 };

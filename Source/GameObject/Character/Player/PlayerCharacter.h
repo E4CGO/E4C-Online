@@ -5,6 +5,7 @@
 #define __INCLUDED_PLAYER_CHARACTER_H__
 
 #include <unordered_map>
+#include <mutex>
 
 #include "TAKOEngine/AI/StateMachine.h"
 #include "GameObject/Character/Character.h"
@@ -35,6 +36,7 @@ public:
 		float velocity[3];
 		float rotate;
 		uint8_t state;
+		uint8_t sub_state;
 	};
 #pragma pack(pop)
 
@@ -120,26 +122,26 @@ public:
 		Walking_C
 	};
 
-	enum class State
+	enum STATE : uint8_t
 	{
-		Idle,
-		Move,
-		Jump,
-		Fall,
-		Land,
-		Dodge,
-		Hurt,
-		Death,
+		IDLE,
+		MOVE,
+		JUMP,
+		FALL,
+		LAND,
+		DODGE,
+		HURT,
+		DEATH,
 
-		AttackNormal,
-		AttackSpecial,
-		Skill_1,
-		Skill_2,
-		Skill_4,
-		Skill_3,
+		ATTACK_NORMAL,
+		ATTACK_SPECIAL,
+		SKILL_1,
+		SKILL_2,
+		SKILL_3,
+		SKILL_4,
 
-		Waiting = 998,	// 待機
-		Ready = 999,	// 待機 (準備完了)
+		WAITING = 254,	// 待機
+		READY = 255,	// 待機 (準備完了)
 	};
 
 	enum COLOR_PATTERN {
@@ -185,7 +187,7 @@ public:
 	void TurnByInput();
 
 	uint64_t GetClientId() { return m_client_id; }
-	void SetClientId(int id) { m_client_id = id; }
+	void SetClientId(const uint64_t id) { m_client_id = id; }
 	int GetClassType() { return type; }
 
 	float GetTurnSpeed() { return turnSpeed; }
@@ -251,20 +253,9 @@ public:
 
 
 	// 同期用データを取得
-	void GetSyncData(SYNC_DATA& data)
-	{
-		data.client_id = m_client_id;
-		data.sync_count_id = m_sync_count_id;
-		data.position[0] = position.x;
-		data.position[1] = position.y;
-		data.position[2] = position.z;
-		data.velocity[0] = velocity.x;
-		data.velocity[1] = velocity.y;
-		data.velocity[2] = velocity.z;
-		data.rotate = angle.y;
-		data.state = static_cast<uint8_t>(stateMachine->GetStateIndex());
-		m_sync_count_id++;
-	}
+	void GetSyncData(SYNC_DATA& data);
+	// 同期用データを計算
+	void ImportSyncData(const SYNC_DATA& data);
 
 	static DirectX::XMFLOAT4 GetColorSet(int idx) { return PlayerCharacter::colorSet[idx]; }
 protected:
@@ -332,6 +323,10 @@ protected:
 	StateMachine<PlayerCharacter>* stateMachine;
 
 	std::unordered_map<int, Collider*> m_pattackColliders; // 攻撃判定
+
+	// 同期用
+	std::mutex m_mut;
+	SYNC_DATA m_sync_data;
 };
 
 #endif // __INCLUDED_PLAYER_CHARACTER_H__

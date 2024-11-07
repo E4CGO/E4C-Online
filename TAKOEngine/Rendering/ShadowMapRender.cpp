@@ -7,6 +7,7 @@
 
 #include "TAKOEngine\Rendering\ShadowMapRender.h"
 #include "TAKOEngine\Rendering\Graphics.h"
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 
 namespace myRenderer
 {
@@ -73,7 +74,6 @@ namespace myRenderer
 
 			Graphics& graphics = Graphics::Instance();
 			ID3D11DeviceContext* dc = graphics.GetDeviceContext();
-			Camera& camera = Camera::Instance();
 
 			// 現在設定されているバッファを退避して初期化して
 			UINT			cachedViewportCount{ D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE };
@@ -91,19 +91,19 @@ namespace myRenderer
 			//シャドウマップの分割エリア定義
 			float splitAreaTable[] =
 			{
-				Camera::Instance().GetNearZ(),
+				CameraManager::Instance().GetCamera()->GetNearZ(),
 				50.0f,
 				150.0f,
 				300.0f,
 				500.0f,
-				Camera::Instance().GetFarZ(),
+				CameraManager::Instance().GetCamera()->GetFarZ(),
 			};
 
 			//カメラパラメータを取得
-			DirectX::XMVECTOR cameraFront = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera.GetFront()));
-			DirectX::XMVECTOR cameraRight = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera.GetRight()));
-			DirectX::XMVECTOR cameraUp = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera.GetUp()));
-			DirectX::XMVECTOR cameraPos = DirectX::XMLoadFloat3(&camera.GetEye());
+			DirectX::XMVECTOR cameraFront = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&CameraManager::Instance().GetCamera()->GetFront()));
+			DirectX::XMVECTOR cameraRight = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&CameraManager::Instance().GetCamera()->GetRight()));
+			DirectX::XMVECTOR cameraUp = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&CameraManager::Instance().GetCamera()->GetUp()));
+			DirectX::XMVECTOR cameraPos = DirectX::XMLoadFloat3(&CameraManager::Instance().GetCamera()->GetEye());
 
 			//ライトビュープロジェクション行列の作成
 			DirectX::XMMATRIX viewMatrix, projectionMatrix, viewProjectionMatrix;
@@ -152,16 +152,16 @@ namespace myRenderer
 				DirectX::XMVECTOR vertex[8];
 				{
 					//エリアの近平面の中心からの上面までの距離を求める
-					float nearY = tanf(camera.GetFovY() / 2.0f) * nearDepth;
+					float nearY = tanf(CameraManager::Instance().GetCamera()->GetFovY() / 2.0f) * nearDepth;
 
 					//エリアの近平面の中心からの右面までの距離を求める
-					float nearX = nearY * camera.GetAspect();
+					float nearX = nearY * CameraManager::Instance().GetCamera()->GetAspect();
 
 					//エリアの遠平面の中心からの上面までの距離を求める
-					float farY = tanf(camera.GetFovY() / 2.0f) * farDepth;
+					float farY = tanf(CameraManager::Instance().GetCamera()->GetFovY() / 2.0f) * farDepth;
 
 					//エリアの遠平面の中心からの右面までの距離を求める
-					float farX = farY * camera.GetAspect();
+					float farX = farY * CameraManager::Instance().GetCamera()->GetAspect();
 
 					//エリアの近平面の中心座標を求める
 					DirectX::XMVECTOR nearPosition = DirectX::XMVectorAdd(cameraPos, DirectX::XMVectorScale(cameraFront, nearDepth));
@@ -227,7 +227,7 @@ namespace myRenderer
 				// ライトビュープロジェクション行列にクロップ行列を乗算
 				DirectX::XMStoreFloat4x4(&lightViewProjection[i], viewProjectionMatrix * clopMatrix);
 
-				rc.camera = &camera;
+				rc.camera = CameraManager::Instance().GetCamera();
 				rc.deviceContext = dc;
 				rc.renderState = graphics.GetRenderState();
 				DirectX::XMStoreFloat4x4(&view, viewMatrix);

@@ -1,4 +1,7 @@
-﻿#include "PlayerCharacterManager.h"
+﻿//! @file PlayerCharacterManager.cpp
+//! @note 
+
+#include "PlayerCharacterManager.h"
 
 /**************************************************************************//**
 	@brief		プレイヤーキャラクター更新処理
@@ -49,6 +52,7 @@ PlayerCharacter* PlayerCharacterManager::UpdatePlayerData(const uint64_t client_
 	{
 		// 新プレイヤー
 		player = new PlayerCharacter(client_id, name, appearance);
+		player->Hide();
 		Register(player);
 		return player;
 	}
@@ -57,6 +61,7 @@ PlayerCharacter* PlayerCharacterManager::UpdatePlayerData(const uint64_t client_
 		// プレイヤーデータ更新
 		player->SetName(name);
 		player->LoadAppearance(appearance);
+		return player;
 	}
 }
 
@@ -70,22 +75,14 @@ void PlayerCharacterManager::SyncPlayer(const uint64_t client_id, const PlayerCh
 {
 	PlayerCharacter* player = GetPlayerCharacterById(client_id);
 	if (player == nullptr) return;
-
 	std::lock_guard<std::mutex> lock(m_mut);
 	// 補間？
-	if (player->CheckSync(data.sync_count_id))
-	{
-		player->SetPosition({ data.position[0], data.position[1], data.position[2] });
-		player->Stop();
-		player->AddImpulse({ data.velocity[0], data.velocity[1], data.velocity[2] });
-		player->SetAngle({ 0.0f, data.rotate, 0.0f });
-		player->GetStateMachine()->ChangeState(data.state);
-	}
+	player->ImportSyncData(data);
 }
 
 
 /**************************************************************************//**
- 	@brief		プレイヤーキャラクターを削除
+	@brief		プレイヤーキャラクターを削除
 	@param[in]	client_id クライアントID
 	@return		なし
 *//***************************************************************************/

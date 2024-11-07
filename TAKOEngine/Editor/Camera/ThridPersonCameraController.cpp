@@ -1,4 +1,5 @@
-#include "ThridPersonCameraController.h"
+ï»¿#include "ThridPersonCameraController.h"
+#include "TAKOEngine/Tool/Mathf.h"
 
 #include <imgui.h>
 #include <algorithm>
@@ -11,7 +12,7 @@
 
 static ThridPersonCameraController* instance = nullptr;
 
-// ƒCƒ“ƒXƒ^ƒ“ƒXæ“¾
+// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹å–å¾—
 ThridPersonCameraController& ThridPersonCameraController::Instance()
 {
 	return *instance;
@@ -19,7 +20,7 @@ ThridPersonCameraController& ThridPersonCameraController::Instance()
 
 ThridPersonCameraController::ThridPersonCameraController()
 {
-	// ƒCƒ“ƒXƒ^ƒ“ƒXƒ|ƒCƒ“ƒ^İ’è
+	// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãƒã‚¤ãƒ³ã‚¿è¨­å®š
 	instance = this;
 
 	distance = (distanceMax + distanceMin) * 0.5f;
@@ -27,34 +28,41 @@ ThridPersonCameraController::ThridPersonCameraController()
 	offsetLerp = offset;
 }
 
-// XVˆ—
+// æ›´æ–°å‡¦ç†
 void ThridPersonCameraController::Update(float elapsedTime)
 {
-	if (player == nullptr) return; // XV‚µ‚È‚¢ƒtƒ‰ƒO
-	if (!TentacleLib::isFocus()) return; // ƒtƒH[ƒJƒX‚µ‚È‚¢
+	if (player == nullptr) return; // æ›´æ–°ã—ãªã„ãƒ•ãƒ©ã‚°
+	if (!TentacleLib::isFocus()) return; // ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã—ãªã„
+
 	shakeTimer -= elapsedTime;
 	if (shakeTimer < 0.0f) shakeTimer = 0.0f;
+	DirectX::XMFLOAT3 PlayerPostion = player->GetPosition() + DirectX::XMFLOAT3(0, player->GetHeight() * 1.1f, 0);
+
+
 
 	float moveX = 0.0f;
 	float moveY = 0.0f;
 	float wheelScroll = 0.0f;
 
-	if (GAME_SETTING.KeyboardInput)
+	if (!TentacleLib::isShowCursor())
 	{
-		// ƒ}ƒEƒX“ü—Í’l‚ğg‚Á‚ÄƒJƒƒ‰‘€ì‚·‚éB
-		wheelScroll = T_INPUT.GetMouseScrollY();
+		if (GAME_SETTING.KeyboardInput)
+		{
+			// ãƒã‚¦ã‚¹å…¥åŠ›å€¤ã‚’ä½¿ã£ã¦ã‚«ãƒ¡ãƒ©æ“ä½œã™ã‚‹ã€‚
+			wheelScroll = T_INPUT.GetMouseScrollY();
 
-		// ƒ}ƒEƒXƒJ[ƒ\ƒ‹‚ÌˆÚ“®—Ê‚ğ‹‚ß‚é
-		moveX = T_INPUT.GetMouseDeltaX() / SCREEN_W * GAME_SETTING.CameraSensitivity;
-		moveY = T_INPUT.GetMouseDeltaY() / SCREEN_H * GAME_SETTING.CameraSensitivity;
-	}
-	else
-	{
-		if (T_INPUT.GamePadKeyPress(GAME_PAD_BTN::DPAD_DOWN)) wheelScroll += -1.0f;
-		if (T_INPUT.GamePadKeyPress(GAME_PAD_BTN::DPAD_UP)) wheelScroll += +1.0f;
+			// ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ã®ç§»å‹•é‡ã‚’æ±‚ã‚ã‚‹
+			moveX = T_INPUT.GetMouseDeltaX() / SCREEN_W * GAME_SETTING.CameraSensitivity;
+			moveY = T_INPUT.GetMouseDeltaY() / SCREEN_H * GAME_SETTING.CameraSensitivity;
+		}
+		else
+		{
+			if (T_INPUT.GamePadKeyPress(GAME_PAD_BTN::DPAD_DOWN)) wheelScroll += -1.0f;
+			if (T_INPUT.GamePadKeyPress(GAME_PAD_BTN::DPAD_UP)) wheelScroll += +1.0f;
 
-		moveX = T_INPUT.GetGamePadRAxis().x * 0.01f * GAME_SETTING.CameraSensitivity;
-		moveY = -T_INPUT.GetGamePadRAxis().y * 0.01f * GAME_SETTING.CameraSensitivity;
+			moveX = T_INPUT.GetGamePadRAxis().x * 0.01f * GAME_SETTING.CameraSensitivity;
+			moveY = -T_INPUT.GetGamePadRAxis().y * 0.01f * GAME_SETTING.CameraSensitivity;
+		}
 	}
 
 	if (!enable)
@@ -70,15 +78,15 @@ void ThridPersonCameraController::Update(float elapsedTime)
 	}
 	distance = std::lerp(distance, distanceLerp, lerpT);
 
-	// ”½“]İ’è
+	// åè»¢è¨­å®š
 	if (GAME_SETTING.CamerainvertX) moveX *= -1.0f;
 	if (GAME_SETTING.CamerainvertY) moveY *= -1.0f;
 
-	// Y²‰ñ“]
+	// Yè»¸å›è»¢
 	angleYLerp += moveX;
 	angleY = std::lerp(angleY, angleYLerp, lerpT);
 
-	// X²‰ñ“]
+	// Xè»¸å›è»¢
 	angleXLerp += moveY;
 
 	angleXLerp = std::clamp(angleXLerp, -angleXMax, angleXMax);
@@ -93,79 +101,93 @@ void ThridPersonCameraController::Update(float elapsedTime)
 	float sy = ::sinf(angleY);
 	float cy = ::cosf(angleY);
 
-	// ƒJƒƒ‰‚Ì•ûŒü‚ğZo
+	// ã‚«ãƒ¡ãƒ©ã®æ–¹å‘ã‚’ç®—å‡º
 	DirectX::XMVECTOR Front = DirectX::XMVectorSet(-cx * sy, -sx, -cx * cy, 0.0f);
 	DirectX::XMVECTOR Right = DirectX::XMVectorSet(cy, 0, -sy, 0.0f);
 	DirectX::XMVECTOR Up = DirectX::XMVector3Cross(Right, Front);
 
-	// offset’²®
+	// offsetèª¿æ•´
 	DirectX::XMFLOAT3 Offset;
 	DirectX::XMStoreFloat3(&Offset, Up);
 	Offset = Offset * offset.y;
 	Offset = Offset + (DirectX::XMFLOAT3(cy, 0, -sy) * -offset.x);
 
-	focus = player->GetPosition() + DirectX::XMFLOAT3(0, player->GetHeight() * 1.1f, 0);
-	// RayCast •Ç‘Îô
+	focus = {
+		Mathf::Lerp(focus.x,PlayerPostion.x,5.f * elapsedTime),
+		Mathf::Lerp(focus.y,PlayerPostion.y,5.f * elapsedTime),
+		Mathf::Lerp(focus.z,PlayerPostion.z,5.f * elapsedTime)
+	};
+
+	// RayCast å£å¯¾ç­–
 	{
-		HitResult hit;
-		DirectX::XMFLOAT3 end = focus + Offset;
-		if (MAPTILES.RayCast(focus, end, hit, true))
+		if (Offset.x != 0.0f || Offset.y != 0.0f || Offset.x != 0.0f)
 		{
-			// ƒJƒƒ‰‚ª•Ç‚É“–‚½‚Á‚½
-			focus = hit.position;
-		}
-		else
-		{
-			focus = focus + Offset;
+			HitResult hit;
+			DirectX::XMFLOAT3 end = focus + Offset;
+
+			if (MAPTILES.RayCast(focus, end, hit, true))
+			{
+				// ã‚«ãƒ¡ãƒ©ãŒå£ã«å½“ãŸã£ãŸ
+				focus = hit.position;
+			}
+			else
+			{
+				focus = focus + Offset;
+			}
 		}
 	}
 
-	// ƒJƒƒ‰—h‚ê
+	// ã‚«ãƒ¡ãƒ©æºã‚Œ
 	if (shakeTimer > 0.0f)
 	{
 		float shakeY = shakeRange * (shakeTimer);
 		shakeY *= shakeModify;
-		shakeModify *= -1.0f; // ‹t
+		shakeModify *= -1.0f; // é€†
 
 		focus.y += shakeY;
 	}
 
-	// ƒJƒƒ‰‚Ì‹“_&’‹“_‚ğZo
+
+
+
+
+	// ã‚«ãƒ¡ãƒ©ã®è¦–ç‚¹&æ³¨è¦–ç‚¹ã‚’ç®—å‡º
 	DirectX::XMVECTOR Focus = DirectX::XMLoadFloat3(&focus);
 
 	DirectX::XMVECTOR Distance = DirectX::XMVectorSet(distance, distance, distance, 0);
 
 	DirectX::XMVECTOR Eye = DirectX::XMVectorSubtract(Focus, DirectX::XMVectorMultiply(Front, Distance));
 
-	// RayCast •Ç‘Îô
+	// RayCast å£å¯¾ç­–
 	{
-		HitResult hit;
 		DirectX::XMFLOAT3 end;
 		DirectX::XMStoreFloat3(&end, Eye);
-		if (MAPTILES.RayCast(focus, end, hit, true))
+		if (focus != eye)
 		{
-			// ƒJƒƒ‰‚ª•Ç‚É“–‚½‚Á‚½
-			float temp = hit.distance;
-			if (temp > XMFLOAT3Length(end - focus))
+			HitResult hit;
+			if (MAPTILES.RayCast(focus, end, hit, true))
 			{
-				hit.distance = temp;
+				// ã‚«ãƒ¡ãƒ©ãŒå£ã«å½“ãŸã£ãŸ
+				float temp = hit.distance;
+				if (temp > XMFLOAT3Length(end - focus))
+				{
+					hit.distance = temp;
+				}
+				float d = hit.distance * 0.95f;
+
+				if (d < 0.01f) d = 0.01f;
+				Eye = DirectX::XMVectorSubtract(Focus, DirectX::XMVectorScale(Front, d));
 			}
-			float d = hit.distance * 0.95f;
-			
-
-
-			if (d < 0.01f) d = 0.01f;
-			Eye = DirectX::XMVectorSubtract(Focus, DirectX::XMVectorScale(Front, d));
 		}
 	}
 
-	// ƒrƒ…[s—ñ‚©‚çƒ[ƒ‹ƒhs—ñ‚ğZo
+	// ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã‹ã‚‰ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—ã‚’ç®—å‡º
 	DirectX::XMMATRIX View = DirectX::XMMatrixLookAtLH(Eye, Focus, Up);
 	DirectX::XMMATRIX World = DirectX::XMMatrixTranspose(View);
-	// ƒ[ƒ‹ƒhs—ñ‚©‚ç•ûŒü‚ğZo
+	// ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—ã‹ã‚‰æ–¹å‘ã‚’ç®—å‡º
 	Right = DirectX::XMVector3TransformNormal(DirectX::XMVectorSet(1, 0, 0, 0), World);
 	Up = DirectX::XMVector3TransformNormal(DirectX::XMVectorSet(0, 1, 0, 0), World);
-	// Œ‹‰Ê‚ğŠi”[
+	// çµæœã‚’æ ¼ç´
 	DirectX::XMStoreFloat3(&eye, Eye);
 	DirectX::XMStoreFloat3(&up, Up);
 	DirectX::XMStoreFloat3(&right, Right);
@@ -181,7 +203,7 @@ void ThridPersonCameraController::AimMode(bool enable)
 	if (enable)
 	{
 		distanceCache = distanceLerp;
-		offsetLerp = { 1.5f, 0.5f };
+		offsetLerp = { 0.1f, 0.05f };
 		distanceLerp = 3.0f;
 
 		CROSS_HAIR.Show();

@@ -1,8 +1,6 @@
-#include "WidgetLogin.h"
+ï»¿#include "WidgetLogin.h"
 
-#undef _WINSOCKAPI_
-#define _WINSOCKAPI_
-#include <windows.h>
+#include "TAKOEngine/Network/WinSock2Wrapper.h"
 #include <shellapi.h>
 #include <imgui.h>
 
@@ -25,7 +23,7 @@ void WidgetLogin::Update(float elapsedTime)
 		if (xhr->IsDone())
 		{
 			HttpResponse response = xhr->GetResponse();
-			if (response.status == 200) // ¬Œ÷
+			if (response.status == 200) // æˆåŠŸ
 			{
 				std::string token = response.data["token"];
 				memset(GAME_DATA.GetSetting().token, 0, sizeof(GAME_DATA.GetSetting().token));
@@ -36,7 +34,7 @@ void WidgetLogin::Update(float elapsedTime)
 			}
 			else
 			{
-				// 200ˆÈŠO: Ž¸”s
+				// 200ä»¥å¤–: å¤±æ•—
 				state = STATE::FAIL;
 			}
 			delete xhr;
@@ -78,14 +76,14 @@ void WidgetLogin::Render(const RenderContext& rc)
 
 				ImGui::TableNextRow();
 				ImGui::TableSetColumnIndex(0);
-				ImGui::Text((char*)u8"ƒ†[ƒU[");
+				ImGui::Text((char*)u8"ãƒ¦ãƒ¼ã‚¶ãƒ¼");
 				ImGui::TableSetColumnIndex(1);
 				ImGui::SetNextItemWidth(-1);
 				ImGui::InputText("##username", username, sizeof(username));
 
 				ImGui::TableNextRow();
 				ImGui::TableSetColumnIndex(0);
-				ImGui::Text((char*)u8"ƒpƒXƒ[ƒh");
+				ImGui::Text((char*)u8"ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰");
 				ImGui::TableSetColumnIndex(1);
 				ImGui::SetNextItemWidth(-1);
 				ImGui::InputText("##password", password, sizeof(password), ImGuiInputTextFlags_Password);
@@ -96,14 +94,14 @@ void WidgetLogin::Render(const RenderContext& rc)
 					ImGui::TableSetColumnIndex(1);
 					ImGui::SetNextItemWidth(-1);
 					ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
-					ImGui::Text((char*)u8"ƒƒOƒCƒ“Ž¸”s");
+					ImGui::Text((char*)u8"ãƒ­ã‚°ã‚¤ãƒ³å¤±æ•—");
 					ImGui::PopStyleColor();
 				}
 
 				ImGui::EndTable();
 			}
 
-			if (ImGui::Button((char*)u8"ƒƒOƒCƒ“"))
+			if (ImGui::Button((char*)u8"ãƒ­ã‚°ã‚¤ãƒ³"))
 			{
 				xhr = new HttpRequest(URL(Url::LOGIN));
 				xhr->SetMethod(HttpRequest::METHOD::POST);
@@ -115,7 +113,7 @@ void WidgetLogin::Render(const RenderContext& rc)
 				state = STATE::LOADING;
 			}
 			ImGui::SameLine();
-			if (ImGui::Button((char*)u8"ƒTƒCƒ“ƒAƒbƒv"))
+			if (ImGui::Button((char*)u8"ã‚µã‚¤ãƒ³ã‚¢ãƒƒãƒ—"))
 			{
 				ShellExecute(0, 0, Encode::string_to_wstring(URL(Url::REGISTER_PAGE)).c_str(), 0, 0, SW_SHOW);
 			}

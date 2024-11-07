@@ -19,14 +19,14 @@ public:
 		Shield
 	};
 
-	// ˆê”ÊUŒ‚iŒ•j
+	// ä¸€èˆ¬æ”»æ’ƒï¼ˆå‰£ï¼‰
 	enum ATTACK_STATE {
 		ATTACK_1,
 		ATTACK_2,
 		ATTACK_3,
 	};
 
-	// “ÁŽêUŒ‚i‚j
+	// ç‰¹æ®Šæ”»æ’ƒï¼ˆç›¾ï¼‰
 	enum BLOCK_STATE {
 		BLOCK_START,
 		BLOCK_ATTACK,

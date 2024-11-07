@@ -6,11 +6,11 @@ class CameraController
 {
 public:
 	CameraController() = default;
-	// ƒJƒƒ‰‚©‚çƒRƒ“ƒgƒ[ƒ‰[ƒwƒpƒ‰ƒ[ƒ^‚ğ“¯Šú‚·‚é
-	void SyncCameraToController(const Camera& camera);
-	// ƒRƒ“ƒgƒ[ƒ‰[‚©‚çƒJƒƒ‰‚Öƒpƒ‰ƒ[ƒ^‚ğ“¯Šú‚·‚é
-	void SyncContrllerToCamera(Camera& camera);
-	// XVˆ—
+	// ã‚«ãƒ¡ãƒ©ã‹ã‚‰ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼ãƒ˜ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’åŒæœŸã™ã‚‹
+	void SyncCameraToController(Camera* camera);
+	// ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼ã‹ã‚‰ã‚«ãƒ¡ãƒ©ã¸ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’åŒæœŸã™ã‚‹
+	void SyncContrllerToCamera(Camera* camera);
+	// æ›´æ–°å‡¦ç†
 	virtual void Update(float elapsedTime = 0.0f) {};
 
 	float GetDistance() { return distance; }
