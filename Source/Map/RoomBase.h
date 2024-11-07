@@ -185,17 +185,24 @@ public:
 		return farthestChilds;
 	}
 
+	// 親を設定
+	void SetParent(RoomBase* parent) { this->parent = parent; }
+
 	// 子を追加する
 	void AddRoom(RoomBase* room) { this->childs.emplace_back(room); }
 
-	// 部屋の接続点の数を取得
-	int GetConnectPointCount() { return m_connectPointDatas.size(); }
-
 	// 部屋の接続点データを取得
-	CONNECTPOINT_DATA GetConnectPointData(int index) { return m_connectPointDatas.at(index); }
+	std::vector<CONNECTPOINT_DATA> GetConnectPointData() const { return m_connectPointDatas; }
+	CONNECTPOINT_DATA GetConnectPointData(int index) const { return m_connectPointDatas.at(index); }
 
 	// 行列取得
 	DirectX::XMFLOAT4X4 GetTransform() { return m_transform; }
+
+	// AABB取得
+	AABB GetAABB() const { return m_aabb; }
+
+	// 部屋タイルデータをロード
+	virtual void LoadMapTileData() {}
 
 	// 部屋タイルを配置
 	virtual void PlaceMapTile() {}
@@ -227,6 +234,8 @@ public:
 			m_angle.x = DirectX::XMConvertToRadians(debugAngle.x);
 			m_angle.y = DirectX::XMConvertToRadians(debugAngle.y);
 			m_angle.z = DirectX::XMConvertToRadians(debugAngle.z);
+			ImGui::DragFloat3("AABB.pos", &m_aabb.position.x);
+			ImGui::DragFloat3("AABB.radii", &m_aabb.radii.x);
 
 			//ImGui::Text(("MapTileSize: " + std::to_string(mapTiles.size())).c_str());
 			ImGui::Text(("ParentConnectPointIndex: " + std::to_string(parentConnectPointIndex)).c_str());
@@ -289,12 +298,12 @@ protected:
 
 	std::vector<TILE_DATA> m_tileDatas;
 	std::vector<CONNECTPOINT_DATA> m_connectPointDatas;
-	std::vector<DungeonData::RoomType> m_connectableRooms;
 
 	//std::vector<MapTile*> mapTiles;
 
 	int parentConnectPointIndex = -1;
 	int depth = 0;
+	AABB m_aabb = {};		// 当たり判定
 
 	DungeonData::RoomType roomType = DungeonData::RoomType::END_ROOM;
 

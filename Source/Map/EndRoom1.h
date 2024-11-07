@@ -15,6 +15,8 @@ public:
 		RoomBase* parent,
 		int pointIndex);
 
+	void LoadMapTileData() override;
+
 	void PlaceMapTile() override;
 
 	void PlaceExit() override;

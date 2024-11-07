@@ -27,7 +27,7 @@ EndRoom1::EndRoom1(RoomBase* parent, int pointIndex)
 	roomType = DungeonData::END_ROOM;
 }
 
-void EndRoom1::PlaceMapTile()
+void EndRoom1::LoadMapTileData()
 {
 	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR, { 0.0f, 0.0f, 0.0f }));
 	m_tileDatas.emplace_back(TILE_DATA(TileType::WALL, { 0.0f, 0.0f, 0.0f },
@@ -81,6 +81,41 @@ void EndRoom1::PlaceMapTile()
 		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
 		DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
 
+	float minX = INT_MAX;
+	float maxX = INT_MIN;
+	float minZ = INT_MAX;
+	float maxZ = INT_MIN;
+
+	for (const TILE_DATA& tileData : m_tileDatas)
+	{
+		if (tileData.position.x < minX) minX = tileData.position.x;
+		if (tileData.position.x > maxX) maxX = tileData.position.x;
+		if (tileData.position.z < minZ) minZ = tileData.position.z;
+		if (tileData.position.z > maxZ) maxZ = tileData.position.z;
+	}
+
+	Update(0);
+
+	DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&m_transform);
+
+	// AABB
+	m_aabb.position = {
+		(minX + maxX) * 0.5f,
+		1.0f,
+		(minZ + maxZ) * 0.5f
+	};
+
+	// ワールド座標に変換し保存
+	DirectX::XMVECTOR AABBPos = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&m_aabb.position), WorldTransform);
+	DirectX::XMStoreFloat3(&m_aabb.position, AABBPos);
+
+	m_aabb.radii.x = (maxX - minX);
+	m_aabb.radii.y = 1.0f;
+	m_aabb.radii.z = (maxZ - minZ);
+}
+
+void EndRoom1::PlaceMapTile()
+{
 	for (const TILE_DATA& tileData : m_tileDatas)
 	{
 		std::string fileName;

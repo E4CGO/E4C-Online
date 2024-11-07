@@ -5,19 +5,22 @@
 class SimpleRoom1 : public RoomBase
 {
 public:
-	// コンストラクタ（配列から生成を行う）
+	// コンストラクタ（乱数による自動生成）
+	SimpleRoom1(
+		RoomBase* parent,
+		int pointIndex,
+		std::vector<AABB>& roomAABBs);
+
+	// コンストラクタ（配列に基づいた生成）
 	SimpleRoom1(
 		RoomBase* parent,
 		int pointIndex,
 		std::vector<int> roomTree,
 		int& treeIndex);
 
-	// コンストラクタ（乱数を用いて生成を行う）
-	SimpleRoom1(
-		RoomBase* parent,
-		int pointIndex);
-
 	void Update(float elapsedTime) override;
+
+	void LoadMapTileData() override;
 
 	void PlaceMapTile() override;
 };

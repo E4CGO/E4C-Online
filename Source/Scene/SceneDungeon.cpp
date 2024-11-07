@@ -174,7 +174,7 @@ void SceneDungeon::Render()
 	// 内容描画
 	{
 		//Deferred Rendering
-		deferredRendering->SetDeferredRTV();
+		//deferredRendering->SetDeferredRTV();
 
 		player->Render(rc);
 		//オブジェクト描画
@@ -203,7 +203,7 @@ void SceneDungeon::Render()
 	}
 
 	//DeferredRendering
-	deferredRendering->Render();
+	//deferredRendering->Render();
 
 	UI.Render(rc);						// インターフェース
 
@@ -227,7 +227,6 @@ void SceneDungeon::GenerateDungeon(std::vector<int> roomTree)
 	rootRoom->PlaceMapTile();
 	for (RoomBase* room : rootRoom->GetAllChilds())
 	{
-		room->Update(0);
 		room->PlaceMapTile();
 	}
 }
@@ -235,15 +234,56 @@ void SceneDungeon::GenerateDungeon(std::vector<int> roomTree)
 std::vector<int> SceneDungeon::GenerateDungeon()
 {
 	std::vector<int> roomTree;
+	std::vector<AABB> roomAABBs;
 
-	rootRoom = new SimpleRoom1(nullptr, -1);
-
-	// 部屋のモデルを配置しつつ配列に保存
-	for (RoomBase* room : rootRoom->GetAll())
-	{
-		room->Update(0);
-		room->PlaceMapTile();
-		roomTree.emplace_back(room->GetRoomType());
-	}
+	rootRoom = new SimpleRoom1(nullptr, -1, roomAABBs);
+	
 	return roomTree;
+
+	//// 部屋の当たり判定用配列
+	//std::vector<AABB> roomAABBs;
+
+	//rootRoom = new SimpleRoom1(nullptr, -1);
+	//rootRoom->LoadMapTileData();
+	//rootRoom->PlaceMapTile();
+	//roomAABBs.emplace_back(rootRoom->GetAABB());
+
+	//// 部屋のモデルを配置しつつ配列に保存
+	//for (RoomBase* room : rootRoom->GetAll())
+	//{
+	//	room->LoadMapTileData();
+
+	//	for (const AABB& aabb : roomAABBs)
+	//	{
+	//		IntersectionResult result;
+
+	//		AABB aR = room->GetAABB();
+
+	//		// 半径減らしとこ
+	//		aR.radii = { 0.0f, 0.0f, 0.0f };
+	//		//aR.radii = { 1.0f, 1.0f, 1.0f };
+
+	//		if (Collision::IntersectAABBVsAABB(
+	//			DirectX::XMLoadFloat3(&aR.position),
+	//			DirectX::XMLoadFloat3(&aR.radii),
+	//			DirectX::XMLoadFloat3(&aabb.position),
+	//			DirectX::XMLoadFloat3(&aabb.radii),
+	//			&result))
+	//		{
+	//			//int a = 0;
+	//			roomTree.emplace_back(DungeonData::END_ROOM);
+	//		}
+	//		else
+	//		{
+	//			room->PlaceMapTile();
+	//			roomAABBs.emplace_back(room->GetAABB());
+	//			roomTree.emplace_back(room->GetRoomType());
+	//		}
+	//	}
+	//	//room->PlaceMapTile();
+	//	//roomAABBs.emplace_back(room->GetAABB());
+	//	//roomTree.emplace_back(room->GetRoomType());
+	//	//roomTree.emplace_back(room->GetRoomType());
+	//}
+	//return roomTree;
 }

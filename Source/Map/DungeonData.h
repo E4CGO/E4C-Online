@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "TAKOEngine/Tool/Singleton.h"
+#include "TAKOEngine/Physics/Collision.h"
 #include <vector>
 
 // ダンジョンデータ
@@ -28,6 +29,8 @@ public:
 	struct RoomGenerateSetting
 	{
 		int weight;	// 重み、多ければ多いほど生成確率が高い
+		AABB aabb;	// 当たり判定用 AABB
+		std::vector<RoomType> placementCandidates;	// 配置候補の部屋を保存する配列
 	};
 
 	// ダンジョンの生成設定
