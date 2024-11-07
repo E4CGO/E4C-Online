@@ -100,7 +100,7 @@ void SceneTitle::Initialize()
 		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/button_agree.png");
 
 		// skydomeテクスチャ
-		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Sprites/envmap_miramar.dds");
+		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
 	}
 
 	// 光
