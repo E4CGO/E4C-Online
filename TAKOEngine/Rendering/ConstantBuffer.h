@@ -5,7 +5,8 @@
 //TODO::SetCbScene
 struct CbScene
 {
-	DirectX::XMFLOAT4X4	view_projection;
+	DirectX::XMFLOAT4X4 view;
+	DirectX::XMFLOAT4X4 projection;
 	DirectX::XMFLOAT4   camera_position;
 
 	//ライト情報

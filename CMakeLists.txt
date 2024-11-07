@@ -722,6 +722,9 @@ set(TAKOEngine__Rendering__HLSL__Primitives
 source_group("TAKOEngine\\Rendering\\HLSL\\Primitives" FILES ${TAKOEngine__Rendering__HLSL__Primitives})
 
 set(TAKOEngine__Rendering__HLSL__Skydome
+    "TAKOEngine/Rendering/HLSL/Skydome/SkyBoxDX12.hlsli"
+    "TAKOEngine/Rendering/HLSL/Skydome/SkyBoxDX12PS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Skydome/SkyBoxDX12VS.hlsl"
     "TAKOEngine/Rendering/HLSL/Skydome/Skydome.hlsli"
     "TAKOEngine/Rendering/HLSL/Skydome/SkydomePS.hlsl"
     "TAKOEngine/Rendering/HLSL/Skydome/SkydomeVS.hlsl"
@@ -864,6 +867,8 @@ set(SHADER_NAMES
     "PlaneVS.cso"
     "PortalPS.cso"
     "PortalVS.cso"
+    "SkyBoxDX12PS.cso"
+    "SkyBoxDX12VS.cso"
     "SkydomePS.cso"
     "SkydomeVS.cso"
     "SpritePS.cso"
@@ -920,6 +925,8 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlaneVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PortalPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PortalVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Skydome/SkyBoxDX12PS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Skydome/SkyBoxDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Skydome/SkydomePS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Skydome/SkydomeVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Sprite/SpritePS.hlsl,5.0,Pixel,main"

@@ -145,6 +145,13 @@ struct FinalpassDataDX12
 	const Descriptor* bloomTexture = nullptr;
 };
 
+// スカイボックス情報
+struct SkydomeData
+{
+	//ブルームテクスチャ
+	const Descriptor* skyTexture = nullptr;
+};
+
 //影情報
 struct ShadowMapData
 {
@@ -217,6 +224,9 @@ struct RenderContextDX12
 	GaussianFilterData		gaussianFilterData;		 //	ガウスフィルター情報
 	ColorGradingData		colorGradingData;		 //	色調補正情報
 	FinalpassDataDX12		finalpassnData;			 //	最終パス情報
+
+	// スカイボックス情報
+	SkydomeData             skydomeData;
 };
 
 #endif // !__INCLUDE_RENDER_CONTEXT_H__
