@@ -22,8 +22,6 @@ namespace Online
 
 		std::cout << "LOGIN: " << PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetName().c_str() << std::endl;
 
-		m_pcontroller->BeginSync();
-
 		return true;
 	}
 	/**************************************************************************//**

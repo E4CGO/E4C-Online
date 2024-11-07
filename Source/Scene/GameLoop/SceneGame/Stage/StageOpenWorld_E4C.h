@@ -1,4 +1,4 @@
-#pragma once
+Ôªø#pragma once
 
 #include <memory>
 #include <array>
@@ -23,7 +23,7 @@ class SceneGame_E4C;
 class StageOpenWorld_E4C : public Stage
 {
 public:
-	StageOpenWorld_E4C(SceneGame_E4C* scene) : m_scene(scene), Stage() {};
+	StageOpenWorld_E4C(SceneGame_E4C* scene) : m_pScene(scene), Stage() {};
 
 	void Initialize() override;
 
@@ -38,7 +38,7 @@ public:
 		NORMAL,
 	};
 private:
-	SceneGame_E4C* m_scene;
+	SceneGame_E4C* m_pScene;
 
 	std::unique_ptr<ThridPersonCameraController> cameraController;
 
@@ -55,15 +55,7 @@ private:
 	std::unique_ptr<ModelObject> Locator;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constant_buffers[8];
 
-
 	float transitionTime = 0.0f;
-	float transitionDuration = 2.f;  // 5ïbÇ©ÇØÇƒà⁄ìÆ
+	float transitionDuration = 2.f;  // 5Áßí„Åã„Åë„Å¶ÁßªÂãï
 	int currentSegment = 0;
-	
-	std::vector<DirectX::XMFLOAT3> cameraPositions = {
-		{0,3,0},
-		{10,3,0},
-		{5,3,4},
-		{8,3,8}
-	};
 };

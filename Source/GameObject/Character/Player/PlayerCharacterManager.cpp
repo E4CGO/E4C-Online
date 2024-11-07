@@ -77,18 +77,7 @@ void PlayerCharacterManager::SyncPlayer(const uint64_t client_id, const PlayerCh
 	if (player == nullptr) return;
 	std::lock_guard<std::mutex> lock(m_mut);
 	// 補間？
-	if (player->CheckSync(data.sync_count_id))
-	{
-		player->SetPosition({ data.position[0], data.position[1], data.position[2] });
-		player->Stop();
-		player->AddImpulse({ data.velocity[0], data.velocity[1], data.velocity[2] });
-		player->SetAngle({ 0.0f, data.rotate, 0.0f });
-		if (data.state != static_cast<uint8_t>(player->GetStateMachine()->GetStateIndex()))
-		{
-			player->GetStateMachine()->ChangeState(data.state);
-		}
-		player->Show();
-	}
+	player->ImportSyncData(data);
 }
 
 

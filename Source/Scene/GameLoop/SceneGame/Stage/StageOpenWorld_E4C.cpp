@@ -18,6 +18,10 @@
 
 #include "Scene/Stage/TestingStage.h"
 
+#include "Network/OnlineController.h"
+
+#include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
+
 static float timer = 0;
 
 void StageOpenWorld_E4C::Initialize()
@@ -85,6 +89,7 @@ void StageOpenWorld_E4C::Initialize()
 	cameraController->SyncCameraToController(mainCamera);
 	cameraController->SetEnable(true);
 	cameraController->SetPlayer(player);
+	CURSOR_OFF;
 
 	{
 		HRESULT hr;
@@ -104,28 +109,38 @@ void StageOpenWorld_E4C::Initialize()
 void StageOpenWorld_E4C::Update(float elapsedTime)
 {
 	Camera* camera = CameraManager::Instance().GetCamera();
-	std::vector<DirectX::XMFLOAT3> cameraFocusPoints = {
-		camera->GetFocus(),
-		camera->GetFocus(),
-		camera->GetFocus(),
-		camera->GetFocus()
-		//{CameraManager::Instance().GetCamera()->GetFocus().x, CameraManager::Instance().GetCamera()->GetFocus().y, CameraManager::Instance().GetCamera()->GetFocus().z}
-	};
+	Online::OnlineController* onlineController = m_pScene->GetOnlineController();
+	if (onlineController->GetState() == Online::OnlineController::STATE::LOGINED)
+	{
+		onlineController->BeginSync();
+	}
+
 	// ゲームループ内で
+	cameraController->SyncContrllerToCamera(camera);
+	cameraController->Update(elapsedTime);
 
-	if (T_INPUT.KeyPress(VK_SHIFT))
+	if (T_INPUT.KeyDown(VK_MENU))
 	{
-		CameraManager::Instance().GetCamera()->MovePointToCamera(cameraPositions, cameraFocusPoints, transitionTime, transitionDuration, elapsedTime);
+		if (TentacleLib::isShowCursor())
+		{
+			cameraController->SetEnable(true);
+			CURSOR_OFF;
+		}
+		else
+		{
+			cameraController->SetEnable(false);
+			CURSOR_ON;
+		}
 	}
-	else
+	if (!TentacleLib::isFocus())
 	{
-		cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
-		cameraController->Update(elapsedTime);
-		CameraManager::Instance().GetCamera()->GetSegment() = 0;
-		transitionTime = 0;
+		cameraController->SetEnable(false);
+		CURSOR_ON;
 	}
-
-
+	if (cameraController->isEnable())
+	{
+		T_INPUT.KeepCursorCenter();
+	}
 	PlayerCharacterManager::Instance().Update(elapsedTime);
 	teleporter->Update(elapsedTime);
 	plane->Update(elapsedTime);
@@ -142,12 +157,6 @@ void StageOpenWorld_E4C::Render()
 {
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->Clear(T_GRAPHICS.GetDeviceContext(), 0.2f, 0.2f, 0.2f, 1);
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
-#ifdef _DEBUG
-	{
-		T_GRAPHICS.GetDebugRenderer()->DrawSphere(cameraPositions, 2, { 1,0,0,1 });
-		T_GRAPHICS.GetDebugRenderer()->DrawSphere(CameraManager::Instance().GetCamera(0)->GetEye(), 2, { 1,1,0,1 });
-	}
-#endif // _DEBUG
 
 	// 描画コンテキスト設定
 	RenderContext rc;

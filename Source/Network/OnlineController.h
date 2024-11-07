@@ -126,11 +126,13 @@ namespace Online
 		// 同期開始
 		void BeginSync()
 		{
+			if (m_state != STATE::LOGINED) return;
 			if (!m_udpSendThread.joinable())
 			{
 				m_udpSendThread = std::thread(&OnlineController::UDPSendThread, this);
 			}
 			m_udpRecvThread = std::thread(&OnlineController::UDPRecvThread, this);
+			m_state = STATE::SYNC;
 		}
 	private:
 		// TCP受信

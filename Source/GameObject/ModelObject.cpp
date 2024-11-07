@@ -86,7 +86,7 @@ void ModelObject::SetModelAnimation(const int model_idx, const int animation_ind
 	@brief	全てのモデルのアニメーション判定
 	@return	アニメーション中判定
 *//***************************************************************************/
-bool ModelObject::IsPlayAnimaition(void)
+bool ModelObject::IsPlayAnimation(void)
 {
 	for (auto& model : m_pmodels)
 	{
@@ -99,7 +99,7 @@ bool ModelObject::IsPlayAnimaition(void)
 	@param[in]	idx モデルインデックス
 	@return	アニメーション中判定
 *//***************************************************************************/
-bool ModelObject::IsPlayAnimaition(int idx)
+bool ModelObject::IsPlayAnimation(int idx)
 {
 	return m_pmodels[idx]->IsPlayAnimation();
 }

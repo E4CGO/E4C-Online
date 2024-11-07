@@ -19,6 +19,9 @@
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "TAKOEngine/Tool/Console.h"
 
+#include "UI/Widget/WidgetCrosshair.h"
+#include "TAKOEngine/GUI/UIManager.h"
+
 void SceneGame_E4C::Initialize()
 {
 	stateMachine = std::make_unique<StateMachine<SceneGame_E4C>>();
@@ -37,7 +40,7 @@ void SceneGame_E4C::Initialize()
 	const PlayerCharacterData::CharacterInfo info = PlayerCharacterData::Instance().GetCurrentCharacter();
 	PlayerCharacter* player = PlayerCharacterManager::Instance().UpdatePlayerData(0, "", info.Character.pattern);
 	player->Show();
-	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::State::Idle));
+	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 
 	STAGES.ChangeStage(new StageOpenWorld_E4C(this));
 
@@ -46,6 +49,10 @@ void SceneGame_E4C::Initialize()
 	{
 		m_ponlineController->Login();
 	}
+
+	CURSOR_OFF;
+
+	UI.Register(new WidgetCrosshair);
 }
 
 void SceneGame_E4C::Finalize()
@@ -57,6 +64,7 @@ void SceneGame_E4C::Finalize()
 	STAGES.Clear();
 	MAPTILES.Clear();
 	PlayerCharacterManager::Instance().Clear();
+	UI.Clear();
 }
 
 // 更新処理
