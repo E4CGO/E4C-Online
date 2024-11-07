@@ -43,7 +43,7 @@ namespace SceneCharacter_E4CState
 		void Exit() override;
 	private:
 		float timer = 0.0f;
-	
+		
 	};
 
 	// ログインステート
@@ -60,6 +60,8 @@ namespace SceneCharacter_E4CState
 		void Execute(float elapsedTime) override;
 		// ステートから出ていくときのメソッド
 		void Exit() override;
+		
+
 	};
 
 	// ログインステート

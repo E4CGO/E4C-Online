@@ -28,15 +28,16 @@ void SceneGame_E4C::Initialize()
 	//stageDungeon = std::make_unique<TestingStage>();
 	//stageDungeon->Initialize();
 
-	CameraManager& cameraManager = CameraManager::Instance();
-	Camera* DebugCamera = new Camera();
-	cameraManager.Register(DebugCamera);
-	cameraManager.SetCamera(0);
 
+	CameraManager& cameraManager = CameraManager::Instance();
 	Camera* mainCamera = new Camera();
 	cameraManager.Register(mainCamera);
+	cameraManager.SetCamera(0);
+#ifdef _DEBUG
+		Camera* DebugCamera = new Camera();
+	cameraManager.Register(DebugCamera);
 	cameraManager.SetCamera(1);
-
+#endif
 	//Console::Instance().Open();
 
 	stageOpenWorld = std::make_unique<StageOpenWorld_E4C>(this);
@@ -100,5 +101,5 @@ void SceneGame_E4C::Render()
 		STAGES.Render(rc);
 	}
 
-	ProfileDrawUI();
+	//ProfileDrawUI();
 }

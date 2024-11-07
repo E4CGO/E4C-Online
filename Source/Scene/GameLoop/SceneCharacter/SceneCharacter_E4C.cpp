@@ -118,6 +118,9 @@ void SceneCharacter_E4C::Update(float elapsedTime)
 	// カメラ更新
 	cameraController->Update();
 	cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
+
+
+	//CameraManager::Instance().GetCamera()->Move2PointToCamera(CameraManager::Instance().GetCamera()->GetEye(), { 6.f,2.f,9.f }, CameraManager::Instance().GetCamera()->GetFocus(), { -3.0f, 0.0, 0.0f }, transitiontime, 2.f, elapsedTime);
 #endif // _DEBUG
 
 	UI.Update(elapsedTime);

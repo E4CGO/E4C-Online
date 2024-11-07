@@ -138,11 +138,10 @@ void SceneCharacter_E4CState::CharacterCreationStateLeft::Enter()
 	btnStartCharacter->SetSize({ 196.0f * 1.5f, 92.0f * 1.5f });
 	UIManager::Instance().Register(btnStartCharacter);
 
-	CameraManager& cameraManager = CameraManager::Instance();
 	
 	CameraManager::Instance().GetCamera()->SetLookAt(
-		{ 6.0, 2.0f, 9.0f },			// 視点
-		{ -3.0f, 0.0, 0.0f },					// 注視点
+		{ 6.0f, 2.0f, 9.0f },			// 視点
+		{ -3.0f, 0.0f, 0.0f },					// 注視点
 		{ 0.036f, 0.999f, -0.035f }				// 上ベクトル
 	);
 
@@ -153,6 +152,7 @@ void SceneCharacter_E4CState::CharacterCreationStateLeft::Enter()
 }
 void SceneCharacter_E4CState::CharacterCreationStateLeft::Execute(float elapsedTime)
 {
+
 }
 void SceneCharacter_E4CState::CharacterCreationStateLeft::Exit()
 {

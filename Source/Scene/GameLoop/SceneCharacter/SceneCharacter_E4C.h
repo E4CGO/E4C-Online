@@ -74,4 +74,6 @@ private:
 	static const int m_maxCharacters;
 
 	static float m_time;
+
+	float transitiontime = 0.f;
 };
