@@ -58,8 +58,8 @@ void StageOpenWorld_E4C::Initialize()
 			DirectX::XMFLOAT3{ 25.0f, 25.0f, 5.0f }
 		};
 
-		//portal = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, positions);
-		//portal.get()->SetShader(ModelShaderId::Portal);
+		portal = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, positions);
+		portal.get()->SetShader(ModelShaderId::Portal);
 	}
 
 	// 光
@@ -146,7 +146,7 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	PlayerCharacterManager::Instance().Update(elapsedTime);
 	teleporter->Update(elapsedTime);
 	plane->Update(elapsedTime);
-	//portal->Update(elapsedTime);
+	portal->Update(elapsedTime);
 
 	teleporter->CheckPlayer(PlayerCharacterManager::Instance().GetPlayerCharacterById(GAME_DATA.GetClientId())->GetPosition(), elapsedTime);
 
@@ -242,7 +242,7 @@ void StageOpenWorld_E4C::Render()
 	teleporter->Render(rc);
 	plane->Render(rc);
 
-	//portal->Render(rc);
+	portal->Render(rc);
 
 	// デバッグレンダラ描画実行
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());

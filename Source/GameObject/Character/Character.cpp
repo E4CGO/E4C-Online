@@ -1,5 +1,5 @@
 #include "Character.h"
-
+#include <iostream>
 #include "Map/MapTileManager.h"
 
 #define POS_ERROR 0.0001f  // 誤差調整

@@ -20,6 +20,8 @@ namespace Online
 		bool Receive(uint8_t* buffer, size_t size) override;
 		// データ送信
 		void Send(void* data) override;
+	private:
+		uint64_t m_sync_count_id = 1;
 	};
 }
 

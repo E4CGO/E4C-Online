@@ -45,11 +45,12 @@ namespace Online
 		PlayerCharacter::SYNC_DATA syncData;
 		PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetSyncData(syncData);
 
-
 		std::vector<uint8_t> buffer;
 		CreateHeaderBuffer(buffer, m_cmd, sizeof(PlayerCharacter::SYNC_DATA));
 
-		U8Buffer::Insert(buffer, syncData.sync_count_id);
+		U8Buffer::Insert(buffer, m_sync_count_id);
+		m_sync_count_id++;
+
 		for (int i = 0; i < 3; i++)
 		{
 			U8Buffer::Insert(buffer, syncData.position[i]);

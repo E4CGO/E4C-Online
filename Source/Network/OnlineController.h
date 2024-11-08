@@ -14,8 +14,12 @@
 
 namespace Online
 {
+
+#ifdef _DEBUG
 	const static char* SV_IP = "127.0.0.1";
-	//const static char* SV_IP = "34.82.222.201";
+#else
+	const static char* SV_IP = "34.82.222.201";
+#endif // _DEBUG
 
 	const static char* port = "9000";
 	/**************************************************************************//**

@@ -10,6 +10,7 @@ namespace PlayerCharacterState
 {
 	void PlayerTransition(PlayerCharacter* owner, uint32_t flags)
 	{
+		if (!owner->IsPlayer()) return;
 		if (flags & flag_Dodge && owner->InputDodge())
 		{
 			owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::DODGE));

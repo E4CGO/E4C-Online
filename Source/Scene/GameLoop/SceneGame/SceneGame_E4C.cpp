@@ -84,5 +84,5 @@ void SceneGame_E4C::Render()
 
 	STAGES.Render();
 
-	ProfileDrawUI();
+	//ProfileDrawUI();
 }
