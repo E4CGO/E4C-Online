@@ -19,12 +19,12 @@ void RoomBase::UpdateTransform()
 		DirectX::XMMATRIX LocalTransform = S * R * T;
 
 		DirectX::XMMATRIX ParentTransform;
-		if (parentConnectPointIndex > -1)
-		{
-			DirectX::XMFLOAT4X4 parentTransform = parent->GetConnectPointData(parentConnectPointIndex).transform;
-			ParentTransform = DirectX::XMLoadFloat4x4(&parentTransform);
-		}
-		else
+		//if (parentConnectPointIndex > -1)
+		//{
+		//	DirectX::XMFLOAT4X4 parentTransform = parent->GetConnectPointData(parentConnectPointIndex).transform;
+		//	ParentTransform = DirectX::XMLoadFloat4x4(&parentTransform);
+		//}
+		//else
 		{
 			ParentTransform = DirectX::XMMatrixIdentity();
 		}
