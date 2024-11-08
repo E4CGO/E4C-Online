@@ -7,6 +7,144 @@
 #include "Map/EndRoom1.h"
 #include "Map/Passage1.h"
 
+CrossRoom1::CrossRoom1(RoomBase* parent, int pointIndex, std::vector<AABB>& roomAABBs)
+{
+	// 親と接続点番号を代入
+	this->parent = parent;
+	this->parentConnectPointIndex = pointIndex;
+
+	// 深度を取得
+	depth = GetDepth();
+
+	// 部屋タイプを設定
+	roomType = DungeonData::CROSS_ROOM_1;
+
+	// 接続点データを設定
+	CONNECTPOINT_DATA point1;
+	point1.position = { 12.0f, 0.0f, 12.0f };
+	point1.angle = { 0.0f, DirectX::XMConvertToRadians(90.0f), 0.0f };
+	m_connectPointDatas.emplace_back(point1);
+
+	CONNECTPOINT_DATA point2;
+	point2.position = { -12.0f, 0.0f, 12.0f };
+	point2.angle = { 0.0f, DirectX::XMConvertToRadians(-90.0f), 0.0f };
+	m_connectPointDatas.emplace_back(point2);
+
+	CONNECTPOINT_DATA point3;
+	point3.position = { 0.0f, 0.0f, 24.0f };
+	point3.angle = { 0.0f, 0.0f, 0.0f };
+	m_connectPointDatas.emplace_back(point3);
+
+	// 部屋データのロード
+	LoadMapTileData();
+
+	// 自身のAABBを配列に入れる
+	roomAABBs.emplace_back(m_aabb);
+
+	// 一定の深度まではランダムな部屋を生成する
+	// ここから次の部屋の生成
+	if (!(depth > DungeonData::Instance().GetDungeonGenerateSetting().maxDepth))
+	{
+		// 配置時に他の部屋と重ならない部屋のみを配列に保存する
+		std::vector<std::vector<DungeonData::RoomType>> placeableRooms;
+		placeableRooms.resize(m_connectPointDatas.size());
+
+		// 接続点の数だけ当たり判定を行う
+		for (int i = 0; i < m_connectPointDatas.size(); i++)
+		{
+			for (DungeonData::RoomType type : DungeonData::Instance().GetRoomGenerateSetting(roomType).placementCandidates)
+			{
+				AABB nextRoomAABB = DungeonData::Instance().GetRoomGenerateSetting(roomType).aabb;
+
+				// 接続点の角度によりAABBを変形させる
+				DirectX::XMFLOAT3 connectPointAngle = m_connectPointDatas.at(i).angle;
+
+				// 360°以内に丸める
+				//connectPointAngle = 
+				//if (connectPointAngle.y > DirectX::XMConvertToRadians(89.9f) && connectPointAngle.y < DirectX::XMConvertToRadians(91.0f))
+
+				// 自分以外のAABBとの当たり判定を行う
+				for (const AABB& anotherRoomAABB : roomAABBs)
+				{
+					IntersectionResult result;
+
+					if (Collision::IntersectAABBVsAABB(
+						DirectX::XMLoadFloat3(&nextRoomAABB.position),
+						DirectX::XMLoadFloat3(&nextRoomAABB.radii),
+						DirectX::XMLoadFloat3(&anotherRoomAABB.position),
+						DirectX::XMLoadFloat3(&anotherRoomAABB.radii),
+						&result))
+					{
+						// 自分以外のAABBと衝突するなら配列に保存しない
+					}
+					else
+					{
+						//placeableRooms.at(i).emplace_back(type);
+					}
+					placeableRooms.at(i).emplace_back(type);
+					break;
+				}
+			}
+		}
+
+		// 接続点の数だけ子を生成する
+		for (int i = 0; i < m_connectPointDatas.size(); i++)
+		{
+			// 接続可能な部屋の重みの合計
+			int totalWeight = 0;
+			for (DungeonData::RoomType type : placeableRooms.at(i))
+			{
+				totalWeight += DungeonData::Instance().GetRoomGenerateSetting(type).weight;
+			}
+
+			int randomValue = std::rand() % totalWeight;
+			for (DungeonData::RoomType type : placeableRooms.at(i))
+			{
+				randomValue -= DungeonData::Instance().GetRoomGenerateSetting(type).weight;
+
+				if (randomValue < 0)
+				{
+					RoomBase* nextRoom = nullptr;
+
+					switch (type)
+					{
+					case DungeonData::SIMPLE_ROOM_1:
+						nextRoom = new SimpleRoom1(this, i, roomAABBs);
+						break;
+
+					case DungeonData::END_ROOM:
+						nextRoom = new EndRoom1(this, i, roomAABBs);
+						break;
+
+					case DungeonData::CROSS_ROOM_1:
+						nextRoom = new CrossRoom1(this, i, roomAABBs);
+						break;
+
+					case DungeonData::PASSAGE_1:
+						nextRoom = new Passage1(this, i, roomAABBs);
+						break;
+
+					default:
+						break;
+					}
+					AddRoom(nextRoom);
+					break;
+				}
+			}
+		}
+	}
+	// 一定の深度を超えた場合は終端の部屋を生成する
+	else
+	{
+		// 接続点の数だけ終端の部屋を生成する
+		for (int i = 0; i < m_connectPointDatas.size(); i++)
+		{
+			RoomBase* nextEndRoom = new EndRoom1(this, i, roomAABBs);
+			AddRoom(nextEndRoom);
+		}
+	}
+}
+
 CrossRoom1::CrossRoom1(RoomBase* parent, int pointIndex, std::vector<int> roomTree, int& treeIndex)
 {
 	this->parent = parent;
@@ -61,101 +199,6 @@ CrossRoom1::CrossRoom1(RoomBase* parent, int pointIndex, std::vector<int> roomTr
 		}
 		AddRoom(nextRoom);
 	}
-}
-
-CrossRoom1::CrossRoom1(RoomBase* parent, int pointIndex)
-{
-	//this->parent = parent;
-	//this->parentConnectPointIndex = pointIndex;
-
-	//depth = GetDepth();
-
-	//roomType = DungeonData::CROSS_ROOM_1;
-
-
-	//// 接続点データ
-	//CONNECTPOINT_DATA point1;
-	//point1.position = { 12.0f, 0.0f, 12.0f };
-	//point1.angle = { 0.0f, DirectX::XMConvertToRadians(90.0f), 0.0f };
-	//m_connectPointDatas.emplace_back(point1);
-
-	//CONNECTPOINT_DATA point2;
-	//point2.position = { -12.0f, 0.0f, 12.0f };
-	//point2.angle = { 0.0f, DirectX::XMConvertToRadians(-90.0f), 0.0f };
-	//m_connectPointDatas.emplace_back(point2);
-
-	//CONNECTPOINT_DATA point3;
-	//point3.position = { 0.0f, 0.0f, 24.0f };
-	//point3.angle = { 0.0f, 0.0f, 0.0f };
-	//m_connectPointDatas.emplace_back(point3);
-
-
-	//// 一定の深度まではランダムな部屋を生成する
-	//if (!(depth > DungeonData::Instance().GetDungeonGenerateSetting().maxDepth))
-	//{
-	//	// 接続可能な部屋を設定
-	//	m_connectableRooms.emplace_back(DungeonData::SIMPLE_ROOM_1);
-	//	m_connectableRooms.emplace_back(DungeonData::END_ROOM);
-	//	//m_connectableRooms.emplace_back(DungeonData::CROSS_ROOM_1);
-	//	m_connectableRooms.emplace_back(DungeonData::PASSAGE_1);
-
-	//	// 接続可能な部屋の重みの合計
-	//	int totalWeight = 0;
-	//	for (DungeonData::RoomType type : m_connectableRooms)
-	//	{
-	//		totalWeight += DungeonData::Instance().GetRoomGenerateSetting(type).weight;
-	//	}
-
-	//	// 接続点の数だけ子を生成する
-	//	for (int i = 0; i < m_connectPointDatas.size(); i++)
-	//	{
-	//		int randomValue = std::rand() % totalWeight;
-
-	//		for (DungeonData::RoomType type : m_connectableRooms)
-	//		{
-	//			randomValue -= DungeonData::Instance().GetRoomGenerateSetting(type).weight;
-
-	//			if (randomValue < 0)
-	//			{
-	//				RoomBase* nextRoom = nullptr;
-
-	//				switch (type)
-	//				{
-	//				case DungeonData::SIMPLE_ROOM_1:
-	//					nextRoom = new SimpleRoom1(this, i);
-	//					break;
-
-	//				case DungeonData::END_ROOM:
-	//					nextRoom = new EndRoom1(this, i);
-	//					break;
-
-	//				case DungeonData::CROSS_ROOM_1:
-	//					nextRoom = new CrossRoom1(this, i);
-	//					break;
-
-	//				case DungeonData::PASSAGE_1:
-	//					nextRoom = new Passage1(this, i);
-	//					break;
-
-	//				default:
-	//					break;
-	//				}
-	//				AddRoom(nextRoom);
-	//				break;
-	//			}
-	//		}
-	//	}
-	//}
-	//// 一定の深度を超えた場合は終端の部屋を生成する
-	//else
-	//{
-	//	// 接続点の数だけ終端の部屋を生成する
-	//	for (int i = 0; i < m_connectPointDatas.size(); i++)
-	//	{
-	//		RoomBase* nextEndRoom = new EndRoom1(this, i);
-	//		AddRoom(nextEndRoom);
-	//	}
-	//}
 }
 
 void CrossRoom1::LoadMapTileData()

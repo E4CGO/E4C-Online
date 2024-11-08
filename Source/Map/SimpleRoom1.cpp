@@ -20,7 +20,6 @@ SimpleRoom1::SimpleRoom1(RoomBase* parent, int pointIndex, std::vector<AABB>& ro
 	// 部屋タイプを設定
 	roomType = DungeonData::SIMPLE_ROOM_1;
 
-
 	// 接続点データを設定
 	CONNECTPOINT_DATA point1;
 	point1.position = { 12.0f, 0.0f, 8.0f };
@@ -58,7 +57,6 @@ SimpleRoom1::SimpleRoom1(RoomBase* parent, int pointIndex, std::vector<AABB>& ro
 				
 				// 360°以内に丸める
 				//connectPointAngle = 
-
 				//if (connectPointAngle.y > DirectX::XMConvertToRadians(89.9f) && connectPointAngle.y < DirectX::XMConvertToRadians(91.0f))
 
 				// 自分以外のAABBとの当たり判定を行う
@@ -111,15 +109,15 @@ SimpleRoom1::SimpleRoom1(RoomBase* parent, int pointIndex, std::vector<AABB>& ro
 						break;
 
 					case DungeonData::END_ROOM:
-						//nextRoom = new EndRoom1(this, i);
+						nextRoom = new EndRoom1(this, i, roomAABBs);
 						break;
 
 					case DungeonData::CROSS_ROOM_1:
-						//nextRoom = new CrossRoom1(this, i);
+						nextRoom = new CrossRoom1(this, i, roomAABBs);
 						break;
 
 					case DungeonData::PASSAGE_1:
-						//nextRoom = new Passage1(this, i);
+						nextRoom = new Passage1(this, i, roomAABBs);
 						break;
 
 					default:
@@ -137,7 +135,7 @@ SimpleRoom1::SimpleRoom1(RoomBase* parent, int pointIndex, std::vector<AABB>& ro
 		// 接続点の数だけ終端の部屋を生成する
 		for (int i = 0; i < m_connectPointDatas.size(); i++)
 		{
-			RoomBase* nextEndRoom = new EndRoom1(this, i);
+			RoomBase* nextEndRoom = new EndRoom1(this, i, roomAABBs);
 			AddRoom(nextEndRoom);
 		}
 	}
@@ -156,7 +154,6 @@ SimpleRoom1::SimpleRoom1(RoomBase* parent, int pointIndex, std::vector<int> room
 	// 部屋タイプを設定
 	roomType = DungeonData::SIMPLE_ROOM_1;
 
-
 	// 接続点データを設定
 	CONNECTPOINT_DATA point1;
 	point1.position = { 12.0f, 0.0f, 8.0f };
@@ -168,6 +165,8 @@ SimpleRoom1::SimpleRoom1(RoomBase* parent, int pointIndex, std::vector<int> room
 	point2.angle = { 0.0f, DirectX::XMConvertToRadians(-90.0f), 0.0f };
 	m_connectPointDatas.emplace_back(point2);
 
+	// 部屋データをロード
+	LoadMapTileData();
 
 	// 接続点の数だけ子を生成する
 	for (int i = 0; i < m_connectPointDatas.size(); i++)
@@ -195,16 +194,6 @@ SimpleRoom1::SimpleRoom1(RoomBase* parent, int pointIndex, std::vector<int> room
 			break;
 		}
 		AddRoom(nextRoom);
-	}
-}
-
-void SimpleRoom1::Update(float elapsedTime)
-{
-	UpdateTransform();
-
-	for (RoomBase* child : childs)
-	{
-		child->Update(elapsedTime);
 	}
 }
 
@@ -340,17 +329,13 @@ void SimpleRoom1::PlaceMapTile()
 		switch (tileData.type)
 		{
 		case TileType::FLOOR:
-			//fileName = "Data/Model/Dungeon/Floor_Plain_Parent.glb";
-			fileName = "Data/Model/Dungeon/Floor_Plain_Parent_new.glb";
+			fileName = "Data/Model/Dungeon/Floor_Plain_Parent.glb";
 			break;
 		case TileType::WALL:
 			fileName = "Data/Model/Dungeon assets/SM_Wall_01a.fbx";
-			//fileName = "Data/Model/Dungeon/Doorway Parent 006_new.glb";
-			//continue;
 			break;
 		default:
-			fileName = "Data/Model/Dungeon/Floor_Plain_Parent.glb";
-			break;
+			continue;
 		}
 
 		MapTile* newTile = new MapTile(fileName.c_str(), 1.0f, this);
@@ -360,11 +345,5 @@ void SimpleRoom1::PlaceMapTile()
 		newTile->SetColor(tileData.color);
 		newTile->Update(0);
 		MAPTILES.Register(newTile);
-		//mapTiles.emplace_back(newTile);
 	}
-	// 最後にMapTileManagerに登録する
-	//for (MapTile* tile : mapTiles)
-	//{
-	//	MAPTILES.Register(tile);
-	//}
 }

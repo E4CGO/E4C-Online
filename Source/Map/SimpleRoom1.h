@@ -18,8 +18,6 @@ public:
 		std::vector<int> roomTree,
 		int& treeIndex);
 
-	void Update(float elapsedTime) override;
-
 	void LoadMapTileData() override;
 
 	void PlaceMapTile() override;
