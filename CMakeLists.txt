@@ -171,6 +171,7 @@ set(Source__Map
     "Source/Map/MapTileManager.h"
     "Source/Map/Passage1.cpp"
     "Source/Map/Passage1.h"
+    "Source/Map/RoomBase.cpp"
     "Source/Map/RoomBase.h"
     "Source/Map/SimpleRoom1.cpp"
     "Source/Map/SimpleRoom1.h"
@@ -346,6 +347,8 @@ set(Source__Scene__GameLoop__SceneTitle
 source_group("Source\\Scene\\GameLoop\\SceneTitle" FILES ${Source__Scene__GameLoop__SceneTitle})
 
 set(Source__Scene__GameLoop__SceneGame__Stage
+    "Source/Scene/GameLoop/SceneGame/Stage/StageDungeon_E4C.cpp"
+    "Source/Scene/GameLoop/SceneGame/Stage/StageDungeon_E4C.h"
     "Source/Scene/GameLoop/SceneGame/Stage/StageOpenWorld_E4C.cpp"
     "Source/Scene/GameLoop/SceneGame/Stage/StageOpenWorld_E4C.h"
 )

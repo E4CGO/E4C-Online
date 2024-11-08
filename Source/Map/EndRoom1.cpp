@@ -5,6 +5,22 @@
 #include "Map/EndRoom1.h"
 #include "Map/CrossRoom1.h"
 
+EndRoom1::EndRoom1(RoomBase* parent, int pointIndex, std::vector<AABB>& roomAABBs)
+{
+	this->parent = parent;
+	this->parentConnectPointIndex = pointIndex;
+
+	depth = GetDepth();
+
+	roomType = DungeonData::END_ROOM;
+
+	// 部屋データのロード
+	LoadMapTileData();
+
+	// 自身のAABBを配列に入れる
+	roomAABBs.emplace_back(m_aabb);
+}
+
 EndRoom1::EndRoom1(RoomBase* parent, int pointIndex, std::vector<int> roomTree, int& treeIndex)
 {
 	this->parent = parent;
@@ -14,17 +30,8 @@ EndRoom1::EndRoom1(RoomBase* parent, int pointIndex, std::vector<int> roomTree, 
 
 	roomType = DungeonData::END_ROOM;
 
-	//PlaceMapTile();
-}
-
-EndRoom1::EndRoom1(RoomBase* parent, int pointIndex)
-{
-	this->parent = parent;
-	this->parentConnectPointIndex = pointIndex;
-
-	depth = GetDepth();
-
-	roomType = DungeonData::END_ROOM;
+	// 部屋データのロード
+	LoadMapTileData();
 }
 
 void EndRoom1::LoadMapTileData()
@@ -143,10 +150,10 @@ void EndRoom1::PlaceMapTile()
 		MAPTILES.Register(newTile);
 	}
 }
-
-void EndRoom1::PlaceExit()
-{
-	MapTile* exit = new MapTile("Data/Model/Cube/testCubes.glb", 1.0f, this);
-	exit->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 8.0f));
-	MAPTILES.Register(exit);
-}
+//
+//void EndRoom1::PlaceExit()
+//{
+//	MapTile* exit = new MapTile("Data/Model/Cube/testCubes.glb", 1.0f, this);
+//	exit->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 8.0f));
+//	MAPTILES.Register(exit);
+//}
