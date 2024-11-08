@@ -8,7 +8,7 @@ DungeonData::DungeonData()
 	// SIMPLE_ROOM_1
 	{
 		RoomGenerateSetting setting;
-		setting.weight = 30;
+		setting.weight = 60;
 		setting.aabb.position = { 0.0f, 0.0f, 8.0f };
 		setting.aabb.radii = { 10.0f, 1.0f, 8.0f };
 		setting.placementCandidates.emplace_back(RoomType::END_ROOM);
@@ -19,7 +19,7 @@ DungeonData::DungeonData()
 	// END_ROOM
 	{
 		RoomGenerateSetting setting;
-		setting.weight = 999999;
+		setting.weight = 10;
 		setting.aabb.position = { 0.0f, 0.0f, 8.0f };
 		setting.aabb.radii = { 10.0f, 1.0f, 8.0f };
 		m_roomGenerateSettings.at(END_ROOM) = setting;
@@ -39,7 +39,7 @@ DungeonData::DungeonData()
 	// PASSAGE_1
 	{
 		RoomGenerateSetting setting;
-		setting.weight = 50;
+		setting.weight = 40;
 		setting.aabb.position = { 0.0f, 0.0f, 8.0f };
 		setting.aabb.radii = { 10.0f, 1.0f, 8.0f };
 		setting.placementCandidates.emplace_back(RoomType::SIMPLE_ROOM_1);
@@ -51,5 +51,5 @@ DungeonData::DungeonData()
 
 
 	// ダンジョンの生成設定
-	m_dungeonGenerateSettings.maxDepth = 3;
+	m_dungeonGenerateSettings.maxDepth = 6;
 }
