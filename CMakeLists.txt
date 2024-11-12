@@ -440,6 +440,8 @@ source_group("TAKOEngine\\Network" FILES ${TAKOEngine__Network})
 set(TAKOEngine__Physics
     "TAKOEngine/Physics/BoundingBoxCollider.cpp"
     "TAKOEngine/Physics/BoundingBoxCollider.h"
+    "TAKOEngine/Physics/CapsuleCollider.cpp"
+    "TAKOEngine/Physics/CapsuleCollider.h"
     "TAKOEngine/Physics/Collider.cpp"
     "TAKOEngine/Physics/Collider.h"
     "TAKOEngine/Physics/Collision.cpp"
