@@ -14,7 +14,13 @@
 #include "TAKOEngine/Rendering/ResourceManager.h"
 #include "TAKOEngine/Rendering/GpuResourceUtils.h"
 #include "TAKOEngine/Tool/AssimpImporter.h"
+#include "TAKOEngine/Tool/GLTFImporter.h"
 #include "TAKOEngine/Tool/Logger.h"
+
+bool null_load_no_image_data(tinygltf::Image*, const int, std::string*, std::string*, int, int, const unsigned char*, int, void*)
+{
+	return true;
+}
 
 namespace DirectX
 {
@@ -316,6 +322,53 @@ void ModelResource::Load(ID3D11Device* device, const char* filename)
 	}
 }
 
+void ModelResource::LoadGLTF(ID3D11Device* device, std::string filename)
+{
+	std::filesystem::path filepath(filename);
+	std::filesystem::path dirpath(filepath.parent_path());
+
+	// 独自形式のモデルファイルの存在確認
+	filepath.replace_extension(".cereal");
+	if (false)
+		//if (std::filesystem::exists(filepath))
+	{
+	}
+	else
+	{
+		tinygltf::TinyGLTF tiny_gltf;
+		tiny_gltf.SetImageLoader(null_load_no_image_data, nullptr);
+
+		tinygltf::Model gltf_model;
+		std::string error, warning;
+		bool succeeded{ false };
+		if (filename.find(".glb") != std::string::npos)
+		{
+			succeeded = tiny_gltf.LoadBinaryFromFile(&gltf_model, &error, &warning, filename.c_str());
+		}
+		else if (filename.find(".gltf") != std::string::npos)
+		{
+			succeeded = tiny_gltf.LoadASCIIFromFile(&gltf_model, &error, &warning, filename.c_str());
+		}
+
+		_ASSERT_EXPR_A(warning.empty(), warning.c_str());
+		_ASSERT_EXPR_A(error.empty(), warning.c_str());
+		_ASSERT_EXPR_A(succeeded, L"Failed to load gltf file");
+
+		for (std::vector<tinygltf::Scene>::const_reference gltf_scene : gltf_model.scenes)
+		{
+			ModelResource::scene& scene{ newScenes.emplace_back() };
+			scene.name = gltf_model.scenes.at(0).name;
+			scene.nodes = gltf_model.scenes.at(0).nodes;
+		}
+
+		gltf_model::fetch_nodes(gltf_model, newNodes, newScenes);
+		gltf_model::fetch_meshes(device, gltf_model, newMeshes);
+		gltf_model::fetch_materials(device, gltf_model, newMaterials, newMaterialsRV);
+		gltf_model::fetch_textures(device, gltf_model, newTextures, newTextureRV, newImages, filename);
+		gltf_model::fetch_animations(gltf_model, newSkins, newAnimations);
+	}
+}
+
 void ModelResource::Load(const char* filename)
 {
 	// ディレクトリパス取得
@@ -428,10 +481,10 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 
 				// シェーダーリソースビューの設定
 				D3D12_SHADER_RESOURCE_VIEW_DESC d3d_srv_desc = {};
-				d3d_srv_desc.ViewDimension             = D3D12_SRV_DIMENSION_TEXTURE2D;
-				d3d_srv_desc.Shader4ComponentMapping   = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-				d3d_srv_desc.Format                    = d3d_resource_desc.Format;
-				d3d_srv_desc.Texture2D.MipLevels       = d3d_resource_desc.MipLevels;
+				d3d_srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+				d3d_srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+				d3d_srv_desc.Format = d3d_resource_desc.Format;
+				d3d_srv_desc.Texture2D.MipLevels = d3d_resource_desc.MipLevels;
 				d3d_srv_desc.Texture2D.MostDetailedMip = 0;
 
 				// ディスクリプタ取得
@@ -770,18 +823,18 @@ void ModelResource::ComputeLocalBounds()
 				DirectX::XMStoreFloat4x4(&boneTransforms[i], BoneTransform);
 			}
 
-			DirectX::XMFLOAT3 boundsMin              = { FLT_MAX, FLT_MAX, FLT_MAX };
-			DirectX::XMFLOAT3 boundsMax              = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
-			DirectX::XMMATRIX GlobalTransform        = DirectX::XMLoadFloat4x4(&globalTransforms[mesh.nodeIndex]);
+			DirectX::XMFLOAT3 boundsMin = { FLT_MAX, FLT_MAX, FLT_MAX };
+			DirectX::XMFLOAT3 boundsMax = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
+			DirectX::XMMATRIX GlobalTransform = DirectX::XMLoadFloat4x4(&globalTransforms[mesh.nodeIndex]);
 			DirectX::XMMATRIX InverseGlobalTransform = DirectX::XMMatrixInverse(nullptr, GlobalTransform);
 
 			for (const ModelResource::Vertex& vertex : mesh.vertices)
 			{
 				//スキニング
 				DirectX::XMVECTOR Position = DirectX::XMLoadFloat3(&vertex.position);
-				DirectX::XMVECTOR P        = DirectX::XMVectorZero();
+				DirectX::XMVECTOR P = DirectX::XMVectorZero();
 				const float* weights = &vertex.boneWeight.x;
-				const UINT*  indices = &vertex.boneIndex.x;
+				const UINT* indices = &vertex.boneIndex.x;
 				for (int j = 0; j < 4; ++j)
 				{
 					DirectX::XMMATRIX BoneTransform = DirectX::XMLoadFloat4x4(&boneTransforms[indices[j]]);

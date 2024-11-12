@@ -33,12 +33,15 @@ void ModelObject::LoadModel(const char* filename, float scaling, ModelObject::RE
 {
 	if (strlen(filename) == 0) return;
 
-	switch (renderMode)
+	m_renderMode = renderMode;
+
+	switch (m_renderMode)
 	{
 	case ModelObject::RENDER_MODE::DX11:
 		m_pmodels.push_back(std::make_unique<ModelDX11>(T_GRAPHICS.GetDevice(), filename, scaling));
 		break;
 	case ModelObject::RENDER_MODE::DX11GLTF:
+		m_pmodels.push_back(std::make_unique<NewModelDX11>(T_GRAPHICS.GetDevice(), filename, scaling));
 		break;
 	case ModelObject::RENDER_MODE::DX12:
 		break;
@@ -136,6 +139,11 @@ void ModelObject::Render(const RenderContext& rc)
 	for (auto& model : m_pmodels)
 	{
 		if (model == nullptr) return;
+		if (m_renderMode != DX11)
+		{
+			static_cast<NewModelDX11*>(model.get())->Render(rc);
+			return;
+		}
 		// 描画
 		ModelShader* shader = T_GRAPHICS.GetModelShader(m_shaderId);
 		shader->Begin(rc);

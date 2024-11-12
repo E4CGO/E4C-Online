@@ -16,7 +16,6 @@
 
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
-#include "TAKOEngine/Tool/GLTFImporter.h"
 
 class SceneGame_E4C;
 
@@ -44,22 +43,20 @@ private:
 
 	MapTile* stage_collision = nullptr;
 
-	std::unique_ptr<ModelObject> testModel;
-
 	std::unique_ptr <Teleporter> teleporter;
 	std::unique_ptr <Plane> plane;
 	std::unique_ptr <Plane> portal;
 
-	std::unique_ptr<gltf_model> map;
+	std::unique_ptr<ModelObject> map;
+	std::unique_ptr<ModelObject> door;
+	std::unique_ptr<ModelObject> floor;
 
-	std::unique_ptr<ModelObject> Locator;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constant_buffers[8];
-
 
 	float transitionTime = 0.0f;
 	float transitionDuration = 2.f;  // 5•b‚©‚¯‚ÄˆÚ“®
 	int currentSegment = 0;
-	
+
 	std::vector<DirectX::XMFLOAT3> cameraPositions = {
 		{0,3,0},
 		{10,3,0},

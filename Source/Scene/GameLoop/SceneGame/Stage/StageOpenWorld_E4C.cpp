@@ -9,7 +9,6 @@
 #include "Map/MapTile.h"
 
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
-#include "TAKOEngine/Tool/GLTFImporter.h"
 #include "TAKOEngine/Tool/Timer.h"
 
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
@@ -18,17 +17,18 @@
 
 #include "Scene/Stage/TestingStage.h"
 
-static float timer = 0;
-
 void StageOpenWorld_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
 
-	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.025f);
+	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
 	stage_collision->Update(0);
 	MAPTILES.Register(stage_collision);
 
-	map = std::make_unique<gltf_model>(T_GRAPHICS.GetDevice(), "Data/Model/Stage/Terrain_Map.glb");
+	map = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 2.5f, ModelObject::RENDER_MODE::DX11GLTF);
+
+	door = std::make_unique<ModelObject>("Data/Model/Stage/Doorway_Parent_006.glb", 2.5f, ModelObject::RENDER_MODE::DX11GLTF);
+	floor = std::make_unique<ModelObject>("Data/Model/Stage/Floor_Plain_Parent.glb", 2.5f, ModelObject::RENDER_MODE::DX11GLTF);
 
 	const PlayerCharacterData::CharacterInfo info = PlayerCharacterData::Instance().GetCurrentCharacter();
 	PlayerCharacter* player = PlayerCharacterManager::Instance().UpdatePlayerData(0, "", info.Character.pattern);
@@ -67,7 +67,6 @@ void StageOpenWorld_E4C::Initialize()
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
 
-
 	// カメラ設定
 	Camera* mainCamera = CameraManager::Instance().GetCamera();
 	mainCamera->SetPerspectiveFov(
@@ -86,20 +85,6 @@ void StageOpenWorld_E4C::Initialize()
 	cameraController->SyncCameraToController(mainCamera);
 	cameraController->SetEnable(true);
 	cameraController->SetPlayer(player);
-
-	{
-		HRESULT hr;
-
-		D3D11_BUFFER_DESC buffer_desc{};
-		buffer_desc.ByteWidth = (sizeof(CbScene) + 15) / 16 * 16;
-		buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-		buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		buffer_desc.CPUAccessFlags = 0;
-		buffer_desc.MiscFlags = 0;
-		buffer_desc.StructureByteStride = 0;
-		hr = T_GRAPHICS.GetDevice()->CreateBuffer(&buffer_desc, nullptr, constant_buffers[1].GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-	}
 }
 
 void StageOpenWorld_E4C::Update(float elapsedTime)
@@ -126,7 +111,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 		transitionTime = 0;
 	}
 
-
 	PlayerCharacterManager::Instance().Update(elapsedTime);
 	teleporter->Update(elapsedTime);
 	plane->Update(elapsedTime);
@@ -135,6 +119,10 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	teleporter->CheckPlayer(PlayerCharacterManager::Instance().GetPlayerCharacterById(GAME_DATA.GetClientId())->GetPosition(), elapsedTime);
 
 	if (teleporter->GetPortalReady()) STAGES.ChangeStage(new TestingStage);
+
+	map->Update(elapsedTime);
+	door->Update(elapsedTime);
+	floor->Update(elapsedTime);
 
 	timer += elapsedTime;
 }
@@ -165,75 +153,16 @@ void StageOpenWorld_E4C::Render()
 	// 描画
 	PlayerCharacterManager::Instance().Render(rc);
 
-	float time = 0;
-
-	{
-		static std::vector<gltf_model::node> animated_nodes{ map->nodes };
-
-		//map->animate(0/*animation index*/, time, animated_nodes);
-
-		const DirectX::XMFLOAT4X4 coordinate_system_transforms[]
-		{
-			{-1, 0, 0, 0,
-			  0, 1, 0, 0,
-			  0, 0, 1, 0,
-			  0, 0, 0, 1}, // 0:RHS Y-UP
-
-			{ 1, 0, 0, 0,
-			  0, 1, 0, 0,
-			  0, 0, 1, 0,
-			  0, 0, 0, 1}, // 1:LHS Y-UP
-
-			{-1, 0, 0, 0,
-			  0, 0,-1, 0,
-			  0, 1, 0, 0,
-			  0, 0, 0, 1}, // 2:RHS Z-UP
-
-			{ 1, 0, 0, 0,
-			  0, 0, 1, 0,
-			  0, 1, 0, 0,
-			  0, 0, 0, 1}, //3:LHS Z - UP
-		};
-
-		float scale_factor = 1.0f;
-
-		DirectX::XMMATRIX C{ DirectX::XMLoadFloat4x4(&coordinate_system_transforms[0]) * DirectX::XMMatrixScaling(scale_factor, scale_factor, scale_factor) };
-		DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(2.5, 2.5f, 2.5f) };
-		DirectX::XMMATRIX R{ DirectX::XMMatrixRotationRollPitchYaw(0.0f, 0.0f, 0.0f) };
-		DirectX::XMMATRIX T{ DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f) };
-
-		DirectX::XMFLOAT4X4 world;
-		DirectX::XMStoreFloat4x4(&world, C * S * R * T);
-
-		// シーン用定数バッファ更新
-		CbScene cbScene{};
-		DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&rc.camera->GetView());
-		DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&rc.camera->GetProjection());
-		DirectX::XMStoreFloat4x4(&cbScene.view_projection, V * P);
-
-		const DirectX::XMFLOAT3& eye = rc.camera->GetEye();
-		cbScene.camera_position.x = eye.x;
-		cbScene.camera_position.y = eye.y;
-		cbScene.camera_position.z = eye.z;
-
-		// レンダーステート設定
-		const float blend_factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		rc.deviceContext->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Opaque), blend_factor, 0xFFFFFFFF);
-		rc.deviceContext->OMSetDepthStencilState(rc.renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
-		rc.deviceContext->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullNone));
-
-		rc.deviceContext->UpdateSubresource(constant_buffers[1].Get(), 0, 0, &cbScene, 0, 0);
-		rc.deviceContext->VSSetConstantBuffers(1, 1, constant_buffers[1].GetAddressOf());
-		rc.deviceContext->PSSetConstantBuffers(1, 1, constant_buffers[1].GetAddressOf());
-
-		map->render(rc, world, animated_nodes);
-	}
+	map->Render(rc);
+	door->Render(rc);
+	floor->Render(rc);
 
 	teleporter->Render(rc);
 	plane->Render(rc);
 	portal->Render(rc);
 
 	//MAPTILES.Render(rc);
+
 	//if (ImGui::TreeNode("Camera Positions"))
 	//{
 	//	for (size_t i = 0; i < cameraPositions.size(); ++i)

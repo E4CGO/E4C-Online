@@ -47,7 +47,7 @@ void SceneTitle_E4C::Initialize()
 	shadowMapRenderer->SetShadowLight(dl);
 
 	CameraManager& cameramanager = CameraManager::Instance();
-	Camera*mainCamera = new Camera();
+	Camera* mainCamera = new Camera();
 	cameramanager.Register(mainCamera);
 	cameramanager.SetCamera(0);
 
@@ -77,6 +77,10 @@ void SceneTitle_E4C::Initialize()
 	Sound::Instance().InitAudio();
 	Sound::Instance().LoadAudio("Data/Sound/TitleTheme.mp3");
 	Sound::Instance().PlayAudio(0);
+
+	//knight = std::make_unique<ModelObject>("Data/Model/Character/Player/ANM_PCMsword_Prototype_3_ANIMATION.glb", 1.0f, ModelObject::DX11GLTF);
+	//knight->SetAnimation(0, true, 0.0f);
+	//knight->SetAngle({ 0.0f, 0.0f, 0.0f });
 }
 
 void SceneTitle_E4C::Finalize()
@@ -92,6 +96,8 @@ void SceneTitle_E4C::Finalize()
 void SceneTitle_E4C::Update(float elapsedTime)
 {
 	time += elapsedTime;
+
+	//knight->Update(elapsedTime);
 
 	stateMachine->Update(elapsedTime);
 
@@ -121,6 +127,8 @@ void SceneTitle_E4C::Render()
 	// ライトの情報を詰め込む
 	LightManager::Instance().PushRenderContext(rc);
 
+	//knight->Render(rc);
+
 	//	シャドウマップ描画
 	shadowMapRenderer->Render();
 	rc.shadowMapData = shadowMapRenderer->GetShadowMapData();
@@ -140,7 +148,6 @@ void SceneTitle_E4C::RenderDX12()
 {
 	TentacleLib::graphics.BeginRender();
 	{
-		
 		// シーン用定数バッファ更新
 		const Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
 			CameraManager::Instance().GetCamera());

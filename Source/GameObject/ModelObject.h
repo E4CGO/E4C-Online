@@ -26,6 +26,8 @@ public:
 		NOMODEL,
 	};
 
+	RENDER_MODE m_renderMode;
+
 	// コンストラクタ
 	ModelObject(void) {};
 	// コンストラクタ（引数付き）
