@@ -4,6 +4,9 @@
 #include <imgui.h>
 
 #include "Map/SimpleRoom1.h"
+#include "Map/EndRoom1.h"
+#include "Map/CrossRoom1.h"
+#include "Map/Passage1.h"
 
 
 void RoomBase::UpdateTransform()
@@ -19,12 +22,12 @@ void RoomBase::UpdateTransform()
 		DirectX::XMMATRIX LocalTransform = S * R * T;
 
 		DirectX::XMMATRIX ParentTransform;
-		if (parentConnectPointIndex > -1)
-		{
-			DirectX::XMFLOAT4X4 parentTransform = parent->GetConnectPointData(parentConnectPointIndex).transform;
-			ParentTransform = DirectX::XMLoadFloat4x4(&parentTransform);
-		}
-		else
+		//if (parentConnectPointIndex > -1)
+		//{
+		//	DirectX::XMFLOAT4X4 parentTransform = parent->GetConnectPointData(parentConnectPointIndex).transform;
+		//	ParentTransform = DirectX::XMLoadFloat4x4(&parentTransform);
+		//}
+		//else
 		{
 			ParentTransform = DirectX::XMMatrixIdentity();
 		}
@@ -45,6 +48,55 @@ void RoomBase::UpdateTransform()
 		DirectX::XMMATRIX GlobalTransform = LocalTransform * ParentTransform;
 		DirectX::XMStoreFloat4x4(&data.transform, GlobalTransform);
 	}
+}
+
+AABB RoomBase::CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const
+{
+	// 360度以内に丸める
+	while (degree >= 360.0f) degree -= 360.0f;
+	while (degree < 0.0f) degree += 360.0f;
+
+	// 角度によって補正を行う
+	// 90度か270度ならxとzを逆転させる
+	if ((degree > 89.9f && degree < 90.1f) || (degree > 269.9f && degree < 270.1f))
+	{
+		AABB buf = aabb;
+
+		aabb.position.x = aabb.position.z;
+		aabb.position.z = buf.position.x;
+		aabb.radii.x = aabb.radii.z;
+		aabb.radii.z = buf.radii.x;
+	}
+
+	// 90度
+	if (degree > 89.9f && degree < 90.1f)
+	{
+
+	}
+
+	// 180度
+	if (degree > 179.9f && degree < 180.1f)
+	{
+		// 位置補正
+		aabb.position.z += tileScale;
+
+		// zを反転
+		aabb.position.z = -aabb.position.z;
+	}
+
+	// 270度
+	if (degree > 269.9f && degree < 270.1f)
+	{
+		// xを反転
+		aabb.position.x = -aabb.position.x;
+
+		// 位置補正
+		aabb.position.x += tileScale;
+	}
+
+	aabb.position += pos;
+
+	return aabb;
 }
 
 int RoomBase::DrawDebugGUI(int i)

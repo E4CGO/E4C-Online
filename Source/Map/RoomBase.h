@@ -162,6 +162,9 @@ public:
 	// AABB取得
 	AABB GetAABB() const { return m_aabb; }
 
+	// AABB算出
+	AABB CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const;
+
 	// 部屋タイルデータをロード
 	virtual void LoadMapTileData() {}
 
@@ -189,6 +192,8 @@ protected:
 	std::vector<CONNECTPOINT_DATA> m_connectPointDatas;
 
 	//std::vector<MapTile*> mapTiles;
+
+	float tileScale = 4.0f;
 
 	int parentConnectPointIndex = -1;
 	int depth = 0;

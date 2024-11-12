@@ -30,8 +30,8 @@ class StageDungeon_E4C : public Stage
 public:
 	// コンストラクタ（部屋配列なし）
 	StageDungeon_E4C(SceneGame_E4C* scene);
-	// コンストラクタ（部屋配列あり）
-	StageDungeon_E4C(SceneGame_E4C* scene, std::vector<int> roomTree);
+
+	void GenerateDungeon();
 
 	void Initialize() override;
 
@@ -51,6 +51,7 @@ private:
 	std::unique_ptr<ThridPersonCameraController> cameraController;
 
 	std::unique_ptr<RoomBase> rootRoom;
+	std::vector<UINT16> roomTree;
 
 	std::unique_ptr<ModelObject> testModel;
 

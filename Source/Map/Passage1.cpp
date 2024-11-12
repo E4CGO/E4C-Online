@@ -135,7 +135,7 @@ Passage1::Passage1(RoomBase* parent, int pointIndex, std::vector<AABB>& roomAABB
 	}
 }
 
-Passage1::Passage1(RoomBase* parent, int pointIndex, std::vector<int> roomTree, int& treeIndex)
+Passage1::Passage1(RoomBase* parent, int pointIndex, std::vector<UINT16> roomTree, int& treeIndex)
 {
 	this->parent = parent;
 	this->parentConnectPointIndex = pointIndex;

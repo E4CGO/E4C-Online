@@ -15,7 +15,7 @@ public:
 	CrossRoom1(
 		RoomBase* parent,
 		int pointIndex,
-		std::vector<int> roomTree,
+		std::vector<UINT16> roomTree,
 		int& treeIndex);
 
 	void LoadMapTileData() override;

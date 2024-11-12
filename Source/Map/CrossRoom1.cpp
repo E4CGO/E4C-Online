@@ -145,7 +145,7 @@ CrossRoom1::CrossRoom1(RoomBase* parent, int pointIndex, std::vector<AABB>& room
 	}
 }
 
-CrossRoom1::CrossRoom1(RoomBase* parent, int pointIndex, std::vector<int> roomTree, int& treeIndex)
+CrossRoom1::CrossRoom1(RoomBase* parent, int pointIndex, std::vector<UINT16> roomTree, int& treeIndex)
 {
 	this->parent = parent;
 	this->parentConnectPointIndex = pointIndex;

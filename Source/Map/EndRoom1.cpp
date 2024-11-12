@@ -21,7 +21,7 @@ EndRoom1::EndRoom1(RoomBase* parent, int pointIndex, std::vector<AABB>& roomAABB
 	roomAABBs.emplace_back(m_aabb);
 }
 
-EndRoom1::EndRoom1(RoomBase* parent, int pointIndex, std::vector<int> roomTree, int& treeIndex)
+EndRoom1::EndRoom1(RoomBase* parent, int pointIndex, std::vector<UINT16> roomTree, int& treeIndex)
 {
 	this->parent = parent;
 	this->parentConnectPointIndex = pointIndex;
