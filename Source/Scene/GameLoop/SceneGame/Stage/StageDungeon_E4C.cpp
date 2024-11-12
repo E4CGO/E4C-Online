@@ -1,7 +1,6 @@
 ﻿#include "StageDungeon_E4C.h"
 
 #include "GameObject/ModelObject.h"
-#include "GameObject/Props/Teleporter.h"
 #include "Scene/Stage/StageManager.h"
 #include "Scene/Stage/Stage.h"
 
@@ -48,8 +47,6 @@ void StageDungeon_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
 
-	teleporter = std::make_unique<Teleporter>("Data/Model/Cube/testCubes.glb", 1.0);
-	teleporter->SetPosition({ 50, 0, 60 });
 
 	{
 		std::array<DirectX::XMFLOAT3, 4 > positions = {
@@ -169,13 +166,8 @@ void StageDungeon_E4C::Update(float elapsedTime)
 		T_INPUT.KeepCursorCenter();
 	}
 	PlayerCharacterManager::Instance().Update(elapsedTime);
-	teleporter->Update(elapsedTime);
 	plane->Update(elapsedTime);
 	portal->Update(elapsedTime);
-
-	teleporter->CheckPlayer(PlayerCharacterManager::Instance().GetPlayerCharacterById(GAME_DATA.GetClientId())->GetPosition(), elapsedTime);
-
-	if (teleporter->GetPortalReady()) STAGES.ChangeStage(new TestingStage);
 
 	timer += elapsedTime;
 }
@@ -260,7 +252,6 @@ void StageDungeon_E4C::Render()
 		MAPTILES.Render(rc);
 	}
 
-	teleporter->Render(rc);
 	plane->Render(rc);
 
 	portal->Render(rc);

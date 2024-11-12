@@ -10,25 +10,14 @@
 #include "Scene/SceneManager.h"
 #include "Scene/SceneTitle.h"
 
-// 接続待ちステート
-void SceneGame_E4CState::WaitingState::Enter()
+// 初期化ステート
+void SceneGame_E4CState::InitState::Enter()
 {
 }
-void SceneGame_E4CState::WaitingState::Execute(float elapsedTime)
+void SceneGame_E4CState::InitState::Execute(float elapsedTime)
 {
 }
-void SceneGame_E4CState::WaitingState::Exit()
-{
-}
-
-// 準備完了ステート（カウントダウン）
-void SceneGame_E4CState::ReadyState::Enter()
-{
-}
-void SceneGame_E4CState::ReadyState::Execute(float elapsedTime)
-{
-}
-void SceneGame_E4CState::ReadyState::Exit()
+void SceneGame_E4CState::InitState::Exit()
 {
 }
 
@@ -43,24 +32,24 @@ void SceneGame_E4CState::GameState::Exit()
 {
 }
 
-// ゲームオーバーステート
-void SceneGame_E4CState::GameOverState::Enter()
+// ゲームステート
+void SceneGame_E4CState::LoadingState::Enter()
 {
 }
-void SceneGame_E4CState::GameOverState::Execute(float elapsedTime)
+void SceneGame_E4CState::LoadingState::Execute(float elapsedTime)
 {
 }
-void SceneGame_E4CState::GameOverState::Exit()
+void SceneGame_E4CState::LoadingState::Exit()
 {
 }
 
-// ゲームオーバーステート
-void SceneGame_E4CState::WinState::Enter()
+// ゲームステート
+void SceneGame_E4CState::MatchingState::Enter()
 {
 }
-void SceneGame_E4CState::WinState::Execute(float elapsedTime)
+void SceneGame_E4CState::MatchingState::Execute(float elapsedTime)
 {
 }
-void SceneGame_E4CState::WinState::Exit()
+void SceneGame_E4CState::MatchingState::Exit()
 {
 }

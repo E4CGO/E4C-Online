@@ -16,7 +16,7 @@
 
 #include "Scene/Stage/StageManager.h"
 
-#include "Scene/Stage/TestingStage.h"
+#include "Scene/GameLoop/SceneGame/Stage/StageDungeon_E4C.h"
 
 #include "Network/OnlineController.h"
 
@@ -36,15 +36,15 @@ void StageOpenWorld_E4C::Initialize()
 	map = std::make_unique<gltf_model>(T_GRAPHICS.GetDevice(), "Data/Model/Stage/Terrain_Map.glb");
 	//map = std::make_unique<gltf_model>(T_GRAPHICS.GetDevice(), "Data/Model/Dungeon/Doorway Parent 006_new.glb");
 
-	teleporter = std::make_unique<Teleporter>("Data/Model/Cube/testCubes.glb", 1.0);
-	teleporter->SetPosition({ 50, 0, 60 });
+	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene));
+	teleporter->SetPosition({ 0, 10, 0 });
 
 	{
 		std::array<DirectX::XMFLOAT3, 4 > positions = {
-		DirectX::XMFLOAT3{ 10.0f, 10.0f, 5.0f},
-		DirectX::XMFLOAT3{ 10.0f, 20.0f, 5.0f },
-		DirectX::XMFLOAT3{ 5.0f, 10.0f, 5.0f },
-		DirectX::XMFLOAT3{ 5.0f, 20.0f, 5.0f }
+			DirectX::XMFLOAT3{ 10.0f, 10.0f, 5.0f},
+			DirectX::XMFLOAT3{ 10.0f, 20.0f, 5.0f },
+			DirectX::XMFLOAT3{ 5.0f, 10.0f, 5.0f },
+			DirectX::XMFLOAT3{ 5.0f, 20.0f, 5.0f }
 		};
 
 		plane = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "Data/Sprites/gem.png", 1.0f, positions);
@@ -147,10 +147,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	teleporter->Update(elapsedTime);
 	plane->Update(elapsedTime);
 	portal->Update(elapsedTime);
-
-	teleporter->CheckPlayer(PlayerCharacterManager::Instance().GetPlayerCharacterById(GAME_DATA.GetClientId())->GetPosition(), elapsedTime);
-
-	if (teleporter->GetPortalReady()) STAGES.ChangeStage(new TestingStage);
 
 	timer += elapsedTime;
 }

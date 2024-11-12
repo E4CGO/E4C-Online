@@ -26,16 +26,15 @@
 void SceneGame_E4C::Initialize()
 {
 	stateMachine = std::make_unique<StateMachine<SceneGame_E4C>>();
-	stateMachine->RegisterState(GAME_STATE::OPENWORLD, new SceneGame_E4CState::WaitingState(this));
-	stateMachine->RegisterState(GAME_STATE::DUNGEON, new SceneGame_E4CState::WaitingState(this));
-	stateMachine->SetState(GAME_STATE::OPENWORLD);
+	stateMachine->RegisterState(GAME_STATE::INIT, new SceneGame_E4CState::InitState(this));
+	stateMachine->SetState(GAME_STATE::INIT);
 
 	CameraManager& cameraManager = CameraManager::Instance();
 	Camera* mainCamera = new Camera();
 	cameraManager.Register(mainCamera);
 	cameraManager.SetCamera(0);
 
-	//Console::Instance().Open();
+	Console::Instance().Open();
 
 	// 選択した自機
 	const PlayerCharacterData::CharacterInfo info = PlayerCharacterData::Instance().GetCurrentCharacter();
@@ -43,8 +42,8 @@ void SceneGame_E4C::Initialize()
 	player->Show();
 	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 
-	//STAGES.ChangeStage(new StageOpenWorld_E4C(this));
-	STAGES.ChangeStage(new StageDungeon_E4C(this));
+	STAGES.ChangeStage(new StageOpenWorld_E4C(this));
+	//STAGES.ChangeStage(new StageDungeon_E4C(this));
 
 	m_ponlineController = new Online::OnlineController;
 	if (m_ponlineController->Initialize())
@@ -85,6 +84,4 @@ void SceneGame_E4C::Render()
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
 	STAGES.Render();
-
-	//ProfileDrawUI();
 }

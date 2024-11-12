@@ -2,6 +2,22 @@
 
 #include <iostream>
 
+void MapTileManager::Clear()
+{
+	quadtree.ClearAllAABBObject();
+	quadtree.ClearAllCapsuleObject();
+	quadtree.ClearAllSphereObject();
+	quadtree.ClearAllTriangleObject();
+	
+	octree.ClearAllAABBObject();
+	octree.ClearAllCapsuleObject();
+	octree.ClearAllSphereObject();
+	octree.ClearAllTriangleObject();
+
+	tree.Finalize();
+
+	Manager::Clear();
+}
 
 // レイキャスト
 bool MapTileManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, HitResult& hit, bool camera)
@@ -209,8 +225,8 @@ int MapTileManager::InsertMapMesh()
 				DirectX::XMStoreFloat3(&p_triangle->position[2], C);
 
 				// 三角形をワールド座標で登録
-				quadtree.InsertTriangleObject(triangle);
-				octree.InsertTriangleObject(triangle);
+				//quadtree.InsertTriangleObject(triangle);
+				//octree.InsertTriangleObject(triangle);
 
 				XMFLOAT3 minPos, maxPos;
 				triangle.GetBoundPoints(&minPos, &maxPos);
