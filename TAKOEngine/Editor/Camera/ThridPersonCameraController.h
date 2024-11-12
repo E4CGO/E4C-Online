@@ -29,7 +29,8 @@ public:
 private:
 	Character* player;
 
-	float lerpT = 0.2f;
+	//float lerpT = 0.2f;
+	float lerpT = 0.8f;
 
 	const float distanceMax = 9.0f;
 	const float distanceMin = 3.0f;

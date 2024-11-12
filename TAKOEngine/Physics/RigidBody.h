@@ -2,9 +2,9 @@
 //! @note 剛体の物理処理
 
 #ifndef __RIGID_BODY_H__
-#define __Rigid_Body_H__
+#define __RIGID_BODY_H__
 
 #include <DirectXMath.h>
 
 
-#endif // !__Rigid_Body_H__
+#endif // !__RIGID_BODY_H__

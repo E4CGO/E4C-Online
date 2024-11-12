@@ -1,6 +1,6 @@
-#include "TAKOEngine/Runtime/tentacle_lib.h"
+﻿#include "TAKOEngine/Runtime/tentacle_lib.h"
 
-#include <DirectXCollision.h>
+//#include <DirectXCollision.h>
 #include "SphereCollider.h"
 #include "Source/Map/MapTileManager.h"
 
@@ -8,6 +8,13 @@ SphereCollider::SphereCollider(float _radius)
 {
 	radius = _radius;
 	type = COLLIDER_TYPE::SPHERE;
+}
+
+// Sphere用パラメータセット
+void SphereCollider::SetParam(Sphere sphere)
+{
+	position = sphere.position;
+	radius = sphere.radius;
 }
 
 void SphereCollider::DrawDebugPrimitive(DirectX::XMFLOAT4 color)
@@ -70,13 +77,13 @@ bool SphereCollider::RayCast(
 	if (A == 0.0f) return false; // Ray Error
 
 	float s = B * B - A * C;
-	if (s < 0.0f) return false; // �Փ˂��Ă��Ȃ�
+	if (s < 0.0f) return false; // 衝突していない
 
 	s = sqrtf(s);
 	float a1 = (B - s) / A;
 	float a2 = (B + s) / A;
 
-	if (a1 < 0.0f || a2 < 0.0f) return false; // ���C�̔��΂ŏՓ�
+	if (a1 < 0.0f || a2 < 0.0f) return false; // レイの反対で衝突
 
 	result.position.x = start.x + a1 * v.x;
 	result.position.y = start.y + a1 * v.y;

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <vector>
 #include <wrl.h>
@@ -12,27 +12,30 @@ public:
 	~DebugRenderer() {}
 
 public:
-	// •`‰æÀs
+	// æç”»å®Ÿè¡Œ
 	void Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
-	// ‹…•`‰æ
+	// çƒæç”»
 	void DrawSphere(const DirectX::XMFLOAT3& center, float radius, const DirectX::XMFLOAT4& color);
 	void DrawSphere(const std::vector<DirectX::XMFLOAT3>& centers, float radius, const DirectX::XMFLOAT4& color);
 
-	// ‰~’Œ•`‰æ
+	// å††æŸ±æç”»
 	void DrawCylinder(const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color);
 
-	// —§•û‘Ì•`‰æ
+	// ç«‹æ–¹ä½“æç”»
 	void DrawCube(const DirectX::XMFLOAT3& position, DirectX::XMFLOAT3& scale, const DirectX::XMFLOAT4& color);
 
+	// ã‚«ãƒ—ã‚»ãƒ«æç”»
+	void DrawCapsule(const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color);
+
 private:
-	// ‹…ƒƒbƒVƒ…ì¬
+	// çƒãƒ¡ãƒƒã‚·ãƒ¥ä½œæˆ
 	void CreateSphereMesh(ID3D11Device* device, float radius, int slices, int stacks);
 
-	// ‰~’ŒƒƒbƒVƒ…ì¬
+	// å††æŸ±ãƒ¡ãƒƒã‚·ãƒ¥ä½œæˆ
 	void CreateCylinderMesh(ID3D11Device* device, float radius1, float radius2, float start, float height, int slices, int stacks);
 
-	// —§•û‘ÌƒƒbƒVƒ…ì¬
+	// ç«‹æ–¹ä½“ãƒ¡ãƒƒã‚·ãƒ¥ä½œæˆ
 	void CreateCubeMesh(ID3D11Device* device);
 private:
 	struct CbMesh

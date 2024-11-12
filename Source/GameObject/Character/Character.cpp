@@ -286,30 +286,32 @@ void Character::UpdateHorizontalMove(float elapsedTime)
 
 		// マップ
 		if (collider != nullptr) {
-			collider->SetPosition(position + DirectX::XMFLOAT3{ 0, height * 0.5f, 0 } *scale + DirectX::XMFLOAT3{ velocity.x / velocityLengthXZ, 0, velocity.z / velocityLengthXZ } *scale);
-			if (!collider->CollisionVsMap(true))
-			{
-				isWall = false;
+			//collider->SetPosition(position + DirectX::XMFLOAT3{ 0, height * 0.5f, 0 } *scale + DirectX::XMFLOAT3{ velocity.x / velocityLengthXZ, 0, velocity.z / velocityLengthXZ } *scale);
+			//collider->SetPosition(position + DirectX::XMFLOAT3{ 0, 0.4f, 0 } + DirectX::XMFLOAT3{ velocity.x / velocityLengthXZ, 0, velocity.z / velocityLengthXZ });
+			//if (!collider->CollisionVsMap(true))
+			//{
+			//	isWall = false;
 				position.x += mx;
 				position.z += mz;
-			}
-			else
-			{
-				collider->SetPosition(position + DirectX::XMFLOAT3{ 0, height * 0.5f, 0 } *scale + DirectX::XMFLOAT3{ mx, 0, mz });
-				if (!collider->CollisionVsMap(true))
-				{
-					position.x += mx;
-					position.z += mz;
-				}
-				else
-				{
-					if (!isWall)
-					{
-						OnWall();
-					}
-					isWall = true;
-				}
-			}
+			//}
+			//else
+			//{
+			//	//collider->SetPosition(position + DirectX::XMFLOAT3{ 0, height * 0.5f, 0 } *scale + DirectX::XMFLOAT3{ mx, 0, mz });
+			//	collider->SetPosition(position + DirectX::XMFLOAT3{ 0, 0.4f, 0 } + DirectX::XMFLOAT3{ mx, 0, mz });
+			//	if (!collider->CollisionVsMap(true))
+			//	{
+			//		position.x += mx;
+			//		position.z += mz;
+			//	}
+			//	else
+			//	{
+			//		if (!isWall)
+			//		{
+			//			OnWall();
+			//		}
+			//		isWall = true;
+			//	}
+			//}
 		}
 		else
 		{

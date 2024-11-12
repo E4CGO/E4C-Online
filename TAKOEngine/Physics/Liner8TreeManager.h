@@ -123,25 +123,27 @@ public:
 
 	//終了化
 	void Finalize()
-	{		
-		for (int i = 0; i < m_iCellNum; i++)
+	{
+		if (ppCellAry != NULL)
 		{
-			if (ppCellAry[i] != nullptr)
+			for (int i = 0; i < m_iCellNum; i++)
 			{
-				OFT<T>* pOFT = ppCellAry[i]->pLatest;
-				while (pOFT != nullptr)
+				if (ppCellAry[i] != NULL)
 				{
-					OFT<T>* next_pOFT = pOFT->m_pNext;
-					delete pOFT->m_pObject; // OFT内のオブジェクトを削除
-					delete pOFT; // 生成したOFTオブジェクトを削除
-					pOFT = next_pOFT;
+					OFT<T>* pOFT = ppCellAry[i]->pLatest;
+					while (pOFT != nullptr)
+					{
+						OFT<T>* next_pOFT = pOFT->m_pNext;
+						delete pOFT->m_pObject; // OFT内のオブジェクトを削除
+						delete pOFT; // 生成したOFTオブジェクトを削除
+						pOFT = next_pOFT;
+					}
+
+					delete ppCellAry[i]; // 生成した空間を削除
 				}
-
-				delete ppCellAry[i]; // 生成した空間を削除
 			}
+			delete[] ppCellAry;	// 線形空間配列削除
 		}
-
-		delete[] ppCellAry;	// 線形空間配列削除
 	}
 
 	//オブジェクト登録
