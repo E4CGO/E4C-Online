@@ -4,6 +4,7 @@
 #include "TAKOEngine/Physics/UnrotatedBoxCollider.h"
 #include "TAKOEngine/Physics/BoundingBoxCollider.h"
 #include "TAKOEngine/Physics/SphereCollider.h"
+#include "TAKOEngine/Physics/CapsuleCollider.h"
 #include "TAKOEngine/Physics/ModelCollider.h"
 #include "TAKOEngine/Physics/MapCollider.h"
 
@@ -153,14 +154,17 @@ void ModelObject::SetCollider(Collider::COLLIDER_TYPE collider, int idx)
 {
 	switch (collider)
 	{
+	case Collider::COLLIDER_TYPE::SPHERE:
+		this->collider = std::make_unique<SphereCollider>();
+		break;
 	case Collider::COLLIDER_TYPE::UNROTATED_BOX:
 		this->collider = std::make_unique<UnrotatedBoxCollider>();
 		break;
+	case Collider::COLLIDER_TYPE::CAPSULE:
+		this->collider = std::make_unique<CapsuleCollider>();
+		break;
 	case Collider::COLLIDER_TYPE::MODEL:
 		this->collider = std::make_unique<ModelCollider>(m_pmodels[idx].get());
-		break;
-	case Collider::COLLIDER_TYPE::SPHERE:
-		this->collider = std::make_unique<SphereCollider>();
 		break;
 	case Collider::COLLIDER_TYPE::BOUNDING_BOX:
 		this->collider = std::make_unique<BoundingBoxCollider>(m_pmodels[idx].get());

@@ -33,7 +33,9 @@ PlayerCharacter::PlayerCharacter(uint64_t id, const char* name, const uint8_t ap
 	mpCost[static_cast<int>(STATE::DODGE)] = 0.0f;
 
 	// 衝突判定
-	SetCollider(Collider::COLLIDER_TYPE::SPHERE);
+	SetCollider(Collider::COLLIDER_TYPE::CAPSULE);
+	//SetCollider(Collider::COLLIDER_TYPE::SPHERE);
+	//collider->SetScale(DirectX::XMFLOAT3{ height * 0.3f, height * 0.3f, height * 0.3f } *scale);
 
 	m_client_id = id;
 	this->m_name = name;
@@ -58,7 +60,7 @@ PlayerCharacter::PlayerCharacter(PlayerCharacterData::CharacterInfo dataInfo) : 
 	mpCost[static_cast<int>(STATE::DODGE)] = 00.0f;
 
 	// 衝突判定
-	SetCollider(Collider::COLLIDER_TYPE::SPHERE);
+	SetCollider(Collider::COLLIDER_TYPE::CAPSULE);
 
 	LoadAppearance(dataInfo.Character.pattern);
 }
@@ -125,8 +127,23 @@ void PlayerCharacter::UpdateTarget()
 
 void PlayerCharacter::UpdateColliders()
 {
-	collider->SetPosition(position + DirectX::XMFLOAT3{ 0, height * 0.5f, 0 } *scale);
-	collider->SetScale(DirectX::XMFLOAT3{ height * 0.3f, height * 0.3f, height * 0.3f } *scale);
+	//collider->SetPosition(position + DirectX::XMFLOAT3{ 0, height * 0.5f, 0 } *scale);
+	Capsule capsule{};
+	capsule.position = position + DirectX::XMFLOAT3{ 0, 0.4f, 0 };
+	capsule.direction = { 0, 1, 0 };
+	capsule.radius = 0.4f;
+	capsule.length = height - capsule.radius * 2;
+	collider->SetParam(capsule);
+	//if(!isGround)
+	if (XMFLOAT3LengthSq(velocity) > 0.0f)
+	{
+		if (collider->CollisionVsMap())
+		{
+			position = collider->GetPosition();
+			position.y -= 0.4f;
+		}
+	}
+	//collider->SetScale(DirectX::XMFLOAT3{ height * 0.3f, height * 0.3f, height * 0.3f } *scale);
 }
 
 bool  PlayerCharacter::CollisionVsEnemies(Collider* collider, int damage, bool power, float force, int effectIdx, float effectScale)

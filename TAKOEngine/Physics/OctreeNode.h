@@ -1,8 +1,8 @@
 //! @file OctreeNode.h
 //! @note ”ª•ª–Ø‹óŠÔ
 
-#ifndef __Octree_Node_H__
-#define __Octree_Node_H__
+#ifndef __OCTREE_NODE_H__
+#define __OCTREE_NODE_H__
 
 #include "TAKOEngine/Physics/Collision.h"
 
@@ -159,4 +159,4 @@ private:
 		0, 1, 9, 73, 585, 4681, 37449, 299593
 	};
 };
-#endif // !__Octotree_Node_H__
+#endif // !__OCTREE_NODE_H__

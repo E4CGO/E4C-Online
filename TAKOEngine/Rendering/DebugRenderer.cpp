@@ -1,4 +1,4 @@
-#include <stdio.h>
+ï»¿#include <stdio.h>
 #include <memory>
 #include "Misc.h"
 #include "DebugRenderer.h"
@@ -6,12 +6,12 @@
 
 DebugRenderer::DebugRenderer(ID3D11Device* device)
 {
-	// “ü—ÍƒŒƒCƒAƒEƒg
+	// å…¥åŠ›ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆ
 	D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
-	// ’¸“_ƒVƒF[ƒ_[
+	// é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 	GpuResourceUtils::LoadVertexShader(
 		device,
 		"Data/Shader/DebugVS.cso",
@@ -21,21 +21,21 @@ DebugRenderer::DebugRenderer(ID3D11Device* device)
 		vertexShader.GetAddressOf()
 	);
 
-	// ƒsƒNƒZƒ‹ƒVƒF[ƒ_[
+	// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 	GpuResourceUtils::LoadPixelShader(
 		device,
 		"Data/Shader/DebugPS.cso",
 		pixelShader.GetAddressOf()
 	);
 
-	// ’è”ƒoƒbƒtƒ@
+	// å®šæ•°ãƒãƒƒãƒ•ã‚¡
 	GpuResourceUtils::CreateConstantBuffer(
 		device,
 		sizeof(CbMesh),
 		constantBuffer.GetAddressOf()
 	);
 
-	// ƒuƒŒƒ“ƒhƒXƒe[ƒg
+	// ãƒ–ãƒ¬ãƒ³ãƒ‰ã‚¹ãƒ†ãƒ¼ãƒˆ
 	{
 		D3D11_BLEND_DESC desc;
 		::memset(&desc, 0, sizeof(desc));
@@ -54,7 +54,7 @@ DebugRenderer::DebugRenderer(ID3D11Device* device)
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 
-	// [“xƒXƒeƒ“ƒVƒ‹ƒXƒe[ƒg
+	// æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ã‚¹ãƒ†ãƒ¼ãƒˆ
 	{
 		D3D11_DEPTH_STENCIL_DESC desc;
 		::memset(&desc, 0, sizeof(desc));
@@ -66,7 +66,7 @@ DebugRenderer::DebugRenderer(ID3D11Device* device)
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 
-	// ƒ‰ƒXƒ^ƒ‰ƒCƒU[ƒXƒe[ƒg
+	// ãƒ©ã‚¹ã‚¿ãƒ©ã‚¤ã‚¶ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆ
 	{
 		D3D11_RASTERIZER_DESC desc;
 		::memset(&desc, 0, sizeof(desc));
@@ -85,53 +85,53 @@ DebugRenderer::DebugRenderer(ID3D11Device* device)
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 
-	// ‹…ƒƒbƒVƒ…ì¬
+	// çƒãƒ¡ãƒƒã‚·ãƒ¥ä½œæˆ
 	CreateSphereMesh(device, 1.0f, 16, 16);
 
-	// ‰~’ŒƒƒbƒVƒ…ì¬
+	// å††æŸ±ãƒ¡ãƒƒã‚·ãƒ¥ä½œæˆ
 	CreateCylinderMesh(device, 1.0f, 1.0f, 0.0f, 1.0f, 16, 1);
-	// —§•û‘ÌƒƒbƒVƒ…ì¬
+	// ç«‹æ–¹ä½“ãƒ¡ãƒƒã‚·ãƒ¥ä½œæˆ
 	CreateCubeMesh(device);
 }
 
-// •`‰æŠJn
+// æç”»é–‹å§‹
 void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
-	// ƒVƒF[ƒ_[İ’è
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼è¨­å®š
 	context->VSSetShader(vertexShader.Get(), nullptr, 0);
 	context->PSSetShader(pixelShader.Get(), nullptr, 0);
 	context->IASetInputLayout(inputLayout.Get());
 
-	// ’è”ƒoƒbƒtƒ@İ’è
+	// å®šæ•°ãƒãƒƒãƒ•ã‚¡è¨­å®š
 	context->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
 
-	// ƒŒƒ“ƒ_[ƒXƒe[ƒgİ’è
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆè¨­å®š
 	const float blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	context->OMSetBlendState(blendState.Get(), blendFactor, 0xFFFFFFFF);
 	context->OMSetDepthStencilState(depthStencilState.Get(), 0);
 	context->RSSetState(rasterizerState.Get());
 
-	// ƒrƒ…[ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñì¬
+	// ãƒ“ãƒ¥ãƒ¼ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—ä½œæˆ
 	DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&view);
 	DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&projection);
 	DirectX::XMMATRIX VP = V * P;
 
-	// ƒvƒŠƒ~ƒeƒBƒuİ’è
+	// ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–è¨­å®š
 	UINT stride = sizeof(DirectX::XMFLOAT3);
 	UINT offset = 0;
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
-	// ‹…•`‰æ
+	// çƒæç”»
 	context->IASetVertexBuffers(0, 1, sphereVertexBuffer.GetAddressOf(), &stride, &offset);
 	for (const Sphere& sphere : spheres)
 	{
-		// ƒ[ƒ‹ƒhƒrƒ…[ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñì¬
+		// ãƒ¯ãƒ¼ãƒ«ãƒ‰ãƒ“ãƒ¥ãƒ¼ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—ä½œæˆ
 		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(sphere.radius, sphere.radius, sphere.radius);
 		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(sphere.center.x, sphere.center.y, sphere.center.z);
 		DirectX::XMMATRIX W = S * T;
 		DirectX::XMMATRIX WVP = W * VP;
 
-		// ’è”ƒoƒbƒtƒ@XV
+		// å®šæ•°ãƒãƒƒãƒ•ã‚¡æ›´æ–°
 		CbMesh cbMesh;
 		cbMesh.color = sphere.color;
 		DirectX::XMStoreFloat4x4(&cbMesh.wvp, WVP);
@@ -141,17 +141,17 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
 	}
 	spheres.clear();
 
-	// ‰~’Œ•`‰æ
+	// å††æŸ±æç”»
 	context->IASetVertexBuffers(0, 1, cylinderVertexBuffer.GetAddressOf(), &stride, &offset);
 	for (const Cylinder& cylinder : cylinders)
 	{
-		// ƒ[ƒ‹ƒhƒrƒ…[ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñì¬
+		// ãƒ¯ãƒ¼ãƒ«ãƒ‰ãƒ“ãƒ¥ãƒ¼ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—ä½œæˆ
 		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(cylinder.radius, cylinder.height, cylinder.radius);
 		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(cylinder.position.x, cylinder.position.y, cylinder.position.z);
 		DirectX::XMMATRIX W = S * T;
 		DirectX::XMMATRIX WVP = W * VP;
 
-		// ’è”ƒoƒbƒtƒ@XV
+		// å®šæ•°ãƒãƒƒãƒ•ã‚¡æ›´æ–°
 		CbMesh cbMesh;
 		cbMesh.color = cylinder.color;
 		DirectX::XMStoreFloat4x4(&cbMesh.wvp, WVP);
@@ -161,17 +161,17 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
 	}
 	cylinders.clear();
 
-	// —§•û‘Ì•`‰æ
+	// ç«‹æ–¹ä½“æç”»
 	context->IASetVertexBuffers(0, 1, cubeVertexBuffer.GetAddressOf(), &stride, &offset);
 	for (const Cube& cube : cubes)
 	{
-		// ƒ[ƒ‹ƒhƒrƒ…[ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñì¬
+		// ãƒ¯ãƒ¼ãƒ«ãƒ‰ãƒ“ãƒ¥ãƒ¼ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—ä½œæˆ
 		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(cube.scale.x, cube.scale.y, cube.scale.z);
 		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(cube.position.x, cube.position.y, cube.position.z);
 		DirectX::XMMATRIX W = S * T;
 		DirectX::XMMATRIX WVP = W * VP;
 
-		// ’è”ƒoƒbƒtƒ@XV
+		// å®šæ•°ãƒãƒƒãƒ•ã‚¡æ›´æ–°
 		CbMesh cbMesh;
 		cbMesh.color = cube.color;
 		DirectX::XMStoreFloat4x4(&cbMesh.wvp, WVP);
@@ -182,7 +182,7 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
 	cubes.clear();
 }
 
-// ‹…•`‰æ
+// çƒæç”»
 void DebugRenderer::DrawSphere(const DirectX::XMFLOAT3& center, float radius, const DirectX::XMFLOAT4& color)
 {
 	Sphere sphere;
@@ -199,7 +199,7 @@ void DebugRenderer::DrawSphere(const std::vector<DirectX::XMFLOAT3>& centers, fl
 	}
 }
 
-// ‰~’Œ•`‰æ
+// å††æŸ±æç”»
 void DebugRenderer::DrawCylinder(const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color)
 {
 	Cylinder cylinder;
@@ -210,7 +210,7 @@ void DebugRenderer::DrawCylinder(const DirectX::XMFLOAT3& position, float radius
 	cylinders.emplace_back(cylinder);
 }
 
-// —§•û‘Ì•`‰æ
+// ç«‹æ–¹ä½“æç”»
 void DebugRenderer::DrawCube(const DirectX::XMFLOAT3& position, DirectX::XMFLOAT3& scale, const DirectX::XMFLOAT4& color)
 {
 	Cube cube;
@@ -220,7 +220,17 @@ void DebugRenderer::DrawCube(const DirectX::XMFLOAT3& position, DirectX::XMFLOAT
 	cubes.emplace_back(cube);
 }
 
-// ‹…ƒƒbƒVƒ…ì¬
+// ã‚«ãƒ—ã‚»ãƒ«æç”»
+void DebugRenderer::DrawCapsule(const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color)
+{
+	DrawCylinder(position, radius, height, color);
+	DrawSphere(position, radius, color);
+	DirectX::XMFLOAT3 upPos = position;
+	upPos.y += height;
+	DrawSphere(upPos, radius, color);
+}
+
+// çƒãƒ¡ãƒƒã‚·ãƒ¥ä½œæˆ
 void DebugRenderer::CreateSphereMesh(ID3D11Device* device, float radius, int slices, int stacks)
 {
 	sphereVertexCount = stacks * slices * 2 + slices * stacks * 2;
@@ -274,7 +284,7 @@ void DebugRenderer::CreateSphereMesh(ID3D11Device* device, float radius, int sli
 		}
 	}
 
-	// ’¸“_ƒoƒbƒtƒ@
+	// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡
 	{
 		D3D11_BUFFER_DESC desc = {};
 		D3D11_SUBRESOURCE_DATA subresourceData = {};
@@ -294,7 +304,7 @@ void DebugRenderer::CreateSphereMesh(ID3D11Device* device, float radius, int sli
 	}
 }
 
-// ‰~’ŒƒƒbƒVƒ…ì¬
+// å††æŸ±ãƒ¡ãƒƒã‚·ãƒ¥ä½œæˆ
 void DebugRenderer::CreateCylinderMesh(ID3D11Device* device, float radius1, float radius2, float start, float height, int slices, int stacks)
 {
 	cylinderVertexCount = 2 * slices * (stacks + 1) + 2 * slices;
@@ -345,7 +355,7 @@ void DebugRenderer::CreateCylinderMesh(ID3D11Device* device, float radius1, floa
 		p++;
 	}
 
-	// ’¸“_ƒoƒbƒtƒ@
+	// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡
 	{
 		D3D11_BUFFER_DESC desc = {};
 		D3D11_SUBRESOURCE_DATA subresourceData = {};
@@ -365,7 +375,7 @@ void DebugRenderer::CreateCylinderMesh(ID3D11Device* device, float radius1, floa
 	}
 }
 
-// —§•û‘ÌƒƒbƒVƒ…ì¬
+// ç«‹æ–¹ä½“ãƒ¡ãƒƒã‚·ãƒ¥ä½œæˆ
 void DebugRenderer::CreateCubeMesh(ID3D11Device* device)
 {
 	cubeVertexCount = 24;
@@ -400,7 +410,7 @@ void DebugRenderer::CreateCubeMesh(ID3D11Device* device)
 	p[22] = { -0.5f, -0.5f, +0.5f };
 	p[23] = { -0.5f, -0.5f, -0.5f };
 
-	// ’¸“_ƒoƒbƒtƒ@
+	// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡
 	{
 		D3D11_BUFFER_DESC desc = {};
 		D3D11_SUBRESOURCE_DATA subresourceData = {};

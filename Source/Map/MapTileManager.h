@@ -24,10 +24,13 @@ public:
 	bool VerticalRayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, HitResult& hit);
 
 	// オブジェクトのコリダーを押し戻す
-	bool IntersectColliderVsMap(Collider* collider);
+	//bool IntersectColliderVsMap(Collider* collider);
 
 	// 球の押し戻し
-	bool IntersectSphereVsMap(const DirectX::XMVECTOR& spherePos, float radius);
+	bool IntersectSphereVsMap(Sphere& sphere, bool wallCheck = false);
+
+	// カプセルの押し戻し
+	bool IntersectCapsuleVsMap(Capsule& capsule, bool wallCheck = false);
 
 	// 空間生成
 	void CreateSpatialIndex(uint32_t quadDepth = 1, uint32_t octDepth = 1, DirectX::XMFLOAT3* minPos = nullptr, DirectX::XMFLOAT3* maxPos = nullptr);
@@ -48,19 +51,50 @@ protected:
 	// マップのメッシュを登録(返り値はメッシュの三角形の数)
 	int InsertMapMesh();
 
-	bool SearchChildren(	// 子空間探索
+	// 子空間探索
+	bool SearchChildren(	// レイ探索
 		int Elem,
 		const DirectX::XMFLOAT3& start,
 		const DirectX::XMFLOAT3& direction,
 		float dist,
 		HitResult& result,
 		bool& hit);
-	bool SearchParent(	// 親空間探索
+	bool SearchChildren(	// 球探索
+		int Elem,
+		DirectX::XMVECTOR& spherePos,
+		float radius,
+		bool wallCheck,
+		bool& hit);
+	bool SearchChildren(	// カプセル探索
+		int Elem,
+		DirectX::XMVECTOR& capsulePos,
+		const DirectX::XMVECTOR& direction,
+		float radius,
+		float length,
+		bool wallCheck,
+		bool& hit);
+
+	// 親空間探索
+	bool SearchParent(	// レイ探索
 		int Elem,
 		const DirectX::XMFLOAT3& start,
 		const DirectX::XMFLOAT3& direction,
 		float dist,
 		HitResult& result,
+		bool& hit);
+	bool SearchParent(	// 球探索
+		int Elem,
+		DirectX::XMVECTOR& spherePos,
+		float radius,
+		bool wallCheck,
+		bool& hit);
+	bool SearchParent(	// カプセル探索
+		int Elem,
+		DirectX::XMVECTOR& capsulePos,
+		const DirectX::XMVECTOR& direction,
+		float radius,
+		float length,
+		bool wallCheck,
 		bool& hit);
 
 private:

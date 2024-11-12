@@ -1,7 +1,6 @@
 #pragma once
 
 // writer Matsumura
-#include <iostream>
 
 template< class T>
 class Liner8TreeManager		// 線形8分木配列

@@ -110,7 +110,7 @@ namespace PlayerCharacterState
 
 		PlayerTransition(
 			owner,
-			flag_Fall | flag_Dodge | flag_AttackN | flag_AttackS | flag_Skill_1
+			flag_Fall | flag_Dodge | flag_Ground | flag_AttackN | flag_AttackS | flag_Skill_1
 		);
 	}
 	void JumpState::Exit()

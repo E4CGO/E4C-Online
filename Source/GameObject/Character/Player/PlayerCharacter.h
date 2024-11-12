@@ -181,7 +181,7 @@ public:
 	bool ReleaseSkill4() { return (input & Input_R_Skill_4) > 0; }
 
 	bool IsMove() { return velocity.x != 0.0f || velocity.z != 0.0f; }
-	bool IsFall() { return velocity.y < -2.0f; }
+	bool IsFall() { return velocity.y < -10.0f; }
 
 	void FaceToCamera();
 	void TurnByInput();

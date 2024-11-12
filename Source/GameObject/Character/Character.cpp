@@ -116,10 +116,10 @@ void Character::UpdateVelocity(float elapsedTime)
 		// 水平速力更新処理
 		UpdateHorizontalVelocity(elapsedFrame);
 
-		// 垂直移動更新処理
-		UpdateVerticalMove(elapsedTime);
 		// 水平移動更新処理
 		UpdateHorizontalMove(elapsedTime);
+		// 垂直移動更新処理
+		UpdateVerticalMove(elapsedTime);
 	}
 
 	// 衝突判定更新
@@ -222,13 +222,17 @@ void Character::UpdateVerticalMove(float elapsedTime)
 				OnLanding();
 			}
 			isGround = true;
-			velocity.y = -1.0f;
+			//velocity.y = -1.0f;
+			velocity.y = 0.0f;
 		}
 		else
 		{
 			// 空中に浮いている
 			position.y += my;
-			isGround = false;
+			if (velocity.y < -10.0f)
+			{
+				isGround = false;
+			}
 		}
 	}
 	// 上昇中
@@ -242,7 +246,7 @@ void Character::UpdateVerticalMove(float elapsedTime)
 		if (MAPTILES.RayCast(start, end, hit))
 		{
 			// 地面に接地している
-			position = hit.position;
+			//position = hit.position;
 			// 回転
 			//angle.x += hit.rotation.x;
 			//angle.y += hit.rotation.y;
@@ -273,7 +277,7 @@ void Character::UpdateVerticalMove(float elapsedTime)
 void Character::UpdateHorizontalMove(float elapsedTime)
 {
 	// 水平速力量計算
-	float velocityLengthXZ = sqrtf(velocity.x * velocity.x + velocity.y * velocity.y);
+	float velocityLengthXZ = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);
 	if (velocityLengthXZ > 0.0f)
 	{
 		// 水平移動地
@@ -282,20 +286,30 @@ void Character::UpdateHorizontalMove(float elapsedTime)
 
 		// マップ
 		if (collider != nullptr) {
-			HitResult hit;
-			Collider* col = collider.get();
-			//for (ModelObject*& map : MAPTILES.GetAll())
+			//collider->SetPosition(position + DirectX::XMFLOAT3{ 0, height * 0.5f, 0 } *scale + DirectX::XMFLOAT3{ velocity.x / velocityLengthXZ, 0, velocity.z / velocityLengthXZ } *scale);
+			//collider->SetPosition(position + DirectX::XMFLOAT3{ 0, 0.4f, 0 } + DirectX::XMFLOAT3{ velocity.x / velocityLengthXZ, 0, velocity.z / velocityLengthXZ });
+			//if (!collider->CollisionVsMap(true))
 			//{
-			//	DirectX::XMFLOAT3 direction = { mx, 0, mz };
-			//	if (map->GetCollider()->Collision(col, direction, hit))
+			//	isWall = false;
+				position.x += mx;
+				position.z += mz;
+			//}
+			//else
+			//{
+			//	//collider->SetPosition(position + DirectX::XMFLOAT3{ 0, height * 0.5f, 0 } *scale + DirectX::XMFLOAT3{ mx, 0, mz });
+			//	collider->SetPosition(position + DirectX::XMFLOAT3{ 0, 0.4f, 0 } + DirectX::XMFLOAT3{ mx, 0, mz });
+			//	if (!collider->CollisionVsMap(true))
 			//	{
-			//		hit.normal.y = 0.0f;
-			//		position += hit.normal * hit.distance;
+			//		position.x += mx;
+			//		position.z += mz;
 			//	}
 			//	else
 			//	{
-			position.x += mx;
-			position.z += mz;
+			//		if (!isWall)
+			//		{
+			//			OnWall();
+			//		}
+			//		isWall = true;
 			//	}
 			//}
 		}
