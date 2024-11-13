@@ -1,70 +1,110 @@
+﻿//! @file WidgetDragFloat.cpp
+//! @note 
+
 #include "WidgetDragFloat.h"
 
 #include "TAKOEngine/Runtime/tentacle_lib.h"
 #include "TAKOEngine/Rendering/ResourceManager.h"
 
-WidgetDragBar::WidgetDragBar(float rate) : rate(rate)
+/**************************************************************************//**
+ 	@brief		コンストラクタ
+	@param[in]	rate	初期値%
+*//***************************************************************************/
+WidgetDragBar::WidgetDragBar(float rate) : m_rate(rate)
 {
-	scrollBar = RESOURCE.LoadSpriteResource("Data/Sprites/button_frame.png");
-	scrollBtn = RESOURCE.LoadSpriteResource("Data/Sprites/button2_ready_on.png");
+	m_scrollBar = RESOURCE.LoadSpriteResource("Data/Sprites/button_frame.png");
+	m_scrollBtn = RESOURCE.LoadSpriteResource("Data/Sprites/button2_ready_on.png");
 }
 
+/**************************************************************************//**
+ 	@brief		推し続ける処理
+	@param[in]	なし
+	@return		なし
+*//***************************************************************************/
 void WidgetDragBar::OnPress()
 {
 	DirectX::XMFLOAT2 mousePos = T_INPUT.GetMouseWinPos();
-	rate = (mousePos.x - position.x) / (size.x);
-	T_INPUT.SetCursorWinPositionY(position.y + size.y * 0.5f);
+	m_rate = (mousePos.x - m_position.x) / (m_size.x);
+	T_INPUT.SetCursorWinPositionY(m_position.y + m_size.y * 0.5f);
 }
-
+/**************************************************************************//**
+ 	@brief		描画処理
+	@param[in]	rc	レンダーコンテンツ
+	@return		なし
+*//***************************************************************************/
 void WidgetDragBar::Render(const RenderContext& rc)
 {
-	scrollBar->Render(
+	m_scrollBar->Render(
 		rc.deviceContext,
-		position.x, position.y + size.y * 0.25f, 0,
-		size.x, size.y * 0.5f
+		m_position.x, m_position.y + m_size.y * 0.25f, 0,
+		m_size.x, m_size.y * 0.5f
 	);
 
-	scrollBtn->Render(
+	m_scrollBtn->Render(
 		rc.deviceContext,
-		position.x - size.x * 0.025f + size.x * rate, position.y, 0,
-		size.x * 0.05f, size.y
+		m_position.x - m_size.x * 0.025f + m_size.x * m_rate, m_position.y, 0,
+		m_size.x * 0.05f, m_size.y
 	);
 }
-
-WidgetDragFloat::WidgetDragFloat(const char* label, float* value, float minValue, float maxValue) : label(label), value(value), minValue(minValue), maxValue(maxValue)
+/**************************************************************************//**
+ 	@brief		コンストラクタ
+	@param[in]	label		ラベル
+	@param[in]	value		float値参照ポインタ
+	@param[in]	minValue	最大値
+	@param[in]	maxValue	最小値
+*//***************************************************************************/
+WidgetDragFloat::WidgetDragFloat(const char* label, float* value, float minValue, float maxValue) : m_label(label), m_pValue(value), m_minValue(minValue), m_maxValue(maxValue)
 {
-	bar = new WidgetDragBar((*value - minValue) / (maxValue - minValue));
+	m_pBar = new WidgetDragBar((*value - minValue) / (maxValue - minValue));
 }
 
+/**************************************************************************//**
+ 	@brief		位置を設定
+	@param[in]	position	位置
+	@return		なし
+*//***************************************************************************/
 void WidgetDragFloat::SetPosition(const DirectX::XMFLOAT2& position)
 {
 	Widget::SetPosition(position);
-	bar->SetPosition(position + DirectX::XMFLOAT2{ 0.0f,  size.y * 0.6f });
+	m_pBar->SetPosition(position + DirectX::XMFLOAT2{ 0.0f,  m_size.y * 0.6f });
 }
+/**************************************************************************//**
+ 	@brief		サイズ設定
+	@param[in]	size	サイズ
+	@return		なし
+*//***************************************************************************/
 void WidgetDragFloat::SetSize(const DirectX::XMFLOAT2& size)
 {
 	Widget::SetSize(size);
-	bar->SetSize({ size.x, size.y * 0.3f });
+	m_pBar->SetSize({ size.x, size.y * 0.3f });
 }
-
+/**************************************************************************//**
+ 	@brief		更新処理
+	@param[in]	elapsedTime	経過時間
+	@return		なし
+*//***************************************************************************/
 void WidgetDragFloat::Update(float elapsedTime)
 {
-	bar->Update(elapsedTime);
+	m_pBar->Update(elapsedTime);
 
-	*this->value = minValue + (maxValue - minValue) * bar->GetRate();
+	*this->m_pValue = m_minValue + (m_maxValue - m_minValue) * m_pBar->GetRate();
 }
-
+/**************************************************************************//**
+ 	@brief		描画処理
+	@param[in]	rc	レンダーコンテンツ
+	@return		なし
+*//***************************************************************************/
 void WidgetDragFloat::Render(const RenderContext& rc)
 {
 	T_TEXT.Render(
 		FONT_ID::HGpop,
-		label.c_str(),
-		position.x, position.y,
+		m_label.c_str(),
+		m_position.x, m_position.y,
 		1.0f, 1.0f, 1.0f, 1.0f,
 		0.0f,
 		FONT_ALIGN::TOP_LEFT,
 		0.5f,
 		1
 	);
-	bar->Render(rc);
+	m_pBar->Render(rc);
 }

@@ -77,6 +77,8 @@ void SceneTitle::Initialize()
 		test = std::make_unique<ModelDX12>("Data/Model/Enemy/Goblin.glb");
 		test->PlayAnimation(0, true);
 
+		sky = std::make_unique<ModelDX12>("Data/Model/Cube/Cube.fbx");
+
 		float posX = 0;
 		for (int i = 0; i < 3; ++i)
 		{
@@ -96,6 +98,9 @@ void SceneTitle::Initialize()
 		}
 
 		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/button_agree.png");
+
+		// skydomeテクスチャ
+		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
 	}
 
 	// 光
@@ -198,6 +203,8 @@ void SceneTitle::Update(float elapsedTime)
 		//test->SetTransformMatrix(test_transform);
 		test->UpdateAnimation(elapsedTime);
 		test->UpdateTransform();
+
+		sky->UpdateTransform();
 	}
 
 #ifdef _DEBUG
@@ -252,8 +259,7 @@ void SceneTitle::RenderDX12()
 	{
 		// シーン用定数バッファ更新
 		const Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
-			CameraManager::Instance().GetCamera()
-		);
+			CameraManager::Instance().GetCamera());
 
 		// レンダーコンテキスト設定
 		RenderContextDX12 rc;
@@ -268,7 +274,15 @@ void SceneTitle::RenderDX12()
 
 			//スキニング
 			test->UpdateFrameResource(test_transform);
+			sky->UpdateFrameResource(test_transform);
 			m_skinning_pipeline->Compute(rc, test.get());
+
+			// skyBox
+			{
+				rc.skydomeData.skyTexture = m_sprites[1]->GetDescriptor();
+				ModelShaderDX12* shader = T_GRAPHICS.GetModelShaderDX12(ModelShaderDX12Id::Skydome);
+				shader->Render(rc, sky.get());
+			}
 
 			// モデル描画
 			ModelShaderDX12* shader = T_GRAPHICS.GetModelShaderDX12(ModelShaderDX12Id::ToonInstancing);

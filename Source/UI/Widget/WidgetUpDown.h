@@ -23,7 +23,7 @@ public:
 
 	void Render(const RenderContext& rc) override;
 
-	void OnPress() override;
+	void OnClick() override;
 
 	uint8_t* GetValue() { return value; }
 private:
@@ -47,7 +47,7 @@ public:
 
 	void Render(const RenderContext& rc) override;
 
-	void OnPress() override;
+	void OnClick() override;
 
 	uint8_t* GetValue() { return value; }
 private:

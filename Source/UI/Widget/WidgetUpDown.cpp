@@ -1,5 +1,7 @@
-#include "WidgetUpDown.h"
+//! @file WidgetUpDown.cpp
+//! @note 
 
+#include "WidgetUpDown.h"
 #include "TAKOEngine/Runtime/tentacle_lib.h"
 #include "TAKOEngine/Rendering/ResourceManager.h"
 
@@ -25,15 +27,15 @@ void WidgetArrowLeft::Render(const RenderContext& rc)
 {
 	btn->Render(
 		rc.deviceContext,
-		position.x, position.y, 0,
-		size.x, size.y
+		m_position.x, m_position.y, 0,
+		m_size.x, m_size.y
 	);
 }
 
 /**************************************************************************//**
 	 @brief	値を変更関数
 *//***************************************************************************/
-void WidgetArrowLeft::OnPress()
+void WidgetArrowLeft::OnClick()
 {
 	if (*value == 0)
 	{
@@ -67,15 +69,15 @@ void WidgetArrowRight::Render(const RenderContext& rc)
 {
 	btn->Render(
 		rc.deviceContext,
-		position.x, position.y, 0,
-		size.x, size.y
+		m_position.x, m_position.y, 0,
+		m_size.x, m_size.y
 	);
 }
 
 /**************************************************************************//**
 	 @brief	値を変更関数
 *//***************************************************************************/
-void WidgetArrowRight::OnPress()
+void WidgetArrowRight::OnClick()
 {
 	if (*value == 255)
 	{
@@ -87,11 +89,11 @@ void WidgetArrowRight::OnPress()
 }
 
 /**************************************************************************//**
-	 @brief			コンストラクタ
-	@param[in]    label		名前
-	@param[in]    uvalue	値
-	@param[in]    minValue	最低値
-	@param[in]    maxValue	最大値
+	@brief		コンストラクタ
+	@param[in]	label		名前
+	@param[in]	uvalue	値
+	@param[in]	minValue	最低値
+	@param[in]	maxValue	最大値
 *//***************************************************************************/
 WidgetUpDown::WidgetUpDown(const char* label, uint8_t* uvalue, uint8_t minValue, uint8_t maxValue) : label(label), uvalue(uvalue)
 {
@@ -106,8 +108,8 @@ WidgetUpDown::WidgetUpDown(const char* label, uint8_t* uvalue, uint8_t minValue,
 void WidgetUpDown::SetPosition(const DirectX::XMFLOAT2& position)
 {
 	Widget::SetPosition(position);
-	m_ArrowLeft->SetPosition(position + DirectX::XMFLOAT2{ 0.0f,  size.y });
-	m_ArrowRight->SetPosition(position + DirectX::XMFLOAT2{ size.x,  size.y });
+	m_ArrowLeft->SetPosition(position + DirectX::XMFLOAT2{ 0.0f,  m_size.y });
+	m_ArrowRight->SetPosition(position + DirectX::XMFLOAT2{ m_size.x,  m_size.y });
 }
 
 /**************************************************************************//**
@@ -142,7 +144,7 @@ void WidgetUpDown::Render(const RenderContext& rc)
 	T_TEXT.Render(
 		FONT_ID::HGpop,
 		label.c_str(),
-		position.x, position.y,
+		m_position.x, m_position.y,
 		1.0f, 1.0f, 1.0f, 1.0f,
 		0.0f,
 		FONT_ALIGN::TOP_LEFT,

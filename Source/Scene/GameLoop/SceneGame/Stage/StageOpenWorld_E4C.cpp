@@ -27,11 +27,6 @@ void StageOpenWorld_E4C::Initialize()
 
 	map = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 2.5f, ModelObject::RENDER_MODE::DX11GLTF);
 
-	const PlayerCharacterData::CharacterInfo info = PlayerCharacterData::Instance().GetCurrentCharacter();
-	PlayerCharacter* player = PlayerCharacterManager::Instance().UpdatePlayerData(0, "", info.Character.pattern);
-	player->SetPosition({ 5,	10, 5 });
-	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::State::Idle));
-
 	teleporter = std::make_unique<Teleporter>("Data/Model/Cube/testCubes.glb", 1.0);
 	teleporter->SetPosition({ 50, 0, 60 });
 
@@ -64,6 +59,10 @@ void StageOpenWorld_E4C::Initialize()
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
 
+	// プレイヤー
+	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
+	player->SetPosition({ 5.0f, 5.0f, 5.0f });
+
 	// カメラ設定
 	Camera* mainCamera = CameraManager::Instance().GetCamera();
 	mainCamera->SetPerspectiveFov(
@@ -73,10 +72,11 @@ void StageOpenWorld_E4C::Initialize()
 		10000.0f													// ファークリップ
 	);
 	mainCamera->SetLookAt(
-		{ 0, 5.0f, 10.0f },		// 視点
-		{ 0, 0, 0 },			// 注視点
+		{ 0, 5.0f, 5.0f },		// 視点
+		player->GetPosition(),			// 注視点
 		{ 0, 0.969f, -0.248f }	// 上ベクトル
 	);
+
 
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(mainCamera);

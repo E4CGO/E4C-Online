@@ -1,19 +1,29 @@
-#include "WidgetImage.h"
+﻿//! @file WidgetImage.cpp
+//! @note 
 
+#include "WidgetImage.h"
 #include "TAKOEngine/Rendering/ResourceManager.h"
 
+/**************************************************************************//**
+ 	@brief		コンストラクタ
+	@param[in]	filename ファイル名前
+*//***************************************************************************/
 WidgetImage::WidgetImage(const char* filename)
 {
-	sprite = RESOURCE.LoadSpriteResource(filename);
+	m_pSprite = RESOURCE.LoadSpriteResource(filename);
 }
 
+/**************************************************************************//**
+ 	@brief		描画処理
+	@param[in]	rc
+*//***************************************************************************/
 void WidgetImage::Render(const RenderContext& rc)
 {
-	sprite->Render(
+	m_pSprite->Render(
 		rc.deviceContext,
-		position.x, position.y, 0,
-		size.x, size.y,
-		angle,
-		color.x, color.y, color.z, color.w
+		m_position.x, m_position.y, 0,
+		m_size.x, m_size.y,
+		m_angle,
+		m_color.x, m_color.y, m_color.z, m_color.w
 	);
 }

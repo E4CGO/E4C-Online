@@ -1,5 +1,5 @@
-#include	"../Lighting/Light.hlsli"
-#include "Constants.hlsli"
+#include "../Lighting/Light.hlsli"
+#include "../Model/Constants.hlsli"
 
 struct VS_OUT
 {
@@ -44,5 +44,16 @@ cbuffer CbMaterial : register(b2)
                   DescriptorTable(CBV(b1), visibility=SHADER_VISIBILITY_VERTEX), \
                   DescriptorTable(CBV(b2), visibility=SHADER_VISIBILITY_ALL), \
                   DescriptorTable(SRV(t0), visibility=SHADER_VISIBILITY_PIXEL), \
-                  DescriptorTable(SRV(t1), visibility=SHADER_VISIBILITY_PIXEL), \
-                  DescriptorTable(Sampler(s0), visibility=SHADER_VISIBILITY_PIXEL)"
+                  StaticSampler(s0 ,\
+                  filter = FILTER_MIN_MAG_MIP_LINEAR,\
+                  addressU = TEXTURE_ADDRESS_WRAP,\
+                  addressV = TEXTURE_ADDRESS_WRAP,\
+                  addressW = TEXTURE_ADDRESS_WRAP,\
+                  mipLodBias = 0.0f,\
+                  maxAnisotropy = 1,\
+                  comparisonFunc  = COMPARISON_NEVER,\
+                  borderColor = STATIC_BORDER_COLOR_TRANSPARENT_BLACK,\
+                  minLOD = 0.0f,\
+                  maxLOD = 3.402823466e+38f,\
+                  space  =  0,\
+                  visibility = SHADER_VISIBILITY_PIXEL\)"

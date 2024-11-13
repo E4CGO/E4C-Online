@@ -1,4 +1,4 @@
-#include "WidgetMenu.h"
+Ôªø#include "WidgetMenu.h"
 
 #include "TAKOEngine/Runtime/tentacle_lib.h"
 #include "TAKOEngine/Rendering/ResourceManager.h"
@@ -12,18 +12,18 @@
 WidgetMenu::WidgetMenu()
 {
 	background = RESOURCE.LoadSpriteResource("Data/Sprites/big_background.png");
-	size = background->GetTextureSize();
-	// çÇÇ≥Çï“èW
-	float rate = SCREEN_H / size.y; // ägëÂèkè¨ó¶
-	size = size * rate;
+	m_size = background->GetTextureSize();
+	// È´ò„Åï„ÇíÁ∑®ÈõÜ
+	float rate = SCREEN_H / m_size.y; // Êã°Â§ßÁ∏ÆÂ∞èÁéá
+	m_size = m_size * rate;
 
-	position.x = -size.x; // ç∂Ç…âBÇ∑
+	m_position.x = -m_size.x; // Â∑¶„Å´Èö†„Åô
 
-	options.push_back(new WidgetButtonText("ÉIÉvÉVÉáÉì", [&](Widget*) {
+	options.push_back(new WidgetButtonText("„Ç™„Éó„Ç∑„Éß„É≥", [&](Widget*) {
 		if (this->settingWindow == nullptr) this->settingWindow = new WidgetSettingWindow;
 		}));
 
-	options.push_back(new WidgetButtonText("É^ÉCÉgÉãâÊñ Ç÷", [&](Widget*) {
+	options.push_back(new WidgetButtonText("„Çø„Ç§„Éà„É´ÁîªÈù¢„Å∏", [&](Widget*) {
 		SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTitle));
 		}));
 }
@@ -62,19 +62,19 @@ DirectX::XMFLOAT2 WidgetMenu::GetOptionsSize()
 
 void WidgetMenu::Update(float elapsedTime)
 {
-	if (enable && position.x < 0) // ç∂Ç©ÇÁèoåª
+	if (enable && m_position.x < 0) // Â∑¶„Åã„ÇâÂá∫Áèæ
 	{
-		position.x += elapsedTime * (size.x / moveSpeed); // 1ïbÇ≈èoåª
-		if (position.x > 0) position.x = 0.0f;
+		m_position.x += elapsedTime * (m_size.x / moveSpeed); // 1Áßí„ÅßÂá∫Áèæ
+		if (m_position.x > 0) m_position.x = 0.0f;
 	}
-	if (!enable && position.x > -size.x) // ç∂Ç…è¡Ç¶ÇÈ
+	if (!enable && m_position.x > -m_size.x) // Â∑¶„Å´Ê∂à„Åà„Çã
 	{
-		position.x -= elapsedTime * (size.x / moveSpeed); // 1ïbÇ≈è¡Ç¶ÇÈ
-		if (position.x < -size.x) position.x = -size.x;
+		m_position.x -= elapsedTime * (m_size.x / moveSpeed); // 1Áßí„ÅßÊ∂à„Åà„Çã
+		if (m_position.x < -m_size.x) m_position.x = -m_size.x;
 	}
 
 	DirectX::XMFLOAT2 optionSize = GetOptionsSize();
-	DirectX::XMFLOAT2 optionPosition = position + ((size - optionSize) * 0.5f);
+	DirectX::XMFLOAT2 optionPosition = m_position + ((m_size - optionSize) * 0.5f);
 	for (WidgetButton*& option : options)
 	{
 		option->SetPosition(optionPosition);
@@ -95,12 +95,12 @@ void WidgetMenu::Render(const RenderContext& rc)
 {
 	T_TEXT.End();
 	T_TEXT.Begin();
-	if (position.x > -size.x)
+	if (m_position.x > -m_size.x)
 	{
 		background->Render(
 			rc.deviceContext,
-			position.x, position.y, 0,
-			size.x, size.y,
+			m_position.x, m_position.y, 0,
+			m_size.x, m_size.y,
 			20.0f, 20.0f,
 			2008, 3012,
 			0.0f,

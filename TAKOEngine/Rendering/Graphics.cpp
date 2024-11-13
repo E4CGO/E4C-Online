@@ -26,7 +26,7 @@
 Graphics* Graphics::s_instance = nullptr;
 
 //******************************************************************
-// @class     デストラクタ
+// @brief     デストラクタ
 // @param[in] なし
 // @return    なし
 //******************************************************************
@@ -36,7 +36,7 @@ Graphics::~Graphics()
 }
 
 //******************************************************************
-// @class     DX12の終了
+// @brief     DX12の終了
 // @param[in] なし
 // @return    なし
 //******************************************************************
@@ -105,7 +105,7 @@ void Graphics::FinishDX12()
 }
 
 //******************************************************************
-// @class     初期化
+// @brief     初期化
 // @param[in] hWnd　        HWND
 // @param[in] buffer_count  バッファの数
 // @return    なし
@@ -513,6 +513,7 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::PhongInstancing)]   = std::make_unique<PhongShaderDX12>(m_d3d_device.Get(), true);
 	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Toon)]              = std::make_unique<ToonShaderDX12>(m_d3d_device.Get());
 	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::ToonInstancing)]    = std::make_unique<ToonShaderDX12>(m_d3d_device.Get(), true);
+	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Skydome)]           = std::make_unique<SkydomeShaderDX12>(m_d3d_device.Get());
 
 	// スプライトシェーダー生成
 	spriteShaders[static_cast<int>(SpriteShaderId::Default)]             = std::make_unique<DefaultSpriteShader>(device.Get());
@@ -540,7 +541,7 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 }
 
 //******************************************************************
-// @class     画面表示
+// @brief     画面表示
 // @param[in] syncInterval　  垂直同期
 // @return    なし
 //******************************************************************
@@ -550,7 +551,7 @@ void Graphics::Present(UINT syncInterval)
 }
 
 //******************************************************************
-// @class     スクリーン作成取得
+// @brief     スクリーン作成取得
 // @param[in] worldPosition　  ワールド座標系での位置
 // @param[in] viewport         ビューポート情報
 // @param[in] View             ビュー行列
@@ -583,7 +584,7 @@ DirectX::XMFLOAT3 Graphics::GetScreenPosition(
 }
 
 //******************************************************************
-// @class     スクリーン作成取得
+// @brief     スクリーン作成取得
 // @param[in] worldPosition　  ワールド座標系での位置
 // @return    DirectX::XMFLOAT3
 //******************************************************************
@@ -603,7 +604,7 @@ DirectX::XMFLOAT3 Graphics::GetScreenPosition(const DirectX::XMFLOAT3 worldPosit
 }
 
 //******************************************************************
-// @class     描画開始
+// @brief     描画開始
 // @param[in] なし
 // @return    なし
 //******************************************************************
@@ -640,7 +641,7 @@ void Graphics::BeginRender()
 }
 
 //******************************************************************
-// @class     描画終了
+// @brief     描画終了
 // @param[in] なし
 // @return    なし
 //******************************************************************
@@ -654,7 +655,7 @@ void Graphics::End()
 }
 
 //******************************************************************
-// @class     描画コマンド実行完了まで待つ
+// @brief     描画コマンド実行完了まで待つ
 // @param[in] なし
 // @return    なし
 //******************************************************************
@@ -665,7 +666,7 @@ void Graphics::WaitIdle()
 }
 
 //******************************************************************
-// @class     描画コマンド実行完了まで待つ
+// @brief     描画コマンド実行完了まで待つ
 // @param[in] command_queue　コマンドキュー
 // @return    なし
 //******************************************************************
@@ -683,7 +684,7 @@ void Graphics::WaitIdle(CommandQueue& command_queue)
 }
 
 //******************************************************************
-// @class     描画実行
+// @brief     描画実行
 // @param[in] なし
 // @return    なし
 //******************************************************************
@@ -692,7 +693,6 @@ void Graphics::Execute()
 	// コマンド実行
 	ID3D12CommandList* d3d_command_lists[] =
 	{
-		//frame_resource.d3d_command_list.Get()
 		d3d_command_list.Get(),
 	};
 
@@ -707,7 +707,7 @@ void Graphics::Execute()
 
 //TODO : UpdataConstantBuffer
 //******************************************************************
-// @class     コンスタントバッファ更新
+// @brief     コンスタントバッファ更新
 // @param[in] camera　カメラ
 // @return    const Descriptor*
 //******************************************************************
@@ -715,11 +715,9 @@ const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera)
 {
 	LightManager& ligtManager = LightManager::Instance();
 
-	DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&camera->GetView());
-	DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&camera->GetProjection());
-	DirectX::XMMATRIX ViewProjection = DirectX::XMMatrixMultiply(View, Projection);
-	DirectX::XMStoreFloat4x4(&cb_scene_data->view_projection, ViewProjection);
-
+	cb_scene_data->view = camera->GetView();
+	cb_scene_data->projection = camera->GetProjection();
+	
 	// カメラ
 	cb_scene_data->camera_position.x = camera->GetEye().x;
 	cb_scene_data->camera_position.y = camera->GetEye().y;
@@ -780,7 +778,7 @@ const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera)
 }
 
 //******************************************************************
-// @class     フレームバッファ用のレンダリングターゲットビューを作成
+// @brief     フレームバッファ用のレンダリングターゲットビューを作成
 // @param[in] なし
 // @return    なし
 //******************************************************************
@@ -797,7 +795,7 @@ void Graphics::CreateRTVForFameBuffer()
 }
 
 //******************************************************************
-// @class     フレームバッファ用の深度ステンシルビューを作成
+// @brief     フレームバッファ用の深度ステンシルビューを作成
 // @param[in] frameBufferWidth　　幅
 // @param[in] frameBufferHeight   高さ
 // @return    なし
@@ -847,7 +845,7 @@ void Graphics::CreateDSVForFrameBuffer(UINT frameBufferWidth, UINT frameBufferHe
 }
 
 //******************************************************************
-// @class     フレームバッファ用のコンスタントバッファを作成
+// @brief     フレームバッファ用のコンスタントバッファを作成
 // @param[in] なし
 // @return    なし
 //******************************************************************
@@ -898,7 +896,7 @@ void Graphics::CreateConstantBuffer()
 }
 
 //******************************************************************
-// @class     コマンドリストとコマンドアロケーターの作成
+// @brief     コマンドリストとコマンドアロケーターの作成
 // @param[in] なし
 // @return    なし
 //******************************************************************
@@ -922,7 +920,7 @@ void Graphics::CreateCommand()
 }
 
 //******************************************************************
-// @class     テクスチャ読み込み
+// @brief     テクスチャ読み込み
 // @param[in] filename　　    ファイル名
 // @param[in] d3d_resource    ID3D12Resource**
 // @return    HRESULT
@@ -961,7 +959,65 @@ HRESULT Graphics::LoadTexture(const char* filename, ID3D12Resource** d3d_resourc
 }
 
 //******************************************************************
-// @class     テクスチャ作成
+// @brief     キューブマップ用テクスチャ読み込み
+// @param[in] filename　　    ファイル名
+// @param[in] d3d_resource    ID3D12Resource**
+// @return    HRESULT
+//******************************************************************
+HRESULT Graphics::LoadCubeTexture(const std::wstring& filename, ID3D12Resource** d3d_resource)
+{
+	DirectX::ScratchImage image;
+	HRESULT hr = DirectX::LoadFromDDSFile(filename.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, image);
+	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+	// テクスチャリソースのメタデータを取得し、キューブマップか確認
+	const DirectX::TexMetadata& metadata = image.GetMetadata();
+	assert(metadata.IsCubemap());
+
+	// テクスチャリソースの設定
+    D3D12_RESOURCE_DESC textureDesc = {};
+    textureDesc.Dimension        = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    textureDesc.Width            = static_cast<UINT>(metadata.width);
+    textureDesc.Height           = static_cast<UINT>(metadata.height);
+    textureDesc.DepthOrArraySize = static_cast<UINT>(metadata.arraySize); // キューブマップの6面
+    textureDesc.MipLevels        = static_cast<UINT>(metadata.mipLevels);
+    textureDesc.Format           = metadata.format;
+    textureDesc.SampleDesc.Count = 1;
+    textureDesc.Flags            = D3D12_RESOURCE_FLAG_NONE;
+    textureDesc.Layout           = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+
+	// ヒーププロパティ（デフォルトヒープ）を設定
+	D3D12_HEAP_PROPERTIES heapProps = {};
+	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+	// テクスチャリソースを作成
+	hr = m_d3d_device->CreateCommittedResource(
+		&heapProps,
+		D3D12_HEAP_FLAG_NONE,
+		&textureDesc,
+		D3D12_RESOURCE_STATE_COPY_DEST,
+		nullptr,
+		IID_PPV_ARGS(d3d_resource));
+	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+	// サブリソースデータの準備
+	std::vector<D3D12_SUBRESOURCE_DATA> subresources(6); // キューブマップの6面分
+	const DirectX::Image* images = image.GetImages();
+	for (UINT i = 0; i < 6; i++)
+	{
+		subresources[i].pData = images[i].pixels;
+		subresources[i].RowPitch = images[i].rowPitch;
+		subresources[i].SlicePitch = images[i].slicePitch;
+	}
+
+	// CopyImageForCubeMapを呼び出してデータをコピー
+	hr = CopyImageForCubeMap(subresources.data(), metadata.width, metadata.height, metadata.format, *d3d_resource);
+	
+	return hr;
+}
+
+//******************************************************************
+// @brief     テクスチャ作成
 // @param[in] pixels　　    ピクセル
 // @param[in] width         幅
 // @param[in] height        高さ
@@ -1008,7 +1064,7 @@ HRESULT Graphics::CreateTexture(const BYTE* pixels, UINT width, UINT height, DXG
 }
 
 //******************************************************************
-// @class     ダミーテクスチャ生成
+// @brief     ダミーテクスチャ生成
 // @param[in] d3d_resource    ID3D12Resource**
 // @return    HRESULT
 //******************************************************************
@@ -1066,7 +1122,7 @@ HRESULT Graphics::CreateDummyTexture(ID3D12Resource** d3d_resource)
 }
 
 //******************************************************************
-// @class     バッファコピー
+// @brief     バッファコピー
 // @param[in] d3d_src_resource    シェーダーリソース
 // @param[in] d3d_dst_resource    デプスステンシルビューリソース
 // @return    HRESULT
@@ -1105,7 +1161,7 @@ HRESULT Graphics::CopyBuffer(ID3D12Resource* d3d_src_resource, ID3D12Resource* d
 }
 
 //******************************************************************
-// @class     イメージコピー
+// @brief     イメージコピー
 // @param[in] pixels　　    ピクセル
 // @param[in] width         幅
 // @param[in] height        高さ
@@ -1153,8 +1209,7 @@ HRESULT Graphics::CopyImage(const BYTE* pixels, UINT width, UINT height, DXGI_FO
 		&d3d_resource_desc,
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
-		IID_PPV_ARGS(d3d_upload_resource.GetAddressOf())
-	);
+		IID_PPV_ARGS(d3d_upload_resource.GetAddressOf()));
 	if (FAILED(hr))
 	{
 		return hr;
@@ -1221,7 +1276,116 @@ HRESULT Graphics::CopyImage(const BYTE* pixels, UINT width, UINT height, DXGI_FO
 }
 
 //******************************************************************
-// @class     ビットあたりのピクセル数
+// @brief     キューブマップ用イメージコピー
+// @param[in] pixels　　    ピクセル
+// @param[in] width         幅
+// @param[in] height        高さ
+// @param[in] format        フォーマット
+// @param[in] d3d_resource  ID3D12Resource*
+// @return    HRESULT
+//******************************************************************
+HRESULT Graphics::CopyImageForCubeMap(const D3D12_SUBRESOURCE_DATA* subresources, UINT width, UINT height, DXGI_FORMAT format, ID3D12Resource* d3d_resource)
+{
+	HRESULT hr = S_OK;
+
+	// ビット単位のピッチとメモリアライメントを計算
+	UINT bpp = BitsPerPixel(format);
+	UINT rowPitch = (width * bpp) >> 3;
+	UINT uploadPitch = (rowPitch + D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u) & ~(D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u);
+	UINT uploadSize = height * uploadPitch * 6;  // 6面分のメモリを確保 
+
+	// アップロード用リソースの作成
+	Microsoft::WRL::ComPtr<ID3D12Resource> d3d_upload_resource;
+	{
+		D3D12_HEAP_PROPERTIES heapProps = {};
+		heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+
+		D3D12_RESOURCE_DESC uploadResourceDesc = {};
+		uploadResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		uploadResourceDesc.Width = uploadSize;
+		uploadResourceDesc.Height = 1;
+		uploadResourceDesc.DepthOrArraySize = 1;
+		uploadResourceDesc.MipLevels = 1;
+		uploadResourceDesc.Format = DXGI_FORMAT_UNKNOWN;
+		uploadResourceDesc.SampleDesc.Count = 1;
+		uploadResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+
+		hr = m_d3d_device->CreateCommittedResource(
+			&heapProps,
+			D3D12_HEAP_FLAG_NONE,
+			&uploadResourceDesc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(d3d_upload_resource.GetAddressOf()));
+		if (FAILED(hr)) return hr;
+	}
+
+	// アップロード用リソースのマッピングとデータコピー
+	{
+		void* mapped = nullptr;
+		D3D12_RANGE readRange = { 0, uploadSize }; // 読み取り範囲を指定しない
+		hr = d3d_upload_resource->Map(0, &readRange, &mapped);
+		if (FAILED(hr)) return hr;
+
+		for (UINT faceIndex = 0; faceIndex < 6; faceIndex++)
+		{
+			memcpy(static_cast<BYTE*>(mapped) + faceIndex * height * uploadPitch,
+				subresources[faceIndex].pData,
+				subresources[faceIndex].SlicePitch); // SlicePitchを使って各面のデータをコピー
+		}
+		d3d_upload_resource->Unmap(0, &readRange);
+	}
+
+	// テクスチャの各面にデータをコピー
+	for (UINT faceIndex = 0; faceIndex < 6; faceIndex++) 
+	{
+		D3D12_TEXTURE_COPY_LOCATION srcLocation = {};
+		srcLocation.pResource = d3d_upload_resource.Get();
+		srcLocation.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+		srcLocation.PlacedFootprint.Offset = faceIndex * height * uploadPitch;
+		srcLocation.PlacedFootprint.Footprint.Format = format;
+		srcLocation.PlacedFootprint.Footprint.Width = width;
+		srcLocation.PlacedFootprint.Footprint.Height = height;
+		srcLocation.PlacedFootprint.Footprint.Depth = 1;
+		srcLocation.PlacedFootprint.Footprint.RowPitch = uploadPitch;
+
+		D3D12_TEXTURE_COPY_LOCATION destLocation = {};
+		destLocation.pResource = d3d_resource;
+		destLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+		destLocation.SubresourceIndex = faceIndex;
+
+		// コピーコマンドの発行
+		m_d3d_resource_command_list->CopyTextureRegion(&destLocation, 0, 0, 0, &srcLocation, nullptr);
+	}
+
+	// リソースバリアを設定
+	D3D12_RESOURCE_BARRIER barrier = {};
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier.Transition.pResource = d3d_resource;
+	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+
+	m_d3d_resource_command_list->ResourceBarrier(1, &barrier);
+	m_d3d_resource_command_list->Close();
+
+	// コマンドリストの実行
+	ID3D12CommandList* commandLists[] = { m_d3d_resource_command_list.Get() };
+	m_resource_queue.d3d_command_queue->ExecuteCommandLists(_countof(commandLists), commandLists);
+
+	// コマンド完了まで待機
+	WaitIdle(m_resource_queue);
+
+	// コマンドリストのリセット
+	m_d3d_resource_command_allocator->Reset();
+	m_d3d_resource_command_list->Reset(m_d3d_resource_command_allocator.Get(), nullptr);
+
+	return S_OK;
+}
+
+//******************************************************************
+// @brief     ビットあたりのピクセル数
 // @param[in] fmt    　フォーマット
 // @return    UINT
 //******************************************************************

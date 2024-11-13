@@ -66,6 +66,7 @@ public:
 	//! コンストラクタ
 	SpriteDX12(UINT sprite_count, const char* filename = nullptr);
 	SpriteDX12(UINT sprite_count, FrameBufferTexture* frameBuffer);
+	SpriteDX12(UINT sprite_count, const std::wstring& filename);
 
 	//! デストラクタ
 	~SpriteDX12();

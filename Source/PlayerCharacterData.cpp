@@ -22,10 +22,10 @@ PlayerCharacterData::PlayerCharacterData()
 
 /**************************************************************************//**
 	@brief		プレイヤーキャラクターに外見設定を実装する
-	@param[in]	player			プレイヤー参照ポインタ
+	@param[in]	chara			プレイヤー参照ポインタ
 	@param[in]	appearance_idx	外見インデックス
 	@param[in]	pattern_idx		外見パターン
-	@retrun		なし
+	@return		なし
 *//***************************************************************************/
 void PlayerCharacterData::LoadAppearance(Character* chara, uint8_t appearance_idx, uint8_t pattern_idx)
 {
@@ -35,9 +35,9 @@ void PlayerCharacterData::LoadAppearance(Character* chara, uint8_t appearance_id
 }
 
 /**************************************************************************//**
-	@brief		// 外見パターンをクリア
+	@brief		外見パターンをクリア
 	@param[in]	なし
-	@retrun		なし
+	@return		なし
 *//***************************************************************************/
 void PlayerCharacterData::ClearAppearancePatterns()
 {

@@ -1,4 +1,4 @@
-#include "WidgetGem.h"
+ï»¿#include "WidgetGem.h"
 
 #undef _WINSOCKAPI_
 #define _WINSOCKAPI_
@@ -22,10 +22,10 @@ WidgetGem::WidgetGem() : WidgetButtonImage("", "Data/Sprites/barmid_ready.png", 
 		this->enable = false;
 	})
 {
-	chargeBtn = new WidgetButtonText("ƒ`ƒƒ[ƒW", [&](Widget*) {
+	chargeBtn = new WidgetButtonText("ãƒãƒ£ãƒ¼ã‚¸", [&](Widget*) {
 		ShellExecute(0, 0, Encode::string_to_wstring(URL(Url::CHARGE_PAGE)).c_str(), 0, 0, SW_SHOW);
 		});
-	size = { 300.0f, 150.0f };
+	m_size = { 300.0f, 150.0f };
 	gem = RESOURCE.LoadSpriteResource("Data/Sprites/gem.png");
 }
 
@@ -33,7 +33,7 @@ void WidgetGem::Update(float elapsedTime)
 {
 	WidgetButtonImage::Update(elapsedTime);
 
-	chargeBtn->SetPosition({ position.x, position.y - chargeBtn->GetSize().y });
+	chargeBtn->SetPosition({ m_position.x, m_position.y - chargeBtn->GetSize().y });
 	chargeBtn->Update(elapsedTime);
 	if (xhr != nullptr)
 	{
@@ -56,13 +56,13 @@ void WidgetGem::Render(const RenderContext& rc)
 	WidgetButtonImage::Render(rc);
 	chargeBtn->Render(rc);
 
-	// “Ç‚Ýž‚ÝŠ®—¹
+	// èª­ã¿è¾¼ã¿å®Œäº†
 	if (xhr == nullptr)
 	{
 		gem->Render(
 			rc.deviceContext,
-			position.x * 1.1f, position.y + size.y * 0.05f, 0,
-			size.y * 0.9f, size.y * 0.9f
+			m_position.x * 1.1f, m_position.y + m_size.y * 0.05f, 0,
+			m_size.y * 0.9f, m_size.y * 0.9f
 		);
 
 		std::string count = " x ";
@@ -70,7 +70,7 @@ void WidgetGem::Render(const RenderContext& rc)
 		T_TEXT.Render(
 			FONT_ID::MsGothic,
 			count.c_str(),
-			position.x * 1.1f + size.y * 0.8f, position.y + size.y / 2.0f,
+			m_position.x * 1.1f + m_size.y * 0.8f, m_position.y + m_size.y / 2.0f,
 			1.0f, 1.0f, 1.0f, 1.0f,
 			0,
 			FONT_ALIGN::LEFT,
