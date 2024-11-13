@@ -361,11 +361,11 @@ void ModelResource::LoadGLTF(ID3D11Device* device, std::string filename)
 			scene.nodes = gltf_model.scenes.at(0).nodes;
 		}
 
-		gltf_model::fetch_nodes(gltf_model, newNodes, newScenes);
-		gltf_model::fetch_meshes(device, gltf_model, newMeshes);
-		gltf_model::fetch_materials(device, gltf_model, newMaterials, newMaterialsRV);
-		gltf_model::fetch_textures(device, gltf_model, newTextures, newTextureRV, newImages, filename);
-		gltf_model::fetch_animations(gltf_model, newSkins, newAnimations);
+		GLTFImporter::fetch_nodes(gltf_model, newNodes, newScenes);
+		GLTFImporter::fetch_meshes(device, gltf_model, newMeshes);
+		GLTFImporter::fetch_materials(device, gltf_model, newMaterials, newMaterialsRV);
+		GLTFImporter::fetch_textures(device, gltf_model, newTextures, newTextureRV, newImages, filename);
+		GLTFImporter::fetch_animations(gltf_model, newSkins, newAnimations);
 	}
 }
 

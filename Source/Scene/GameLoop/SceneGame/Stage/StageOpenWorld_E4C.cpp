@@ -21,14 +21,11 @@ void StageOpenWorld_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
 
-	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
+	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.025f);
 	stage_collision->Update(0);
 	MAPTILES.Register(stage_collision);
 
 	map = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 2.5f, ModelObject::RENDER_MODE::DX11GLTF);
-
-	door = std::make_unique<ModelObject>("Data/Model/Stage/Doorway_Parent_006.glb", 2.5f, ModelObject::RENDER_MODE::DX11GLTF);
-	floor = std::make_unique<ModelObject>("Data/Model/Stage/Floor_Plain_Parent.glb", 2.5f, ModelObject::RENDER_MODE::DX11GLTF);
 
 	const PlayerCharacterData::CharacterInfo info = PlayerCharacterData::Instance().GetCurrentCharacter();
 	PlayerCharacter* player = PlayerCharacterManager::Instance().UpdatePlayerData(0, "", info.Character.pattern);
@@ -121,8 +118,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	if (teleporter->GetPortalReady()) STAGES.ChangeStage(new TestingStage);
 
 	map->Update(elapsedTime);
-	door->Update(elapsedTime);
-	floor->Update(elapsedTime);
 
 	timer += elapsedTime;
 }
@@ -154,8 +149,6 @@ void StageOpenWorld_E4C::Render()
 	PlayerCharacterManager::Instance().Render(rc);
 
 	map->Render(rc);
-	door->Render(rc);
-	floor->Render(rc);
 
 	teleporter->Render(rc);
 	plane->Render(rc);
@@ -173,6 +166,7 @@ void StageOpenWorld_E4C::Render()
 	//	ImGui::TreePop();
 	//}
 	// デバッグレンダラ描画実行
+
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
 }
 

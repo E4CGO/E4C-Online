@@ -49,12 +49,11 @@ private:
 
 	std::unique_ptr<ModelObject> map;
 	std::unique_ptr<ModelObject> door;
+	std::unique_ptr<ModelObject> door2;
 	std::unique_ptr<ModelObject> floor;
 
-	Microsoft::WRL::ComPtr<ID3D11Buffer> constant_buffers[8];
-
 	float transitionTime = 0.0f;
-	float transitionDuration = 2.f;  // 5•b‚©‚¯‚ÄˆÚ“®
+	float transitionDuration = 2.f;  // 5ç§’ã‹ã‘ã¦ç§»å‹•
 	int currentSegment = 0;
 
 	std::vector<DirectX::XMFLOAT3> cameraPositions = {

@@ -20,8 +20,35 @@
 class NewModelDX11 : public iModel
 {
 public:
-	NewModelDX11(ID3D11Device* device, const std::string& filename, float scaling);
+	NewModelDX11(ID3D11Device* device, const std::string& filename, float scaling = 1.0f, int modelType = 0);
 	~NewModelDX11() {};
+
+	void cumulate_transforms(std::vector<ModelResource::node>& nodes);
+
+	ModelResource::buffer_view make_buffer_view(const tinygltf::Accessor& accessor);
+
+	void animate(size_t animation_index, float time, std::vector<ModelResource::node>& animated_nodes);
+
+	void Update(float elapsedTime);
+
+	void Render(const RenderContext& rc);
+
+	void UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform);
+	void PlayAnimation(int index, bool loop, float blendSeconds = 0.2f);
+	bool IsPlayAnimation() const;
+	void UpdateAnimation(float elapsedTime);
+	void ComputeAnimation(float elapsedTime);
+	void ComputeBlending(float elapsedTime);
+	void ComputeWorldBounds();
+
+	iModel::Node* FindNode(const char* name);
+
+	void CopyAnimations(iModel* model);
+	void CopyNodes(iModel* model);
+
+	void DrawDebugGUI();
+
+private:
 
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> vertex_shader;
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixel_shader;
@@ -68,28 +95,6 @@ public:
 	std::string filename;
 	float time = 0;
 
-	void cumulate_transforms(std::vector<ModelResource::node>& nodes);
-
-	ModelResource::buffer_view make_buffer_view(const tinygltf::Accessor& accessor);
-
-	void animate(size_t animation_index, float time, std::vector<ModelResource::node>& animated_nodes);
-
-	void Update(float elapsedTime);
-
-	void Render(const RenderContext& rc);
-
-	void UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform);
-	void PlayAnimation(int index, bool loop, float blendSeconds = 0.2f);
-	bool IsPlayAnimation() const;
-	void UpdateAnimation(float elapsedTime);
-	void ComputeAnimation(float elapsedTime);
-	void ComputeBlending(float elapsedTime);
-	void ComputeWorldBounds();
-
-	iModel::Node* FindNode(const char* name);
-
-	void CopyAnimations(iModel* model);
-	void CopyNodes(iModel* model);
-
-	void DrawDebugGUI();
+	float scaling = 1.0f;
+	int modelType = 0;
 };

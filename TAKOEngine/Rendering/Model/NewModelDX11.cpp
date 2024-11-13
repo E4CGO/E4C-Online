@@ -13,12 +13,7 @@
 #include "TAKOEngine/Rendering/GpuResourceUtils.h"
 #include "TAKOEngine/Rendering/ConstantBuffer.h"
 
-bool set_null_load_image(tinygltf::Image*, const int, std::string*, std::string*, int, int, const unsigned char*, int, void*)
-{
-	return true;
-}
-
-NewModelDX11::NewModelDX11(ID3D11Device* device, const std::string& filename, float scaling)
+NewModelDX11::NewModelDX11(ID3D11Device* device, const std::string& filename, float scaling, int modelType) : scaling(scaling), modelType(modelType)
 {
 	resource = ResourceManager::Instance().LoadModelResourceGLTF(filename);
 
@@ -32,6 +27,8 @@ NewModelDX11::NewModelDX11(ID3D11Device* device, const std::string& filename, fl
 	texture_resource_views = resource->GetNewTexturesRV();
 	skins = resource->GetNewSkins();
 	animations = resource->GetNewAnimations();
+
+	cumulate_transforms(nodes);
 
 	const std::map<std::string, ModelResource::buffer_view>& vertex_buffer_views{
 		meshes.at(0).primitives.at(0).vertex_buffer_views };
@@ -78,14 +75,38 @@ NewModelDX11::NewModelDX11(ID3D11Device* device, const std::string& filename, fl
 
 void NewModelDX11::cumulate_transforms(std::vector<ModelResource::node>& nodes)
 {
+	const DirectX::XMFLOAT4X4 coordinate_system_transforms[]
+	{
+		{-1, 0, 0, 0,
+		  0, 1, 0, 0,
+		  0, 0, 1, 0,
+		  0, 0, 0, 1}, // 0:RHS Y-UP
+
+		{ 1, 0, 0, 0,
+		  0, 1, 0, 0,
+		  0, 0, 1, 0,
+		  0, 0, 0, 1}, // 1:LHS Y-UP
+
+		{-1, 0, 0, 0,
+		  0, 0,-1, 0,
+		  0, 1, 0, 0,
+		  0, 0, 0, 1}, // 2:RHS Z-UP
+
+		{ 1, 0, 0, 0,
+		  0, 0, 1, 0,
+		  0, 1, 0, 0,
+		  0, 0, 0, 1}, //3:LHS Z - UP
+	};
+
 	std::stack<DirectX::XMFLOAT4X4> parent_global_transforms;
 	std::function<void(int)> traverse{ [&](int node_index)->void
 	{
 			ModelResource::node& node{nodes.at(node_index)};
+			DirectX::XMMATRIX C{ DirectX::XMLoadFloat4x4(&coordinate_system_transforms[modelType]) * DirectX::XMMatrixScaling(scaling, scaling, scaling) };
 			DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(node.scale.x, node.scale.y, node.scale.z) };
 			DirectX::XMMATRIX R{ DirectX::XMMatrixRotationQuaternion(DirectX::XMVectorSet(node.rotation.x, node.rotation.y, node.rotation.z, node.rotation.w)) };
 			DirectX::XMMATRIX T{ DirectX::XMMatrixTranslation(node.translation.x, node.translation.y, node.translation.z) };
-			DirectX::XMStoreFloat4x4(&node.global_transform , S * R * T * DirectX::XMLoadFloat4x4(&parent_global_transforms.top()));
+			DirectX::XMStoreFloat4x4(&node.global_transform , C * S * R * T * DirectX::XMLoadFloat4x4(&parent_global_transforms.top()));
 			for (int child_index : node.children)
 			{
 				parent_global_transforms.push(node.global_transform);

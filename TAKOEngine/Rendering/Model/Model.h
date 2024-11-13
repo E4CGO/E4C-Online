@@ -12,7 +12,7 @@ class iModel
 {
 public:
 	iModel() = default;
-	iModel(ID3D11Device* device, const char* filename, float scaling = 1.0f) {};
+	iModel(ID3D11Device* device, const char* filename, float scaling = 1.0f, int modelType = 0) {};
 	virtual ~iModel() {};
 
 	struct Node

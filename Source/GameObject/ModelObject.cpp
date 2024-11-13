@@ -17,9 +17,9 @@
 	@param[in]	scaling		モデルスケール
 	@param[in]	renderMode	レンダーボード
 *//***************************************************************************/
-ModelObject::ModelObject(const char* filename, float scaling, ModelObject::RENDER_MODE renderMode)
+ModelObject::ModelObject(const char* filename, float scaling, ModelObject::RENDER_MODE renderMode, int modelType)
 {
-	LoadModel(filename, scaling, renderMode);
+	LoadModel(filename, scaling, renderMode, modelType);
 }
 
 /**************************************************************************//**
@@ -29,7 +29,7 @@ ModelObject::ModelObject(const char* filename, float scaling, ModelObject::RENDE
 	@param[in]	renderMode	レンダーモード
 	return		なし
 *//***************************************************************************/
-void ModelObject::LoadModel(const char* filename, float scaling, ModelObject::RENDER_MODE renderMode)
+void ModelObject::LoadModel(const char* filename, float scaling, ModelObject::RENDER_MODE renderMode, int modelType)
 {
 	if (strlen(filename) == 0) return;
 
@@ -38,10 +38,10 @@ void ModelObject::LoadModel(const char* filename, float scaling, ModelObject::RE
 	switch (m_renderMode)
 	{
 	case ModelObject::RENDER_MODE::DX11:
-		m_pmodels.push_back(std::make_unique<ModelDX11>(T_GRAPHICS.GetDevice(), filename, scaling));
+		m_pmodels.push_back(std::make_unique<ModelDX11>(T_GRAPHICS.GetDevice(), filename, scaling, modelType));
 		break;
 	case ModelObject::RENDER_MODE::DX11GLTF:
-		m_pmodels.push_back(std::make_unique<NewModelDX11>(T_GRAPHICS.GetDevice(), filename, scaling));
+		m_pmodels.push_back(std::make_unique<NewModelDX11>(T_GRAPHICS.GetDevice(), filename, scaling, modelType));
 		break;
 	case ModelObject::RENDER_MODE::DX12:
 		break;

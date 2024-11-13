@@ -147,7 +147,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     diffuse = lerp(diffuse, diffuse * occlusion_factor, occlusion_strength);
     specular = lerp(specular, specular * occlusion_factor, occlusion_strength);
         
-    float3 Lo = diffuse * 5.0f + specular + emmisive;
+    float3 Lo = diffuse * 10.0f + specular + emmisive;
         
     return float4(Lo, basecolor_factor.a);
 }
