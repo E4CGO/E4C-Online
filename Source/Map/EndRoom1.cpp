@@ -22,8 +22,8 @@ void EndRoom1::LoadMapData()
 	// 接続点データはなし
 
 	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR, { 0.0f, 0.0f, 0.0f }));
-	m_tileDatas.emplace_back(TILE_DATA(TileType::WALL, { 0.0f, 0.0f, 0.0f },
-		DirectX::XMFLOAT3(0.0f, DirectX::XMConvertToRadians(90.0f), 0.0f)));
+	//m_tileDatas.emplace_back(TILE_DATA(TileType::WALL, { 0.0f, 0.0f, 0.0f },
+	//	DirectX::XMFLOAT3(0.0f, DirectX::XMConvertToRadians(90.0f), 0.0f)));
 
 	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
 		DirectX::XMFLOAT3(0.0f, 0.0f, 4.0f),

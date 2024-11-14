@@ -101,7 +101,7 @@ void RoomBase::GenerateNextRoom()
 			std::vector<std::vector<DungeonData::RoomType>> placeableRooms;
 			placeableRooms.resize(m_connectPointDatas.size());
 
-			// 接続点の数だけ当たり判定を行う
+			// 接続点の数だけ当たり判定を行い、生成を行う
 			for (int i = 0; i < m_connectPointDatas.size(); i++)
 			{
 				std::vector<AABB> aAABBs = dungeonData.GetRoomAABBs();
@@ -152,56 +152,104 @@ void RoomBase::GenerateNextRoom()
 						placeableRooms.at(i).emplace_back(type);
 					}
 				}
-			}
 
-			// 接続点の数だけ子を生成する
-			for (int i = 0; i < m_connectPointDatas.size(); i++)
-			{
-				// 他の部屋と重ならない部屋が存在しない場合は処理を行わない
-				if (placeableRooms.at(i).size() < 1) continue;
-
-				// 接続可能な部屋の重みの合計
-				int totalWeight = 0;
-				for (DungeonData::RoomType type : placeableRooms.at(i))
+				// 子の部屋を生成する
+				// 他の部屋と重ならない部屋があるならば生成を開始する
+				if (placeableRooms.at(i).size() > 0)
 				{
-					totalWeight += dungeonData.GetRoomGenerateSetting(type).weight;
-				}
-
-				int randomValue = std::rand() % totalWeight;
-				for (DungeonData::RoomType type : placeableRooms.at(i))
-				{
-					randomValue -= dungeonData.GetRoomGenerateSetting(type).weight;
-
-					if (randomValue < 0)
+					// 生成可能な部屋の重みの合計
+					int totalWeight = 0;
+					for (DungeonData::RoomType type : placeableRooms.at(i))
 					{
-						RoomBase* nextRoom = nullptr;
+						totalWeight += dungeonData.GetRoomGenerateSetting(type).weight;
+					}
 
-						switch (type)
+					int randomValue = std::rand() % totalWeight;
+					for (DungeonData::RoomType type : placeableRooms.at(i))
+					{
+						randomValue -= dungeonData.GetRoomGenerateSetting(type).weight;
+
+						if (randomValue < 0)
 						{
-						case DungeonData::SIMPLE_ROOM_1:
-							nextRoom = new SimpleRoom1(this, i);
-							break;
+							RoomBase* nextRoom = nullptr;
 
-						case DungeonData::END_ROOM:
-							nextRoom = new EndRoom1(this, i);
-							break;
+							switch (type)
+							{
+							case DungeonData::SIMPLE_ROOM_1:
+								nextRoom = new SimpleRoom1(this, i);
+								break;
 
-						case DungeonData::CROSS_ROOM_1:
-							nextRoom = new CrossRoom1(this, i);
-							break;
+							case DungeonData::END_ROOM:
+								nextRoom = new EndRoom1(this, i);
+								break;
 
-						case DungeonData::PASSAGE_1:
-							//nextRoom = new Passage1(this, i, roomAABBs);
-							break;
+							case DungeonData::CROSS_ROOM_1:
+								nextRoom = new CrossRoom1(this, i);
+								break;
 
-						default:
+							case DungeonData::PASSAGE_1:
+								nextRoom = new Passage1(this, i);
+								break;
+
+							default:
+								break;
+							}
+							AddRoom(nextRoom);
 							break;
 						}
-						AddRoom(nextRoom);
-						break;
 					}
+
 				}
 			}
+
+			//// 接続点の数だけ子を生成する
+			//for (int i = 0; i < m_connectPointDatas.size(); i++)
+			//{
+			//	// 他の部屋と重ならない部屋が存在しない場合は処理を行わない
+			//	if (placeableRooms.at(i).size() < 1) continue;
+
+			//	// 接続可能な部屋の重みの合計
+			//	int totalWeight = 0;
+			//	for (DungeonData::RoomType type : placeableRooms.at(i))
+			//	{
+			//		totalWeight += dungeonData.GetRoomGenerateSetting(type).weight;
+			//	}
+
+			//	int randomValue = std::rand() % totalWeight;
+			//	for (DungeonData::RoomType type : placeableRooms.at(i))
+			//	{
+			//		randomValue -= dungeonData.GetRoomGenerateSetting(type).weight;
+
+			//		if (randomValue < 0)
+			//		{
+			//			RoomBase* nextRoom = nullptr;
+
+			//			switch (type)
+			//			{
+			//			case DungeonData::SIMPLE_ROOM_1:
+			//				nextRoom = new SimpleRoom1(this, i);
+			//				break;
+
+			//			case DungeonData::END_ROOM:
+			//				nextRoom = new EndRoom1(this, i);
+			//				break;
+
+			//			case DungeonData::CROSS_ROOM_1:
+			//				nextRoom = new CrossRoom1(this, i);
+			//				break;
+
+			//			case DungeonData::PASSAGE_1:
+			//				//nextRoom = new Passage1(this, i, roomAABBs);
+			//				break;
+
+			//			default:
+			//				break;
+			//			}
+			//			AddRoom(nextRoom);
+			//			break;
+			//		}
+			//	}
+			//}
 		}
 		// 一定の深度を超えた場合は終端の部屋を生成する
 		else
@@ -312,8 +360,9 @@ void RoomBase::PlaceMapTile()
 			fileName = "Data/Model/Dungeon/Floor_Plain_Parent.glb";
 			break;
 		case TileType::WALL:
+			fileName = "Data/Model/Dungeon assets/SM_Wall_01a.fbx";
 			//fileName = "Data/Model/Dungeon/DoorWay Parent 006.glb";
-			continue;
+			//continue;
 			break;
 		case TileType::STAIR:
 			fileName = "Data/Model/Dungeon/Stair Parent 001.glb";
