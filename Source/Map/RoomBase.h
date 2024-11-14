@@ -8,7 +8,11 @@ class RoomBase
 {
 public:
 	// コンストラクタ
-	RoomBase() = default;
+	RoomBase(
+		RoomBase* parent,
+		int pointIndex);
+
+	// ですとら
 	virtual ~RoomBase()
 	{
 		for (RoomBase* room : childs)
@@ -48,6 +52,8 @@ public:
 		};
 	};
 
+	virtual void Initialize() {}
+
 	virtual void Update(float elapsedTime)
 	{
 		UpdateTransform();
@@ -59,6 +65,9 @@ public:
 	}
 
 	void UpdateTransform();
+
+	// 次の部屋を生成する
+	void GenerateNextRoom();
 
 	// 自分の深度を取得する
 	int GetDepth(int i = 0)
@@ -165,11 +174,11 @@ public:
 	// AABB算出
 	AABB CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const;
 
-	// 部屋タイルデータをロード
-	virtual void LoadMapTileData() {}
+	// 部屋データをロード
+	virtual void LoadMapData() {}
 
 	// 部屋タイルを配置
-	virtual void PlaceMapTile() {}
+	void PlaceMapTile();
 
 	// 出口を配置
 	virtual void PlaceExit() {}

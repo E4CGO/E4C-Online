@@ -34,20 +34,21 @@ StageDungeon_E4C::StageDungeon_E4C(SceneGame_E4C* scene)
 
 void StageDungeon_E4C::GenerateDungeon()
 {
-	if (roomTree.size() < 1)
-	{
-		std::vector<AABB> roomAABBs;
+	rootRoom = std::make_unique<SimpleRoom1>(nullptr, -1);
+	//if (roomTree.size() < 1)
+	//{
+	//	std::vector<AABB> roomAABBs;
 
-		// 乱数による部屋の自動生成を行う
-		rootRoom = std::make_unique<SimpleRoom1>(nullptr, -1, roomAABBs);
-	}
-	else
-	{
-		int treeIndex = 0;
+	//	// 乱数による部屋の自動生成を行う
+	//	rootRoom = std::make_unique<SimpleRoom1>(nullptr, -1, roomAABBs);
+	//}
+	//else
+	//{
+	//	int treeIndex = 0;
 
-		// 部屋配列に従って部屋を生成する
-		rootRoom = std::make_unique<SimpleRoom1>(nullptr, -1, roomTree, treeIndex);
-	}
+	//	// 部屋配列に従って部屋を生成する
+	//	rootRoom = std::make_unique<SimpleRoom1>(nullptr, -1, roomTree, treeIndex);
+	//}
 }
 
 void StageDungeon_E4C::Initialize()

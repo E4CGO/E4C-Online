@@ -8,6 +8,28 @@
 #include "Map/CrossRoom1.h"
 #include "Map/Passage1.h"
 
+#include "MapTile.h"
+#include "MapTileManager.h"
+
+RoomBase::RoomBase(RoomBase* parent, int pointIndex)
+{
+	// 親と接続点番号を代入
+	this->parent = parent;
+	this->parentConnectPointIndex = pointIndex;
+
+	// 親の接続点データから座標の補正を行う
+	if (this->parent != nullptr)
+	{
+		this->m_position = parent->GetConnectPointData(pointIndex).position;
+		this->m_angle = parent->GetConnectPointData(pointIndex).angle;
+	}
+
+	// 深度を取得
+	depth = GetDepth();
+
+	// 後の接続点データ設定、部屋モデル配置のために行列更新処理を行う
+	UpdateTransform();
+}
 
 void RoomBase::UpdateTransform()
 {
@@ -47,6 +69,185 @@ void RoomBase::UpdateTransform()
 		DirectX::XMMATRIX ParentTransform = DirectX::XMLoadFloat4x4(&m_transform);
 		DirectX::XMMATRIX GlobalTransform = LocalTransform * ParentTransform;
 		DirectX::XMStoreFloat4x4(&data.transform, GlobalTransform);
+	}
+}
+
+void RoomBase::GenerateNextRoom()
+{
+	DungeonData& dungeonData = DungeonData::Instance();
+
+	// 部屋データのロード（接続点データ設定もここで行う）
+	LoadMapData();
+
+	if (depth == 1 && this->roomType == DungeonData::CROSS_ROOM_1)
+	{
+		int a = 0;
+	}
+
+	// 自身のAABBを算出
+	m_aabb = CalcAABB(dungeonData.GetRoomGenerateSetting(roomType).aabb,
+		m_position, DirectX::XMConvertToDegrees(m_angle.y));
+
+	// 配列に登録
+	dungeonData.AddRoomAABBs(m_aabb);
+
+	// 部屋の生成配列が存在しないなら新しくダンジョンの自動生成を行う
+	if (dungeonData.GetRoomTree().size() < 1)
+	{
+		// 最大深度が設定値より浅いなら次の部屋を生成する
+		if (depth < dungeonData.GetDungeonGenerateSetting().maxDepth)
+		{
+			// 配置時に他の部屋と重ならない部屋のみを配列に保存する
+			std::vector<std::vector<DungeonData::RoomType>> placeableRooms;
+			placeableRooms.resize(m_connectPointDatas.size());
+
+			// 接続点の数だけ当たり判定を行う
+			for (int i = 0; i < m_connectPointDatas.size(); i++)
+			{
+				std::vector<AABB> aAABBs = dungeonData.GetRoomAABBs();
+
+				for (DungeonData::RoomType type : dungeonData.GetRoomGenerateSetting(roomType).placementCandidates)
+				{
+					AABB nextRoomAABB = CalcAABB(dungeonData.GetRoomGenerateSetting(type).aabb,
+						m_connectPointDatas.at(i).position, DirectX::XMConvertToDegrees(m_connectPointDatas.at(i).angle.y));
+
+					bool isHit = false;
+
+					// 自分以外のAABBとの当たり判定を行う
+					for (const AABB& anotherRoomAABB : dungeonData.GetRoomAABBs())
+					{
+						IntersectionResult result;
+
+						// 部屋同士の当たり判定時のみ半径を少しだけ伸ばすことで、複数の部屋が隣接し、一つの部屋のように生成されてしまうのを防ぐ
+						DirectX::XMFLOAT3 temp_NextRadii =
+						{
+							nextRoomAABB.radii.x + 1.0f,
+							nextRoomAABB.radii.y + 1.0f,
+							nextRoomAABB.radii.z + 1.0f,
+						};
+
+						DirectX::XMFLOAT3 temp_AnotherRadii =
+						{
+							anotherRoomAABB.radii.x + 1.0f,
+							anotherRoomAABB.radii.y + 1.0f,
+							anotherRoomAABB.radii.z + 1.0f,
+						};
+
+						if (Collision::IntersectAABBVsAABB(
+							DirectX::XMLoadFloat3(&nextRoomAABB.position),
+							DirectX::XMLoadFloat3(&temp_NextRadii),
+							DirectX::XMLoadFloat3(&anotherRoomAABB.position),
+							DirectX::XMLoadFloat3(&temp_AnotherRadii),
+							&result))
+						{
+							// AABBと衝突するなら配列に保存しない
+							isHit = true;
+							break;
+						}
+					}
+
+					// 衝突しなかった場合は配列に保存する
+					if (!isHit)
+					{
+						placeableRooms.at(i).emplace_back(type);
+					}
+				}
+			}
+
+			// 接続点の数だけ子を生成する
+			for (int i = 0; i < m_connectPointDatas.size(); i++)
+			{
+				// 他の部屋と重ならない部屋が存在しない場合は処理を行わない
+				if (placeableRooms.at(i).size() < 1) continue;
+
+				// 接続可能な部屋の重みの合計
+				int totalWeight = 0;
+				for (DungeonData::RoomType type : placeableRooms.at(i))
+				{
+					totalWeight += dungeonData.GetRoomGenerateSetting(type).weight;
+				}
+
+				int randomValue = std::rand() % totalWeight;
+				for (DungeonData::RoomType type : placeableRooms.at(i))
+				{
+					randomValue -= dungeonData.GetRoomGenerateSetting(type).weight;
+
+					if (randomValue < 0)
+					{
+						RoomBase* nextRoom = nullptr;
+
+						switch (type)
+						{
+						case DungeonData::SIMPLE_ROOM_1:
+							nextRoom = new SimpleRoom1(this, i);
+							break;
+
+						case DungeonData::END_ROOM:
+							nextRoom = new EndRoom1(this, i);
+							break;
+
+						case DungeonData::CROSS_ROOM_1:
+							nextRoom = new CrossRoom1(this, i);
+							break;
+
+						case DungeonData::PASSAGE_1:
+							//nextRoom = new Passage1(this, i, roomAABBs);
+							break;
+
+						default:
+							break;
+						}
+						AddRoom(nextRoom);
+						break;
+					}
+				}
+			}
+		}
+		// 一定の深度を超えた場合は終端の部屋を生成する
+		else
+		{
+			// 接続点の数だけ終端の部屋を生成する
+			for (int i = 0; i < m_connectPointDatas.size(); i++)
+			{
+				//RoomBase* nextEndRoom = new EndRoom1(this, i, roomAABBs);
+				//AddRoom(nextEndRoom);
+			}
+		}
+
+	}
+	// 存在するなら生成配列に従った生成を行う
+	else
+	{
+		// 接続点の数だけ子を生成する
+		for (int i = 0; i < m_connectPointDatas.size(); i++)
+		{
+			/*
+			RoomBase* nextRoom = nullptr;
+
+			if (treeIndex >= roomTree.size()) break;
+
+			switch (roomTree[treeIndex])
+			{
+			case DungeonData::SIMPLE_ROOM_1:
+				nextRoom = new SimpleRoom1(this, i, roomTree, ++treeIndex);
+				break;
+
+			case DungeonData::END_ROOM:
+				nextRoom = new EndRoom1(this, i, roomTree, ++treeIndex);
+				break;
+
+			case DungeonData::CROSS_ROOM_1:
+				nextRoom = new CrossRoom1(this, i, roomTree, ++treeIndex);
+				break;
+
+			case DungeonData::PASSAGE_1:
+				nextRoom = new Passage1(this, i, roomTree, ++treeIndex);
+				break;
+			}
+			AddRoom(nextRoom);
+			*/
+		}
+
 	}
 }
 
@@ -97,6 +298,39 @@ AABB RoomBase::CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const
 	aabb.position += pos;
 
 	return aabb;
+}
+
+void RoomBase::PlaceMapTile()
+{
+	for (const TILE_DATA& tileData : m_tileDatas)
+	{
+		std::string fileName;
+
+		switch (tileData.type)
+		{
+		case TileType::FLOOR:
+			fileName = "Data/Model/Dungeon/Floor_Plain_Parent.glb";
+			break;
+		case TileType::WALL:
+			//fileName = "Data/Model/Dungeon/DoorWay Parent 006.glb";
+			continue;
+			break;
+		case TileType::STAIR:
+			fileName = "Data/Model/Dungeon/Stair Parent 001.glb";
+			break;
+		default:
+			fileName = "Data/Model/Dungeon/Floor_Plain_Parent.glb";
+			break;
+		}
+
+		MapTile* newTile = new MapTile(fileName.c_str(), 1.0f, this);
+		newTile->SetPosition(tileData.position);
+		newTile->SetAngle(tileData.angle);
+		newTile->SetScale(tileData.scale);
+		newTile->SetColor(tileData.color);
+		newTile->Update(0);
+		MAPTILES.Register(newTile);
+	}
 }
 
 int RoomBase::DrawDebugGUI(int i)
