@@ -37,7 +37,8 @@ void StageOpenWorld_E4C::Initialize()
 	//map = std::make_unique<gltf_model>(T_GRAPHICS.GetDevice(), "Data/Model/Dungeon/Doorway Parent 006_new.glb");
 
 	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene));
-	teleporter->SetPosition({ 0, 10, 0 });
+	teleporter->SetPosition({ 0, 5, 0 });
+	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
 
 	{
 		std::array<DirectX::XMFLOAT3, 4 > positions = {
@@ -48,18 +49,6 @@ void StageOpenWorld_E4C::Initialize()
 		};
 
 		plane = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "Data/Sprites/gem.png", 1.0f, positions);
-	}
-
-	{
-		std::array<DirectX::XMFLOAT3, 4 >positions = {
-			DirectX::XMFLOAT3{ 15.0f, 15.0f, 5.0f},
-			DirectX::XMFLOAT3{ 15.0f, 25.0f, 5.0f },
-			DirectX::XMFLOAT3{ 25.0f, 15.0f, 5.0f },
-			DirectX::XMFLOAT3{ 25.0f, 25.0f, 5.0f }
-		};
-
-		portal = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, positions);
-		portal.get()->SetShader(ModelShaderId::Portal);
 	}
 
 	// 光
@@ -146,7 +135,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	PlayerCharacterManager::Instance().Update(elapsedTime);
 	teleporter->Update(elapsedTime);
 	plane->Update(elapsedTime);
-	portal->Update(elapsedTime);
 
 	timer += elapsedTime;
 }
@@ -232,13 +220,11 @@ void StageOpenWorld_E4C::Render()
 		rc.deviceContext->VSSetConstantBuffers(1, 1, constant_buffers[1].GetAddressOf());
 		rc.deviceContext->PSSetConstantBuffers(1, 1, constant_buffers[1].GetAddressOf());
 
-		map->render(rc, world, animated_nodes);
+		//map->render(rc, world, animated_nodes);
 	}
 
 	teleporter->Render(rc);
 	plane->Render(rc);
-
-	portal->Render(rc);
 
 	// デバッグレンダラ描画実行
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());

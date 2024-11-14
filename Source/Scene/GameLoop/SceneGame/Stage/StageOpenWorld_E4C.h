@@ -48,7 +48,6 @@ private:
 
 	std::unique_ptr <Teleporter> teleporter;
 	std::unique_ptr <Plane> plane;
-	std::unique_ptr <Plane> portal;
 
 	std::unique_ptr<gltf_model> map;
 

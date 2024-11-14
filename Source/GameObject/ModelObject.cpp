@@ -112,12 +112,12 @@ bool ModelObject::IsPlayAnimation(int idx)
 *//***************************************************************************/
 void ModelObject::Update(float elapsedTime)
 {
+	// 行列更新
+	UpdateTransform();
+
 	for (auto& model : m_pmodels)
 	{
 		if (model == nullptr) continue;
-
-		// 行列更新
-		UpdateTransform();
 
 		// アニメーション更新
 		model->UpdateAnimation(elapsedTime * m_animationSpeed);
