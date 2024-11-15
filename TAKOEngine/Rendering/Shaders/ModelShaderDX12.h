@@ -51,4 +51,3 @@ private:
 };
 
 #endif // !__GRAPHICS_MODEL_SHADERDX12_H__
-

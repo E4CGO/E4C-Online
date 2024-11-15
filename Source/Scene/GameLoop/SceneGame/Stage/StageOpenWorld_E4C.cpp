@@ -27,6 +27,9 @@ void StageOpenWorld_E4C::Initialize()
 
 	map = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 2.5f, ModelObject::RENDER_MODE::DX11GLTF);
 
+	door = std::make_unique<ModelObject>("Data/Model/Stage/Doorway_Parent_006_new.glb", 1.0f, ModelObject::RENDER_MODE::DX11GLTF);
+	door->SetAngle({ 0.0, 90.0f, 0.0f });
+
 	teleporter = std::make_unique<Teleporter>("Data/Model/Cube/testCubes.glb", 1.0);
 	teleporter->SetPosition({ 50, 0, 60 });
 
@@ -77,7 +80,6 @@ void StageOpenWorld_E4C::Initialize()
 		{ 0, 0.969f, -0.248f }	// 上ベクトル
 	);
 
-
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(mainCamera);
 	cameraController->SetEnable(true);
@@ -112,6 +114,8 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	teleporter->Update(elapsedTime);
 	plane->Update(elapsedTime);
 	portal->Update(elapsedTime);
+
+	door->Update(elapsedTime);
 
 	teleporter->CheckPlayer(PlayerCharacterManager::Instance().GetPlayerCharacterById(GAME_DATA.GetClientId())->GetPosition(), elapsedTime);
 
@@ -153,6 +157,8 @@ void StageOpenWorld_E4C::Render()
 	teleporter->Render(rc);
 	plane->Render(rc);
 	portal->Render(rc);
+
+	door->Render(rc);
 
 	//MAPTILES.Render(rc);
 

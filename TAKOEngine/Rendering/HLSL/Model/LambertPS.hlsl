@@ -118,7 +118,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     const float3 c_diff = lerp(basecolor_factor.rgb, 0.0, metallic_factor);
     
     const float3 P = pin.w_position.xyz;
-    const float3 V = normalize(camera_position.xyz - pin.w_position.xyz);
+    const float3 V = normalize(cameraPosition.xyz - pin.w_position.xyz);
     
     float3 diffuse = 0;
     float3 specular = 0;
@@ -147,7 +147,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     diffuse = lerp(diffuse, diffuse * occlusion_factor, occlusion_strength);
     specular = lerp(specular, specular * occlusion_factor, occlusion_strength);
         
-    float3 Lo = diffuse * 10.0f + specular + emmisive;
+    float3 Lo = diffuse * 3.0f + specular + emmisive;
         
     return float4(Lo, basecolor_factor.a);
 }

@@ -1,10 +1,296 @@
 //! @file LambertShader.cpp
 //! @note
 
+#include "TAKOEngine/Rendering/Shaders/LambertShader.h"
+
 #include "TAKOEngine/Rendering/Misc.h"
 #include "TAKOEngine/Rendering/Graphics.h"
-#include "TAKOEngine/Rendering/Shaders/LambertShader.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
+
+LambertShader::LambertShader(ID3D11Device* device) : ModelShader(device, "Data/Shader/ToonVS.cso", "Data/Shader/ToonPS.cso")
+{
+	//// 入力レイアウト
+	D3D11_INPUT_ELEMENT_DESC inputElementDesc[]
+	{
+			{ "POSITION", 0,DXGI_FORMAT_R32G32B32_FLOAT , 0, 0, D3D11_INPUT_PER_VERTEX_DATA},
+			{ "NORMAL", 0,  DXGI_FORMAT_R32G32B32_FLOAT, 1, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "TANGENT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 2, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "TEXCOORD", 0,DXGI_FORMAT_R32G32_FLOAT, 3, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "JOINTS", 0,  DXGI_FORMAT_R16G16B16A16_UINT, 4, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{ "WEIGHTS", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 5, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	// 頂点シェーダー
+	GpuResourceUtils::LoadVertexShader(
+		device,
+		VertexShaderName,
+		inputElementDesc,
+		_countof(inputElementDesc),
+		m_InputLayout.GetAddressOf(),
+		m_VertexShader.GetAddressOf());
+
+	// ピクセルシェーダー
+	if (PixelShaderName)
+	{
+		GpuResourceUtils::LoadPixelShader(
+			device,
+			PixelShaderName,
+			m_PixelShader.GetAddressOf());
+	}
+
+	// シーン用定数バッファ
+	GpuResourceUtils::CreateConstantBuffer(
+		device,
+		sizeof(CbScene),
+		m_sceneConstantBuffer.GetAddressOf());
+
+	{
+		HRESULT hr;
+		D3D11_BUFFER_DESC buffer_desc{};
+
+		buffer_desc.ByteWidth = sizeof(primitive_constants);
+		buffer_desc.Usage = D3D11_USAGE_DEFAULT;
+		buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+
+		hr = device->CreateBuffer(&buffer_desc, nullptr, m_PrimitiveConstantBuffer.ReleaseAndGetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+		buffer_desc.ByteWidth = sizeof(primitive_joint_constants);
+		buffer_desc.Usage = D3D11_USAGE_DEFAULT;
+		buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		hr = device->CreateBuffer(&buffer_desc, nullptr, m_PrimitiveJointConstantBuffer.ReleaseAndGetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+		buffer_desc.ByteWidth = (sizeof(CbScene) + 15) / 16 * 16;
+		buffer_desc.Usage = D3D11_USAGE_DEFAULT;
+		buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		buffer_desc.CPUAccessFlags = 0;
+		buffer_desc.MiscFlags = 0;
+		buffer_desc.StructureByteStride = 0;
+		hr = device->CreateBuffer(&buffer_desc, nullptr, m_SceneConstantBuffer.GetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+	}
+}
+
+//******************************************************************
+// @brief       描画開始
+// @param[in]   rc  レンダーコンテキスト
+// @return      なし
+//******************************************************************
+void LambertShader::Begin(const RenderContext& rc)
+{
+	ID3D11DeviceContext* immediate_context = rc.deviceContext;
+
+	//// シェーダー設定
+	immediate_context->IASetInputLayout(m_InputLayout.Get());
+	immediate_context->VSSetShader(m_VertexShader.Get(), nullptr, 0);
+	immediate_context->PSSetShader(m_PixelShader.Get(), nullptr, 0);
+	immediate_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	//// 定数バッファ設定
+	ID3D11Buffer* constantBuffers[] =
+	{
+		m_sceneConstantBuffer.Get(),
+	};
+	immediate_context->VSSetConstantBuffers(0, _countof(constantBuffers), constantBuffers);
+	immediate_context->PSSetConstantBuffers(0, _countof(constantBuffers), constantBuffers);
+
+	// サンプラステート
+	ID3D11SamplerState* samplerStates[] =
+	{
+		rc.renderState->GetSamplerState(SamplerState::PointWrap),
+		rc.renderState->GetSamplerState(SamplerState::LinearWrap),
+		rc.renderState->GetSamplerState(SamplerState::AnisotropicWrap),
+	};
+	rc.deviceContext->PSSetSamplers(0, _countof(samplerStates), samplerStates);
+
+	//// レンダーステート設定
+	SetRenderState(rc);
+
+	//// シーン用定数バッファ更新
+
+	::CbScene cbscene;
+
+	DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&rc.camera->GetView());
+	DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&rc.camera->GetProjection());
+	DirectX::XMStoreFloat4x4(&cbscene.view, V);
+	DirectX::XMStoreFloat4x4(&cbscene.projection, P);
+
+	const DirectX::XMFLOAT3& eye = rc.camera->GetEye();
+	cbscene.camera_position.x = eye.x;
+	cbscene.camera_position.y = eye.y;
+	cbscene.camera_position.z = eye.z;
+
+	cbscene.ambientLightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+	cbscene.directionalLightData = rc.directionalLightData;
+
+	memcpy_s(
+		cbscene.pointLightData,
+		sizeof(cbscene.pointLightData),
+		rc.pointLightData,
+		sizeof(rc.pointLightData)
+	);
+	cbscene.pointLightCount = rc.pointLightCount;
+	memcpy_s(
+		cbscene.spotLightData,
+		sizeof(cbscene.spotLightData),
+		rc.spotLightData,
+		sizeof(rc.spotLightData)
+	);
+	cbscene.spotLightCount = rc.spotLightCount;
+
+	rc.deviceContext->UpdateSubresource(m_SceneConstantBuffer.Get(), 0, 0, &cbscene, 0, 0);
+	rc.deviceContext->VSSetConstantBuffers(1, 1, m_SceneConstantBuffer.GetAddressOf());
+	rc.deviceContext->PSSetConstantBuffers(1, 1, m_SceneConstantBuffer.GetAddressOf());
+}
+
+//******************************************************************
+// @brief       描画終了
+// @param[in]   rc     レンダーコンテキスト
+// @return      なし
+//******************************************************************
+void LambertShader::End(const RenderContext& rc)
+{
+}
+
+//******************************************************************
+// @brief       モデル描画
+// @param[in]   rc     レンダーコンテキスト
+// @param[in]   model  描画対象のモデルデータを指すポインタ
+// @param[in]   color  マテリアルカラー
+// @return      なし
+//******************************************************************
+void LambertShader::Draw(const RenderContext& rc, const iModel* model, DirectX::XMFLOAT4 color)
+{
+	ID3D11DeviceContext* immediate_context = rc.deviceContext;
+
+	//const std::vector<iModel::Node>& nodes = model->GetNodes();
+
+	//// カメラに写っている範囲のオブジェクトをフラグでマークする配列を用意
+	//std::vector<bool> visibleObjects(model->GetMeshes().size(), false);
+
+	//// 視錐台カリングを実行して可視オブジェクトをマーク
+	//FrustumCulling::FrustumCullingFlag(model->GetMeshes(), visibleObjects);
+	//int culling = 0;
+
+	//for (const ModelResource::Mesh& mesh : resource->GetMeshes())
+	//{
+	//	if (!visibleObjects[culling++]) continue;
+	//}
+
+	std::function<void(int)> traverse{ [&](int node_index)->void {
+		const ModelResource::node& node {model->gltf_nodes.at(node_index)};
+		if (node.skin > -1)
+		{
+			const ModelResource::skin& skin{ model->skins.at(node.skin)};
+			primitive_joint_constants primitive_joint_data{};
+			for (size_t joint_index = 0; joint_index < skin.joints.size(); ++joint_index)
+			{
+				XMStoreFloat4x4(&primitive_joint_data.matrices[joint_index],
+					XMLoadFloat4x4(&skin.inverse_bind_matrices.at(joint_index)) *
+					XMLoadFloat4x4(&model->gltf_nodes.at(skin.joints.at(joint_index)).global_transform) *
+					XMMatrixInverse(NULL, XMLoadFloat4x4(&node.global_transform))
+				);
+			}
+			immediate_context->UpdateSubresource(m_PrimitiveJointConstantBuffer.Get(), 0, 0, &primitive_joint_data, 0, 0);
+			immediate_context->VSSetConstantBuffers(2, 1, m_PrimitiveJointConstantBuffer.GetAddressOf());
+		}
+		if (node.mesh > -1)
+		{
+			const ModelResource::mesh& mesh{ model->meshes.at(node.mesh)};
+			for (std::vector<ModelResource::mesh::primitive>::const_reference primitive : mesh.primitives)
+			{
+				ID3D11Buffer* vertex_buffers[]
+				{
+					primitive.vertex_buffer_views.at("POSITION").buffer.Get(),
+					primitive.vertex_buffer_views.at("NORMAL").buffer.Get(),
+					primitive.vertex_buffer_views.at("TANGENT").buffer.Get(),
+					primitive.vertex_buffer_views.at("TEXCOORD_0").buffer.Get(),
+					primitive.vertex_buffer_views.at("JOINTS_0").buffer.Get(),
+					primitive.vertex_buffer_views.at("WEIGHTS_0").buffer.Get(),
+				};
+				UINT strides[]{
+					static_cast<UINT>(primitive.vertex_buffer_views.at("POSITION").stride_in_bytes),
+					static_cast<UINT>(primitive.vertex_buffer_views.at("NORMAL").stride_in_bytes),
+					static_cast<UINT>(primitive.vertex_buffer_views.at("TANGENT").stride_in_bytes),
+					static_cast<UINT>(primitive.vertex_buffer_views.at("TEXCOORD_0").stride_in_bytes),
+					static_cast<UINT>(primitive.vertex_buffer_views.at("JOINTS_0").stride_in_bytes),
+					static_cast<UINT>(primitive.vertex_buffer_views.at("WEIGHTS_0").stride_in_bytes),
+				};
+				UINT offsets[_countof(vertex_buffers)]{ 0 };
+				immediate_context->IASetVertexBuffers(0, _countof(vertex_buffers), vertex_buffers, strides, offsets);
+				immediate_context->IASetIndexBuffer(primitive.index_buffer_view.buffer.Get(), primitive.index_buffer_view.format, 0);
+
+				primitive_constants primitive_data{};
+				primitive_data.material = primitive.material;
+				primitive_data.has_tangent = primitive.vertex_buffer_views.at("TANGENT").buffer != NULL;
+				primitive_data.skin = node.skin;
+
+				DirectX::XMFLOAT4X4 world = model->GetWorldMatrix();
+
+				DirectX::XMStoreFloat4x4(&primitive_data.world, DirectX::XMLoadFloat4x4(&node.global_transform) * DirectX::XMLoadFloat4x4(&world));
+
+				//model->SetWorldMatrix(world);
+
+				immediate_context->UpdateSubresource(m_PrimitiveConstantBuffer.Get(), 0, 0, &primitive_data, 0, 0);
+				immediate_context->VSSetConstantBuffers(0, 1, m_PrimitiveConstantBuffer.GetAddressOf());
+				immediate_context->PSSetConstantBuffers(0, 1, m_PrimitiveConstantBuffer.GetAddressOf());
+
+				immediate_context->PSSetShaderResources(0, 1, model->material_resource_view.GetAddressOf());
+
+				const ModelResource::material& material{ model->materials.at(primitive.material) };
+				const int texture_indices[]
+				{
+					material.data.pbr_metallic_roughness.basecolor_texture.index,
+					material.data.pbr_metallic_roughness.metallic_roughness_texture.index,
+					material.data.normal_texture.index,
+					material.data.emissive_texture.index,
+					material.data.occlusion_texture.index,
+				};
+				ID3D11ShaderResourceView* null_shader_resource_view{};
+				std::vector<ID3D11ShaderResourceView*> shader_resource_views(_countof(texture_indices));
+				for (int texture_index = 0; texture_index < shader_resource_views.size(); ++texture_index)
+				{
+					shader_resource_views.at(texture_index) = texture_indices[texture_index] > -1 ?
+						model->texture_resource_views.at(model->textures.at(texture_indices[texture_index]).source).Get() :
+						null_shader_resource_view;
+				}
+				immediate_context->PSSetShaderResources(1, static_cast<UINT>(shader_resource_views.size()), shader_resource_views.data());
+
+				immediate_context->DrawIndexed(static_cast<UINT>(primitive.index_buffer_view.count()), 0, 0);
+			}
+		}
+
+		for (std::vector<int>::value_type child_index : node.children)
+		{
+			traverse(child_index);
+		}
+		} };
+
+	for (std::vector<int>::value_type node_index : model->scenes.at(0).nodes)
+	{
+		traverse(node_index);
+	}
+}
+
+void LambertShader::Draw(const RenderContext& rc, const ModelResource::Mesh& mesh)
+{
+}
+
+void LambertShader::SetRenderState(const RenderContext& rc)
+{
+	ID3D11DeviceContext* dc = rc.deviceContext;
+
+	// レンダーステート設定
+	const float blend_factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	dc->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Opaque), blend_factor, 0xFFFFFFFF);
+	dc->OMSetDepthStencilState(rc.renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
+	dc->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullNone));
+}
+
+void LambertShader::SetShaderResourceView(const ModelResource::Mesh& mesh, ID3D11DeviceContext*& dc)
+{
+}
 
 //***********************************************************
 // @brief       コンストラクタ
@@ -12,7 +298,7 @@
 // @param[in]   instancing インスタンシング　ture : あり, false : なし
 // @return      なし
 //***********************************************************
-LambertShader::LambertShader(ID3D12Device* device, bool instancing)
+LambertShaderDX12::LambertShaderDX12(ID3D12Device* device, bool instancing)
 {
 	Graphics& graphics = Graphics::Instance();
 	const RenderStateDX12* renderState = graphics.GetRenderStateDX12();
@@ -109,7 +395,7 @@ LambertShader::LambertShader(ID3D12Device* device, bool instancing)
 // @param[in]   なし
 // @return      なし
 //***********************************************************
-LambertShader::~LambertShader()
+LambertShaderDX12::~LambertShaderDX12()
 {
 }
 
@@ -119,7 +405,7 @@ LambertShader::~LambertShader()
 // @param[in]   model  描画対象のモデルデータを指すポインタ
 // @return      なし
 //***********************************************************
-void LambertShader::Render(const RenderContextDX12& rc, ModelDX12* model)
+void LambertShaderDX12::Render(const RenderContextDX12& rc, ModelDX12* model)
 {
 	Graphics& graphics = Graphics::Instance();
 

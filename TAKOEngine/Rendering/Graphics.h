@@ -36,6 +36,7 @@ enum class ModelShaderId
 	ShadowMap,
 	Plane,
 	Portal,
+	Lambert,
 
 	EnumCount
 };

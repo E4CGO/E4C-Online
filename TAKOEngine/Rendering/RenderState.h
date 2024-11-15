@@ -53,6 +53,7 @@ enum class RasterizerState
 {
 	SolidCullNone,
 	SolidCullBack,
+	SolidCullFront,
 	WireCullnone,
 	WireCullBack,
 

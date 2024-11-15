@@ -139,13 +139,15 @@ void ModelObject::Render(const RenderContext& rc)
 	for (auto& model : m_pmodels)
 	{
 		if (model == nullptr) return;
-		if (m_renderMode != DX11)
-		{
-			static_cast<NewModelDX11*>(model.get())->Render(rc);
-			return;
-		}
-		// 描画
+
 		ModelShader* shader = T_GRAPHICS.GetModelShader(m_shaderId);
+
+		if (m_renderMode == DX11GLTF)
+		{
+			shader = T_GRAPHICS.GetModelShader(ModelShaderId::Lambert);
+		}
+
+		// 描画
 		shader->Begin(rc);
 		shader->Draw(rc, model.get(), m_color);
 		shader->End(rc);
