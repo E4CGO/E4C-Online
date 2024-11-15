@@ -25,30 +25,9 @@
 
 static float timer = 0;
 
-
-StageDungeon_E4C::StageDungeon_E4C(SceneGame_E4C* scene)
-	: m_pScene(scene), Stage()
-{
-	GenerateDungeon();
-}
-
 void StageDungeon_E4C::GenerateDungeon()
 {
 	rootRoom = std::make_unique<SimpleRoom1>(nullptr, -1);
-	//if (roomTree.size() < 1)
-	//{
-	//	std::vector<AABB> roomAABBs;
-
-	//	// 乱数による部屋の自動生成を行う
-	//	rootRoom = std::make_unique<SimpleRoom1>(nullptr, -1, roomAABBs);
-	//}
-	//else
-	//{
-	//	int treeIndex = 0;
-
-	//	// 部屋配列に従って部屋を生成する
-	//	rootRoom = std::make_unique<SimpleRoom1>(nullptr, -1, roomTree, treeIndex);
-	//}
 }
 
 void StageDungeon_E4C::Initialize()
@@ -125,6 +104,9 @@ void StageDungeon_E4C::Initialize()
 		hr = T_GRAPHICS.GetDevice()->CreateBuffer(&buffer_desc, nullptr, constant_buffers[1].GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
+
+	// ダンジョンを生成する
+	GenerateDungeon();
 
 	// 部屋のモデルを配置
 	for (RoomBase* room : rootRoom->GetAll())

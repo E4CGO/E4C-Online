@@ -352,27 +352,35 @@ void RoomBase::PlaceMapTile()
 {
 	for (const TILE_DATA& tileData : m_tileDatas)
 	{
-		std::string fileName;
+		std::vector<std::string> fileNames;
 
 		switch (tileData.type)
 		{
 		case TileType::FLOOR:
-			fileName = "Data/Model/Dungeon/Floor_Plain_Parent.glb";
+			fileNames.emplace_back("Data/Model/Dungeon/Floor_Plain_Parent.glb");
 			break;
 		case TileType::WALL:
-			fileName = "Data/Model/Dungeon assets/SM_Wall_01a.fbx";
-			//fileName = "Data/Model/Dungeon/DoorWay Parent 006.glb";
-			//continue;
+			fileNames.emplace_back("Data/Model/DungeonAssets/WALL.glb");
+			//fileNames.emplace_back("Data/Model/DungeonAssets/WALL_CENTERED.glb");
+			break;
+		case TileType::PILLAR:
+			fileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_01a.glb");
+			fileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_Base_01a.glb");
+			fileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_Top_01a.glb");
 			break;
 		case TileType::STAIR:
-			fileName = "Data/Model/Dungeon/Stair Parent 001.glb";
+			fileNames.emplace_back("Data/Model/Dungeon/Stair Parent 001.glb");
 			break;
 		default:
-			fileName = "Data/Model/Dungeon/Floor_Plain_Parent.glb";
 			break;
 		}
 
-		MapTile* newTile = new MapTile(fileName.c_str(), 1.0f, this);
+		MapTile* newTile = new MapTile("", 1.0f, this);
+		for (std::string fileName : fileNames)
+		{
+			newTile->LoadModel(fileName.c_str(), 1.0f);
+		}
+		newTile->SetCollider(Collider::COLLIDER_TYPE::MAP);
 		newTile->SetPosition(tileData.position);
 		newTile->SetAngle(tileData.angle);
 		newTile->SetScale(tileData.scale);

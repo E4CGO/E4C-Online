@@ -25,6 +25,7 @@ public:
 	{
 		FLOOR = 0,
 		WALL,
+		PILLAR,
 		STAIR,
 	};
 

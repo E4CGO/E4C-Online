@@ -28,8 +28,8 @@ class SceneGame_E4C;
 class StageDungeon_E4C : public Stage
 {
 public:
-	// コンストラクタ（部屋配列なし）
-	StageDungeon_E4C(SceneGame_E4C* scene);
+	// コンストラクタ
+	StageDungeon_E4C(SceneGame_E4C* scene) {}
 
 	void GenerateDungeon();
 

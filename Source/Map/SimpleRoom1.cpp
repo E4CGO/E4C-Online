@@ -42,9 +42,214 @@ void SimpleRoom1::LoadMapData()
 	}
 
 	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR, { 0.0f, 0.0f, 0.0f }));
-	//m_tileDatas.emplace_back(TILE_DATA(TileType::WALL, { 0.0f, 0.0f, 0.0f },
-	//	DirectX::XMFLOAT3(0.0f, DirectX::XMConvertToRadians(90.0f), 0.0f),
+
+	m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+		{ -10.0f, 0.0f, 2.0f },
+		{ 0.0f, DirectX::XMConvertToRadians(270.0f), 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+		{ -10.0f, 3.0f, 2.0f },
+		{ 0.0f, DirectX::XMConvertToRadians(270.0f), 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		{ -10.0f, 0.0f, 2.0f },
+		{ 0.0f, 0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		{ -10.0f, 3.0f, 2.0f },
+		{ 0.0f, 0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+
+	m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+		{ -6.0f, 0.0f, 2.0f },
+		{ 0.0f, DirectX::XMConvertToRadians(270.0f), 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+		{ -6.0f, 3.0f, 2.0f },
+		{ 0.0f, DirectX::XMConvertToRadians(270.0f), 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		{ -6.0f, 0.0f, 2.0f },
+		{ 0.0f, 0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		{ -6.0f, 3.0f, 2.0f },
+		{ 0.0f, 0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+
+	m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		{ -2.0f, 0.0f, 2.0f },
+		{ 0.0f, 0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		{ -2.0f, 3.0f, 2.0f },
+		{ 0.0f, 0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+
+	m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+		{ 2.0f, 0.0f, 2.0f },
+		{ 0.0f, DirectX::XMConvertToRadians(270.0f), 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+		{ 2.0f, 3.0f, 2.0f },
+		{ 0.0f, DirectX::XMConvertToRadians(270.0f), 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		{ 2.0f, 0.0f, 2.0f },
+		{ 0.0f, 0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		{ 2.0f, 3.0f, 2.0f },
+		{ 0.0f, 0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+
+	m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+		{ 6.0f, 0.0f, 2.0f },
+		{ 0.0f, DirectX::XMConvertToRadians(270.0f), 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+		{ 6.0f, 3.0f, 2.0f },
+		{ 0.0f, DirectX::XMConvertToRadians(270.0f), 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		{ 6.0f, 0.0f, 2.0f },
+		{ 0.0f, 0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		{ 6.0f, 3.0f, 2.0f },
+		{ 0.0f, 0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+
+	m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		{ 10.0f, 0.0f, 2.0f },
+		{ 0.0f, 0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		{ 10.0f, 3.0f, 2.0f },
+		{ 0.0f, 0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+
+
+	
+	for (int i = -3; i < 2; i++)
+	{
+		m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+			{ (4.0f * i) + 2.0f, 0.0f, 14.0f},
+			{ 0.0f, DirectX::XMConvertToRadians(270.0f), 0.0f },
+			{ 1.0f, 1.0f, 1.0f }));
+		m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+			{ (4.0f * i) + 2.0f, 3.0f, 14.0f },
+			{ 0.0f, DirectX::XMConvertToRadians(270.0f), 0.0f },
+			{ 1.0f, 1.0f, 1.0f }));
+		m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+			{ (4.0f * i) + 2.0f, 0.0f, 14.0f },
+			{ 0.0f, 0.0f, 0.0f },
+			{ 1.0f, 1.0f, 1.0f }));
+		m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+			{ (4.0f * i) + 2.0f, 3.0f, 14.0f },
+			{ 0.0f, 0.0f, 0.0f },
+			{ 1.0f, 1.0f, 1.0f }));
+	}
+	m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		{ 10.0f, 0.0f, 14.0f },
+		{ 0.0f, 0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		{ 10.0f, 3.0f, 14.0f },
+		{ 0.0f, 0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+
+
+
+	m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+		{ -10.0f, 0.0f, 2.0f },
+		{ 0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+		{ -10.0f, 3.0f, 2.0f },
+		{ 0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+
+	//m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+	//	{ -10.0f, 0.0f, 6.0f },
+	//	{ 0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f },
 	//	{ 1.0f, 1.0f, 1.0f }));
+	//m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+	//	{ -10.0f, 3.0f, 6.0f },
+	//	{ 0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f },
+	//	{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		{ -10.0f, 0.0f, 6.0f },
+		{ 0.0f, 0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		{ -10.0f, 3.0f, 6.0f },
+		{ 0.0f, 0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+
+	m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+		{ -10.0f, 0.0f, 10.0f },
+		{ 0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+		{ -10.0f, 3.0f, 10.0f },
+		{ 0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		{ -10.0f, 0.0f, 10.0f },
+		{ 0.0f, 0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		{ -10.0f, 3.0f, 10.0f },
+		{ 0.0f, 0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+
+
+
+	m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+		{ 10.0f, 0.0f, 2.0f },
+		{ 0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+		{ 10.0f, 3.0f, 2.0f },
+		{ 0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+
+	//m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+	//	{ -10.0f, 0.0f, 6.0f },
+	//	{ 0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f },
+	//	{ 1.0f, 1.0f, 1.0f }));
+	//m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+	//	{ -10.0f, 3.0f, 6.0f },
+	//	{ 0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f },
+	//	{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		{ 10.0f, 0.0f, 6.0f },
+		{ 0.0f, 0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		{ 10.0f, 3.0f, 6.0f },
+		{ 0.0f, 0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+
+	m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+		{ 10.0f, 0.0f, 10.0f },
+		{ 0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+		{ 10.0f, 3.0f, 10.0f },
+		{ 0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		{ 10.0f, 0.0f, 10.0f },
+		{ 0.0f, 0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+	m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		{ 10.0f, 3.0f, 10.0f },
+		{ 0.0f, 0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f }));
+
+
 
 	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
 		DirectX::XMFLOAT3(0.0f, 0.0f, 4.0f),
@@ -125,80 +330,4 @@ void SimpleRoom1::LoadMapData()
 		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
 		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
 		DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));
-
-	//// XとZの最小値、最大値を保存しておき
-	//// それを元に当たり判定を作成する
-	//float minX = FLT_MAX;
-	//float maxX = FLT_MIN;
-	//float minZ = FLT_MAX;
-	//float maxZ = FLT_MIN;
-
-	//for (const TILE_DATA& tileData : m_tileDatas)
-	//{
-	//	// XとZの最小値、最大値を保存しておく
-	//	if (tileData.position.x < minX) minX = tileData.position.x;
-	//	if (tileData.position.x > maxX) maxX = tileData.position.x;
-	//	if (tileData.position.z < minZ) minZ = tileData.position.z;
-	//	if (tileData.position.z > maxZ) maxZ = tileData.position.z;
-	//}
-
-	//maxX += 4.0f;
-	//maxZ += 4.0f;
-
-	////// 行列更新を行うためUpdate呼び出し
-	////Update(0);
-
-	//DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&m_transform);
-
-	//// AABB
-	//m_aabb.position = {
-	//	(minX + maxX) * 0.5f,
-	//	1.0f,
-	//	(minZ + maxZ) * 0.5f
-	//};
-
-	//// ワールド座標に変換し保存
-	//DirectX::XMVECTOR AABBPos = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&m_aabb.position), WorldTransform);
-	//DirectX::XMStoreFloat3(&m_aabb.position, AABBPos);
-
-	//m_aabb.radii.x = (maxX - minX) * 0.5f;
-	//m_aabb.radii.y = 1.0f;
-	//m_aabb.radii.z = (maxZ - minZ) * 0.5f;
-
-	//// 360度以内に丸める
-	//while (DirectX::XMConvertToDegrees(m_angle.y) >= 360.0f) m_angle.y -= DirectX::XMConvertToRadians(360.0f);
-	//while (DirectX::XMConvertToDegrees(m_angle.y) < 0.0f) m_angle.y += DirectX::XMConvertToRadians(360.0f);
-
-	//// 角度によって位置補正を行う
-	//// 90度
-	//if (DirectX::XMConvertToDegrees(m_angle.y) > 89.9f && DirectX::XMConvertToDegrees(m_angle.y) < 90.1f)
-	//{
-	//	m_aabb.position.z += tileScale;
-	//}
-
-	//// 180度
-	//if (DirectX::XMConvertToDegrees(m_angle.y) > 179.9f && DirectX::XMConvertToDegrees(m_angle.y) < 180.1f)
-	//{
-	//	m_aabb.position.x += tileScale;
-	//	m_aabb.position.z += tileScale;
-	//}
-
-	//// 270度
-	//if (DirectX::XMConvertToDegrees(m_angle.y) > 269.9f && DirectX::XMConvertToDegrees(m_angle.y) < 270.1f)
-	//{
-	//	m_aabb.position.x -= tileScale;
-	//}
-
-	//// 90度か270度ならxとzを逆転させる
-	//if ((DirectX::XMConvertToDegrees(m_angle.y) > 89.9f && DirectX::XMConvertToDegrees(m_angle.y) < 90.1f) ||
-	//	(DirectX::XMConvertToDegrees(m_angle.y) > 269.9f && DirectX::XMConvertToDegrees(m_angle.y) < 270.1f))
-	//{
-	//	AABB buf = m_aabb;
-
-	//	m_aabb.position.x = m_aabb.position.z;
-	//	m_aabb.position.z = buf.position.x;
-
-	//	m_aabb.radii.x = m_aabb.radii.z;
-	//	m_aabb.radii.z = buf.radii.x;
-	//}
 }
