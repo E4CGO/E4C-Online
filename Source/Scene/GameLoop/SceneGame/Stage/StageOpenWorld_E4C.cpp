@@ -15,7 +15,13 @@
 
 #include "Scene/Stage/StageManager.h"
 
-#include "Scene/Stage/TestingStage.h"
+#include "Scene/GameLoop/SceneGame/Stage/StageDungeon_E4C.h"
+
+#include "Network/OnlineController.h"
+
+#include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
+
+static float timer = 0;
 
 void StageOpenWorld_E4C::Initialize()
 {
@@ -24,36 +30,23 @@ void StageOpenWorld_E4C::Initialize()
 	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.025f);
 	stage_collision->Update(0);
 	MAPTILES.Register(stage_collision);
+	MAPTILES.CreateSpatialIndex(5, 7);
 
 	map = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 2.5f, ModelObject::RENDER_MODE::DX11GLTF);
 
-	door = std::make_unique<ModelObject>("Data/Model/Stage/Doorway_Parent_006_new.glb", 1.0f, ModelObject::RENDER_MODE::DX11GLTF);
-	door->SetAngle({ 0.0, 90.0f, 0.0f });
-
-	teleporter = std::make_unique<Teleporter>("Data/Model/Cube/testCubes.glb", 1.0);
-	teleporter->SetPosition({ 50, 0, 60 });
+	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene));
+	teleporter->SetPosition({ 0, 5, 0 });
+	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
 
 	{
 		std::array<DirectX::XMFLOAT3, 4 > positions = {
-		DirectX::XMFLOAT3{ 10.0f, 10.0f, 5.0f},
-		DirectX::XMFLOAT3{ 10.0f, 20.0f, 5.0f },
-		DirectX::XMFLOAT3{ 5.0f, 10.0f, 5.0f },
-		DirectX::XMFLOAT3{ 5.0f, 20.0f, 5.0f }
+			DirectX::XMFLOAT3{ 10.0f, 10.0f, 5.0f},
+			DirectX::XMFLOAT3{ 10.0f, 20.0f, 5.0f },
+			DirectX::XMFLOAT3{ 5.0f, 10.0f, 5.0f },
+			DirectX::XMFLOAT3{ 5.0f, 20.0f, 5.0f }
 		};
 
 		plane = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "Data/Sprites/gem.png", 1.0f, positions);
-	}
-
-	{
-		std::array<DirectX::XMFLOAT3, 4 >positions = {
-			DirectX::XMFLOAT3{ 15.0f, 15.0f, 5.0f},
-			DirectX::XMFLOAT3{ 15.0f, 25.0f, 5.0f },
-			DirectX::XMFLOAT3{ 25.0f, 15.0f, 5.0f },
-			DirectX::XMFLOAT3{ 25.0f, 25.0f, 5.0f }
-		};
-
-		portal = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, positions);
-		portal.get()->SetShader(ModelShaderId::Portal);
 	}
 
 	// 光
@@ -84,44 +77,61 @@ void StageOpenWorld_E4C::Initialize()
 	cameraController->SyncCameraToController(mainCamera);
 	cameraController->SetEnable(true);
 	cameraController->SetPlayer(player);
+	CURSOR_OFF;
+
+	{
+		HRESULT hr;
+
+		D3D11_BUFFER_DESC buffer_desc{};
+		buffer_desc.ByteWidth = (sizeof(CbScene) + 15) / 16 * 16;
+		buffer_desc.Usage = D3D11_USAGE_DEFAULT;
+		buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		buffer_desc.CPUAccessFlags = 0;
+		buffer_desc.MiscFlags = 0;
+		buffer_desc.StructureByteStride = 0;
+		hr = T_GRAPHICS.GetDevice()->CreateBuffer(&buffer_desc, nullptr, constant_buffers[1].GetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+	}
 }
 
 void StageOpenWorld_E4C::Update(float elapsedTime)
 {
 	Camera* camera = CameraManager::Instance().GetCamera();
-	std::vector<DirectX::XMFLOAT3> cameraFocusPoints = {
-		camera->GetFocus(),
-		camera->GetFocus(),
-		camera->GetFocus(),
-		camera->GetFocus()
-		//{CameraManager::Instance().GetCamera()->GetFocus().x, CameraManager::Instance().GetCamera()->GetFocus().y, CameraManager::Instance().GetCamera()->GetFocus().z}
-	};
+	Online::OnlineController* onlineController = m_pScene->GetOnlineController();
+	if (onlineController->GetState() == Online::OnlineController::STATE::LOGINED)
+	{
+		onlineController->BeginSync();
+	}
+
 	// ゲームループ内で
+	cameraController->SyncContrllerToCamera(camera);
+	cameraController->Update(elapsedTime);
 
-	if (T_INPUT.KeyPress(VK_SHIFT))
+	if (T_INPUT.KeyDown(VK_MENU))
 	{
-		CameraManager::Instance().GetCamera()->MovePointToCamera(cameraPositions, cameraFocusPoints, transitionTime, transitionDuration, elapsedTime);
+		if (TentacleLib::isShowCursor())
+		{
+			cameraController->SetEnable(true);
+			CURSOR_OFF;
+		}
+		else
+		{
+			cameraController->SetEnable(false);
+			CURSOR_ON;
+		}
 	}
-	else
+	if (!TentacleLib::isFocus())
 	{
-		cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
-		cameraController->Update(elapsedTime);
-		CameraManager::Instance().GetCamera()->GetSegment() = 0;
-		transitionTime = 0;
+		cameraController->SetEnable(false);
+		CURSOR_ON;
 	}
-
+	if (cameraController->isEnable())
+	{
+		T_INPUT.KeepCursorCenter();
+	}
 	PlayerCharacterManager::Instance().Update(elapsedTime);
 	teleporter->Update(elapsedTime);
 	plane->Update(elapsedTime);
-	portal->Update(elapsedTime);
-
-	door->Update(elapsedTime);
-
-	teleporter->CheckPlayer(PlayerCharacterManager::Instance().GetPlayerCharacterById(GAME_DATA.GetClientId())->GetPosition(), elapsedTime);
-
-	if (teleporter->GetPortalReady()) STAGES.ChangeStage(new TestingStage);
-
-	map->Update(elapsedTime);
 
 	timer += elapsedTime;
 }
@@ -130,12 +140,6 @@ void StageOpenWorld_E4C::Render()
 {
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->Clear(T_GRAPHICS.GetDeviceContext(), 0.2f, 0.2f, 0.2f, 1);
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
-#ifdef _DEBUG
-	{
-		T_GRAPHICS.GetDebugRenderer()->DrawSphere(cameraPositions, 2, { 1,0,0,1 });
-		T_GRAPHICS.GetDebugRenderer()->DrawSphere(CameraManager::Instance().GetCamera(0)->GetEye(), 2, { 1,1,0,1 });
-	}
-#endif // _DEBUG
 
 	// 描画コンテキスト設定
 	RenderContext rc;
@@ -156,7 +160,6 @@ void StageOpenWorld_E4C::Render()
 
 	teleporter->Render(rc);
 	plane->Render(rc);
-	portal->Render(rc);
 
 	door->Render(rc);
 

@@ -71,7 +71,7 @@ void Player::UpdateTarget()
 	{
 		target = hit.position;
 	}
-	//else if (MAPTILES.RayCast(start, end, hit))
+	//else if (MAPTILES.VerticalRayCast(start, end, hit))
 	//{
 	//	target = hit.position;
 	//}
@@ -317,7 +317,7 @@ void Player::Update(float elapsedTime)
 		UpdateSkillTimers(elapsedTime);
 	}
 	{
-		ProfileScopedSection_2("character", ImGuiControl::Profiler::Purple);
+		//ProfileScopedSection_2("character", ImGuiControl::Profiler::Purple);
 		Character::Update(elapsedTime);
 	}
 }

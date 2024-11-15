@@ -1,18 +1,26 @@
-#include "TAKOEngine/Runtime/tentacle_lib.h"
+﻿#include "TAKOEngine/Runtime/tentacle_lib.h"
 
-#include <DirectXCollision.h>
+//#include <DirectXCollision.h>
 #include "SphereCollider.h"
+#include "Source/Map/MapTileManager.h"
 
-SphereCollider::SphereCollider(float radius)
+SphereCollider::SphereCollider(float _radius)
 {
-	scale = { radius, radius, radius };
+	radius = _radius;
 	type = COLLIDER_TYPE::SPHERE;
+}
+
+// Sphere用パラメータセット
+void SphereCollider::SetParam(Sphere sphere)
+{
+	position = sphere.position;
+	radius = sphere.radius;
 }
 
 void SphereCollider::DrawDebugPrimitive(DirectX::XMFLOAT4 color)
 {
 	if (!enable) return;
-	T_GRAPHICS.GetDebugRenderer()->DrawSphere(position, scale.x, color);
+	T_GRAPHICS.GetDebugRenderer()->DrawSphere(position, radius, color);
 }
 
 bool SphereCollider::CollisionVsShpere(
@@ -35,6 +43,21 @@ bool SphereCollider::CollisionVsShpere(
 	return false;
 }
 
+bool SphereCollider::CollisionVsMap(bool wallCheck)
+{
+	Sphere sphere;
+	sphere.position = position;
+	sphere.radius = radius;
+
+	if (MAPTILES.IntersectSphereVsMap(sphere, wallCheck))
+	{
+		position = sphere.position;
+		return true;
+	}
+	return false;
+};
+
+
 bool SphereCollider::RayCast(
 	const DirectX::XMFLOAT3& start,
 	const DirectX::XMFLOAT3& end,
@@ -54,13 +77,13 @@ bool SphereCollider::RayCast(
 	if (A == 0.0f) return false; // Ray Error
 
 	float s = B * B - A * C;
-	if (s < 0.0f) return false; // �Փ˂��Ă��Ȃ�
+	if (s < 0.0f) return false; // 衝突していない
 
 	s = sqrtf(s);
 	float a1 = (B - s) / A;
 	float a2 = (B + s) / A;
 
-	if (a1 < 0.0f || a2 < 0.0f) return false; // ���C�̔��΂ŏՓ�
+	if (a1 < 0.0f || a2 < 0.0f) return false; // レイの反対で衝突
 
 	result.position.x = start.x + a1 * v.x;
 	result.position.y = start.y + a1 * v.y;

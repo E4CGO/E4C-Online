@@ -4,6 +4,7 @@
 #include "TAKOEngine/Physics/UnrotatedBoxCollider.h"
 #include "TAKOEngine/Physics/BoundingBoxCollider.h"
 #include "TAKOEngine/Physics/SphereCollider.h"
+#include "TAKOEngine/Physics/CapsuleCollider.h"
 #include "TAKOEngine/Physics/ModelCollider.h"
 #include "TAKOEngine/Physics/MapCollider.h"
 
@@ -89,7 +90,7 @@ void ModelObject::SetModelAnimation(const int model_idx, const int animation_ind
 	@brief	全てのモデルのアニメーション判定
 	@return	アニメーション中判定
 *//***************************************************************************/
-bool ModelObject::IsPlayAnimaition(void)
+bool ModelObject::IsPlayAnimation(void)
 {
 	for (auto& model : m_pmodels)
 	{
@@ -102,7 +103,7 @@ bool ModelObject::IsPlayAnimaition(void)
 	@param[in]	idx モデルインデックス
 	@return	アニメーション中判定
 *//***************************************************************************/
-bool ModelObject::IsPlayAnimaition(int idx)
+bool ModelObject::IsPlayAnimation(int idx)
 {
 	return m_pmodels[idx]->IsPlayAnimation();
 }
@@ -114,12 +115,12 @@ bool ModelObject::IsPlayAnimaition(int idx)
 *//***************************************************************************/
 void ModelObject::Update(float elapsedTime)
 {
+	// 行列更新
+	UpdateTransform();
+
 	for (auto& model : m_pmodels)
 	{
 		if (model == nullptr) continue;
-
-		// 行列更新
-		UpdateTransform();
 
 		// アニメーション更新
 		model->UpdateAnimation(elapsedTime * m_animationSpeed);
@@ -163,14 +164,17 @@ void ModelObject::SetCollider(Collider::COLLIDER_TYPE collider, int idx)
 {
 	switch (collider)
 	{
+	case Collider::COLLIDER_TYPE::SPHERE:
+		this->collider = std::make_unique<SphereCollider>();
+		break;
 	case Collider::COLLIDER_TYPE::UNROTATED_BOX:
 		this->collider = std::make_unique<UnrotatedBoxCollider>();
 		break;
+	case Collider::COLLIDER_TYPE::CAPSULE:
+		this->collider = std::make_unique<CapsuleCollider>();
+		break;
 	case Collider::COLLIDER_TYPE::MODEL:
 		this->collider = std::make_unique<ModelCollider>(m_pmodels[idx].get());
-		break;
-	case Collider::COLLIDER_TYPE::SPHERE:
-		this->collider = std::make_unique<SphereCollider>();
 		break;
 	case Collider::COLLIDER_TYPE::BOUNDING_BOX:
 		this->collider = std::make_unique<BoundingBoxCollider>(m_pmodels[idx].get());

@@ -44,6 +44,11 @@ public:
 	void RegisterState(int id, HierarchicalState<T>* state)
 	{
 		if (statePool.find(id) != statePool.end()) delete statePool[id];
+		if (state == nullptr)
+		{
+			statePool.erase(id);
+			return;
+		}
 		statePool[id] = state;
 	}
 	// 現在のステート番号取得

@@ -22,7 +22,7 @@ class SceneGame_E4C;
 class StageOpenWorld_E4C : public Stage
 {
 public:
-	StageOpenWorld_E4C(SceneGame_E4C* scene) : m_scene(scene), Stage() {};
+	StageOpenWorld_E4C(SceneGame_E4C* scene) : m_pScene(scene), Stage() {};
 
 	void Initialize() override;
 
@@ -37,7 +37,7 @@ public:
 		NORMAL,
 	};
 private:
-	SceneGame_E4C* m_scene;
+	SceneGame_E4C* m_pScene;
 
 	std::unique_ptr<ThridPersonCameraController> cameraController;
 
@@ -45,7 +45,6 @@ private:
 
 	std::unique_ptr <Teleporter> teleporter;
 	std::unique_ptr <Plane> plane;
-	std::unique_ptr <Plane> portal;
 
 	std::unique_ptr<ModelObject> map;
 	std::unique_ptr<ModelObject> door;

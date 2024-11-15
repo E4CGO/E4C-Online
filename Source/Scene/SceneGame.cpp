@@ -11,6 +11,7 @@
 #include "TAKOEngine/GUI/UIManager.h"
 #include "TAKOEngine/GUI/Dialog.h"
 #include "TAKOEngine/Physics/Collision.h"
+#include "TAKOEngine/Physics/CollisionManager.h"
 #include "TAKOEngine/Physics/CollisionDataManager.h"
 #include "TAKOEngine/Effects/EffectManager.h"
 #include "TAKOEngine/Tool/Encode.h"

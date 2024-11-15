@@ -48,9 +48,6 @@ public:
 	const DirectX::XMFLOAT3& GetScale() const { return scale; }
 	// スケール設定
 	void SetScale(const DirectX::XMFLOAT3& scale) { this->scale = scale; }
-
-protected:
-	virtual void UpdateColliders() {};
 protected:
 
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;

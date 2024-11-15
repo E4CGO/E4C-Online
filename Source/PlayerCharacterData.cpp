@@ -16,7 +16,8 @@ PlayerCharacterData::PlayerCharacterData()
 	m_pAppearancePatterns[APPEARANCE_PATTERN::GENDER].push_back(new PlayerCharacterPatternGender(false));
 
 	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternNone);
-	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/WEAPON_BARB.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSword("Data/Model/Character/WEAPON_KNIGHT.glb"));
+	//m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternAxe("Data/Model/Character/WEAPON_BARB.glb"));
 	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/WEAPON_MAGE.glb"));
 }
 
@@ -27,7 +28,7 @@ PlayerCharacterData::PlayerCharacterData()
 	@param[in]	pattern_idx		外見パターン
 	@return		なし
 *//***************************************************************************/
-void PlayerCharacterData::LoadAppearance(Character* chara, uint8_t appearance_idx, uint8_t pattern_idx)
+void PlayerCharacterData::LoadAppearance(PlayerCharacter* chara, uint8_t appearance_idx, uint8_t pattern_idx)
 {
 	if (m_pAppearancePatterns.find(appearance_idx) == m_pAppearancePatterns.end()) return;
 	if (m_pAppearancePatterns[appearance_idx].size() <= pattern_idx) return;
