@@ -36,7 +36,7 @@ void StageOpenWorld_E4C::Initialize()
 	map = std::make_unique<gltf_model>(T_GRAPHICS.GetDevice(), "Data/Model/Stage/Terrain_Map.glb");
 	//map = std::make_unique<gltf_model>(T_GRAPHICS.GetDevice(), "Data/Model/Dungeon/Doorway Parent 006_new.glb");
 
-	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene));
+	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
 	teleporter->SetPosition({ 0, 5, 0 });
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
 
@@ -220,14 +220,11 @@ void StageOpenWorld_E4C::Render()
 		rc.deviceContext->VSSetConstantBuffers(1, 1, constant_buffers[1].GetAddressOf());
 		rc.deviceContext->PSSetConstantBuffers(1, 1, constant_buffers[1].GetAddressOf());
 
-		//map->render(rc, world, animated_nodes);
+		map->render(rc, world, animated_nodes);
 	}
 
 	teleporter->Render(rc);
 	plane->Render(rc);
-
-	// デバッグレンダラ描画実行
-	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
 }
 
 void StageOpenWorld_E4C::OnPhase()

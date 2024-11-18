@@ -6,12 +6,13 @@
 #include "TAKOEngine/Tool/XMFLOAT.h"
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "Scene/Stage/StageManager.h"
+#include "TAKOEngine/GUI/UIManager.h"
 /**************************************************************************//**
 	@brief		コンストラクタ
 	@param[in]	stage	ステージ参照ポインタ
 	@return	なし
 *//***************************************************************************/
-Teleporter::Teleporter(Stage* stage) : m_pStage(stage), ModelObject()
+Teleporter::Teleporter(Stage* stage, Online::OnlineController* onlineController) : m_pStage(stage), m_pOnlineController(onlineController), ModelObject()
 {
 	m_timer = 0.0f;
 	SetShader(ModelShaderId::Portal);
@@ -81,21 +82,29 @@ Teleporter::Teleporter(Stage* stage) : m_pStage(stage), ModelObject()
 void Teleporter::Update(float elapsedTime)
 {
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
-	if (player != nullptr && XMFLOAT3LengthSq(player->GetPosition() - position) < m_radius * m_radius)
+	const float radius = 0.5f * scale.x;
+	if (player != nullptr && XMFLOAT3LengthSq(player->GetPosition() - (position - DirectX::XMFLOAT3{ 0.0f, 0.5f * scale.y, 0.0f })) < radius* radius)
 	{
 		m_timer += elapsedTime;
 		if (m_timer >= m_portalTime)
 		{
-			StageManager::Instance().ChangeStage(m_pStage);
-			m_pStage = nullptr;
+			if (m_pWidgetMatching == nullptr)
+			{
+				m_pWidgetMatching = new WidgetMatching(m_pOnlineController, this);
+				UI.Register(m_pWidgetMatching);
+			}
 		}
 	}
 	else
 	{
 		m_timer = 0.0f;
+		if (m_pWidgetMatching != nullptr)
+		{
+			UI.Remove(m_pWidgetMatching);
+			m_pOnlineController->EndMathcing();
+			m_pWidgetMatching = nullptr;
+		}
 	}
-
-	angle.y += RADIAN1;
 
 	ModelObject::Update(elapsedTime);
 
@@ -128,11 +137,23 @@ void Teleporter::Render(const RenderContext& rc)
 	// 頂点バッファの内容の編集を終了する
 	rc.deviceContext->Unmap(m_mesh.vertexBuffer.Get(), 0);
 
-
 	ModelShader* shader = T_GRAPHICS.GetModelShader(m_shaderId);
 	shader->Begin(rc);
 	shader->Draw(rc, m_mesh);
 	shader->End(rc);
+}
+
+/**************************************************************************//**
+ 	@brief		転送開始
+	@param[in]	なし
+	@return		なし
+*//***************************************************************************/
+void Teleporter::Teleport()
+{
+	StageManager::Instance().ChangeStage(m_pStage);
+	UI.Remove(m_pWidgetMatching);
+	m_pWidgetMatching = nullptr;
+	m_pStage = nullptr;
 }
 
 /**************************************************************************//**
@@ -143,8 +164,10 @@ void Teleporter::Render(const RenderContext& rc)
 Teleporter::~Teleporter()
 {
 	if (m_pStage != nullptr)
+	{
 		delete m_pStage;
-	m_pStage = nullptr;
+		m_pStage = nullptr;
+	}
 
 	if (m_mesh.material != nullptr)
 		delete m_mesh.material;

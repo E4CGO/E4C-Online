@@ -9,17 +9,33 @@
 namespace Online
 {
 	/**************************************************************************//**
-		@brief		クライアント入室受信関数
+		@brief		入室命令受信関数
 		@param[in]	size データサイズ
 		@return		成功判定
 	*//***************************************************************************/
 	bool TCPRoomIn::Receive(size_t size)
 	{
-		PlayerCharacter* player = ReceiveClient();
-		if (player == nullptr) return false;
+		return false;
+	}
 
-		std::cout << player->GetName() << reinterpret_cast <const char*>(u8" が 入室しました。") << std::endl;
-		return true;
+	/**************************************************************************//**
+	 	@brief		入室命令送信関数
+		@param[in]	data データ参照ポインタ
+		@return		成功判断
+	*//***************************************************************************/
+	bool TCPRoomIn::Send(void* data)
+	{
+		return false;
+	}
+
+	/**************************************************************************//**
+	 	@brief		部屋作りの受信関数
+		@param[in]	size データサイズ
+		@return		成功判断
+	*//***************************************************************************/
+	bool TCPRoomNew::Receive(size_t size)
+	{
+		return false;
 	}
 
 

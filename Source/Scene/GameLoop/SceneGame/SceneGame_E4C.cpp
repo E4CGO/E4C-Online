@@ -34,7 +34,7 @@ void SceneGame_E4C::Initialize()
 	cameraManager.Register(mainCamera);
 	cameraManager.SetCamera(0);
 
-	Console::Instance().Open();
+	//Console::Instance().Open();
 
 	// 選択した自機
 	const PlayerCharacterData::CharacterInfo info = PlayerCharacterData::Instance().GetCurrentCharacter();
@@ -72,16 +72,24 @@ void SceneGame_E4C::Finalize()
 void SceneGame_E4C::Update(float elapsedTime)
 {
 	STAGES.Update(elapsedTime);
-
+	UI.Update(elapsedTime);
 	stateMachine->Update(elapsedTime);
 }
 
 // 描画処理
 void SceneGame_E4C::Render()
 {
+	T_TEXT.Begin();
 	RenderContext rc;
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
 	STAGES.Render();
+
+	UI.Render(rc);
+
+	T_TEXT.End();
+	// デバッグレンダラ描画実行
+	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
+
 }

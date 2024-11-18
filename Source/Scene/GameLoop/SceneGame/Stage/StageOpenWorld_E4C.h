@@ -24,6 +24,7 @@ class StageOpenWorld_E4C : public Stage
 {
 public:
 	StageOpenWorld_E4C(SceneGame_E4C* scene) : m_pScene(scene), Stage() {};
+	~StageOpenWorld_E4C() {};
 
 	void Initialize() override;
 
