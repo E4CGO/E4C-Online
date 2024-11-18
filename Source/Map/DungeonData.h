@@ -21,6 +21,7 @@ public:
 		END_ROOM,
 		CROSS_ROOM_1,
 		PASSAGE_1,
+		DEAD_END,
 
 		ENUM_COUNT
 	};
@@ -39,22 +40,26 @@ public:
 		int maxDepth;	// 最大深度、親からの距離（深度）がこの値以上になった場合、終端の部屋を生成する
 	};
 
+
+
 	// 部屋の生成配列を取得
-	std::vector<UINT16> GetRoomTree() { return m_roomTree; }
+	std::vector<uint8_t> GetRoomTree() { return m_roomTree; }
 
 	// 次の生成配列内データを取得
-	UINT16 GetNextRoom()
+	uint8_t GetNextRoom()
 	{
-		UINT16 ret = m_roomTree.at(m_roomTreeIndex);
+		if (m_roomTreeIndex >= m_roomTree.size()) return DEAD_END;
+
+		uint8_t ret = m_roomTree.at(m_roomTreeIndex);
 		m_roomTreeIndex++;
 		return ret;
 	}
 
 	// 部屋の生成配列を設定
-	void SetRoomTree(std::vector<UINT16> newRoomTree) { m_roomTree = newRoomTree; }
+	void SetRoomTree(std::vector<uint8_t> newRoomTree) { m_roomTree = newRoomTree; }
 
 	// 部屋の生成配列に追加
-	void AddRoomTree(UINT16 newRoom) { m_roomTree.emplace_back(newRoom); }
+	void AddRoomTree(uint8_t newRoom) { m_roomTree.emplace_back(newRoom); }
 
 
 
@@ -84,7 +89,7 @@ public:
 	DungeonGenerateSetting GetDungeonGenerateSetting() { return m_dungeonGenerateSettings; }
 
 private:
-	std::vector<UINT16> m_roomTree;	// 部屋の生成配列
+	std::vector<uint8_t> m_roomTree;	// 部屋の生成配列
 	std::vector<AABB> m_roomAABBs;	// 部屋のAABB配列
 	int m_roomTreeIndex = 0;
 	int m_roomAABBsIndex = 0;

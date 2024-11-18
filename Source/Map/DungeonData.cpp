@@ -53,8 +53,17 @@ DungeonData::DungeonData()
 		m_roomGenerateSettings.at(PASSAGE_1) = setting;
 	}
 
+	// DEAD_END
+	{
+		RoomGenerateSetting setting;
+		setting.weight = 0;
+		setting.aabb.position = { 0.0f, 0.0f, 0.0f };
+		setting.aabb.radii = { 0.0f, 0.0f, 0.0f };
+		m_roomGenerateSettings.at(DEAD_END) = setting;
+	}
+
 
 
 	// ダンジョンの生成設定
-	m_dungeonGenerateSettings.maxDepth = 4;
+	m_dungeonGenerateSettings.maxDepth = 3;
 }

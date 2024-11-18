@@ -7,6 +7,7 @@
 #include "Map/EndRoom1.h"
 #include "Map/CrossRoom1.h"
 #include "Map/Passage1.h"
+#include "Map/DeadEndRoom.h"
 
 #include "MapTile.h"
 #include "MapTileManager.h"
@@ -198,67 +199,23 @@ void RoomBase::GenerateNextRoom()
 							break;
 						}
 					}
-
+				}
+				// 何も生成できないならば行き止まり用の部屋を生成する
+				else
+				{
+					DeadEndRoom* deadEnd = new DeadEndRoom(this, i);
+					AddRoom(deadEnd);
 				}
 			}
-
-			//// 接続点の数だけ子を生成する
-			//for (int i = 0; i < m_connectPointDatas.size(); i++)
-			//{
-			//	// 他の部屋と重ならない部屋が存在しない場合は処理を行わない
-			//	if (placeableRooms.at(i).size() < 1) continue;
-
-			//	// 接続可能な部屋の重みの合計
-			//	int totalWeight = 0;
-			//	for (DungeonData::RoomType type : placeableRooms.at(i))
-			//	{
-			//		totalWeight += dungeonData.GetRoomGenerateSetting(type).weight;
-			//	}
-
-			//	int randomValue = std::rand() % totalWeight;
-			//	for (DungeonData::RoomType type : placeableRooms.at(i))
-			//	{
-			//		randomValue -= dungeonData.GetRoomGenerateSetting(type).weight;
-
-			//		if (randomValue < 0)
-			//		{
-			//			RoomBase* nextRoom = nullptr;
-
-			//			switch (type)
-			//			{
-			//			case DungeonData::SIMPLE_ROOM_1:
-			//				nextRoom = new SimpleRoom1(this, i);
-			//				break;
-
-			//			case DungeonData::END_ROOM:
-			//				nextRoom = new EndRoom1(this, i);
-			//				break;
-
-			//			case DungeonData::CROSS_ROOM_1:
-			//				nextRoom = new CrossRoom1(this, i);
-			//				break;
-
-			//			case DungeonData::PASSAGE_1:
-			//				//nextRoom = new Passage1(this, i, roomAABBs);
-			//				break;
-
-			//			default:
-			//				break;
-			//			}
-			//			AddRoom(nextRoom);
-			//			break;
-			//		}
-			//	}
-			//}
 		}
-		// 一定の深度を超えた場合は終端の部屋を生成する
+		// 一定の深度を超えた場合は行き止まり用の部屋を生成する
 		else
 		{
-			// 接続点の数だけ終端の部屋を生成する
+			// 接続点の数だけ行き止まり用の部屋を生成する
 			for (int i = 0; i < m_connectPointDatas.size(); i++)
 			{
-				//RoomBase* nextEndRoom = new EndRoom1(this, i, roomAABBs);
-				//AddRoom(nextEndRoom);
+				DeadEndRoom* deadEnd = new DeadEndRoom(this, i);
+				AddRoom(deadEnd);
 			}
 		}
 
@@ -269,33 +226,34 @@ void RoomBase::GenerateNextRoom()
 		// 接続点の数だけ子を生成する
 		for (int i = 0; i < m_connectPointDatas.size(); i++)
 		{
-			/*
+			uint8_t nextRoomType = dungeonData.GetNextRoom();
+
 			RoomBase* nextRoom = nullptr;
 
-			if (treeIndex >= roomTree.size()) break;
-
-			switch (roomTree[treeIndex])
+			switch (nextRoomType)
 			{
 			case DungeonData::SIMPLE_ROOM_1:
-				nextRoom = new SimpleRoom1(this, i, roomTree, ++treeIndex);
+				nextRoom = new SimpleRoom1(this, i);
 				break;
 
 			case DungeonData::END_ROOM:
-				nextRoom = new EndRoom1(this, i, roomTree, ++treeIndex);
+				nextRoom = new EndRoom1(this, i);
 				break;
 
 			case DungeonData::CROSS_ROOM_1:
-				nextRoom = new CrossRoom1(this, i, roomTree, ++treeIndex);
+				nextRoom = new CrossRoom1(this, i);
 				break;
 
 			case DungeonData::PASSAGE_1:
-				nextRoom = new Passage1(this, i, roomTree, ++treeIndex);
+				nextRoom = new Passage1(this, i);
+				break;
+
+			case DungeonData::DEAD_END:
+				nextRoom = new DeadEndRoom(this, i);
 				break;
 			}
 			AddRoom(nextRoom);
-			*/
 		}
-
 	}
 }
 
@@ -400,6 +358,7 @@ int RoomBase::DrawDebugGUI(int i)
 	case DungeonData::END_ROOM:		 nameStr = "EndRoom";		break;
 	case DungeonData::CROSS_ROOM_1:	 nameStr = "CrossRoom1";	break;
 	case DungeonData::PASSAGE_1:	 nameStr = "Passage1";		break;
+	case DungeonData::DEAD_END:		 nameStr = "DeadEnd";		break;
 	default: break;
 	}
 

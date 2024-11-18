@@ -18,6 +18,7 @@
 #include "Map/EndRoom1.h"
 #include "Map/CrossRoom1.h"
 #include "Map/Passage1.h"
+#include "Map/DeadEndRoom.h"
 
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
@@ -29,7 +30,7 @@ class StageDungeon_E4C : public Stage
 {
 public:
 	// コンストラクタ
-	StageDungeon_E4C(SceneGame_E4C* scene) {}
+	StageDungeon_E4C(SceneGame_E4C* scene) : m_pScene(scene), Stage() {}
 
 	void GenerateDungeon();
 

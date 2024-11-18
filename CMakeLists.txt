@@ -159,6 +159,8 @@ set(Source__Map
     "Source/Map/DungeonData.h"
     "Source/Map/EndRoom1.cpp"
     "Source/Map/EndRoom1.h"
+    "Source/Map/DeadEndRoom.cpp"
+    "Source/Map/DeadEndRoom.h"
     "Source/Map/Map001.cpp"
     "Source/Map/Map001.h"
     "Source/Map/Map001BossRoomTeleport.cpp"

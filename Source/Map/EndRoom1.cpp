@@ -10,7 +10,7 @@ EndRoom1::EndRoom1(
 	// 部屋タイプを設定
 	roomType = DungeonData::END_ROOM;
 
-	// 次の部屋の生成を行う
+	// 生成を行う（接続点がないため次の部屋は生成されない）
 	GenerateNextRoom();
 }
 
