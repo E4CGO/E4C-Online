@@ -2,10 +2,10 @@
 
 #include "RoomBase.h"
 
-class CrossRoom1 : public RoomBase
+class DeadEndRoom : public RoomBase
 {
 public:
-	CrossRoom1(
+	DeadEndRoom(
 		RoomBase* parent,
 		int pointIndex);
 
