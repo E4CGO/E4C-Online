@@ -80,11 +80,6 @@ void RoomBase::GenerateNextRoom()
 	// 部屋データのロード（接続点データ設定もここで行う）
 	LoadMapData();
 
-	if (depth == 1 && this->roomType == DungeonData::CROSS_ROOM_1)
-	{
-		int a = 0;
-	}
-
 	// 自身のAABBを算出
 	m_aabb = CalcAABB(dungeonData.GetRoomGenerateSetting(roomType).aabb,
 		m_position, DirectX::XMConvertToDegrees(m_angle.y));
@@ -203,6 +198,8 @@ void RoomBase::GenerateNextRoom()
 				// 何も生成できないならば行き止まり用の部屋を生成する
 				else
 				{
+					//EndRoom1* end = new EndRoom1(this, i);
+					//AddRoom(end);
 					DeadEndRoom* deadEnd = new DeadEndRoom(this, i);
 					AddRoom(deadEnd);
 				}
@@ -255,6 +252,8 @@ void RoomBase::GenerateNextRoom()
 			AddRoom(nextRoom);
 		}
 	}
+
+	int salmon = 0;
 }
 
 AABB RoomBase::CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const

@@ -8,7 +8,7 @@ DungeonData::DungeonData()
 	// SIMPLE_ROOM_1
 	{
 		RoomGenerateSetting setting;
-		setting.weight = 70;
+		setting.weight = 50;
 		setting.aabb.position = { 2.0f, 0.0f, 10.0f };
 		setting.aabb.radii = { 10.0f, 100.0f, 6.0f };
 		//setting.placementCandidates.emplace_back(RoomType::SIMPLE_ROOM_1);
