@@ -1,4 +1,8 @@
-#pragma once
+//! @file GLTFModelDX11.h
+//! @note
+
+#ifndef __INCLUDED_GLTF_MODEL_DX11_H__
+#define __INCLUDED_GLTF_MODEL_DX11_H__
 
 #include <map>
 #include <memory>
@@ -17,11 +21,17 @@
 #include "TAKOEngine/Rendering/RenderContext.h"
 #include "TAKOEngine/Rendering/Model/Model.h"
 
-class NewModelDX11 : public iModel
+/**************************************************************************//**
+	@class	GLTFModelDX11
+	@brief	TinyGLTFベースモデル
+	@par    [説明]
+		TinyGLTFで読み込みでモデル作成
+*//***************************************************************************/
+class GLTFModelDX11 : public iModel
 {
 public:
-	NewModelDX11(ID3D11Device* device, const std::string& filename, float scaling = 1.0f, int modelType = 0);
-	~NewModelDX11() {};
+	GLTFModelDX11(ID3D11Device* device, const std::string& filename, float scaling = 1.0f, int modelType = 0);
+	~GLTFModelDX11() {};
 
 	void cumulate_transforms(std::vector<ModelResource::node>& nodes);
 
@@ -52,3 +62,5 @@ private:
 	float scaling = 1.0f;
 	int modelType = 0;
 };
+
+#endif //!__INCLUDED_GLTF_MODEL_DX11_H__

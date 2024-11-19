@@ -38,7 +38,7 @@ set(CMAKE_CONFIGURATION_TYPES
 if(MSVC)
     # remove default flags provided with CMake for MSVC
     set(CMAKE_CXX_FLAGS "")
-    set(CMAKE_CXX_FLAGS_DEBUG "")
+    set(CMAKE_CXX_FLAGS_DEBUG "/Od /Zi")
     set(CMAKE_CXX_FLAGS_RELEASE "")
 endif()
 
@@ -474,6 +474,8 @@ source_group("TAKOEngine\\Physics" FILES ${TAKOEngine__Physics})
 set(TAKOEngine__Rendering
     "TAKOEngine/Rendering/Constant.h"
     "TAKOEngine/Rendering/ConstantBuffer.h"
+    "TAKOEngine/Rendering/Cylinder.cpp"
+    "TAKOEngine/Rendering/Cylinder.h"
     "TAKOEngine/Rendering/DebugRenderer.cpp"
     "TAKOEngine/Rendering/DebugRenderer.h"
     "TAKOEngine/Rendering/DeferredRendering.cpp"
@@ -590,6 +592,8 @@ set(TAKOEngine__Editor__Input
 source_group("TAKOEngine\\Editor\\Input" FILES ${TAKOEngine__Editor__Input})
 
 set(TAKOEngine__Rendering__Model
+    "TAKOEngine/Rendering/Model/GLTFModelDX11.cpp"
+    "TAKOEngine/Rendering/Model/GLTFModelDX11.h"
     "TAKOEngine/Rendering/Model/Model.h"
     "TAKOEngine/Rendering/Model/ModelDX11.cpp"
     "TAKOEngine/Rendering/Model/ModelDX11.h"
@@ -597,14 +601,14 @@ set(TAKOEngine__Rendering__Model
     "TAKOEngine/Rendering/Model/ModelDX12.h"
     "TAKOEngine/Rendering/Model/ModelResource.cpp"
     "TAKOEngine/Rendering/Model/ModelResource.h"
-    "TAKOEngine/Rendering/Model/NewModelDX11.cpp"
-    "TAKOEngine/Rendering/Model/NewModelDX11.h"
 )
 source_group("TAKOEngine\\Rendering\\Model" FILES ${TAKOEngine__Rendering__Model})
 
 set(TAKOEngine__Rendering__Shaders
     "TAKOEngine/Rendering/Shaders/ColorGradingShader.cpp"
     "TAKOEngine/Rendering/Shaders/ColorGradingShader.h"
+    "TAKOEngine/Rendering/Shaders/CylinderShader.cpp"
+    "TAKOEngine/Rendering/Shaders/CylinderShader.h"
     "TAKOEngine/Rendering/Shaders/DeferredLightingShader.cpp"
     "TAKOEngine/Rendering/Shaders/DeferredLightingShader.h"
     "TAKOEngine/Rendering/Shaders/FinalpassShader.cpp"
@@ -743,6 +747,13 @@ set(TAKOEngine__Rendering__HLSL__PostEffect
 source_group("TAKOEngine\\Rendering\\HLSL\\PostEffect" FILES ${TAKOEngine__Rendering__HLSL__PostEffect})
 
 set(TAKOEngine__Rendering__HLSL__Primitives
+    "TAKOEngine/Rendering/HLSL/Primitives/Billboard.hlsli"
+    "TAKOEngine/Rendering/HLSL/Primitives/BillboardGS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/BillboardPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/BillboardVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/Fireball.hlsli"
+    "TAKOEngine/Rendering/HLSL/Primitives/FireballPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/FireballVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/Plane.hlsli"
     "TAKOEngine/Rendering/HLSL/Primitives/PlanePS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/PlaneVS.hlsl"
@@ -895,6 +906,11 @@ set(SHADER_NAMES
     "LuminanceExtractionDX12VS.cso"
     "LuminanceExtractionPS.cso"
     "MaskPS.cso"
+    "BillboardGS.cso"
+    "BillboardPS.cso"
+    "BillboardVS.cso"
+    "FireballPS.cso"
+    "FireballVS.cso"
     "PlanePS.cso"
     "PlaneVS.cso"
     "PortalPS.cso"
@@ -953,6 +969,11 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/LuminanceExtractionDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/LuminanceExtractionPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/MaskPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/BillboardGS.hlsl,5.0,Geometry,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/BillboardPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/BillboardVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/FireballPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/FireballVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlanePS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlaneVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PortalPS.hlsl,5.0,Pixel,main"

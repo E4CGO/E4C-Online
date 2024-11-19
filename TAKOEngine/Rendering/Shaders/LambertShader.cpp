@@ -7,7 +7,11 @@
 #include "TAKOEngine/Rendering/Graphics.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
 
-LambertShader::LambertShader(ID3D11Device* device) : ModelShader(device, "Data/Shader/ToonVS.cso", "Data/Shader/ToonPS.cso")
+/**************************************************************************//**
+// @brief       コンストラクタ
+// @param[in]   device　    ID3D11Device*
+*//***************************************************************************/
+LambertShader::LambertShader(ID3D11Device* device) : ModelShader()
 {
 	//// 入力レイアウト
 	D3D11_INPUT_ELEMENT_DESC inputElementDesc[]
@@ -41,35 +45,18 @@ LambertShader::LambertShader(ID3D11Device* device) : ModelShader(device, "Data/S
 	// シーン用定数バッファ
 	GpuResourceUtils::CreateConstantBuffer(
 		device,
-		sizeof(CbScene),
-		m_sceneConstantBuffer.GetAddressOf());
+		sizeof(::CbScene),
+		this->m_sceneConstantBuffer.GetAddressOf());
 
-	{
-		HRESULT hr;
-		D3D11_BUFFER_DESC buffer_desc{};
+	GpuResourceUtils::CreateConstantBuffer(
+		device,
+		sizeof(primitive_constants),
+		this->m_PrimitiveConstantBuffer.GetAddressOf());
 
-		buffer_desc.ByteWidth = sizeof(primitive_constants);
-		buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-		buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-
-		hr = device->CreateBuffer(&buffer_desc, nullptr, m_PrimitiveConstantBuffer.ReleaseAndGetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-
-		buffer_desc.ByteWidth = sizeof(primitive_joint_constants);
-		buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-		buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		hr = device->CreateBuffer(&buffer_desc, nullptr, m_PrimitiveJointConstantBuffer.ReleaseAndGetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-
-		buffer_desc.ByteWidth = (sizeof(CbScene) + 15) / 16 * 16;
-		buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-		buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		buffer_desc.CPUAccessFlags = 0;
-		buffer_desc.MiscFlags = 0;
-		buffer_desc.StructureByteStride = 0;
-		hr = device->CreateBuffer(&buffer_desc, nullptr, m_SceneConstantBuffer.GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-	}
+	GpuResourceUtils::CreateConstantBuffer(
+		device,
+		sizeof(primitive_joint_constants),
+		this->m_PrimitiveJointConstantBuffer.GetAddressOf());
 }
 
 //******************************************************************
@@ -92,8 +79,8 @@ void LambertShader::Begin(const RenderContext& rc)
 	{
 		m_sceneConstantBuffer.Get(),
 	};
-	immediate_context->VSSetConstantBuffers(0, _countof(constantBuffers), constantBuffers);
-	immediate_context->PSSetConstantBuffers(0, _countof(constantBuffers), constantBuffers);
+	immediate_context->VSSetConstantBuffers(1, _countof(constantBuffers), constantBuffers);
+	immediate_context->PSSetConstantBuffers(1, _countof(constantBuffers), constantBuffers);
 
 	// サンプラステート
 	ID3D11SamplerState* samplerStates[] =
@@ -102,7 +89,7 @@ void LambertShader::Begin(const RenderContext& rc)
 		rc.renderState->GetSamplerState(SamplerState::LinearWrap),
 		rc.renderState->GetSamplerState(SamplerState::AnisotropicWrap),
 	};
-	rc.deviceContext->PSSetSamplers(0, _countof(samplerStates), samplerStates);
+	immediate_context->PSSetSamplers(0, _countof(samplerStates), samplerStates);
 
 	//// レンダーステート設定
 	SetRenderState(rc);
@@ -139,9 +126,7 @@ void LambertShader::Begin(const RenderContext& rc)
 	);
 	cbscene.spotLightCount = rc.spotLightCount;
 
-	rc.deviceContext->UpdateSubresource(m_SceneConstantBuffer.Get(), 0, 0, &cbscene, 0, 0);
-	rc.deviceContext->VSSetConstantBuffers(1, 1, m_SceneConstantBuffer.GetAddressOf());
-	rc.deviceContext->PSSetConstantBuffers(1, 1, m_SceneConstantBuffer.GetAddressOf());
+	immediate_context->UpdateSubresource(m_sceneConstantBuffer.Get(), 0, 0, &cbscene, 0, 0);
 }
 
 //******************************************************************
@@ -164,20 +149,6 @@ void LambertShader::Draw(const RenderContext& rc, const iModel* model, DirectX::
 {
 	ID3D11DeviceContext* immediate_context = rc.deviceContext;
 
-	//const std::vector<iModel::Node>& nodes = model->GetNodes();
-
-	//// カメラに写っている範囲のオブジェクトをフラグでマークする配列を用意
-	//std::vector<bool> visibleObjects(model->GetMeshes().size(), false);
-
-	//// 視錐台カリングを実行して可視オブジェクトをマーク
-	//FrustumCulling::FrustumCullingFlag(model->GetMeshes(), visibleObjects);
-	//int culling = 0;
-
-	//for (const ModelResource::Mesh& mesh : resource->GetMeshes())
-	//{
-	//	if (!visibleObjects[culling++]) continue;
-	//}
-
 	std::function<void(int)> traverse{ [&](int node_index)->void {
 		const ModelResource::node& node {model->gltf_nodes.at(node_index)};
 		if (node.skin > -1)
@@ -193,11 +164,23 @@ void LambertShader::Draw(const RenderContext& rc, const iModel* model, DirectX::
 				);
 			}
 			immediate_context->UpdateSubresource(m_PrimitiveJointConstantBuffer.Get(), 0, 0, &primitive_joint_data, 0, 0);
-			immediate_context->VSSetConstantBuffers(2, 1, m_PrimitiveJointConstantBuffer.GetAddressOf());
 		}
+
+		immediate_context->VSSetConstantBuffers(2, 1, m_PrimitiveJointConstantBuffer.GetAddressOf());
+		immediate_context->PSSetConstantBuffers(2, 1, m_PrimitiveJointConstantBuffer.GetAddressOf());
+
 		if (node.mesh > -1)
 		{
 			const ModelResource::mesh& mesh{ model->meshes.at(node.mesh)};
+
+			//FrustumCulling::FrustumCullingFlag(model->meshes, visibleObjects);
+			//int culling = 0;
+
+			//for (const ModelResource::Mesh& mesh : model->meshes)
+			//{
+			//	if (!visibleObjects[culling++]) continue;
+			//}
+
 			for (std::vector<ModelResource::mesh::primitive>::const_reference primitive : mesh.primitives)
 			{
 				ID3D11Buffer* vertex_buffers[]
@@ -273,10 +256,10 @@ void LambertShader::Draw(const RenderContext& rc, const iModel* model, DirectX::
 	}
 }
 
-void LambertShader::Draw(const RenderContext& rc, const ModelResource::Mesh& mesh)
-{
-}
-
+/**************************************************************************//**
+	@brief
+	@param[in]    rc
+*//***************************************************************************/
 void LambertShader::SetRenderState(const RenderContext& rc)
 {
 	ID3D11DeviceContext* dc = rc.deviceContext;

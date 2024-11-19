@@ -8,10 +8,6 @@
 #include "TAKOEngine/Physics/ModelCollider.h"
 #include "TAKOEngine/Physics/MapCollider.h"
 
-#include "TAKOEngine/Rendering/Model/ModelDX11.h"
-#include "TAKOEngine/Rendering/Model/NewModelDX11.h"
-#include "TAKOEngine/Rendering/Model/ModelDX12.h"
-
 /**************************************************************************//**
 	@brief		コンストラクタ（引数付き）
 	@param[in]	filename	モデルファイルパス
@@ -28,6 +24,7 @@ ModelObject::ModelObject(const char* filename, float scaling, ModelObject::RENDE
 	@param[in]	filename	戻るファイルパス
 	@param[in]	scaling		モデルスケール
 	@param[in]	renderMode	レンダーモード
+	@param[in]	modelType	モデル作り方分け
 	return		なし
 *//***************************************************************************/
 void ModelObject::LoadModel(const char* filename, float scaling, ModelObject::RENDER_MODE renderMode, int modelType)
@@ -42,7 +39,7 @@ void ModelObject::LoadModel(const char* filename, float scaling, ModelObject::RE
 		m_pmodels.push_back(std::make_unique<ModelDX11>(T_GRAPHICS.GetDevice(), filename, scaling, modelType));
 		break;
 	case ModelObject::RENDER_MODE::DX11GLTF:
-		m_pmodels.push_back(std::make_unique<NewModelDX11>(T_GRAPHICS.GetDevice(), filename, scaling, modelType));
+		m_pmodels.push_back(std::make_unique<GLTFModelDX11>(T_GRAPHICS.GetDevice(), filename, scaling, modelType));
 		break;
 	case ModelObject::RENDER_MODE::DX12:
 		break;

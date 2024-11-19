@@ -13,8 +13,6 @@
 
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 
-#include "Scene/Stage/StageManager.h"
-
 #include "Scene/GameLoop/SceneGame/Stage/StageDungeon_E4C.h"
 
 #include "Network/OnlineController.h"
@@ -47,6 +45,8 @@ void StageOpenWorld_E4C::Initialize()
 		};
 
 		plane = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "Data/Sprites/gem.png", 1.0f, positions);
+
+		billboard = std::make_unique<Fireball>(T_GRAPHICS.GetDevice(), "Data/Sprites/fire.png", 1.0f, positions[0]);
 	}
 
 	// 光
@@ -57,6 +57,7 @@ void StageOpenWorld_E4C::Initialize()
 
 	// プレイヤー
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
+	player->SetScale({ 0.5f, 0.5f, 0.5f });
 	player->SetPosition({ 5.0f, 5.0f, 5.0f });
 
 	// カメラ設定
@@ -78,20 +79,6 @@ void StageOpenWorld_E4C::Initialize()
 	cameraController->SetEnable(true);
 	cameraController->SetPlayer(player);
 	CURSOR_OFF;
-
-	{
-		HRESULT hr;
-
-		D3D11_BUFFER_DESC buffer_desc{};
-		buffer_desc.ByteWidth = (sizeof(CbScene) + 15) / 16 * 16;
-		buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-		buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		buffer_desc.CPUAccessFlags = 0;
-		buffer_desc.MiscFlags = 0;
-		buffer_desc.StructureByteStride = 0;
-		hr = T_GRAPHICS.GetDevice()->CreateBuffer(&buffer_desc, nullptr, constant_buffers[1].GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-	}
 }
 
 void StageOpenWorld_E4C::Update(float elapsedTime)
@@ -130,8 +117,11 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 		T_INPUT.KeepCursorCenter();
 	}
 	PlayerCharacterManager::Instance().Update(elapsedTime);
+	map->Update(elapsedTime);
+
 	teleporter->Update(elapsedTime);
 	plane->Update(elapsedTime);
+	billboard->Update(elapsedTime);
 
 	timer += elapsedTime;
 }
@@ -160,8 +150,7 @@ void StageOpenWorld_E4C::Render()
 
 	teleporter->Render(rc);
 	plane->Render(rc);
-
-	door->Render(rc);
+	billboard->Render(rc);
 
 	//MAPTILES.Render(rc);
 

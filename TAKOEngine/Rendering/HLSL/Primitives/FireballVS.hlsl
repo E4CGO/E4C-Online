@@ -1,4 +1,4 @@
-#include "Portal.hlsli"
+#include "Fireball.hlsli"
 
 // 頂点シェーダーエントリポイント
 VS_OUT main(
@@ -10,11 +10,12 @@ VS_OUT main(
 	float3 normal : NORMAL,
 	float3 tangent : TANGENT)
 {
-	VS_OUT vout;
-	
+    VS_OUT vout;
+   
     vout.position = mul(position, ViewProjection);
-	vout.color = color;
-	vout.texcoord = texcoord;
+	
+    vout.color = color;
+    vout.texcoord = texcoord;
 
-	return vout;
+    return vout;
 }

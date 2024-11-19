@@ -77,10 +77,6 @@ void SceneTitle_E4C::Initialize()
 	Sound::Instance().InitAudio();
 	Sound::Instance().LoadAudio("Data/Sound/TitleTheme.mp3");
 	Sound::Instance().PlayAudio(0);
-
-	knight = std::make_unique<ModelObject>("Data/Model/Character/Player/ANM_PCMsword_Prototype_3_ANIMATION.glb", 1.0f, ModelObject::DX11GLTF, 1);
-	knight->SetAnimation(0, true, 0.0f);
-	knight->SetAngle({ 0.0f, 0.0f, 0.0f });
 }
 
 void SceneTitle_E4C::Finalize()
@@ -90,14 +86,13 @@ void SceneTitle_E4C::Finalize()
 	shadowMapRenderer->Clear();
 	Sound::Instance().StopAudio(0);
 	CameraManager::Instance().Clear();
+	LightManager::Instance().Clear();
 }
 
 // 更新処理
 void SceneTitle_E4C::Update(float elapsedTime)
 {
 	time += elapsedTime;
-
-	knight->Update(elapsedTime);
 
 	stateMachine->Update(elapsedTime);
 
@@ -126,8 +121,6 @@ void SceneTitle_E4C::Render()
 
 	// ライトの情報を詰め込む
 	LightManager::Instance().PushRenderContext(rc);
-
-	knight->Render(rc);
 
 	//	シャドウマップ描画
 	shadowMapRenderer->Render();

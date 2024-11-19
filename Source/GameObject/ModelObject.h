@@ -6,7 +6,7 @@
 
 #include "GameObject.h"
 #include "TAKOEngine/Rendering/Model/ModelDX11.h"
-#include "TAKOEngine/Rendering/Model/NewModelDX11.h"
+#include "TAKOEngine/Rendering/Model/GLTFModelDX11.h"
 #include "TAKOEngine/Rendering/Model/ModelDX12.h"
 
 /**************************************************************************//**

@@ -3,9 +3,23 @@
 // 頂点シェーダー出力データ
 struct VS_OUT
 {
-	float4 position : SV_POSITION;
-	float4 color	: COLOR;
-	float2 texcoord : TEXCOORD;
+    float4 position : SV_POSITION;
+    float2 texcoord : TEXCOORD;
+    float4 color : COLOR;
+};
+
+struct GSInput
+{
+    float4 Position : SV_POSITION;
+    float2 texcoord : TEXCOORD0;
+    float4 Color : COLOR;
+};
+
+struct PSInput
+{
+    float4 position : SV_POSITION;
+    float2 texcoord : TEXCOORD0;
+    float4 color : COLOR;
 };
 
 cbuffer CbScene : register(b0)

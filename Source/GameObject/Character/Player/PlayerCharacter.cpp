@@ -1,5 +1,5 @@
 //! @file PlayerCharacter.cpp
-//! @note 
+//! @note
 
 #include "PlayerCharacter.h"
 
@@ -395,8 +395,6 @@ void PlayerCharacter::Update(float elapsedTime)
 	}
 	{
 		ProfileScopedSection_2("character", ImGuiControl::Profiler::Purple);
-
-
 
 		Character::Update(elapsedTime);
 	}

@@ -54,7 +54,7 @@ StructuredBuffer<material_constants> materials : register(t0);
 
 float4 main(VS_OUT pin) : SV_TARGET
 {
-    const float GAMMA = 2.2f;
+    const float GAMMA = 1.0f;
 
     material_constants m = materials[material];
         

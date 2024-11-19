@@ -31,8 +31,6 @@ public:
 	// モデル描画
 	void Draw(const RenderContext& rc, const iModel* model, DirectX::XMFLOAT4 color = { 1, 1, 1, 1 }) override;
 
-	void Draw(const RenderContext& rc, const ModelResource::Mesh& mesh) override;
-
 protected:
 	// レンダーステート設定
 	void SetRenderState(const RenderContext& rc) override;
@@ -64,8 +62,6 @@ private:
 		DirectX::XMFLOAT4X4 matrices[PRIMITIVE_MAX_JOINTS];
 	};
 	Microsoft::WRL::ComPtr<ID3D11Buffer> m_PrimitiveJointConstantBuffer;
-
-	Microsoft::WRL::ComPtr<ID3D11Buffer> m_SceneConstantBuffer;
 };
 
 //****************************************************

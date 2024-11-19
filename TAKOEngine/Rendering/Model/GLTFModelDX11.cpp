@@ -1,4 +1,4 @@
-#include "NewModelDX11.h"
+#include "GLTFModelDX11.h"
 
 #include <filesystem>
 #include <fstream>
@@ -13,7 +13,14 @@
 #include "TAKOEngine/Rendering/GpuResourceUtils.h"
 #include "TAKOEngine/Rendering/ConstantBuffer.h"
 
-NewModelDX11::NewModelDX11(ID3D11Device* device, const std::string& filename, float scaling, int modelType) : scaling(scaling), modelType(modelType)
+/**************************************************************************//**
+	@brief		モデルローディング
+	@param[in]    device	ID3D11Device
+	@param[in]    filename	ファイルパス
+	@param[in]    scaling	スケール
+	@param[in]    modelType	モデルタイプ
+*//***************************************************************************/
+GLTFModelDX11::GLTFModelDX11(ID3D11Device* device, const std::string& filename, float scaling, int modelType) : scaling(scaling), modelType(modelType)
 {
 	resource = ResourceManager::Instance().LoadModelResourceGLTF(filename);
 
@@ -31,7 +38,11 @@ NewModelDX11::NewModelDX11(ID3D11Device* device, const std::string& filename, fl
 	cumulate_transforms(gltf_nodes);
 }
 
-void NewModelDX11::cumulate_transforms(std::vector<ModelResource::node>& nodes)
+/**************************************************************************//**
+	@brief		トランスフォーム計算
+	@param[in]    nodes	モデルノード
+*//***************************************************************************/
+void GLTFModelDX11::cumulate_transforms(std::vector<ModelResource::node>& nodes)
 {
 	const DirectX::XMFLOAT4X4 coordinate_system_transforms[]
 	{
@@ -80,7 +91,12 @@ void NewModelDX11::cumulate_transforms(std::vector<ModelResource::node>& nodes)
 	}
 }
 
-ModelResource::buffer_view NewModelDX11::make_buffer_view(const tinygltf::Accessor& accessor)
+/**************************************************************************//**
+	@brief		バファ作成
+	@param[in]    accessor	tinygltfバファ
+	@return		バファ
+*//***************************************************************************/
+ModelResource::buffer_view GLTFModelDX11::make_buffer_view(const tinygltf::Accessor& accessor)
 {
 	ModelResource::buffer_view buffer_view;
 	switch (accessor.type)
@@ -212,7 +228,13 @@ ModelResource::buffer_view NewModelDX11::make_buffer_view(const tinygltf::Access
 	return buffer_view;
 }
 
-void NewModelDX11::animate(size_t animation_index, float time, std::vector<ModelResource::node>& animated_nodes)
+/**************************************************************************//**
+	@brief		アニメーション設定
+	@param[in]    animation_index	インデックス
+	@param[in]    time				タイマー
+	@param[in]    animated_nodes	アニメーション
+*//***************************************************************************/
+void GLTFModelDX11::animate(size_t animation_index, float time, std::vector<ModelResource::node>& animated_nodes)
 {
 	std::function<size_t(const std::vector<float>&, float, float&)> indexof
 	{
@@ -289,51 +311,96 @@ void NewModelDX11::animate(size_t animation_index, float time, std::vector<Model
 	}
 }
 
-void NewModelDX11::UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform)
+/**************************************************************************//**
+	@brief		世界行列設定
+	@param[in]    worldTransform	世界行列
+*//***************************************************************************/
+void GLTFModelDX11::UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform)
 {
 	m_WorldMatrix = worldTransform;
 }
 
-void NewModelDX11::PlayAnimation(int index, bool loop, float blendSeconds)
+/**************************************************************************//**
+	@brief
+	@param[in]    index
+	@param[in]    loop
+	@param[in]    blendSeconds
+*//***************************************************************************/
+void GLTFModelDX11::PlayAnimation(int index, bool loop, float blendSeconds)
 {
 }
 
-bool NewModelDX11::IsPlayAnimation() const
+/**************************************************************************//**
+	@brief
+	@return
+*//***************************************************************************/
+bool GLTFModelDX11::IsPlayAnimation() const
 {
 	return false;
 }
 
-void NewModelDX11::UpdateAnimation(float elapsedTime)
+/**************************************************************************//**
+	@brief		アニメーションアップデート
+	@param[in]    elapsedTime	タイマー
+*//***************************************************************************/
+void GLTFModelDX11::UpdateAnimation(float elapsedTime)
 {
 	this->time += elapsedTime;
 	this->animate(0, this->time, gltf_nodes);
 }
 
-void NewModelDX11::ComputeAnimation(float elapsedTime)
+/**************************************************************************//**
+	@brief
+	@param[in]    elapsedTime
+*//***************************************************************************/
+void GLTFModelDX11::ComputeAnimation(float elapsedTime)
 {
 }
 
-void NewModelDX11::ComputeBlending(float elapsedTime)
+/**************************************************************************//**
+	@brief
+	@param[in]    elapsedTime
+*//***************************************************************************/
+void GLTFModelDX11::ComputeBlending(float elapsedTime)
 {
 }
 
-void NewModelDX11::ComputeWorldBounds()
+/**************************************************************************//**
+	@brief
+*//***************************************************************************/
+void GLTFModelDX11::ComputeWorldBounds()
 {
 }
 
-iModel::Node* NewModelDX11::FindNode(const char* name)
+/**************************************************************************//**
+	@brief
+	@param[in]    name
+	@return
+*//***************************************************************************/
+iModel::Node* GLTFModelDX11::FindNode(const char* name)
 {
 	return nullptr;
 }
 
-void NewModelDX11::CopyAnimations(iModel* model)
+/**************************************************************************//**
+	@brief
+	@param[in]    model
+*//***************************************************************************/
+void GLTFModelDX11::CopyAnimations(iModel* model)
 {
 }
 
-void NewModelDX11::CopyNodes(iModel* model)
+/**************************************************************************//**
+	@brief
+	@param[in]    model
+*//***************************************************************************/
+void GLTFModelDX11::CopyNodes(iModel* model)
 {
 }
 
-void NewModelDX11::DrawDebugGUI()
+/**************************************************************************//**
+	@brief
+*//***************************************************************************/
+void GLTFModelDX11::DrawDebugGUI()
 {
 }

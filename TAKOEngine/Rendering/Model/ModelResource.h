@@ -187,11 +187,9 @@ public:
 		void serialize(Archive& archive);
 	};
 
+	// GLTF モデル用
 	//////////////////////////////////////////////
-	///
-	///
-	///
-	///
+
 	struct scene
 	{
 		std::string name;
@@ -353,10 +351,6 @@ public:
 		DirectX::XMFLOAT4X4 matrices[PRIMITIVE_MAX_JOINTS];
 	};
 
-	///
-	///
-	///
-	///
 	//////////////////////////////////////////////
 
 	// 各種データ取得
@@ -367,11 +361,8 @@ public:
 	void SetAnimations(std::vector<Animation> animations) { this->animations = animations; }
 	const std::vector<Material>& GetMaterials() const { return materials; }
 
+	// GLTF モデル用
 	//////////////////////////////////////////////
-	///
-	///
-	///
-	///
 
 	const std::vector<scene>& GetNewScenes() const { return newScenes; }
 	const std::vector<node>& GetNewNodes() const { return newNodes; }
@@ -386,10 +377,6 @@ public:
 	const Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& GetNewMateriaslRV() const { return newMaterialsRV; }
 	const std::vector<Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>>& GetNewTexturesRV() const { return newTextureRV; }
 
-	///
-	///
-	///
-	///
 	//////////////////////////////////////////////
 
 	// 読み込み
@@ -421,11 +408,8 @@ protected:
 	std::vector<Mesh>		meshes;
 	std::vector<Animation>	animations;
 
+	// GLTF モデル用
 	//////////////////////////////////////////////
-	///
-	///
-	///
-	///
 
 	std::vector<scene> newScenes;
 	std::vector<node> newNodes;
@@ -439,9 +423,5 @@ protected:
 	std::vector<animation> newAnimations;
 	std::vector<node> newAnimationNodes;
 
-	///
-	///
-	///
-	///
 	//////////////////////////////////////////////
 };

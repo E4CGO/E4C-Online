@@ -46,10 +46,10 @@ private:
 	std::unique_ptr <Teleporter> teleporter;
 	std::unique_ptr <Plane> plane;
 
+	std::unique_ptr <Billboard> billboard;
+
 	std::unique_ptr<ModelObject> map;
-	std::unique_ptr<ModelObject> door;
-	std::unique_ptr<ModelObject> door2;
-	std::unique_ptr<ModelObject> floor;
+	std::unique_ptr<ModelObject> shrine;
 
 	float transitionTime = 0.0f;
 	float transitionDuration = 2.f;  // 5秒かけて移動

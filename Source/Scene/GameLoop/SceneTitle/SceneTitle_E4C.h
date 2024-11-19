@@ -62,7 +62,5 @@ private:
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
 	std::unique_ptr<SpriteDX12>			m_sprites[8];
 
-	std::unique_ptr<ModelObject> knight;
-
 	static float time;
 };
