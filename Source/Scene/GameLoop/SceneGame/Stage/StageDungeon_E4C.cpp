@@ -28,16 +28,13 @@ void StageDungeon_E4C::GenerateDungeon()
 {
 	DungeonData& dungeonData = DungeonData::Instance();
 
-	//m_roomOrder.emplace_back(0);
-	//m_roomOrder.emplace_back(DungeonData::DEAD_END);
-	//m_roomOrder.emplace_back(DungeonData::DEAD_END);
-
-	// 配列のサイズがないなら自動生成を行う
+	// 生成順番配列の中身がないなら自動生成を行う
 	if (m_roomOrder.size() == 0)
 	{
+		// ダンジョンの自動生成を行う
 		std::vector<DungeonData::RoomType> placeableRooms;
 		placeableRooms.emplace_back(DungeonData::SIMPLE_ROOM_1);
-		placeableRooms.emplace_back(DungeonData::CROSS_ROOM_1);
+		//placeableRooms.emplace_back(DungeonData::CROSS_ROOM_1);
 
 		// 生成可能な部屋の重みの合計
 		int totalWeight = 0;
@@ -99,8 +96,13 @@ void StageDungeon_E4C::GenerateDungeon()
 				}
 			}
 		}
+		// 生成順番に登録する
+		for (RoomBase* room : rootRoom->GetAll())
+		{
+			m_roomOrder.emplace_back(room->GetRoomType());
+		}
 	}
-	// 配列の中身があるなら生成順番に沿って生成を行う
+	// 中身があるならそれに沿って生成を行う
 	else
 	{
 		int orderIndex = 1;
@@ -223,28 +225,13 @@ void StageDungeon_E4C::Initialize()
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 
-
-
-	// ダンジョンを生成する
-	// この時点でm_roomOrderの中身がない場合は自動生成、ある場合は生成順に従った生成を行う
 	GenerateDungeon();
-
-	//// 部屋の生成配列がない（自動生成を行った）場合、
-	//// 部屋のデータを変換して生成配列に書き込む
-	//if (DungeonData::Instance().GetRoomTree().size() == 0)
-	//{
-	//	for (RoomBase* room : rootRoom->GetAll())
-	//	{
-	//		DungeonData::Instance().AddRoomTree(room->GetRoomType());
-	//	}
-	//}
 
 	// 部屋のモデルを配置
 	for (RoomBase* room : rootRoom->GetAll())
 	{
 		room->PlaceMapTile();
 	}
-
 	// 部屋の当たり判定を設定
 	MAPTILES.CreateSpatialIndex(5, 7);
 }
