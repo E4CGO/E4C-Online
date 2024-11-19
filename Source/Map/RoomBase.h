@@ -9,8 +9,10 @@ class RoomBase
 public:
 	// コンストラクタ
 	RoomBase(
-		RoomBase* parent,
-		int pointIndex);
+		RoomBase* parent, int pointIndex,
+		std::vector<AABB>& roomAABBs,
+		bool isAutoGeneration,
+		std::vector<uint8_t> roomOrder, int& orderIndex);
 
 	// ですとら
 	virtual ~RoomBase()
@@ -68,7 +70,10 @@ public:
 	void UpdateTransform();
 
 	// 次の部屋を生成する
-	void GenerateNextRoom();
+	void GenerateNextRoom(
+		std::vector<AABB>& roomAABBs,
+		bool isAutoGeneration,
+		std::vector<uint8_t> roomOrder, int& orderIndex);
 
 	// 自分の深度を取得する
 	int GetDepth(int i = 0)

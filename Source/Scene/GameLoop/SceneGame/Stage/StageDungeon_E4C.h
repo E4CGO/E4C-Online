@@ -31,6 +31,9 @@ public:
 	// コンストラクタ
 	StageDungeon_E4C(SceneGame_E4C* scene) : m_pScene(scene), Stage() {}
 
+	void SetRoomOrder(const std::vector<uint8_t>& newRoomOrder) { m_roomOrder = newRoomOrder; }
+	std::vector<uint8_t> GetRoomOrder() { return m_roomOrder; }
+
 	void GenerateDungeon();
 
 	
@@ -57,7 +60,8 @@ protected:
 	std::unique_ptr<ThridPersonCameraController> cameraController;
 
 	std::unique_ptr<RoomBase> rootRoom;
-	std::vector<UINT16> roomTree;
+	std::vector<uint8_t> m_roomOrder;
+	std::vector<AABB> m_roomAABBs;
 
 	std::unique_ptr<ModelObject> testModel;
 

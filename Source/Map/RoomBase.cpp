@@ -12,7 +12,11 @@
 #include "MapTile.h"
 #include "MapTileManager.h"
 
-RoomBase::RoomBase(RoomBase* parent, int pointIndex)
+RoomBase::RoomBase(
+	RoomBase* parent, int pointIndex,
+	std::vector<AABB>& roomAABBs,
+	bool isAutoGeneration,
+	std::vector<uint8_t> roomOrder, int& orderIndex)
 {
 	// 親と接続点番号を代入
 	this->parent = parent;
@@ -73,7 +77,10 @@ void RoomBase::UpdateTransform()
 	}
 }
 
-void RoomBase::GenerateNextRoom()
+void RoomBase::GenerateNextRoom(
+	std::vector<AABB>& roomAABBs,
+	bool isAutoGeneration,
+	std::vector<uint8_t> roomOrder, int& orderIndex)
 {
 	DungeonData& dungeonData = DungeonData::Instance();
 
@@ -84,11 +91,13 @@ void RoomBase::GenerateNextRoom()
 	m_aabb = CalcAABB(dungeonData.GetRoomGenerateSetting(roomType).aabb,
 		m_position, DirectX::XMConvertToDegrees(m_angle.y));
 
-	// 配列に登録
-	dungeonData.AddRoomAABBs(m_aabb);
+	// AABB配列に保存
+	roomAABBs.emplace_back(m_aabb);
 
-	// 部屋の生成配列が存在しないなら新しくダンジョンの自動生成を行う
-	if (dungeonData.GetRoomTree().size() < 1)
+
+
+	// 自動生成を行う
+	if (isAutoGeneration)
 	{
 		// 最大深度が設定値より浅いなら次の部屋を生成する
 		if (depth < dungeonData.GetDungeonGenerateSetting().maxDepth)
@@ -100,8 +109,6 @@ void RoomBase::GenerateNextRoom()
 			// 接続点の数だけ当たり判定を行い、生成を行う
 			for (int i = 0; i < m_connectPointDatas.size(); i++)
 			{
-				std::vector<AABB> aAABBs = dungeonData.GetRoomAABBs();
-
 				for (DungeonData::RoomType type : dungeonData.GetRoomGenerateSetting(roomType).placementCandidates)
 				{
 					AABB nextRoomAABB = CalcAABB(dungeonData.GetRoomGenerateSetting(type).aabb,
@@ -110,7 +117,7 @@ void RoomBase::GenerateNextRoom()
 					bool isHit = false;
 
 					// 自分以外のAABBとの当たり判定を行う
-					for (const AABB& anotherRoomAABB : dungeonData.GetRoomAABBs())
+					for (const AABB& anotherRoomAABB : roomAABBs)
 					{
 						IntersectionResult result;
 
@@ -141,7 +148,6 @@ void RoomBase::GenerateNextRoom()
 							break;
 						}
 					}
-
 					// 衝突しなかった場合は配列に保存する
 					if (!isHit)
 					{
@@ -172,19 +178,19 @@ void RoomBase::GenerateNextRoom()
 							switch (type)
 							{
 							case DungeonData::SIMPLE_ROOM_1:
-								nextRoom = new SimpleRoom1(this, i);
+								nextRoom = new SimpleRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
 								break;
 
 							case DungeonData::END_ROOM:
-								nextRoom = new EndRoom1(this, i);
+								nextRoom = new EndRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
 								break;
 
 							case DungeonData::CROSS_ROOM_1:
-								nextRoom = new CrossRoom1(this, i);
+								nextRoom = new CrossRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
 								break;
 
 							case DungeonData::PASSAGE_1:
-								nextRoom = new Passage1(this, i);
+								nextRoom = new Passage1(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
 								break;
 
 							default:
@@ -200,7 +206,7 @@ void RoomBase::GenerateNextRoom()
 				{
 					//EndRoom1* end = new EndRoom1(this, i);
 					//AddRoom(end);
-					DeadEndRoom* deadEnd = new DeadEndRoom(this, i);
+					DeadEndRoom* deadEnd = new DeadEndRoom(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
 					AddRoom(deadEnd);
 				}
 			}
@@ -211,50 +217,48 @@ void RoomBase::GenerateNextRoom()
 			// 接続点の数だけ行き止まり用の部屋を生成する
 			for (int i = 0; i < m_connectPointDatas.size(); i++)
 			{
-				DeadEndRoom* deadEnd = new DeadEndRoom(this, i);
+				DeadEndRoom* deadEnd = new DeadEndRoom(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
 				AddRoom(deadEnd);
 			}
 		}
-
 	}
-	// 存在するなら生成配列に従った生成を行う
+	// 自動生成は行わず、生成順（roomOrder）で生成を行う
 	else
 	{
 		// 接続点の数だけ子を生成する
 		for (int i = 0; i < m_connectPointDatas.size(); i++)
 		{
-			uint8_t nextRoomType = dungeonData.GetNextRoom();
+			uint8_t nextRoomType = roomOrder.at(orderIndex);
 
 			RoomBase* nextRoom = nullptr;
 
 			switch (nextRoomType)
 			{
 			case DungeonData::SIMPLE_ROOM_1:
-				nextRoom = new SimpleRoom1(this, i);
+				nextRoom = new SimpleRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
 				break;
 
 			case DungeonData::END_ROOM:
-				nextRoom = new EndRoom1(this, i);
+				nextRoom = new EndRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
 				break;
 
 			case DungeonData::CROSS_ROOM_1:
-				nextRoom = new CrossRoom1(this, i);
+				nextRoom = new CrossRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
 				break;
 
 			case DungeonData::PASSAGE_1:
-				nextRoom = new Passage1(this, i);
+				nextRoom = new Passage1(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
 				break;
 
 			case DungeonData::DEAD_END:
-				nextRoom = new DeadEndRoom(this, i);
+				nextRoom = new DeadEndRoom(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
 				break;
 			}
 			AddRoom(nextRoom);
 		}
 	}
-
-	int salmon = 0;
 }
+
 
 AABB RoomBase::CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const
 {

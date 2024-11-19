@@ -28,9 +28,12 @@ void StageDungeon_E4C::GenerateDungeon()
 {
 	DungeonData& dungeonData = DungeonData::Instance();
 
-	// 部屋の生成配列がない場合、最初の部屋のタイプを
-	// 接続点があるタイプの中から抽選する
-	if (dungeonData.GetRoomTree().size() == 0)
+	//m_roomOrder.emplace_back(0);
+	//m_roomOrder.emplace_back(DungeonData::DEAD_END);
+	//m_roomOrder.emplace_back(DungeonData::DEAD_END);
+
+	// 配列のサイズがないなら自動生成を行う
+	if (m_roomOrder.size() == 0)
 	{
 		std::vector<DungeonData::RoomType> placeableRooms;
 		placeableRooms.emplace_back(DungeonData::SIMPLE_ROOM_1);
@@ -50,60 +53,98 @@ void StageDungeon_E4C::GenerateDungeon()
 
 			if (randomValue < 0)
 			{
+				int orderIndex = 0;
+
 				switch (type)
 				{
 				case DungeonData::SIMPLE_ROOM_1:
-					rootRoom = std::make_unique<SimpleRoom1>(nullptr, -1);
+					rootRoom = std::make_unique<SimpleRoom1>(
+						nullptr, -1,
+						m_roomAABBs,
+						true,
+						m_roomOrder, orderIndex);
 					break;
 
 				case DungeonData::END_ROOM:
-					rootRoom = std::make_unique<EndRoom1>(nullptr, -1);
+					rootRoom = std::make_unique<EndRoom1>(
+						nullptr, -1,
+						m_roomAABBs,
+						true,
+						m_roomOrder, orderIndex);
 					break;
 
 				case DungeonData::CROSS_ROOM_1:
-					rootRoom = std::make_unique<CrossRoom1>(nullptr, -1);
+					rootRoom = std::make_unique<CrossRoom1>(
+						nullptr, -1,
+						m_roomAABBs,
+						true,
+						m_roomOrder, orderIndex);
 					break;
 
 				case DungeonData::PASSAGE_1:
-					rootRoom = std::make_unique<Passage1>(nullptr, -1);
+					rootRoom = std::make_unique<Passage1>(
+						nullptr, -1,
+						m_roomAABBs,
+						true,
+						m_roomOrder, orderIndex);
 					break;
 
 				case DungeonData::DEAD_END:
-					rootRoom = std::make_unique<DeadEndRoom>(nullptr, -1);
-					break;
-
-				default:
+					rootRoom = std::make_unique<DeadEndRoom>(
+						nullptr, -1,
+						m_roomAABBs,
+						true,
+						m_roomOrder, orderIndex);
 					break;
 				}
 			}
 		}
 	}
-	// ある場合は生成配列からタイプを取得
+	// 配列の中身があるなら生成順番に沿って生成を行う
 	else
 	{
-		switch (dungeonData.GetNextRoom())
+		int orderIndex = 1;
+
+		switch (m_roomOrder.front())
 		{
 		case DungeonData::SIMPLE_ROOM_1:
-			rootRoom = std::make_unique<SimpleRoom1>(nullptr, -1);
+			rootRoom = std::make_unique<SimpleRoom1>(
+				nullptr, -1,
+				m_roomAABBs,
+				false,
+				m_roomOrder, orderIndex);
 			break;
 
 		case DungeonData::END_ROOM:
-			rootRoom = std::make_unique<EndRoom1>(nullptr, -1);
+			rootRoom = std::make_unique<EndRoom1>(
+				nullptr, -1,
+				m_roomAABBs,
+				false,
+				m_roomOrder, orderIndex);
 			break;
 
 		case DungeonData::CROSS_ROOM_1:
-			rootRoom = std::make_unique<CrossRoom1>(nullptr, -1);
+			rootRoom = std::make_unique<CrossRoom1>(
+				nullptr, -1,
+				m_roomAABBs,
+				false,
+				m_roomOrder, orderIndex);
 			break;
 
 		case DungeonData::PASSAGE_1:
-			rootRoom = std::make_unique<Passage1>(nullptr, -1);
+			rootRoom = std::make_unique<Passage1>(
+				nullptr, -1,
+				m_roomAABBs,
+				false,
+				m_roomOrder, orderIndex);
 			break;
 
 		case DungeonData::DEAD_END:
-			rootRoom = std::make_unique<DeadEndRoom>(nullptr, -1);
-			break;
-
-		default:
+			rootRoom = std::make_unique<DeadEndRoom>(
+				nullptr, -1,
+				m_roomAABBs,
+				false,
+				m_roomOrder, orderIndex);
 			break;
 		}
 	}
@@ -182,24 +223,21 @@ void StageDungeon_E4C::Initialize()
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 
-	// デバッグ
-	//std::vector<uint8_t> roomTree = { 0,1,2,0,2,4,4,4,2,4,4,4,3,0,4,4,4 };
-	//DungeonData::Instance().SetRoomTree(roomTree);
-
 
 
 	// ダンジョンを生成する
+	// この時点でm_roomOrderの中身がない場合は自動生成、ある場合は生成順に従った生成を行う
 	GenerateDungeon();
 
-	// 部屋の生成配列がない（自動生成を行った）場合、
-	// 部屋のデータを変換して生成配列に書き込む
-	if (DungeonData::Instance().GetRoomTree().size() == 0)
-	{
-		for (RoomBase* room : rootRoom->GetAll())
-		{
-			DungeonData::Instance().AddRoomTree(room->GetRoomType());
-		}
-	}
+	//// 部屋の生成配列がない（自動生成を行った）場合、
+	//// 部屋のデータを変換して生成配列に書き込む
+	//if (DungeonData::Instance().GetRoomTree().size() == 0)
+	//{
+	//	for (RoomBase* room : rootRoom->GetAll())
+	//	{
+	//		DungeonData::Instance().AddRoomTree(room->GetRoomType());
+	//	}
+	//}
 
 	// 部屋のモデルを配置
 	for (RoomBase* room : rootRoom->GetAll())
@@ -207,6 +245,7 @@ void StageDungeon_E4C::Initialize()
 		room->PlaceMapTile();
 	}
 
+	// 部屋の当たり判定を設定
 	MAPTILES.CreateSpatialIndex(5, 7);
 }
 

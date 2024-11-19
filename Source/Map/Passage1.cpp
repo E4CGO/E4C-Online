@@ -4,14 +4,20 @@
 #include "TAKOEngine/Tool/XMFLOAT.h"
 
 Passage1::Passage1(
-	RoomBase* parent,
-	int pointIndex) : RoomBase(parent, pointIndex)
+	RoomBase* parent, const int pointIndex,
+	std::vector<AABB>& roomAABBs,
+	const bool isAutoGeneration,
+	const std::vector<uint8_t> roomOrder, int& orderIndex)
+	: RoomBase(parent, pointIndex, roomAABBs, isAutoGeneration, roomOrder, orderIndex)
 {
 	// 部屋タイプを設定
 	roomType = DungeonData::PASSAGE_1;
 
 	// 次の部屋の生成を行う
-	GenerateNextRoom();
+	GenerateNextRoom(
+		roomAABBs,
+		isAutoGeneration,
+		roomOrder, orderIndex);
 }
 
 void Passage1::LoadMapData()
