@@ -6,6 +6,11 @@
 #include "Graphics.h"
 #include "ParticleRenderer.h"
 
+//**************************************************************
+// @brief       コンストラクタ
+// @param[in]   なし
+// @return      なし
+//**************************************************************
 ParticleRenderer::ParticleRenderer()
 {
 	Graphics&       graphics = Graphics::Instance();
@@ -22,6 +27,11 @@ ParticleRenderer::ParticleRenderer()
 	CreateConstantBuffer();
 }
 
+//***********************************************************
+// @brief       デストラクタ
+// @param[in]   なし
+// @return      なし
+//***********************************************************
 ParticleRenderer::~ParticleRenderer()
 {
 	if (T_GRAPHICS.GetParticleCompute()->uav_descriptor != nullptr)
@@ -39,6 +49,11 @@ ParticleRenderer::~ParticleRenderer()
 	}
 }
 
+//***********************************************************
+// @brief       描画
+// @param[in]   framBuffer     フレームバッファ
+// @return      なし
+//***********************************************************
 void ParticleRenderer::Render(FrameBufferManager* framBuffer)
 {
 	RenderContextDX12 rc;
@@ -63,6 +78,11 @@ void ParticleRenderer::Render(FrameBufferManager* framBuffer)
 	shader->Render(rc, m_sprites[static_cast<int>(ParticleSprite::Anime)].get());
 }
 
+//*************************************************************
+// @brief       コンスタントバッファ生成
+// @param[in]   なし
+// @return      なし
+//*************************************************************
 void ParticleRenderer::CreateConstantBuffer()
 {
 	Graphics& graphics = Graphics::Instance();
@@ -119,6 +139,11 @@ void ParticleRenderer::CreateConstantBuffer()
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 }
 
+//*************************************************************
+// @brief       コンスタントバッファ更新
+// @param[in]   rc レンダーコンテキスト
+// @return      const Descriptor*
+//*************************************************************
 const Descriptor* ParticleRenderer::UpdateSceneConstantBuffer(const RenderContextDX12& rc)
 {
 	const Camera* camera = CameraManager::Instance().GetCamera();

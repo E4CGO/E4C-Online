@@ -6,6 +6,11 @@
 
 #include "TAKOEngine\Rendering\Shaders\ParticleShader.h"
 
+//***************************************************
+// @class ParticleRenderer
+// @brief パーティクルの描画
+// @par   [説明]
+//***************************************************
 class ParticleRenderer
 {
 public:
