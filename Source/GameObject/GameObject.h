@@ -25,7 +25,7 @@ public:
 	// デストラクタ
 	virtual ~GameObject() = default;
 	// トランスフォーム更新
-	void UpdateTransform();
+	virtual void UpdateTransform();
 	// 更新処理
 	virtual void Update(float elapsedTime) = 0;
 	// 描画処理

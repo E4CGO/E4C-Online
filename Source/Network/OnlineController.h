@@ -14,8 +14,12 @@
 
 namespace Online
 {
+
+#ifdef _DEBUG
 	const static char* SV_IP = "127.0.0.1";
-	//const static char* SV_IP = "34.82.222.201";
+#else
+	const static char* SV_IP = "34.82.222.201";
+#endif // _DEBUG
 
 	const static char* port = "9000";
 	/**************************************************************************//**
@@ -126,11 +130,13 @@ namespace Online
 		// 同期開始
 		void BeginSync()
 		{
+			if (m_state != STATE::LOGINED) return;
 			if (!m_udpSendThread.joinable())
 			{
 				m_udpSendThread = std::thread(&OnlineController::UDPSendThread, this);
 			}
 			m_udpRecvThread = std::thread(&OnlineController::UDPRecvThread, this);
+			m_state = STATE::SYNC;
 		}
 	private:
 		// TCP受信

@@ -16,8 +16,15 @@ PlayerCharacterData::PlayerCharacterData()
 	m_pAppearancePatterns[APPEARANCE_PATTERN::GENDER].push_back(new PlayerCharacterPatternGender(false));
 
 	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternNone);
-	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/WEAPON_BARB.glb"));
-	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/WEAPON_MAGE.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSword("Data/Model/Character/PlayerModels/MDL_PLAYER_SWORD_ANIMATION.glb"));
+
+	m_pAppearancePatterns[APPEARANCE_PATTERN::BOTTOM].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/MDL_PLAYER_BOTTOM_ANIMATION.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::TOP].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/MDL_PLAYER_TOP_ANIMATION.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::HAIR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/MDL_PLAYER_HAIR_ANIMATION.glb"));
+
+	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternNone);
+	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD1_ANIMATION.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD2_ANIMATION.glb"));
 }
 
 /**************************************************************************//**
@@ -27,7 +34,7 @@ PlayerCharacterData::PlayerCharacterData()
 	@param[in]	pattern_idx		外見パターン
 	@return		なし
 *//***************************************************************************/
-void PlayerCharacterData::LoadAppearance(Character* chara, uint8_t appearance_idx, uint8_t pattern_idx)
+void PlayerCharacterData::LoadAppearance(PlayerCharacter* chara, uint8_t appearance_idx, uint8_t pattern_idx)
 {
 	if (m_pAppearancePatterns.find(appearance_idx) == m_pAppearancePatterns.end()) return;
 	if (m_pAppearancePatterns[appearance_idx].size() <= pattern_idx) return;

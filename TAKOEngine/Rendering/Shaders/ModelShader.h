@@ -18,6 +18,7 @@
 class ModelShader : public Shader
 {
 public:
+	ModelShader() {};
 	ModelShader(ID3D11Device* device, const char* vs, const char* ps);
 
 	virtual ~ModelShader() override = default;

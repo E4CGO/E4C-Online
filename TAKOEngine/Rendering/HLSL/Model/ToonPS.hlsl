@@ -5,7 +5,7 @@ Texture2D toonTex : register(t1); // トゥーンテクスチャ
 
 SamplerState diffuseMapSamplerState : register(s0);
 
-PSOutput main(VS_OUT pin)
+PSOutput main(VS_OUT pin) : SV_TARGET
 {
     float4 diffuseColor = diffuseMap.Sample(diffuseMapSamplerState, pin.texcoord) * pin.color;
     if (linearGamma != 1.0f) diffuseColor.rgb = pow(diffuseColor, 1.0f / linearGamma);

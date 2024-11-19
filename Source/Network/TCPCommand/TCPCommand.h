@@ -67,7 +67,7 @@ namespace Online
 					if (ReceiveString(name))
 					{
 						PlayerCharacter* player = PlayerCharacterManager::Instance().UpdatePlayerData(client_id, name.c_str(), appearance);
-						player->SetFriction(0.0f);
+						//player->SetFriction(0.0f);
 						return player;
 					}
 				}

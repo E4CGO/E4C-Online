@@ -38,7 +38,7 @@ set(CMAKE_CONFIGURATION_TYPES
 if(MSVC)
     # remove default flags provided with CMake for MSVC
     set(CMAKE_CXX_FLAGS "")
-    set(CMAKE_CXX_FLAGS_DEBUG "")
+    set(CMAKE_CXX_FLAGS_DEBUG "/Od /Zi")
     set(CMAKE_CXX_FLAGS_RELEASE "")
 endif()
 
@@ -153,6 +153,12 @@ set(Source__GameObject
 source_group("Source\\GameObject" FILES ${Source__GameObject})
 
 set(Source__Map
+    "Source/Map/CrossRoom1.cpp"
+    "Source/Map/CrossRoom1.h"
+    "Source/Map/DungeonData.cpp"
+    "Source/Map/DungeonData.h"
+    "Source/Map/EndRoom1.cpp"
+    "Source/Map/EndRoom1.h"
     "Source/Map/Map001.cpp"
     "Source/Map/Map001.h"
     "Source/Map/Map001BossRoomTeleport.cpp"
@@ -163,6 +169,12 @@ set(Source__Map
     "Source/Map/MapTile.h"
     "Source/Map/MapTileManager.cpp"
     "Source/Map/MapTileManager.h"
+    "Source/Map/Passage1.cpp"
+    "Source/Map/Passage1.h"
+    "Source/Map/RoomBase.cpp"
+    "Source/Map/RoomBase.h"
+    "Source/Map/SimpleRoom1.cpp"
+    "Source/Map/SimpleRoom1.h"
 )
 source_group("Source\\Map" FILES ${Source__Map})
 
@@ -175,6 +187,8 @@ source_group("Source\\Network" FILES ${Source__Network})
 set(Source__Scene
     "Source/Scene/Scene.cpp"
     "Source/Scene/Scene.h"
+    "Source/Scene/SceneDungeon.cpp"
+    "Source/Scene/SceneDungeon.h"
     "Source/Scene/SceneGame.cpp"
     "Source/Scene/SceneGame.h"
     "Source/Scene/SceneGameState.cpp"
@@ -247,16 +261,12 @@ set(Source__GameObject__Character__Player
     "Source/GameObject/Character/Player/Mage.h"
     "Source/GameObject/Character/Player/NonPlayerCharacter.cpp"
     "Source/GameObject/Character/Player/NonPlayerCharacter.h"
-    "Source/GameObject/Character/Player/NonPlayerCharacterState.cpp"
-    "Source/GameObject/Character/Player/NonPlayerCharacterState.h"
     "Source/GameObject/Character/Player/Player.cpp"
     "Source/GameObject/Character/Player/Player.h"
     "Source/GameObject/Character/Player/PlayerCharacter.cpp"
     "Source/GameObject/Character/Player/PlayerCharacter.h"
     "Source/GameObject/Character/Player/PlayerCharacterManager.cpp"
     "Source/GameObject/Character/Player/PlayerCharacterManager.h"
-    "Source/GameObject/Character/Player/PlayerCharacterState.cpp"
-    "Source/GameObject/Character/Player/PlayerCharacterState.h"
     "Source/GameObject/Character/Player/PlayerManager.cpp"
     "Source/GameObject/Character/Player/PlayerManager.h"
     "Source/GameObject/Character/Player/PlayerState.cpp"
@@ -267,6 +277,16 @@ set(Source__GameObject__Character__Player
     "Source/GameObject/Character/Player/RogueState.h"
 )
 source_group("Source\\GameObject\\Character\\Player" FILES ${Source__GameObject__Character__Player})
+
+set(Source__GameObject__Character__Player__State
+    "Source/GameObject/Character/Player/State/NonPlayerCharacterState.cpp"
+    "Source/GameObject/Character/Player/State/NonPlayerCharacterState.h"
+    "Source/GameObject/Character/Player/State/PlayerCharacterState.cpp"
+    "Source/GameObject/Character/Player/State/PlayerCharacterState.h"
+    "Source/GameObject/Character/Player/State/PlayerCharacterSwordState.cpp"
+    "Source/GameObject/Character/Player/State/PlayerCharacterSwordState.h"
+)
+source_group("Source\\GameObject\\Character\\Player\\State" FILES ${Source__GameObject__Character__Player__State})
 
 set(Source__Network__TCPCommand
     "Source/Network/TCPCommand/TCPChat.cpp"
@@ -327,6 +347,8 @@ set(Source__Scene__GameLoop__SceneTitle
 source_group("Source\\Scene\\GameLoop\\SceneTitle" FILES ${Source__Scene__GameLoop__SceneTitle})
 
 set(Source__Scene__GameLoop__SceneGame__Stage
+    "Source/Scene/GameLoop/SceneGame/Stage/StageDungeon_E4C.cpp"
+    "Source/Scene/GameLoop/SceneGame/Stage/StageDungeon_E4C.h"
     "Source/Scene/GameLoop/SceneGame/Stage/StageOpenWorld_E4C.cpp"
     "Source/Scene/GameLoop/SceneGame/Stage/StageOpenWorld_E4C.h"
 )
@@ -418,12 +440,16 @@ source_group("TAKOEngine\\Network" FILES ${TAKOEngine__Network})
 set(TAKOEngine__Physics
     "TAKOEngine/Physics/BoundingBoxCollider.cpp"
     "TAKOEngine/Physics/BoundingBoxCollider.h"
+    "TAKOEngine/Physics/CapsuleCollider.cpp"
+    "TAKOEngine/Physics/CapsuleCollider.h"
     "TAKOEngine/Physics/Collider.cpp"
     "TAKOEngine/Physics/Collider.h"
     "TAKOEngine/Physics/Collision.cpp"
     "TAKOEngine/Physics/Collision.h"
     "TAKOEngine/Physics/CollisionDataManager.cpp"
     "TAKOEngine/Physics/CollisionDataManager.h"
+    "TAKOEngine/Physics/CollisionManager.cpp"
+    "TAKOEngine/Physics/CollisionManager.h"
     "TAKOEngine/Physics/Liner8TreeManager.h"
     "TAKOEngine/Physics/MapCollider.cpp"
     "TAKOEngine/Physics/MapCollider.h"
@@ -431,8 +457,13 @@ set(TAKOEngine__Physics
     "TAKOEngine/Physics/MapCollisionManager.h"
     "TAKOEngine/Physics/ModelCollider.cpp"
     "TAKOEngine/Physics/ModelCollider.h"
+    "TAKOEngine/Physics/OctreeNode.cpp"
+    "TAKOEngine/Physics/OctreeNode.h"
     "TAKOEngine/Physics/PlayerCollisionObject.cpp"
     "TAKOEngine/Physics/PlayerCollisionObject.h"
+    "TAKOEngine/Physics/QuadtreeNode.cpp"
+    "TAKOEngine/Physics/QuadtreeNode.h"
+    "TAKOEngine/Physics/RigidBody.h"
     "TAKOEngine/Physics/SphereCollider.cpp"
     "TAKOEngine/Physics/SphereCollider.h"
     "TAKOEngine/Physics/UnrotatedBoxCollider.cpp"
@@ -443,6 +474,8 @@ source_group("TAKOEngine\\Physics" FILES ${TAKOEngine__Physics})
 set(TAKOEngine__Rendering
     "TAKOEngine/Rendering/Constant.h"
     "TAKOEngine/Rendering/ConstantBuffer.h"
+    "TAKOEngine/Rendering/Cylinder.cpp"
+    "TAKOEngine/Rendering/Cylinder.h"
     "TAKOEngine/Rendering/DebugRenderer.cpp"
     "TAKOEngine/Rendering/DebugRenderer.h"
     "TAKOEngine/Rendering/DeferredRendering.cpp"
@@ -561,6 +594,8 @@ set(TAKOEngine__Editor__Input
 source_group("TAKOEngine\\Editor\\Input" FILES ${TAKOEngine__Editor__Input})
 
 set(TAKOEngine__Rendering__Model
+    "TAKOEngine/Rendering/Model/GLTFModelDX11.cpp"
+    "TAKOEngine/Rendering/Model/GLTFModelDX11.h"
     "TAKOEngine/Rendering/Model/Model.h"
     "TAKOEngine/Rendering/Model/ModelDX11.cpp"
     "TAKOEngine/Rendering/Model/ModelDX11.h"
@@ -568,14 +603,14 @@ set(TAKOEngine__Rendering__Model
     "TAKOEngine/Rendering/Model/ModelDX12.h"
     "TAKOEngine/Rendering/Model/ModelResource.cpp"
     "TAKOEngine/Rendering/Model/ModelResource.h"
-    "TAKOEngine/Rendering/Model/NewModelDX11.cpp"
-    "TAKOEngine/Rendering/Model/NewModelDX11.h"
 )
 source_group("TAKOEngine\\Rendering\\Model" FILES ${TAKOEngine__Rendering__Model})
 
 set(TAKOEngine__Rendering__Shaders
     "TAKOEngine/Rendering/Shaders/ColorGradingShader.cpp"
     "TAKOEngine/Rendering/Shaders/ColorGradingShader.h"
+    "TAKOEngine/Rendering/Shaders/CylinderShader.cpp"
+    "TAKOEngine/Rendering/Shaders/CylinderShader.h"
     "TAKOEngine/Rendering/Shaders/DeferredLightingShader.cpp"
     "TAKOEngine/Rendering/Shaders/DeferredLightingShader.h"
     "TAKOEngine/Rendering/Shaders/FinalpassShader.cpp"
@@ -725,6 +760,13 @@ set(TAKOEngine__Rendering__HLSL__PostEffect
 source_group("TAKOEngine\\Rendering\\HLSL\\PostEffect" FILES ${TAKOEngine__Rendering__HLSL__PostEffect})
 
 set(TAKOEngine__Rendering__HLSL__Primitives
+    "TAKOEngine/Rendering/HLSL/Primitives/Billboard.hlsli"
+    "TAKOEngine/Rendering/HLSL/Primitives/BillboardGS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/BillboardPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/BillboardVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/Fireball.hlsli"
+    "TAKOEngine/Rendering/HLSL/Primitives/FireballPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/FireballVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/Plane.hlsli"
     "TAKOEngine/Rendering/HLSL/Primitives/PlanePS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/PlaneVS.hlsl"
@@ -773,6 +815,7 @@ set(ALL_FILES
     ${Source__GameObject__Props}
     ${Source__GameObject__Character__Enemy}
     ${Source__GameObject__Character__Player}
+    ${Source__GameObject__Character__Player__State}
     ${Source__Network__TCPCommand}
     ${Source__Network__UDPCommand}
     ${Source__Scene__GameLoop}
@@ -881,6 +924,11 @@ set(SHADER_NAMES
     "LuminanceExtractionDX12VS.cso"
     "LuminanceExtractionPS.cso"
     "MaskPS.cso"
+    "BillboardGS.cso"
+    "BillboardPS.cso"
+    "BillboardVS.cso"
+    "FireballPS.cso"
+    "FireballVS.cso"
     "PlanePS.cso"
     "PlaneVS.cso"
     "PortalPS.cso"
@@ -943,6 +991,11 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/LuminanceExtractionDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/LuminanceExtractionPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/MaskPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/BillboardGS.hlsl,5.0,Geometry,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/BillboardPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/BillboardVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/FireballPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/FireballVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlanePS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlaneVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PortalPS.hlsl,5.0,Pixel,main"

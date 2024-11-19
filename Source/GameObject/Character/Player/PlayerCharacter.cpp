@@ -1,5 +1,5 @@
 //! @file PlayerCharacter.cpp
-//! @note 
+//! @note
 
 #include "PlayerCharacter.h"
 
@@ -12,10 +12,12 @@
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 
-#include "GameObject/Character/Player/PlayerCharacterState.h"
+#include "GameObject/Character/Player/State/PlayerCharacterState.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 
 #include "GameData.h"
+
+#include "TAKOEngine/Tool/Mathf.h"
 
 PlayerCharacter::PlayerCharacter(uint64_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]) : Character()
 {
@@ -26,12 +28,14 @@ PlayerCharacter::PlayerCharacter(uint64_t id, const char* name, const uint8_t ap
 
 	stateMachine = new StateMachine<PlayerCharacter>;
 	RegisterCommonState();
-	stateMachine->SetState(static_cast<int>(State::Waiting));
+	stateMachine->SetState(static_cast<int>(STATE::WAITING));
 
-	mpCost[static_cast<int>(State::Dodge)] = 20.0f;
+	mpCost[static_cast<int>(STATE::DODGE)] = 0.0f;
 
 	// 衝突判定
-	SetCollider(Collider::COLLIDER_TYPE::SPHERE);
+	SetCollider(Collider::COLLIDER_TYPE::CAPSULE);
+	//SetCollider(Collider::COLLIDER_TYPE::SPHERE);
+	//collider->SetScale(DirectX::XMFLOAT3{ height * 0.3f, height * 0.3f, height * 0.3f } *scale);
 
 	m_client_id = id;
 	this->m_name = name;
@@ -51,12 +55,12 @@ PlayerCharacter::PlayerCharacter(PlayerCharacterData::CharacterInfo dataInfo) : 
 
 	stateMachine = new StateMachine<PlayerCharacter>;
 	RegisterCommonState();
-	stateMachine->SetState(static_cast<int>(State::Waiting));
+	stateMachine->SetState(static_cast<int>(STATE::WAITING));
 
-	mpCost[static_cast<int>(State::Dodge)] = 20.0f;
+	mpCost[static_cast<int>(STATE::DODGE)] = 00.0f;
 
 	// 衝突判定
-	SetCollider(Collider::COLLIDER_TYPE::SPHERE);
+	SetCollider(Collider::COLLIDER_TYPE::CAPSULE);
 
 	LoadAppearance(dataInfo.Character.pattern);
 }
@@ -75,7 +79,7 @@ void PlayerCharacter::LoadAppearance(const uint8_t appearance[PlayerCharacterDat
 		PlayerCharacterData::Instance().LoadAppearance(this, i, appearance[i]);
 	}
 
-	stateMachine->SetState(static_cast<int>(State::Waiting));
+	stateMachine->SetState(static_cast<int>(STATE::WAITING));
 }
 
 PlayerCharacter::~PlayerCharacter()
@@ -91,16 +95,16 @@ PlayerCharacter::~PlayerCharacter()
 
 void PlayerCharacter::RegisterCommonState()
 {
-	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Idle), new PlayerCharacterState::IdleState(this));
-	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Move), new PlayerCharacterState::MoveState(this));
-	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Jump), new PlayerCharacterState::JumpState(this));
-	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Fall), new PlayerCharacterState::FallState(this));
-	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Land), new PlayerCharacterState::LandState(this));
-	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Dodge), new PlayerCharacterState::DodgeState(this));
-	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Hurt), new PlayerCharacterState::HurtState(this));
-	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Death), new PlayerCharacterState::DeathState(this));
-	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Waiting), new PlayerCharacterState::WaitState(this));
-	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Ready), new PlayerCharacterState::ReadyState(this));
+	//stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Idle), new PlayerCharacterState::IdleState(this));
+	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::MOVE), new PlayerCharacterState::MoveState(this));
+	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::JUMP), new PlayerCharacterState::JumpState(this));
+	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::FALL), new PlayerCharacterState::FallState(this));
+	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::LAND), new PlayerCharacterState::LandState(this));
+	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::DODGE), new PlayerCharacterState::DodgeState(this));
+	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::HURT), new PlayerCharacterState::HurtState(this));
+	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::DEATH), new PlayerCharacterState::DeathState(this));
+	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::WAITING), new PlayerCharacterState::WaitState(this));
+	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::READY), new PlayerCharacterState::ReadyState(this));
 }
 
 void PlayerCharacter::UpdateTarget()
@@ -123,8 +127,23 @@ void PlayerCharacter::UpdateTarget()
 
 void PlayerCharacter::UpdateColliders()
 {
-	collider->SetPosition(position + DirectX::XMFLOAT3{ 0, height * 0.5f, 0 } *scale);
-	collider->SetScale(DirectX::XMFLOAT3{ height * 0.3f, height * 0.3f, height * 0.3f } *scale);
+	//collider->SetPosition(position + DirectX::XMFLOAT3{ 0, height * 0.5f, 0 } *scale);
+	Capsule capsule{};
+	capsule.position = position + DirectX::XMFLOAT3{ 0, 0.4f, 0 };
+	capsule.direction = { 0, 1, 0 };
+	capsule.radius = 0.4f;
+	capsule.length = height - capsule.radius * 2;
+	collider->SetParam(capsule);
+	//if(!isGround)
+	if (XMFLOAT3LengthSq(velocity) > 0.0f)
+	{
+		if (collider->CollisionVsMap())
+		{
+			position = collider->GetPosition();
+			position.y -= 0.4f;
+		}
+	}
+	//collider->SetScale(DirectX::XMFLOAT3{ height * 0.3f, height * 0.3f, height * 0.3f } *scale);
 }
 
 bool  PlayerCharacter::CollisionVsEnemies(Collider* collider, int damage, bool power, float force, int effectIdx, float effectScale)
@@ -176,33 +195,33 @@ void PlayerCharacter::UpdateInput()
 		}
 
 		if (T_INPUT.KeyDown(VK_SPACE)) input |= Input_Jump;
-		if (T_INPUT.KeyDown(VK_CONTROL) && mp >= GetMpCost(static_cast<int>(State::Dodge))) input |= Input_Dodge;
+		if (T_INPUT.KeyDown(VK_CONTROL) && mp >= GetMpCost(static_cast<int>(STATE::DODGE))) input |= Input_Dodge;
 
 		if (T_INPUT.KeyPress(VK_LBUTTON) && !TentacleLib::isShowCursor()) input |= Input_Attack_N;
 		if (T_INPUT.KeyPress(VK_RBUTTON) && !TentacleLib::isShowCursor()) input |= Input_Attack_S;
 
 		if (
 			T_INPUT.KeyPress('1')
-			&& mp >= GetMpCost(static_cast<int>(State::Skill_1))
-			&& GetSkillTimerTime(static_cast<int>(State::Skill_1)) == 0.0f
+			&& mp >= GetMpCost(static_cast<int>(STATE::SKILL_1))
+			&& GetSkillTimerTime(static_cast<int>(STATE::SKILL_1)) == 0.0f
 			) input |= Input_Skill_1;
 
 		if (
 			T_INPUT.KeyPress('2')
-			&& mp >= GetMpCost(static_cast<int>(State::Skill_2))
-			&& GetSkillTimerTime(static_cast<int>(State::Skill_2)) == 0.0f
+			&& mp >= GetMpCost(static_cast<int>(STATE::SKILL_2))
+			&& GetSkillTimerTime(static_cast<int>(STATE::SKILL_2)) == 0.0f
 			) input |= Input_Skill_2;
 
 		if (
 			T_INPUT.KeyPress('3')
-			&& mp >= GetMpCost(static_cast<int>(State::Skill_3))
-			&& GetSkillTimerTime(static_cast<int>(State::Skill_3)) == 0.0f
+			&& mp >= GetMpCost(static_cast<int>(STATE::SKILL_3))
+			&& GetSkillTimerTime(static_cast<int>(STATE::SKILL_3)) == 0.0f
 			) input |= Input_Skill_3;
 
 		if (
 			T_INPUT.KeyPress('4')
-			&& mp >= GetMpCost(static_cast<int>(State::Skill_4))
-			&& GetSkillTimerTime(static_cast<int>(State::Skill_4)) == 0.0f
+			&& mp >= GetMpCost(static_cast<int>(STATE::SKILL_4))
+			&& GetSkillTimerTime(static_cast<int>(STATE::SKILL_4)) == 0.0f
 			) input |= Input_Skill_4;
 
 		if (T_INPUT.KeyUp(VK_LBUTTON)) input |= Input_R_Attack_N;
@@ -222,33 +241,33 @@ void PlayerCharacter::UpdateInput()
 	{
 		// ゲームパッド
 		if (T_INPUT.GamePadKeyDown(GAME_PAD_BTN::A)) input |= Input_Jump;
-		if (T_INPUT.GamePadKeyDown(GAME_PAD_BTN::B) && mp >= GetMpCost(static_cast<int>(State::Dodge))) input |= Input_Dodge;
+		if (T_INPUT.GamePadKeyDown(GAME_PAD_BTN::B) && mp >= GetMpCost(static_cast<int>(STATE::DODGE))) input |= Input_Dodge;
 
 		if (T_INPUT.GamePadKeyPress(GAME_PAD_BTN::X) && !TentacleLib::isShowCursor()) input |= Input_Attack_N;
 		if (T_INPUT.GamePadKeyPress(GAME_PAD_BTN::LTRIGGER) && !TentacleLib::isShowCursor()) input |= Input_Attack_S;
 
 		if (
 			T_INPUT.GamePadKeyPress(GAME_PAD_BTN::LSHOULDER)
-			&& mp >= GetMpCost(static_cast<int>(State::Skill_1))
-			&& GetSkillTimerTime(static_cast<int>(State::Skill_1)) == 0.0f
+			&& mp >= GetMpCost(static_cast<int>(STATE::SKILL_1))
+			&& GetSkillTimerTime(static_cast<int>(STATE::SKILL_1)) == 0.0f
 			) input |= Input_Skill_1;
 
 		if (
 			T_INPUT.GamePadKeyPress(GAME_PAD_BTN::RSHOULDER)
-			&& mp >= GetMpCost(static_cast<int>(State::Skill_2))
-			&& GetSkillTimerTime(static_cast<int>(State::Skill_2)) == 0.0f
+			&& mp >= GetMpCost(static_cast<int>(STATE::SKILL_2))
+			&& GetSkillTimerTime(static_cast<int>(STATE::SKILL_2)) == 0.0f
 			) input |= Input_Skill_2;
 
 		if (
 			T_INPUT.GamePadKeyPress(GAME_PAD_BTN::RTRIGGER)
-			&& mp >= GetMpCost(static_cast<int>(State::Skill_3))
-			&& GetSkillTimerTime(static_cast<int>(State::Skill_3)) == 0.0f
+			&& mp >= GetMpCost(static_cast<int>(STATE::SKILL_3))
+			&& GetSkillTimerTime(static_cast<int>(STATE::SKILL_3)) == 0.0f
 			) input |= Input_Skill_3;
 
 		if (
 			T_INPUT.GamePadKeyPress(GAME_PAD_BTN::Y)
-			&& mp >= GetMpCost(static_cast<int>(State::Skill_4))
-			&& GetSkillTimerTime(static_cast<int>(State::Skill_4)) == 0.0f
+			&& mp >= GetMpCost(static_cast<int>(STATE::SKILL_4))
+			&& GetSkillTimerTime(static_cast<int>(STATE::SKILL_4)) == 0.0f
 			) input |= Input_Skill_4;
 
 		if (T_INPUT.GamePadKeyUp(GAME_PAD_BTN::X)) input |= Input_R_Attack_N;
@@ -339,6 +358,7 @@ void PlayerCharacter::UpdateSkillTimers(float elapsedTime)
 
 void PlayerCharacter::Update(float elapsedTime)
 {
+	std::lock_guard<std::mutex> lock(m_mut);
 	{
 		ProfileScopedSection_2("input", ImGuiControl::Profiler::Red);
 		if (IsPlayer()) // 自機限定 ステート管理
@@ -346,6 +366,23 @@ void PlayerCharacter::Update(float elapsedTime)
 			input = 0;
 			UpdateTarget();
 			UpdateInput();
+		}
+		else
+		{
+			velocity.x = 0.0f;
+			velocity.z = 0.0f;
+			if (m_tempData.time > 0.0f)
+			{
+				m_tempData.timer += elapsedTime;
+				float rate = m_tempData.timer / m_tempData.time;
+				position = {
+					Mathf::Lerp(m_tempData.position.x, m_tempData.sync_data.position[0], rate),
+					//Mathf::Lerp(m_tempData.position.y, m_tempData.sync_data.position[1], rate),
+					position.y,
+					Mathf::Lerp(m_tempData.position.z, m_tempData.sync_data.position[2], rate),
+				};
+				angle.y = Mathf::LerpRadian(m_tempData.angle, m_tempData.sync_data.rotate, rate);
+			}
 		}
 	}
 	{
@@ -358,6 +395,7 @@ void PlayerCharacter::Update(float elapsedTime)
 	}
 	{
 		ProfileScopedSection_2("character", ImGuiControl::Profiler::Purple);
+
 		Character::Update(elapsedTime);
 	}
 }
@@ -427,11 +465,11 @@ void PlayerCharacter::OnDamage(const HitResult& hit, int damage)
 	if (hp <= 0)
 	{
 		hp = 0;
-		stateMachine->ChangeState(static_cast<int>(State::Death));
+		stateMachine->ChangeState(static_cast<int>(STATE::DEATH));
 	}
 	else
 	{
-		stateMachine->ChangeState(static_cast<int>(State::Hurt));
+		stateMachine->ChangeState(static_cast<int>(STATE::HURT));
 	}
 }
 
@@ -507,4 +545,57 @@ void PlayerCharacter::SkillCost(int idx)
 	ModifyMp(-GetMpCost(idx));
 	// タイマー
 	ResetSkillTimer(idx);
+}
+
+// NETWORK
+void PlayerCharacter::GetSyncData(SYNC_DATA& data)
+{
+	std::lock_guard<std::mutex> lock(m_mut);
+	data.client_id = m_client_id;
+	data.position[0] = position.x;
+	data.position[1] = position.y;
+	data.position[2] = position.z;
+	data.velocity[0] = velocity.x;
+	data.velocity[1] = velocity.y;
+	data.velocity[2] = velocity.z;
+	data.rotate = angle.y;
+	data.state = static_cast<uint8_t>(stateMachine->GetStateIndex());
+	data.sub_state = static_cast<uint8_t>(stateMachine->GetState()->GetSubStateIndex());
+}
+
+void PlayerCharacter::ImportSyncData(const SYNC_DATA& data)
+{
+	if (m_tempData.old_sync_count < data.sync_count_id)
+	{
+		std::lock_guard<std::mutex> lock(m_mut);
+		if (m_tempData.old_sync_count == 0)	// 初めての同期
+		{
+			SetPosition({ data.position[0], data.position[1], data.position[2] });
+			Stop();
+			//AddImpulse({ data.velocity[0], data.velocity[1], data.velocity[2] });
+			SetAngle({ 0.0f, data.rotate, 0.0f });
+			Show();
+		}
+		m_tempData.old_sync_count = m_tempData.sync_data.sync_count_id;
+		m_tempData.timer = 0.0f;
+		m_tempData.position = position;
+		m_tempData.angle = angle.y;
+		m_tempData.sync_data = data;
+		m_tempData.time = (m_tempData.sync_data.sync_count_id - m_tempData.old_sync_count) * 0.25f;
+
+		if (data.velocity[1] > 0.0f)
+		{
+			position.y = data.position[1];
+			velocity.y = data.velocity[1];
+		}
+
+		if (data.state != static_cast<uint8_t>(GetStateMachine()->GetStateIndex()))
+		{
+			GetStateMachine()->ChangeState(data.state);
+		}
+		else if (data.sub_state != static_cast<uint8_t>(GetStateMachine()->GetState()->GetSubStateIndex()))
+		{
+			GetStateMachine()->ChangeSubState(data.sub_state);
+		}
+	}
 }

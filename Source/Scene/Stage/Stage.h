@@ -4,10 +4,9 @@
 #ifndef __INCLUDED_STAGE_H__
 #define __INCLUDED_STAGE_H__
 
-
-
 #include <DirectXMath.h>
 #include <vector>
+
 
 
 struct ENEMY_LIST_DATA
@@ -58,6 +57,7 @@ protected:
 	int pointer = 0;
 
 	bool m_ready = false;;
+
 };
 
 #endif // !__INCLUDED_STAGE_H__

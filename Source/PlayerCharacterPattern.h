@@ -6,7 +6,7 @@
 
 #include <string>
 
-class Character;
+class PlayerCharacter;
 
 /**************************************************************************//**
 	@class	PlayerCharacterPattern
@@ -20,7 +20,7 @@ public:
 	PlayerCharacterPattern() {};
 	virtual ~PlayerCharacterPattern() = default;
 
-	virtual void Execute(Character* chara) = 0;
+	virtual void Execute(PlayerCharacter* chara) = 0;
 };
 
 /**************************************************************************//**
@@ -35,7 +35,7 @@ public:
 	PlayerCharacterPatternNone() {};
 	virtual ~PlayerCharacterPatternNone() = default;
 
-	virtual void Execute(Character* chara) {};
+	virtual void Execute(PlayerCharacter* chara) {};
 };
 
 
@@ -50,7 +50,7 @@ class PlayerCharacterPatternGender : public PlayerCharacterPattern
 public:
 	PlayerCharacterPatternGender(bool isMale) : PlayerCharacterPattern(), m_isMale(isMale) {}
 
-	void Execute(Character* chara);
+	void Execute(PlayerCharacter* chara);
 private:
 	bool m_isMale;
 };
@@ -66,8 +66,36 @@ class PlayerCharacterPatternSingleModel : public PlayerCharacterPattern
 public:
 	PlayerCharacterPatternSingleModel(const char* filename) : PlayerCharacterPattern(), m_filename(filename) {}
 
-	void Execute(Character* chara) override;
-private:
+	void Execute(PlayerCharacter* chara) override;
+protected:
 	std::string m_filename;
+};
+
+/**************************************************************************//**
+	@class	PlayerCharacterPatternSword
+	@brief	斧モデル実装
+	@par	[説明]
+		斧モーション付きで斧を登録する(未実装)
+*//***************************************************************************/
+class PlayerCharacterPatternSword : public PlayerCharacterPatternSingleModel
+{
+public:
+	PlayerCharacterPatternSword(const char* filename) : PlayerCharacterPatternSingleModel(filename) {}
+
+	void Execute(PlayerCharacter* chara) override;
+};
+
+/**************************************************************************//**
+	@class	PlayerCharacterPatternAxe
+	@brief	斧モデル実装
+	@par	[説明]
+		斧モーション付きで斧を登録する(未実装)
+*//***************************************************************************/
+class PlayerCharacterPatternAxe : public PlayerCharacterPatternSingleModel
+{
+public:
+	PlayerCharacterPatternAxe(const char* filename) : PlayerCharacterPatternSingleModel(filename) {}
+
+	void Execute(PlayerCharacter* chara) override;
 };
 #endif //!__INCLUDED_PLAYER_CHARACTER_PATTERN_H__

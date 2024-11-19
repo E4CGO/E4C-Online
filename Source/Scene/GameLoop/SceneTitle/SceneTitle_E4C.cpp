@@ -47,7 +47,7 @@ void SceneTitle_E4C::Initialize()
 	shadowMapRenderer->SetShadowLight(dl);
 
 	CameraManager& cameramanager = CameraManager::Instance();
-	Camera*mainCamera = new Camera();
+	Camera* mainCamera = new Camera();
 	cameramanager.Register(mainCamera);
 	cameramanager.SetCamera(0);
 
@@ -86,6 +86,7 @@ void SceneTitle_E4C::Finalize()
 	shadowMapRenderer->Clear();
 	Sound::Instance().StopAudio(0);
 	CameraManager::Instance().Clear();
+	LightManager::Instance().Clear();
 }
 
 // 更新処理

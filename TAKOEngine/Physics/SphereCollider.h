@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Collider.h"
 
@@ -15,10 +15,12 @@ public:
 	) override;
 
 	//bool CollisionVsModel(
-	//	Collider*& other,				// ���f��
+	//	Collider*& other,				// モデル
 	//	DirectX::XMFLOAT3& direction,
 	//	HitResult& result
 	//);
+
+	bool CollisionVsMap(bool wallCheck = false) override;
 
 	bool RayCast(
 		const DirectX::XMFLOAT3& start,
@@ -26,5 +28,13 @@ public:
 		HitResult& result
 	) override;
 
+	// Sphere用パラメータセット
+	void SetParam(Sphere sphere) override;
+
+	float GetRadius() const { return radius; }
+
 	void DrawDebugPrimitive(DirectX::XMFLOAT4 color = { 1, 1, 1, 1 }) override;
+
+private:
+	float radius;
 };

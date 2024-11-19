@@ -1,5 +1,5 @@
 //! @file Grahics.h
-//! @note 
+//! @note
 
 #ifndef __GRAHICS_GRAHICS_H__
 #define __GRAHICS_GRAHICS_H__
@@ -37,6 +37,9 @@ enum class ModelShaderId
 	ShadowMap,
 	Plane,
 	Portal,
+	Billboard,
+	Fireball,
+	Lambert,
 
 	EnumCount
 };
@@ -117,7 +120,7 @@ static const DXGI_FORMAT DepthStencilFormat = DXGI_FORMAT_D32_FLOAT;
 //*******************************************************
 // @class Graphics
 // @brief グラフィックスエンジン
-// @par   
+// @par
 //*******************************************************
 class Graphics
 {
@@ -331,7 +334,7 @@ private:
 	CbScene* cb_scene_data = nullptr;
 
 	D3D12_VIEWPORT m_viewport;	//ビューポート
-	UINT frame_buffer_index  = 0;
+	UINT frame_buffer_index = 0;
 
 	Microsoft::WRL::ComPtr<ID3D12Device>				m_d3d_device;
 	Microsoft::WRL::ComPtr<IDXGIFactory4>				m_dxgi_factory;
