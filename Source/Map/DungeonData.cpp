@@ -8,13 +8,20 @@ DungeonData::DungeonData()
 	// SIMPLE_ROOM_1
 	{
 		RoomGenerateSetting setting;
+
+		// 重み
 		setting.weight = 50;
+
+		// AABB
 		setting.aabb.position = { 2.0f, 0.0f, 10.0f };
 		setting.aabb.radii = { 10.0f, 100.0f, 6.0f };
+
+		// 配置候補の部屋を設定
 		//setting.placementCandidates.emplace_back(RoomType::SIMPLE_ROOM_1);
 		setting.placementCandidates.emplace_back(RoomType::CROSS_ROOM_1);
 		setting.placementCandidates.emplace_back(RoomType::END_ROOM);
 		setting.placementCandidates.emplace_back(RoomType::PASSAGE_1);
+
 		m_roomGenerateSettings.at(SIMPLE_ROOM_1) = setting;
 	}
 

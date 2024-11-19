@@ -32,9 +32,12 @@ public:
 	// コンストラクタ
 	StageDungeon_E4C(SceneGame_E4C* scene) : m_pScene(scene), Stage() {}
 
+	// 部屋の生成順番のセッター・ゲッター
 	void SetRoomOrder(const std::vector<uint8_t>& newRoomOrder) { m_roomOrder = newRoomOrder; }
 	std::vector<uint8_t> GetRoomOrder() { return m_roomOrder; }
-
+	
+	// 生成順番配列がない場合は自動生成、
+	// ある場合は配列に従い生成を行う
 	void GenerateDungeon();
 
 	void Initialize() override;
