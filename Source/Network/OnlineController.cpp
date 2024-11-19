@@ -13,6 +13,10 @@
 #include "TCPCommand/TCPMatching.h"
 
 #include "UDPCommand/UDPSync.h"
+#include "GameObject/Props/Teleporter.h"
+#include "Scene/GameLoop/SceneGame/Stage/StageDungeon_E4C.h"	
+
+#include "Scene/SceneManager.h"
 
 namespace Online
 {
@@ -35,6 +39,7 @@ namespace Online
 
 		m_tcpCommands[TCP_CMD::ROOM_IN] = new TCPRoomIn(this, TCP_CMD::ROOM_IN);
 		m_tcpCommands[TCP_CMD::ROOM_OUT] = new TCPRoomOut(this, TCP_CMD::ROOM_OUT);
+		m_tcpCommands[TCP_CMD::ROOM_NEW] = new TCPRoomNew(this, TCP_CMD::ROOM_NEW);
 		m_tcpCommands[TCP_CMD::CHAT] = new TCPChat(this, TCP_CMD::CHAT);
 		m_tcpCommands[TCP_CMD::PING] = new TCPNone(this, TCP_CMD::PING);
 
@@ -218,9 +223,36 @@ namespace Online
 		m_tcpCommands[TCP_CMD::MATCHING_READY]->Send(nullptr);
 	}
 
+	/**************************************************************************//**
+	 	@brief		ダンジョンを生成する(ホスト)
+		@param[in]	なし
+		@return		なし
+	*//***************************************************************************/
 	void OnlineController::NewRoom()
 	{
-		
+		if (m_pMatchingUI)
+		{
+			EndSync();
+			Stage* stage = m_pMatchingUI->GetTeleporter()->GetStage();
+			if (auto dungeon = dynamic_cast<StageDungeon_E4C*>(stage))
+			{
+				dungeon->GenerateDungeon();
+				std::vector<uint8_t> roomOrder = dungeon->GetRoomOrder();
+				m_tcpCommands[TCP_CMD::ROOM_NEW]->Send(&roomOrder);
+			}
+		}
+	}
+	void OnlineController::NewRoom(const std::vector<uint8_t>& roomOrder)
+	{
+		if (m_pMatchingUI)
+		{
+			Stage* stage = m_pMatchingUI->GetTeleporter()->GetStage();
+			if (auto dungeon = dynamic_cast<StageDungeon_E4C*>(stage))
+			{
+				dungeon->SetRoomOrder(roomOrder);
+				m_pMatchingUI->GetTeleporter()->Teleport();
+			}
+		}
 	}
 
 	/**************************************************************************//**

@@ -29,6 +29,8 @@ public:
 	void Callback();
 	void SetMaxPlayerNum(const uint8_t num) { m_maxPlayerNum = num; }
 	void SetPlayerNum(const uint8_t num) { m_playerNum = num; }
+
+	Teleporter* GetTeleporter() { return m_pTeleporter; }
 private:
 	Teleporter* m_pTeleporter;
 
