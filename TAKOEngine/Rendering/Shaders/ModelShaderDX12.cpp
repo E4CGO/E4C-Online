@@ -7,21 +7,21 @@
 #include "TAKOEngine/Rendering/Shaders/ModelShaderDX12.h"
 
 //*************************************************************
-// @brief       ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-// @param[in]   device@ID3D12Device*
-// @return      ‚È‚µ
+// @brief       ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+// @param[in]   deviceã€€ID3D12Device*
+// @return      ãªã—
 //*************************************************************
 SkinningPipeline::SkinningPipeline(ID3D12Device* device)
 {
 	HRESULT hr = S_OK;
 
-	//ƒVƒF[ƒ_[“Ç‚İ‚İ
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼èª­ã¿è¾¼ã¿
 	std::vector<BYTE> cs_data;
 	{
 		GpuResourceUtils::LoadShaderFile("Data/Shader/SkinningCS.cso", cs_data);
 	}
 
-	//ƒ‹[ƒgƒVƒOƒlƒNƒ`ƒƒ‚Ì¶¬
+	// ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒã‚¯ãƒãƒ£ã®ç”Ÿæˆ
 	{
 		hr = device->CreateRootSignature(
 			0,
@@ -32,17 +32,17 @@ SkinningPipeline::SkinningPipeline(ID3D12Device* device)
 		m_d3d_root_signature->SetName(L"SkinningRootSignature");
 	}
 
-	//ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg‚Ì¶¬
+	// ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã®ç”Ÿæˆ
 	{
 		D3D12_COMPUTE_PIPELINE_STATE_DESC d3d_compute_pipeline_state_desc = {};
 
-		//ƒ‹[ƒgƒVƒOƒlƒNƒ`ƒƒ
+		// ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒã‚¯ãƒãƒ£
 		d3d_compute_pipeline_state_desc.pRootSignature = m_d3d_root_signature.Get();
 
 		d3d_compute_pipeline_state_desc.CS.pShaderBytecode = cs_data.data();
 		d3d_compute_pipeline_state_desc.CS.BytecodeLength  = cs_data.size();
 
-		//ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg¶¬
+		// ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆç”Ÿæˆ
 		hr = device->CreateComputePipelineState(
 			&d3d_compute_pipeline_state_desc,
 			IID_PPV_ARGS(m_d3d_pipeline_state.GetAddressOf()));
@@ -52,25 +52,25 @@ SkinningPipeline::SkinningPipeline(ID3D12Device* device)
 }
 
 //*************************************************************
-// @brief       ƒfƒXƒgƒ‰ƒNƒ^
-// @param[in]   ‚È‚µ
-// @return      ‚È‚µ
+// @brief       ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+// @param[in]   ãªã—
+// @return      ãªã—
 //*************************************************************
 SkinningPipeline::~SkinningPipeline()
 {
 }
 
 //*************************************************************
-// @brief       ŒvZ
-// @param[in]   rc     ƒŒƒ“ƒ_[ƒRƒ“ƒeƒLƒXƒg(DX12)
-// @param[in]   model  •`‰æ‘ÎÛ‚Ìƒ‚ƒfƒ‹ƒf[ƒ^‚ğw‚·ƒ|ƒCƒ“ƒ^(DX12)
-// @return      ‚È‚µ
+// @brief       è¨ˆç®—
+// @param[in]   rc     ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆ(DX12)
+// @param[in]   model  æç”»å¯¾è±¡ã®ãƒ¢ãƒ‡ãƒ«ãƒ‡ãƒ¼ã‚¿ã‚’æŒ‡ã™ãƒã‚¤ãƒ³ã‚¿(DX12)
+// @return      ãªã—
 //*************************************************************
 void SkinningPipeline::Compute(const RenderContextDX12& rc, ModelDX12* model)
 {
 	Graphics& graphics = Graphics::Instance();
 
-	//ƒpƒCƒvƒ‰ƒCƒ“İ’è
+	//ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³è¨­å®š
 	rc.d3d_command_list->SetComputeRootSignature(m_d3d_root_signature.Get());
 	rc.d3d_command_list->SetPipelineState(m_d3d_pipeline_state.Get());
 
@@ -80,12 +80,12 @@ void SkinningPipeline::Compute(const RenderContextDX12& rc, ModelDX12* model)
 
 		const ModelDX12::Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
 
-		//ƒfƒBƒXƒNƒŠƒvƒ^İ’è
+		//ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿è¨­å®š
 		rc.d3d_command_list->SetComputeRootDescriptorTable(0, mesh.mesh->srv_descriptor->GetGpuHandle());
 		rc.d3d_command_list->SetComputeRootDescriptorTable(1, frame_resource.uav_descriptor->GetGpuHandle());
 		rc.d3d_command_list->SetComputeRootDescriptorTable(2, frame_resource.cbv_descriptor->GetGpuHandle());
 
-		//ŒvZÀs
+		//è¨ˆç®—å®Ÿè¡Œ
 		rc.d3d_command_list->Dispatch(mesh.vertex_count / SkinningCSThreadNum, 1, 1);
 	}
 }

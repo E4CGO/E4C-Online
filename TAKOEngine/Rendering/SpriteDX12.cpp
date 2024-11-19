@@ -251,8 +251,7 @@ SpriteDX12::SpriteDX12(UINT sprite_count, FrameBufferTexture* frameBuffer) : m_s
 
 		hr = d3d_device->CreateGraphicsPipelineState(
 			&d3d_graphics_pipeline_state_desc,
-			IID_PPV_ARGS(&m_d3d_pipeline_state)
-		);
+			IID_PPV_ARGS(&m_d3d_pipeline_state));
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 		m_d3d_pipeline_state->SetName(L"SpriteGraphicsPipelineState");
 	}
@@ -695,7 +694,6 @@ void SpriteDX12::End(ID3D12GraphicsCommandList* d3d_command_list)
 void SpriteDX12::CreateFrameResource()
 {
 	Graphics& graphics = Graphics::Instance();
-	const RenderStateDX12* renderState = graphics.GetRenderStateDX12();
 	ID3D12Device* d3d_device = graphics.GetDeviceDX12();
 
 	HRESULT hr = S_OK;

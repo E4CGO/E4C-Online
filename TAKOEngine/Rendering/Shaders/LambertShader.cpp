@@ -278,7 +278,7 @@ void LambertShader::SetShaderResourceView(const ModelResource::Mesh& mesh, ID3D1
 //***********************************************************
 // @brief       コンストラクタ
 // @param[in]   device　    ID3D12Device*
-// @param[in]   instancing インスタンシング　ture : あり, false : なし
+// @param[in]   instancing インスタンシング　true : あり, false : なし
 // @return      なし
 //***********************************************************
 LambertShaderDX12::LambertShaderDX12(ID3D12Device* device, bool instancing)

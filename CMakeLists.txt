@@ -506,6 +506,8 @@ set(TAKOEngine__Rendering
     "TAKOEngine/Rendering/LineRenderer.h"
     "TAKOEngine/Rendering/Misc.h"
     "TAKOEngine/Rendering/MyRender.h"
+    "TAKOEngine/Rendering/ParticleRenderer.cpp"
+    "TAKOEngine/Rendering/ParticleRenderer.h"
     "TAKOEngine/Rendering/PipelineState.cpp"
     "TAKOEngine/Rendering/PipelineState.h"
     "TAKOEngine/Rendering/Plane.cpp"
@@ -625,6 +627,8 @@ set(TAKOEngine__Rendering__Shaders
     "TAKOEngine/Rendering/Shaders/ModelShader.h"
     "TAKOEngine/Rendering/Shaders/ModelShaderDX12.cpp"
     "TAKOEngine/Rendering/Shaders/ModelShaderDX12.h"
+    "TAKOEngine/Rendering/Shaders/ParticleShader.cpp"
+    "TAKOEngine/Rendering/Shaders/ParticleShader.h"
     "TAKOEngine/Rendering/Shaders/PhongShader.cpp"
     "TAKOEngine/Rendering/Shaders/PhongShader.h"
     "TAKOEngine/Rendering/Shaders/PlaneShader.cpp"
@@ -713,6 +717,15 @@ set(TAKOEngine__Rendering__HLSL__Model
     "TAKOEngine/Rendering/HLSL/Model/ToonVS.hlsl"
 )
 source_group("TAKOEngine\\Rendering\\HLSL\\Model" FILES ${TAKOEngine__Rendering__HLSL__Model})
+
+set(TAKOEngine__Rendering__HLSL__Particle
+    "TAKOEngine/Rendering/HLSL/Particle/Particle.hlsli"
+    "TAKOEngine/Rendering/HLSL/Particle/ParticleCS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Particle/ParticleGS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Particle/ParticlePS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Particle/ParticleVS.hlsl"
+)
+source_group("TAKOEngine\\Rendering\\HLSL\\Particle" FILES ${TAKOEngine__Rendering__HLSL__Particle})
 
 set(TAKOEngine__Rendering__HLSL__PostEffect
     "TAKOEngine/Rendering/HLSL/PostEffect/BloomPS.hlsl"
@@ -832,6 +845,7 @@ set(ALL_FILES
     ${TAKOEngine__Rendering__HLSL__Debug}
     ${TAKOEngine__Rendering__HLSL__Lighting}
     ${TAKOEngine__Rendering__HLSL__Model}
+    ${TAKOEngine__Rendering__HLSL__Particle}
     ${TAKOEngine__Rendering__HLSL__PostEffect}
     ${TAKOEngine__Rendering__HLSL__Primitives}
     ${TAKOEngine__Rendering__HLSL__Skydome}
@@ -891,6 +905,10 @@ set(SHADER_NAMES
     "ToonInstancingVS.cso"
     "ToonPS.cso"
     "ToonVS.cso"
+    "ParticleCS.cso"
+    "ParticleGS.cso"
+    "ParticlePS.cso"
+    "ParticleVS.cso"
     "BloomPS.cso"
     "ColorGradingDX12PS.cso"
     "ColorGradingDX12VS.cso"
@@ -954,6 +972,10 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/ToonInstancingVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/ToonPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/ToonVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Particle/ParticleCS.hlsl,5.0,Compute,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Particle/ParticleGS.hlsl,5.0,Geometry,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Particle/ParticlePS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Particle/ParticleVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/BloomPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/ColorGradingDX12PS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/ColorGradingDX12VS.hlsl,5.0,Vertex,main"
