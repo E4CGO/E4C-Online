@@ -36,17 +36,17 @@ namespace TentacleLib
 		SetProcessDPIAware();
 		RECT rc = { 0, 0, width, height };
 
-#ifdef FULLSCREEN
-
-		width = GetSystemMetrics(SM_CXSCREEN);
-		height = GetSystemMetrics(SM_CYSCREEN);
-
-		hWnd = CreateWindow(APPLICATION_NAME, _T(""), WS_POPUP, 0, 0, width, height, NULL, NULL, instance, NULL);
-#else
+//#ifdef FULLSCREEN
+//
+//		width = GetSystemMetrics(SM_CXSCREEN);
+//		height = GetSystemMetrics(SM_CYSCREEN);
+//
+//		hWnd = CreateWindow(APPLICATION_NAME, _T(""), WS_POPUP, 0, 0, width, height, NULL, NULL, instance, NULL);
+//#else
 		AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
 		hWnd = CreateWindow(APPLICATION_NAME, _T(""), WS_OVERLAPPEDWINDOW ^ WS_MAXIMIZEBOX ^ WS_THICKFRAME | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, NULL, NULL, instance, NULL);
 
-#endif// FULLSCREEN
+//#endif// FULLSCREEN
 
 		ShowWindow(hWnd, cmd_show);
 

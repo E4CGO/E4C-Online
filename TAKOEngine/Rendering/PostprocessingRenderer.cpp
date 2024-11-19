@@ -191,8 +191,6 @@ void PostprocessingRenderer::DrawDebugGUI()
 //******************************************************************
 PostprocessingRendererDX12::PostprocessingRendererDX12()
 {
-	Graphics& graphics = Graphics::Instance();
-
 	renderSprite[static_cast<int>(RenderTarget::Luminance)] = std::make_unique<SpriteDX12>(1, T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene)->GetRenderTargetTexture());
 	renderSprite[static_cast<int>(RenderTarget::GaussianBlur)] = std::make_unique<SpriteDX12>(1, T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance)->GetRenderTargetTexture());
 	renderSprite[static_cast<int>(RenderTarget::Finalpass)] = std::make_unique<SpriteDX12>(1, T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene)->GetRenderTargetTexture());

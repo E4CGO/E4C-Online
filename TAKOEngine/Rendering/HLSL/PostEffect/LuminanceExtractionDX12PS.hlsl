@@ -21,5 +21,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     }
     color.rgb *= contribution * intensity;
     
+    clip(color.a - 0.2);
+    
     return color;
 }

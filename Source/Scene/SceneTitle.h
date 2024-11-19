@@ -56,6 +56,9 @@ private:
 	//スキニング
 	SkinningPipeline*	m_skinning_pipeline;
 
+	// パーティクル
+	std::unique_ptr<ParticleRenderer> m_particle;
+
 	// フレームバッファマネージャー
 	FrameBufferManager* m_frameBuffer;
 
@@ -93,7 +96,6 @@ private:
 	DirectX::XMFLOAT3 test_scale = { 1, 1, 1 };
 
 	std::unique_ptr<SpriteDX12>			m_sprites[8];
-
 
 	static float time;
 };

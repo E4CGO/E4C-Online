@@ -25,6 +25,7 @@
 #include "TAKOEngine/Rendering/ConstantBuffer.h"
 #include "TAKOEngine/Tool/ImGuiRenderer.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
+#include "TAKOEngine/Rendering/ParticleRenderer.h"
 
 #define MAX_BUFFER_COUNT (2)
 
@@ -74,6 +75,7 @@ enum class SpriteShaderDX12Id
 	GaussianBlur,
 	ColorGrading,
 	Finalpass,
+	Particle,
 
 	EnumCount
 };
@@ -183,6 +185,9 @@ public:
 
 	//スキニング取得
 	SkinningPipeline* GetSkinningPipeline() const { return m_skinning_pipeline.get(); }
+
+	// パーティクル取得
+	ParticleCompute* GetParticleCompute() const { return m_compute.get(); }
 
 	// ImGUIンレンダラ取得
 	ImGuiRenderer* GetImGUIRenderer() const { return m_imgui_renderer.get(); }
@@ -307,6 +312,9 @@ private:
 	std::unique_ptr<LineRenderer>					lineRenderer;
 	//スキニング
 	std::unique_ptr<SkinningPipeline>	m_skinning_pipeline;
+
+	// パーティクル
+	std::unique_ptr<ParticleCompute> m_compute;
 
 	std::mutex mutex;	// ミューテックス
 

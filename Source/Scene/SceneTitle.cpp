@@ -35,6 +35,9 @@ void SceneTitle::Initialize()
 	// フレームバッファマネージャー
 	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
 
+	// パーティクル
+	m_particle = std::make_unique<ParticleRenderer>();
+
 	// モデル
 	{
 		// 背景
@@ -113,9 +116,7 @@ void SceneTitle::Initialize()
 	cameramanager.Register(mainCamera);
 	cameramanager.SetCamera(0);
 
-
 	// カメラ設定
-
 	CameraManager::Instance().GetCamera()->SetPerspectiveFov(
 		DirectX::XMConvertToRadians(45),		// 画角
 		SCREEN_W / SCREEN_H,					// 画面アスペクト比
@@ -258,7 +259,7 @@ void SceneTitle::RenderDX12()
 	T_GRAPHICS.BeginRender();
 	{
 		// シーン用定数バッファ更新
-		const Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
+		const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
 			CameraManager::Instance().GetCamera());
 
 		// レンダーコンテキスト設定
@@ -290,6 +291,9 @@ void SceneTitle::RenderDX12()
 			{
 				shader->Render(rc, test.get());
 			}
+
+			// パーティクル描画
+			m_particle->Render(m_frameBuffer);
 
 			m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 		}

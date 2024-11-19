@@ -21,7 +21,7 @@ protected:
 
 public:
 	//デストラクタ
-	virtual ~SpriteShaderDX12() {};
+	virtual ~SpriteShaderDX12() = default;
 
 	// 描画
 	virtual void Render(const RenderContextDX12& rc, SpriteDX12* sprite) = 0;

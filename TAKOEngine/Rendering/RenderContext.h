@@ -138,20 +138,6 @@ struct FinalpassnData
 	ID3D11ShaderResourceView* bloomTexture;
 };
 
-// ポストエフェクトの最終パス用情報
-struct FinalpassDataDX12
-{
-	//ブルームテクスチャ
-	const Descriptor* bloomTexture = nullptr;
-};
-
-// スカイボックス情報
-struct SkydomeData
-{
-	//ブルームテクスチャ
-	const Descriptor* skyTexture = nullptr;
-};
-
 //影情報
 struct ShadowMapData
 {
@@ -172,6 +158,43 @@ struct ShadowMapData
 	DirectX::XMFLOAT3 shadowColor = { 0.5f,0.5f,0.5f };
 };
 #pragma endregion
+
+// ポストエフェクトの最終パス用情報
+struct FinalpassDataDX12
+{
+	//ブルームテクスチャ
+	const Descriptor* bloomTexture = nullptr;
+};
+
+// スカイボックス情報
+struct SkydomeData
+{
+	//ブルームテクスチャ
+	const Descriptor* skyTexture = nullptr;
+};
+
+// パーティクル情報
+struct ParticleData
+{
+	// コンスタントバッファ
+	const Descriptor* cbv_descriptor = nullptr;
+
+	// パーティクル情報
+	float elapsedTime = 0; //経過時間
+	float deltaTime = 0;   //フレーム経過時間
+	int emitCount = 0;     //出現させる個数
+	int emitIndex = 0;     //現在の出現待ち
+
+	DirectX::XMFLOAT4 startColor = { 1.0f, 0.0f, 0.0f, 1.0f };
+	DirectX::XMFLOAT4 endColor = { 0.0f, 1.0f, 0.0f, 1.0f };
+
+	float scale = 0.3f;
+	float lifetime = 1.0f;
+
+	//ノイズ
+	float noiseSpeed = 0.4f;
+	float noisePower = 100.0f;
+};
 
 struct RenderContext
 {
@@ -227,6 +250,9 @@ struct RenderContextDX12
 
 	// スカイボックス情報
 	SkydomeData             skydomeData;
+
+	// パーティクル情報
+	ParticleData            particleData;
 };
 
 #endif // !__INCLUDE_RENDER_CONTEXT_H__
