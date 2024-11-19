@@ -227,6 +227,7 @@ ParticleCompute::ParticleCompute(ID3D12Device* device)
 //*************************************************************
 ParticleCompute::~ParticleCompute()
 {
+	points.clear();
 }
 
 //*************************************************************

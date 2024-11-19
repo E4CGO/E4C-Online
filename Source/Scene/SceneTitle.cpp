@@ -174,6 +174,8 @@ void SceneTitle::Initialize()
 
 void SceneTitle::Finalize()
 {
+	LightManager::Instance().Clear();
+	CameraManager::Instance().Clear();
 	spritePreLoad.clear();
 	UI.Clear();
 	shadowMapRenderer->Clear();
