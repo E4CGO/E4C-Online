@@ -6,8 +6,10 @@ class EndRoom1 : public RoomBase
 {
 public:
 	EndRoom1(
-		RoomBase* parent,
-		int pointIndex);
+		RoomBase* parent, const int pointIndex,
+		std::vector<AABB>& roomAABBs,
+		const bool isAutoGeneration,
+		const std::vector<uint8_t> roomOrder, int& orderIndex);
 
 	void LoadMapData() override;
 };

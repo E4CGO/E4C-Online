@@ -4,14 +4,20 @@
 #include "TAKOEngine/Tool/XMFLOAT.h"
 
 EndRoom1::EndRoom1(
-	RoomBase* parent,
-	int pointIndex) : RoomBase(parent, pointIndex)
+	RoomBase* parent, const int pointIndex,
+	std::vector<AABB>& roomAABBs,
+	const bool isAutoGeneration,
+	const std::vector<uint8_t> roomOrder, int& orderIndex)
+	: RoomBase(parent, pointIndex, roomAABBs, isAutoGeneration, roomOrder, orderIndex)
 {
 	// 部屋タイプを設定
 	roomType = DungeonData::END_ROOM;
 
 	// 生成を行う（接続点がないため次の部屋は生成されない）
-	GenerateNextRoom();
+	GenerateNextRoom(
+		roomAABBs,
+		isAutoGeneration,
+		roomOrder, orderIndex);
 }
 
 void EndRoom1::LoadMapData()
