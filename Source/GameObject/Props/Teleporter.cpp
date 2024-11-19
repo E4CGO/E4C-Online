@@ -101,7 +101,7 @@ void Teleporter::Update(float elapsedTime)
 		if (m_pWidgetMatching != nullptr)
 		{
 			UI.Remove(m_pWidgetMatching);
-			m_pOnlineController->EndMathcing();
+			m_pOnlineController->EndMatching();
 			m_pWidgetMatching = nullptr;
 		}
 	}

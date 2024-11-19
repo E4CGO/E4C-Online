@@ -140,7 +140,10 @@ namespace Online
 		// マッチング開始
 		void StartMatching(WidgetMatching* ui);
 		// マッチング終了
-		void EndMathcing();
+		void EndMatching();
+		// マッチング準備完了
+		void ReadyMatching();
+		void NewRoom();
 
 		// 同期開始
 		void BeginSync()

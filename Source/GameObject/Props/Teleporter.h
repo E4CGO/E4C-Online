@@ -24,6 +24,8 @@ public:
 	void Render(const RenderContext& rc) override;
 
 	void Teleport();
+
+	Stage* GetStage() { return m_pStage; }
 private:
 	Stage* m_pStage;
 	

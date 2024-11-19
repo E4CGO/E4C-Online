@@ -35,6 +35,9 @@ namespace Online
 	*//***************************************************************************/
 	bool TCPRoomNew::Receive(size_t size)
 	{
+		std::cout << "NewRoom" << std::endl;
+		m_pcontroller->NewRoom();
+
 		return false;
 	}
 

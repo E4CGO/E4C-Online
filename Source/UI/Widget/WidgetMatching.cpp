@@ -52,7 +52,7 @@ void WidgetMatching::Callback()
 	}
 	else
 	{
-
+		m_pOnlineController->ReadyMatching();
 	}
 }
 

@@ -35,7 +35,7 @@ namespace Online
 	public:
 		TCPMatchingUpdate(OnlineController* controller, uint8_t cmd) : TCPCommand(controller, cmd) {};
 
-		// データ送信
+		// データ受信
 		bool Receive(size_t size) override;
 	private:
 		struct MATCHING_DATA {
@@ -43,6 +43,21 @@ namespace Online
 			uint8_t client_num;
 			uint8_t max_client_num;
 		};
+	};
+
+	/**************************************************************************//**
+		@class		TCPMatchingReady
+		@brief		マッチング準備完了処理クラス
+		@par		[説明]
+						マッチング準備完了の送信
+	*//***************************************************************************/
+	class TCPMatchingReady : public TCPCommand
+	{
+	public:
+		TCPMatchingReady(OnlineController* controller, uint8_t cmd) : TCPCommand(controller, cmd) {};
+
+		// データ送信
+		bool Send(void* data) override;
 	};
 
 	/**************************************************************************//**

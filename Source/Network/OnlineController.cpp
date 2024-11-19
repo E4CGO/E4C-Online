@@ -31,6 +31,7 @@ namespace Online
 		m_tcpCommands[TCP_CMD::MATCHING_START] = new TCPMatchingStart(this, TCP_CMD::MATCHING_START);
 		m_tcpCommands[TCP_CMD::MATCHING_UPDATE] = new TCPMatchingUpdate(this, TCP_CMD::MATCHING_UPDATE);
 		m_tcpCommands[TCP_CMD::MATCHING_END] = new TCPMatchingEnd(this, TCP_CMD::MATCHING_END);
+		m_tcpCommands[TCP_CMD::MATCHING_READY] = new TCPMatchingReady(this, TCP_CMD::MATCHING_READY);
 
 		m_tcpCommands[TCP_CMD::ROOM_IN] = new TCPRoomIn(this, TCP_CMD::ROOM_IN);
 		m_tcpCommands[TCP_CMD::ROOM_OUT] = new TCPRoomOut(this, TCP_CMD::ROOM_OUT);
@@ -198,12 +199,29 @@ namespace Online
 		@param[in]	なし
 		@return		なし
 	*//***************************************************************************/
-	void OnlineController::EndMathcing()
+	void OnlineController::EndMatching()
 	{
+		if (m_state == STATE::OFFLINE) return;
+		if (m_ptcpSocket == nullptr) return;
 		m_tcpCommands[TCP_CMD::MATCHING_END]->Send(nullptr);
 		m_pMatchingUI = nullptr;
 	}
+	/**************************************************************************//**
+		@brief		マッチング準備完了
+		@param[in]	なし
+		@return		なし
+	*//***************************************************************************/
+	void OnlineController::ReadyMatching()
+	{
+		if (m_state == STATE::OFFLINE) return;
+		if (m_ptcpSocket == nullptr) return;
+		m_tcpCommands[TCP_CMD::MATCHING_READY]->Send(nullptr);
+	}
 
+	void OnlineController::NewRoom()
+	{
+		
+	}
 
 	/**************************************************************************//**
 		@brief		終了処理

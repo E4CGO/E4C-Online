@@ -32,6 +32,11 @@ namespace Online
 		return m_pcontroller->GetTcpSocket()->Send(buffer.data(), buffer.size()) >= 0;
 	}
 
+	/**************************************************************************//**
+	 	@brief		マッチングデータ受信処理
+		@param[in]	size	データサイズ
+		@return		成功判断
+	*//***************************************************************************/
 	bool TCPMatchingUpdate::Receive(size_t size)
 	{
 		MATCHING_DATA matching_data;
@@ -46,6 +51,19 @@ namespace Online
 			}
 		}
 		return false;
+	}
+
+	/**************************************************************************//**
+		@brief		マッチング準備完了送信
+		@param[in]	data データ参照ポインタ
+		@return		成功判断
+	*//***************************************************************************/
+	bool TCPMatchingReady::Send(void* data)
+	{
+		std::vector<uint8_t> buffer;
+		CreateHeaderBuffer(buffer, m_cmd, 0);
+
+		return m_pcontroller->GetTcpSocket()->Send(buffer.data(), buffer.size()) >= 0;
 	}
 }
 
