@@ -13,6 +13,7 @@
 #include "TAKOEngine/Rendering/Shaders/SkydomeShader.h"
 #include "TAKOEngine/Rendering/Shaders/ShadowMapShader.h"
 #include "TAKOEngine/Rendering/Shaders//PlaneShader.h"
+#include "TAKOEngine/Rendering/Shaders/ParticleShader.h"
 
 #include "TAKOEngine/Rendering/Shaders/UVScrollShader.h"
 #include "TAKOEngine/Rendering/Shaders/MaskShader.h"
@@ -133,12 +134,16 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 
 	{
 		Microsoft::WRL::ComPtr<ID3D12Debug> d3d_debug;
+		Microsoft::WRL::ComPtr<ID3D12Debug1> d3d_debug1;
 		if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(d3d_debug.GetAddressOf()))))
 		{
-			d3d_debug->EnableDebugLayer();
+			if (SUCCEEDED(d3d_debug->QueryInterface(IID_PPV_ARGS(&d3d_debug1))))
+			{
+				//d3d_debug->EnableDebugLayer();
+				d3d_debug1->SetEnableGPUBasedValidation(true);
+			}
+			//dxgi_factory_flags |= DXGI_CREATE_FACTORY_DEBUG;
 		}
-
-		dxgi_factory_flags |= DXGI_CREATE_FACTORY_DEBUG;
 	}
 
 	{
@@ -530,10 +535,14 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::GaussianBlur)]        = std::make_unique<GaussianBlurShaderDX12>(m_d3d_device.Get());
 	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::ColorGrading)]        = std::make_unique<ColorGradingShaderDX12>(m_d3d_device.Get());
 	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::Finalpass)]           = std::make_unique<FinalpassShaderDX12>(m_d3d_device.Get());
+	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::Particle)]            = std::make_unique<ParticleShader>(m_d3d_device.Get());
 
 	// レンダラ
 	debugRenderer = std::make_unique<DebugRenderer>(device.Get());
 	lineRenderer = std::make_unique<LineRenderer>(device.Get(), 1024);
+
+	// パーティクル
+	m_compute = std::make_unique<ParticleCompute>(m_d3d_device.Get());
 
 	//スキニング
 	m_skinning_pipeline = std::make_unique<SkinningPipeline>(m_d3d_device.Get());
@@ -1122,8 +1131,8 @@ HRESULT Graphics::CreateDummyTexture(ID3D12Resource** d3d_resource)
 
 //******************************************************************
 // @brief     バッファコピー
-// @param[in] d3d_src_resource    シェーダーリソース
-// @param[in] d3d_dst_resource    デプスステンシルビューリソース
+// @param[in] d3d_src_resource    リソース(入力)
+// @param[in] d3d_dst_resource    リソース(出力)
 // @return    HRESULT
 //******************************************************************
 HRESULT Graphics::CopyBuffer(ID3D12Resource* d3d_src_resource, ID3D12Resource* d3d_dst_resource)
@@ -1322,7 +1331,7 @@ HRESULT Graphics::CopyImageForCubeMap(const D3D12_SUBRESOURCE_DATA* subresources
 	// アップロード用リソースのマッピングとデータコピー
 	{
 		void* mapped = nullptr;
-		D3D12_RANGE readRange = { 0, uploadSize }; // 読み取り範囲を指定しない
+		D3D12_RANGE readRange = { 0, uploadSize }; 
 		hr = d3d_upload_resource->Map(0, &readRange, &mapped);
 		if (FAILED(hr)) return hr;
 
