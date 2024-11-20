@@ -24,6 +24,7 @@ class StageOpenWorld_E4C : public Stage
 {
 public:
 	StageOpenWorld_E4C(SceneGame_E4C* scene) : m_pScene(scene), Stage() {};
+	~StageOpenWorld_E4C() {};
 
 	void Initialize() override;
 
@@ -48,7 +49,6 @@ private:
 
 	std::unique_ptr <Teleporter> teleporter;
 	std::unique_ptr <Plane> plane;
-	std::unique_ptr <Plane> portal;
 
 	std::unique_ptr<gltf_model> map;
 

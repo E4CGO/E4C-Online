@@ -375,11 +375,12 @@ void PlayerCharacter::Update(float elapsedTime)
 			{
 				m_tempData.timer += elapsedTime;
 				float rate = m_tempData.timer / m_tempData.time;
-				position = Mathf::Lerp(m_tempData.position, {
-					m_tempData.sync_data.position[0],
-					m_tempData.sync_data.position[1],
-					m_tempData.sync_data.position[2],
-					}, rate);
+				position = {
+					Mathf::Lerp(m_tempData.position.x, m_tempData.sync_data.position[0], rate),
+					//Mathf::Lerp(m_tempData.position.y, m_tempData.sync_data.position[1], rate),
+					position.y,
+					Mathf::Lerp(m_tempData.position.z, m_tempData.sync_data.position[2], rate),
+				};
 				angle.y = Mathf::LerpRadian(m_tempData.angle, m_tempData.sync_data.rotate, rate);
 			}
 		}
@@ -394,8 +395,6 @@ void PlayerCharacter::Update(float elapsedTime)
 	}
 	{
 		ProfileScopedSection_2("character", ImGuiControl::Profiler::Purple);
-
-
 
 		Character::Update(elapsedTime);
 	}
@@ -583,6 +582,12 @@ void PlayerCharacter::ImportSyncData(const SYNC_DATA& data)
 		m_tempData.angle = angle.y;
 		m_tempData.sync_data = data;
 		m_tempData.time = (m_tempData.sync_data.sync_count_id - m_tempData.old_sync_count) * 0.25f;
+
+		if (data.velocity[1] > 0.0f)
+		{
+			position.y = data.position[1];
+			velocity.y = data.velocity[1];
+		}
 
 		if (data.state != static_cast<uint8_t>(GetStateMachine()->GetStateIndex()))
 		{

@@ -39,7 +39,7 @@ public:
 	// 自分以外全てのプレイヤーを削除
 	void ClearOtherPlayers();
 private:
-	uint64_t m_local_client_id = 0; //ローカルプレイヤーID offline = 0;
+	//uint64_t m_local_client_id = 0; //ローカルプレイヤーID offline = 0;
 	std::mutex m_mut;				// ロック
 };
 

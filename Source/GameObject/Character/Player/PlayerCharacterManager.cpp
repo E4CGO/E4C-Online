@@ -54,13 +54,17 @@ PlayerCharacter* PlayerCharacterManager::UpdatePlayerData(const uint64_t client_
 		player = new PlayerCharacter(client_id, name, appearance);
 		player->Hide();
 		Register(player);
+		player->GetStateMachine()->ChangeState(PlayerCharacter::STATE::IDLE);
 		return player;
 	}
 	else
 	{
-		// プレイヤーデータ更新
-		player->SetName(name);
-		player->LoadAppearance(appearance);
+		if (client_id != GAME_DATA.GetClientId())
+		{
+			// プレイヤーデータ更新
+			player->SetName(name);
+			player->LoadAppearance(appearance);
+		}
 		return player;
 	}
 }
@@ -100,6 +104,13 @@ void PlayerCharacterManager::Remove(const uint64_t client_id)
 void PlayerCharacterManager::ClearOtherPlayers()
 {
 	std::lock_guard<std::mutex> lock(m_mut);
-	std::erase_if(this->items, [this](const auto& item) { return item->GetClientId() != m_local_client_id; });
+	for (PlayerCharacter* player : this->items)
+	{
+		if (player->GetClientId() != GAME_DATA.GetClientId())
+		{
+			delete player;
+		}
+	}
+	std::erase_if(this->items, [this](const auto& item) { return item->GetClientId() != GAME_DATA.GetClientId(); });
 }
 

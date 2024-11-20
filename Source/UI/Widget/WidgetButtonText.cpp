@@ -32,6 +32,6 @@ void WidgetButtonText::Render(const RenderContext& rc)
 		0.0f,
 		FONT_ALIGN::TOP_LEFT,
 		m_scale,
-		1
+		0
 	);
 }

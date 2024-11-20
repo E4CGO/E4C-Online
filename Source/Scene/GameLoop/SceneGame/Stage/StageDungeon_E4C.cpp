@@ -24,23 +24,132 @@
 
 static float timer = 0;
 
-
-StageDungeon_E4C::StageDungeon_E4C(SceneGame_E4C* scene)
-	: m_pScene(scene), Stage()
+void StageDungeon_E4C::GenerateDungeon()
 {
-	std::vector<AABB> roomAABBs;
+	DungeonData& dungeonData = DungeonData::Instance();
 
-	// 乱数による部屋の自動生成を行う
-	rootRoom = std::make_unique<SimpleRoom1>(nullptr, -1, roomAABBs);
-}
+	// 生成順番配列の中身がないなら自動生成を行う
+	if (m_roomOrder.size() == 0)
+	{
+		// ダンジョンの自動生成を行う
+		std::vector<DungeonData::RoomType> placeableRooms;
+		//placeableRooms.emplace_back(DungeonData::SIMPLE_ROOM_1);
+		placeableRooms.emplace_back(DungeonData::CROSS_ROOM_1);
 
-StageDungeon_E4C::StageDungeon_E4C(SceneGame_E4C* scene, std::vector<int> roomTree)
-	: m_pScene(scene), Stage()
-{
-	int treeIndex = 0;
+		// 生成可能な部屋の重みの合計
+		int totalWeight = 0;
+		for (DungeonData::RoomType type : placeableRooms)
+		{
+			totalWeight += dungeonData.GetRoomGenerateSetting(type).weight;
+		}
 
-	// 部屋配列に従って部屋を生成する
-	rootRoom = std::make_unique<SimpleRoom1>(nullptr, -1, roomTree, treeIndex);
+		int randomValue = std::rand() % totalWeight;
+		for (DungeonData::RoomType type : placeableRooms)
+		{
+			randomValue -= dungeonData.GetRoomGenerateSetting(type).weight;
+
+			if (randomValue < 0)
+			{
+				int orderIndex = 0;
+
+				switch (type)
+				{
+				case DungeonData::SIMPLE_ROOM_1:
+					rootRoom = std::make_unique<SimpleRoom1>(
+						nullptr, -1,
+						m_roomAABBs,
+						true,
+						m_roomOrder, orderIndex);
+					break;
+
+				case DungeonData::END_ROOM:
+					rootRoom = std::make_unique<EndRoom1>(
+						nullptr, -1,
+						m_roomAABBs,
+						true,
+						m_roomOrder, orderIndex);
+					break;
+
+				case DungeonData::CROSS_ROOM_1:
+					rootRoom = std::make_unique<CrossRoom1>(
+						nullptr, -1,
+						m_roomAABBs,
+						true,
+						m_roomOrder, orderIndex);
+					break;
+
+				case DungeonData::PASSAGE_1:
+					rootRoom = std::make_unique<Passage1>(
+						nullptr, -1,
+						m_roomAABBs,
+						true,
+						m_roomOrder, orderIndex);
+					break;
+
+				case DungeonData::DEAD_END:
+					rootRoom = std::make_unique<DeadEndRoom>(
+						nullptr, -1,
+						m_roomAABBs,
+						true,
+						m_roomOrder, orderIndex);
+					break;
+				}
+			}
+		}
+		// 生成順番に登録する
+		for (RoomBase* room : rootRoom->GetAll())
+		{
+			m_roomOrder.emplace_back(room->GetRoomType());
+		}
+	}
+	// 中身があるならそれに沿って生成を行う
+	else
+	{
+		int orderIndex = 1;
+
+		switch (m_roomOrder.front())
+		{
+		case DungeonData::SIMPLE_ROOM_1:
+			rootRoom = std::make_unique<SimpleRoom1>(
+				nullptr, -1,
+				m_roomAABBs,
+				false,
+				m_roomOrder, orderIndex);
+			break;
+
+		case DungeonData::END_ROOM:
+			rootRoom = std::make_unique<EndRoom1>(
+				nullptr, -1,
+				m_roomAABBs,
+				false,
+				m_roomOrder, orderIndex);
+			break;
+
+		case DungeonData::CROSS_ROOM_1:
+			rootRoom = std::make_unique<CrossRoom1>(
+				nullptr, -1,
+				m_roomAABBs,
+				false,
+				m_roomOrder, orderIndex);
+			break;
+
+		case DungeonData::PASSAGE_1:
+			rootRoom = std::make_unique<Passage1>(
+				nullptr, -1,
+				m_roomAABBs,
+				false,
+				m_roomOrder, orderIndex);
+			break;
+
+		case DungeonData::DEAD_END:
+			rootRoom = std::make_unique<DeadEndRoom>(
+				nullptr, -1,
+				m_roomAABBs,
+				false,
+				m_roomOrder, orderIndex);
+			break;
+		}
+	}
 }
 
 void StageDungeon_E4C::Initialize()
@@ -67,8 +176,8 @@ void StageDungeon_E4C::Initialize()
 			DirectX::XMFLOAT3{ 25.0f, 25.0f, 5.0f }
 		};
 
-		portal = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, positions);
-		portal.get()->SetShader(ModelShaderId::Portal);
+		//portal = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, positions);
+		//portal.get()->SetShader(ModelShaderId::Portal);
 	}
 
 	// 光
@@ -80,6 +189,7 @@ void StageDungeon_E4C::Initialize()
 	// プレイヤー
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
 	player->SetPosition({ 5.0f, 5.0f, 5.0f });
+	player->GetStateMachine()->ChangeState(PlayerCharacter::STATE::IDLE);
 
 	// カメラ設定
 	Camera* mainCamera = CameraManager::Instance().GetCamera();
@@ -116,12 +226,14 @@ void StageDungeon_E4C::Initialize()
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 
+	GenerateDungeon();
+
 	// 部屋のモデルを配置
 	for (RoomBase* room : rootRoom->GetAll())
 	{
 		room->PlaceMapTile();
 	}
-
+	// 部屋の当たり判定を設定
 	MAPTILES.CreateSpatialIndex(5, 7);
 }
 
@@ -131,6 +243,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	Online::OnlineController* onlineController = m_pScene->GetOnlineController();
 	if (onlineController->GetState() == Online::OnlineController::STATE::LOGINED)
 	{
+		onlineController->RoomIn();
 		onlineController->BeginSync();
 	}
 
@@ -167,7 +280,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	}
 	PlayerCharacterManager::Instance().Update(elapsedTime);
 	plane->Update(elapsedTime);
-	portal->Update(elapsedTime);
+	//portal->Update(elapsedTime);
 
 	timer += elapsedTime;
 }
@@ -195,70 +308,71 @@ void StageDungeon_E4C::Render()
 	float time = 0;
 
 	{
-		const DirectX::XMFLOAT4X4 coordinate_system_transforms[]
-		{
-			{-1, 0, 0, 0,
-			  0, 1, 0, 0,
-			  0, 0, 1, 0,
-			  0, 0, 0, 1}, // 0:RHS Y-UP
+		//const DirectX::XMFLOAT4X4 coordinate_system_transforms[]
+		//{
+		//	{-1, 0, 0, 0,
+		//	  0, 1, 0, 0,
+		//	  0, 0, 1, 0,
+		//	  0, 0, 0, 1}, // 0:RHS Y-UP
 
-			{ 1, 0, 0, 0,
-			  0, 1, 0, 0,
-			  0, 0, 1, 0,
-			  0, 0, 0, 1}, // 1:LHS Y-UP
+		//	{ 1, 0, 0, 0,
+		//	  0, 1, 0, 0,
+		//	  0, 0, 1, 0,
+		//	  0, 0, 0, 1}, // 1:LHS Y-UP
 
-			{-1, 0, 0, 0,
-			  0, 0,-1, 0,
-			  0, 1, 0, 0,
-			  0, 0, 0, 1}, // 2:RHS Z-UP
+		//	{-1, 0, 0, 0,
+		//	  0, 0,-1, 0,
+		//	  0, 1, 0, 0,
+		//	  0, 0, 0, 1}, // 2:RHS Z-UP
 
-			{ 1, 0, 0, 0,
-			  0, 0, 1, 0,
-			  0, 1, 0, 0,
-			  0, 0, 0, 1}, //3:LHS Z - UP
-		};
+		//	{ 1, 0, 0, 0,
+		//	  0, 0, 1, 0,
+		//	  0, 1, 0, 0,
+		//	  0, 0, 0, 1}, //3:LHS Z - UP
+		//};
 
-		float scale_factor = 1.0f;
+		//float scale_factor = 1.0f;
 
-		DirectX::XMMATRIX C{ DirectX::XMLoadFloat4x4(&coordinate_system_transforms[0]) * DirectX::XMMatrixScaling(scale_factor, scale_factor, scale_factor) };
-		DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(2.5, 2.5f, 2.5f) };
-		DirectX::XMMATRIX R{ DirectX::XMMatrixRotationRollPitchYaw(0.0f, 0.0f, 0.0f) };
-		DirectX::XMMATRIX T{ DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f) };
+		//DirectX::XMMATRIX C{ DirectX::XMLoadFloat4x4(&coordinate_system_transforms[0]) * DirectX::XMMatrixScaling(scale_factor, scale_factor, scale_factor) };
+		//DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(2.5, 2.5f, 2.5f) };
+		//DirectX::XMMATRIX R{ DirectX::XMMatrixRotationRollPitchYaw(0.0f, 0.0f, 0.0f) };
+		//DirectX::XMMATRIX T{ DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f) };
 
-		DirectX::XMFLOAT4X4 world;
-		DirectX::XMStoreFloat4x4(&world, C * S * R * T);
+		//DirectX::XMFLOAT4X4 world;
+		//DirectX::XMStoreFloat4x4(&world, C * S * R * T);
 
-		// シーン用定数バッファ更新
-		CbScene cbScene{};
-		DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&rc.camera->GetView());
-		DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&rc.camera->GetProjection());
-		DirectX::XMStoreFloat4x4(&cbScene.view_projection, V * P);
+		//// シーン用定数バッファ更新
+		//CbScene cbScene{};
+		//DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&rc.camera->GetView());
+		//DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&rc.camera->GetProjection());
+		//DirectX::XMStoreFloat4x4(&cbScene.view_projection, V * P);
 
-		const DirectX::XMFLOAT3& eye = rc.camera->GetEye();
-		cbScene.camera_position.x = eye.x;
-		cbScene.camera_position.y = eye.y;
-		cbScene.camera_position.z = eye.z;
+		//const DirectX::XMFLOAT3& eye = rc.camera->GetEye();
+		//cbScene.camera_position.x = eye.x;
+		//cbScene.camera_position.y = eye.y;
+		//cbScene.camera_position.z = eye.z;
 
-		// レンダーステート設定
-		const float blend_factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		rc.deviceContext->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Opaque), blend_factor, 0xFFFFFFFF);
-		rc.deviceContext->OMSetDepthStencilState(rc.renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
-		rc.deviceContext->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullNone));
+		//// レンダーステート設定
+		//const float blend_factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		//rc.deviceContext->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Opaque), blend_factor, 0xFFFFFFFF);
+		//rc.deviceContext->OMSetDepthStencilState(rc.renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
+		//rc.deviceContext->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullNone));
 
-		rc.deviceContext->UpdateSubresource(constant_buffers[1].Get(), 0, 0, &cbScene, 0, 0);
-		rc.deviceContext->VSSetConstantBuffers(1, 1, constant_buffers[1].GetAddressOf());
-		rc.deviceContext->PSSetConstantBuffers(1, 1, constant_buffers[1].GetAddressOf());
+		//rc.deviceContext->UpdateSubresource(constant_buffers[1].Get(), 0, 0, &cbScene, 0, 0);
+		//rc.deviceContext->VSSetConstantBuffers(1, 1, constant_buffers[1].GetAddressOf());
+		//rc.deviceContext->PSSetConstantBuffers(1, 1, constant_buffers[1].GetAddressOf());
 
 		MAPTILES.Render(rc);
 	}
 
 	plane->Render(rc);
 
-	portal->Render(rc);
+	//portal->Render(rc);
 
 	// デバッグレンダラ描画実行
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
 
+	PlayerCharacterManager::Instance().DrawDebugGUI();
 	rootRoom->DrawDebugGUI();
 }
 
