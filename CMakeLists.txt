@@ -461,6 +461,8 @@ set(TAKOEngine__Physics
     "TAKOEngine/Physics/MapCollider.h"
     "TAKOEngine/Physics/MapCollisionManager.cpp"
     "TAKOEngine/Physics/MapCollisionManager.h"
+    "TAKOEngine/Physics/MapQuadtree.cpp"
+    "TAKOEngine/Physics/MapQuadtree.h"
     "TAKOEngine/Physics/ModelCollider.cpp"
     "TAKOEngine/Physics/ModelCollider.h"
     "TAKOEngine/Physics/OctreeNode.cpp"
