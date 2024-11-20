@@ -12,7 +12,7 @@ class iModel
 {
 public:
 	iModel() = default;
-	iModel(ID3D11Device* device, const char* filename, float scaling = 1.0f) {};
+	iModel(ID3D11Device* device, const char* filename, float scaling = 1.0f, int modelType = 0) {};
 	virtual ~iModel() {};
 
 	struct Node
@@ -48,11 +48,37 @@ public:
 		std::vector<FrameResource> frame_resources;
 	};
 
+	//
+	//
+
+	std::vector<ModelResource::scene> scenes;
+	std::vector<ModelResource::node> gltf_nodes;
+	std::vector<ModelResource::mesh> meshes;
+
+	std::vector<ModelResource::material> materials;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> material_resource_view;
+
+	std::vector<ModelResource::texture> textures;
+
+	std::vector<ModelResource::image> images;
+	std::vector<Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> texture_resource_views;
+
+	std::vector<ModelResource::skin> skins;
+
+	std::vector<ModelResource::animation> animations;
+	std::vector<ModelResource::node> animated_nodes;
+
+	//
+	//
+
 	// ノードデータ取得
 	const std::vector<Node>& GetNodes() const { return nodes; }
 
 	// メッシュ取得
 	const std::vector<Mesh>& GetMeshes() const { return m_meshes; }
+
+	const DirectX::XMFLOAT4X4 GetWorldMatrix() const { return m_WorldMatrix; }
+	DirectX::XMFLOAT4X4 SetWorldMatrix(const DirectX::XMFLOAT4X4 world) { this->m_WorldMatrix = world; }
 
 	// トランスフォーム更新処理
 	virtual void UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform) = 0;
@@ -129,6 +155,8 @@ protected:
 		DirectX::XMFLOAT3 scale = { 1, 1, 1 };
 	};
 	std::vector<NodeCache> nodeCaches;
+
+	DirectX::XMFLOAT4X4 m_WorldMatrix;
 
 	float currentAnimationBlendSeconds = 0.0f;
 	float animationBlendSecondsLength = -1.0f;

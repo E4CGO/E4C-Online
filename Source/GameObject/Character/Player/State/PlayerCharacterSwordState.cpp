@@ -1,5 +1,5 @@
 ﻿//! @file PlayerCharacterSwordState.cpp
-//! @note 
+//! @note
 
 #include "PlayerCharacterSwordState.h"
 
@@ -34,7 +34,7 @@ namespace PlayerCharacterState
 		//  一般攻撃1
 		void AttackNormalState_1::Enter()
 		{
-			owner->SetAnimation(Player::Animation::OneHanded_Melee_Attack_Slice_Diagonal, false, 0.05f);
+			owner->SetAnimation(Player::Animation::ATTACK_SIMPLE, false, 0.05f);
 		}
 		void AttackNormalState_1::Execute(float elapsedTime)
 		{
@@ -57,7 +57,7 @@ namespace PlayerCharacterState
 		//  一般攻撃2
 		void AttackNormalState_2::Enter()
 		{
-			owner->SetAnimation(Player::Animation::OneHanded_Melee_Attack_Chop, false, 0.05f);
+			owner->SetAnimation(Player::Animation::ATTACK_SIMPLE, false, 0.05f);
 		}
 		void AttackNormalState_2::Execute(float elapsedTime)
 		{
@@ -81,7 +81,7 @@ namespace PlayerCharacterState
 		void AttackNormalState_3::Enter()
 		{
 			owner->SetAnimationSpeed(1.2f);
-			owner->SetAnimation(Player::Animation::OneHanded_Melee_Attack_Slice_Horizontal, false, 0.05f);
+			owner->SetAnimation(Player::Animation::ATTACK_SIMPLE, false, 0.05f);
 		}
 		void AttackNormalState_3::Execute(float elapsedTime)
 		{

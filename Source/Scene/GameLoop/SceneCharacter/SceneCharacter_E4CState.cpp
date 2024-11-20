@@ -308,8 +308,8 @@ void SceneCharacter_E4CState::CharacterCreationState::Enter()
 	SceneCharacter_E4CState::btnStartCharacter->SetSize({ 196.0f * 1.5f, 92.0f * 1.5f });
 	UIManager::Instance().Register(SceneCharacter_E4CState::btnStartCharacter);
 
-	WidgetUpDown* GenderSelector = new WidgetUpDown("GENDER", &SceneCharacter_E4CState::currentCharacterInfo.Character.pattern[PlayerCharacterData::APPEARANCE_PATTERN::GENDER], 0, 1);
-	WidgetUpDown* WeaponSelector = new WidgetUpDown("WEAPON", &SceneCharacter_E4CState::currentCharacterInfo.Character.pattern[PlayerCharacterData::APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT], 0, 2);
+	WidgetUpDown* GenderSelector = new WidgetUpDown("SHIELD", &SceneCharacter_E4CState::currentCharacterInfo.Character.pattern[PlayerCharacterData::APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT], 0, 2);
+	WidgetUpDown* WeaponSelector = new WidgetUpDown("WEAPON", &SceneCharacter_E4CState::currentCharacterInfo.Character.pattern[PlayerCharacterData::APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT], 0, 1);
 
 	SceneCharacter_E4CState::background = RESOURCE.LoadSpriteResource("Data/Sprites/UI/keybinds/key_Left.png");
 	DirectX::XMFLOAT2 size = SceneCharacter_E4CState::background->GetTextureSize() * 0.2f;

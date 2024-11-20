@@ -156,7 +156,6 @@ void StageDungeon_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
 
-
 	{
 		std::array<DirectX::XMFLOAT3, 4 > positions = {
 		DirectX::XMFLOAT3{ 10.0f, 10.0f, 5.0f},
@@ -204,7 +203,6 @@ void StageDungeon_E4C::Initialize()
 		player->GetPosition(),			// 注視点
 		{ 0, 0.969f, -0.248f }	// 上ベクトル
 	);
-
 
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(mainCamera);
@@ -305,65 +303,7 @@ void StageDungeon_E4C::Render()
 	// 描画
 	PlayerCharacterManager::Instance().Render(rc);
 
-	float time = 0;
-
-	{
-		//const DirectX::XMFLOAT4X4 coordinate_system_transforms[]
-		//{
-		//	{-1, 0, 0, 0,
-		//	  0, 1, 0, 0,
-		//	  0, 0, 1, 0,
-		//	  0, 0, 0, 1}, // 0:RHS Y-UP
-
-		//	{ 1, 0, 0, 0,
-		//	  0, 1, 0, 0,
-		//	  0, 0, 1, 0,
-		//	  0, 0, 0, 1}, // 1:LHS Y-UP
-
-		//	{-1, 0, 0, 0,
-		//	  0, 0,-1, 0,
-		//	  0, 1, 0, 0,
-		//	  0, 0, 0, 1}, // 2:RHS Z-UP
-
-		//	{ 1, 0, 0, 0,
-		//	  0, 0, 1, 0,
-		//	  0, 1, 0, 0,
-		//	  0, 0, 0, 1}, //3:LHS Z - UP
-		//};
-
-		//float scale_factor = 1.0f;
-
-		//DirectX::XMMATRIX C{ DirectX::XMLoadFloat4x4(&coordinate_system_transforms[0]) * DirectX::XMMatrixScaling(scale_factor, scale_factor, scale_factor) };
-		//DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(2.5, 2.5f, 2.5f) };
-		//DirectX::XMMATRIX R{ DirectX::XMMatrixRotationRollPitchYaw(0.0f, 0.0f, 0.0f) };
-		//DirectX::XMMATRIX T{ DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f) };
-
-		//DirectX::XMFLOAT4X4 world;
-		//DirectX::XMStoreFloat4x4(&world, C * S * R * T);
-
-		//// シーン用定数バッファ更新
-		//CbScene cbScene{};
-		//DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&rc.camera->GetView());
-		//DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&rc.camera->GetProjection());
-		//DirectX::XMStoreFloat4x4(&cbScene.view_projection, V * P);
-
-		//const DirectX::XMFLOAT3& eye = rc.camera->GetEye();
-		//cbScene.camera_position.x = eye.x;
-		//cbScene.camera_position.y = eye.y;
-		//cbScene.camera_position.z = eye.z;
-
-		//// レンダーステート設定
-		//const float blend_factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		//rc.deviceContext->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Opaque), blend_factor, 0xFFFFFFFF);
-		//rc.deviceContext->OMSetDepthStencilState(rc.renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
-		//rc.deviceContext->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullNone));
-
-		//rc.deviceContext->UpdateSubresource(constant_buffers[1].Get(), 0, 0, &cbScene, 0, 0);
-		//rc.deviceContext->VSSetConstantBuffers(1, 1, constant_buffers[1].GetAddressOf());
-		//rc.deviceContext->PSSetConstantBuffers(1, 1, constant_buffers[1].GetAddressOf());
-
-		MAPTILES.Render(rc);
-	}
+	MAPTILES.Render(rc);
 
 	plane->Render(rc);
 
@@ -378,5 +318,4 @@ void StageDungeon_E4C::Render()
 
 void StageDungeon_E4C::OnPhase()
 {
-
 }

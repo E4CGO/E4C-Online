@@ -10,7 +10,7 @@
 #include "TAKOEngine/Rendering/ResourceManager.h"
 
 // コンストラクタ
-ModelDX11::ModelDX11(ID3D11Device* device, const char* filename, float scaling) : scaling(scaling)
+ModelDX11::ModelDX11(ID3D11Device* device, const char* filename, float scaling, int modelType) : scaling(scaling)
 {
 	resource = ResourceManager::Instance().LoadModelResource(filename);
 
@@ -243,7 +243,7 @@ void ModelDX11::UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform)
 
 		// ローカル行列算出
 		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(node.scale.x, node.scale.y, node.scale.z);
-		DirectX::XMMATRIX R = DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&node.rotation));
+		DirectX::XMMATRIX R = DirectX::XMMatrixRotationQuaternion(DirectX::XMVectorSet(node.rotation.x, node.rotation.y, node.rotation.z, node.rotation.w));
 		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(node.position.x, node.position.y, node.position.z);
 		DirectX::XMMATRIX LocalTransform = S * R * T;
 

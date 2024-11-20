@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <tchar.h>
 
-//#define FULLSCREEN
+#define FULLSCREEN
 
 namespace TentacleLib
 {
@@ -46,7 +46,7 @@ namespace TentacleLib
 		AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
 		hWnd = CreateWindow(APPLICATION_NAME, _T(""), WS_OVERLAPPEDWINDOW ^ WS_MAXIMIZEBOX ^ WS_THICKFRAME | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, NULL, NULL, instance, NULL);
 
-#endif// FULLSCREEN
+#endif // FULLSCREEN
 
 		ShowWindow(hWnd, cmd_show);
 

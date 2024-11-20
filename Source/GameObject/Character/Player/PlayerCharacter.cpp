@@ -1,5 +1,5 @@
 //! @file PlayerCharacter.cpp
-//! @note 
+//! @note
 
 #include "PlayerCharacter.h"
 
