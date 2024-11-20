@@ -1,4 +1,7 @@
-#pragma once
+//! @file Enemy.h
+//! @note 
+#ifndef __INCLUDED_ENEMY_H__
+#define __INCLUDED_ENEMY_H__
 
 #include "TAKOEngine/AI/StateMachine.h"
 
@@ -139,3 +142,4 @@ protected:
 
 	bool showHp = true;	// HP•\Ž¦
 };
+#endif

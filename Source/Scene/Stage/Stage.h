@@ -10,6 +10,7 @@ struct ENEMY_LIST_DATA
 	int enemyType = -1;
 	DirectX::XMFLOAT3 position = {};
 	DirectX::XMFLOAT3 rotation = {};
+	
 };
 
 /*
@@ -24,6 +25,8 @@ public:
 	virtual void Initialize();
 
 	virtual void Update(float elapsedTime);
+
+	void Spawne();
 
 	virtual void Render() = 0;
 

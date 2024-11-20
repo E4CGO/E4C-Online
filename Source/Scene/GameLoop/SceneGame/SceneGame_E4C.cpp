@@ -33,11 +33,6 @@ void SceneGame_E4C::Initialize()
 	Camera* mainCamera = new Camera();
 	cameraManager.Register(mainCamera);
 	cameraManager.SetCamera(0);
-#ifdef _DEBUG
-		Camera* DebugCamera = new Camera();
-	cameraManager.Register(DebugCamera);
-	cameraManager.SetCamera(1);
-#endif
 	//Console::Instance().Open();
 
 	stageOpenWorld = std::make_unique<StageOpenWorld_E4C>(this);

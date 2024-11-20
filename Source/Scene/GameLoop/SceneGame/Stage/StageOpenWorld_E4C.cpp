@@ -3,6 +3,7 @@
 #include "GameObject/ModelObject.h"
 #include "GameObject/Character/Player/Barbarian.h"
 #include "GameObject/Props/Teleporter.h"
+#include "GameObject/Character/Enemy/EnemyManager.h"
 
 #include "Scene/Scene.h"
 #include "Scene/Stage/StageManager.h"
@@ -36,8 +37,8 @@ void StageOpenWorld_E4C::Initialize()
 	player->SetPosition({ 5,	10, 5 });
 	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::State::Idle));
 	
+	EnemyManager&enemyManager = EnemyManager::Instance();
 
-	
 	teleporter = std::make_unique<Teleporter>("Data/Model/Cube/testCubes.glb", 1.0);
 	teleporter->SetPosition({ 50, 0, 60 });
 
@@ -87,17 +88,10 @@ void StageOpenWorld_E4C::Initialize()
 			{ 0, 0.969f, -0.248f } // 上ベクトル
 		);
 	}
-
-#ifdef _DEBUG
-	debugCameraController = std::make_unique<FreeCameraController>();
-	debugCameraController->SyncCameraToController(CameraManager::Instance().GetCamera(1));
-	debugCameraController->SetEnable(true);
-#endif
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(CameraManager::Instance().GetCamera(0));
 	cameraController->SetEnable(true);
 	cameraController->SetPlayer(player);
-
 	{
 		HRESULT hr;
 
@@ -134,10 +128,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 		cameraController->Update(elapsedTime);
 		CameraManager::Instance().GetCamera(0)->GetSegment() = 0;
 		transitionTime = 0;
-#ifdef _DEBUG
-		debugCameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera(1));
-		debugCameraController->Update(elapsedTime);
-#endif
 	}
 	
 	PlayerCharacterManager::Instance().Update(elapsedTime);
@@ -172,23 +162,13 @@ void StageOpenWorld_E4C::Render()
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
 	// 描画コンテキスト設定
 	RenderContext rc;
-#ifdef _DEBUG
-	{
-		T_GRAPHICS.GetDebugRenderer()->DrawSphere(cameraPositions, 2, { 1,0,0,1 });
-		T_GRAPHICS.GetDebugRenderer()->DrawSphere(CameraManager::Instance().GetCamera(0)->GetEye(), 2, {1,1,0,1});
 
-		if (debugCameraMode == true)
-		{
-			rc.camera = CameraManager::Instance().GetCamera(1);
-			T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera(1)->GetView(), CameraManager::Instance().GetCamera(1)->GetProjection());
-		}
-		else
-		{
-			rc.camera = CameraManager::Instance().GetCamera(0);
-			T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera(0)->GetView(), CameraManager::Instance().GetCamera(0)->GetProjection());
-		}
-	}
-#endif // _DEBUG
+	T_GRAPHICS.GetDebugRenderer()->DrawSphere(cameraPositions, 2, { 1,0,0,1 });
+	T_GRAPHICS.GetDebugRenderer()->DrawSphere(CameraManager::Instance().GetCamera(0)->GetEye(), 2, {1,1,0,1});
+	rc.camera = CameraManager::Instance().GetCamera(0);
+	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera(0)->GetView(), CameraManager::Instance().GetCamera(0)->GetProjection());
+		
+	
 
 	
 	
@@ -272,7 +252,7 @@ void StageOpenWorld_E4C::Render()
 	plane->Render(rc);
 	//portal->Render(rc);
 
-#ifdef DEBUG
+#ifdef _DEBUG
 	if (ImGui::TreeNode("Camera Positions"))
 	{
 		for (size_t i = 0; i < cameraPositions.size(); ++i)
@@ -287,13 +267,6 @@ void StageOpenWorld_E4C::Render()
 
 	}
 #endif // DEBUG
-
-	
-	// デバッグレンダラ描画実行
-	
-	
-	
-
 }
 
 void StageOpenWorld_E4C::OnPhase()

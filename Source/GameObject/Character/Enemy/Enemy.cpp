@@ -134,7 +134,7 @@ void Enemy::ImportData(ENEMY_DATA data)
 }
 void Enemy::ExportData(ENEMY_DATA& data)
 {
-	data.enemy_id = enemy_id;
+ 	data.enemy_id = enemy_id;
 	data.enemyType = enemyType;
 	data.position = position;
 	data.velocity = velocity;

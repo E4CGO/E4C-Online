@@ -228,8 +228,6 @@ void SceneGame::Update(float elapsedTime)
 	}
 
 
-
-
 	CameraManager::Instance().Update();
 	std::vector<DirectX::XMFLOAT3> cameraFocusPoints = {
 		{CameraManager::Instance().GetCamera()->GetFocus().x, CameraManager::Instance().GetCamera()->GetFocus().y, CameraManager::Instance().GetCamera()->GetFocus().z},

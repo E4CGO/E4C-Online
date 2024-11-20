@@ -41,8 +41,6 @@ private:
 	SceneGame_E4C* m_scene;
 
 	std::unique_ptr<ThridPersonCameraController> cameraController;
-	std::unique_ptr<FreeCameraController>debugCameraController;
-
 	MapTile* stage_collision = nullptr;
 
 	std::unique_ptr <Teleporter> teleporter;
