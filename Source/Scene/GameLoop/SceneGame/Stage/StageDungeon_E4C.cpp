@@ -228,15 +228,6 @@ void StageDungeon_E4C::Initialize()
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 
-	//m_roomOrder.emplace_back(DungeonData::SIMPLE_ROOM_1);
-	//m_roomOrder.emplace_back(DungeonData::CROSS_ROOM_1);
-	//m_roomOrder.emplace_back(DungeonData::END_ROOM);
-	//m_roomOrder.emplace_back(DungeonData::END_ROOM);
-	//m_roomOrder.emplace_back(DungeonData::END_ROOM);
-	//m_roomOrder.emplace_back(DungeonData::SIMPLE_ROOM_1);
-	//m_roomOrder.emplace_back(DungeonData::END_ROOM);
-	//m_roomOrder.emplace_back(DungeonData::END_ROOM);
-
 	GenerateDungeon();
 
 	// 部屋のモデルを配置

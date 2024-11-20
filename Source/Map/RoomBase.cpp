@@ -334,7 +334,7 @@ void RoomBase::PlaceMapTile()
 			fileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_Top_01a.glb");
 			break;
 		case TileType::STAIR:
-			fileNames.emplace_back("Data/Model/Dungeon/Stair Parent 001.glb");
+			fileNames.emplace_back("Data/Model/DungeonAssets/SLOPE.glb");
 			break;
 		default:
 			break;
