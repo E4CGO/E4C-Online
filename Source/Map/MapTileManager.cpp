@@ -4,17 +4,19 @@
 
 void MapTileManager::Clear()
 {
-	quadtree.ClearAllAABBObject();
-	quadtree.ClearAllCapsuleObject();
-	quadtree.ClearAllSphereObject();
-	quadtree.ClearAllTriangleObject();
-	
-	octree.ClearAllAABBObject();
-	octree.ClearAllCapsuleObject();
-	octree.ClearAllSphereObject();
-	octree.ClearAllTriangleObject();
+	//quadtree.ClearAllAABBObject();
+	//quadtree.ClearAllCapsuleObject();
+	//quadtree.ClearAllSphereObject();
+	//quadtree.ClearAllTriangleObject();
+	//
+	//octree.ClearAllAABBObject();
+	//octree.ClearAllCapsuleObject();
+	//octree.ClearAllSphereObject();
+	//octree.ClearAllTriangleObject();
 
-	tree.Finalize();
+	//tree.Finalize();
+
+	mapQuadtree.ClearQuadtree();
 
 	Manager::Clear();
 }
@@ -31,49 +33,51 @@ bool MapTileManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFL
 bool MapTileManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& direction, float dist, HitResult& hit, bool camera)
 {
 	// 最小値最大値
-	float minX, maxX;
-	if (direction.x > 0.0f)
-	{
-		minX = start.x;
-		maxX = start.x + direction.x * dist;
-	}
-	else
-	{
-		minX = start.x + direction.x * dist;
-		maxX = start.x;
-	}
+	//float minX, maxX;
+	//if (direction.x > 0.0f)
+	//{
+	//	minX = start.x;
+	//	maxX = start.x + direction.x * dist;
+	//}
+	//else
+	//{
+	//	minX = start.x + direction.x * dist;
+	//	maxX = start.x;
+	//}
 
-	float minY, maxY;
-	if (direction.y > 0.0f)
-	{
-		minY = start.y;
-		maxY = start.y + direction.y * dist;
-	}
-	else
-	{
-		minY = start.y + direction.y * dist;
-		maxY = start.y;
-	}
+	//float minY, maxY;
+	//if (direction.y > 0.0f)
+	//{
+	//	minY = start.y;
+	//	maxY = start.y + direction.y * dist;
+	//}
+	//else
+	//{
+	//	minY = start.y + direction.y * dist;
+	//	maxY = start.y;
+	//}
 
-	float minZ, maxZ;
-	if (direction.z > 0.0f)
-	{
-		minZ = start.z;
-		maxZ = start.z + direction.z * dist;
-	}
-	else
-	{
-		minZ = start.z + direction.z * dist;
-		maxZ = start.z;
-	}
+	//float minZ, maxZ;
+	//if (direction.z > 0.0f)
+	//{
+	//	minZ = start.z;
+	//	maxZ = start.z + direction.z * dist;
+	//}
+	//else
+	//{
+	//	minZ = start.z + direction.z * dist;
+	//	maxZ = start.z;
+	//}
 
-	// レイが通る空間の配列番号算出
-	int Elem = tree.GetLinerIndex(minX, maxX, minY, maxY, minZ, maxZ);
+	//// レイが通る空間の配列番号算出
+	//int Elem = tree.GetLinerIndex(minX, maxX, minY, maxY, minZ, maxZ);
 
-	bool ret = false;
-	SearchChildren(Elem, start, direction, dist, hit, ret);
-	SearchParent(Elem, start, direction, dist, hit, ret);
-	return ret;
+	//bool ret = false;
+	//SearchChildren(Elem, start, direction, dist, hit, ret);
+	//SearchParent(Elem, start, direction, dist, hit, ret);
+	//return ret;
+
+	return mapQuadtree.IntersectVsRay(start, direction, dist, hit);
 	
 	/* 作成中
 	/////////////////////////////////////////////////////
@@ -264,38 +268,39 @@ bool MapTileManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFL
 // 垂直レイキャスト
 bool MapTileManager::VerticalRayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, HitResult& hit)
 {
-	HitResultVector result;
-	bool ret = quadtree.IntersectVerticalRayVsTriangle(start, end, result);
+	//HitResultVector result;
+	//bool ret = quadtree.IntersectVerticalRayVsTriangle(start, end, result);
 
-	XMStoreFloat3(&hit.position, result.position);
-	XMStoreFloat3(&hit.normal, result.normal);
-	hit.distance = result.distance;
-	hit.materialIndex = result.materialIndex;
-	XMStoreFloat3(&hit.triangleVerts[0], result.triangleVerts[0]);
-	XMStoreFloat3(&hit.triangleVerts[1], result.triangleVerts[1]);
-	XMStoreFloat3(&hit.triangleVerts[2], result.triangleVerts[2]);
+	//XMStoreFloat3(&hit.position, result.position);
+	//XMStoreFloat3(&hit.normal, result.normal);
+	//hit.distance = result.distance;
+	//hit.materialIndex = result.materialIndex;
+	//XMStoreFloat3(&hit.triangleVerts[0], result.triangleVerts[0]);
+	//XMStoreFloat3(&hit.triangleVerts[1], result.triangleVerts[1]);
+	//XMStoreFloat3(&hit.triangleVerts[2], result.triangleVerts[2]);
 
-	return ret;
+	//return ret;
+	return false;
 }
 
 // 球の押し戻し
 bool MapTileManager::IntersectSphereVsMap(Sphere& sphere, bool wallCheck)
 {
-	XMFLOAT3 minPos, maxPos;
-	sphere.GetBoundPoints(&minPos, &maxPos);
+	//XMFLOAT3 minPos, maxPos;
+	//sphere.GetBoundPoints(&minPos, &maxPos);
 
-	//球の空間配列番号
-	int Elem = tree.GetLinerIndex(minPos.x, maxPos.x, minPos.y, maxPos.y, minPos.z, maxPos.z);
+	////球の空間配列番号
+	//int Elem = tree.GetLinerIndex(minPos.x, maxPos.x, minPos.y, maxPos.y, minPos.z, maxPos.z);
 
-	DirectX::XMVECTOR position = DirectX::XMLoadFloat3(&sphere.position);
+	//DirectX::XMVECTOR position = DirectX::XMLoadFloat3(&sphere.position);
 	bool ret = false;
-	SearchChildren(Elem, position, sphere.radius, wallCheck, ret);
-	SearchParent(Elem, position, sphere.radius, wallCheck, ret);
+	//SearchChildren(Elem, position, sphere.radius, wallCheck, ret);
+	//SearchParent(Elem, position, sphere.radius, wallCheck, ret);
 
-	if (!wallCheck)
-	{
-		DirectX::XMStoreFloat3(&sphere.position, position);
-	}
+	//if (!wallCheck)
+	//{
+	//	DirectX::XMStoreFloat3(&sphere.position, position);
+	//}
 
 	return ret;
 }
@@ -303,24 +308,26 @@ bool MapTileManager::IntersectSphereVsMap(Sphere& sphere, bool wallCheck)
 // カプセルの押し戻し
 bool MapTileManager::IntersectCapsuleVsMap(Capsule& capsule, bool wallCheck)
 {
-	XMFLOAT3 minPos, maxPos;
-	capsule.GetBoundPoints(&minPos, &maxPos);
+	//XMFLOAT3 minPos, maxPos;
+	//capsule.GetBoundPoints(&minPos, &maxPos);
 
-	//カプセルの空間配列番号
-	int Elem = tree.GetLinerIndex(minPos.x, maxPos.x, minPos.y, maxPos.y, minPos.z, maxPos.z);
+	////カプセルの空間配列番号
+	//int Elem = tree.GetLinerIndex(minPos.x, maxPos.x, minPos.y, maxPos.y, minPos.z, maxPos.z);
 
-	DirectX::XMVECTOR position = DirectX::XMLoadFloat3(&capsule.position);
-	DirectX::XMVECTOR direction = DirectX::XMLoadFloat3(&capsule.direction);
-	bool ret = false;
-	SearchChildren(Elem, position, direction, capsule.radius, capsule.length, wallCheck, ret);
-	SearchParent(Elem, position, direction, capsule.radius, capsule.length, wallCheck, ret);
+	//DirectX::XMVECTOR position = DirectX::XMLoadFloat3(&capsule.position);
+	//DirectX::XMVECTOR direction = DirectX::XMLoadFloat3(&capsule.direction);
+	//bool ret = false;
+	//SearchChildren(Elem, position, direction, capsule.radius, capsule.length, wallCheck, ret);
+	//SearchParent(Elem, position, direction, capsule.radius, capsule.length, wallCheck, ret);
 
-	if (!wallCheck)
-	{
-		DirectX::XMStoreFloat3(&capsule.position, position);
-	}
+	//if (!wallCheck)
+	//{
+	//	DirectX::XMStoreFloat3(&capsule.position, position);
+	//}
 
-	return ret;
+	//return ret;
+
+	return mapQuadtree.IntersectVsCapsule(capsule, wallCheck);
 }
 
 // マップサイズ計算
@@ -395,20 +402,21 @@ void MapTileManager::CreateSpatialIndex(uint32_t quadDepth, uint32_t octDepth, D
 		c_maxPos = { maxPos->x, maxPos->y, maxPos->z };
 	}
 
-	tree.Initialize(octDepth,
-		c_minPos.x - 1.0f, c_maxPos.x + 1.0f,
-		c_minPos.y - 20.0f, c_maxPos.y + 20.0f,
-		c_minPos.z - 1.0f, c_maxPos.z + 1.0f);	// エリアを少し大きめに作成
+	//tree.Initialize(octDepth,
+	//	c_minPos.x - 1.0f, c_maxPos.x + 1.0f,
+	//	c_minPos.y - 20.0f, c_maxPos.y + 20.0f,
+	//	c_minPos.z - 1.0f, c_maxPos.z + 1.0f);	// エリアを少し大きめに作成
 
-	XMFLOAT3 center = (c_minPos + c_maxPos) * 0.5f;
-	XMFLOAT3 size = c_maxPos - c_minPos;
-	float quadHalfSize = max(size.x, size.z) * 0.5f;
-	float octHalfSize = max(size.y * 0.5f, quadHalfSize);
-	quadHalfSize += 1.0f;
-	octHalfSize += 1.0f;
+	//XMFLOAT3 center = (c_minPos + c_maxPos) * 0.5f;
+	//XMFLOAT3 size = c_maxPos - c_minPos;
+	//float quadHalfSize = max(size.x, size.z) * 0.5f;
+	//float octHalfSize = max(size.y * 0.5f, quadHalfSize);
+	//quadHalfSize += 1.0f;
+	//octHalfSize += 1.0f;
 
-	quadtree.CreateQuadtree(center, quadHalfSize, quadDepth);
-	octree.CreateOctree(center, octHalfSize, octDepth);
+	//quadtree.CreateQuadtree(center, quadHalfSize, quadDepth);
+	//octree.CreateOctree(center, octHalfSize, octDepth);
+	mapQuadtree.CreateQuadtree(XMFLOAT3{ c_minPos.x - 1.0f, 0, c_minPos.z - 1.0f }, XMFLOAT3{ c_maxPos.x + 1.0f, 0, c_maxPos.z + 1.0f }, quadDepth);
 
 	InsertMapMesh();
 }
@@ -444,10 +452,10 @@ int MapTileManager::InsertMapMesh()
 				const DirectX::XMVECTOR B = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&b.position), WorldTransform);
 				const DirectX::XMVECTOR C = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&c.position), WorldTransform);
 
-				Triangle triangle = {};
-				DirectX::XMStoreFloat3(&triangle.position[0], A);
-				DirectX::XMStoreFloat3(&triangle.position[1], B);
-				DirectX::XMStoreFloat3(&triangle.position[2], C);
+				//Triangle triangle = {};
+				//DirectX::XMStoreFloat3(&triangle.position[0], A);
+				//DirectX::XMStoreFloat3(&triangle.position[1], B);
+				//DirectX::XMStoreFloat3(&triangle.position[2], C);
 				//triangle.materialIndex = mesh.materialIndex;
 				Triangle* p_triangle = new Triangle;
 				DirectX::XMStoreFloat3(&p_triangle->position[0], A);
@@ -458,9 +466,10 @@ int MapTileManager::InsertMapMesh()
 				//quadtree.InsertTriangleObject(triangle);
 				//octree.InsertTriangleObject(triangle);
 
-				XMFLOAT3 minPos, maxPos;
-				triangle.GetBoundPoints(&minPos, &maxPos);
-				tree.Regist(minPos.x, maxPos.x, minPos.y, maxPos.y, minPos.z, maxPos.z, p_triangle);
+				//XMFLOAT3 minPos, maxPos;
+				//triangle.GetBoundPoints(&minPos, &maxPos);
+				//tree.Regist(minPos.x, maxPos.x, minPos.y, maxPos.y, minPos.z, maxPos.z, p_triangle);
+				mapQuadtree.Regist(p_triangle);
 
 				count++;
 			}
