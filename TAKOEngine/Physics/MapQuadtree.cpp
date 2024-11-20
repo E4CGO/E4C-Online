@@ -2,6 +2,7 @@
 //! @note マップ用四分木空間
 #include "TAKOEngine/Physics/MapQuadtree.h"
 #include "TAKOEngine/Tool/XMFLOAT.h"
+#include <iostream>
 
 /**************************************************************************//**
 	@brief		四分木空間の生成
@@ -124,13 +125,11 @@ bool MapQuadtree::Regist(Triangle* mesh)
 	// モートンコードの排他的論理和を使い、上位空間に登録するかのチェック
 	uint32_t count = 1;
 	uint32_t shift = 0;
-	uint32_t maskedXOR = 0x03;
 
 	while (mortonCodeXOR != 0)
 	{
 		// 下位2bitずつマスクして値をチェックする
-		maskedXOR = mortonCodeXOR & 0x03;
-		if (maskedXOR)
+		if (mortonCodeXOR & 0x03)
 		{
 			// シフト数を上書き保存
 			shift = count;
@@ -188,6 +187,47 @@ bool MapQuadtree::Regist(Triangle* mesh)
 }
 
 /**************************************************************************//**
+	@brief		全てのノードで三角形と垂直レイの交差判定を行う（最初に交差する三角形のみを返す方式）
+	@param[in]	rayStart		: 始点位置
+				rayDirection	: 向き
+				float rayDist	: 長さ
+				result			: ヒット結果
+	@return		交差判定
+*//***************************************************************************/
+bool MapQuadtree::IntersectVerticalRayVsTriangle(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayDirection, float rayDist, HitResult& result)
+{
+	bool hit = false;
+
+	// レイの始点のモートンコードと線形インデックスを算出
+	uint32_t mortonCode = GetMortonCode(rayStart, m_quadtreeNodes[GetLevelStart(m_level)].m_size);
+	uint32_t index = GetLevelStart(m_level) + mortonCode;
+
+	uint32_t level = m_level;		// 探索する階層（最下層から）
+	uint32_t mortonArea = 0b1111;	// その空間内で探索するエリア
+
+	// 四分木のルート空間までループ処理
+	while(1)
+	{
+		IntersectVsRayInNode(index, mortonArea, rayStart, rayDirection, rayDist, result, hit);
+		//if (IntersectVsRayInNode(index, mortonArea, rayStart, rayDirection, rayDist, result, hit))
+		//{
+		//	std::cout << index << "; " << mortonCode << std::endl;
+		//}
+
+		// ルート空間ならbreak
+		if (level == 0)	break;
+
+		// 親階層へ
+		level--;
+		mortonArea = 1 << (mortonCode & 0x03);	// 下位2bitをマスクした分左シフト
+		mortonCode >>= 2;
+		index = GetLevelStart(level) + mortonCode;
+	}
+
+	return hit;
+}
+
+/**************************************************************************//**
 	@brief		全てのノードで三角形とレイの交差判定を行う（最初に交差する三角形のみを返す方式）
 	@param[in]	rayStart		: 始点位置
 				rayDirection	: 向き
@@ -197,6 +237,7 @@ bool MapQuadtree::Regist(Triangle* mesh)
 *//***************************************************************************/
 bool MapQuadtree::IntersectVsRay(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayDirection, float rayDist, HitResult& result)
 {
+	/*
 	DirectX::XMFLOAT3 minPos, maxPos;
 	if (rayDirection.x > 0.0f)
 	{
@@ -264,8 +305,6 @@ bool MapQuadtree::IntersectVsRay(const DirectX::XMFLOAT3& rayStart, const Direct
 	
 				// 隣の空間へ
 				nowX++;
-				//mortonCode = bitSeparete(nowX) | (bitSeparete(nowZ) << 1);
-				//index = GetLevelStart(level) + mortonCode;
 				mortonArea |= (mortonArea & 0b1010) >> 1;	// 隣のフラグを立てる
 				if (depth && nowX == maxX >> depth)	// 最小空間ではなく、xが最大点の空間の時
 				{
@@ -278,8 +317,6 @@ bool MapQuadtree::IntersectVsRay(const DirectX::XMFLOAT3& rayStart, const Direct
 			// 隣の列の空間へ
 			nowX = minX >> depth;
 			nowZ++;
-			//mortonCode = bitSeparete(nowX) | (bitSeparete(nowZ) << 1);
-			//index = GetLevelStart(level) + mortonCode;
 			mortonArea = 0b1111;
 			if (depth)
 			{
@@ -310,6 +347,192 @@ bool MapQuadtree::IntersectVsRay(const DirectX::XMFLOAT3& rayStart, const Direct
 	}
 
 	return hit;
+
+	/*/
+	/////////////////////////////////////////////////////
+	
+	// 制御用変数
+	bool hit = false;	// 全体の交差結果。一度でも三角形との交差が出ればtrue
+	bool ret = false;	// 階層ごとの交差結果。一度でも三角形の交差が出ればtrue
+
+	// レイの長さでヒット情報の距離を初期化
+	result.distance = rayDist;
+
+	// xz軸それぞれのレイの向きをプラス→１、ゼロ→０、マイナス→－１で記録
+	int directionX = rayDirection.x > 0.0f ? 1 : (rayDirection.x < 0.0f ? -1 : 0);
+	int directionZ = rayDirection.z > 0.0f ? 1 : (rayDirection.z < 0.0f ? -1 : 0);
+
+	// 垂直レイの時
+	if (directionX == 0 && directionZ == 0)
+	{
+		return IntersectVerticalRayVsTriangle(rayStart, rayDirection, rayDist, result);
+	}
+
+	const uint32_t startX = static_cast<uint32_t>((rayStart.x - m_quadtreeNodes[0].m_minPos.x) / m_quadtreeNodes[GetLevelStart(m_level)].m_size.x);
+	const uint32_t startZ = static_cast<uint32_t>((rayStart.z - m_quadtreeNodes[0].m_minPos.z) / m_quadtreeNodes[GetLevelStart(m_level)].m_size.z);
+	const uint32_t endX = static_cast<uint32_t>((rayStart.x + rayDirection.x * rayDist - m_quadtreeNodes[0].m_minPos.x) / m_quadtreeNodes[GetLevelStart(m_level)].m_size.x);
+	const uint32_t endZ = static_cast<uint32_t>((rayStart.z + rayDirection.z * rayDist - m_quadtreeNodes[0].m_minPos.z) / m_quadtreeNodes[GetLevelStart(m_level)].m_size.z);
+
+	uint32_t level = 0;			// 探索する階層（ルート空間から）
+	uint32_t mortonCode = 0;	// 探索するモートンコード
+	uint32_t index = 0;			// 探索する空間配列番号
+	uint32_t mortonArea = 0;	// その空間内で探索するエリア
+	
+	// モートンエリアチェック用定数
+	uint32_t sX, sZ, eX, eZ, mX, mZ;
+	if (directionX >= 0)
+	{
+		sX = startX;	// 最下位bitが1の時チェック
+		eX = ~endX;		// 最下位bitが0の時チェック
+		mX = 0b1010;	// 1, 3
+	}
+	else
+	{
+		sX = ~startX;	// 最下位bitが0の時チェック
+		eX = endX;		// 最下位bitが1の時チェック
+		mX = 0b0101;	// 0, 2
+	}
+	if (directionZ >= 0)
+	{
+		sZ = startZ;	// 最下位bitが1の時チェック
+		eZ = ~endZ;		// 最下位bitが0の時チェック
+		mZ = 0b1100;	// 2, 3
+	}
+	else
+	{
+		sZ = ~startZ;	// 最下位bitが0の時チェック
+		eZ = endZ;		// 最下位bitが1の時チェック
+		mZ = 0b0011;	// 0, 1
+	}
+
+	// 階層数分のループ処理。ルート空間からスタート
+	for (level = 0; level <= m_level; level++)
+	{
+		// 現在の階層の線形インデックスを取得
+		uint32_t levelStart = GetLevelStart(level);
+
+		// DDAを使ってレイで辿るノードを算出するための各変数の準備
+
+		// 空間の直方体の辺の長さ
+		XMFLOAT3 cubeSize = m_quadtreeNodes[levelStart].m_size;
+
+		// レイの傾きから一つノードを進めた時の次のノードまでの距離の増加量の定数「直方体のxz軸の辺の長さ/|レイの成分|」を算出
+		float dx = directionX != 0 ? cubeSize.x / fabsf(rayDirection.x) : 0.0f;
+		float dz = directionZ != 0 ? cubeSize.z / fabsf(rayDirection.z) : 0.0f;
+
+		// レイの始点が四分木の最小点を含むノードから数えて何個目のノードに居るか算出（０個目スタート）
+		uint32_t nowX = startX << (m_level - level);
+		uint32_t nowZ = startZ << (m_level - level);
+		uint32_t goalX = endX << (m_level - level);
+		uint32_t goalZ = endZ << (m_level - level);
+
+		// レイの始点のノードの最小・最大座標の算出
+		float minX = m_quadtreeNodes[0].m_minPos.x + nowX * cubeSize.x, maxX = minX + cubeSize.x;
+		float minZ = m_quadtreeNodes[0].m_minPos.z + nowZ * cubeSize.z, maxZ = minZ + cubeSize.z;
+
+		// レイの始点において、レイが進む際、「次のノードにぶつかるまでの距離/|レイの成分|」を算出
+		float distX = directionX * (maxX - rayStart.x) + ((1 - directionX) / 2) * cubeSize.x;
+		float distZ = directionZ * (maxZ - rayStart.z) + ((1 - directionZ) / 2) * cubeSize.z;
+
+		float tx = directionX != 0 ? distX / fabsf(rayDirection.x) : FLT_MAX;
+		float tz = directionZ != 0 ? distZ / fabsf(rayDirection.z) : FLT_MAX;
+
+
+		mortonArea = 0b1111;
+		if (level < m_level)
+		{
+			// モートンエリアチェック
+			if (sX >> (m_level - level - 1) & 0x01)
+			{
+				mortonArea &= mX;
+			}
+			if (sZ >> (m_level - level - 1) & 0x01)
+			{
+				mortonArea &= mZ;
+			}
+		}
+
+		// ループ処理で四分木の同一階層内のレイvs三角形の交差判定を行う
+		while (1)
+		{
+			// モートンコード算出
+			mortonCode = bitSeparete(nowX) | (bitSeparete(nowZ) << 1);
+
+			// 線形（配列）のインデックスへ変換
+			index = mortonCode + levelStart;
+			std::cout << index << "; " << mortonCode << std::endl;
+
+			// 階層内に収まっているか確認
+			if (index <= GetLevelStart(level + 1) - 1)
+			{
+				// 空間内の当たり判定処理
+				ret = IntersectVsRayInNode(index, mortonArea, rayStart, rayDirection, rayDist, result, hit);
+			}
+			else
+			{
+				// 階層外なら終了
+				break;
+			}
+
+			// １度でもヒットしていたら、この階層のチェックは終了。（レイの開始点に近いノード順にチェックしているので）
+			if (ret)
+			{
+				std::cout << index << "; " << mortonCode << "hit" << std::endl;
+				break;
+			}
+
+			// DDAを用いて、次にチェックする隣の区画を算出し、そのノードを示すモートンコードを上書きする
+			// x方向
+			if (tx <= tz)
+			{
+				// 終端の空間まで来ていたら現在の階層の処理を終了させる
+				if (nowX == goalX)	break;
+
+				// 既に見つかっている最短交差距離よりも探索する空間までの距離が長くなっていれば、
+				// これ以上進む必要はないため現在の階層の処理を終了させる
+				if (result.distance < rayDist * tx)	break;
+
+				// 移動するのでtxとnowXを更新する
+				tx += dx;
+				nowX += directionX;
+				
+				mortonArea |= ((mortonArea & mX) << 1) >> (directionX + 1);	// 隣のフラグを立てる
+				if (level < m_level && nowX == goalX)	// 最小空間ではなく、xが終点の空間の時
+				{
+					if (eX >> (m_level - level - 1) & 0x01)	// モートンエリアチェック
+					{
+						mortonArea &= ~mX;
+					}
+				}
+			}
+			// z方向
+			else
+			{
+				// 終端の空間まで来ていたら処理を終了させる
+				if (nowZ == goalZ)	break;
+
+				// 既に見つかっている最短交差距離よりも探索する空間までの距離が長くなっていれば、
+				// これ以上進む必要はないため現在の階層の処理を終了させる
+				if (result.distance < rayDist * tz)	break;
+
+				// 移動するのでtzとnowZを更新する
+				tz += dz;
+				nowZ += directionZ;
+
+				mortonArea |= ((mortonArea & mZ) << 2) >> (2 * (directionZ + 1));	// 隣のフラグを立てる
+				if (level < m_level && nowZ == goalZ)	// 最小空間ではなく、zが終点の空間の時
+				{
+					if (eZ >> (m_level - level - 1) & 0x01)	// モートンエリアチェック
+					{
+						mortonArea &= ~mZ;
+					}
+				}
+			}
+		}
+	}
+
+	return hit;
+	//*/
 }
 
 /**************************************************************************//**
@@ -332,7 +555,9 @@ bool MapQuadtree::IntersectVsRayInNode(
 	HitResult& result,
 	bool& hit)
 {
+	bool ret = false; //この空間内での衝突判定
 	OFT* oft = m_quadtreeNodes[index].m_pLatest;
+	
 	while (oft)
 	{
 		if (oft->m_mortonArea & mortonArea)
@@ -340,12 +565,13 @@ bool MapQuadtree::IntersectVsRayInNode(
 			if (Collision::IntersectRayVsTriangle(start, direction, dist, oft->m_pMesh->position, result))
 			{
 				hit = true;
+				ret = true;
 			}
 		}
 		oft = oft->m_pNext;
 	}
 
-	return hit;
+	return ret;
 }
 
 /**************************************************************************//**
@@ -405,8 +631,6 @@ bool MapQuadtree::IntersectVsCapsule(Capsule& capsule, bool wallCheck)
 	
 				// 隣の空間へ
 				nowX++;
-				//mortonCode = bitSeparete(nowX) | (bitSeparete(nowZ) << 1);
-				//index = GetLevelStart(level) + mortonCode;
 				mortonArea |= (mortonArea & 0b1010) >> 1;	// 隣のフラグを立てる
 				if (depth && nowX == maxX >> depth)	// 最小空間ではなく、xが最大点の空間の時
 				{
@@ -419,8 +643,6 @@ bool MapQuadtree::IntersectVsCapsule(Capsule& capsule, bool wallCheck)
 			// 隣の列の空間へ
 			nowX = minX >> depth;
 			nowZ++;
-			//mortonCode = bitSeparete(nowX) | (bitSeparete(nowZ) << 1);
-			//index = GetLevelStart(level) + mortonCode;
 			mortonArea = 0b1111;
 			if (depth)
 			{
@@ -480,8 +702,10 @@ bool MapQuadtree::IntersectVsCapsuleInNode(
 	bool wallCheck,
 	bool& hit)
 {
+	bool ret = false; //この空間内での衝突判定
 	OFT* oft = m_quadtreeNodes[index].m_pLatest;
 	IntersectionResult result;
+	
 	while (oft)
 	{
 		if (oft->m_mortonArea & mortonArea)
@@ -501,6 +725,7 @@ bool MapQuadtree::IntersectVsCapsuleInNode(
 					if (result.normal.m128_f32[1] < 0.4f)	// 66度以上の壁
 					{
 						hit = true;
+						ret = true;
 					}
 				}
 			}
@@ -511,11 +736,12 @@ bool MapQuadtree::IntersectVsCapsuleInNode(
 					// カプセルのみ押し戻し処理
 					capsulePos = DirectX::XMVectorAdd(capsulePos, DirectX::XMVectorScale(result.normal, result.penetration));
 					hit = true;
+					ret = true;
 				}
 			}
 		}
 		oft = oft->m_pNext;
 	}
 
-	return hit;
+	return ret;
 }

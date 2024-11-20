@@ -27,6 +27,9 @@ public:
 	// マップメッシュ登録
 	bool Regist(Triangle* mesh);
 
+	// 全てのノードで三角形と垂直レイの交差判定を行う（最初に交差する三角形のみを返す方式）
+	bool IntersectVerticalRayVsTriangle(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayDirection, float rayDist, HitResult& result);
+
 	// 全てのノードで三角形とレイの交差判定を行う（最初に交差する三角形のみを返す方式）
 	bool IntersectVsRay(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayDirection, float rayDist, HitResult& result);
 
