@@ -9,7 +9,7 @@ public:
 		RoomBase* parent, int pointIndex,
 		std::vector<AABB>& roomAABBs,
 		bool isAutoGeneration,
-		std::vector<uint8_t> roomOrder, int& orderIndex);
+		std::vector<uint8_t>& roomOrder, int& orderIndex);
 
 	void LoadMapData() override;
 };

@@ -34,8 +34,8 @@ void StageDungeon_E4C::GenerateDungeon()
 	{
 		// ダンジョンの自動生成を行う
 		std::vector<DungeonData::RoomType> placeableRooms;
-		placeableRooms.emplace_back(DungeonData::SIMPLE_ROOM_1);
-		//placeableRooms.emplace_back(DungeonData::CROSS_ROOM_1);
+		//placeableRooms.emplace_back(DungeonData::SIMPLE_ROOM_1);
+		placeableRooms.emplace_back(DungeonData::CROSS_ROOM_1);
 
 		// 生成可能な部屋の重みの合計
 		int totalWeight = 0;
@@ -227,6 +227,15 @@ void StageDungeon_E4C::Initialize()
 		hr = T_GRAPHICS.GetDevice()->CreateBuffer(&buffer_desc, nullptr, constant_buffers[1].GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
+
+	//m_roomOrder.emplace_back(DungeonData::SIMPLE_ROOM_1);
+	//m_roomOrder.emplace_back(DungeonData::CROSS_ROOM_1);
+	//m_roomOrder.emplace_back(DungeonData::END_ROOM);
+	//m_roomOrder.emplace_back(DungeonData::END_ROOM);
+	//m_roomOrder.emplace_back(DungeonData::END_ROOM);
+	//m_roomOrder.emplace_back(DungeonData::SIMPLE_ROOM_1);
+	//m_roomOrder.emplace_back(DungeonData::END_ROOM);
+	//m_roomOrder.emplace_back(DungeonData::END_ROOM);
 
 	GenerateDungeon();
 

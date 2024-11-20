@@ -7,7 +7,7 @@ DeadEndRoom::DeadEndRoom(
 	RoomBase* parent, const int pointIndex,
 	std::vector<AABB>& roomAABBs,
 	const bool isAutoGeneration,
-	const std::vector<uint8_t> roomOrder, int& orderIndex)
+	std::vector<uint8_t>& roomOrder, int& orderIndex)
 	: RoomBase(parent, pointIndex, roomAABBs, isAutoGeneration, roomOrder, orderIndex)
 {
 	// 部屋タイプを設定
