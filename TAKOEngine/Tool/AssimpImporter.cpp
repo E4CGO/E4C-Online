@@ -86,11 +86,10 @@ void AssimpImporter::LoadMaterials(MaterialList& materials)
 					{
 						// テクスチャファイルパス作成
 						std::filesystem::path textureFilePath(aTextureFilePath.C_Str());
-						if (textureFilePath == "*0")
-						{
-							// テクスチャファイル名がなかった場合はマテリアル名とテクスチャタイプから作成
-							textureFilePath = material.name + "_" + aiTextureTypeToString(aTextureType) + "." + aTexture->achFormatHint;
-						}
+
+						// テクスチャファイル名がなかった場合はマテリアル名とテクスチャタイプから作成
+						textureFilePath = material.name + "_" + aiTextureTypeToString(aTextureType) + "." + aTexture->achFormatHint;
+
 						textureFilePath = "Textures" / textureFilePath.filename();
 
 						// 埋め込みテクスチャを出力するディレクトリを確認

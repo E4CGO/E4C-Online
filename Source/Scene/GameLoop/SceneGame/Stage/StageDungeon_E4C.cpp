@@ -158,30 +158,7 @@ void StageDungeon_E4C::Initialize()
 	Stage::Initialize(); // デフォルト
 
 	teleporter = std::make_unique<Teleporter>("Data/Model/Cube/testCubes.glb", 1.0);
-	teleporter->SetPosition({ 50, 0, 60 });
-
-	{
-		std::array<DirectX::XMFLOAT3, 4 > positions = {
-		DirectX::XMFLOAT3{ 10.0f, 10.0f, 5.0f},
-		DirectX::XMFLOAT3{ 10.0f, 20.0f, 5.0f },
-		DirectX::XMFLOAT3{ 5.0f, 10.0f, 5.0f },
-		DirectX::XMFLOAT3{ 5.0f, 20.0f, 5.0f }
-		};
-
-		plane = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "Data/Sprites/gem.png", 1.0f, positions);
-	}
-
-	{
-		std::array<DirectX::XMFLOAT3, 4 >positions = {
-			DirectX::XMFLOAT3{ 15.0f, 15.0f, 5.0f},
-			DirectX::XMFLOAT3{ 15.0f, 25.0f, 5.0f },
-			DirectX::XMFLOAT3{ 25.0f, 15.0f, 5.0f },
-			DirectX::XMFLOAT3{ 25.0f, 25.0f, 5.0f }
-		};
-
-		//portal = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, positions);
-		//portal.get()->SetShader(ModelShaderId::Portal);
-	}
+	//teleporter->SetPosition({ 50, 0, 60 });
 
 	// 光
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
@@ -229,6 +206,10 @@ void StageDungeon_E4C::Initialize()
 	}
 
 	GenerateDungeon();
+
+	// 一番遠い部屋のうち、ランダムな一つを抽選しテレポーターを設置する
+	RoomBase* lastRoom = rootRoom->GetFarthestChild().at(std::rand() % rootRoom->GetFarthestChild().size());
+	teleporter->SetPosition(lastRoom->GetPosition());
 
 	// 部屋のモデルを配置
 	for (RoomBase* room : rootRoom->GetAll())
@@ -281,9 +262,6 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	}
 	PlayerCharacterManager::Instance().Update(elapsedTime);
 	teleporter->Update(elapsedTime);
-	plane->Update(elapsedTime);
-	//portal->Update(elapsedTime);
-
 	teleporter->CheckPlayer(PlayerCharacterManager::Instance().GetPlayerCharacterById(GAME_DATA.GetClientId())->GetPosition(), elapsedTime);
 
 	if (teleporter->GetPortalReady()) STAGES.ChangeStage(new TestingStage);
@@ -311,70 +289,8 @@ void StageDungeon_E4C::Render()
 	// 描画
 	PlayerCharacterManager::Instance().Render(rc);
 
-	float time = 0;
-
-	{
-		//const DirectX::XMFLOAT4X4 coordinate_system_transforms[]
-		//{
-		//	{-1, 0, 0, 0,
-		//	  0, 1, 0, 0,
-		//	  0, 0, 1, 0,
-		//	  0, 0, 0, 1}, // 0:RHS Y-UP
-
-		//	{ 1, 0, 0, 0,
-		//	  0, 1, 0, 0,
-		//	  0, 0, 1, 0,
-		//	  0, 0, 0, 1}, // 1:LHS Y-UP
-
-		//	{-1, 0, 0, 0,
-		//	  0, 0,-1, 0,
-		//	  0, 1, 0, 0,
-		//	  0, 0, 0, 1}, // 2:RHS Z-UP
-
-		//	{ 1, 0, 0, 0,
-		//	  0, 0, 1, 0,
-		//	  0, 1, 0, 0,
-		//	  0, 0, 0, 1}, //3:LHS Z - UP
-		//};
-
-		//float scale_factor = 1.0f;
-
-		//DirectX::XMMATRIX C{ DirectX::XMLoadFloat4x4(&coordinate_system_transforms[0]) * DirectX::XMMatrixScaling(scale_factor, scale_factor, scale_factor) };
-		//DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(2.5, 2.5f, 2.5f) };
-		//DirectX::XMMATRIX R{ DirectX::XMMatrixRotationRollPitchYaw(0.0f, 0.0f, 0.0f) };
-		//DirectX::XMMATRIX T{ DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f) };
-
-		//DirectX::XMFLOAT4X4 world;
-		//DirectX::XMStoreFloat4x4(&world, C * S * R * T);
-
-		//// シーン用定数バッファ更新
-		//CbScene cbScene{};
-		//DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&rc.camera->GetView());
-		//DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&rc.camera->GetProjection());
-		//DirectX::XMStoreFloat4x4(&cbScene.view_projection, V * P);
-
-		//const DirectX::XMFLOAT3& eye = rc.camera->GetEye();
-		//cbScene.camera_position.x = eye.x;
-		//cbScene.camera_position.y = eye.y;
-		//cbScene.camera_position.z = eye.z;
-
-		//// レンダーステート設定
-		//const float blend_factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		//rc.deviceContext->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Opaque), blend_factor, 0xFFFFFFFF);
-		//rc.deviceContext->OMSetDepthStencilState(rc.renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
-		//rc.deviceContext->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullNone));
-
-		//rc.deviceContext->UpdateSubresource(constant_buffers[1].Get(), 0, 0, &cbScene, 0, 0);
-		//rc.deviceContext->VSSetConstantBuffers(1, 1, constant_buffers[1].GetAddressOf());
-		//rc.deviceContext->PSSetConstantBuffers(1, 1, constant_buffers[1].GetAddressOf());
-
-		MAPTILES.Render(rc);
-	}
-
+	MAPTILES.Render(rc);
 	teleporter->Render(rc);
-	plane->Render(rc);
-
-	//portal->Render(rc);
 
 	// デバッグレンダラ描画実行
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());

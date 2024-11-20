@@ -39,28 +39,13 @@ RoomBase::RoomBase(
 void RoomBase::UpdateTransform()
 {
 	{
-		// スケール行列生成
 		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(m_scale.x, m_scale.y, m_scale.z);
-		// 回転行列生成
 		DirectX::XMMATRIX R = AnglesToMatrix(m_angle);
-		// 位置行列生成
 		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(m_position.x, m_position.y, m_position.z);
 
 		DirectX::XMMATRIX LocalTransform = S * R * T;
 
-		DirectX::XMMATRIX ParentTransform;
-		//if (parentConnectPointIndex > -1)
-		//{
-		//	DirectX::XMFLOAT4X4 parentTransform = parent->GetConnectPointData(parentConnectPointIndex).transform;
-		//	ParentTransform = DirectX::XMLoadFloat4x4(&parentTransform);
-		//}
-		//else
-		{
-			ParentTransform = DirectX::XMMatrixIdentity();
-		}
-		DirectX::XMMATRIX GlobalTransform = LocalTransform * ParentTransform;
-
-		DirectX::XMStoreFloat4x4(&m_transform, GlobalTransform);
+		DirectX::XMStoreFloat4x4(&m_transform, LocalTransform);
 	}
 
 	// 接続点データも更新
@@ -316,36 +301,41 @@ void RoomBase::PlaceMapTile()
 {
 	for (const TILE_DATA& tileData : m_tileDatas)
 	{
-		std::vector<std::string> fileNames;
+		std::vector<std::string> colliderFileNames;
+		std::vector<std::string> modelFileNames;
 
 		switch (tileData.type)
 		{
 		case TileType::FLOOR:
-			//fileNames.emplace_back("Data/Model/Dungeon/Floor_Plain_Parent.glb");
-			fileNames.emplace_back("Data/Model/DungeonAssets/FLOOR.glb");
+			colliderFileNames.emplace_back("Data/Model/DungeonAssets/FLOOR.glb");
 			break;
 		case TileType::WALL:
-			fileNames.emplace_back("Data/Model/DungeonAssets/WALL.glb");
-			//fileNames.emplace_back("Data/Model/DungeonAssets/WALL_CENTERED.glb");
+			colliderFileNames.emplace_back("Data/Model/DungeonAssets/WALL.glb");
 			break;
 		case TileType::PILLAR:
-			fileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_01a.glb");
-			fileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_Base_01a.glb");
-			fileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_Top_01a.glb");
+			modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_01a.glb");
+			modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_Base_01a.glb");
+			modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_Top_01a.glb");
 			break;
 		case TileType::STAIR:
-			fileNames.emplace_back("Data/Model/DungeonAssets/SLOPE.glb");
-			break;
-		default:
+			colliderFileNames.emplace_back("Data/Model/DungeonAssets/SLOPE.glb");
 			break;
 		}
 
 		MapTile* newTile = new MapTile("", 1.0f, this);
-		for (std::string fileName : fileNames)
+
+		// 当たり判定モデルだけ先に読み込み、当たり判定を設定する
+		for (std::string fileName : colliderFileNames)
 		{
 			newTile->LoadModel(fileName.c_str(), 1.0f);
 		}
-		newTile->SetCollider(Collider::COLLIDER_TYPE::MAP);
+		if (colliderFileNames.size() != 0) newTile->SetCollider(Collider::COLLIDER_TYPE::MAP);
+
+		// 表示用モデルは後に読み込む
+		for (std::string fileName : modelFileNames)
+		{
+			newTile->LoadModel(fileName.c_str(), 1.0f);
+		}
 		newTile->SetPosition(tileData.position);
 		newTile->SetAngle(tileData.angle);
 		newTile->SetScale(tileData.scale);
@@ -366,7 +356,6 @@ int RoomBase::DrawDebugGUI(int i)
 	case DungeonData::CROSS_ROOM_1:	 nameStr = "CrossRoom1";	break;
 	case DungeonData::PASSAGE_1:	 nameStr = "Passage1";		break;
 	case DungeonData::DEAD_END:		 nameStr = "DeadEnd";		break;
-	default: break;
 	}
 
 	if (ImGui::TreeNode((nameStr + "(" + std::to_string(i) + ")").c_str()))
@@ -385,9 +374,27 @@ int RoomBase::DrawDebugGUI(int i)
 			m_angle.z = DirectX::XMConvertToRadians(debugAngle.z);
 			ImGui::DragFloat3("Scale", &m_scale.x);
 
+			float newWindowWidth = (ImGui::GetWindowWidth() * 0.15f);
+			ImGui::Text("Transform"); ImGui::SetNextItemWidth(newWindowWidth);
+			ImGui::DragFloat("##_11", &m_transform._11); ImGui::SameLine(); ImGui::SetNextItemWidth(newWindowWidth);
+			ImGui::DragFloat("##_12", &m_transform._12); ImGui::SameLine(); ImGui::SetNextItemWidth(newWindowWidth);
+			ImGui::DragFloat("##_13", &m_transform._13); ImGui::SameLine(); ImGui::SetNextItemWidth(newWindowWidth);
+			ImGui::DragFloat("##_14", &m_transform._14); ImGui::SetNextItemWidth(newWindowWidth);
+			ImGui::DragFloat("##_21", &m_transform._21); ImGui::SameLine(); ImGui::SetNextItemWidth(newWindowWidth);
+			ImGui::DragFloat("##_22", &m_transform._22); ImGui::SameLine(); ImGui::SetNextItemWidth(newWindowWidth);
+			ImGui::DragFloat("##_23", &m_transform._23); ImGui::SameLine(); ImGui::SetNextItemWidth(newWindowWidth);
+			ImGui::DragFloat("##_24", &m_transform._24); ImGui::SetNextItemWidth(newWindowWidth);
+			ImGui::DragFloat("##_31", &m_transform._31); ImGui::SameLine(); ImGui::SetNextItemWidth(newWindowWidth);
+			ImGui::DragFloat("##_32", &m_transform._32); ImGui::SameLine(); ImGui::SetNextItemWidth(newWindowWidth);
+			ImGui::DragFloat("##_33", &m_transform._33); ImGui::SameLine(); ImGui::SetNextItemWidth(newWindowWidth);
+			ImGui::DragFloat("##_34", &m_transform._34); ImGui::SetNextItemWidth(newWindowWidth);
+			ImGui::DragFloat("##_41", &m_transform._41); ImGui::SameLine(); ImGui::SetNextItemWidth(newWindowWidth);
+			ImGui::DragFloat("##_42", &m_transform._42); ImGui::SameLine(); ImGui::SetNextItemWidth(newWindowWidth);
+			ImGui::DragFloat("##_43", &m_transform._43); ImGui::SameLine(); ImGui::SetNextItemWidth(newWindowWidth);
+			ImGui::DragFloat("##_44", &m_transform._44); ImGui::SetNextItemWidth(newWindowWidth);
+
 			ImGui::Text(("TileDataCount: " + std::to_string(m_tileDatas.size())).c_str());
 			ImGui::Text(("ConnectPointCount: " + std::to_string(m_connectPointDatas.size())).c_str());
-			//ImGui::Text(("MapTileSize: " + std::to_string(mapTiles.size())).c_str());
 			ImGui::Text(("ParentConnectPointIndex: " + std::to_string(parentConnectPointIndex)).c_str());
 			ImGui::Text(("Depth: " + std::to_string(depth)).c_str());
 			ImGui::DragFloat3("AABB.pos", &m_aabb.position.x);

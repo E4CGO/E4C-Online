@@ -69,6 +69,15 @@ public:
 
 	void UpdateTransform();
 
+	DirectX::XMFLOAT3 GetPosition() { return m_position; }
+	DirectX::XMFLOAT3 GetCenterPos()
+	{
+		return m_position;
+	}
+
+	DirectX::XMFLOAT3 GetAngle() { return m_angle; }
+	DirectX::XMFLOAT3 GetScale() { return m_scale; }
+
 	// 次の部屋を生成する
 	void GenerateNextRoom(
 		std::vector<AABB>& roomAABBs,
@@ -122,7 +131,16 @@ public:
 		// 子の数が０なら末端
 		if (this->childs.size() == 0)
 		{
-			childs.emplace_back(this);
+			// DEAD_END（行き止まり）なら親を登録
+			if (this->roomType == DungeonData::DEAD_END)
+			{
+				childs.emplace_back(this->parent);
+			}
+			// それ以外なら自分を登録
+			else
+			{
+				childs.emplace_back(this);
+			}
 		}
 		else
 		{
@@ -205,8 +223,6 @@ protected:
 
 	std::vector<TILE_DATA> m_tileDatas;
 	std::vector<CONNECTPOINT_DATA> m_connectPointDatas;
-
-	//std::vector<MapTile*> mapTiles;
 
 	float tileScale = 4.0f;
 
