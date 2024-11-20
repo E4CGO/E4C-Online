@@ -145,6 +145,7 @@ namespace Online
 		void ReadyMatching();
 		void NewRoom();
 		void NewRoom(const std::vector<uint8_t>& roomOrder);
+		void RoomIn();
 
 		// 同期開始
 		void BeginSync()

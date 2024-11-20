@@ -251,8 +251,16 @@ namespace Online
 			{
 				dungeon->SetRoomOrder(roomOrder);
 				m_pMatchingUI->GetTeleporter()->Teleport();
+			
+				PlayerCharacterManager::Instance().ClearOtherPlayers();
+				EndSync();
 			}
 		}
+	}
+
+	void OnlineController::RoomIn()
+	{
+		m_tcpCommands[TCP_CMD::ROOM_IN]->Send(nullptr);
 	}
 
 	/**************************************************************************//**

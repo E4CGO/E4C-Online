@@ -15,12 +15,18 @@ namespace Online
 	*//***************************************************************************/
 	bool TCPRoomIn::Receive(size_t size)
 	{
-		uint8_t* buffer = new uint8_t[size];
-		if (m_pcontroller->GetTcpSocket()->Receive(&buffer, size) > 0)
+		uint8_t* buffer = new uint8_t[size + 1];
+		ZeroMemory(buffer, size + 1);
+		if (m_pcontroller->GetTcpSocket()->Receive(buffer, size) > 0)
 		{
 			std::vector<uint8_t> roomOrder;
-
+			for (int i = 8; i < size; i++)
+			{
+				roomOrder.push_back(buffer[i]);
+			}
+			delete[] buffer;
 			m_pcontroller->NewRoom(roomOrder);
+			return true;
 		}
 		delete[] buffer;
 		return false;
@@ -33,9 +39,9 @@ namespace Online
 	*//***************************************************************************/
 	bool TCPRoomIn::Send(void* data)
 	{
-
-
-		return false;
+		std::vector<uint8_t> buffer;
+		CreateHeaderBuffer(buffer, m_cmd, 0);
+		return m_pcontroller->GetTcpSocket()->Send(buffer.data(), buffer.size()) >= 0;
 	}
 
 	/**************************************************************************//**

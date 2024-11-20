@@ -189,6 +189,7 @@ void StageDungeon_E4C::Initialize()
 	// プレイヤー
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
 	player->SetPosition({ 5.0f, 5.0f, 5.0f });
+	player->GetStateMachine()->ChangeState(PlayerCharacter::STATE::IDLE);
 
 	// カメラ設定
 	Camera* mainCamera = CameraManager::Instance().GetCamera();
@@ -242,6 +243,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	Online::OnlineController* onlineController = m_pScene->GetOnlineController();
 	if (onlineController->GetState() == Online::OnlineController::STATE::LOGINED)
 	{
+		onlineController->RoomIn();
 		onlineController->BeginSync();
 	}
 
