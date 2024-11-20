@@ -33,8 +33,8 @@ void StageDungeon_E4C::GenerateDungeon()
 	{
 		// ダンジョンの自動生成を行う
 		std::vector<DungeonData::RoomType> placeableRooms;
-		placeableRooms.emplace_back(DungeonData::SIMPLE_ROOM_1);
-		//placeableRooms.emplace_back(DungeonData::CROSS_ROOM_1);
+		//placeableRooms.emplace_back(DungeonData::SIMPLE_ROOM_1);
+		placeableRooms.emplace_back(DungeonData::CROSS_ROOM_1);
 
 		// 生成可能な部屋の重みの合計
 		int totalWeight = 0;

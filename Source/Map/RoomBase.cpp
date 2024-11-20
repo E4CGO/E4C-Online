@@ -16,7 +16,7 @@ RoomBase::RoomBase(
 	RoomBase* parent, int pointIndex,
 	std::vector<AABB>& roomAABBs,
 	bool isAutoGeneration,
-	std::vector<uint8_t> roomOrder, int& orderIndex)
+	std::vector<uint8_t>& roomOrder, int& orderIndex)
 {
 	// 親と接続点番号を代入
 	this->parent = parent;
@@ -80,7 +80,7 @@ void RoomBase::UpdateTransform()
 void RoomBase::GenerateNextRoom(
 	std::vector<AABB>& roomAABBs,
 	bool isAutoGeneration,
-	std::vector<uint8_t> roomOrder, int& orderIndex)
+	std::vector<uint8_t>& roomOrder, int& orderIndex)
 {
 	DungeonData& dungeonData = DungeonData::Instance();
 
@@ -228,6 +228,9 @@ void RoomBase::GenerateNextRoom(
 		// 接続点の数だけ子を生成する
 		for (int i = 0; i < m_connectPointDatas.size(); i++)
 		{
+			// もしも配列のサイズを超えてしまうならreturn
+			if (orderIndex >= roomOrder.size()) return;
+
 			uint8_t nextRoomType = roomOrder.at(orderIndex);
 
 			RoomBase* nextRoom = nullptr;
@@ -318,7 +321,8 @@ void RoomBase::PlaceMapTile()
 		switch (tileData.type)
 		{
 		case TileType::FLOOR:
-			fileNames.emplace_back("Data/Model/Dungeon/Floor_Plain_Parent.glb");
+			//fileNames.emplace_back("Data/Model/Dungeon/Floor_Plain_Parent.glb");
+			fileNames.emplace_back("Data/Model/DungeonAssets/FLOOR.glb");
 			break;
 		case TileType::WALL:
 			fileNames.emplace_back("Data/Model/DungeonAssets/WALL.glb");
@@ -330,7 +334,7 @@ void RoomBase::PlaceMapTile()
 			fileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_Top_01a.glb");
 			break;
 		case TileType::STAIR:
-			fileNames.emplace_back("Data/Model/Dungeon/Stair Parent 001.glb");
+			fileNames.emplace_back("Data/Model/DungeonAssets/SLOPE.glb");
 			break;
 		default:
 			break;
