@@ -51,7 +51,7 @@ SkeletonMinionBoss::SkeletonMinionBoss() : SkeletonMinion(3.0f)
 	enemyType = ENEMY_TYPE::SKELETON_MINION_BOSS;
 	maxHp *= 10;
 	hp = maxHp;
-	atk = 0;
+	atk = 20;
 	moveSpeed = 3.0f;
 	turnSpeed = DirectX::XMConvertToRadians(90);
 

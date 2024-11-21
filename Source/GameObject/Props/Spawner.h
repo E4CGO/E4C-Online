@@ -3,10 +3,12 @@
 #ifndef __INCLUDED_SPAWNER_H__
 #define __INCLUDED_SPAWNER_H__
 #include "Source/GameObject/GameObject.h"
+#include "Source/Scene/Stage/Stage.h"
 #include "Source/GameObject/Character/Enemy/Enemy.h"
 #include "TAKOEngine/Rendering/Model/ModelDX11.h"
 #include "TAKOEngine/Rendering/Model/NewModelDX11.h"
 #include "TAKOEngine/Rendering/Model/ModelDX12.h"
+
 
 /**************************************************************************//**
     @class  Spawner
@@ -26,8 +28,10 @@ public:
 
     void SetTerritory(const DirectX::XMFLOAT3& origin, float range);
 
+   
+
     //プレイヤー索敵
-    bool SerchPlayer();
+    bool SearchPlayer();
 
     float GetSerchRenge() { return serchRange; }
     float GetTerrytoryRange() { return territoryRange; }
@@ -39,6 +43,17 @@ private:
     float serchRange = 5.f;
 
     DirectX::XMFLOAT3 playerPosition = {};
+    DirectX::XMFLOAT3 spawnPos{};
+
+    std::vector<ENEMY_LIST_DATA> enemyList;
+    int spawnedEnemyCount = 0;             // 現在までに生成されたエネミーの数
+    float spawntimer = 0.f;
+    float spawntime = 5.f;
+    int maxEnemies = 20;
+
+    int phase;
+    float timer = 0.0f;
+    int pointer = 0;
 };
 #endif
 

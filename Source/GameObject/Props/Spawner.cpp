@@ -1,13 +1,15 @@
 #include "Spawner.h"
 #include "GameObject/Character/Player/PlayerManager.h"
 #include "Scene/Stage/StageManager.h"
-#include "Scene/Stage/TestingStage.h"
+#include "TAKOEngine/Tool/Mathf.h"
+#include "Source/Scene/Stage/TestingStage.h"
+#include <GameObject/Character/Enemy/EnemyManager.h>
 /**************************************************************************//**
      @brief  コンストラクタ  
 *//***************************************************************************/
 Spawner::Spawner()
 {
-	position = { -38.0f, 2.0f, -48.0f };
+	
 }
 /**************************************************************************//**
      @brief    更新
@@ -15,7 +17,7 @@ Spawner::Spawner()
 *//***************************************************************************/
 void Spawner::Update(float elapsedTime)
 {
-	if (SerchPlayer())
+	if (SearchPlayer())
 	{
 		STAGES.GetStage()->SetPhase(TestingStage::PHASE::MONSTERRUSH);
 	}
@@ -34,7 +36,7 @@ void Spawner::SetTerritory(const DirectX::XMFLOAT3& origin, float range)
      @brief    プレイヤー発見
     @return    
 *//***************************************************************************/
-bool Spawner::SerchPlayer()
+bool Spawner::SearchPlayer()
 {
 	for (Player*& player : PLAYERS.GetAll())
 	{
@@ -62,4 +64,5 @@ bool Spawner::SerchPlayer()
 *//***************************************************************************/
 void Spawner::Render(const RenderContext& rc)
 {
+
 }
