@@ -292,11 +292,12 @@ void StageDungeon_E4C::Render()
 	MAPTILES.Render(rc);
 	teleporter->Render(rc);
 
+#ifdef _DEBUG
 	// デバッグレンダラ描画実行
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
-
-	PlayerCharacterManager::Instance().DrawDebugGUI();
 	rootRoom->DrawDebugGUI();
+#endif // _DEBUG
+
 }
 
 void StageDungeon_E4C::OnPhase()
