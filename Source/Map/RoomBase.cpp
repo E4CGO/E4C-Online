@@ -72,6 +72,35 @@ void RoomBase::GenerateNextRoom(
 	// 部屋データのロード（接続点データ設定もここで行う）
 	LoadMapData();
 
+	// 親がない＝最初の部屋ならば入口を塞いでおく
+	if (parent == nullptr)
+	{
+		m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+			{ -2.0f, 0.0f, -2.0f },
+			{ 0.0f, DirectX::XMConvertToRadians(270.0f), 0.0f },
+			{ 1.0f, 1.0f, 1.0f }));
+		m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+			{ -2.0f, 3.0f, -2.0f },
+			{ 0.0f, DirectX::XMConvertToRadians(270.0f), 0.0f },
+			{ 1.0f, 1.0f, 1.0f }));
+		m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+			{ -2.0f, 0.0f, -2.0f },
+			{ 0.0f, 0.0f, 0.0f },
+			{ 1.0f, 1.0f, 1.0f }));
+		m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+			{ -2.0f, 3.0f, -2.0f },
+			{ 0.0f, 0.0f, 0.0f },
+			{ 1.0f, 1.0f, 1.0f }));
+		m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+			{ 2.0f, 0.0f, -2.0f },
+			{ 0.0f, 0.0f, 0.0f },
+			{ 1.0f, 1.0f, 1.0f }));
+		m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+			{ 2.0f, 3.0f, -2.0f },
+			{ 0.0f, 0.0f, 0.0f },
+			{ 1.0f, 1.0f, 1.0f }));
+	}
+
 	// 自身のAABBを算出
 	m_aabb = CalcAABB(dungeonData.GetRoomGenerateSetting(roomType).aabb,
 		m_position, DirectX::XMConvertToDegrees(m_angle.y));
