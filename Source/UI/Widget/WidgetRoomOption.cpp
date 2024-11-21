@@ -96,6 +96,10 @@ void WidgetRoomOption::Render(const RenderContext& rc)
 	}
 }
 
+void WidgetRoomOption::RenderDX12(const RenderContextDX12& rc)
+{
+}
+
 void WidgetRoomOption::NameWithToken()
 {
 	// ランダムプレイヤー名

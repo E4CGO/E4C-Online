@@ -14,6 +14,7 @@ public:
 
 	void Update(float elapsedTime) override;
 	void Render(const RenderContext& rc) override;
+	void RenderDX12(const RenderContextDX12& rc) override;
 private:
 	Enemy* enemy = nullptr;
 	std::string name;

@@ -1,5 +1,5 @@
 ﻿//! @file WidgetButtonImage.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDE_WIDGET_BUTTON_IMAGE__
 #define __INCLUDE_WIDGET_BUTTON_IMAGE__
@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "TAKOEngine/Rendering/Sprite.h"
+#include "TAKOEngine/Rendering/SpriteDX12.h"
 
 #include "UI/Widget/WidgetButton.h"
 #include "UI/Widget/WidgetText.h"
@@ -32,6 +33,8 @@ public:
 
 	// 描画処理
 	virtual void Render(const RenderContext& rc);
+	// 描画処理
+	virtual void RenderDX12(const RenderContextDX12& rc);
 	// 画像色を設定
 	void SetColor(const DirectX::XMFLOAT4& color) { this->m_color = color; }
 protected:
@@ -39,8 +42,12 @@ protected:
 	DirectX::XMFLOAT4 m_color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	// ボタン画像
 	std::shared_ptr<Sprite> m_btnImage;
+	// ボタン画像 DX12
+	std::shared_ptr<SpriteDX12> m_btnImageDX12;
 	// ボタンホバー画像
 	std::shared_ptr<Sprite> m_hoverBtnImage;
+	// ボタンホバー画像 DX12
+	std::shared_ptr<SpriteDX12> m_hoverBtnImageDX12;
 	// ボタン文字
 	std::unique_ptr<WidgetText> m_text;
 };

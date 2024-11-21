@@ -126,3 +126,7 @@ void WidgetLogin::Render(const RenderContext& rc)
 		break;
 	}
 }
+
+void WidgetLogin::RenderDX12(const RenderContextDX12& rc)
+{
+}

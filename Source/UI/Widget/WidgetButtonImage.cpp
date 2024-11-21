@@ -1,5 +1,5 @@
 ﻿//! @file WidgetButtonImage.cpp
-//! @note 
+//! @note
 
 #include "WidgetButtonImage.h"
 
@@ -7,7 +7,7 @@
 #include "TAKOEngine/Tool/XMFLOAT.h"
 
 /**************************************************************************//**
- 	@brief		コンストラクタ
+	@brief		コンストラクタ
 	@param[in]	text		ボタン文字
 	@param[in]	image		ボタン画像
 	@param[in]	hoverImage	ボタンホバー画像
@@ -16,7 +16,11 @@
 WidgetButtonImage::WidgetButtonImage(const char* text, const char* image, const char* hoverImage, std::function<void(WidgetButton*)> f)
 {
 	m_btnImage = RESOURCE.LoadSpriteResource(image);
+	m_btnImageDX12 = RESOURCE.LoadSpriteResourceDX12(image);
+
 	m_hoverBtnImage = RESOURCE.LoadSpriteResource(hoverImage);
+	m_hoverBtnImageDX12 = RESOURCE.LoadSpriteResourceDX12(hoverImage);
+
 	m_size = m_btnImage->GetTextureSize();
 
 	this->m_text = std::make_unique<WidgetText>(text);
@@ -28,7 +32,7 @@ WidgetButtonImage::WidgetButtonImage(const char* text, const char* image, const 
 }
 
 /**************************************************************************//**
- 	@brief		コンストラクタ(ホバーなし)
+	@brief		コンストラクタ(ホバーなし)
 	@param[in]	text		ボタン文字
 	@param[in]	image		ボタン画像
 	@param[in]	f			クリックコールバックラムダ
@@ -60,4 +64,30 @@ void WidgetButtonImage::Render(const RenderContext& rc)
 
 	this->m_text->SetPosition(m_position + (m_size * 0.5f));
 	this->m_text->Render(rc);
+}
+
+void WidgetButtonImage::RenderDX12(const RenderContextDX12& rc)
+{
+	if (isHover)
+	{
+		this->m_hoverBtnImageDX12->Begin(rc);
+		this->m_hoverBtnImageDX12->Draw(
+			m_position.x, m_position.y,
+			m_size.x, m_size.y,
+			0,
+			m_color.x, m_color.y, m_color.z, m_color.w
+		);
+		this->m_hoverBtnImageDX12->End(rc.d3d_command_list);
+	}
+	else
+	{
+		this->m_btnImageDX12->Begin(rc);
+		this->m_btnImageDX12->Draw(
+			m_position.x, m_position.y,
+			m_size.x, m_size.y,
+			0,
+			m_color.x, m_color.y, m_color.z, m_color.w
+		);
+		this->m_btnImageDX12->End(rc.d3d_command_list);
+	}
 }

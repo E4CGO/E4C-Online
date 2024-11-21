@@ -14,8 +14,8 @@
 *//***************************************************************************/
 SpriteDX12::SpriteDX12(UINT sprite_count, const char* filename) : m_sprite_count(sprite_count)
 {
-	Graphics&                 graphics = Graphics::Instance();
-	const RenderStateDX12* renderState = graphics.GetRenderStateDX12(); 
+	Graphics& graphics = Graphics::Instance();
+	const RenderStateDX12* renderState = graphics.GetRenderStateDX12();
 	ID3D12Device* d3d_device = graphics.GetDeviceDX12();
 
 	HRESULT hr = S_OK;
@@ -46,9 +46,9 @@ SpriteDX12::SpriteDX12(UINT sprite_count, const char* filename) : m_sprite_count
 		d3d_graphics_pipeline_state_desc.pRootSignature = m_d3d_root_signature.Get();
 
 		d3d_graphics_pipeline_state_desc.VS.pShaderBytecode = vsData.data();
-		d3d_graphics_pipeline_state_desc.VS.BytecodeLength  = vsData.size();
+		d3d_graphics_pipeline_state_desc.VS.BytecodeLength = vsData.size();
 		d3d_graphics_pipeline_state_desc.PS.pShaderBytecode = psData.data();
-		d3d_graphics_pipeline_state_desc.PS.BytecodeLength  = psData.size();
+		d3d_graphics_pipeline_state_desc.PS.BytecodeLength = psData.size();
 
 		// 入力レイアウト
 		D3D12_INPUT_ELEMENT_DESC d3d_input_element_descs[] =
@@ -62,12 +62,12 @@ SpriteDX12::SpriteDX12(UINT sprite_count, const char* filename) : m_sprite_count
 
 		// ブレンドステート
 		d3d_graphics_pipeline_state_desc.BlendState = renderState->GetBlendState(BlendState::Transparency);
-		
+
 		// 深度ステンシルステート
-		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthEnable    = true;
+		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthEnable = true;
 		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthFunc      = D3D12_COMPARISON_FUNC_ALWAYS;
-		d3d_graphics_pipeline_state_desc.DepthStencilState.StencilEnable  = false;
+		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+		d3d_graphics_pipeline_state_desc.DepthStencilState.StencilEnable = false;
 
 		// ラスタライザーステート
 		d3d_graphics_pipeline_state_desc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
@@ -162,8 +162,8 @@ SpriteDX12::SpriteDX12(UINT sprite_count, const char* filename) : m_sprite_count
 *//***************************************************************************/
 SpriteDX12::SpriteDX12(UINT sprite_count, FrameBufferTexture* frameBuffer) : m_sprite_count(sprite_count)
 {
-	Graphics&                 graphics = Graphics::Instance();
-	const RenderStateDX12* renderState = graphics.GetRenderStateDX12(); 
+	Graphics& graphics = Graphics::Instance();
+	const RenderStateDX12* renderState = graphics.GetRenderStateDX12();
 	ID3D12Device* d3d_device = graphics.GetDeviceDX12();
 
 	HRESULT hr = S_OK;
@@ -194,9 +194,9 @@ SpriteDX12::SpriteDX12(UINT sprite_count, FrameBufferTexture* frameBuffer) : m_s
 		d3d_graphics_pipeline_state_desc.pRootSignature = m_d3d_root_signature.Get();
 
 		d3d_graphics_pipeline_state_desc.VS.pShaderBytecode = vsData.data();
-		d3d_graphics_pipeline_state_desc.VS.BytecodeLength  = vsData.size();
+		d3d_graphics_pipeline_state_desc.VS.BytecodeLength = vsData.size();
 		d3d_graphics_pipeline_state_desc.PS.pShaderBytecode = psData.data();
-		d3d_graphics_pipeline_state_desc.PS.BytecodeLength  = psData.size();
+		d3d_graphics_pipeline_state_desc.PS.BytecodeLength = psData.size();
 
 		// 入力レイアウト
 		D3D12_INPUT_ELEMENT_DESC d3d_input_element_descs[] =
@@ -210,12 +210,12 @@ SpriteDX12::SpriteDX12(UINT sprite_count, FrameBufferTexture* frameBuffer) : m_s
 
 		// ブレンドステート
 		d3d_graphics_pipeline_state_desc.BlendState = renderState->GetBlendState(BlendState::Transparency);
-		
+
 		// 深度ステンシルステート
-		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthEnable    = true;
+		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthEnable = true;
 		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthFunc      = D3D12_COMPARISON_FUNC_ALWAYS;
-		d3d_graphics_pipeline_state_desc.DepthStencilState.StencilEnable  = false;
+		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+		d3d_graphics_pipeline_state_desc.DepthStencilState.StencilEnable = false;
 
 		// ラスタライザーステート
 		d3d_graphics_pipeline_state_desc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
@@ -263,7 +263,7 @@ SpriteDX12::SpriteDX12(UINT sprite_count, FrameBufferTexture* frameBuffer) : m_s
 		if (m_d3d_texture)
 		{
 			m_srv_descriptor = Graphics::Instance().GetShaderResourceDescriptorHeap()->PopDescriptor();
-			
+
 			// シェーダーリソースビューの生成
 			D3D12_RESOURCE_DESC d3d_resource_desc = m_d3d_texture->GetDesc();
 
@@ -272,7 +272,7 @@ SpriteDX12::SpriteDX12(UINT sprite_count, FrameBufferTexture* frameBuffer) : m_s
 			d3d_srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 			d3d_srv_desc.Format = d3d_resource_desc.Format;
 			d3d_srv_desc.Texture2D.MipLevels = d3d_resource_desc.MipLevels;
-			d3d_srv_desc.Texture2D.MostDetailedMip = 0; 
+			d3d_srv_desc.Texture2D.MostDetailedMip = 0;
 
 			// シェーダリソースビューを生成.
 			d3d_device->CreateShaderResourceView(
@@ -281,7 +281,7 @@ SpriteDX12::SpriteDX12(UINT sprite_count, FrameBufferTexture* frameBuffer) : m_s
 				m_srv_descriptor->GetCpuHandle());
 
 			// テクスチャ情報の取得
-			m_texture_width  = static_cast<int>(d3d_resource_desc.Width);
+			m_texture_width = static_cast<int>(d3d_resource_desc.Width);
 			m_texture_height = static_cast<int>(d3d_resource_desc.Height);
 		}
 	}
@@ -298,8 +298,8 @@ SpriteDX12::SpriteDX12(UINT sprite_count, FrameBufferTexture* frameBuffer) : m_s
 *//***************************************************************************/
 SpriteDX12::SpriteDX12(UINT sprite_count, const std::wstring& filename) : m_sprite_count(sprite_count)
 {
-	Graphics&                 graphics = Graphics::Instance();
-	const RenderStateDX12* renderState = graphics.GetRenderStateDX12(); 
+	Graphics& graphics = Graphics::Instance();
+	const RenderStateDX12* renderState = graphics.GetRenderStateDX12();
 	ID3D12Device* d3d_device = graphics.GetDeviceDX12();
 
 	HRESULT hr = S_OK;
@@ -330,9 +330,9 @@ SpriteDX12::SpriteDX12(UINT sprite_count, const std::wstring& filename) : m_spri
 		d3d_graphics_pipeline_state_desc.pRootSignature = m_d3d_root_signature.Get();
 
 		d3d_graphics_pipeline_state_desc.VS.pShaderBytecode = vsData.data();
-		d3d_graphics_pipeline_state_desc.VS.BytecodeLength  = vsData.size();
+		d3d_graphics_pipeline_state_desc.VS.BytecodeLength = vsData.size();
 		d3d_graphics_pipeline_state_desc.PS.pShaderBytecode = psData.data();
-		d3d_graphics_pipeline_state_desc.PS.BytecodeLength  = psData.size();
+		d3d_graphics_pipeline_state_desc.PS.BytecodeLength = psData.size();
 
 		// 入力レイアウト
 		D3D12_INPUT_ELEMENT_DESC d3d_input_element_descs[] =
@@ -346,12 +346,12 @@ SpriteDX12::SpriteDX12(UINT sprite_count, const std::wstring& filename) : m_spri
 
 		// ブレンドステート
 		d3d_graphics_pipeline_state_desc.BlendState = renderState->GetBlendState(BlendState::Transparency);
-		
+
 		// 深度ステンシルステート
-		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthEnable    = true;
+		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthEnable = true;
 		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthFunc      = D3D12_COMPARISON_FUNC_ALWAYS;
-		d3d_graphics_pipeline_state_desc.DepthStencilState.StencilEnable  = false;
+		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+		d3d_graphics_pipeline_state_desc.DepthStencilState.StencilEnable = false;
 
 		// ラスタライザーステート
 		d3d_graphics_pipeline_state_desc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
@@ -406,10 +406,10 @@ SpriteDX12::SpriteDX12(UINT sprite_count, const std::wstring& filename) : m_spri
 
 		// シェーダーリソースビューの設定
 		D3D12_SHADER_RESOURCE_VIEW_DESC d3d_srv_desc = {};
-		d3d_srv_desc.ViewDimension               = D3D12_SRV_DIMENSION_TEXTURECUBE;
-		d3d_srv_desc.Shader4ComponentMapping     = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		d3d_srv_desc.Format                      = d3d_resource_desc.Format;;
-		d3d_srv_desc.TextureCube.MipLevels       = d3d_resource_desc.MipLevels;
+		d3d_srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
+		d3d_srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		d3d_srv_desc.Format = d3d_resource_desc.Format;;
+		d3d_srv_desc.TextureCube.MipLevels = d3d_resource_desc.MipLevels;
 		d3d_srv_desc.TextureCube.MostDetailedMip = 0;
 		d3d_srv_desc.TextureCube.ResourceMinLODClamp = 0.0f;
 
@@ -478,7 +478,7 @@ void SpriteDX12::Begin(const RenderContextDX12& rc)
 	CalcGaussianFilter(fram_resource, rc.gaussianFilterData);
 
 	// ColorGrading
-	fram_resource.cb_scene_data->hueShift   = rc.colorGradingData.hueShift;
+	fram_resource.cb_scene_data->hueShift = rc.colorGradingData.hueShift;
 	fram_resource.cb_scene_data->saturation = rc.colorGradingData.saturation;
 	fram_resource.cb_scene_data->brightness = rc.colorGradingData.brightness;
 }
@@ -518,7 +518,7 @@ void SpriteDX12::CalcGaussianFilter(FrameResource& fram_resource, const Gaussian
 			id++;
 		}
 	}
-	
+
 	for (int i = 0; i < fram_resource.cb_scene_data->kernelSize * fram_resource.cb_scene_data->kernelSize; i++)
 	{
 		fram_resource.cb_scene_data->weights[i].z /= sum;
@@ -550,7 +550,7 @@ void SpriteDX12::Draw(
 		dx, dy, dw, dh,
 		0, 0, static_cast<float>(m_texture_width), static_cast<float>(m_texture_height),
 		angle,
-		r, g, b, a, 
+		r, g, b, a,
 		graphics.GetViwePort());
 }
 
@@ -629,7 +629,7 @@ void SpriteDX12::Draw(
 	}
 
 	// 現在設定されているビューポートからスクリーンサイズを取得する
-	float screen_width  = viewport.Width;
+	float screen_width = viewport.Width;
 	float screen_height = viewport.Height;
 
 	// スクリーン座標系からNDC座標系へ変換する。

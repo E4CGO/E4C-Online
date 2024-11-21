@@ -58,6 +58,10 @@ void WidgetSkillTimer::Render(const RenderContext& rc)
 	DrawIcon(rc, special_attack_icon, m_position + DirectX::XMFLOAT2{ m_size.x + 64.0f / 2.0f, 0.0f }, static_cast<int>(Player::State::AttackSpecial), "[RMB]");
 }
 
+void WidgetSkillTimer::RenderDX12(const RenderContextDX12& rc)
+{
+}
+
 void WidgetSkillTimer::DrawIcon(
 	const RenderContext& rc,
 	const int& imageIdx,

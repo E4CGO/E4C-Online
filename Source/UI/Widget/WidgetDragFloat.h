@@ -1,5 +1,5 @@
 ﻿//! @file WidgetDragFloat.h
-//! @note 
+//! @note
 
 #ifndef __WIDGET_DRAG_FLOAT__
 #define __WIDGET_DRAG_FLOAT__
@@ -15,7 +15,7 @@
 	@class	WidgetDragBar
 	@brief	値を調整用ドラッグバー基底クラス
 	@par	[説明]
-		
+
 *//***************************************************************************/
 class WidgetDragBar : public WidgetButton
 {
@@ -26,7 +26,8 @@ public:
 	~WidgetDragBar() {};
 	// 描画処理
 	void Render(const RenderContext& rc) override;
-
+	// 描画処理
+	void RenderDX12(const RenderContextDX12& rc) override;
 	// 押しつづけ勝利
 	void OnPress() override;
 	// 現在%を取得
@@ -58,6 +59,8 @@ public:
 	void Update(float elapsedTime) override;
 	// 描画処理
 	void Render(const RenderContext& rc) override;
+	// 描画処理
+	void RenderDX12(const RenderContextDX12& rc) override;
 	// 位置調整
 	void SetPosition(const DirectX::XMFLOAT2& position) override;
 	// サイズ調整

@@ -1,5 +1,5 @@
 ﻿//! @file WidgetText.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDED_UI_WIDGET_TEXT__
 #define __INCLUDED_UI_WIDGET_TEXT__
@@ -25,6 +25,8 @@ public:
 
 	// 描画処理
 	void Render(const RenderContext& rc) override;
+
+	void RenderDX12(const RenderContextDX12& rc) override;
 
 	DirectX::XMFLOAT4 GetColor() { return this->m_color; }
 

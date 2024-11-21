@@ -91,6 +91,7 @@ public:
 	void Update(float elapsedTime) override;
 	// 描画処理
 	void Render() override;
+	void RenderDX12() override;
 private:
 	// ローディングスレッド
 	static void LoadingThread(SceneLoading* scene);
