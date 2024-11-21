@@ -149,6 +149,7 @@ set(Source__GameObject
     "Source/GameObject/ModelObject.cpp"
     "Source/GameObject/ModelObject.h"
     "Source/GameObject/ObjectManager.h"
+    "Source/GameObject/GameObjectManager.h"
 )
 source_group("Source\\GameObject" FILES ${Source__GameObject})
 
