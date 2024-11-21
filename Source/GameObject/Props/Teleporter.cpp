@@ -7,6 +7,10 @@
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "Scene/Stage/StageManager.h"
 #include "TAKOEngine/GUI/UIManager.h"
+
+#include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
+#include "Scene/SceneManager.h"
+
 /**************************************************************************//**
 	@brief		コンストラクタ
 	@param[in]	stage	ステージ参照ポインタ
@@ -172,4 +176,31 @@ Teleporter::~Teleporter()
 	if (m_mesh.material != nullptr)
 		delete m_mesh.material;
 	m_mesh.material = nullptr;
+}
+
+/**************************************************************************//**
+	@brief		更新処理
+	@param[in]	elapsedTime	経過時間
+	@return		なし
+*//***************************************************************************/
+void TeleportToOpenworld::Update(float elapsedTime)
+{
+	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
+	const float radius = 0.5f * scale.x;
+	if (player != nullptr && XMFLOAT3LengthSq(player->GetPosition() - position) < radius * radius)
+	{
+		m_timer += elapsedTime;
+		if (m_timer >= m_portalTime)
+		{
+			SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame_E4C));
+		}
+	}
+
+	ModelObject::Update(elapsedTime);
+	DirectX::XMMATRIX Transform = DirectX::XMLoadFloat4x4(&transform);
+	for (int i = 0; i < m_mesh.vertices.size(); i++)
+	{
+		ModelResource::Vertex& vertice = m_mesh.vertices[i];
+		DirectX::XMStoreFloat3(&vertice.position, DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&m_defaultVertices[i].position), Transform));
+	}
 }

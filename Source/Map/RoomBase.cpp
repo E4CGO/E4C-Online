@@ -63,6 +63,53 @@ void RoomBase::UpdateTransform()
 	}
 }
 
+DirectX::XMFLOAT3 RoomBase::GetCenterPos()
+{
+	DirectX::XMFLOAT3 placePos = DungeonData::Instance().GetRoomGenerateSetting(roomType).portalPosition;
+
+	float degree = DirectX::XMConvertToDegrees(m_angle.y);
+
+	// 360度以内に丸める
+	while (degree >= 360.0f) degree -= 360.0f;
+	while (degree < 0.0f) degree += 360.0f;
+
+	// 角度によって補正を行う
+	// 90度か270度ならxとzを逆転させる
+	if ((degree > 89.9f && degree < 90.1f) || (degree > 269.9f && degree < 270.1f))
+	{
+		DirectX::XMFLOAT3 buf = placePos;
+		placePos.x = placePos.z;
+		placePos.z = buf.x;
+	}
+
+	// 90度
+	if (degree > 89.9f && degree < 90.1f)
+	{
+
+	}
+
+	// 180度
+	if (degree > 179.9f && degree < 180.1f)
+	{
+		// 位置補正
+		//placePos += tileScale;
+
+		// zを反転
+		placePos.z = -placePos.z;
+	}
+
+	// 270度
+	if (degree > 269.9f && degree < 270.1f)
+	{
+		// xを反転
+		placePos.x = -placePos.x;
+
+		// 位置補正
+		//placePos.x += tileScale;
+	}
+	return m_position + placePos;
+}
+
 void RoomBase::GenerateNextRoom(
 	std::vector<AABB>& roomAABBs,
 	bool isAutoGeneration,
@@ -139,16 +186,16 @@ void RoomBase::GenerateNextRoom(
 						// 部屋同士の当たり判定時のみ半径を少しだけ伸ばすことで、複数の部屋が隣接し、一つの部屋のように生成されてしまうのを防ぐ
 						DirectX::XMFLOAT3 temp_NextRadii =
 						{
-							nextRoomAABB.radii.x + 1.0f,
-							nextRoomAABB.radii.y + 1.0f,
-							nextRoomAABB.radii.z + 1.0f,
+							nextRoomAABB.radii.x + 0.0f,
+							nextRoomAABB.radii.y + 0.0f,
+							nextRoomAABB.radii.z + 0.0f,
 						};
 
 						DirectX::XMFLOAT3 temp_AnotherRadii =
 						{
-							anotherRoomAABB.radii.x + 1.0f,
-							anotherRoomAABB.radii.y + 1.0f,
-							anotherRoomAABB.radii.z + 1.0f,
+							anotherRoomAABB.radii.x + 0.0f,
+							anotherRoomAABB.radii.y + 0.0f,
+							anotherRoomAABB.radii.z + 0.0f,
 						};
 
 						if (Collision::IntersectAABBVsAABB(
@@ -314,7 +361,7 @@ AABB RoomBase::CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const
 	if (degree > 179.9f && degree < 180.1f)
 	{
 		// 位置補正
-		aabb.position.z += tileScale;
+		//aabb.position.z += tileScale;
 
 		// zを反転
 		aabb.position.z = -aabb.position.z;
@@ -327,7 +374,7 @@ AABB RoomBase::CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const
 		aabb.position.x = -aabb.position.x;
 
 		// 位置補正
-		aabb.position.x += tileScale;
+		//aabb.position.x += tileScale;
 	}
 
 	aabb.position += pos;

@@ -71,11 +71,7 @@ public:
 	void UpdateTransform();
 
 	DirectX::XMFLOAT3 GetPosition() { return m_position; }
-	DirectX::XMFLOAT3 GetCenterPos()
-	{
-		return m_position;
-	}
-
+	DirectX::XMFLOAT3 GetCenterPos();
 	DirectX::XMFLOAT3 GetAngle() { return m_angle; }
 	DirectX::XMFLOAT3 GetScale() { return m_scale; }
 

@@ -32,6 +32,7 @@ public:
 	{
 		int weight;	// 重み、多ければ多いほど生成確率が高い
 		AABB aabb;	// 当たり判定用 AABB
+		DirectX::XMFLOAT3 portalPosition;	// ポータル配置用
 		std::vector<RoomType> placementCandidates;			// 配置候補の部屋を保存する配列
 	};
 

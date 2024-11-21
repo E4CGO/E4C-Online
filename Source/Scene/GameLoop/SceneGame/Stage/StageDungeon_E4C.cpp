@@ -1,4 +1,7 @@
 ﻿#include "StageDungeon_E4C.h"
+#include "StageOpenWorld_E4C.h"
+
+#include "GameObject/GameObjectManager.h"
 
 #include "GameObject/ModelObject.h"
 #include "Scene/Stage/StageManager.h"
@@ -17,6 +20,7 @@
 #include "Scene/Stage/StageManager.h"
 
 #include "Scene/Stage/TestingStage.h"
+#include "GameObject/Props/Teleporter.h"
 
 #include "Network/OnlineController.h"
 
@@ -228,6 +232,12 @@ void StageDungeon_E4C::Initialize()
 	// 一番遠い部屋のうち、ランダムな一つを抽選しテレポーターを設置する
 	RoomBase* lastRoom = rootRoom->GetFarthestChild().at(std::rand() % rootRoom->GetFarthestChild().size());
 
+	TeleportToOpenworld* teleporter = new TeleportToOpenworld();
+	teleporter->SetPosition(lastRoom->GetCenterPos());
+	teleporter->SetAngle({ 90.0f * RADIAN1, 0.0f, 0.0f});
+	teleporter->SetScale({ 10.0f, 10.0f, 1.0f });
+	GameObjectManager::Instance().Register(teleporter);
+
 	// 部屋のモデルを配置
 	for (RoomBase* room : rootRoom->GetAll())
 	{
@@ -235,6 +245,11 @@ void StageDungeon_E4C::Initialize()
 	}
 	// 部屋の当たり判定を設定
 	MAPTILES.CreateSpatialIndex(5, 7);
+}
+
+void StageDungeon_E4C::Finalize()
+{
+	GameObjectManager::Instance().Clear();
 }
 
 void StageDungeon_E4C::Update(float elapsedTime)
@@ -253,6 +268,8 @@ void StageDungeon_E4C::Update(float elapsedTime)
 
 	// 部屋を全てアップデート
 	rootRoom->Update(elapsedTime);
+
+	GameObjectManager::Instance().Update(elapsedTime);
 
 	MAPTILES.Update(elapsedTime);
 
@@ -302,6 +319,8 @@ void StageDungeon_E4C::Render()
 
 	// 描画
 	PlayerCharacterManager::Instance().Render(rc);
+
+	GameObjectManager::Instance().Render(rc);
 
 	MAPTILES.Render(rc);
 
