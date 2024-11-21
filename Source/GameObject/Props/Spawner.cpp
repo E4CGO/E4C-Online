@@ -1,18 +1,18 @@
-#include "Spawner.h"
+ï»¿#include "Spawner.h"
 #include "GameObject/Character/Player/PlayerManager.h"
 #include "Scene/Stage/StageManager.h"
 #include "TAKOEngine/Tool/Mathf.h"
 #include "Source/Scene/Stage/TestingStage.h"
 #include <GameObject/Character/Enemy/EnemyManager.h>
 /**************************************************************************//**
-     @brief  ƒRƒ“ƒXƒgƒ‰ƒNƒ^  
+     @brief  ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿  
 *//***************************************************************************/
 Spawner::Spawner()
 {
 	
 }
 /**************************************************************************//**
-     @brief    XV
+     @brief    æ›´æ–°
     @param[in]    elapsedTime
 *//***************************************************************************/
 void Spawner::Update(float elapsedTime)
@@ -23,7 +23,7 @@ void Spawner::Update(float elapsedTime)
 	}
 }
 /**************************************************************************//**
-     @brief    ƒeƒŠƒgƒŠ[”z’u
+     @brief    ãƒ†ãƒªãƒˆãƒªãƒ¼é…ç½®
     @param[in]    origin
     @param[in]    range
 *//***************************************************************************/
@@ -33,23 +33,23 @@ void Spawner::SetTerritory(const DirectX::XMFLOAT3& origin, float range)
 	territoryRange = range;
 }
 /**************************************************************************//**
-     @brief    ƒvƒŒƒCƒ„[”­Œ©
+     @brief    ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ç™ºè¦‹
     @return    
 *//***************************************************************************/
 bool Spawner::SearchPlayer()
 {
 	for (Player*& player : PLAYERS.GetAll())
 	{
-		// ƒvƒŒƒCƒ„[‚ÌˆÊ’u‚ğæ“¾
+		// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ä½ç½®ã‚’å–å¾—
 		playerPosition = player->GetPosition();
 
-		// ©g‚ÆƒvƒŒƒCƒ„[‚ÌŠÔ‚Ì‹——£‚ğŒvZ
+		// è‡ªèº«ã¨ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®é–“ã®è·é›¢ã‚’è¨ˆç®—
 		float vx = playerPosition.x - position.x;
 		float vy = playerPosition.y - position.y;
 		float vz = playerPosition.z - position.z;
 		float dist = sqrtf(vx * vx + vy * vy + vz * vz);
 
-		// ŒŸ’m”ÍˆÍ“à‚©Šm”F
+		// æ¤œçŸ¥ç¯„å›²å†…ã‹ç¢ºèª
 		if (dist < serchRange)
 		{
 			return true;
@@ -59,7 +59,7 @@ bool Spawner::SearchPlayer()
 	}
 }
 /**************************************************************************//**
-     @brief    •`‰æ
+     @brief    æç”»
     @param[in]    rc
 *//***************************************************************************/
 void Spawner::Render(const RenderContext& rc)

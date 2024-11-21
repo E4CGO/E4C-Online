@@ -43,17 +43,6 @@ private:
     float serchRange = 5.f;
 
     DirectX::XMFLOAT3 playerPosition = {};
-    DirectX::XMFLOAT3 spawnPos{};
-
-    std::vector<ENEMY_LIST_DATA> enemyList;
-    int spawnedEnemyCount = 0;             // 現在までに生成されたエネミーの数
-    float spawntimer = 0.f;
-    float spawntime = 5.f;
-    int maxEnemies = 20;
-
-    int phase;
-    float timer = 0.0f;
-    int pointer = 0;
 };
 #endif
 

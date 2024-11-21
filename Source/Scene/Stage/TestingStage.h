@@ -19,7 +19,7 @@ public:
 
 	void Render() override;
 
-	void SpawnerEnemy(float elapsedTime, int phase, float time, int enemyType);
+	void SpawnEnemy(float elapsedTime, int phase, float time, int enemyType);
 protected:
 	void OnPhase() override;
 public:

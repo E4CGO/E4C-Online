@@ -211,6 +211,8 @@ set(Source__GameObject__Projectile
 source_group("Source\\GameObject\\Projectile" FILES ${Source__GameObject__Projectile})
 
 set(Source__GameObject__Props
+    "Source/GameObject/Props/Spawner.cpp"
+    "Source/GameObject/Props/Spawner.h"
     "Source/GameObject/Props/Teleporter.cpp"
     "Source/GameObject/Props/Teleporter.h"
 )
