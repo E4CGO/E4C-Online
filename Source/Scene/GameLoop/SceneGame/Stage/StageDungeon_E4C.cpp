@@ -31,6 +31,9 @@ void StageDungeon_E4C::GenerateDungeon()
 	// 生成順番配列の中身がないなら自動生成を行う
 	if (m_roomOrder.size() == 0)
 	{
+		// 自動生成はリーダーのみ行う
+		isLeader = true;
+
 		// ダンジョンの自動生成を行う
 		std::vector<DungeonData::RoomType> placeableRooms;
 		//placeableRooms.emplace_back(DungeonData::SIMPLE_ROOM_1);
@@ -78,6 +81,14 @@ void StageDungeon_E4C::GenerateDungeon()
 						m_roomOrder, orderIndex);
 					break;
 
+				case DungeonData::CROSS_ROOM_2:
+					rootRoom = std::make_unique<CrossRoom2>(
+						nullptr, -1,
+						m_roomAABBs,
+						true,
+						m_roomOrder, orderIndex);
+					break;
+
 				case DungeonData::PASSAGE_1:
 					rootRoom = std::make_unique<Passage1>(
 						nullptr, -1,
@@ -105,6 +116,9 @@ void StageDungeon_E4C::GenerateDungeon()
 	// 中身があるならそれに沿って生成を行う
 	else
 	{
+		// リーダーではない
+		isLeader = false;
+
 		int orderIndex = 1;
 
 		switch (m_roomOrder.front())
@@ -133,6 +147,14 @@ void StageDungeon_E4C::GenerateDungeon()
 				m_roomOrder, orderIndex);
 			break;
 
+		case DungeonData::CROSS_ROOM_2:
+			rootRoom = std::make_unique<CrossRoom2>(
+				nullptr, -1,
+				m_roomAABBs,
+				false,
+				m_roomOrder, orderIndex);
+			break;
+
 		case DungeonData::PASSAGE_1:
 			rootRoom = std::make_unique<Passage1>(
 				nullptr, -1,
@@ -155,29 +177,6 @@ void StageDungeon_E4C::GenerateDungeon()
 void StageDungeon_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
-
-	{
-		std::array<DirectX::XMFLOAT3, 4 > positions = {
-		DirectX::XMFLOAT3{ 10.0f, 10.0f, 5.0f},
-		DirectX::XMFLOAT3{ 10.0f, 20.0f, 5.0f },
-		DirectX::XMFLOAT3{ 5.0f, 10.0f, 5.0f },
-		DirectX::XMFLOAT3{ 5.0f, 20.0f, 5.0f }
-		};
-
-		plane = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "Data/Sprites/gem.png", 1.0f, positions);
-	}
-
-	{
-		std::array<DirectX::XMFLOAT3, 4 >positions = {
-			DirectX::XMFLOAT3{ 15.0f, 15.0f, 5.0f},
-			DirectX::XMFLOAT3{ 15.0f, 25.0f, 5.0f },
-			DirectX::XMFLOAT3{ 25.0f, 15.0f, 5.0f },
-			DirectX::XMFLOAT3{ 25.0f, 25.0f, 5.0f }
-		};
-
-		//portal = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, positions);
-		//portal.get()->SetShader(ModelShaderId::Portal);
-	}
 
 	// 光
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
@@ -226,10 +225,13 @@ void StageDungeon_E4C::Initialize()
 
 	GenerateDungeon();
 
+	// 一番遠い部屋のうち、ランダムな一つを抽選しテレポーターを設置する
+	RoomBase* lastRoom = rootRoom->GetFarthestChild().at(std::rand() % rootRoom->GetFarthestChild().size());
+
 	// 部屋のモデルを配置
 	for (RoomBase* room : rootRoom->GetAll())
 	{
-		room->PlaceMapTile();
+		room->PlaceMapTile(isLeader);
 	}
 	// 部屋の当たり判定を設定
 	MAPTILES.CreateSpatialIndex(5, 7);
@@ -277,8 +279,6 @@ void StageDungeon_E4C::Update(float elapsedTime)
 		T_INPUT.KeepCursorCenter();
 	}
 	PlayerCharacterManager::Instance().Update(elapsedTime);
-	plane->Update(elapsedTime);
-	//portal->Update(elapsedTime);
 
 	timer += elapsedTime;
 }
@@ -304,16 +304,14 @@ void StageDungeon_E4C::Render()
 	PlayerCharacterManager::Instance().Render(rc);
 
 	MAPTILES.Render(rc);
+	teleporter->Render(rc);
 
-	plane->Render(rc);
-
-	//portal->Render(rc);
-
+#ifdef _DEBUG
 	// デバッグレンダラ描画実行
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
-
-	PlayerCharacterManager::Instance().DrawDebugGUI();
 	rootRoom->DrawDebugGUI();
+#endif // _DEBUG
+
 }
 
 void StageDungeon_E4C::OnPhase()

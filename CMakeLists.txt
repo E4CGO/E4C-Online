@@ -155,6 +155,8 @@ source_group("Source\\GameObject" FILES ${Source__GameObject})
 set(Source__Map
     "Source/Map/CrossRoom1.cpp"
     "Source/Map/CrossRoom1.h"
+    "Source/Map/CrossRoom2.cpp"
+    "Source/Map/CrossRoom2.h"
     "Source/Map/DeadEndRoom.cpp"
     "Source/Map/DeadEndRoom.h"
     "Source/Map/DungeonData.cpp"
