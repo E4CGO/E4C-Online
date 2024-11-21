@@ -304,7 +304,6 @@ void StageDungeon_E4C::Render()
 	PlayerCharacterManager::Instance().Render(rc);
 
 	MAPTILES.Render(rc);
-	teleporter->Render(rc);
 
 #ifdef _DEBUG
 	// デバッグレンダラ描画実行
