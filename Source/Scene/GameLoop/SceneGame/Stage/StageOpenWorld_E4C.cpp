@@ -32,7 +32,7 @@ void StageOpenWorld_E4C::Initialize()
 
 	map = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 2.5f, ModelObject::RENDER_MODE::DX11GLTF);
 
-	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene));
+	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
 	teleporter->SetPosition({ 0, 5, 0 });
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
 
@@ -57,7 +57,6 @@ void StageOpenWorld_E4C::Initialize()
 
 	// プレイヤー
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
-	player->SetScale({ 0.5f, 0.5f, 0.5f });
 	player->SetPosition({ 5.0f, 5.0f, 5.0f });
 
 	// カメラ設定

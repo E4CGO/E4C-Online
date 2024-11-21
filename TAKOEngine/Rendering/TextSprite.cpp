@@ -201,6 +201,7 @@ DirectX::SimpleMath::Vector2 TextSprite::AlignOrig(const wchar_t* text, const FO
 DirectX::XMFLOAT2 TextSprite::TextSize(FONT_ID font, const char* text)
 {
 	DirectX::XMFLOAT2 size;
-	DirectX::XMStoreFloat2(&size, fonts[static_cast<int>(font)]->MeasureString(Encode::char_to_wchar(text)));
+	std::string str = text;
+	DirectX::XMStoreFloat2(&size, fonts[static_cast<int>(font)]->MeasureString(Encode::string_to_wstring(text).c_str()));
 	return size;
 }

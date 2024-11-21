@@ -1,9 +1,9 @@
-﻿#include "Map/CrossRoom1.h"
+﻿#include "Map/CrossRoom2.h"
 
 #include <DirectXMath.h>
 #include "TAKOEngine/Tool/XMFLOAT.h"
 
-CrossRoom1::CrossRoom1(
+CrossRoom2::CrossRoom2(
 	RoomBase* parent, const int pointIndex,
 	std::vector<AABB>& roomAABBs,
 	const bool isAutoGeneration,
@@ -20,7 +20,7 @@ CrossRoom1::CrossRoom1(
 		roomOrder, orderIndex);
 }
 
-void CrossRoom1::LoadMapData()
+void CrossRoom2::LoadMapData()
 {
 	// 接続点データを設定
 	{
@@ -62,6 +62,12 @@ void CrossRoom1::LoadMapData()
 	DirectX::XMFLOAT4 floorColor = { 0.8f, 0.8f, 0.8f, 1.0f };
 	DirectX::XMFLOAT4 wallColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 	DirectX::XMFLOAT4 pillarColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+	// モンスタースポナー（実装予定）
+	//m_tileDatas.emplace_back(TILE_DATA(TileType::SPAWNER,
+	//	{ 0.0f, 1.5f, 12.0f },
+	//	{ 0.0f, 0.0f, 0.0f },
+	//	{ 1.0f, 1.0f, 1.0f }));
 
 	// 床
 	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,

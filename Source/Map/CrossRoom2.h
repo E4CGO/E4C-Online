@@ -2,10 +2,11 @@
 
 #include "RoomBase.h"
 
-class CrossRoom1 : public RoomBase
+// CrossRoomのスポナーありバージョン
+class CrossRoom2 : public RoomBase
 {
 public:
-	CrossRoom1(
+	CrossRoom2(
 		RoomBase* parent, const int pointIndex,
 		std::vector<AABB>& roomAABBs,
 		const bool isAutoGeneration,

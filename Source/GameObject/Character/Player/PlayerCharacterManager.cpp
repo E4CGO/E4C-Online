@@ -2,6 +2,7 @@
 //! @note 
 
 #include "PlayerCharacterManager.h"
+#include <iostream>
 
 /**************************************************************************//**
 	@brief		プレイヤーキャラクター更新処理
@@ -12,6 +13,16 @@ void PlayerCharacterManager::Update(float elapsedTime)
 {
 	std::lock_guard<std::mutex> lock(m_mut);
 	ObjectManager<PlayerCharacter>::Update(elapsedTime);
+}
+/**************************************************************************//**
+	@brief		プレイヤーキャラクター描画処理
+	@param[in]	elapsedTime 経過時間
+	@return		なし
+*//***************************************************************************/
+void PlayerCharacterManager::Render(const RenderContext& rc)
+{
+	std::lock_guard<std::mutex> lock(m_mut);
+	ObjectManager<PlayerCharacter>::Render(rc);
 }
 
 /**************************************************************************//**
@@ -54,13 +65,20 @@ PlayerCharacter* PlayerCharacterManager::UpdatePlayerData(const uint64_t client_
 		player = new PlayerCharacter(client_id, name, appearance);
 		player->Hide();
 		Register(player);
+		player->GetStateMachine()->ChangeState(PlayerCharacter::STATE::IDLE);
+
+		std::cout << "New PlayerCharacter: " << static_cast<int>(client_id) << std::endl;
 		return player;
 	}
 	else
 	{
-		// プレイヤーデータ更新
-		player->SetName(name);
-		player->LoadAppearance(appearance);
+		if (client_id != GAME_DATA.GetClientId())
+		{
+			// プレイヤーデータ更新
+			player->SetName(name);
+			player->LoadAppearance(appearance);
+			std::cout << "Update PlayerCharacter: " << static_cast<int>(client_id) << std::endl;
+		}
 		return player;
 	}
 }
@@ -100,6 +118,13 @@ void PlayerCharacterManager::Remove(const uint64_t client_id)
 void PlayerCharacterManager::ClearOtherPlayers()
 {
 	std::lock_guard<std::mutex> lock(m_mut);
-	std::erase_if(this->items, [this](const auto& item) { return item->GetClientId() != m_local_client_id; });
+	for (PlayerCharacter* player : this->items)
+	{
+		if (player->GetClientId() != GAME_DATA.GetClientId())
+		{
+			delete player;
+		}
+	}
+	std::erase_if(this->items, [this](const auto& item) { return item->GetClientId() != GAME_DATA.GetClientId(); });
 }
 

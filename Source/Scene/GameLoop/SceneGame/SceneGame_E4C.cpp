@@ -13,8 +13,6 @@
 
 #include "SceneGame_E4CState.h"
 #include "Scene/GameLoop/SceneGame/Stage/StageOpenWorld_E4C.h"
-#include "Scene/GameLoop/SceneGame/Stage/StageDungeon_E4C.h"
-#include "Scene/Stage/TestingStage.h"
 
 #include "Scene/Stage/StageManager.h"
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
@@ -43,7 +41,6 @@ void SceneGame_E4C::Initialize()
 	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 
 	STAGES.ChangeStage(new StageOpenWorld_E4C(this));
-	//STAGES.ChangeStage(new StageDungeon_E4C(this));
 
 	m_ponlineController = new Online::OnlineController;
 	if (m_ponlineController->Initialize())
@@ -72,16 +69,24 @@ void SceneGame_E4C::Finalize()
 void SceneGame_E4C::Update(float elapsedTime)
 {
 	STAGES.Update(elapsedTime);
-
+	UI.Update(elapsedTime);
 	stateMachine->Update(elapsedTime);
 }
 
 // 描画処理
 void SceneGame_E4C::Render()
 {
+	T_TEXT.Begin();
 	RenderContext rc;
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
 	STAGES.Render();
+
+	UI.Render(rc);
+
+	T_TEXT.End();
+	// デバッグレンダラ描画実行
+	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
+
 }

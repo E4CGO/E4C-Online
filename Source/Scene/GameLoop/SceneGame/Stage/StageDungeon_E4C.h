@@ -16,7 +16,9 @@
 #include "Map/SimpleRoom1.h"
 #include "Map/EndRoom1.h"
 #include "Map/CrossRoom1.h"
+#include "Map/CrossRoom2.h"
 #include "Map/Passage1.h"
+#include "Map/DeadEndRoom.h"
 
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
@@ -27,10 +29,16 @@ class SceneGame_E4C;
 class StageDungeon_E4C : public Stage
 {
 public:
-	// コンストラクタ（部屋配列なし）
-	StageDungeon_E4C(SceneGame_E4C* scene);
-	// コンストラクタ（部屋配列あり）
-	StageDungeon_E4C(SceneGame_E4C* scene, std::vector<int> roomTree);
+	// コンストラクタ
+	StageDungeon_E4C(SceneGame_E4C* scene) : m_pScene(scene), Stage() {}
+
+	// 部屋の生成順番のセッター・ゲッター
+	void SetRoomOrder(const std::vector<uint8_t>& newRoomOrder) { m_roomOrder = newRoomOrder; }
+	std::vector<uint8_t> GetRoomOrder() { return m_roomOrder; }
+	
+	// 生成順番配列がない場合は自動生成、
+	// ある場合は配列に従い生成を行う
+	void GenerateDungeon();
 
 	
 	enum PHASE
@@ -56,6 +64,10 @@ protected:
 	std::unique_ptr<ThridPersonCameraController> cameraController;
 
 	std::unique_ptr<RoomBase> rootRoom;
+	std::vector<uint8_t> m_roomOrder;
+	std::vector<AABB> m_roomAABBs;
+
+	bool isLeader = true;
 
 	std::unique_ptr<ModelObject> testModel;
 
