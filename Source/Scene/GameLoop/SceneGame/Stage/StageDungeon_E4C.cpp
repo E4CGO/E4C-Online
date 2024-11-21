@@ -32,6 +32,9 @@ void StageDungeon_E4C::GenerateDungeon()
 	// 生成順番配列の中身がないなら自動生成を行う
 	if (m_roomOrder.size() == 0)
 	{
+		// 自動生成はリーダーのみ行う
+		isLeader = true;
+
 		// ダンジョンの自動生成を行う
 		std::vector<DungeonData::RoomType> placeableRooms;
 		//placeableRooms.emplace_back(DungeonData::SIMPLE_ROOM_1);
@@ -79,6 +82,14 @@ void StageDungeon_E4C::GenerateDungeon()
 						m_roomOrder, orderIndex);
 					break;
 
+				case DungeonData::CROSS_ROOM_2:
+					rootRoom = std::make_unique<CrossRoom2>(
+						nullptr, -1,
+						m_roomAABBs,
+						true,
+						m_roomOrder, orderIndex);
+					break;
+
 				case DungeonData::PASSAGE_1:
 					rootRoom = std::make_unique<Passage1>(
 						nullptr, -1,
@@ -106,6 +117,9 @@ void StageDungeon_E4C::GenerateDungeon()
 	// 中身があるならそれに沿って生成を行う
 	else
 	{
+		// リーダーではない
+		isLeader = false;
+
 		int orderIndex = 1;
 
 		switch (m_roomOrder.front())
@@ -128,6 +142,14 @@ void StageDungeon_E4C::GenerateDungeon()
 
 		case DungeonData::CROSS_ROOM_1:
 			rootRoom = std::make_unique<CrossRoom1>(
+				nullptr, -1,
+				m_roomAABBs,
+				false,
+				m_roomOrder, orderIndex);
+			break;
+
+		case DungeonData::CROSS_ROOM_2:
+			rootRoom = std::make_unique<CrossRoom2>(
 				nullptr, -1,
 				m_roomAABBs,
 				false,
@@ -214,7 +236,7 @@ void StageDungeon_E4C::Initialize()
 	// 部屋のモデルを配置
 	for (RoomBase* room : rootRoom->GetAll())
 	{
-		room->PlaceMapTile();
+		room->PlaceMapTile(isLeader);
 	}
 	// 部屋の当たり判定を設定
 	MAPTILES.CreateSpatialIndex(5, 7);

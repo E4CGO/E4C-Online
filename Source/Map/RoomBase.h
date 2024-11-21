@@ -29,6 +29,7 @@ public:
 		WALL,
 		PILLAR,
 		STAIR,
+		SPAWNER,
 	};
 
 	// 配置するタイルデータ
@@ -202,7 +203,7 @@ public:
 	virtual void LoadMapData() {}
 
 	// 部屋タイルを配置
-	void PlaceMapTile();
+	void PlaceMapTile(bool isLeader = false);
 
 	// 出口を配置
 	virtual void PlaceExit() {}

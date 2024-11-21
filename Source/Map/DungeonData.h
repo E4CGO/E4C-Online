@@ -20,6 +20,7 @@ public:
 		SIMPLE_ROOM_1 = 0,
 		END_ROOM,
 		CROSS_ROOM_1,
+		CROSS_ROOM_2,
 		PASSAGE_1,
 		DEAD_END,
 

@@ -6,6 +6,7 @@
 #include "Map/SimpleRoom1.h"
 #include "Map/EndRoom1.h"
 #include "Map/CrossRoom1.h"
+#include "Map/CrossRoom2.h"
 #include "Map/Passage1.h"
 #include "Map/DeadEndRoom.h"
 
@@ -203,6 +204,10 @@ void RoomBase::GenerateNextRoom(
 								nextRoom = new CrossRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
 								break;
 
+							case DungeonData::CROSS_ROOM_2:
+								nextRoom = new CrossRoom2(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+								break;
+
 							case DungeonData::PASSAGE_1:
 								nextRoom = new Passage1(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
 								break;
@@ -261,6 +266,10 @@ void RoomBase::GenerateNextRoom(
 
 			case DungeonData::CROSS_ROOM_1:
 				nextRoom = new CrossRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
+				break;
+
+			case DungeonData::CROSS_ROOM_2:
+				nextRoom = new CrossRoom2(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
 				break;
 
 			case DungeonData::PASSAGE_1:
@@ -326,7 +335,7 @@ AABB RoomBase::CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const
 	return aabb;
 }
 
-void RoomBase::PlaceMapTile()
+void RoomBase::PlaceMapTile(bool isLeader)
 {
 	for (const TILE_DATA& tileData : m_tileDatas)
 	{
@@ -348,6 +357,9 @@ void RoomBase::PlaceMapTile()
 			break;
 		case TileType::STAIR:
 			colliderFileNames.emplace_back("Data/Model/DungeonAssets/SLOPE.glb");
+			break;
+		case TileType::SPAWNER:
+			modelFileNames.emplace_back("Data/Model/Cube/testCubes.glb");
 			break;
 		}
 
