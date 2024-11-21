@@ -1,6 +1,8 @@
 ﻿#include "StageDungeon_E4C.h"
 #include "StageOpenWorld_E4C.h"
 
+#include "TAKOEngine/GUI/UIManager.h"
+
 #include "GameObject/GameObjectManager.h"
 
 #include "GameObject/ModelObject.h"
@@ -213,20 +215,6 @@ void StageDungeon_E4C::Initialize()
 	cameraController->SetPlayer(player);
 	CURSOR_OFF;
 
-	{
-		HRESULT hr;
-
-		D3D11_BUFFER_DESC buffer_desc{};
-		buffer_desc.ByteWidth = (sizeof(CbScene) + 15) / 16 * 16;
-		buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-		buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		buffer_desc.CPUAccessFlags = 0;
-		buffer_desc.MiscFlags = 0;
-		buffer_desc.StructureByteStride = 0;
-		hr = T_GRAPHICS.GetDevice()->CreateBuffer(&buffer_desc, nullptr, constant_buffers[1].GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-	}
-
 	GenerateDungeon();
 
 	// 一番遠い部屋のうち、ランダムな一つを抽選しテレポーターを設置する
@@ -234,7 +222,7 @@ void StageDungeon_E4C::Initialize()
 
 	TeleportToOpenworld* teleporter = new TeleportToOpenworld();
 	teleporter->SetPosition(lastRoom->GetCenterPos());
-	teleporter->SetAngle({ 90.0f * RADIAN1, 0.0f, 0.0f});
+	teleporter->SetAngle({ 90.0f * RADIAN1, 0.0f, 0.0f });
 	teleporter->SetScale({ 10.0f, 10.0f, 1.0f });
 	GameObjectManager::Instance().Register(teleporter);
 
@@ -245,6 +233,12 @@ void StageDungeon_E4C::Initialize()
 	}
 	// 部屋の当たり判定を設定
 	MAPTILES.CreateSpatialIndex(5, 7);
+
+	// Sprite Resource Preload
+	for (auto& filename : spriteList)
+	{
+		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
+	}
 }
 
 void StageDungeon_E4C::Finalize()
@@ -298,6 +292,78 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	PlayerCharacterManager::Instance().Update(elapsedTime);
 
 	timer += elapsedTime;
+
+	// 展示会だけ
+	if (T_INPUT.KeyDown(VK_ESCAPE))
+	{
+		isPause = !isPause;
+	}
+
+	if (isPause)
+	{
+		if (btnExit == nullptr)
+		{
+			auto widgets = UI.GetAll();
+			for (auto it : widgets)
+			{
+				if (it == btnExit)
+				{
+					return;
+				}
+			}
+			btnExit = new WidgetButtonImage("", "Data/Sprites/UI/exit.png", [&](WidgetButton*) {
+				m_pScene->GetStateMachine()->ChangeState(SceneGame_E4C::GAME_STATE::EXIT);
+				});
+			btnExit->SetPosition({ SCREEN_W * 0.5f - 163.0f * 0.5f * 1.5f, SCREEN_H * 0.8f });
+			btnExit->SetSize({ 163.0f * 1.5f, 128.0f });
+			UI.Register(btnExit);
+		}
+		if (background == nullptr)
+		{
+			auto widgets = UI.GetAll();
+			for (auto it : widgets)
+			{
+				if (it == background)
+				{
+					return;
+				}
+			}
+			background = new WidgetImage("Data/Sprites/big_background.t.png");
+			background->SetPosition({ 0, 0 });
+			background->SetSize({ SCREEN_W, SCREEN_H });
+			background->SetColor(DirectX::XMFLOAT4{ 1.0f, 1.0f, 1.0f, 0.5f });
+			UI.Register(background);
+		}
+	}
+	else
+	{
+		if (background != nullptr)
+		{
+			auto widgets = UI.GetAll();
+			for (auto it : widgets)
+			{
+				if (it == background)
+				{
+					UI.Remove(background);
+					background = nullptr;
+				}
+			}
+		}
+		if (btnExit != nullptr)
+		{
+			auto widgets = UI.GetAll();
+			for (auto it : widgets)
+			{
+				if (it == btnExit)
+				{
+					UI.Remove(btnExit);
+					btnExit = nullptr;
+				}
+			}
+		}
+	}
+
+	UI.Update(elapsedTime);
 }
 
 void StageDungeon_E4C::Render()
@@ -324,12 +390,13 @@ void StageDungeon_E4C::Render()
 
 	MAPTILES.Render(rc);
 
+	UI.Render(rc);
+
 #ifdef _DEBUG
 	// デバッグレンダラ描画実行
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
 	rootRoom->DrawDebugGUI();
 #endif // _DEBUG
-
 }
 
 void StageDungeon_E4C::OnPhase()

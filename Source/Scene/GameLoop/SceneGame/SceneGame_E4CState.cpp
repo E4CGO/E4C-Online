@@ -53,3 +53,15 @@ void SceneGame_E4CState::MatchingState::Execute(float elapsedTime)
 void SceneGame_E4CState::MatchingState::Exit()
 {
 }
+
+// ゲームステート
+void SceneGame_E4CState::ExitState::Enter()
+{
+	PostMessage(TentacleLib::hWnd, WM_QUIT, 0, 0);
+}
+void SceneGame_E4CState::ExitState::Execute(float elapsedTime)
+{
+}
+void SceneGame_E4CState::ExitState::Exit()
+{
+}

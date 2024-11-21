@@ -1,5 +1,5 @@
 //! @file SceneGame_E4C.cpp
-//! @note 
+//! @note
 
 #include "SceneGame_E4C.h"
 
@@ -7,7 +7,6 @@
 #include <profiler.h>
 #include "Map/MapTileManager.h"
 #include "TAKOEngine/Tool/GLTFImporter.h"
-
 
 #include "Source/Scene/Stage/StageManager.h"
 
@@ -25,6 +24,7 @@ void SceneGame_E4C::Initialize()
 {
 	stateMachine = std::make_unique<StateMachine<SceneGame_E4C>>();
 	stateMachine->RegisterState(GAME_STATE::INIT, new SceneGame_E4CState::InitState(this));
+	stateMachine->RegisterState(GAME_STATE::EXIT, new SceneGame_E4CState::ExitState(this));
 	stateMachine->SetState(GAME_STATE::INIT);
 
 	CameraManager& cameraManager = CameraManager::Instance();
@@ -88,5 +88,4 @@ void SceneGame_E4C::Render()
 	T_TEXT.End();
 	// デバッグレンダラ描画実行
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
-
 }
