@@ -283,6 +283,8 @@ namespace Online
 			delete command.second;
 		}
 		m_udpCommands.clear();
+
+		GAME_DATA.SetClientId(0);
 	}
 
 	/**************************************************************************//**
