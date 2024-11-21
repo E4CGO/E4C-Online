@@ -61,6 +61,8 @@ private:
 	std::vector<uint8_t> m_roomOrder;
 	std::vector<AABB> m_roomAABBs;
 
+	bool isLeader;
+
 	std::unique_ptr<ModelObject> testModel;
 
 	std::unique_ptr <Teleporter> teleporter;
