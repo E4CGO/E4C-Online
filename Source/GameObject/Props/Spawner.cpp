@@ -19,7 +19,7 @@ void Spawner::Update(float elapsedTime)
 {
 	if (SearchPlayer())
 	{
-		STAGES.GetStage()->SetPhase(TestingStage::PHASE::MONSTERRUSH);
+		SpawnEnemy(elapsedTime);
 	}
 }
 /**************************************************************************//**
@@ -57,6 +57,35 @@ bool Spawner::SearchPlayer()
 		}
 		return false;
 	}
+}
+void Spawner::SpawnEnemy(float elapsedTime)
+{
+	float theta = Mathf::RandomRange(0, DirectX::XM_2PI);
+	float range = Mathf::RandomRange(0, territoryRange);
+
+	spawnPos.x =position.x + territoryOrigin.x + range * sinf(theta);
+	spawnPos.y = 2.0f;
+	spawnPos.z = position.z +territoryOrigin.z + range * cosf(theta);
+
+
+	spawntimer += elapsedTime;
+	if (spawntimer > spawntime && spawnedEnemyCount < maxEnemies)
+	{
+		// 一度に3匹のモンスターをスポーン（ただし、生成可能なエネミー数を確認）
+		int spawnCount = min(3, maxEnemies - spawnedEnemyCount); // 残り生成可能数を計算
+		for (int i = 0; i < spawnCount; ++i)
+		{
+			float offsetX = static_cast<float>(i) * 2.0f - 2.0f; // スポーン位置を調整
+			float offsetZ = static_cast<float>(i) * 1.0f - 1.0f;
+			SkeletonMinion* enemy = new SkeletonMinion();
+			enemy->SetPosition({ spawnPos.x + offsetX,spawnPos.y,spawnPos.z + offsetZ });
+			ENEMIES.Register(enemy);
+
+			spawnedEnemyCount++; // 生成したエネミー数をカウント
+		}
+		spawntimer = 0; // タイマーをリセット
+	}
+
 }
 /**************************************************************************//**
      @brief    描画

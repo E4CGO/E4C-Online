@@ -28,7 +28,7 @@ public:
 
     void SetTerritory(const DirectX::XMFLOAT3& origin, float range);
 
-   
+    void SpawnEnemy(float elapsedTime);
 
     //プレイヤー索敵
     bool SearchPlayer();
@@ -43,6 +43,13 @@ private:
     float serchRange = 5.f;
 
     DirectX::XMFLOAT3 playerPosition = {};
+
+    DirectX::XMFLOAT3 spawnPos{};
+
+    int spawnedEnemyCount = 0;             // 現在までに生成されたエネミーの数
+    float spawntimer = 0.f;
+    float spawntime = 5.f;
+    int maxEnemies = 20;
 };
 #endif
 
