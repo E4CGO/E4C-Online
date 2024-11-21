@@ -87,7 +87,7 @@ namespace Online
 			PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById(client_id);
 			if (player != nullptr)
 			{
-				std::cout << player->GetName() << reinterpret_cast <const char*>(u8" が 退室しました。") << std::endl;
+				std::cout << static_cast<int>(player->GetClientId()) << " " << player->GetName() << reinterpret_cast <const char*>(u8" が 退室しました。") << std::endl;
 				PlayerCharacterManager::Instance().Remove(client_id);
 			}
 			return true;

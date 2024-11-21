@@ -1,7 +1,6 @@
 ﻿//! @file OnlineController.cpp
 //! @note 
 
-#include <iostream>
 
 #include "OnlineController.h"
 
@@ -102,8 +101,9 @@ namespace Online
 					char buf;
 					while (m_ptcpSocket->Receive(&buf, 1) > 0)
 					{
-						buf;
+						std::cout << buf;
 					}
+					std::cout << std::endl;
 				}
 				SetConsoleOutputCP(temp);
 			}
@@ -253,7 +253,9 @@ namespace Online
 				m_pMatchingUI->GetTeleporter()->Teleport();
 			
 				PlayerCharacterManager::Instance().ClearOtherPlayers();
+				std::cout << "Clean PlayerCharacterManager" << std::endl;
 				EndSync();
+				m_pMatchingUI = nullptr;
 			}
 		}
 	}

@@ -57,7 +57,6 @@ void StageOpenWorld_E4C::Initialize()
 
 	// プレイヤー
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
-	player->SetScale({ 0.5f, 0.5f, 0.5f });
 	player->SetPosition({ 5.0f, 5.0f, 5.0f });
 
 	// カメラ設定
