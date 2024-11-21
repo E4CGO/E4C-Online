@@ -7,13 +7,14 @@
 #include "TAKOEngine/Physics/QuadtreeNode.h"
 #include "TAKOEngine/Physics/OctreeNode.h"
 #include "TAKOEngine/Physics/Liner8TreeManager.h"
+#include "TAKOEngine/Physics/MapQuadtree.h"
 
 class MapTileManager : public ObjectManager<ModelObject>, public Singleton<MapTileManager>
 {
 	friend class Singleton<MapTileManager>;
 protected:
 	MapTileManager() = default;
-	~MapTileManager() { tree.Finalize(); }
+	~MapTileManager() { tree.Finalize(); mapQuadtree.ClearQuadtree(); }
 public:
 	void Clear() override;
 
@@ -101,6 +102,7 @@ private:
 	QuadtreeNodeManager quadtree;
 	OctreeNodeManager octree;
 	Liner8TreeManager<Triangle> tree;
+	MapQuadtree mapQuadtree;
 };
 
 #define MAPTILES MapTileManager::Instance()

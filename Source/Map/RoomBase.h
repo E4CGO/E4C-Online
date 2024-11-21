@@ -8,7 +8,13 @@ class RoomBase
 {
 public:
 	// コンストラクタ
-	RoomBase() = default;
+	RoomBase(
+		RoomBase* parent, int pointIndex,
+		std::vector<AABB>& roomAABBs,
+		bool isAutoGeneration,
+		std::vector<uint8_t>& roomOrder, int& orderIndex);
+
+	// ですとら
 	virtual ~RoomBase()
 	{
 		for (RoomBase* room : childs)
@@ -21,6 +27,7 @@ public:
 	{
 		FLOOR = 0,
 		WALL,
+		PILLAR,
 		STAIR,
 	};
 
@@ -48,6 +55,8 @@ public:
 		};
 	};
 
+	virtual void Initialize() {}
+
 	virtual void Update(float elapsedTime)
 	{
 		UpdateTransform();
@@ -59,6 +68,12 @@ public:
 	}
 
 	void UpdateTransform();
+
+	// 次の部屋を生成する
+	void GenerateNextRoom(
+		std::vector<AABB>& roomAABBs,
+		bool isAutoGeneration,
+		std::vector<uint8_t>& roomOrder, int& orderIndex);
 
 	// 自分の深度を取得する
 	int GetDepth(int i = 0)
@@ -162,11 +177,14 @@ public:
 	// AABB取得
 	AABB GetAABB() const { return m_aabb; }
 
-	// 部屋タイルデータをロード
-	virtual void LoadMapTileData() {}
+	// AABB算出
+	AABB CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const;
+
+	// 部屋データをロード
+	virtual void LoadMapData() {}
 
 	// 部屋タイルを配置
-	virtual void PlaceMapTile() {}
+	void PlaceMapTile();
 
 	// 出口を配置
 	virtual void PlaceExit() {}
@@ -189,6 +207,8 @@ protected:
 	std::vector<CONNECTPOINT_DATA> m_connectPointDatas;
 
 	//std::vector<MapTile*> mapTiles;
+
+	float tileScale = 4.0f;
 
 	int parentConnectPointIndex = -1;
 	int depth = 0;

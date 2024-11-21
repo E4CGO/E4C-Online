@@ -9,9 +9,15 @@
 
 namespace Online
 {
+    struct RoomData
+    {
+        uint64_t owner_id;
+        uint8_t& tree;
+    };
+
     /**************************************************************************//**
 		@class		TCPRoomIn
-		@brief		入室処理処理クラス
+		@brief		入室命令処理クラス
 		@par		[説明]
 						入室したキャラの処理
 	*//***************************************************************************/
@@ -19,14 +25,33 @@ namespace Online
     {
     public:
         TCPRoomIn(OnlineController* controller, uint8_t cmd) : TCPCommand(controller, cmd) {};
-        
+
         // データ受信
         bool Receive(size_t size) override;
+        // データ送信
+        bool Send(void* data) override;
+    };
+
+    /**************************************************************************//**
+        @class		TCPRoomNew
+        @brief		新しい命令処理クラス
+        @par		[説明]
+                        入室したキャラの処理
+    *//***************************************************************************/
+    class TCPRoomNew : public TCPCommand
+    {
+    public:
+        TCPRoomNew(OnlineController* controller, uint8_t cmd) : TCPCommand(controller, cmd) {};
+
+        // データ受信
+        bool Receive(size_t size) override;
+        // データ送信
+        bool Send(void* data) override;
     };
 
     /**************************************************************************//**
         @class		TCPRoomOut
-        @brief		退室処理処理クラス
+        @brief		退室命令処理クラス
         @par		[説明]
                         退室したキャラの処理
     *//***************************************************************************/
@@ -37,10 +62,8 @@ namespace Online
 
         // データ受信
         bool Receive(size_t size) override;
-    };
-
-    class TCPRoomNew : public TCPCommand
-    {
+        //// データ送信
+        //bool Send(void* data) override;
     };
 }
 #endif

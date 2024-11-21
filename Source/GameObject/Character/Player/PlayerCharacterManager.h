@@ -26,6 +26,8 @@ private:
 public:
 	// オブジェクトとして更新処理
 	void Update(float elapsedTime) override;
+	// オブジェクトとして描画処理
+	void Render(const RenderContext& rc) override;
 	// プレイヤーキャラクターを取得
 	PlayerCharacter* GetPlayerCharacterById(void);
 	PlayerCharacter* GetPlayerCharacterById(uint64_t client_id);
@@ -39,7 +41,7 @@ public:
 	// 自分以外全てのプレイヤーを削除
 	void ClearOtherPlayers();
 private:
-	uint64_t m_local_client_id = 0; //ローカルプレイヤーID offline = 0;
+	//uint64_t m_local_client_id = 0; //ローカルプレイヤーID offline = 0;
 	std::mutex m_mut;				// ロック
 };
 

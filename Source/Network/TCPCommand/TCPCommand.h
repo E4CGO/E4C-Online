@@ -28,7 +28,7 @@ namespace Online
 		virtual ~TCPCommand() = default;
 
 		// データ受信
-		virtual bool Receive(size_t size) = 0;
+		virtual bool Receive(size_t size) { return true; };
 		// データ送信
 		virtual bool Send(void* data) { return true; };
 
