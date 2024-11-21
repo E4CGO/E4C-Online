@@ -20,6 +20,7 @@
 #include "Scene/Stage/StageManager.h"
 
 #include "Scene/Stage/TestingStage.h"
+#include "GameObject/Props/Teleporter.h"
 
 #include "Network/OnlineController.h"
 
@@ -231,10 +232,10 @@ void StageDungeon_E4C::Initialize()
 	// 一番遠い部屋のうち、ランダムな一つを抽選しテレポーターを設置する
 	RoomBase* lastRoom = rootRoom->GetFarthestChild().at(std::rand() % rootRoom->GetFarthestChild().size());
 
-	Teleporter* teleporter = new Teleporter(new StageOpenWorld_E4C(m_pScene), m_pScene->GetOnlineController());
+	TeleportToOpenworld* teleporter = new TeleportToOpenworld();
 	teleporter->SetPosition(lastRoom->GetCenterPos());
-	teleporter->SetAngle(lastRoom->GetAngle());
-	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
+	teleporter->SetAngle({ 90.0f * RADIAN1, 0.0f, 0.0f});
+	teleporter->SetScale({ 10.0f, 10.0f, 1.0f });
 	GameObjectManager::Instance().Register(teleporter);
 
 	// 部屋のモデルを配置
