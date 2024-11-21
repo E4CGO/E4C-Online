@@ -1,8 +1,8 @@
 //! @file QuadtreeNode.h
 //! @note Žl•ª–Ø‹óŠÔ
 
-#ifndef __Quadtree_Node_H__
-#define __Quadtree_Node_H__
+#ifndef __QUADTREE_NODE_H__
+#define __QUADTREE_NODE_H__
 
 #include "TAKOEngine/Physics/Collision.h"
 
@@ -159,4 +159,4 @@ public:
 			0, 1, 5, 21, 85, 341, 1365, 5461, 21845, 87381
 		};
 };
-#endif // !__Quadtree_Node_H__
+#endif // !__QUADTREE_NODE_H__

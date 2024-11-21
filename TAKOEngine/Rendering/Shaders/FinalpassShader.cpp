@@ -109,7 +109,7 @@ FinalpassShaderDX12::FinalpassShaderDX12(ID3D12Device* device)
 		d3d_graphics_pipeline_state_desc.InputLayout.NumElements = _countof(inputElementDescs);
 
 		// ブレンドステート
-		d3d_graphics_pipeline_state_desc.BlendState = renderState->GetBlendState(BlendState::Transparency);
+		d3d_graphics_pipeline_state_desc.BlendState = renderState->GetBlendState(BlendState::Opaque);
 
 		// 深度ステンシルステート
 		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthEnable    = true;

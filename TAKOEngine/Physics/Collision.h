@@ -1,38 +1,38 @@
-//! @file Cillision.h
-//! @note “–‚½‚è”»’èˆ—‘‚Ü‚Æ‚ß
+ï»¿//! @file Collision.h
+//! @note å½“ãŸã‚Šåˆ¤å®šå‡¦ç†ç·ã¾ã¨ã‚
  
-#ifndef __Collision_H__
-#define __Collision_H__
+#ifndef __COLLISION_H__
+#define __COLLISION_H__
 
 #include <DirectXMath.h>
 #include <cmath>
 #include <algorithm>
 #include "TAKOEngine/Rendering/Model/Model.h"
 
-// ƒqƒbƒgŒ‹‰Ê
+// ãƒ’ãƒƒãƒˆçµæœ
 struct HitResult
 {
-	DirectX::XMFLOAT3	position = { 0, 0, 0 };// ƒŒƒC‚Æƒ|ƒŠƒSƒ“‚ÌŒğ“_
-	DirectX::XMFLOAT3	normal = { 0, 0, 0 };	// Õ“Ë‚µ‚½ƒ|ƒŠƒSƒ“‚Ì–@üƒxƒNƒgƒ‹
-	float				distance = 0.0f; 		// ƒŒƒC‚Ìn“_‚©‚çŒğ“_‚Ü‚Å‚Ì‹——£
-	int					materialIndex = -1; 	// Õ“Ë‚µ‚½ƒ|ƒŠƒSƒ“‚Ìƒ}ƒeƒŠƒAƒ‹”Ô†
+	DirectX::XMFLOAT3	position = { 0, 0, 0 };// ãƒ¬ã‚¤ã¨ãƒãƒªã‚´ãƒ³ã®äº¤ç‚¹
+	DirectX::XMFLOAT3	normal = { 0, 0, 0 };	// è¡çªã—ãŸãƒãƒªã‚´ãƒ³ã®æ³•ç·šãƒ™ã‚¯ãƒˆãƒ«
+	float				distance = 0.0f; 		// ãƒ¬ã‚¤ã®å§‹ç‚¹ã‹ã‚‰äº¤ç‚¹ã¾ã§ã®è·é›¢
+	int					materialIndex = -1; 	// è¡çªã—ãŸãƒãƒªã‚´ãƒ³ã®ãƒãƒ†ãƒªã‚¢ãƒ«ç•ªå·
 	DirectX::XMFLOAT3	triangleVerts[3] = {};
 };
 struct HitResultVector
 {
-	DirectX::XMVECTOR	position = { 0, 0, 0 };// ƒŒƒC‚Æƒ|ƒŠƒSƒ“‚ÌŒğ“_
-	DirectX::XMVECTOR	normal = { 0, 0, 0 };	// Õ“Ë‚µ‚½ƒ|ƒŠƒSƒ“‚Ì–@üƒxƒNƒgƒ‹
-	float				distance = 0.0f; 		// ƒŒƒC‚Ìn“_‚©‚çŒğ“_‚Ü‚Å‚Ì‹——£
+	DirectX::XMVECTOR	position = { 0, 0, 0 };// ãƒ¬ã‚¤ã¨ãƒãƒªã‚´ãƒ³ã®äº¤ç‚¹
+	DirectX::XMVECTOR	normal = { 0, 0, 0 };	// è¡çªã—ãŸãƒãƒªã‚´ãƒ³ã®æ³•ç·šãƒ™ã‚¯ãƒˆãƒ«
+	float				distance = 0.0f; 		// ãƒ¬ã‚¤ã®å§‹ç‚¹ã‹ã‚‰äº¤ç‚¹ã¾ã§ã®è·é›¢
 	DirectX::XMVECTOR	triangleVerts[3] = {};
-	int					materialIndex = -1; 	// Õ“Ë‚µ‚½ƒ|ƒŠƒSƒ“‚Ìƒ}ƒeƒŠƒAƒ‹”Ô†
+	int					materialIndex = -1; 	// è¡çªã—ãŸãƒãƒªã‚´ãƒ³ã®ãƒãƒ†ãƒªã‚¢ãƒ«ç•ªå·
 };
-// ƒIƒuƒWƒFƒNƒg‚ÌŒğ·Œ‹‰Ê‚Ì\‘¢‘Ì
+// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®äº¤å·®çµæœã®æ§‹é€ ä½“
 struct IntersectionResult
 {
-	DirectX::XMVECTOR	pointA = {};			// ƒIƒuƒWƒFƒNƒgA‘¤‚ÌŒğ“_BƒIƒuƒWƒFƒNƒgA Vs ƒIƒuƒWƒFƒNƒgB‚ÅŠÖ”‚ª\¬‚³‚ê‚é
-	DirectX::XMVECTOR	pointB = {};			// ƒIƒuƒWƒFƒNƒgB‘¤‚ÌŒğ“_BƒIƒuƒWƒFƒNƒgA Vs ƒIƒuƒWƒFƒNƒgB‚ÅŠÖ”‚ª\¬‚³‚ê‚é
-	DirectX::XMVECTOR	normal = {};			// Œğ“_‚ğŒ‹‚ÔÕ“Ë‚Ì’PˆÊ–@üƒxƒNƒgƒ‹B•ûŒü‚ÍƒIƒuƒWƒFƒNƒgB¨ƒIƒuƒWƒFƒNƒgA
-	float				penetration = 0.0f; 	// –@üƒxƒNƒgƒ‹‚ğŒ³‚É‚µ‚½‚ß‚è‚İ—ÊBŒğ·‚µ‚Ä‚¢‚éê‡‚Éƒvƒ‰ƒX‚Ì’l‚ª•Ô‹p‚³‚ê‚é
+	DirectX::XMVECTOR	pointA = {};			// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆAå´ã®äº¤ç‚¹ã€‚ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆA Vs ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆBã§é–¢æ•°ãŒæ§‹æˆã•ã‚Œã‚‹
+	DirectX::XMVECTOR	pointB = {};			// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆBå´ã®äº¤ç‚¹ã€‚ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆA Vs ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆBã§é–¢æ•°ãŒæ§‹æˆã•ã‚Œã‚‹
+	DirectX::XMVECTOR	normal = {};			// äº¤ç‚¹ã‚’çµã¶è¡çªã®å˜ä½æ³•ç·šãƒ™ã‚¯ãƒˆãƒ«ã€‚æ–¹å‘ã¯ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆBâ†’ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆA
+	float				penetration = 0.0f; 	// æ³•ç·šãƒ™ã‚¯ãƒˆãƒ«ã‚’å…ƒã«ã—ãŸã‚ã‚Šè¾¼ã¿é‡ã€‚äº¤å·®ã—ã¦ã„ã‚‹å ´åˆã«ãƒ—ãƒ©ã‚¹ã®å€¤ãŒè¿”å´ã•ã‚Œã‚‹
 };
 
 struct Triangle
@@ -40,7 +40,7 @@ struct Triangle
 	DirectX::XMFLOAT3	position[3] = {};
 	int					materialIndex = -1;
 
-	// OŠpŒ`‚ÉŠOÚ‚·‚éAABB‚ğ\¬‚·‚éÅ¬“_‚ÆÅ‘å“_‚ğæ“¾‚·‚é
+	// ä¸‰è§’å½¢ã«å¤–æ¥ã™ã‚‹AABBã‚’æ§‹æˆã™ã‚‹æœ€å°ç‚¹ã¨æœ€å¤§ç‚¹ã‚’å–å¾—ã™ã‚‹
 	void GetBoundPoints(DirectX::XMFLOAT3* minPoint, DirectX::XMFLOAT3* maxPoint)
 	{
 		if (minPoint && maxPoint)
@@ -56,10 +56,10 @@ struct Triangle
 };
 struct Sphere
 {
-	DirectX::XMFLOAT3	position;	// ’†S
-	float				radius;	// ”¼Œa
+	DirectX::XMFLOAT3	position;	// ä¸­å¿ƒ
+	float				radius;	// åŠå¾„
 
-	// ‹…‘Ì‚ÉŠOÚ‚·‚éAABB‚ğ\¬‚·‚éÅ¬“_‚ÆÅ‘å“_‚ğæ“¾‚·‚é
+	// çƒä½“ã«å¤–æ¥ã™ã‚‹AABBã‚’æ§‹æˆã™ã‚‹æœ€å°ç‚¹ã¨æœ€å¤§ç‚¹ã‚’å–å¾—ã™ã‚‹
 	void GetBoundPoints(DirectX::XMFLOAT3* minPoint, DirectX::XMFLOAT3* maxPoint)
 	{
 		if (minPoint && maxPoint)
@@ -80,17 +80,17 @@ struct Sphere
 };
 struct AABB
 {
-	DirectX::XMFLOAT3	position;	// ’†S
-	DirectX::XMFLOAT3	radii;	// ”¼Œa
+	DirectX::XMFLOAT3	position;	// ä¸­å¿ƒ
+	DirectX::XMFLOAT3	radii;	// åŠå¾„
 };
 struct Capsule
 {
-	DirectX::XMFLOAT3	position;	// ’†S
-	DirectX::XMFLOAT3	direction;	// Œü‚«i³‹K‰»j
-	float				length;	// ’·‚³
-	float				radius;	// ”¼Œa
+	DirectX::XMFLOAT3	position;	// ä¸­å¿ƒ
+	DirectX::XMFLOAT3	direction;	// å‘ãï¼ˆæ­£è¦åŒ–ï¼‰
+	float				length;	// é•·ã•
+	float				radius;	// åŠå¾„
 
-	// ƒJƒvƒZƒ‹‚ÉŠOÚ‚·‚éAABB‚ğ\¬‚·‚éÅ¬“_‚ÆÅ‘å“_‚ğæ“¾‚·‚é
+	// ã‚«ãƒ—ã‚»ãƒ«ã«å¤–æ¥ã™ã‚‹AABBã‚’æ§‹æˆã™ã‚‹æœ€å°ç‚¹ã¨æœ€å¤§ç‚¹ã‚’å–å¾—ã™ã‚‹
 	void GetBoundPoints(DirectX::XMFLOAT3* minPoint, DirectX::XMFLOAT3* maxPoint)
 	{
 		if (minPoint && maxPoint)
@@ -133,13 +133,13 @@ struct Capsule
 
 /**************************************************************************//**
 	@class		Collision
-	@brief		“–‚½‚è”»’èˆ—
-	@par		staticƒNƒ‰ƒX
+	@brief		å½“ãŸã‚Šåˆ¤å®šå‡¦ç†
+	@par		staticã‚¯ãƒ©ã‚¹
 *//***************************************************************************/
 class Collision
 {
 public:
-	// ƒŒƒC‚Æƒ‚ƒfƒ‹‚ÌŒğ·”»’è
+	// ãƒ¬ã‚¤ã¨ãƒ¢ãƒ‡ãƒ«ã®äº¤å·®åˆ¤å®š
 	static bool IntersectRayVsModel(
 		const DirectX::XMFLOAT3& start,
 		const DirectX::XMFLOAT3& end,
@@ -147,34 +147,34 @@ public:
 		HitResultVector& result
 	);
 
-	// ƒŒƒC‚ÆOŠpŒ`‚ÌŒğ·”»’è
+	// ãƒ¬ã‚¤ã¨ä¸‰è§’å½¢ã®äº¤å·®åˆ¤å®š
 	static bool IntersectRayVsTriangle(
 		const DirectX::XMVECTOR& rayStart,
-		const DirectX::XMVECTOR& rayDirection,		// —v³‹K‰»
+		const DirectX::XMVECTOR& rayDirection,		// è¦æ­£è¦åŒ–
 		float rayDist,
 		const DirectX::XMVECTOR triangleVerts[3],
 		HitResultVector& result);
 
 	static bool IntersectRayVsTriangle(
 		const DirectX::XMVECTOR& rayStart,
-		const DirectX::XMVECTOR& rayDirection,		// ”ñ³‹K‰»
+		const DirectX::XMVECTOR& rayDirection,		// éæ­£è¦åŒ–
 		const DirectX::XMVECTOR triangleVerts[3],
 		HitResultVector& result);
 
 	static bool IntersectRayVsTriangle(
 		const DirectX::XMFLOAT3& rayStart,
-		const DirectX::XMFLOAT3& rayDirection,		// —v³‹K‰»
+		const DirectX::XMFLOAT3& rayDirection,		// è¦æ­£è¦åŒ–
 		float rayDist,
 		const DirectX::XMFLOAT3 triangleVerts[3],
 		HitResult& result);
 
-	// ŠO•”‚Ì“_‚É‘Î‚·‚éOŠpŒ`“à•”‚ÌÅ‹ß“_‚ğæ“¾‚·‚é
+	// å¤–éƒ¨ã®ç‚¹ã«å¯¾ã™ã‚‹ä¸‰è§’å½¢å†…éƒ¨ã®æœ€è¿‘ç‚¹ã‚’å–å¾—ã™ã‚‹
 	static bool GetClosestPoint_PointTriangle(
 		const DirectX::XMVECTOR& point,
 		const DirectX::XMVECTOR trianglePos[3],
 		DirectX::XMVECTOR& nearPos);
 
-	// ‹…‚Æ‹…‚ÌŒğ·”»’è
+	// çƒã¨çƒã®äº¤å·®åˆ¤å®š
 	static bool IntersectSphereVsSphere(
 		const DirectX::XMVECTOR& position1,
 		float radius1,
@@ -182,7 +182,7 @@ public:
 		float radius2,
 		IntersectionResult* result);
 	
-	// ‹…VsOŠpŒ`
+	// çƒVsä¸‰è§’å½¢
 	static bool IntersectSphereVsTriangle(
 		const DirectX::XMVECTOR& spherePos,
 		float radius,
@@ -190,7 +190,7 @@ public:
 		IntersectionResult* result = {},
 		bool triangleNormOnly = false);
 	
-	// ‹…VsAABB
+	// çƒVsAABB
 	static bool IntersectSphereVsAABB(
 		const DirectX::XMVECTOR& spherePos,
 		float sphereRadius,
@@ -198,25 +198,25 @@ public:
 		const DirectX::XMVECTOR& aabbRadii,
 		IntersectionResult* result);
 	
-	// ‹…vsƒJƒvƒZƒ‹‚ÌŒğ·”»’è
+	// çƒvsã‚«ãƒ—ã‚»ãƒ«ã®äº¤å·®åˆ¤å®š
 	static bool IntersectSphereVsCapsule(
 		const DirectX::XMVECTOR& spherePos,
 		float sphereRadius,
 		const DirectX::XMVECTOR& capsulePos,
 		const DirectX::XMVECTOR& capsuleDirection,
 		float capsuleLength,
-		float capsuleRadius,					// ƒJƒvƒZƒ‹‚Ì”¼Œa
+		float capsuleRadius,					// ã‚«ãƒ—ã‚»ãƒ«ã®åŠå¾„
 		IntersectionResult* result = {});
 
-	// AABB‚Æ•½–Ê‚ÌÅ’Z‹——£‚ğæ“¾‚·‚é	¦•Ô‚è’l‚ªƒ}ƒCƒiƒX‚¾‚ÆŒğ·‚µ‚Ä‚¢‚éó‹µ‚Æ’è‹`
+	// AABBã¨å¹³é¢ã®æœ€çŸ­è·é›¢ã‚’å–å¾—ã™ã‚‹	â€»è¿”ã‚Šå€¤ãŒãƒã‚¤ãƒŠã‚¹ã ã¨äº¤å·®ã—ã¦ã„ã‚‹çŠ¶æ³ã¨å®šç¾©
 	static float GetMinDist_AABBPlane(
 		const DirectX::XMVECTOR& aabbPos,
 		const DirectX::XMVECTOR& aabbRadii,
-		const DirectX::XMVECTOR& planeNorm,	// —v³‹K‰»
+		const DirectX::XMVECTOR& planeNorm,	// è¦æ­£è¦åŒ–
 		const float planeDist,
-		bool* reverse);				// –@ü‚É‘Î‚µ‚Ä— ‚©•\‚©‚ğ”»’f‚·‚é‚æ‚¤‚Ìƒtƒ‰ƒO
+		bool* reverse);				// æ³•ç·šã«å¯¾ã—ã¦è£ã‹è¡¨ã‹ã‚’åˆ¤æ–­ã™ã‚‹ã‚ˆã†ã®ãƒ•ãƒ©ã‚°
 
-	// AABBvsOŠpŒ`‚ÌŒğ·”»’è
+	// AABBvsä¸‰è§’å½¢ã®äº¤å·®åˆ¤å®š
 	static bool IntersectAABBVsTriangle(
 		const DirectX::XMVECTOR& aabbPos,
 		const DirectX::XMVECTOR& aabbRadii,
@@ -231,7 +231,7 @@ public:
 		const DirectX::XMVECTOR& aabbRadii2,
 		IntersectionResult* result);
 
-	// ü•ª‚Æü•ª‚ÌÅ’Z‹——£‚Ì“ñæ‚ğæ“¾‚·‚é
+	// ç·šåˆ†ã¨ç·šåˆ†ã®æœ€çŸ­è·é›¢ã®äºŒä¹—ã‚’å–å¾—ã™ã‚‹
 	static float GetMinDistSq_SegmentSegment(
 		const  DirectX::XMVECTOR& point1A,
 		const  DirectX::XMVECTOR& point1B,
@@ -240,7 +240,7 @@ public:
 		DirectX::XMVECTOR* nearPoint1,
 		DirectX::XMVECTOR* nearPoint2);
 
-	// ü•ª‚ÆOŠpŒ`‚ÌÅ’Z‹——£‚Ì“ñæ‚ğæ“¾‚·‚é
+	// ç·šåˆ†ã¨ä¸‰è§’å½¢ã®æœ€çŸ­è·é›¢ã®äºŒä¹—ã‚’å–å¾—ã™ã‚‹
 	static float GetMinDistSq_SegmentTriangle(
 		const  DirectX::XMVECTOR& pointA,
 		const  DirectX::XMVECTOR& pointB,
@@ -249,7 +249,7 @@ public:
 		DirectX::XMVECTOR* nearPointTriangle,
 		bool& nearPointEdghFlg);
 
-	// ƒJƒvƒZƒ‹vsOŠpŒ`
+	// ã‚«ãƒ—ã‚»ãƒ«vsä¸‰è§’å½¢
 	static bool IntersectCapsuleVsTriangle(
 		const DirectX::XMVECTOR& position,
 		const DirectX::XMVECTOR& direction,
@@ -258,46 +258,46 @@ public:
 		const DirectX::XMVECTOR trianglePos[3],
 		IntersectionResult* result);
 
-	// ƒJƒvƒZƒ‹vsƒJƒvƒZƒ‹‚ÌŒğ·”»’è
+	// ã‚«ãƒ—ã‚»ãƒ«vsã‚«ãƒ—ã‚»ãƒ«ã®äº¤å·®åˆ¤å®š
 	static bool IntersectCapsuleVsCapsule(
-		const DirectX::XMVECTOR& position1,		// ’†S
-		const DirectX::XMVECTOR& direction1,	// Œü‚«i³‹K‰»j
-		const float					length1,	// ’·‚³
-		const float					radius1,	// ”¼Œa
-		const DirectX::XMVECTOR& position2,		// ’†S
-		const DirectX::XMVECTOR& direction2,	// Œü‚«i³‹K‰»j
-		const float					length2,	// ’·‚³
-		const float					radius2,	// ”¼Œa
+		const DirectX::XMVECTOR& position1,		// ä¸­å¿ƒ
+		const DirectX::XMVECTOR& direction1,	// å‘ãï¼ˆæ­£è¦åŒ–ï¼‰
+		const float					length1,	// é•·ã•
+		const float					radius1,	// åŠå¾„
+		const DirectX::XMVECTOR& position2,		// ä¸­å¿ƒ
+		const DirectX::XMVECTOR& direction2,	// å‘ãï¼ˆæ­£è¦åŒ–ï¼‰
+		const float					length2,	// é•·ã•
+		const float					radius2,	// åŠå¾„
 		IntersectionResult* result);
 
-	// ƒŒƒCVsƒXƒ‰ƒu3D (²•½sƒXƒ‰ƒu)
+	// ãƒ¬ã‚¤Vsã‚¹ãƒ©ãƒ–3D (è»¸å¹³è¡Œã‚¹ãƒ©ãƒ–)
 	static bool IntersectRayVsSlub3D(
 		const DirectX::XMVECTOR& rayStart,
-		const DirectX::XMVECTOR& rayDirection,		// —v³‹K‰»
+		const DirectX::XMVECTOR& rayDirection,		// è¦æ­£è¦åŒ–
 		float rayDist,
 		const DirectX::XMVECTOR& slubCenter,
 		const DirectX::XMVECTOR& slubRadii,
-		HitResultVector* resultNear = {},			// ƒŒƒC‚ÆƒXƒ‰ƒu‚ÌÅ‰‚ÌŒğ“_î•ñ
-		HitResultVector* resultFar = {});			// ƒŒƒC‚ÆƒXƒ‰ƒu‚ÌÅŒã‚ÌŒğ“_î•ñ
+		HitResultVector* resultNear = {},			// ãƒ¬ã‚¤ã¨ã‚¹ãƒ©ãƒ–ã®æœ€åˆã®äº¤ç‚¹æƒ…å ±
+		HitResultVector* resultFar = {});			// ãƒ¬ã‚¤ã¨ã‚¹ãƒ©ãƒ–ã®æœ€å¾Œã®äº¤ç‚¹æƒ…å ±
 
-	// ƒŒƒCVsAABB
+	// ãƒ¬ã‚¤VsAABB
 	static bool IntersectRayVsAABB(
 		const DirectX::XMVECTOR& rayStart,
-		const DirectX::XMVECTOR& rayDirection,		// —v³‹K‰»
+		const DirectX::XMVECTOR& rayDirection,		// è¦æ­£è¦åŒ–
 		float rayDist,
 		const DirectX::XMVECTOR& aabbPos,
 		const DirectX::XMVECTOR& aabbRadii,
 		HitResultVector* resultNear,
 		HitResultVector* resultFar);
 
-	// ŠO•”‚Ì“_‚É‘Î‚·‚éAABB“à•”‚ÌÅ‹ß“_‚ğæ“¾‚·‚é
+	// å¤–éƒ¨ã®ç‚¹ã«å¯¾ã™ã‚‹AABBå†…éƒ¨ã®æœ€è¿‘ç‚¹ã‚’å–å¾—ã™ã‚‹
 	static DirectX::XMVECTOR GetClosestPoint_PointAABB(
 		const DirectX::XMVECTOR& point,
 		const DirectX::XMVECTOR& aabbPos,
 		const DirectX::XMVECTOR& aabbRadii,
 		bool surfaceFlg = false);
 
-	// ü•ª‚ÆAABB‚ÌÅ’Z‹——£‚Ì“ñæ‚ğæ“¾‚·‚é
+	// ç·šåˆ†ã¨AABBã®æœ€çŸ­è·é›¢ã®äºŒä¹—ã‚’å–å¾—ã™ã‚‹
 	static float GetMinDistSq_SegmentAABB(
 		const DirectX::XMVECTOR& pointA,
 		const DirectX::XMVECTOR& pointB,
@@ -306,29 +306,29 @@ public:
 		DirectX::XMVECTOR* nearPointSegment = {},
 		DirectX::XMVECTOR* nearPointAABB = {});
 
-	// ƒJƒvƒZƒ‹vsAABB‚ÌŒğ·”»’è				¦ƒJƒvƒZƒ‹’†SŠÔ‚ÌƒŒƒC‚ªAABB‚ÆŒğ·‚µ‚Ä‚¢‚éê‡‚Ì‰Ÿ‚µ–ß‚µ‚Ì‚½‚ß‚Ìresult‚ÍƒŒƒC•ûŒü‚É“®‚­d—lBƒŒƒCˆÈŠO‚ÌÅ’Z•ûŒü‚Å‚Í‚È‚¢B
+	// ã‚«ãƒ—ã‚»ãƒ«vsAABBã®äº¤å·®åˆ¤å®š				â€»ã‚«ãƒ—ã‚»ãƒ«ä¸­å¿ƒé–“ã®ãƒ¬ã‚¤ãŒAABBã¨äº¤å·®ã—ã¦ã„ã‚‹å ´åˆã®æŠ¼ã—æˆ»ã—ã®ãŸã‚ã®resultã¯ãƒ¬ã‚¤æ–¹å‘ã«å‹•ãä»•æ§˜ã€‚ãƒ¬ã‚¤ä»¥å¤–ã®æœ€çŸ­æ–¹å‘ã§ã¯ãªã„ã€‚
 	static bool IntersectCapsuleVsAABB(
-		const DirectX::XMVECTOR& position,	// ’†S
-		const DirectX::XMVECTOR& direction,	// Œü‚«i³‹K‰»j
-		const float				length,	// ’·‚³
-		const float				radius,	// ”¼Œa
+		const DirectX::XMVECTOR& position,	// ä¸­å¿ƒ
+		const DirectX::XMVECTOR& direction,	// å‘ãï¼ˆæ­£è¦åŒ–ï¼‰
+		const float				length,	// é•·ã•
+		const float				radius,	// åŠå¾„
 		const DirectX::XMVECTOR& aabbPos,
 		const DirectX::XMVECTOR& aabbRadii,
 		IntersectionResult* result = {});
 
-	// ƒŒƒCVs‹…
+	// ãƒ¬ã‚¤Vsçƒ
 	static bool IntersectRayVsSphere(
 		const DirectX::XMVECTOR& rayStart,
-		const DirectX::XMVECTOR& rayDirection,		// —v³‹K‰»
+		const DirectX::XMVECTOR& rayDirection,		// è¦æ­£è¦åŒ–
 		float rayDist,
 		const DirectX::XMVECTOR& spherePos,
 		float radius,
 		HitResultVector* result = {});
 
-	// ƒŒƒCVs‰~’Œ
+	// ãƒ¬ã‚¤Vså††æŸ±
 	static bool IntersectRayVsOrientedCylinder(
 		const DirectX::XMVECTOR& rayStart,
-		const DirectX::XMVECTOR& rayDirection,		// —v³‹K‰»
+		const DirectX::XMVECTOR& rayDirection,		// è¦æ­£è¦åŒ–
 		float rayDist,
 		const DirectX::XMVECTOR& startCylinder,
 		const DirectX::XMVECTOR& endCylinder,
@@ -336,26 +336,26 @@ public:
 		HitResultVector* result = {},
 		DirectX::XMVECTOR* onCenterLinPos = {});
 
-	// ƒXƒtƒBƒAƒLƒƒƒXƒgVsOŠpŒ`
+	// ã‚¹ãƒ•ã‚£ã‚¢ã‚­ãƒ£ã‚¹ãƒˆVsä¸‰è§’å½¢
 	static bool IntersectSphereCastVsTriangle(
-		const DirectX::XMVECTOR& sphereCastStart,		// ƒXƒtƒBƒAƒLƒƒƒXƒg‚Ì”­Ë“_i‹…‚Ì’†Sj
-		const DirectX::XMVECTOR& sphereCastDirection,	// ƒXƒtƒBƒAƒLƒƒƒXƒg‚ÌŒü‚«B—v³‹K‰»
+		const DirectX::XMVECTOR& sphereCastStart,		// ã‚¹ãƒ•ã‚£ã‚¢ã‚­ãƒ£ã‚¹ãƒˆã®ç™ºå°„ç‚¹ï¼ˆçƒã®ä¸­å¿ƒï¼‰
+		const DirectX::XMVECTOR& sphereCastDirection,	// ã‚¹ãƒ•ã‚£ã‚¢ã‚­ãƒ£ã‚¹ãƒˆã®å‘ãã€‚è¦æ­£è¦åŒ–
 		float sphereCastDist,
-		float sphereCastRadius,							// ƒXƒtƒBƒAƒLƒƒƒXƒg‚Ì”¼Œa
+		float sphereCastRadius,							// ã‚¹ãƒ•ã‚£ã‚¢ã‚­ãƒ£ã‚¹ãƒˆã®åŠå¾„
 		const DirectX::XMVECTOR trianglePos[3],
 		HitResult* result = {},
-		bool firstSphereChk = false);				// ƒXƒtƒBƒAƒLƒƒƒXƒg‚Ì”­Ë“_‚Ì‹…‚ªŠù‚ÉOŠpŒ`‚ÉÚ‚µ‚Ä‚¢‚éê‡‚Éfalse‚ğ•Ô‚·ƒ`ƒFƒbƒN‚ğs‚¤‚©‚Ç‚¤‚©
+		bool firstSphereChk = false);				// ã‚¹ãƒ•ã‚£ã‚¢ã‚­ãƒ£ã‚¹ãƒˆã®ç™ºå°„ç‚¹ã®çƒãŒæ—¢ã«ä¸‰è§’å½¢ã«æ¥ã—ã¦ã„ã‚‹å ´åˆã«falseã‚’è¿”ã™ãƒã‚§ãƒƒã‚¯ã‚’è¡Œã†ã‹ã©ã†ã‹
 
-	// ƒXƒtƒBƒAƒLƒƒƒXƒgVsƒ‚ƒfƒ‹iƒƒbƒVƒ…j
+	// ã‚¹ãƒ•ã‚£ã‚¢ã‚­ãƒ£ã‚¹ãƒˆVsãƒ¢ãƒ‡ãƒ«ï¼ˆãƒ¡ãƒƒã‚·ãƒ¥ï¼‰
 	static bool IntersectSphereCastVsModel(
-		const DirectX::XMFLOAT3& start,			// ƒXƒtƒBƒAƒLƒƒƒXƒg‚ÌƒXƒ^[ƒg‚ÌˆÊ’u‚Ì‹…‚Ì’†S
-		const DirectX::XMFLOAT3& end,  			// ƒXƒtƒBƒAƒLƒƒƒXƒg‚ÌƒGƒ“ƒh‚ÌˆÊ’u‚Ì‹…‚Ì’†S
+		const DirectX::XMFLOAT3& start,			// ã‚¹ãƒ•ã‚£ã‚¢ã‚­ãƒ£ã‚¹ãƒˆã®ã‚¹ã‚¿ãƒ¼ãƒˆã®ä½ç½®ã®çƒã®ä¸­å¿ƒ
+		const DirectX::XMFLOAT3& end,  			// ã‚¹ãƒ•ã‚£ã‚¢ã‚­ãƒ£ã‚¹ãƒˆã®ã‚¨ãƒ³ãƒ‰ã®ä½ç½®ã®çƒã®ä¸­å¿ƒ
 		float radius,
 		const iModel* model,
 		HitResultVector* result = {});
 	static bool IntersectSphereCastVsModel(
-		const DirectX::XMVECTOR& start,			// ƒXƒtƒBƒAƒLƒƒƒXƒg‚ÌƒXƒ^[ƒg‚ÌˆÊ’u‚Ì‹…‚Ì’†S
-		const DirectX::XMVECTOR& end,  			// ƒXƒtƒBƒAƒLƒƒƒXƒg‚ÌƒGƒ“ƒh‚ÌˆÊ’u‚Ì‹…‚Ì’†S
+		const DirectX::XMVECTOR& start,			// ã‚¹ãƒ•ã‚£ã‚¢ã‚­ãƒ£ã‚¹ãƒˆã®ã‚¹ã‚¿ãƒ¼ãƒˆã®ä½ç½®ã®çƒã®ä¸­å¿ƒ
+		const DirectX::XMVECTOR& end,  			// ã‚¹ãƒ•ã‚£ã‚¢ã‚­ãƒ£ã‚¹ãƒˆã®ã‚¨ãƒ³ãƒ‰ã®ä½ç½®ã®çƒã®ä¸­å¿ƒ
 		float radius,
 		const iModel* model,
 		HitResultVector* result = {});

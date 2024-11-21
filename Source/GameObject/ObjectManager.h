@@ -33,7 +33,7 @@ public:
 			this->items.at(i)->Update(elapsedTime);
 		}
 	}
-	void Render(const RenderContext& rc)
+	virtual void Render(const RenderContext& rc)
 	{
 		for (T* item : this->items)
 		{

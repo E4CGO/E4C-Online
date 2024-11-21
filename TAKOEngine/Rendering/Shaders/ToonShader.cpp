@@ -1,4 +1,4 @@
-﻿//! @file ToonShader.cpp
+//! @file ToonShader.cpp
 //! @note
 
 #include "TAKOEngine/Rendering/Misc.h"

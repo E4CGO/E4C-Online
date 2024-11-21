@@ -1,5 +1,5 @@
 //! @file PlayerCharacter.cpp
-//! @note 
+//! @note
 
 #include "PlayerCharacter.h"
 
@@ -17,8 +17,11 @@
 
 #include "GameData.h"
 
+#include "TAKOEngine/Tool/Mathf.h"
+
 PlayerCharacter::PlayerCharacter(uint64_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]) : Character()
 {
+	scale = { 0.5f, 0.5f, 0.5f };
 	moveSpeed = 10.0f;
 	turnSpeed = DirectX::XMConvertToRadians(720);
 	jumpSpeed = 20.0f;
@@ -28,10 +31,10 @@ PlayerCharacter::PlayerCharacter(uint64_t id, const char* name, const uint8_t ap
 	RegisterCommonState();
 	stateMachine->SetState(static_cast<int>(STATE::WAITING));
 
-	mpCost[static_cast<int>(STATE::DODGE)] = 20.0f;
+	mpCost[static_cast<int>(STATE::DODGE)] = 0.0f;
 
 	// 衝突判定
-	SetCollider(Collider::COLLIDER_TYPE::SPHERE);
+	SetCollider(Collider::COLLIDER_TYPE::CAPSULE);
 
 	m_client_id = id;
 	this->m_name = name;
@@ -41,6 +44,7 @@ PlayerCharacter::PlayerCharacter(uint64_t id, const char* name, const uint8_t ap
 
 PlayerCharacter::PlayerCharacter(PlayerCharacterData::CharacterInfo dataInfo) : Character()
 {
+	scale = { 0.5f, 0.5f, 0.5f };
 	moveSpeed = 10.0f;
 	turnSpeed = DirectX::XMConvertToRadians(720);
 	jumpSpeed = 20.0f;
@@ -53,10 +57,10 @@ PlayerCharacter::PlayerCharacter(PlayerCharacterData::CharacterInfo dataInfo) : 
 	RegisterCommonState();
 	stateMachine->SetState(static_cast<int>(STATE::WAITING));
 
-	mpCost[static_cast<int>(STATE::DODGE)] = 20.0f;
+	mpCost[static_cast<int>(STATE::DODGE)] = 00.0f;
 
 	// 衝突判定
-	SetCollider(Collider::COLLIDER_TYPE::SPHERE);
+	SetCollider(Collider::COLLIDER_TYPE::CAPSULE);
 
 	LoadAppearance(dataInfo.Character.pattern);
 }
@@ -123,8 +127,23 @@ void PlayerCharacter::UpdateTarget()
 
 void PlayerCharacter::UpdateColliders()
 {
-	collider->SetPosition(position + DirectX::XMFLOAT3{ 0, height * 0.5f, 0 } *scale);
-	collider->SetScale(DirectX::XMFLOAT3{ height * 0.3f, height * 0.3f, height * 0.3f } *scale);
+	//collider->SetPosition(position + DirectX::XMFLOAT3{ 0, height * 0.5f, 0 } *scale);
+	Capsule capsule{};
+	capsule.position = position + DirectX::XMFLOAT3{ 0, 0.4f, 0 };
+	capsule.direction = { 0, 1, 0 };
+	capsule.radius = 0.4f;
+	capsule.length = height - capsule.radius * 2;
+	collider->SetParam(capsule);
+	//if(!isGround)
+	if (XMFLOAT3LengthSq(velocity) > 0.0f)
+	{
+		if (collider->CollisionVsMap())
+		{
+			position = collider->GetPosition();
+			position.y -= 0.4f;
+		}
+	}
+	//collider->SetScale(DirectX::XMFLOAT3{ height * 0.3f, height * 0.3f, height * 0.3f } *scale);
 }
 
 bool  PlayerCharacter::CollisionVsEnemies(Collider* collider, int damage, bool power, float force, int effectIdx, float effectScale)
@@ -339,6 +358,7 @@ void PlayerCharacter::UpdateSkillTimers(float elapsedTime)
 
 void PlayerCharacter::Update(float elapsedTime)
 {
+	std::lock_guard<std::mutex> lock(m_mut);
 	{
 		ProfileScopedSection_2("input", ImGuiControl::Profiler::Red);
 		if (IsPlayer()) // 自機限定 ステート管理
@@ -346,6 +366,23 @@ void PlayerCharacter::Update(float elapsedTime)
 			input = 0;
 			UpdateTarget();
 			UpdateInput();
+		}
+		else
+		{
+			velocity.x = 0.0f;
+			velocity.z = 0.0f;
+			if (m_tempData.time > 0.0f)
+			{
+				m_tempData.timer += elapsedTime;
+				float rate = m_tempData.timer / m_tempData.time;
+				position = {
+					Mathf::Lerp(m_tempData.position.x, m_tempData.sync_data.position[0], rate),
+					//Mathf::Lerp(m_tempData.position.y, m_tempData.sync_data.position[1], rate),
+					position.y,
+					Mathf::Lerp(m_tempData.position.z, m_tempData.sync_data.position[2], rate),
+				};
+				angle.y = Mathf::LerpRadian(m_tempData.angle, m_tempData.sync_data.rotate, rate);
+			}
 		}
 	}
 	{
@@ -358,6 +395,7 @@ void PlayerCharacter::Update(float elapsedTime)
 	}
 	{
 		ProfileScopedSection_2("character", ImGuiControl::Profiler::Purple);
+
 		Character::Update(elapsedTime);
 	}
 }
@@ -509,14 +547,11 @@ void PlayerCharacter::SkillCost(int idx)
 	ResetSkillTimer(idx);
 }
 
-
 // NETWORK
-
 void PlayerCharacter::GetSyncData(SYNC_DATA& data)
 {
 	std::lock_guard<std::mutex> lock(m_mut);
 	data.client_id = m_client_id;
-	data.sync_count_id = m_sync_count_id;
 	data.position[0] = position.x;
 	data.position[1] = position.y;
 	data.position[2] = position.z;
@@ -526,20 +561,34 @@ void PlayerCharacter::GetSyncData(SYNC_DATA& data)
 	data.rotate = angle.y;
 	data.state = static_cast<uint8_t>(stateMachine->GetStateIndex());
 	data.sub_state = static_cast<uint8_t>(stateMachine->GetState()->GetSubStateIndex());
-	m_sync_count_id++;
 }
 
 void PlayerCharacter::ImportSyncData(const SYNC_DATA& data)
 {
-	if (CheckSync(data.sync_count_id))
+	if (m_tempData.old_sync_count < data.sync_count_id)
 	{
 		std::lock_guard<std::mutex> lock(m_mut);
-		m_sync_data = data;
+		if (m_tempData.old_sync_count == 0)	// 初めての同期
+		{
+			SetPosition({ data.position[0], data.position[1], data.position[2] });
+			Stop();
+			//AddImpulse({ data.velocity[0], data.velocity[1], data.velocity[2] });
+			SetAngle({ 0.0f, data.rotate, 0.0f });
+			Show();
+		}
+		m_tempData.old_sync_count = m_tempData.sync_data.sync_count_id;
+		m_tempData.timer = 0.0f;
+		m_tempData.position = position;
+		m_tempData.angle = angle.y;
+		m_tempData.sync_data = data;
+		m_tempData.time = (m_tempData.sync_data.sync_count_id - m_tempData.old_sync_count) * 0.25f;
 
-		SetPosition({ data.position[0], data.position[1], data.position[2] });
-		Stop();
-		AddImpulse({ data.velocity[0], data.velocity[1], data.velocity[2] });
-		SetAngle({ 0.0f, data.rotate, 0.0f });
+		if (data.velocity[1] > 0.0f)
+		{
+			position.y = data.position[1];
+			velocity.y = data.velocity[1];
+		}
+
 		if (data.state != static_cast<uint8_t>(GetStateMachine()->GetStateIndex()))
 		{
 			GetStateMachine()->ChangeState(data.state);
@@ -548,6 +597,5 @@ void PlayerCharacter::ImportSyncData(const SYNC_DATA& data)
 		{
 			GetStateMachine()->ChangeSubState(data.sub_state);
 		}
-		Show();
 	}
 }

@@ -4,12 +4,9 @@
 #include "TAKOEngine/Physics/UnrotatedBoxCollider.h"
 #include "TAKOEngine/Physics/BoundingBoxCollider.h"
 #include "TAKOEngine/Physics/SphereCollider.h"
+#include "TAKOEngine/Physics/CapsuleCollider.h"
 #include "TAKOEngine/Physics/ModelCollider.h"
 #include "TAKOEngine/Physics/MapCollider.h"
-
-#include "TAKOEngine/Rendering/Model/ModelDX11.h"
-#include "TAKOEngine/Rendering/Model/NewModelDX11.h"
-#include "TAKOEngine/Rendering/Model/ModelDX12.h"
 
 /**************************************************************************//**
 	@brief		コンストラクタ（引数付き）
@@ -17,9 +14,9 @@
 	@param[in]	scaling		モデルスケール
 	@param[in]	renderMode	レンダーボード
 *//***************************************************************************/
-ModelObject::ModelObject(const char* filename, float scaling, ModelObject::RENDER_MODE renderMode)
+ModelObject::ModelObject(const char* filename, float scaling, ModelObject::RENDER_MODE renderMode, int modelType)
 {
-	LoadModel(filename, scaling, renderMode);
+	LoadModel(filename, scaling, renderMode, modelType);
 }
 
 /**************************************************************************//**
@@ -27,18 +24,22 @@ ModelObject::ModelObject(const char* filename, float scaling, ModelObject::RENDE
 	@param[in]	filename	戻るファイルパス
 	@param[in]	scaling		モデルスケール
 	@param[in]	renderMode	レンダーモード
+	@param[in]	modelType	モデル作り方分け
 	return		なし
 *//***************************************************************************/
-void ModelObject::LoadModel(const char* filename, float scaling, ModelObject::RENDER_MODE renderMode)
+void ModelObject::LoadModel(const char* filename, float scaling, ModelObject::RENDER_MODE renderMode, int modelType)
 {
 	if (strlen(filename) == 0) return;
 
-	switch (renderMode)
+	m_renderMode = renderMode;
+
+	switch (m_renderMode)
 	{
 	case ModelObject::RENDER_MODE::DX11:
-		m_pmodels.push_back(std::make_unique<ModelDX11>(T_GRAPHICS.GetDevice(), filename, scaling));
+		m_pmodels.push_back(std::make_unique<ModelDX11>(T_GRAPHICS.GetDevice(), filename, scaling, modelType));
 		break;
 	case ModelObject::RENDER_MODE::DX11GLTF:
+		m_pmodels.push_back(std::make_unique<GLTFModelDX11>(T_GRAPHICS.GetDevice(), filename, scaling, modelType));
 		break;
 	case ModelObject::RENDER_MODE::DX12:
 		break;
@@ -111,12 +112,12 @@ bool ModelObject::IsPlayAnimation(int idx)
 *//***************************************************************************/
 void ModelObject::Update(float elapsedTime)
 {
+	// 行列更新
+	UpdateTransform();
+
 	for (auto& model : m_pmodels)
 	{
 		if (model == nullptr) continue;
-
-		// 行列更新
-		UpdateTransform();
 
 		// アニメーション更新
 		model->UpdateAnimation(elapsedTime * m_animationSpeed);
@@ -136,8 +137,15 @@ void ModelObject::Render(const RenderContext& rc)
 	for (auto& model : m_pmodels)
 	{
 		if (model == nullptr) return;
-		// 描画
+
 		ModelShader* shader = T_GRAPHICS.GetModelShader(m_shaderId);
+
+		if (m_renderMode == DX11GLTF)
+		{
+			shader = T_GRAPHICS.GetModelShader(ModelShaderId::Lambert);
+		}
+
+		// 描画
 		shader->Begin(rc);
 		shader->Draw(rc, model.get(), m_color);
 		shader->End(rc);
@@ -153,14 +161,17 @@ void ModelObject::SetCollider(Collider::COLLIDER_TYPE collider, int idx)
 {
 	switch (collider)
 	{
+	case Collider::COLLIDER_TYPE::SPHERE:
+		this->collider = std::make_unique<SphereCollider>();
+		break;
 	case Collider::COLLIDER_TYPE::UNROTATED_BOX:
 		this->collider = std::make_unique<UnrotatedBoxCollider>();
 		break;
+	case Collider::COLLIDER_TYPE::CAPSULE:
+		this->collider = std::make_unique<CapsuleCollider>();
+		break;
 	case Collider::COLLIDER_TYPE::MODEL:
 		this->collider = std::make_unique<ModelCollider>(m_pmodels[idx].get());
-		break;
-	case Collider::COLLIDER_TYPE::SPHERE:
-		this->collider = std::make_unique<SphereCollider>();
 		break;
 	case Collider::COLLIDER_TYPE::BOUNDING_BOX:
 		this->collider = std::make_unique<BoundingBoxCollider>(m_pmodels[idx].get());

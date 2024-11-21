@@ -10,6 +10,7 @@ namespace PlayerCharacterState
 {
 	void PlayerTransition(PlayerCharacter* owner, uint32_t flags)
 	{
+		if (!owner->IsPlayer()) return;
 		if (flags & flag_Dodge && owner->InputDodge())
 		{
 			owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::DODGE));
@@ -59,7 +60,7 @@ namespace PlayerCharacterState
 	// 待機ステート
 	void IdleState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::Idle, true, 0.1f);
+		owner->SetAnimation(Player::Animation::IDLE, true, 0.1f);
 	}
 	void IdleState::Execute(float elapsedTime)
 	{
@@ -80,7 +81,7 @@ namespace PlayerCharacterState
 	// 移動ステート
 	void MoveState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::Running_A, true, 0.1f);
+		owner->SetAnimation(Player::Animation::MOVE, true, 0.1f);
 	}
 	void MoveState::Execute(float elapsedTime)
 	{
@@ -101,7 +102,7 @@ namespace PlayerCharacterState
 	// ジャンプステート
 	void JumpState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::Jump_Start, false, 0.1f);
+		owner->SetAnimation(Player::Animation::MOVE, false, 0.1f);
 	}
 	void JumpState::Execute(float elapsedTime)
 	{
@@ -109,7 +110,7 @@ namespace PlayerCharacterState
 
 		PlayerTransition(
 			owner,
-			flag_Fall | flag_Dodge | flag_AttackN | flag_AttackS | flag_Skill_1
+			flag_Fall | flag_Dodge | flag_Ground | flag_AttackN | flag_AttackS | flag_Skill_1
 		);
 	}
 	void JumpState::Exit()
@@ -119,7 +120,7 @@ namespace PlayerCharacterState
 	// 落下ステート
 	void FallState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::Jump_Idle, true, 0.1f);
+		owner->SetAnimation(Player::Animation::MOVE, true, 0.1f);
 	}
 	void FallState::Execute(float elapsedTime)
 	{
@@ -137,7 +138,7 @@ namespace PlayerCharacterState
 	// 着地ステート
 	void LandState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::Jump_Land, false, 0.1f);
+		owner->SetAnimation(Player::Animation::MOVE_START, false, 0.1f);
 	}
 	void LandState::Execute(float elapsedTime)
 	{
@@ -158,7 +159,7 @@ namespace PlayerCharacterState
 	// 回避ステート
 	void DodgeState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::Dodge_Forward, false, 0.0f);
+		owner->SetAnimation(Player::Animation::MOVE, false, 0.0f);
 		owner->SetHurtCoolTime(0.2f);
 
 		// MP消費
@@ -180,7 +181,7 @@ namespace PlayerCharacterState
 	// 怪我
 	void HurtState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::Hit_A, false, 0.1f);
+		owner->SetAnimation(Player::Animation::IDLE, false, 0.1f);
 	}
 	void HurtState::Execute(float elapsedTime)
 	{
@@ -195,7 +196,7 @@ namespace PlayerCharacterState
 	// 死亡
 	void DeathState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::Death_A, false, 0.1f);
+		owner->SetAnimation(Player::Animation::IDLE, false, 0.1f);
 		owner->GetCollider()->SetEnable(false);
 	}
 	void DeathState::Execute(float elapsedTime)
@@ -207,7 +208,7 @@ namespace PlayerCharacterState
 	// 待機用ステート
 	void WaitState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::Idle, true, 0.1f);
+		owner->SetAnimation(Player::Animation::IDLE, true, 0.1f);
 	}
 	void WaitState::Execute(float elapsedTime)
 	{
@@ -218,7 +219,7 @@ namespace PlayerCharacterState
 	// 待機用 (準備完了)ステート
 	void ReadyState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::Cheer, true, 0.1f);
+		owner->SetAnimation(Player::Animation::IDLE, true, 0.1f);
 	}
 	void ReadyState::Execute(float elapsedTime)
 	{
@@ -226,8 +227,6 @@ namespace PlayerCharacterState
 	void ReadyState::Exit()
 	{
 	}
-
-
 
 	//斧
 	namespace Axe
@@ -450,4 +449,3 @@ namespace PlayerCharacterState
 		}
 	}
 }
-

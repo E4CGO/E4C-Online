@@ -1,4 +1,4 @@
-//! @file Cillision.cpp
+//! @file Collision.cpp
 //! @note 当たり判定処理総まとめ
 
 #include "Collision.h"
@@ -1536,7 +1536,7 @@ bool Collision::IntersectRayVsOrientedCylinder(
 	if (result)
 	{
 		// resultの各パラメータを算出する
-		result->distance = DirectX::XMVectorGetX(DirectX::XMVector3Length(DirectX::XMVectorScale(n, hitDistance)));
+		result->distance = rayDist * hitDistance;
 		result->position = DirectX::XMVectorAdd(rayStart, DirectX::XMVectorScale(rayDirection, result->distance));
 		result->normal = DirectX::XMVectorNegate(rayDirection);
 

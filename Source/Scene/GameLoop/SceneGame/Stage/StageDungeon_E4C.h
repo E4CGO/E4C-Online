@@ -6,7 +6,6 @@
 #include "GameObject/ModelObject.h"
 #include "GameObject/GameObject.h"
 #include "GameObject/Character/Player/PlayerCharacter.h"
-#include "GameObject/Props/Teleporter.h"
 #include "TAKOEngine/Rendering/Shaders/PlaneShader.h"
 
 #include "Scene/Scene.h"
@@ -41,6 +40,17 @@ public:
 	// ある場合は配列に従い生成を行う
 	void GenerateDungeon();
 
+	
+	enum PHASE
+	{
+		NORMAL,
+	};
+
+	enum STATE
+	{
+
+	};
+
 	void Initialize() override;
 
 	void Update(float elapsedTime) override;
@@ -48,12 +58,7 @@ public:
 	void Render() override;
 protected:
 	void OnPhase() override;
-public:
-	enum PHASE
-	{
-		NORMAL,
-	};
-private:
+protected:
 	SceneGame_E4C* m_pScene;
 
 	std::unique_ptr<ThridPersonCameraController> cameraController;
@@ -66,7 +71,6 @@ private:
 
 	std::unique_ptr<ModelObject> testModel;
 
-	std::unique_ptr <Teleporter> teleporter;
 	std::unique_ptr <Plane> plane;
 	std::unique_ptr <Plane> portal;
 
@@ -76,4 +80,6 @@ private:
 	float transitionTime = 0.0f;
 	float transitionDuration = 2.f;  // 5秒かけて移動
 	int currentSegment = 0;
+
+	
 };

@@ -181,7 +181,7 @@ public:
 	bool ReleaseSkill4() { return (input & Input_R_Skill_4) > 0; }
 
 	bool IsMove() { return velocity.x != 0.0f || velocity.z != 0.0f; }
-	bool IsFall() { return velocity.y < -2.0f; }
+	bool IsFall() { return velocity.y < -10.0f; }
 
 	void FaceToCamera();
 	void TurnByInput();
@@ -195,16 +195,6 @@ public:
 
 	const std::string& GetName() { return m_name; }
 	void SetName(const char* name) { this->m_name = name; }
-
-	bool CheckSync(uint64_t sync_count_id)
-	{
-		if (sync_count_id > m_sync_count_id)
-		{
-			m_sync_count_id = sync_count_id;
-			return true;
-		}
-		return false;
-	}
 
 	void SetMenuVisibility(bool value) { this->m_menuVisible = value; }
 	bool GetMenuVisibility() { return this->m_menuVisible; }
@@ -276,7 +266,6 @@ protected:
 
 private:
 	uint64_t m_client_id = 0;
-	uint64_t m_sync_count_id = 0;
 
 	uint32_t input = 0;						// キー入力
 	DirectX::XMFLOAT2 inputDirection = {};	// 移動方向
@@ -326,7 +315,15 @@ protected:
 
 	// 同期用
 	std::mutex m_mut;
-	SYNC_DATA m_sync_data;
+	// 同期補間
+	struct TEMP_DATA {
+		float timer = 0.0f;
+		float time = 0.0f;
+		DirectX::XMFLOAT3 position = {};
+		float angle = 0.0f;
+		uint64_t old_sync_count = 0;
+		SYNC_DATA sync_data = {};
+	} m_tempData;
 };
 
 #endif // __INCLUDED_PLAYER_CHARACTER_H__

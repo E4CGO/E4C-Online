@@ -1175,9 +1175,9 @@ void QuadtreeNodeManager::CollisionSphereVsTriangle(uint32_t target, bool single
 		{
 			DirectX::XMVECTOR triPos[3] =
 			{
-				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[0]),
-				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[1]),
-				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[2])
+				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(j).position[0]),
+				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(j).position[1]),
+				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(j).position[2])
 			};
 			if (Collision::IntersectSphereVsTriangle(
 				DirectX::XMLoadFloat3(&targetNode.GetSpheres().at(i)->position), 
@@ -1228,9 +1228,9 @@ void QuadtreeNodeManager::CollisionSphereVsTriangle(uint32_t target, bool single
 		{
 			DirectX::XMVECTOR triPos[3] =
 			{
-				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[0]),
-				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[1]),
-				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[2])
+				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(j).position[0]),
+				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(j).position[1]),
+				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(j).position[2])
 			};
 			if (Collision::IntersectSphereVsTriangle(
 				DirectX::XMLoadFloat3(&upperListSphere->at(i)->position), 
@@ -1303,9 +1303,9 @@ void QuadtreeNodeManager::CollisionCapsuleVsTriangle(uint32_t target, bool singl
 		{
 			DirectX::XMVECTOR triPos[3] =
 			{
-				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[0]),
-				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[1]),
-				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[2])
+				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(j).position[0]),
+				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(j).position[1]),
+				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(j).position[2])
 			};
 			if (Collision::IntersectCapsuleVsTriangle(
 				DirectX::XMLoadFloat3(&targetNode.GetCapsules().at(i)->position), 
@@ -1360,9 +1360,9 @@ void QuadtreeNodeManager::CollisionCapsuleVsTriangle(uint32_t target, bool singl
 		{
 			DirectX::XMVECTOR triPos[3] =
 			{
-				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[0]),
-				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[1]),
-				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[2])
+				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(j).position[0]),
+				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(j).position[1]),
+				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(j).position[2])
 			};
 			if (Collision::IntersectCapsuleVsTriangle(
 				DirectX::XMLoadFloat3(&upperListCapsule->at(i)->position), 
@@ -1437,9 +1437,9 @@ void QuadtreeNodeManager::CollisionAABBVsTriangle(uint32_t target, bool singleNo
 		{
 			DirectX::XMVECTOR triPos[3] =
 			{
-				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[0]),
-				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[1]),
-				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[2])
+				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(j).position[0]),
+				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(j).position[1]),
+				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(j).position[2])
 			};
 			if (Collision::IntersectAABBVsTriangle(
 				DirectX::XMLoadFloat3(&targetNode.GetAABBs().at(i)->position), 
@@ -1490,9 +1490,9 @@ void QuadtreeNodeManager::CollisionAABBVsTriangle(uint32_t target, bool singleNo
 		{
 			DirectX::XMVECTOR triPos[3] =
 			{
-				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[0]),
-				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[1]),
-				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(i).position[2])
+				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(j).position[0]),
+				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(j).position[1]),
+				DirectX::XMLoadFloat3(&targetNode.GetTriangles().at(j).position[2])
 			};
 			if (Collision::IntersectAABBVsTriangle(
 				DirectX::XMLoadFloat3(&upperListAABB->at(i)->position), 

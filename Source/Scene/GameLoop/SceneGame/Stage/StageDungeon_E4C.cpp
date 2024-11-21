@@ -1,7 +1,6 @@
 ﻿#include "StageDungeon_E4C.h"
 
 #include "GameObject/ModelObject.h"
-#include "GameObject/Props/Teleporter.h"
 #include "Scene/Stage/StageManager.h"
 #include "Scene/Stage/Stage.h"
 
@@ -179,9 +178,6 @@ void StageDungeon_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
 
-	teleporter = std::make_unique<Teleporter>("Data/Model/Cube/testCubes.glb", 1.0);
-	//teleporter->SetPosition({ 50, 0, 60 });
-
 	// 光
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
 	Light* dl = new Light(LightType::Directional);
@@ -191,6 +187,7 @@ void StageDungeon_E4C::Initialize()
 	// プレイヤー
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
 	player->SetPosition({ 5.0f, 5.0f, 5.0f });
+	player->GetStateMachine()->ChangeState(PlayerCharacter::STATE::IDLE);
 
 	// カメラ設定
 	Camera* mainCamera = CameraManager::Instance().GetCamera();
@@ -205,7 +202,6 @@ void StageDungeon_E4C::Initialize()
 		player->GetPosition(),			// 注視点
 		{ 0, 0.969f, -0.248f }	// 上ベクトル
 	);
-
 
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(mainCamera);
@@ -231,7 +227,6 @@ void StageDungeon_E4C::Initialize()
 
 	// 一番遠い部屋のうち、ランダムな一つを抽選しテレポーターを設置する
 	RoomBase* lastRoom = rootRoom->GetFarthestChild().at(std::rand() % rootRoom->GetFarthestChild().size());
-	teleporter->SetPosition(lastRoom->GetPosition());
 
 	// 部屋のモデルを配置
 	for (RoomBase* room : rootRoom->GetAll())
@@ -248,6 +243,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	Online::OnlineController* onlineController = m_pScene->GetOnlineController();
 	if (onlineController->GetState() == Online::OnlineController::STATE::LOGINED)
 	{
+		onlineController->RoomIn();
 		onlineController->BeginSync();
 	}
 
@@ -283,10 +279,6 @@ void StageDungeon_E4C::Update(float elapsedTime)
 		T_INPUT.KeepCursorCenter();
 	}
 	PlayerCharacterManager::Instance().Update(elapsedTime);
-	teleporter->Update(elapsedTime);
-	teleporter->CheckPlayer(PlayerCharacterManager::Instance().GetPlayerCharacterById(GAME_DATA.GetClientId())->GetPosition(), elapsedTime);
-
-	if (teleporter->GetPortalReady()) STAGES.ChangeStage(new TestingStage);
 
 	timer += elapsedTime;
 }
@@ -324,5 +316,4 @@ void StageDungeon_E4C::Render()
 
 void StageDungeon_E4C::OnPhase()
 {
-
 }

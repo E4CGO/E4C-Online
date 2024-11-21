@@ -20,7 +20,8 @@ VS_OUT main(VS_IN vin)
     VS_OUT vout;
     
     vin.position.w = 1;
-    vout.position = mul(vin.position, mul(world, view_projection));
+    float4x4 viewProjection = mul(View, Projection);
+    vout.position = mul(vin.position, mul(world, viewProjection));
     vout.w_position = mul(vin.position, world);
     
     vin.normal.w = 0;
