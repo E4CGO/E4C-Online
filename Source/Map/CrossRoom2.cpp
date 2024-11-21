@@ -64,10 +64,10 @@ void CrossRoom2::LoadMapData()
 	DirectX::XMFLOAT4 pillarColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 	// モンスタースポナー（実装予定）
-	m_tileDatas.emplace_back(TILE_DATA(TileType::SPAWNER,
-		{ 0.0f, 1.5f, 12.0f },
-		{ 0.0f, 0.0f, 0.0f },
-		{ 1.0f, 1.0f, 1.0f }));
+	//m_tileDatas.emplace_back(TILE_DATA(TileType::SPAWNER,
+	//	{ 0.0f, 1.5f, 12.0f },
+	//	{ 0.0f, 0.0f, 0.0f },
+	//	{ 1.0f, 1.0f, 1.0f }));
 
 	// 床
 	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
