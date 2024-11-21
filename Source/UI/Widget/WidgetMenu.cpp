@@ -114,3 +114,7 @@ void WidgetMenu::Render(const RenderContext& rc)
 	}
 	if (settingWindow) settingWindow->Render(rc);
 }
+
+void WidgetMenu::RenderDX12(const RenderContextDX12& rc)
+{
+}

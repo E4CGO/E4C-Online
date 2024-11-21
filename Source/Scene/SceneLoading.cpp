@@ -46,6 +46,12 @@ void SceneLoading::Render()
 	T_TEXT.End();
 }
 
+void SceneLoading::RenderDX12()
+{
+	T_GRAPHICS.BeginRender();
+	T_GRAPHICS.End();
+}
+
 void SceneLoading::LoadingThread(SceneLoading* scene)
 {
 	srand(static_cast <unsigned> (time(NULL)));

@@ -7,7 +7,8 @@ SamplerState diffuseMapSamplerState : register(s0);
 
 PSOutput main(VS_OUT pin) : SV_TARGET
 {
-    float4 diffuseColor = diffuseMap.Sample(diffuseMapSamplerState, pin.texcoord) * pin.color;
+    float4 diffuseColor = float4(diffuseMap.Sample(diffuseMapSamplerState, pin.texcoord).rgb, 1.0f) * pin.color;
+    
     if (linearGamma != 1.0f) diffuseColor.rgb = pow(diffuseColor, 1.0f / linearGamma);
  
     float3 N = normalize(pin.normal);

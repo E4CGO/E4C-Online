@@ -1,5 +1,5 @@
 ﻿//! @file WidgetDragFloat.cpp
-//! @note 
+//! @note
 
 #include "WidgetDragFloat.h"
 
@@ -7,7 +7,7 @@
 #include "TAKOEngine/Rendering/ResourceManager.h"
 
 /**************************************************************************//**
- 	@brief		コンストラクタ
+	@brief		コンストラクタ
 	@param[in]	rate	初期値%
 *//***************************************************************************/
 WidgetDragBar::WidgetDragBar(float rate) : m_rate(rate)
@@ -17,7 +17,7 @@ WidgetDragBar::WidgetDragBar(float rate) : m_rate(rate)
 }
 
 /**************************************************************************//**
- 	@brief		推し続ける処理
+	@brief		推し続ける処理
 	@param[in]	なし
 	@return		なし
 *//***************************************************************************/
@@ -28,7 +28,7 @@ void WidgetDragBar::OnPress()
 	T_INPUT.SetCursorWinPositionY(m_position.y + m_size.y * 0.5f);
 }
 /**************************************************************************//**
- 	@brief		描画処理
+	@brief		描画処理
 	@param[in]	rc	レンダーコンテンツ
 	@return		なし
 *//***************************************************************************/
@@ -46,8 +46,11 @@ void WidgetDragBar::Render(const RenderContext& rc)
 		m_size.x * 0.05f, m_size.y
 	);
 }
+void WidgetDragBar::RenderDX12(const RenderContextDX12& rc)
+{
+}
 /**************************************************************************//**
- 	@brief		コンストラクタ
+	@brief		コンストラクタ
 	@param[in]	label		ラベル
 	@param[in]	value		float値参照ポインタ
 	@param[in]	minValue	最大値
@@ -59,7 +62,7 @@ WidgetDragFloat::WidgetDragFloat(const char* label, float* value, float minValue
 }
 
 /**************************************************************************//**
- 	@brief		位置を設定
+	@brief		位置を設定
 	@param[in]	position	位置
 	@return		なし
 *//***************************************************************************/
@@ -69,7 +72,7 @@ void WidgetDragFloat::SetPosition(const DirectX::XMFLOAT2& position)
 	m_pBar->SetPosition(position + DirectX::XMFLOAT2{ 0.0f,  m_size.y * 0.6f });
 }
 /**************************************************************************//**
- 	@brief		サイズ設定
+	@brief		サイズ設定
 	@param[in]	size	サイズ
 	@return		なし
 *//***************************************************************************/
@@ -79,7 +82,7 @@ void WidgetDragFloat::SetSize(const DirectX::XMFLOAT2& size)
 	m_pBar->SetSize({ size.x, size.y * 0.3f });
 }
 /**************************************************************************//**
- 	@brief		更新処理
+	@brief		更新処理
 	@param[in]	elapsedTime	経過時間
 	@return		なし
 *//***************************************************************************/
@@ -90,7 +93,7 @@ void WidgetDragFloat::Update(float elapsedTime)
 	*this->m_pValue = m_minValue + (m_maxValue - m_minValue) * m_pBar->GetRate();
 }
 /**************************************************************************//**
- 	@brief		描画処理
+	@brief		描画処理
 	@param[in]	rc	レンダーコンテンツ
 	@return		なし
 *//***************************************************************************/
@@ -107,4 +110,8 @@ void WidgetDragFloat::Render(const RenderContext& rc)
 		1
 	);
 	m_pBar->Render(rc);
+}
+
+void WidgetDragFloat::RenderDX12(const RenderContextDX12& rc)
+{
 }

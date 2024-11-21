@@ -12,6 +12,7 @@ public:
 	WidgetEnemiesHp(DirectX::XMFLOAT2 size);
 
 	virtual void Render(const RenderContext& rc) override;
+	virtual void RenderDX12(const RenderContextDX12& rc) override;
 private:
 	std::shared_ptr<Sprite> gauge;
 };

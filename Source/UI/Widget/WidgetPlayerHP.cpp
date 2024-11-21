@@ -129,3 +129,7 @@ void WidgetPlayerHP::Render(const RenderContext& rc)
 		1
 	);
 }
+
+void WidgetPlayerHP::RenderDX12(const RenderContextDX12& rc)
+{
+}

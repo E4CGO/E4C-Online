@@ -12,6 +12,7 @@ public:
 	WidgetSkillTimer();
 
 	void Render(const RenderContext& rc);
+	void RenderDX12(const RenderContextDX12& rc);
 private:
 	enum ICON {
 		ICON_ROCK,			// スキルアイコン_岩.png

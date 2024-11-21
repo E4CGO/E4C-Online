@@ -79,3 +79,7 @@ void WidgetGem::Render(const RenderContext& rc)
 		);
 	}
 }
+
+void WidgetGem::RenderDX12(const RenderContextDX12& rc)
+{
+}

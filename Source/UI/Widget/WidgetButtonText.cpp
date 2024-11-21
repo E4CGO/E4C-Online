@@ -1,5 +1,5 @@
 ﻿//! @file WidgetButtonText.cpp
-//! @note 
+//! @note
 
 #include "WidgetButtonText.h"
 #include "TAKOEngine/Runtime/tentacle_lib.h"
@@ -34,4 +34,8 @@ void WidgetButtonText::Render(const RenderContext& rc)
 		m_scale,
 		0
 	);
+}
+
+void WidgetButtonText::RenderDX12(const RenderContextDX12& rc)
+{
 }

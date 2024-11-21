@@ -72,7 +72,6 @@ private:
 		// Setting UI
 	};
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
-	std::unique_ptr<SpriteDX12>			m_sprites[8];
 
 	// Model Preload
 	std::unordered_set<const char*> modelList = {

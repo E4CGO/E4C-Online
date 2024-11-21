@@ -1,5 +1,5 @@
 ﻿//! @file Widget.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDED_UI_WIDGET__
 #define __INCLUDED_UI_WIDGET__
@@ -8,7 +8,7 @@
 
 #include "TAKOEngine/Rendering/RenderContext.h"
 /**************************************************************************//**
-	@class	
+	@class
 	@brief	UIウィジェット基底クラス
 	@par	[説明]
 *//***************************************************************************/
@@ -24,6 +24,8 @@ public:
 	virtual void Update(float elapsedTime) {};
 	// 描画処理
 	virtual void Render(const RenderContext& rc) = 0;
+
+	virtual void RenderDX12(const RenderContextDX12& rc) = 0;
 public:
 	// アクセス
 

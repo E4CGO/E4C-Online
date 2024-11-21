@@ -1,10 +1,8 @@
 ﻿//! @file WidgetMenu.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDE_WIDGET_MENU__
 #define __INCLUDE_WIDGET_MENU__
-
-
 
 #include <memory>
 #include <vector>
@@ -28,6 +26,7 @@ public:
 
 	void Update(float elapsedTime);
 	void Render(const RenderContext& rc);
+	void RenderDX12(const RenderContextDX12& rc);
 
 	bool IsShow() { return enable; }
 	void Show();

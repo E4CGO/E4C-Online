@@ -33,12 +33,6 @@ void SceneTitle_E4C::Initialize()
 	// フレームバッファマネージャー
 	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
 
-	// モデル
-	{
-		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/UI/start.png");
-		m_sprites[1] = std::make_unique<SpriteDX12>(1, "Data/Sprites/UI/exit.png");
-	}
-
 	// 光
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
 	Light* dl = new Light(LightType::Directional);
@@ -150,13 +144,7 @@ void SceneTitle_E4C::RenderDX12()
 		rc.d3d_command_list = m_frameBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
-		// スプライト描画
-		if (m_sprites[0] != nullptr)
-		{
-			m_sprites[0]->Begin(rc);
-			m_sprites[0]->Draw(0, 0, 100, 100, 0, 1, 1, 1, 1);
-			m_sprites[0]->End(m_frameBuffer->GetCommandList());
-		}
+		UI.RenderDX12(rc);
 	}
 	T_GRAPHICS.End();
 }

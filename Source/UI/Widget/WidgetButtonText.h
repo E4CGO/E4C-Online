@@ -1,5 +1,5 @@
 ﻿//! @file WidgetButtonText.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDED_WIDGET_BUTTON_TEXT__
 #define __INCLUDED_WIDGET_BUTTON_TEXT__
@@ -22,6 +22,7 @@ public:
 	~WidgetButtonText() {};
 	// 描画処理
 	virtual void Render(const RenderContext& rc);
+	virtual void RenderDX12(const RenderContextDX12& rc);
 protected:
 	// 文字
 	std::string m_text;

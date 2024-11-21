@@ -11,6 +11,8 @@ public:
 	~WidgetRoomOption() {}
 
 	virtual void Render(const RenderContext& rc);
+
+	virtual void RenderDX12(const RenderContextDX12& rc);
 private:
 	void NameWithToken();
 private:
