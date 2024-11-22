@@ -72,7 +72,6 @@ private:
 		// Setting UI
 	};
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
-	std::unique_ptr<SpriteDX12>			m_sprites[8];
 
 	// Model Preload
 	std::unordered_set<const char*> modelList = {
@@ -81,10 +80,15 @@ private:
 		"Data/Model/Character/HEAD_BARB.glb",
 		"Data/Model/Character/BODY_BARB.glb",
 		"Data/Model/Character/HEAD_MAGE.glb",
-		"Data/Model/Character/BODY_MAGE.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_BODY_ANIMATION.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_BOTTOM_ANIMATION.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_TOP_ANIMATION.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_HAIR_ANIMATION.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_SWORD_ANIMATION.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD1_ANIMATION.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD2_ANIMATION.glb",
 	};
 	std::unordered_set<std::shared_ptr<ModelResource>> modelPreLoad;
-
 
 	static const int m_maxCharacters;
 

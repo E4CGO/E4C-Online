@@ -33,18 +33,11 @@ void SceneCharacter_E4C::Initialize()
 		modelPreLoad.insert(RESOURCE.LoadModelResource(filename));
 	}
 
-
 	//シャドウマップレンダラ
 	shadowMapRenderer->Initialize();
 
 	// フレームバッファマネージャー
 	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
-
-	// モデル
-	{
-		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/UI/start.png");
-		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/UI/exit.png");
-	}
 
 	m_previewCharacters.resize(m_maxCharacters);
 
@@ -179,13 +172,7 @@ void SceneCharacter_E4C::RenderDX12()
 		rc.d3d_command_list = m_frameBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
-		// スプライト描画
-		if (m_sprites[0] != nullptr)
-		{
-			m_sprites[0]->Begin(rc);
-			m_sprites[0]->Draw(0, 0, 100, 100, 0, 1, 1, 1, 1);
-			m_sprites[0]->End(m_frameBuffer->GetCommandList());
-		}
+		UI.RenderDX12(rc);
 	}
 	TentacleLib::graphics.End();
 }

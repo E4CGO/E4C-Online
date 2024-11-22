@@ -1,5 +1,5 @@
 //! @file Grahics.h
-//! @note 
+//! @note
 
 #ifndef __GRAHICS_GRAHICS_H__
 #define __GRAHICS_GRAHICS_H__
@@ -25,6 +25,7 @@
 #include "TAKOEngine/Rendering/ConstantBuffer.h"
 #include "TAKOEngine/Tool/ImGuiRenderer.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
+#include "TAKOEngine/Rendering/ParticleRenderer.h"
 
 #define MAX_BUFFER_COUNT (2)
 
@@ -36,6 +37,9 @@ enum class ModelShaderId
 	ShadowMap,
 	Plane,
 	Portal,
+	Billboard,
+	Fireball,
+	Lambert,
 
 	EnumCount
 };
@@ -48,6 +52,7 @@ enum class ModelShaderDX12Id
 	PhongInstancing,
 	Toon,
 	ToonInstancing,
+	Skydome,
 
 	EnumCount
 };
@@ -73,6 +78,7 @@ enum class SpriteShaderDX12Id
 	GaussianBlur,
 	ColorGrading,
 	Finalpass,
+	Particle,
 
 	EnumCount
 };
@@ -114,7 +120,7 @@ static const DXGI_FORMAT DepthStencilFormat = DXGI_FORMAT_D32_FLOAT;
 //*******************************************************
 // @class Graphics
 // @brief グラフィックスエンジン
-// @par   
+// @par
 //*******************************************************
 class Graphics
 {
@@ -183,6 +189,9 @@ public:
 	//スキニング取得
 	SkinningPipeline* GetSkinningPipeline() const { return m_skinning_pipeline.get(); }
 
+	// パーティクル取得
+	ParticleCompute* GetParticleCompute() const { return m_compute.get(); }
+
 	// ImGUIンレンダラ取得
 	ImGuiRenderer* GetImGUIRenderer() const { return m_imgui_renderer.get(); }
 
@@ -230,6 +239,7 @@ public:
 
 	// テクスチャ読み込み
 	HRESULT LoadTexture(const char* filename, ID3D12Resource** d3d_resource);
+	HRESULT LoadCubeTexture(const std::wstring& filename, ID3D12Resource** d3d_resource);
 
 	// テクスチャ作成
 	HRESULT CreateTexture(const BYTE* pixels, UINT width, UINT height, DXGI_FORMAT format, ID3D12Resource** d3d_resource);
@@ -264,6 +274,9 @@ public:
 private:
 	// イメージコピー
 	HRESULT CopyImage(const BYTE* pixels, UINT width, UINT height, DXGI_FORMAT format, ID3D12Resource* resource);
+
+	// キューブマップ用イメージコピー
+	HRESULT CopyImageForCubeMap(const D3D12_SUBRESOURCE_DATA* subresources, UINT width, UINT height, DXGI_FORMAT format, ID3D12Resource* d3d_resource);
 
 	static UINT BitsPerPixel(DXGI_FORMAT fmt);
 
@@ -303,6 +316,9 @@ private:
 	//スキニング
 	std::unique_ptr<SkinningPipeline>	m_skinning_pipeline;
 
+	// パーティクル
+	std::unique_ptr<ParticleCompute> m_compute;
+
 	std::mutex mutex;	// ミューテックス
 
 	static Graphics* s_instance;
@@ -318,7 +334,7 @@ private:
 	CbScene* cb_scene_data = nullptr;
 
 	D3D12_VIEWPORT m_viewport;	//ビューポート
-	UINT frame_buffer_index  = 0;
+	UINT frame_buffer_index = 0;
 
 	Microsoft::WRL::ComPtr<ID3D12Device>				m_d3d_device;
 	Microsoft::WRL::ComPtr<IDXGIFactory4>				m_dxgi_factory;

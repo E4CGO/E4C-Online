@@ -16,6 +16,7 @@
 #include "Map/SimpleRoom1.h"
 #include "Map/EndRoom1.h"
 #include "Map/CrossRoom1.h"
+#include "Map/CrossRoom2.h"
 #include "Map/Passage1.h"
 #include "Map/DeadEndRoom.h"
 
@@ -52,6 +53,8 @@ public:
 
 	void Initialize() override;
 
+	void Finalize() override;
+
 	void Update(float elapsedTime) override;
 
 	void Render() override;
@@ -65,6 +68,8 @@ protected:
 	std::unique_ptr<RoomBase> rootRoom;
 	std::vector<uint8_t> m_roomOrder;
 	std::vector<AABB> m_roomAABBs;
+
+	bool isLeader = true;
 
 	std::unique_ptr<ModelObject> testModel;
 

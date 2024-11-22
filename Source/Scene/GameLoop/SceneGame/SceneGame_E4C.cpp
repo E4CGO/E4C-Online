@@ -13,8 +13,6 @@
 
 #include "SceneGame_E4CState.h"
 #include "Scene/GameLoop/SceneGame/Stage/StageOpenWorld_E4C.h"
-#include "Scene/GameLoop/SceneGame/Stage/StageDungeon_E4C.h"
-#include "Scene/Stage/TestingStage.h"
 
 #include "Scene/Stage/StageManager.h"
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
@@ -34,7 +32,7 @@ void SceneGame_E4C::Initialize()
 	cameraManager.Register(mainCamera);
 	cameraManager.SetCamera(0);
 
-	//Console::Instance().Open();
+	Console::Instance().Open();
 
 	// 選択した自機
 	const PlayerCharacterData::CharacterInfo info = PlayerCharacterData::Instance().GetCurrentCharacter();
@@ -43,7 +41,6 @@ void SceneGame_E4C::Initialize()
 	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 
 	STAGES.ChangeStage(new StageOpenWorld_E4C(this));
-	//STAGES.ChangeStage(new StageDungeon_E4C(this));
 
 	m_ponlineController = new Online::OnlineController;
 	if (m_ponlineController->Initialize())

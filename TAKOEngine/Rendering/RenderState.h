@@ -18,6 +18,7 @@ enum class SamplerState
 	LinearWrap,
 	LinearClamp,
 	LinearBorder,
+	AnisotropicWrap,
 	ShadowMap,
 
 	EnumCount
@@ -52,6 +53,7 @@ enum class RasterizerState
 {
 	SolidCullNone,
 	SolidCullBack,
+	SolidCullFront,
 	WireCullnone,
 	WireCullBack,
 

@@ -12,7 +12,7 @@ VS_OUT main(
 {
 	VS_OUT vout;
 
-    vout.position = mul(position, viewProjection);
+    vout.position = mul(position, ViewProjection);
 	vout.color = color;
 	vout.texcoord = texcoord;
 

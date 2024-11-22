@@ -1,5 +1,5 @@
 //! @file PlayerCharacter.cpp
-//! @note 
+//! @note
 
 #include "PlayerCharacter.h"
 
@@ -21,6 +21,7 @@
 
 PlayerCharacter::PlayerCharacter(uint64_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]) : Character()
 {
+	scale = { 0.5f, 0.5f, 0.5f };
 	moveSpeed = 10.0f;
 	turnSpeed = DirectX::XMConvertToRadians(720);
 	jumpSpeed = 20.0f;
@@ -34,8 +35,6 @@ PlayerCharacter::PlayerCharacter(uint64_t id, const char* name, const uint8_t ap
 
 	// 衝突判定
 	SetCollider(Collider::COLLIDER_TYPE::CAPSULE);
-	//SetCollider(Collider::COLLIDER_TYPE::SPHERE);
-	//collider->SetScale(DirectX::XMFLOAT3{ height * 0.3f, height * 0.3f, height * 0.3f } *scale);
 
 	m_client_id = id;
 	this->m_name = name;
@@ -45,6 +44,7 @@ PlayerCharacter::PlayerCharacter(uint64_t id, const char* name, const uint8_t ap
 
 PlayerCharacter::PlayerCharacter(PlayerCharacterData::CharacterInfo dataInfo) : Character()
 {
+	scale = { 0.5f, 0.5f, 0.5f };
 	moveSpeed = 10.0f;
 	turnSpeed = DirectX::XMConvertToRadians(720);
 	jumpSpeed = 20.0f;

@@ -2,6 +2,7 @@
 //! @note 
 
 #include "PlayerCharacterManager.h"
+#include <iostream>
 
 /**************************************************************************//**
 	@brief		プレイヤーキャラクター更新処理
@@ -12,6 +13,16 @@ void PlayerCharacterManager::Update(float elapsedTime)
 {
 	std::lock_guard<std::mutex> lock(m_mut);
 	ObjectManager<PlayerCharacter>::Update(elapsedTime);
+}
+/**************************************************************************//**
+	@brief		プレイヤーキャラクター描画処理
+	@param[in]	elapsedTime 経過時間
+	@return		なし
+*//***************************************************************************/
+void PlayerCharacterManager::Render(const RenderContext& rc)
+{
+	std::lock_guard<std::mutex> lock(m_mut);
+	ObjectManager<PlayerCharacter>::Render(rc);
 }
 
 /**************************************************************************//**
@@ -55,6 +66,8 @@ PlayerCharacter* PlayerCharacterManager::UpdatePlayerData(const uint64_t client_
 		player->Hide();
 		Register(player);
 		player->GetStateMachine()->ChangeState(PlayerCharacter::STATE::IDLE);
+
+		std::cout << "New PlayerCharacter: " << static_cast<int>(client_id) << std::endl;
 		return player;
 	}
 	else
@@ -64,6 +77,7 @@ PlayerCharacter* PlayerCharacterManager::UpdatePlayerData(const uint64_t client_
 			// プレイヤーデータ更新
 			player->SetName(name);
 			player->LoadAppearance(appearance);
+			std::cout << "Update PlayerCharacter: " << static_cast<int>(client_id) << std::endl;
 		}
 		return player;
 	}

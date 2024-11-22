@@ -1,10 +1,8 @@
 //! @file Player.h
-//! @note 
-
+//! @note
 
 #ifndef __INCLUDED_PLAYER_H__
 #define __INCLUDED_PLAYER_H__
-
 
 #include "TAKOEngine/AI/StateMachine.h"
 
@@ -207,6 +205,10 @@ public:
 	// KayKit Adventurers
 	enum Animation
 	{
+		IDLE,
+		MOVE_START,
+		MOVE,
+		ATTACK_SIMPLE,
 		OneHanded_Melee_Attack_Chop,
 		OneHanded_Melee_Attack_Slice_Diagonal,
 		OneHanded_Melee_Attack_Slice_Horizontal,

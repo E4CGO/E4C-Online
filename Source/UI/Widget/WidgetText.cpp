@@ -1,18 +1,18 @@
 ﻿//! @file WidgetText.cpp
-//! @note 
+//! @note
 
 #include "WidgetText.h"
 #include "TAKOEngine/Runtime/tentacle_lib.h"
 
 /**************************************************************************//**
- 	@brief	コンストラクタ
+	@brief	コンストラクタ
 	@param[in]	text	UI文字
 	@param[in]	scale	UIの大きさ
 *//***************************************************************************/
 WidgetText::WidgetText(const char* text, float scale) : m_str(text), m_scale(scale) {}
 
 /**************************************************************************//**
- 	@brief		描画処理
+	@brief		描画処理
 	@param[in]	rc	レンダーコンテンツ参照
 *//***************************************************************************/
 void WidgetText::Render(const RenderContext& rc)
@@ -30,4 +30,8 @@ void WidgetText::Render(const RenderContext& rc)
 		m_border,
 		m_borderColor
 	);
+}
+
+void WidgetText::RenderDX12(const RenderContextDX12& rc)
+{
 }

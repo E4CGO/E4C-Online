@@ -1,5 +1,5 @@
 ﻿//! @file WidgetImage.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDE_WIDGET_IMAGE__
 #define __INCLUDE_WIDGET_IMAGE__
@@ -22,7 +22,9 @@ public:
 
 	// 描画処理
 	void Render(const RenderContext& rc) override;
-	
+
+	void RenderDX12(const RenderContextDX12& rc) override;
+
 	// 色を取得
 	DirectX::XMFLOAT4 GetColor() { return this->m_color; }
 	// 色を設定

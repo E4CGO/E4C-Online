@@ -26,6 +26,8 @@ private:
 public:
 	// オブジェクトとして更新処理
 	void Update(float elapsedTime) override;
+	// オブジェクトとして描画処理
+	void Render(const RenderContext& rc) override;
 	// プレイヤーキャラクターを取得
 	PlayerCharacter* GetPlayerCharacterById(void);
 	PlayerCharacter* GetPlayerCharacterById(uint64_t client_id);

@@ -33,12 +33,6 @@ void SceneTitle_E4C::Initialize()
 	// フレームバッファマネージャー
 	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
 
-	// モデル
-	{
-		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/UI/start.png");
-		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/UI/exit.png");
-	}
-
 	// 光
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
 	Light* dl = new Light(LightType::Directional);
@@ -47,7 +41,7 @@ void SceneTitle_E4C::Initialize()
 	shadowMapRenderer->SetShadowLight(dl);
 
 	CameraManager& cameramanager = CameraManager::Instance();
-	Camera*mainCamera = new Camera();
+	Camera* mainCamera = new Camera();
 	cameramanager.Register(mainCamera);
 	cameramanager.SetCamera(0);
 
@@ -86,6 +80,7 @@ void SceneTitle_E4C::Finalize()
 	shadowMapRenderer->Clear();
 	Sound::Instance().StopAudio(0);
 	CameraManager::Instance().Clear();
+	LightManager::Instance().Clear();
 }
 
 // 更新処理
@@ -138,11 +133,10 @@ void SceneTitle_E4C::Render()
 
 void SceneTitle_E4C::RenderDX12()
 {
-	TentacleLib::graphics.BeginRender();
+	T_GRAPHICS.BeginRender();
 	{
-		
 		// シーン用定数バッファ更新
-		const Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
+		const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
 			CameraManager::Instance().GetCamera());
 
 		// レンダーコンテキスト設定
@@ -150,15 +144,9 @@ void SceneTitle_E4C::RenderDX12()
 		rc.d3d_command_list = m_frameBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
-		// スプライト描画
-		if (m_sprites[0] != nullptr)
-		{
-			m_sprites[0]->Begin(rc);
-			m_sprites[0]->Draw(0, 0, 100, 100, 0, 1, 1, 1, 1);
-			m_sprites[0]->End(m_frameBuffer->GetCommandList());
-		}
+		UI.RenderDX12(rc);
 	}
-	TentacleLib::graphics.End();
+	T_GRAPHICS.End();
 }
 
 void SceneTitle_E4C::DrawSceneGUI()

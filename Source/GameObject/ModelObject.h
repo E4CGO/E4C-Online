@@ -6,7 +6,7 @@
 
 #include "GameObject.h"
 #include "TAKOEngine/Rendering/Model/ModelDX11.h"
-#include "TAKOEngine/Rendering/Model/NewModelDX11.h"
+#include "TAKOEngine/Rendering/Model/GLTFModelDX11.h"
 #include "TAKOEngine/Rendering/Model/ModelDX12.h"
 
 /**************************************************************************//**
@@ -26,14 +26,16 @@ public:
 		NOMODEL,
 	};
 
+	RENDER_MODE m_renderMode;
+
 	// コンストラクタ
 	ModelObject(void) {};
 	// コンストラクタ（引数付き）
-	ModelObject(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::DX11);
+	ModelObject(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::DX11, int modelType = 0);
 	virtual ~ModelObject() = default;
 
 	// モデルを読み取り
-	void LoadModel(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX11);
+	void LoadModel(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX11, int modelType = 0);
 
 	void CleanModels();
 

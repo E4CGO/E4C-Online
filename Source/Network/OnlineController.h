@@ -5,6 +5,7 @@
 
 #include "TAKOEngine/Network/WinSock2Wrapper.h"
 
+#include <iostream>
 #include <string>
 #include <unordered_map>
 #include <thread>
@@ -161,6 +162,7 @@ namespace Online
 			}
 			m_state = STATE::SYNC;
 			m_udpFlag = true;
+			std::cout << "BeginSync" << std::endl;
 		}
 		void EndSync()
 		{
@@ -174,6 +176,7 @@ namespace Online
 				m_udpRecvThread.join();
 			}
 			m_state = STATE::LOGINED;
+			std::cout << "EndSync" << std::endl;
 		}
 
 		WidgetMatching* GetMathcingUI() { return m_pMatchingUI; }

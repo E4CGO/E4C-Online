@@ -20,13 +20,13 @@ public:
 	Teleporter(Stage* stage, Online::OnlineController* onlineController);
 	~Teleporter();
 
-	void Update(float elapsedTime) override;
+	virtual void Update(float elapsedTime) override;
 	void Render(const RenderContext& rc) override;
 
 	void Teleport();
 
 	Stage* GetStage() { return m_pStage; }
-private:
+protected:
 	Stage* m_pStage;
 	
 	ModelResource::Mesh m_mesh;
@@ -46,5 +46,13 @@ private:
 
 	WidgetMatching* m_pWidgetMatching = nullptr;
 
+};
+
+
+class TeleportToOpenworld : public Teleporter
+{
+public:
+	TeleportToOpenworld() : Teleporter(nullptr, nullptr) {}
+	virtual void Update(float elapsedTime) override;
 };
 #endif // !__INCLUDE_TELEPORTER_H__

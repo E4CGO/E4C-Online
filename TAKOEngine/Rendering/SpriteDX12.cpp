@@ -14,8 +14,8 @@
 *//***************************************************************************/
 SpriteDX12::SpriteDX12(UINT sprite_count, const char* filename) : m_sprite_count(sprite_count)
 {
-	Graphics&                 graphics = Graphics::Instance();
-	const RenderStateDX12* renderState = graphics.GetRenderStateDX12(); 
+	Graphics& graphics = Graphics::Instance();
+	const RenderStateDX12* renderState = graphics.GetRenderStateDX12();
 	ID3D12Device* d3d_device = graphics.GetDeviceDX12();
 
 	HRESULT hr = S_OK;
@@ -46,9 +46,9 @@ SpriteDX12::SpriteDX12(UINT sprite_count, const char* filename) : m_sprite_count
 		d3d_graphics_pipeline_state_desc.pRootSignature = m_d3d_root_signature.Get();
 
 		d3d_graphics_pipeline_state_desc.VS.pShaderBytecode = vsData.data();
-		d3d_graphics_pipeline_state_desc.VS.BytecodeLength  = vsData.size();
+		d3d_graphics_pipeline_state_desc.VS.BytecodeLength = vsData.size();
 		d3d_graphics_pipeline_state_desc.PS.pShaderBytecode = psData.data();
-		d3d_graphics_pipeline_state_desc.PS.BytecodeLength  = psData.size();
+		d3d_graphics_pipeline_state_desc.PS.BytecodeLength = psData.size();
 
 		// 入力レイアウト
 		D3D12_INPUT_ELEMENT_DESC d3d_input_element_descs[] =
@@ -62,12 +62,12 @@ SpriteDX12::SpriteDX12(UINT sprite_count, const char* filename) : m_sprite_count
 
 		// ブレンドステート
 		d3d_graphics_pipeline_state_desc.BlendState = renderState->GetBlendState(BlendState::Transparency);
-		
+
 		// 深度ステンシルステート
-		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthEnable    = true;
+		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthEnable = true;
 		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthFunc      = D3D12_COMPARISON_FUNC_ALWAYS;
-		d3d_graphics_pipeline_state_desc.DepthStencilState.StencilEnable  = false;
+		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+		d3d_graphics_pipeline_state_desc.DepthStencilState.StencilEnable = false;
 
 		// ラスタライザーステート
 		d3d_graphics_pipeline_state_desc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
@@ -138,7 +138,7 @@ SpriteDX12::SpriteDX12(UINT sprite_count, const char* filename) : m_sprite_count
 		d3d_srv_desc.Texture2D.MipLevels = d3d_resource_desc.MipLevels;
 		d3d_srv_desc.Texture2D.MostDetailedMip = 0;
 
-		// シェーダリソースビューを生成.
+		// シェーダリソースビューを生成
 		d3d_device->CreateShaderResourceView(
 			m_d3d_texture.Get(),
 			&d3d_srv_desc,
@@ -162,8 +162,8 @@ SpriteDX12::SpriteDX12(UINT sprite_count, const char* filename) : m_sprite_count
 *//***************************************************************************/
 SpriteDX12::SpriteDX12(UINT sprite_count, FrameBufferTexture* frameBuffer) : m_sprite_count(sprite_count)
 {
-	Graphics&                 graphics = Graphics::Instance();
-	const RenderStateDX12* renderState = graphics.GetRenderStateDX12(); 
+	Graphics& graphics = Graphics::Instance();
+	const RenderStateDX12* renderState = graphics.GetRenderStateDX12();
 	ID3D12Device* d3d_device = graphics.GetDeviceDX12();
 
 	HRESULT hr = S_OK;
@@ -194,9 +194,9 @@ SpriteDX12::SpriteDX12(UINT sprite_count, FrameBufferTexture* frameBuffer) : m_s
 		d3d_graphics_pipeline_state_desc.pRootSignature = m_d3d_root_signature.Get();
 
 		d3d_graphics_pipeline_state_desc.VS.pShaderBytecode = vsData.data();
-		d3d_graphics_pipeline_state_desc.VS.BytecodeLength  = vsData.size();
+		d3d_graphics_pipeline_state_desc.VS.BytecodeLength = vsData.size();
 		d3d_graphics_pipeline_state_desc.PS.pShaderBytecode = psData.data();
-		d3d_graphics_pipeline_state_desc.PS.BytecodeLength  = psData.size();
+		d3d_graphics_pipeline_state_desc.PS.BytecodeLength = psData.size();
 
 		// 入力レイアウト
 		D3D12_INPUT_ELEMENT_DESC d3d_input_element_descs[] =
@@ -210,12 +210,12 @@ SpriteDX12::SpriteDX12(UINT sprite_count, FrameBufferTexture* frameBuffer) : m_s
 
 		// ブレンドステート
 		d3d_graphics_pipeline_state_desc.BlendState = renderState->GetBlendState(BlendState::Transparency);
-		
+
 		// 深度ステンシルステート
-		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthEnable    = true;
+		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthEnable = true;
 		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthFunc      = D3D12_COMPARISON_FUNC_ALWAYS;
-		d3d_graphics_pipeline_state_desc.DepthStencilState.StencilEnable  = false;
+		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+		d3d_graphics_pipeline_state_desc.DepthStencilState.StencilEnable = false;
 
 		// ラスタライザーステート
 		d3d_graphics_pipeline_state_desc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
@@ -251,8 +251,7 @@ SpriteDX12::SpriteDX12(UINT sprite_count, FrameBufferTexture* frameBuffer) : m_s
 
 		hr = d3d_device->CreateGraphicsPipelineState(
 			&d3d_graphics_pipeline_state_desc,
-			IID_PPV_ARGS(&m_d3d_pipeline_state)
-		);
+			IID_PPV_ARGS(&m_d3d_pipeline_state));
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 		m_d3d_pipeline_state->SetName(L"SpriteGraphicsPipelineState");
 	}
@@ -264,7 +263,7 @@ SpriteDX12::SpriteDX12(UINT sprite_count, FrameBufferTexture* frameBuffer) : m_s
 		if (m_d3d_texture)
 		{
 			m_srv_descriptor = Graphics::Instance().GetShaderResourceDescriptorHeap()->PopDescriptor();
-			
+
 			// シェーダーリソースビューの生成
 			D3D12_RESOURCE_DESC d3d_resource_desc = m_d3d_texture->GetDesc();
 
@@ -273,7 +272,7 @@ SpriteDX12::SpriteDX12(UINT sprite_count, FrameBufferTexture* frameBuffer) : m_s
 			d3d_srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 			d3d_srv_desc.Format = d3d_resource_desc.Format;
 			d3d_srv_desc.Texture2D.MipLevels = d3d_resource_desc.MipLevels;
-			d3d_srv_desc.Texture2D.MostDetailedMip = 0; 
+			d3d_srv_desc.Texture2D.MostDetailedMip = 0;
 
 			// シェーダリソースビューを生成.
 			d3d_device->CreateShaderResourceView(
@@ -282,9 +281,147 @@ SpriteDX12::SpriteDX12(UINT sprite_count, FrameBufferTexture* frameBuffer) : m_s
 				m_srv_descriptor->GetCpuHandle());
 
 			// テクスチャ情報の取得
-			m_texture_width  = static_cast<int>(d3d_resource_desc.Width);
+			m_texture_width = static_cast<int>(d3d_resource_desc.Width);
 			m_texture_height = static_cast<int>(d3d_resource_desc.Height);
 		}
+	}
+
+	// フレームリソース生成
+	CreateFrameResource();
+}
+
+/**************************************************************************//**
+		@brief		コンストラクタ
+		@param[in]	sprite_count	描画数
+		@param[in]	filename		キューブマップ用テクスチャ
+		@return		なし
+*//***************************************************************************/
+SpriteDX12::SpriteDX12(UINT sprite_count, const std::wstring& filename) : m_sprite_count(sprite_count)
+{
+	Graphics& graphics = Graphics::Instance();
+	const RenderStateDX12* renderState = graphics.GetRenderStateDX12();
+	ID3D12Device* d3d_device = graphics.GetDeviceDX12();
+
+	HRESULT hr = S_OK;
+
+	// シェーダー
+	std::vector<BYTE> vsData, psData;
+	{
+		GpuResourceUtils::LoadShaderFile("Data/Shader/SpriteVS.cso", vsData);
+		GpuResourceUtils::LoadShaderFile("Data/Shader/SpritePS.cso", psData);
+	}
+
+	// ルートシグネチャの生成
+	{
+		hr = d3d_device->CreateRootSignature(
+			0,
+			vsData.data(),
+			vsData.size(),
+			IID_PPV_ARGS(m_d3d_root_signature.GetAddressOf()));
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+		m_d3d_root_signature->SetName(L"SpriteRootSignature");
+	}
+
+	// パイプラインステートの生成
+	{
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC d3d_graphics_pipeline_state_desc = {};
+
+		// ルートシグネチャ
+		d3d_graphics_pipeline_state_desc.pRootSignature = m_d3d_root_signature.Get();
+
+		d3d_graphics_pipeline_state_desc.VS.pShaderBytecode = vsData.data();
+		d3d_graphics_pipeline_state_desc.VS.BytecodeLength = vsData.size();
+		d3d_graphics_pipeline_state_desc.PS.pShaderBytecode = psData.data();
+		d3d_graphics_pipeline_state_desc.PS.BytecodeLength = psData.size();
+
+		// 入力レイアウト
+		D3D12_INPUT_ELEMENT_DESC d3d_input_element_descs[] =
+		{
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		};
+		d3d_graphics_pipeline_state_desc.InputLayout.pInputElementDescs = d3d_input_element_descs;
+		d3d_graphics_pipeline_state_desc.InputLayout.NumElements = _countof(d3d_input_element_descs);
+
+		// ブレンドステート
+		d3d_graphics_pipeline_state_desc.BlendState = renderState->GetBlendState(BlendState::Transparency);
+
+		// 深度ステンシルステート
+		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthEnable = true;
+		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+		d3d_graphics_pipeline_state_desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+		d3d_graphics_pipeline_state_desc.DepthStencilState.StencilEnable = false;
+
+		// ラスタライザーステート
+		d3d_graphics_pipeline_state_desc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+		d3d_graphics_pipeline_state_desc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+		d3d_graphics_pipeline_state_desc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+		d3d_graphics_pipeline_state_desc.RasterizerState.FrontCounterClockwise = false;
+		d3d_graphics_pipeline_state_desc.RasterizerState.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
+		d3d_graphics_pipeline_state_desc.RasterizerState.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
+		d3d_graphics_pipeline_state_desc.RasterizerState.SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;
+		d3d_graphics_pipeline_state_desc.RasterizerState.DepthClipEnable = true;
+		d3d_graphics_pipeline_state_desc.RasterizerState.MultisampleEnable = false;
+		d3d_graphics_pipeline_state_desc.RasterizerState.AntialiasedLineEnable = false;
+		d3d_graphics_pipeline_state_desc.RasterizerState.ForcedSampleCount = 0;
+		d3d_graphics_pipeline_state_desc.RasterizerState.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
+
+		// プリミティブトポロジー
+		d3d_graphics_pipeline_state_desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+
+		// ストリップ時のカット値
+		d3d_graphics_pipeline_state_desc.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
+
+		// レンダーターゲット数
+		d3d_graphics_pipeline_state_desc.NumRenderTargets = 1;
+		d3d_graphics_pipeline_state_desc.RTVFormats[0] = RenderTargetFormat;
+		d3d_graphics_pipeline_state_desc.DSVFormat = DepthStencilFormat;
+
+		// マルチサンプリング
+		d3d_graphics_pipeline_state_desc.SampleDesc.Count = 1;
+		d3d_graphics_pipeline_state_desc.SampleDesc.Quality = 0;
+
+		// アダプタ
+		d3d_graphics_pipeline_state_desc.NodeMask = 0;
+
+		hr = d3d_device->CreateGraphicsPipelineState(
+			&d3d_graphics_pipeline_state_desc,
+			IID_PPV_ARGS(&m_d3d_pipeline_state));
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+		m_d3d_pipeline_state->SetName(L"SpriteGraphicsPipelineState");
+	}
+
+	// テクスチャ生成
+	{
+		// テクスチャ読み込み
+		hr = Graphics::Instance().LoadCubeTexture(filename, m_d3d_texture.GetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+		// ディスクリプタ取得
+		m_srv_descriptor = Graphics::Instance().GetShaderResourceDescriptorHeap()->PopDescriptor();
+
+		// シェーダーリソースビューの生成
+		D3D12_RESOURCE_DESC d3d_resource_desc = m_d3d_texture->GetDesc();
+
+		// シェーダーリソースビューの設定
+		D3D12_SHADER_RESOURCE_VIEW_DESC d3d_srv_desc = {};
+		d3d_srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
+		d3d_srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		d3d_srv_desc.Format = d3d_resource_desc.Format;;
+		d3d_srv_desc.TextureCube.MipLevels = d3d_resource_desc.MipLevels;
+		d3d_srv_desc.TextureCube.MostDetailedMip = 0;
+		d3d_srv_desc.TextureCube.ResourceMinLODClamp = 0.0f;
+
+		// シェーダリソースビューを生成.
+		d3d_device->CreateShaderResourceView(
+			m_d3d_texture.Get(),
+			&d3d_srv_desc,
+			m_srv_descriptor->GetCpuHandle());
+
+		// テクスチャ情報の取得
+		m_texture_width = static_cast<int>(d3d_resource_desc.Width);
+		m_texture_height = static_cast<int>(d3d_resource_desc.Height);
 	}
 
 	// フレームリソース生成
@@ -341,7 +478,7 @@ void SpriteDX12::Begin(const RenderContextDX12& rc)
 	CalcGaussianFilter(fram_resource, rc.gaussianFilterData);
 
 	// ColorGrading
-	fram_resource.cb_scene_data->hueShift   = rc.colorGradingData.hueShift;
+	fram_resource.cb_scene_data->hueShift = rc.colorGradingData.hueShift;
 	fram_resource.cb_scene_data->saturation = rc.colorGradingData.saturation;
 	fram_resource.cb_scene_data->brightness = rc.colorGradingData.brightness;
 }
@@ -381,7 +518,7 @@ void SpriteDX12::CalcGaussianFilter(FrameResource& fram_resource, const Gaussian
 			id++;
 		}
 	}
-	
+
 	for (int i = 0; i < fram_resource.cb_scene_data->kernelSize * fram_resource.cb_scene_data->kernelSize; i++)
 	{
 		fram_resource.cb_scene_data->weights[i].z /= sum;
@@ -413,7 +550,7 @@ void SpriteDX12::Draw(
 		dx, dy, dw, dh,
 		0, 0, static_cast<float>(m_texture_width), static_cast<float>(m_texture_height),
 		angle,
-		r, g, b, a, 
+		r, g, b, a,
 		graphics.GetViwePort());
 }
 
@@ -492,7 +629,7 @@ void SpriteDX12::Draw(
 	}
 
 	// 現在設定されているビューポートからスクリーンサイズを取得する
-	float screen_width  = viewport.Width;
+	float screen_width = viewport.Width;
 	float screen_height = viewport.Height;
 
 	// スクリーン座標系からNDC座標系へ変換する。
@@ -549,11 +686,14 @@ void SpriteDX12::End(ID3D12GraphicsCommandList* d3d_command_list)
 	d3d_command_list->DrawIndexedInstanced(m_sprite_index * 6, 1, 0, 0, 0);
 }
 
-// フレームリソース生成
+/**************************************************************************//**
+		@brief		フレームリソース生成
+		@param[in]	なし
+		@return		なし
+*//***************************************************************************/
 void SpriteDX12::CreateFrameResource()
 {
 	Graphics& graphics = Graphics::Instance();
-	const RenderStateDX12* renderState = graphics.GetRenderStateDX12();
 	ID3D12Device* d3d_device = graphics.GetDeviceDX12();
 
 	HRESULT hr = S_OK;

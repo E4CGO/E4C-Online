@@ -16,13 +16,11 @@ void PlayerCharacterPatternGender::Execute(PlayerCharacter* chara)
 {
 	if (m_isMale) // MALE
 	{
-		chara->LoadModel("Data/Model/Character/HEAD_BARB.glb");
-		chara->LoadModel("Data/Model/Character/BODY_BARB.glb");
+		chara->LoadModel("Data/Model/Character/PlayerModels/MDL_PLAYER_BODY_ANIMATION.glb");
 	}
 	else //FEMALE
 	{
-		chara->LoadModel("Data/Model/Character/HEAD_MAGE.glb");
-		chara->LoadModel("Data/Model/Character/BODY_MAGE.glb");
+		chara->LoadModel("Data/Model/Character/PlayerModels/MDL_PLAYER_BODY_ANIMATION.glb");
 	}
 
 	StateMachine<PlayerCharacter>* stateMachine = chara->GetStateMachine();
@@ -96,5 +94,4 @@ void PlayerCharacterPatternAxe::Execute(PlayerCharacter* chara)
 	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::SKILL_1), new PlayerCharacterState::Axe::Skill1State(chara));
 	stateMachine->RegisterSubState(static_cast<int>(PlayerCharacter::STATE::SKILL_1), Barbarian::SKILL_1_STATE::SKILL_1_START, new PlayerCharacterState::Axe::Skill1StateStart(chara));
 	stateMachine->RegisterSubState(static_cast<int>(PlayerCharacter::STATE::SKILL_1), Barbarian::SKILL_1_STATE::SKILL_1_LOOP, new PlayerCharacterState::Axe::Skill1StateLoop(chara));
-
 }

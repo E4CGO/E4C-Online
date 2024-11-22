@@ -1,5 +1,5 @@
 ﻿//! @file WidgetInputBool.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDED_WIDGET_INPUT_BOOL__
 #define __INCLUDED_WIDGET_INPUT_BOOL__
@@ -30,6 +30,7 @@ public:
 
 	// 描画処理
 	void Render(const RenderContext& rc) override;
+	void RenderDX12(const RenderContextDX12& rc) override;
 private:
 	// TRUE画像
 	std::shared_ptr<Sprite> m_trueImage;

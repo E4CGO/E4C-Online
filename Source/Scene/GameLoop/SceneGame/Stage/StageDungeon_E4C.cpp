@@ -1,4 +1,7 @@
 ﻿#include "StageDungeon_E4C.h"
+#include "StageOpenWorld_E4C.h"
+
+#include "GameObject/GameObjectManager.h"
 
 #include "GameObject/ModelObject.h"
 #include "Scene/Stage/StageManager.h"
@@ -17,6 +20,7 @@
 #include "Scene/Stage/StageManager.h"
 
 #include "Scene/Stage/TestingStage.h"
+#include "GameObject/Props/Teleporter.h"
 
 #include "Network/OnlineController.h"
 
@@ -31,6 +35,9 @@ void StageDungeon_E4C::GenerateDungeon()
 	// 生成順番配列の中身がないなら自動生成を行う
 	if (m_roomOrder.size() == 0)
 	{
+		// 自動生成はリーダーのみ行う
+		isLeader = true;
+
 		// ダンジョンの自動生成を行う
 		std::vector<DungeonData::RoomType> placeableRooms;
 		//placeableRooms.emplace_back(DungeonData::SIMPLE_ROOM_1);
@@ -78,6 +85,14 @@ void StageDungeon_E4C::GenerateDungeon()
 						m_roomOrder, orderIndex);
 					break;
 
+				case DungeonData::CROSS_ROOM_2:
+					rootRoom = std::make_unique<CrossRoom2>(
+						nullptr, -1,
+						m_roomAABBs,
+						true,
+						m_roomOrder, orderIndex);
+					break;
+
 				case DungeonData::PASSAGE_1:
 					rootRoom = std::make_unique<Passage1>(
 						nullptr, -1,
@@ -105,6 +120,9 @@ void StageDungeon_E4C::GenerateDungeon()
 	// 中身があるならそれに沿って生成を行う
 	else
 	{
+		// リーダーではない
+		isLeader = false;
+
 		int orderIndex = 1;
 
 		switch (m_roomOrder.front())
@@ -127,6 +145,14 @@ void StageDungeon_E4C::GenerateDungeon()
 
 		case DungeonData::CROSS_ROOM_1:
 			rootRoom = std::make_unique<CrossRoom1>(
+				nullptr, -1,
+				m_roomAABBs,
+				false,
+				m_roomOrder, orderIndex);
+			break;
+
+		case DungeonData::CROSS_ROOM_2:
+			rootRoom = std::make_unique<CrossRoom2>(
 				nullptr, -1,
 				m_roomAABBs,
 				false,
@@ -156,30 +182,6 @@ void StageDungeon_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
 
-
-	{
-		std::array<DirectX::XMFLOAT3, 4 > positions = {
-		DirectX::XMFLOAT3{ 10.0f, 10.0f, 5.0f},
-		DirectX::XMFLOAT3{ 10.0f, 20.0f, 5.0f },
-		DirectX::XMFLOAT3{ 5.0f, 10.0f, 5.0f },
-		DirectX::XMFLOAT3{ 5.0f, 20.0f, 5.0f }
-		};
-
-		plane = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "Data/Sprites/gem.png", 1.0f, positions);
-	}
-
-	{
-		std::array<DirectX::XMFLOAT3, 4 >positions = {
-			DirectX::XMFLOAT3{ 15.0f, 15.0f, 5.0f},
-			DirectX::XMFLOAT3{ 15.0f, 25.0f, 5.0f },
-			DirectX::XMFLOAT3{ 25.0f, 15.0f, 5.0f },
-			DirectX::XMFLOAT3{ 25.0f, 25.0f, 5.0f }
-		};
-
-		//portal = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, positions);
-		//portal.get()->SetShader(ModelShaderId::Portal);
-	}
-
 	// 光
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
 	Light* dl = new Light(LightType::Directional);
@@ -205,7 +207,6 @@ void StageDungeon_E4C::Initialize()
 		{ 0, 0.969f, -0.248f }	// 上ベクトル
 	);
 
-
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(mainCamera);
 	cameraController->SetEnable(true);
@@ -228,13 +229,27 @@ void StageDungeon_E4C::Initialize()
 
 	GenerateDungeon();
 
+	// 一番遠い部屋のうち、ランダムな一つを抽選しテレポーターを設置する
+	RoomBase* lastRoom = rootRoom->GetFarthestChild().at(std::rand() % rootRoom->GetFarthestChild().size());
+
+	TeleportToOpenworld* teleporter = new TeleportToOpenworld();
+	teleporter->SetPosition(lastRoom->GetCenterPos());
+	teleporter->SetAngle({ 90.0f * RADIAN1, 0.0f, 0.0f});
+	teleporter->SetScale({ 10.0f, 10.0f, 1.0f });
+	GameObjectManager::Instance().Register(teleporter);
+
 	// 部屋のモデルを配置
 	for (RoomBase* room : rootRoom->GetAll())
 	{
-		room->PlaceMapTile();
+		room->PlaceMapTile(isLeader);
 	}
 	// 部屋の当たり判定を設定
 	MAPTILES.CreateSpatialIndex(5, 7);
+}
+
+void StageDungeon_E4C::Finalize()
+{
+	GameObjectManager::Instance().Clear();
 }
 
 void StageDungeon_E4C::Update(float elapsedTime)
@@ -253,6 +268,8 @@ void StageDungeon_E4C::Update(float elapsedTime)
 
 	// 部屋を全てアップデート
 	rootRoom->Update(elapsedTime);
+
+	GameObjectManager::Instance().Update(elapsedTime);
 
 	MAPTILES.Update(elapsedTime);
 
@@ -279,8 +296,6 @@ void StageDungeon_E4C::Update(float elapsedTime)
 		T_INPUT.KeepCursorCenter();
 	}
 	PlayerCharacterManager::Instance().Update(elapsedTime);
-	plane->Update(elapsedTime);
-	//portal->Update(elapsedTime);
 
 	timer += elapsedTime;
 }
@@ -305,78 +320,18 @@ void StageDungeon_E4C::Render()
 	// 描画
 	PlayerCharacterManager::Instance().Render(rc);
 
-	float time = 0;
+	GameObjectManager::Instance().Render(rc);
 
-	{
-		//const DirectX::XMFLOAT4X4 coordinate_system_transforms[]
-		//{
-		//	{-1, 0, 0, 0,
-		//	  0, 1, 0, 0,
-		//	  0, 0, 1, 0,
-		//	  0, 0, 0, 1}, // 0:RHS Y-UP
+	MAPTILES.Render(rc);
 
-		//	{ 1, 0, 0, 0,
-		//	  0, 1, 0, 0,
-		//	  0, 0, 1, 0,
-		//	  0, 0, 0, 1}, // 1:LHS Y-UP
-
-		//	{-1, 0, 0, 0,
-		//	  0, 0,-1, 0,
-		//	  0, 1, 0, 0,
-		//	  0, 0, 0, 1}, // 2:RHS Z-UP
-
-		//	{ 1, 0, 0, 0,
-		//	  0, 0, 1, 0,
-		//	  0, 1, 0, 0,
-		//	  0, 0, 0, 1}, //3:LHS Z - UP
-		//};
-
-		//float scale_factor = 1.0f;
-
-		//DirectX::XMMATRIX C{ DirectX::XMLoadFloat4x4(&coordinate_system_transforms[0]) * DirectX::XMMatrixScaling(scale_factor, scale_factor, scale_factor) };
-		//DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(2.5, 2.5f, 2.5f) };
-		//DirectX::XMMATRIX R{ DirectX::XMMatrixRotationRollPitchYaw(0.0f, 0.0f, 0.0f) };
-		//DirectX::XMMATRIX T{ DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f) };
-
-		//DirectX::XMFLOAT4X4 world;
-		//DirectX::XMStoreFloat4x4(&world, C * S * R * T);
-
-		//// シーン用定数バッファ更新
-		//CbScene cbScene{};
-		//DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&rc.camera->GetView());
-		//DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&rc.camera->GetProjection());
-		//DirectX::XMStoreFloat4x4(&cbScene.view_projection, V * P);
-
-		//const DirectX::XMFLOAT3& eye = rc.camera->GetEye();
-		//cbScene.camera_position.x = eye.x;
-		//cbScene.camera_position.y = eye.y;
-		//cbScene.camera_position.z = eye.z;
-
-		//// レンダーステート設定
-		//const float blend_factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		//rc.deviceContext->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Opaque), blend_factor, 0xFFFFFFFF);
-		//rc.deviceContext->OMSetDepthStencilState(rc.renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
-		//rc.deviceContext->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullNone));
-
-		//rc.deviceContext->UpdateSubresource(constant_buffers[1].Get(), 0, 0, &cbScene, 0, 0);
-		//rc.deviceContext->VSSetConstantBuffers(1, 1, constant_buffers[1].GetAddressOf());
-		//rc.deviceContext->PSSetConstantBuffers(1, 1, constant_buffers[1].GetAddressOf());
-
-		MAPTILES.Render(rc);
-	}
-
-	plane->Render(rc);
-
-	//portal->Render(rc);
-
+#ifdef _DEBUG
 	// デバッグレンダラ描画実行
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
-
-	PlayerCharacterManager::Instance().DrawDebugGUI();
 	rootRoom->DrawDebugGUI();
+#endif // _DEBUG
+
 }
 
 void StageDungeon_E4C::OnPhase()
 {
-
 }
