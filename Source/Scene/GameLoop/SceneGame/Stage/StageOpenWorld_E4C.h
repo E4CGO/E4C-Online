@@ -7,6 +7,7 @@
 #include "GameObject/GameObject.h"
 #include "GameObject/Character/Player/PlayerCharacter.h"
 #include "GameObject/Props/Teleporter.h"
+#include "GameObject/Props/Spawner.h"
 #include "TAKOEngine/Rendering/Shaders/PlaneShader.h"
 
 #include "Scene/Scene.h"
@@ -42,6 +43,8 @@ private:
 
 	std::unique_ptr<ThridPersonCameraController> cameraController;
 	MapTile* stage_collision = nullptr;
+
+	GameObject* spawners;
 
 	std::unique_ptr <Teleporter> teleporter;
 	std::unique_ptr <Plane> plane;

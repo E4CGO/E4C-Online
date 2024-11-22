@@ -35,6 +35,17 @@ bool Enemy::MoveTo(float elapsedTime, const DirectX::XMFLOAT3& target)
 {
 	return Character::MoveTo(elapsedTime, target, moveSpeed, turnSpeed);
 }
+
+bool Enemy::IsAlive()
+{
+	if (hp >= 1)
+	{
+		return true;
+	}
+	return false;
+}
+
+
 void Enemy::TurnTo(float elapsedTime, const DirectX::XMFLOAT3& target)
 {
 	DirectX::XMFLOAT3 d = target - position;

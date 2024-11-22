@@ -17,6 +17,7 @@
 
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "TAKOEngine/Tool/Console.h"
+#include <GameObject/Character/Enemy/EnemyManager.h>
 
 void SceneGame_E4C::Initialize()
 {
@@ -59,6 +60,7 @@ void SceneGame_E4C::Finalize()
 	LightManager::Instance().Clear();
 	MAPTILES.Clear();
 	STAGES.Clear();
+	ENEMIES.Clear();
 	PlayerCharacterManager::Instance().Clear();
 	CameraManager::Instance().Clear();
 }
@@ -73,10 +75,17 @@ void SceneGame_E4C::Update(float elapsedTime)
 	if (stageNumber == 0)
 	{
 		stageOpenWorld->Update(elapsedTime);
+
+		ProfileScopedSection_2("Enemy", ImGuiControl::Profiler::Red);
+		// エネミー更新
+		ENEMIES.Update(elapsedTime);
 	}
 	if (stageNumber == 1)
 	{
 		stageDungeon->Update(elapsedTime);
+	}
+	{
+		
 	}
 }
 
@@ -90,11 +99,12 @@ void SceneGame_E4C::Render()
 	if (stageNumber == 0)
 	{
 		stageOpenWorld->Render();
+		ENEMIES.Render(rc);						// エネミー
 	}
 	if (stageNumber == 1)
 	{
 		STAGES.Render(rc);
 	}
-
+	
 	//ProfileDrawUI();
 }

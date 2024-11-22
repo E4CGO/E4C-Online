@@ -32,15 +32,15 @@ public:
 
     //プレイヤー索敵
     bool SearchPlayer();
-
     float GetSerchRenge() { return serchRange; }
     float GetTerrytoryRange() { return territoryRange; }
     DirectX::XMFLOAT3 GetTerrtoryOrigin() { return territoryOrigin; }
+    int CountEnemiesInRange();
 
 private:
     DirectX::XMFLOAT3 territoryOrigin = { 0,0,0 };
-    float territoryRange = 5.0f; 
-    float serchRange = 5.f;
+    float territoryRange = 7.0f; 
+    float serchRange = 10.f;
 
     DirectX::XMFLOAT3 playerPosition = {};
 
@@ -48,7 +48,7 @@ private:
 
     int spawnedEnemyCount = 0;             // 現在までに生成されたエネミーの数
     float spawntimer = 0.f;
-    float spawntime = 5.f;
+    float spawntime = 2.f;
     int maxEnemies = 20;
 };
 #endif

@@ -37,7 +37,8 @@ void StageOpenWorld_E4C::Initialize()
 	player->SetPosition({ 5,	10, 5 });
 	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::State::Idle));
 	
-	EnemyManager&enemyManager = EnemyManager::Instance();
+	spawners = STAGES.Register(new Spawner);
+	spawners->SetPosition({ 7,2,25 });
 
 	teleporter = std::make_unique<Teleporter>("Data/Model/Cube/testCubes.glb", 1.0);
 	teleporter->SetPosition({ 50, 0, 60 });
@@ -109,6 +110,7 @@ void StageOpenWorld_E4C::Initialize()
 
 void StageOpenWorld_E4C::Update(float elapsedTime)
 {
+	Stage::Update(elapsedTime);
 	std::vector<DirectX::XMFLOAT3> cameraFocusPoints = {
 		{CameraManager::Instance().GetCamera(0)->GetFocus().x, CameraManager::Instance().GetCamera(0)->GetFocus().y, CameraManager::Instance().GetCamera(0)->GetFocus().z},
 		{CameraManager::Instance().GetCamera(0)->GetFocus().x, CameraManager::Instance().GetCamera(0)->GetFocus().y, CameraManager::Instance().GetCamera(0)->GetFocus().z},
@@ -250,6 +252,7 @@ void StageOpenWorld_E4C::Render()
 
 	teleporter->Render(rc);
 	plane->Render(rc);
+	//spawner->Render(rc);
 	//portal->Render(rc);
 
 #ifdef _DEBUG

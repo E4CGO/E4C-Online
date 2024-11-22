@@ -23,7 +23,7 @@ void TestingStage::Initialize()
 	key = STAGES.Register(new Map001Key);
 	bossRoomTeleport = STAGES.Register(new Map001BossRoomTeleport);
 	spawners = STAGES.Register(new Spawner);
-	spawners->SetPosition({ -38.0f, 2.0f, -48.0f });
+	spawners->SetPosition({ -38.0f, 0.0f, -48.0f });
 	
 	enemyList.push_back({ PHASE::NORMAL, 0.0, ENEMY_TYPE::CHEST_EMPTY_SKELETON_MINION, { -40.0f, 0.0f, -15.0f }, { 0, DirectX::XMConvertToRadians(180), 0} });
 

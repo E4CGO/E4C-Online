@@ -69,6 +69,8 @@ public:
 	void SetEnemyId(int id) { enemy_id = id; }
 	int GetEnemyId() { return enemy_id; }
 
+	bool IsAlive();
+
 	bool MoveTo(float elapsedTime, const DirectX::XMFLOAT3& target);
 	void TurnTo(float elapsedTime, const DirectX::XMFLOAT3& target);
 
