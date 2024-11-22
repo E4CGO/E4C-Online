@@ -1,5 +1,7 @@
 #include "StageOpenWorld_E4C.h"
 
+#include "TAKOEngine/GUI/UIManager.h"
+
 #include "GameObject/ModelObject.h"
 #include "GameObject/Props/Teleporter.h"
 #include "Scene/Stage/StageManager.h"
@@ -25,29 +27,23 @@ void StageOpenWorld_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
 
-	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.025f);
+	// Sprite Resource Preload
+	for (auto& filename : spriteList)
+	{
+		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
+	}
+
+	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
 	stage_collision->Update(0);
 	MAPTILES.Register(stage_collision);
 	MAPTILES.CreateSpatialIndex(5, 7);
 
-	map = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 2.5f, ModelObject::RENDER_MODE::DX11GLTF);
+	map = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX11GLTF);
+	tower = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f);
 
 	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
-	teleporter->SetPosition({ 0, 5, 0 });
+	teleporter->SetPosition({ 16, 8.5, -46 });
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
-
-	{
-		std::array<DirectX::XMFLOAT3, 4 > positions = {
-			DirectX::XMFLOAT3{ 10.0f, 10.0f, 5.0f},
-			DirectX::XMFLOAT3{ 10.0f, 20.0f, 5.0f },
-			DirectX::XMFLOAT3{ 5.0f, 10.0f, 5.0f },
-			DirectX::XMFLOAT3{ 5.0f, 20.0f, 5.0f }
-		};
-
-		plane = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "Data/Sprites/gem.png", 1.0f, positions);
-
-		billboard = std::make_unique<Fireball>(T_GRAPHICS.GetDevice(), "Data/Sprites/fire.png", 1.0f, positions[0]);
-	}
 
 	// 光
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
@@ -57,7 +53,7 @@ void StageOpenWorld_E4C::Initialize()
 
 	// プレイヤー
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
-	player->SetPosition({ 5.0f, 5.0f, 5.0f });
+	player->SetPosition({ 15.0f, 15.0f, 5.0f });
 
 	// カメラ設定
 	Camera* mainCamera = CameraManager::Instance().GetCamera();
@@ -93,6 +89,12 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	cameraController->SyncContrllerToCamera(camera);
 	cameraController->Update(elapsedTime);
 
+	// 展示会だけ
+	if (T_INPUT.KeyDown(VK_ESCAPE))
+	{
+		isPause = !isPause;
+	}
+
 	if (T_INPUT.KeyDown(VK_MENU))
 	{
 		if (TentacleLib::isShowCursor())
@@ -117,12 +119,77 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	}
 	PlayerCharacterManager::Instance().Update(elapsedTime);
 	map->Update(elapsedTime);
+	tower->Update(elapsedTime);
 
 	teleporter->Update(elapsedTime);
-	plane->Update(elapsedTime);
-	billboard->Update(elapsedTime);
 
 	timer += elapsedTime;
+
+	if (isPause)
+	{
+		if (btnExit == nullptr)
+		{
+			auto widgets = UI.GetAll();
+			for (auto it : widgets)
+			{
+				if (it == btnExit)
+				{
+					return;
+				}
+			}
+			btnExit = new WidgetButtonImage("", "Data/Sprites/UI/exit.png", [&](WidgetButton*) {
+				m_pScene->GetStateMachine()->ChangeState(SceneGame_E4C::GAME_STATE::EXIT);
+				});
+			btnExit->SetPosition({ SCREEN_W * 0.5f - 163.0f * 0.5f * 1.5f, SCREEN_H * 0.8f });
+			btnExit->SetSize({ 163.0f * 1.5f, 128.0f });
+			UI.Register(btnExit);
+		}
+		if (background == nullptr)
+		{
+			auto widgets = UI.GetAll();
+			for (auto it : widgets)
+			{
+				if (it == background)
+				{
+					return;
+				}
+			}
+			background = new WidgetImage("Data/Sprites/big_background.t.png");
+			background->SetPosition({ 0, 0 });
+			background->SetSize({ SCREEN_W, SCREEN_H });
+			background->SetColor(DirectX::XMFLOAT4{ 1.0f, 1.0f, 1.0f, 0.5f });
+			UI.Register(background);
+		}
+	}
+	else
+	{
+		if (background != nullptr)
+		{
+			auto widgets = UI.GetAll();
+			for (auto it : widgets)
+			{
+				if (it == background)
+				{
+					UI.Remove(background);
+					background = nullptr;
+				}
+			}
+		}
+		if (btnExit != nullptr)
+		{
+			auto widgets = UI.GetAll();
+			for (auto it : widgets)
+			{
+				if (it == btnExit)
+				{
+					UI.Remove(btnExit);
+					btnExit = nullptr;
+				}
+			}
+		}
+	}
+
+	UI.Update(elapsedTime);
 }
 
 void StageOpenWorld_E4C::Render()
@@ -146,10 +213,11 @@ void StageOpenWorld_E4C::Render()
 	PlayerCharacterManager::Instance().Render(rc);
 
 	map->Render(rc);
+	tower->Render(rc);
 
 	teleporter->Render(rc);
-	plane->Render(rc);
-	billboard->Render(rc);
+
+	UI.Render(rc);
 
 	//MAPTILES.Render(rc);
 

@@ -82,11 +82,11 @@ Framework::~Framework()
 // 更新処理
 void Framework::Update(float elapsedTime)
 {
-	if (T_INPUT.KeyDown(VK_F1))
+	/*if (T_INPUT.KeyDown(VK_F1))
 	{
 		T_GRAPHICS.isDX12Active = !T_GRAPHICS.isDX12Active;
 		T_GRAPHICS.isDX11Active = !T_GRAPHICS.isDX11Active;
-	}
+	}*/
 
 	// シーン更新処理
 	SceneManager::Instance().Update(elapsedTime);

@@ -1,5 +1,5 @@
 //! @file SceneGame_E4CState.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDED_SCENE_GAME_E4C_GAME__
 #define __INCLUDED_SCENE_GAME_E4C_GAME__
@@ -63,6 +63,21 @@ namespace SceneGame_E4CState
 		MatchingState(SceneGame_E4C* scene) : HierarchicalState<SceneGame_E4C>(scene) {}
 		// デストラクタ
 		~MatchingState() {}
+		// ステートに入った時のメソッド
+		virtual void Enter() override;
+		// ステートで実行するメソッド
+		void Execute(float elapsedTime) override;
+		// ステートから出ていくときのメソッド
+		void Exit() override;
+	};
+
+	class ExitState : public HierarchicalState<SceneGame_E4C>
+	{
+	public:
+		// コンストラクタ
+		ExitState(SceneGame_E4C* scene) : HierarchicalState<SceneGame_E4C>(scene) {}
+		// デストラクタ
+		~ExitState() {}
 		// ステートに入った時のメソッド
 		virtual void Enter() override;
 		// ステートで実行するメソッド

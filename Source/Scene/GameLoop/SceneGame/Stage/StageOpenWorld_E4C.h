@@ -17,6 +17,11 @@
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
 
+#include "Source/UI/Widget/WidgetButtonImage.h"
+#include "Source/UI/Widget/WidgetImage.h"
+
+#include <unordered_set>
+
 class SceneGame_E4C;
 
 class StageOpenWorld_E4C : public Stage
@@ -37,6 +42,7 @@ public:
 	{
 		NORMAL,
 	};
+
 private:
 	SceneGame_E4C* m_pScene;
 
@@ -50,11 +56,27 @@ private:
 	std::unique_ptr <Billboard> billboard;
 
 	std::unique_ptr<ModelObject> map;
-	std::unique_ptr<ModelObject> shrine;
+	std::unique_ptr<ModelObject> tower;
+	std::unique_ptr<ModelObject> houses;
+
+	WidgetButtonImage* btnExit;
+	WidgetImage* background;
+
+	// Sprite Preload
+	std::unordered_set<const char*> spriteList = {
+		"",											// マスク
+		// Setting UI
+		"Data/Sprites/UI/start.png",
+		"Data/Sprites/big_background.t.png"
+	};
+
+	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
 
 	float transitionTime = 0.0f;
 	float transitionDuration = 2.f;  // 5秒かけて移動
 	int currentSegment = 0;
+
+	bool isPause = false;
 
 	std::vector<DirectX::XMFLOAT3> cameraPositions = {
 		{0,3,0},
