@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <string>
 
@@ -11,10 +11,12 @@ public:
 	~WidgetRoomOption() {}
 
 	virtual void Render(const RenderContext& rc);
+
+	virtual void RenderDX12(const RenderContextDX12& rc);
 private:
 	void NameWithToken();
 private:
-	// “ü—Í
+	// å…¥åŠ›
 	char address[32];
 	char name[32];
 	char port[16];

@@ -12,7 +12,7 @@
 class ModelDX11 : public iModel
 {
 public:
-	ModelDX11(ID3D11Device* device, const char* filename, float scaling = 1.0f);
+	ModelDX11(ID3D11Device* device, const char* filename, float scaling = 1.0f, int modelType = 0);
 	~ModelDX11();
 
 	// ノードデータ取得
@@ -60,9 +60,6 @@ public:
 
 	const std::vector<Node>& GetNodesDX12() const { return m_nodes; }
 	std::vector<Node>& GetNodesDX12() { return m_nodes; }
-
-	// メッシュリスト取得
-	std::vector<Mesh>& GetMeshes() { return m_meshes; }
 
 	// リソース取得
 	const ModelResource* GetResourceDX12() const { return m_resource.get(); }

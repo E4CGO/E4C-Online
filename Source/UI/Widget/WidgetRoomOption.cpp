@@ -1,4 +1,4 @@
-#include <imgui.h>
+ï»¿#include <imgui.h>
 
 #include "TAKOEngine/Runtime/tentacle_lib.h"
 
@@ -14,7 +14,7 @@ WidgetRoomOption::WidgetRoomOption()
 {
 	if (GAME_DATA.GetUser().id < 0)
 	{
-		strcpy_s(name, 32, (char*)u8"ƒvƒŒƒCƒ„[");
+		strcpy_s(name, 32, (char*)u8"ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼");
 	}
 	else
 	{
@@ -52,7 +52,7 @@ void WidgetRoomOption::Render(const RenderContext& rc)
 
 			ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
-			ImGui::Text((char*)u8"–¼‘O");
+			ImGui::Text((char*)u8"åå‰");
 			ImGui::TableSetColumnIndex(1);
 			ImGui::SetNextItemWidth(-1);
 			if (GAME_DATA.GetUser().id < 0)
@@ -66,14 +66,14 @@ void WidgetRoomOption::Render(const RenderContext& rc)
 
 			ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
-			ImGui::Text((char*)u8"IPƒAƒhƒŒƒX");
+			ImGui::Text((char*)u8"IPã‚¢ãƒ‰ãƒ¬ã‚¹");
 			ImGui::TableSetColumnIndex(1);
 			ImGui::SetNextItemWidth(-1);
 			ImGui::InputText("##ipaddress", address, sizeof(address));
 
 			ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
-			ImGui::Text((char*)u8"ƒ|[ƒg");
+			ImGui::Text((char*)u8"ãƒãƒ¼ãƒˆ");
 			ImGui::TableSetColumnIndex(1);
 			ImGui::SetNextItemWidth(-1);
 			ImGui::InputText("##port", port, sizeof(port));
@@ -81,13 +81,13 @@ void WidgetRoomOption::Render(const RenderContext& rc)
 			ImGui::EndTable();
 		}
 
-		if (ImGui::Button((char*)u8"V‚µ‚¢•”‰®"))
+		if (ImGui::Button((char*)u8"æ–°ã—ã„éƒ¨å±‹"))
 		{
 			if (GAME_DATA.GetUser().id < 0) NameWithToken();
 			SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame(name, address, port, new HostNetworkController)));
 		}
 		ImGui::SameLine();
-		if (ImGui::Button((char*)u8"“üŽº"))
+		if (ImGui::Button((char*)u8"å…¥å®¤"))
 		{
 			if (GAME_DATA.GetUser().id < 0) NameWithToken();
 			SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame(name, address, port, new ClientNetworkController)));
@@ -96,9 +96,13 @@ void WidgetRoomOption::Render(const RenderContext& rc)
 	}
 }
 
+void WidgetRoomOption::RenderDX12(const RenderContextDX12& rc)
+{
+}
+
 void WidgetRoomOption::NameWithToken()
 {
-	// ƒ‰ƒ“ƒ_ƒ€ƒvƒŒƒCƒ„[–¼
+	// ãƒ©ãƒ³ãƒ€ãƒ ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼å
 	std::string token = name;
 	token += (char*)u8"#";
 	for (int i = 0; i < 4; i++)

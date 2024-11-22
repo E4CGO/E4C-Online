@@ -1,26 +1,44 @@
-#pragma once
+﻿//! @file StageManager.h
+//! @note 
+
+#ifndef __INCLUDE_STAGE_MANAGER_H__
+#define __INCLUDE_STAGE_MANAGER_H__
 
 #include "TAKOEngine/Tool\Singleton.h"
-#include "TAKOEngine/Physics\Collider.h"
-
 #include "GameObject/ObjectManager.h"
 #include "GameObject/GameObject.h"
 #include "Scene/Stage/Stage.h"
 
+/**************************************************************************//**
+	@class	StageManager
+	@brief	ステージ(ルーム)管理用クラス
+	@par	[説明]
+			オープンフィールド、ダンジョン
+*//***************************************************************************/
 class StageManager : public ObjectManager<GameObject>, public Singleton<StageManager>
 {
 	friend class Singleton<StageManager>;
 protected:
 	StageManager() = default;
 	~StageManager() = default;
-
 public:
-	void SetStage(Stage* stage) { this->currentStage = stage; }
-	Stage* GetStage() { return this->currentStage; }
-public:
-	Stage* currentStage;
+	// 更新処理
+	void Update(float elapsedTime);
+	// 描画処理
+	void Render();
+	void RenderDX12();
+	// 全てのステージをクリア
+	void Clear();
+	// ステージ切り替え
+	void ChangeStage(Stage* stage);
 
-	int stageNumber = 0;
+	// 現在ステージ参照ポインタを取得
+	Stage* GetStage() { return this->m_pCurrentStage; }
+private:
+	Stage* m_pCurrentStage = nullptr;	// 現在ステージ
+	Stage* m_pNextStage = nullptr;		// 次ステージ
 };
 
 #define STAGES StageManager::Instance()
+
+#endif // !__INCLUDE_STAGE_MANAGER_H__

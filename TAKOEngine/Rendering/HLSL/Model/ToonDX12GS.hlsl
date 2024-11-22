@@ -26,6 +26,7 @@ void main( triangle VS_OUT input[3], inout TriangleStream<VS_OUT> output)
 	//	— –Ê‚ÅŠg‘å‚µ‚Äo—Í‚ðì¬
     for (i = 2; i >= 0; --i)
     {
+        float4x4 viewProjection = mul(view, Projection);
         data.vertex = mul(float4(input[i].position.xyz + input[i].normal * 0.02f, 1), viewProjection);
         data.normal   = input[i].normal;
         data.texcoord = input[i].texcoord;

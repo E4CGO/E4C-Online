@@ -1,14 +1,28 @@
-#pragma once
+ï»¿//! @file Mathf.h
+//! @note 
+
+#ifndef __INCLUDED_TOOL_MATH__
+#define __INCLUDED_TOOL_MATH__
+
 #include <DirectXMath.h>
 
+/**************************************************************************//**
+	@class	Mathf
+	@brief	Floatæ•°å­¦è¨ˆç®—ç”¨
+	@par	[èª¬æ˜]
+*//***************************************************************************/
 class Mathf
 {
 public:
-	// üŒ`•âŠ®
+	// ç·šå½¢è£œå®Œ
 	static float Lerp(float a, float b, float t);
-	// w’è”ÍˆÍ‚Ìƒ‰ƒ“ƒ_ƒ€’l‚ğŒvZ‚·‚é
+	static DirectX::XMFLOAT3 Lerp(DirectX::XMFLOAT3 a, DirectX::XMFLOAT3 b, float t);
+	static float LerpRadian(float a, float b, float t);
+	// æŒ‡å®šç¯„å›²ã®ãƒ©ãƒ³ãƒ€ãƒ å€¤ã‚’è¨ˆç®—ã™ã‚‹
 	static float RandomRange(float min, float max);
-	// Œë·”äŠr
+	// èª¤å·®æ¯”è¼ƒ
 	static bool cmpf(float a, float b, float epsilon = 0.005f);
 	static bool cmpfloat3(DirectX::XMFLOAT3 a, DirectX::XMFLOAT3 b, float epsilon = 0.005f);
 };
+
+#endif // !__INCLUDED_TOOL_MATH__

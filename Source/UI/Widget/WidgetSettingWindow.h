@@ -1,4 +1,8 @@
-#pragma once
+﻿//! @file WidgetSettingWindow.h
+//! @note
+
+#ifndef __INCLUDED_WIDGET_SETTING_WINDOW__
+#define __INCLUDED_WIDGET_SETTING_WINDOW__
 
 #include <memory>
 #include <vector>
@@ -13,6 +17,12 @@
 
 #include "GameData.h"
 
+/**************************************************************************//**
+	@class	WidgetSettingWindow
+	@brief	設定ウィンドウズウィジェットクラス
+	@par	[説明]
+		設定画面
+*//***************************************************************************/
 class WidgetSettingWindow : public Widget
 {
 public:
@@ -22,9 +32,11 @@ public:
 	void Update(float elapsedTime) override;
 	void Render(const RenderContext& rc)override;
 
+	void RenderDX12(const RenderContextDX12& rc) override;
+
 	bool IsEnd() { return isEnd; }
 private:
-	bool isEnd = false; // �����t���O
+	bool isEnd = false; // 完結フラグ
 
 	GameData::GameSetting cacheGameSetting;
 
@@ -35,3 +47,5 @@ private:
 
 	std::vector<Widget*> OptionsList;
 };
+
+#endif // !__INCLUDED_WIDGET_SETTING_WINDOW__

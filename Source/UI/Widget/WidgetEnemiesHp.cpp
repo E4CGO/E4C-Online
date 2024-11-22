@@ -10,7 +10,7 @@ WidgetEnemiesHp::WidgetEnemiesHp(DirectX::XMFLOAT2 size)
 {
 	this->gauge = RESOURCE.LoadSpriteResource(""); // 長方形
 
-	this->size = size; // ゲージサイズ
+	this->m_size = size; // ゲージサイズ
 }
 WidgetEnemiesHp::WidgetEnemiesHp(float width, float height) :WidgetEnemiesHp(DirectX::XMFLOAT2{ width, height }) {}
 
@@ -18,7 +18,7 @@ void WidgetEnemiesHp::Render(const RenderContext& rc)
 {
 	// ビューボード
 	D3D11_VIEWPORT viewport;
-	
+
 	UINT numViewports = 1;
 	rc.deviceContext->RSGetViewports(&numViewports, &viewport);
 
@@ -48,18 +48,22 @@ void WidgetEnemiesHp::Render(const RenderContext& rc)
 
 		this->gauge->Render(
 			rc.deviceContext,
-			pos.x - (size.x * 0.5f), pos.y - (size.y * 0.5f), 0,
-			size.x, size.y,
+			pos.x - (m_size.x * 0.5f), pos.y - (m_size.y * 0.5f), 0,
+			m_size.x, m_size.y,
 			0.0f,
 			0.0f, 0.0f, 0.0f, 0.5f
 		);
 
 		this->gauge->Render(
 			rc.deviceContext,
-			pos.x - (size.x * 0.5f) + 1.0f, pos.y - (size.y * 0.5f) + 1.0f, 0,
-			(size.x - 2.0f) * (hp / maxHp), size.y - 2.0f,
+			pos.x - (m_size.x * 0.5f) + 1.0f, pos.y - (m_size.y * 0.5f) + 1.0f, 0,
+			(m_size.x - 2.0f) * (hp / maxHp), m_size.y - 2.0f,
 			0.0f,
 			0.7f, 0.0f, 0.0f, 1.0f
 		);
 	}
+}
+
+void WidgetEnemiesHp::RenderDX12(const RenderContextDX12& rc)
+{
 }

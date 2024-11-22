@@ -18,7 +18,7 @@ void SceneTest::Initialize()
 
 	newPlayer = std::make_unique<PlayerCharacter>(charInfo);
 	newPlayer->SetPosition({ 5,	100, 5 });
-	newPlayer->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::State::Idle));
+	newPlayer->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 
 	//player = std::make_unique<Player>("Data/Model/Character/Barbarian.glb", 1.0f);
 	//player->SetPosition({ 5, 50, 5 });

@@ -1,23 +1,36 @@
+﻿//! @file WidgetInputBool.cpp
+//! @note
+
 #include "WidgetInputBool.h"
 
 #include "TAKOEngine/Runtime/tentacle_lib.h"
 #include "TAKOEngine/Rendering/ResourceManager.h"
 
-WidgetInputBool::WidgetInputBool(const char* label, bool* value) : label(label), value(value)
+/**************************************************************************//**
+	@brief	コンストラクタ
+	@param[in]	label	ラベル
+	@param[in]	value	bool値の参照ポインタ
+*//***************************************************************************/
+WidgetInputBool::WidgetInputBool(const char* label, bool* value) : m_label(label), m_pValue(value)
 {
-	trueImage = RESOURCE.LoadSpriteResource("Data/Sprites/button_agree.png");
-	falseImage = RESOURCE.LoadSpriteResource("Data/Sprites/button3_ready.png");
+	m_trueImage = RESOURCE.LoadSpriteResource("Data/Sprites/button_agree.png");
+	m_falseImage = RESOURCE.LoadSpriteResource("Data/Sprites/button3_ready.png");
 };
 
+/**************************************************************************//**
+	@brief		描画処理
+	@param[in]	rc レンダーコンテンツ
+	@return		なし
+*//***************************************************************************/
 void WidgetInputBool::Render(const RenderContext& rc)
 {
-	DirectX::XMFLOAT2 checkboxSize = { size.y, size.y };
-	DirectX::XMFLOAT2 LabelSize = T_TEXT.TextSize(FONT_ID::HGpop, label.c_str());
+	DirectX::XMFLOAT2 checkboxSize = { m_size.y, m_size.y };
+	DirectX::XMFLOAT2 LabelSize = T_TEXT.TextSize(FONT_ID::HGpop, m_label.c_str());
 
 	T_TEXT.Render(
 		FONT_ID::HGpop,
-		label.c_str(),
-		position.x, position.y + size.y / 2.0f,
+		m_label.c_str(),
+		m_position.x, m_position.y + m_size.y / 2.0f,
 		1, 1, 1, 1,
 		0.0f,
 		FONT_ALIGN::LEFT,
@@ -25,22 +38,26 @@ void WidgetInputBool::Render(const RenderContext& rc)
 		1
 	);
 
-	if (*value)
+	if (*m_pValue)
 	{
 		//True
-		trueImage->Render(
+		m_trueImage->Render(
 			rc.deviceContext,
-			position.x + size.x - checkboxSize.x, position.y, 0,
+			m_position.x + m_size.x - checkboxSize.x, m_position.y, 0,
 			checkboxSize.x, checkboxSize.y
 		);
 	}
 	else
 	{
 		//False
-		falseImage->Render(
+		m_falseImage->Render(
 			rc.deviceContext,
-			position.x + size.x - checkboxSize.x, position.y, 0,
+			m_position.x + m_size.x - checkboxSize.x, m_position.y, 0,
 			checkboxSize.x, checkboxSize.y
 		);
 	}
+}
+
+void WidgetInputBool::RenderDX12(const RenderContextDX12& rc)
+{
 }

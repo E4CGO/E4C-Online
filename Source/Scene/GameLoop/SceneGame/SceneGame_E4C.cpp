@@ -13,44 +13,44 @@
 
 #include "SceneGame_E4CState.h"
 #include "Scene/GameLoop/SceneGame/Stage/StageOpenWorld_E4C.h"
-#include "Scene/Stage/TestingStage.h"
 
+#include "Scene/Stage/StageManager.h"
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "TAKOEngine/Tool/Console.h"
-#include <GameObject/Character/Enemy/EnemyManager.h>
+
+#include "UI/Widget/WidgetCrosshair.h"
+#include "TAKOEngine/GUI/UIManager.h"
 
 void SceneGame_E4C::Initialize()
 {
 	stateMachine = std::make_unique<StateMachine<SceneGame_E4C>>();
-	stateMachine->RegisterState(GAME_STATE::OPENWORLD, new SceneGame_E4CState::WaitingState(this));
-	stateMachine->RegisterState(GAME_STATE::DUNGEON, new SceneGame_E4CState::WaitingState(this));
-	stateMachine->SetState(GAME_STATE::OPENWORLD);
-
-	//stageDungeon = std::make_unique<TestingStage>();
-	//stageDungeon->Initialize();
-
+	stateMachine->RegisterState(GAME_STATE::INIT, new SceneGame_E4CState::InitState(this));
+	stateMachine->SetState(GAME_STATE::INIT);
 
 	CameraManager& cameraManager = CameraManager::Instance();
 	Camera* mainCamera = new Camera();
 	cameraManager.Register(mainCamera);
 	cameraManager.SetCamera(0);
-	//Console::Instance().Open();
 
-	stageOpenWorld = std::make_unique<StageOpenWorld_E4C>(this);
-	stageOpenWorld->Initialize();
+	Console::Instance().Open();
 
+	// 選択した自機
+	const PlayerCharacterData::CharacterInfo info = PlayerCharacterData::Instance().GetCurrentCharacter();
+	PlayerCharacter* player = PlayerCharacterManager::Instance().UpdatePlayerData(0, "", info.Character.pattern);
+	player->Show();
+	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
+
+	STAGES.ChangeStage(new StageOpenWorld_E4C(this));
 
 	m_ponlineController = new Online::OnlineController;
 	if (m_ponlineController->Initialize())
 	{
-		if (m_ponlineController->Login()) {
-			while (m_ponlineController->GetState() != Online::OnlineController::STATE::LOGINED)
-			{
-				// 待つ
-				std::cout << ".";
-			}
-		}
+		m_ponlineController->Login();
 	}
+
+	CURSOR_OFF;
+
+	UI.Register(new WidgetCrosshair);
 }
 
 void SceneGame_E4C::Finalize()
@@ -58,53 +58,35 @@ void SceneGame_E4C::Finalize()
 	delete m_ponlineController;
 	Console::Instance().Close();
 	LightManager::Instance().Clear();
-	MAPTILES.Clear();
-	STAGES.Clear();
-	ENEMIES.Clear();
-	PlayerCharacterManager::Instance().Clear();
 	CameraManager::Instance().Clear();
+	STAGES.Clear();
+	MAPTILES.Clear();
+	PlayerCharacterManager::Instance().Clear();
+	UI.Clear();
 }
 
 // 更新処理
 void SceneGame_E4C::Update(float elapsedTime)
 {
+	STAGES.Update(elapsedTime);
+	UI.Update(elapsedTime);
 	stateMachine->Update(elapsedTime);
-
-	stageNumber = STAGES.stageNumber;
-
-	if (stageNumber == 0)
-	{
-		stageOpenWorld->Update(elapsedTime);
-
-		ProfileScopedSection_2("Enemy", ImGuiControl::Profiler::Red);
-		// エネミー更新
-		ENEMIES.Update(elapsedTime);
-	}
-	if (stageNumber == 1)
-	{
-		stageDungeon->Update(elapsedTime);
-	}
-	{
-		
-	}
 }
 
 // 描画処理
 void SceneGame_E4C::Render()
 {
+	T_TEXT.Begin();
 	RenderContext rc;
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
-	if (stageNumber == 0)
-	{
-		stageOpenWorld->Render();
-		ENEMIES.Render(rc);						// エネミー
-	}
-	if (stageNumber == 1)
-	{
-		STAGES.Render(rc);
-	}
-	
-	//ProfileDrawUI();
+	STAGES.Render();
+
+	UI.Render(rc);
+
+	T_TEXT.End();
+	// デバッグレンダラ描画実行
+	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
+
 }

@@ -1,4 +1,8 @@
-﻿#include "PlayerCharacterManager.h"
+﻿//! @file PlayerCharacterManager.cpp
+//! @note 
+
+#include "PlayerCharacterManager.h"
+#include <iostream>
 
 /**************************************************************************//**
 	@brief		プレイヤーキャラクター更新処理
@@ -9,6 +13,16 @@ void PlayerCharacterManager::Update(float elapsedTime)
 {
 	std::lock_guard<std::mutex> lock(m_mut);
 	ObjectManager<PlayerCharacter>::Update(elapsedTime);
+}
+/**************************************************************************//**
+	@brief		プレイヤーキャラクター描画処理
+	@param[in]	elapsedTime 経過時間
+	@return		なし
+*//***************************************************************************/
+void PlayerCharacterManager::Render(const RenderContext& rc)
+{
+	std::lock_guard<std::mutex> lock(m_mut);
+	ObjectManager<PlayerCharacter>::Render(rc);
 }
 
 /**************************************************************************//**
@@ -49,14 +63,22 @@ PlayerCharacter* PlayerCharacterManager::UpdatePlayerData(const uint64_t client_
 	{
 		// 新プレイヤー
 		player = new PlayerCharacter(client_id, name, appearance);
+		player->Hide();
 		Register(player);
+		player->GetStateMachine()->ChangeState(PlayerCharacter::STATE::IDLE);
+
+		std::cout << "New PlayerCharacter: " << static_cast<int>(client_id) << std::endl;
 		return player;
 	}
 	else
 	{
-		// プレイヤーデータ更新
-		player->SetName(name);
-		player->LoadAppearance(appearance);
+		if (client_id != GAME_DATA.GetClientId())
+		{
+			// プレイヤーデータ更新
+			player->SetName(name);
+			player->LoadAppearance(appearance);
+			std::cout << "Update PlayerCharacter: " << static_cast<int>(client_id) << std::endl;
+		}
 		return player;
 	}
 }
@@ -71,22 +93,14 @@ void PlayerCharacterManager::SyncPlayer(const uint64_t client_id, const PlayerCh
 {
 	PlayerCharacter* player = GetPlayerCharacterById(client_id);
 	if (player == nullptr) return;
-
 	std::lock_guard<std::mutex> lock(m_mut);
 	// 補間？
-	if (player->CheckSync(data.sync_count_id))
-	{
-		player->SetPosition({ data.position[0], data.position[1], data.position[2] });
-		player->Stop();
-		player->AddImpulse({ data.velocity[0], data.velocity[1], data.velocity[2] });
-		player->SetAngle({ 0.0f, data.rotate, 0.0f });
-		player->GetStateMachine()->ChangeState(data.state);
-	}
+	player->ImportSyncData(data);
 }
 
 
 /**************************************************************************//**
- 	@brief		プレイヤーキャラクターを削除
+	@brief		プレイヤーキャラクターを削除
 	@param[in]	client_id クライアントID
 	@return		なし
 *//***************************************************************************/
@@ -104,6 +118,13 @@ void PlayerCharacterManager::Remove(const uint64_t client_id)
 void PlayerCharacterManager::ClearOtherPlayers()
 {
 	std::lock_guard<std::mutex> lock(m_mut);
-	std::erase_if(this->items, [this](const auto& item) { return item->GetClientId() != m_local_client_id; });
+	for (PlayerCharacter* player : this->items)
+	{
+		if (player->GetClientId() != GAME_DATA.GetClientId())
+		{
+			delete player;
+		}
+	}
+	std::erase_if(this->items, [this](const auto& item) { return item->GetClientId() != GAME_DATA.GetClientId(); });
 }
 

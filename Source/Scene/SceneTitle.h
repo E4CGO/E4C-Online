@@ -56,6 +56,9 @@ private:
 	//スキニング
 	SkinningPipeline*	m_skinning_pipeline;
 
+	// パーティクル
+	std::unique_ptr<ParticleRenderer> m_particle;
+
 	// フレームバッファマネージャー
 	FrameBufferManager* m_frameBuffer;
 
@@ -86,13 +89,13 @@ private:
 
 	// テスト用
 	std::unique_ptr<ModelDX12> test;
+	std::unique_ptr<ModelDX12> sky;
 	DirectX::XMFLOAT4X4 test_transform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 	DirectX::XMFLOAT3 test_position = { 0, 0, 0 };
 	DirectX::XMFLOAT4 test_rotation = { 0, 0, 0, 0 };
 	DirectX::XMFLOAT3 test_scale = { 1, 1, 1 };
 
 	std::unique_ptr<SpriteDX12>			m_sprites[8];
-
 
 	static float time;
 };

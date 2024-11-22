@@ -139,7 +139,7 @@ void Camera::Move2PointToCamera(const DirectX::XMFLOAT3& start, const DirectX::X
 
 void Camera::MovePointToCamera(const std::vector<DirectX::XMFLOAT3>& positions, const std::vector<DirectX::XMFLOAT3>& focusPoints,  float& transitionTime, float transitionDuration, float elapsedTime)
 {
-	if (positions.size() < 2 || focusPoints.size() < 2)
+	if (positions.size() < 2 || focusPoints.size() < 2 || positions.size() != focusPoints.size())
 	{
 		// 少なくとも2つのポイントが必要
 		return;

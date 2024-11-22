@@ -1,7 +1,6 @@
 ﻿//! @file OnlineController.cpp
 //! @note 
 
-#include <iostream>
 
 #include "OnlineController.h"
 
@@ -10,8 +9,13 @@
 #include "TCPCommand/TCPClientData.h"
 #include "TCPCommand/TCPRoom.h"
 #include "TCPCommand/TCPChat.h"
+#include "TCPCommand/TCPMatching.h"
 
 #include "UDPCommand/UDPSync.h"
+#include "GameObject/Props/Teleporter.h"
+#include "Scene/GameLoop/SceneGame/Stage/StageDungeon_E4C.h"	
+
+#include "Scene/SceneManager.h"
 
 namespace Online
 {
@@ -26,8 +30,15 @@ namespace Online
 		m_tcpCommands[TCP_CMD::TOKEN] = new TCPToken(this, TCP_CMD::TOKEN);
 		m_tcpCommands[TCP_CMD::LOGIN] = new TCPLogin(this, TCP_CMD::LOGIN);
 		m_tcpCommands[TCP_CMD::CLIENT_DATA] = new TCPClientData(this, TCP_CMD::CLIENT_DATA);
+
+		m_tcpCommands[TCP_CMD::MATCHING_START] = new TCPMatchingStart(this, TCP_CMD::MATCHING_START);
+		m_tcpCommands[TCP_CMD::MATCHING_UPDATE] = new TCPMatchingUpdate(this, TCP_CMD::MATCHING_UPDATE);
+		m_tcpCommands[TCP_CMD::MATCHING_END] = new TCPMatchingEnd(this, TCP_CMD::MATCHING_END);
+		m_tcpCommands[TCP_CMD::MATCHING_READY] = new TCPMatchingReady(this, TCP_CMD::MATCHING_READY);
+
 		m_tcpCommands[TCP_CMD::ROOM_IN] = new TCPRoomIn(this, TCP_CMD::ROOM_IN);
 		m_tcpCommands[TCP_CMD::ROOM_OUT] = new TCPRoomOut(this, TCP_CMD::ROOM_OUT);
+		m_tcpCommands[TCP_CMD::ROOM_NEW] = new TCPRoomNew(this, TCP_CMD::ROOM_NEW);
 		m_tcpCommands[TCP_CMD::CHAT] = new TCPChat(this, TCP_CMD::CHAT);
 		m_tcpCommands[TCP_CMD::PING] = new TCPNone(this, TCP_CMD::PING);
 
@@ -63,19 +74,7 @@ namespace Online
 
 		m_state = Online::OnlineController::STATE::INIT;
 
-
-		clock_t start_time = clock();
-		while (true)
-		{
-			if ((static_cast<float>(clock() - start_time) / CLOCKS_PER_SEC) > 5.0f)
-			{
-				return false;
-			}
-			if (m_state == Online::OnlineController::STATE::CONNNETED)
-			{
-				return true;
-			}
-		}
+		return true;
 	}
 
 	/**************************************************************************//**
@@ -102,8 +101,9 @@ namespace Online
 					char buf;
 					while (m_ptcpSocket->Receive(&buf, 1) > 0)
 					{
-						buf;
+						std::cout << buf;
 					}
+					std::cout << std::endl;
 				}
 				SetConsoleOutputCP(temp);
 			}
@@ -121,7 +121,7 @@ namespace Online
 		uint8_t buffer[buffer_size];
 		DATA_HEADER header;
 		int header_size = sizeof(DATA_HEADER);
-		while (m_pudpSocket->IsConnecting())
+		while (m_udpFlag)
 		{
 			ZeroMemory(&buffer, buffer_size);
 			int size = m_pudpSocket->Receive(&buffer, buffer_size);
@@ -148,7 +148,7 @@ namespace Online
 		clock_t last = clock();
 		const float frequency = 0.25f;
 		uint64_t sync_count_id = 0;
-		while (m_pudpSocket->IsConnecting())
+		while (m_udpFlag)
 		{
 			if ((static_cast<float>(clock() - last) / CLOCKS_PER_SEC) > frequency)
 			{
@@ -175,18 +175,94 @@ namespace Online
 			data.appearance[i] = info.Character.pattern[i];
 		}
 
-		m_state = Online::OnlineController::STATE::LOGIN;
 		return m_tcpCommands[TCP_CMD::LOGIN]->Send(&data);
 	}
 
 	/**************************************************************************//**
 		@brief		チャットを送信
-		@param[in]	なし
+		@param[in]	message	チャットメッセージの参照
 		@return		なし
 	*//***************************************************************************/
 	void OnlineController::Chat(std::string& message)
 	{
 		m_tcpCommands[TCP_CMD::CHAT]->Send(&message);
+	}
+
+	
+	/**************************************************************************//**
+		@brief		マッチング開始
+		@param[in]	なし
+		@return		なし
+	*//***************************************************************************/
+	void OnlineController::StartMatching(WidgetMatching* ui)
+	{
+		m_pMatchingUI = ui;
+		m_tcpCommands[TCP_CMD::MATCHING_START]->Send(nullptr);
+	}
+	/**************************************************************************//**
+		@brief		マッチング終了
+		@param[in]	なし
+		@return		なし
+	*//***************************************************************************/
+	void OnlineController::EndMatching()
+	{
+		if (m_state == STATE::OFFLINE) return;
+		if (m_ptcpSocket == nullptr) return;
+		m_tcpCommands[TCP_CMD::MATCHING_END]->Send(nullptr);
+		m_pMatchingUI = nullptr;
+	}
+	/**************************************************************************//**
+		@brief		マッチング準備完了
+		@param[in]	なし
+		@return		なし
+	*//***************************************************************************/
+	void OnlineController::ReadyMatching()
+	{
+		if (m_state == STATE::OFFLINE) return;
+		if (m_ptcpSocket == nullptr) return;
+		m_tcpCommands[TCP_CMD::MATCHING_READY]->Send(nullptr);
+	}
+
+	/**************************************************************************//**
+	 	@brief		ダンジョンを生成する(ホスト)
+		@param[in]	なし
+		@return		なし
+	*//***************************************************************************/
+	void OnlineController::NewRoom()
+	{
+		if (m_pMatchingUI)
+		{
+			EndSync();
+			Stage* stage = m_pMatchingUI->GetTeleporter()->GetStage();
+			if (auto dungeon = dynamic_cast<StageDungeon_E4C*>(stage))
+			{
+				dungeon->GenerateDungeon();
+				std::vector<uint8_t> roomOrder = dungeon->GetRoomOrder();
+				m_tcpCommands[TCP_CMD::ROOM_NEW]->Send(&roomOrder);
+			}
+		}
+	}
+	void OnlineController::NewRoom(const std::vector<uint8_t>& roomOrder)
+	{
+		if (m_pMatchingUI)
+		{
+			Stage* stage = m_pMatchingUI->GetTeleporter()->GetStage();
+			if (auto dungeon = dynamic_cast<StageDungeon_E4C*>(stage))
+			{
+				dungeon->SetRoomOrder(roomOrder);
+				m_pMatchingUI->GetTeleporter()->Teleport();
+			
+				PlayerCharacterManager::Instance().ClearOtherPlayers();
+				std::cout << "Clean PlayerCharacterManager" << std::endl;
+				EndSync();
+				m_pMatchingUI = nullptr;
+			}
+		}
+	}
+
+	void OnlineController::RoomIn()
+	{
+		m_tcpCommands[TCP_CMD::ROOM_IN]->Send(nullptr);
 	}
 
 	/**************************************************************************//**
@@ -207,6 +283,8 @@ namespace Online
 			delete command.second;
 		}
 		m_udpCommands.clear();
+
+		GAME_DATA.SetClientId(0);
 	}
 
 	/**************************************************************************//**
@@ -225,7 +303,7 @@ namespace Online
 		}
 		if (m_pudpSocket != nullptr)
 		{
-
+			m_udpFlag = false;
 			if (m_pudpSocket->IsConnecting()) m_pudpSocket->Disconnect();
 			if (m_udpRecvThread.joinable()) m_udpRecvThread.join();
 			if (m_udpSendThread.joinable()) m_udpSendThread.join();

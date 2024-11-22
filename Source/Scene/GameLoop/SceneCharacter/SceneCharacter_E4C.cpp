@@ -13,16 +13,24 @@
 
 #include "GameData.h"
 
-//テスト用
+// ディフォルト値
 float SceneCharacter_E4C::m_time{ 0 };
 const int SceneCharacter_E4C::m_maxCharacters{ 3 };
 
+/**************************************************************************//**
+	@brief	初期化
+*//***************************************************************************/
 void SceneCharacter_E4C::Initialize()
 {
 	// Sprite Resource Preload
 	for (auto& filename : spriteList)
 	{
 		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
+	}
+	// Model Resource Preload
+	for (auto& filename : modelList)
+	{
+		modelPreLoad.insert(RESOURCE.LoadModelResource(filename));
 	}
 
 	//シャドウマップレンダラ
@@ -31,29 +39,7 @@ void SceneCharacter_E4C::Initialize()
 	// フレームバッファマネージャー
 	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
 
-	// モデル
-	{
-		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/UI/start.png");
-		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/UI/exit.png");
-	}
-
 	m_previewCharacters.resize(m_maxCharacters);
-
-	for (size_t i = 0; i < m_maxCharacters; i++)
-	{
-		PlayerCharacterData::CharacterInfo charInfo = {
-		true,			// visible
-		"center",		// save
-		{				//Character
-			i, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-		}
-		};
-
-		m_previewCharacters[i] = std::make_unique<NonPlayerCharacter>(charInfo);
-		m_previewCharacters[i]->SetPosition({ 3.5f * i * -1.f + 3.5f, 0.0f, 5.0f });
-		m_previewCharacters[i]->SetKinematic(true);
-		m_previewCharacters[i]->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::State::Waiting));
-	}
 
 	// 光
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
@@ -87,13 +73,14 @@ void SceneCharacter_E4C::Initialize()
 	stateMachine = std::make_unique<StateMachine<SceneCharacter_E4C>>();
 	stateMachine->RegisterState(STATE::INIT, new SceneCharacter_E4CState::InitState(this));
 	stateMachine->RegisterState(STATE::CHARACTERSELECTION, new SceneCharacter_E4CState::CharacterSelectionState(this));
-	stateMachine->RegisterState(STATE::CHARACTERCREATIONLEFT, new SceneCharacter_E4CState::CharacterCreationStateLeft(this));
-	stateMachine->RegisterState(STATE::CHARACTERCREATIONCENTER, new SceneCharacter_E4CState::CharacterCreationStateCenter(this));
-	stateMachine->RegisterState(STATE::CHARACTERCREATIONRIGHT, new SceneCharacter_E4CState::CharacterCreationStateRight(this));
+	stateMachine->RegisterState(STATE::CHARACTERCREATION, new SceneCharacter_E4CState::CharacterCreationState(this));
 	stateMachine->RegisterState(STATE::START, new SceneCharacter_E4CState::StartState(this));
 	stateMachine->SetState(STATE::INIT);
 }
 
+/**************************************************************************//**
+	@brief 終わり
+*//***************************************************************************/
 void SceneCharacter_E4C::Finalize()
 {
 	spritePreLoad.clear();
@@ -102,14 +89,18 @@ void SceneCharacter_E4C::Finalize()
 	CameraManager::Instance().Clear();
 }
 
-// 更新処理
+/**************************************************************************//**
+	@brief		 更新処理
+	@param[in]    elapsedTime
+*//***************************************************************************/
 void SceneCharacter_E4C::Update(float elapsedTime)
 {
 	m_time += elapsedTime;
 
 	for (auto& it : m_previewCharacters)
 	{
-		it->Update(elapsedTime);
+		if (it != nullptr)
+			it->Update(elapsedTime);
 	}
 
 	stateMachine->Update(elapsedTime);
@@ -126,7 +117,9 @@ void SceneCharacter_E4C::Update(float elapsedTime)
 	UI.Update(elapsedTime);
 }
 
-// 描画処理
+/**************************************************************************//**
+	@brief	 描画処理
+*//***************************************************************************/
 void SceneCharacter_E4C::Render()
 {
 	T_TEXT.Begin();
@@ -149,8 +142,10 @@ void SceneCharacter_E4C::Render()
 
 	for (auto& it : m_previewCharacters)
 	{
-		if (it->GetMenuVisibility())
-			it->Render(rc);
+		if (it != nullptr) {
+			if (it->GetMenuVisibility())
+				it->Render(rc);
+		}
 	}
 
 	UI.Render(rc);
@@ -159,17 +154,18 @@ void SceneCharacter_E4C::Render()
 
 #ifdef _DEBUG
 	// DebugIMGUI
-	//DrawSceneGUI();
+	DrawSceneGUI();
 	//shadowMapRenderer->DrawDebugGUI();
 #endif // _DEBUG
 }
 
+/**************************************************************************//**
+	@brief	DX12描画処理
+*//***************************************************************************/
 void SceneCharacter_E4C::RenderDX12()
 {
 	TentacleLib::graphics.BeginRender();
 	{
-		
-
 		// シーン用定数バッファ更新
 		const Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
 			CameraManager::Instance().GetCamera());
@@ -179,22 +175,45 @@ void SceneCharacter_E4C::RenderDX12()
 		rc.d3d_command_list = m_frameBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
-		// スプライト描画
-		if (m_sprites[0] != nullptr)
-		{
-			m_sprites[0]->Begin(rc);
-			m_sprites[0]->Draw(0, 0, 100, 100, 0, 1, 1, 1, 1);
-			m_sprites[0]->End(m_frameBuffer->GetCommandList());
-		}
-
+		UI.RenderDX12(rc);
 	}
 	TentacleLib::graphics.End();
 }
 
+/**************************************************************************//**
+	@brief		キャラコントロール
+	@param[in]    characterNumber
+	@param[in]    modelType
+	@param[in]    value
+*//***************************************************************************/
 void SceneCharacter_E4C::UpdateCurrentModel(int characterNumber, int modelType, int value)
 {
 }
 
+/**************************************************************************//**
+	@brief	ディバッグ描画
+*//***************************************************************************/
 void SceneCharacter_E4C::DrawSceneGUI()
 {
+	ImVec2 pos = ImGui::GetMainViewport()->Pos;
+	ImGui::SetNextWindowPos(ImVec2(pos.x + 10, pos.y + 10), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+
+	if (ImGui::Begin("Scene##Debug", nullptr, ImGuiWindowFlags_None))
+	{
+		if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			// カメラ
+			DirectX::XMFLOAT3 eye = CameraManager::Instance().GetCamera()->GetEye();
+			ImGui::DragFloat3("Eye", &eye.x, 0.01f, 100.0f);
+			DirectX::XMFLOAT3 focus = CameraManager::Instance().GetCamera()->GetFocus();
+			ImGui::DragFloat3("Fcous", &focus.x, 0.01f, 100.0f);
+			DirectX::XMFLOAT3 up = CameraManager::Instance().GetCamera()->GetUp();
+			ImGui::DragFloat3("Up", &up.x, 0.01f, 100.0f);
+
+			CameraManager::Instance().GetCamera()->SetLookAt(eye, focus, up);
+			cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
+		}
+	}
+	ImGui::End();
 }

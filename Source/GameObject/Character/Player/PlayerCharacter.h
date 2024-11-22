@@ -5,6 +5,7 @@
 #define __INCLUDED_PLAYER_CHARACTER_H__
 
 #include <unordered_map>
+#include <mutex>
 
 #include "TAKOEngine/AI/StateMachine.h"
 #include "GameObject/Character/Character.h"
@@ -35,6 +36,7 @@ public:
 		float velocity[3];
 		float rotate;
 		uint8_t state;
+		uint8_t sub_state;
 	};
 #pragma pack(pop)
 
@@ -120,26 +122,26 @@ public:
 		Walking_C
 	};
 
-	enum class State
+	enum STATE : uint8_t
 	{
-		Idle,
-		Move,
-		Jump,
-		Fall,
-		Land,
-		Dodge,
-		Hurt,
-		Death,
+		IDLE,
+		MOVE,
+		JUMP,
+		FALL,
+		LAND,
+		DODGE,
+		HURT,
+		DEATH,
 
-		AttackNormal,
-		AttackSpecial,
-		Skill_1,
-		Skill_2,
-		Skill_4,
-		Skill_3,
+		ATTACK_NORMAL,
+		ATTACK_SPECIAL,
+		SKILL_1,
+		SKILL_2,
+		SKILL_3,
+		SKILL_4,
 
-		Waiting = 998,	// 待機
-		Ready = 999,	// 待機 (準備完了)
+		WAITING = 254,	// 待機
+		READY = 255,	// 待機 (準備完了)
 	};
 
 	enum COLOR_PATTERN {
@@ -179,13 +181,13 @@ public:
 	bool ReleaseSkill4() { return (input & Input_R_Skill_4) > 0; }
 
 	bool IsMove() { return velocity.x != 0.0f || velocity.z != 0.0f; }
-	bool IsFall() { return velocity.y < -2.0f; }
+	bool IsFall() { return velocity.y < -10.0f; }
 
 	void FaceToCamera();
 	void TurnByInput();
 
 	uint64_t GetClientId() { return m_client_id; }
-	void SetClientId(int id) { m_client_id = id; }
+	void SetClientId(const uint64_t id) { m_client_id = id; }
 	int GetClassType() { return type; }
 
 	float GetTurnSpeed() { return turnSpeed; }
@@ -193,16 +195,6 @@ public:
 
 	const std::string& GetName() { return m_name; }
 	void SetName(const char* name) { this->m_name = name; }
-
-	bool CheckSync(uint64_t sync_count_id)
-	{
-		if (sync_count_id > m_sync_count_id)
-		{
-			m_sync_count_id = sync_count_id;
-			return true;
-		}
-		return false;
-	}
 
 	void SetMenuVisibility(bool value) { this->m_menuVisible = value; }
 	bool GetMenuVisibility() { return this->m_menuVisible; }
@@ -251,20 +243,9 @@ public:
 
 
 	// 同期用データを取得
-	void GetSyncData(SYNC_DATA& data)
-	{
-		data.client_id = m_client_id;
-		data.sync_count_id = m_sync_count_id;
-		data.position[0] = position.x;
-		data.position[1] = position.y;
-		data.position[2] = position.z;
-		data.velocity[0] = velocity.x;
-		data.velocity[1] = velocity.y;
-		data.velocity[2] = velocity.z;
-		data.rotate = angle.y;
-		data.state = static_cast<uint8_t>(stateMachine->GetStateIndex());
-		m_sync_count_id++;
-	}
+	void GetSyncData(SYNC_DATA& data);
+	// 同期用データを計算
+	void ImportSyncData(const SYNC_DATA& data);
 
 	static DirectX::XMFLOAT4 GetColorSet(int idx) { return PlayerCharacter::colorSet[idx]; }
 protected:
@@ -285,7 +266,6 @@ protected:
 
 private:
 	uint64_t m_client_id = 0;
-	uint64_t m_sync_count_id = 0;
 
 	uint32_t input = 0;						// キー入力
 	DirectX::XMFLOAT2 inputDirection = {};	// 移動方向
@@ -332,6 +312,18 @@ protected:
 	StateMachine<PlayerCharacter>* stateMachine;
 
 	std::unordered_map<int, Collider*> m_pattackColliders; // 攻撃判定
+
+	// 同期用
+	std::mutex m_mut;
+	// 同期補間
+	struct TEMP_DATA {
+		float timer = 0.0f;
+		float time = 0.0f;
+		DirectX::XMFLOAT3 position = {};
+		float angle = 0.0f;
+		uint64_t old_sync_count = 0;
+		SYNC_DATA sync_data = {};
+	} m_tempData;
 };
 
 #endif // __INCLUDED_PLAYER_CHARACTER_H__

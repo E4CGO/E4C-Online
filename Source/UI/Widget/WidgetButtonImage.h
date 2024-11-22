@@ -1,27 +1,54 @@
-#pragma once
+﻿//! @file WidgetButtonImage.h
+//! @note
+
+#ifndef __INCLUDE_WIDGET_BUTTON_IMAGE__
+#define __INCLUDE_WIDGET_BUTTON_IMAGE__
 
 #include <memory>
-#include <string>
 
 #include "TAKOEngine/Rendering/Sprite.h"
+#include "TAKOEngine/Rendering/SpriteDX12.h"
 
 #include "UI/Widget/WidgetButton.h"
 #include "UI/Widget/WidgetText.h"
 
+/**************************************************************************//**
+	@class	WidgetButtonImage
+	@brief	画像ボタンクラス
+	@par	[説明]
+		クリックができる画像UI
+*//***************************************************************************/
 class WidgetButtonImage : public WidgetButton
 {
 public:
+	// コンストラクタ(ホバー引数付き)
 	WidgetButtonImage(const char* text, const char* image, const char* hoverImage, std::function<void(WidgetButton*)> f);
+	// コンストラクタ(引数付き）
 	WidgetButtonImage(const char* text, const char* image, std::function<void(WidgetButton*)> f);
+	// デストラクタ
 	~WidgetButtonImage() {};
 
-	WidgetText* GetText() { return this->text.get(); }
+	// ボタンの文字を取得
+	WidgetText* GetText() { return this->m_text.get(); }
 
+	// 描画処理
 	virtual void Render(const RenderContext& rc);
-	void SetColor(const DirectX::XMFLOAT4& color) { this->color = color; }
+	// 描画処理
+	virtual void RenderDX12(const RenderContextDX12& rc);
+	// 画像色を設定
+	void SetColor(const DirectX::XMFLOAT4& color) { this->m_color = color; }
 protected:
-	DirectX::XMFLOAT4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	std::shared_ptr<Sprite> btnImage;
-	std::shared_ptr<Sprite> hoverBtnImage;
-	std::unique_ptr<WidgetText> text;
+	// 色
+	DirectX::XMFLOAT4 m_color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	// ボタン画像
+	std::shared_ptr<Sprite> m_btnImage;
+	// ボタン画像 DX12
+	std::shared_ptr<SpriteDX12> m_btnImageDX12;
+	// ボタンホバー画像
+	std::shared_ptr<Sprite> m_hoverBtnImage;
+	// ボタンホバー画像 DX12
+	std::shared_ptr<SpriteDX12> m_hoverBtnImageDX12;
+	// ボタン文字
+	std::unique_ptr<WidgetText> m_text;
 };
+#endif // !__INCLUDE_WIDGET_BUTTON_IMAGE__

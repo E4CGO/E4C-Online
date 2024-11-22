@@ -1,50 +1,58 @@
-#pragma once
+﻿//! @file Teleporter.h
+//! @note 
 
-#include "TAKOEngine/Rendering/RenderContext.h"
-#include "TAKOEngine/Physics/Collider.h"
+#ifndef __INCLUDE_TELEPORTER_H__
+#define __INCLUDE_TELEPORTER_H__
 
 #include "GameObject/ModelObject.h"
+#include "Scene/Stage/Stage.h"
+#include "UI/Widget/WidgetMatching.h"
+#include "Network/OnlineController.h"
 
+/**************************************************************************//**
+	@class	Teleporter
+	@brief	ステージ転送用ゲームオブジェクトクラス
+	@par	[説明]
+*//***************************************************************************/
 class Teleporter : public ModelObject
 {
 public:
-	Teleporter(const char* filename, float scaling = 1.0f) : ModelObject(filename, scaling) {}
-	virtual ~Teleporter() = default;
+	Teleporter(Stage* stage, Online::OnlineController* onlineController);
+	~Teleporter();
 
 	virtual void Update(float elapsedTime) override;
-	void UpdateModel(float elapsedTime);
-	virtual void Render(const RenderContext& rc) override;
+	void Render(const RenderContext& rc) override;
 
-	void CheckPlayer(DirectX::XMFLOAT3 playerCoords, float elapsedTime);
+	void Teleport();
 
-	bool GetPortalReady() { return isPortalReady; }
-	void SetPortalReady() { this->isPortalReady = true; }
-
-public:
-
-	// アクセサ
-	// 位置取得
-	const DirectX::XMFLOAT3& GetPosition() const { return position; }
-	// 位置設定
-	void SetPosition(const DirectX::XMFLOAT3& position) { this->position = position; }
-	// 回転取得
-	const DirectX::XMFLOAT3& GetAngle() const { return angle; }
-	// 回転設定
-	void SetAngle(const DirectX::XMFLOAT3& angle) { this->angle = angle; }
-	// スケール取得
-	const DirectX::XMFLOAT3& GetScale() const { return scale; }
-	// スケール設定
-	void SetScale(const DirectX::XMFLOAT3& scale) { this->scale = scale; }
-
-	float GetHeight() { return height; }
-
+	Stage* GetStage() { return m_pStage; }
 protected:
-	virtual void UpdateColliders() {};
-protected:
-	// レイキャスト用
-	float stepOffset = 0.5f;
-	float height = 2.0f;
+	Stage* m_pStage;
+	
+	ModelResource::Mesh m_mesh;
 
-	float portalTimer = 3.0f;
-	bool isPortalReady = false;
+	float m_portalTime = 3.0f;
+	float m_timer = 0.0f;
+
+	DirectX::XMFLOAT2 m_textureSize = {};
+
+	const std::vector<ModelResource::Vertex> m_defaultVertices = {
+		{ { -0.5, +0.5f, 0.0f }, {}, {}, { 0.0f, 0.0f } },
+		{ { +0.5, +0.5f, 0.0f }, {}, {}, { 0.0f, 1.0f } },
+		{ { -0.5, -0.5f, 0.0f }, {}, {}, { 1.0f, 0.0f } },
+		{ { +0.5, -0.5f, 0.0f }, {}, {}, { 1.0f, 1.0f } },
+	};
+	Online::OnlineController* m_pOnlineController;
+
+	WidgetMatching* m_pWidgetMatching = nullptr;
+
 };
+
+
+class TeleportToOpenworld : public Teleporter
+{
+public:
+	TeleportToOpenworld() : Teleporter(nullptr, nullptr) {}
+	virtual void Update(float elapsedTime) override;
+};
+#endif // !__INCLUDE_TELEPORTER_H__

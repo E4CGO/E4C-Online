@@ -8,47 +8,47 @@ void NonPlayerCharacterState::PlayerTransition(NonPlayerCharacter* owner, uint32
 {
 	if (flags & flag_Dodge && owner->InputDodge())
 	{
-		owner->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::State::Dodge));
+		owner->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::STATE::DODGE));
 		return;
 	}
 	if (flags & flag_Jump && owner->InputJump())
 	{
-		owner->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::State::Jump));
+		owner->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::STATE::JUMP));
 		return;
 	}
 	if (flags & flag_Move && owner->IsMove())
 	{
-		owner->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::State::Move));
+		owner->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::STATE::MOVE));
 		return;
 	}
 	if (flags & flag_Stop && !owner->IsMove())
 	{
-		owner->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::State::Idle));
+		owner->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::STATE::IDLE));
 		return;
 	}
 	if (flags & flag_Fall && owner->IsFall())
 	{
-		owner->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::State::Fall));
+		owner->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::STATE::FALL));
 		return;
 	}
 	if (flags & flag_Ground && owner->IsGround())
 	{
-		owner->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::State::Land));
+		owner->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::STATE::LAND));
 		return;
 	}
 	if (flags & flag_AttackN && owner->InputAttackNormal())
 	{
-		owner->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::State::AttackNormal));
+		owner->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::STATE::ATTACK_NORMAL));
 		return;
 	}
 	if (flags & flag_AttackS && owner->InputAttackSpecial())
 	{
-		owner->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::State::AttackSpecial));
+		owner->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::STATE::ATTACK_SPECIAL));
 		return;
 	}
 	if (flags & flag_Skill_1 && owner->InputSkill1())
 	{
-		owner->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::State::Skill_1));
+		owner->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::STATE::SKILL_1));
 		return;
 	}
 }
@@ -145,7 +145,7 @@ void NonPlayerCharacterState::LandState::Execute(float elapsedTime)
 		flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1
 	);
 
-	if (!owner->IsPlayAnimaition()) owner->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::State::Idle)); return;
+	if (!owner->IsPlayAnimation()) owner->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::STATE::IDLE)); return;
 }
 void NonPlayerCharacterState::LandState::Exit()
 {
@@ -158,13 +158,13 @@ void NonPlayerCharacterState::DodgeState::Enter()
 	owner->SetHurtCoolTime(0.2f);
 
 	// MP消費
-	owner->ModifyMp(-owner->GetMpCost(static_cast<int>(NonPlayerCharacter::State::Dodge)));
+	owner->ModifyMp(-owner->GetMpCost(static_cast<int>(NonPlayerCharacter::STATE::DODGE)));
 }
 void NonPlayerCharacterState::DodgeState::Execute(float elapsedTime)
 {
 	if (!owner->GetModel()->IsPlayAnimation())
 	{
-		owner->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::State::Idle));
+		owner->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::STATE::IDLE));
 		owner->StopMove();
 	}
 }
@@ -182,7 +182,7 @@ void NonPlayerCharacterState::HurtState::Execute(float elapsedTime)
 {
 	if (!owner->GetModel()->IsPlayAnimation())
 	{
-		owner->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::State::Idle));
+		owner->GetStateMachine()->ChangeState(static_cast<int>(NonPlayerCharacter::STATE::IDLE));
 	}
 }
 void NonPlayerCharacterState::HurtState::Exit()
