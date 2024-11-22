@@ -482,9 +482,10 @@ bool MapQuadtree::IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3& rayStar
 	@brief		カプセルの押し戻し
 	@param[in]	capsule		: カプセルオブジェクト
 				wallCheck	: 壁判定だけするか（押し戻しはしない）
+				result		: 最短距離のメッシュを返す
 	@return		衝突判定
 *//***************************************************************************/
-bool MapQuadtree::IntersectVsCapsule(Capsule& capsule, bool wallCheck)
+bool MapQuadtree::IntersectVsCapsule(Capsule& capsule, bool wallCheck, HitResult* result)
 {
 	XMFLOAT3 minPos, maxPos;
 	capsule.GetBoundPoints(&minPos, &maxPos);
@@ -532,7 +533,7 @@ bool MapQuadtree::IntersectVsCapsule(Capsule& capsule, bool wallCheck)
 				mortonCode = bitSeparete(nowX) | (bitSeparete(nowZ) << 1);
 				index = GetLevelStart(level) + mortonCode;
 				
-				IntersectVsCapsuleInNode(index, mortonArea, position, direction, capsule.radius, capsule.length, wallCheck, hit);
+				IntersectVsCapsuleInNode(index, mortonArea, position, direction, capsule.radius, capsule.length, wallCheck, result, hit);
 	
 				// 隣の空間へ
 				nowX++;
@@ -605,11 +606,12 @@ bool MapQuadtree::IntersectVsCapsuleInNode(
 	float radius,
 	float length,
 	bool wallCheck,
+	HitResult* result,
 	bool& hit)
 {
 	bool ret = false; //この空間内での衝突判定
 	OFT* oft = m_quadtreeNodes[index].m_pLatest;
-	IntersectionResult result;
+	IntersectionResult intersect;
 	
 	while (oft)
 	{
@@ -622,12 +624,21 @@ bool MapQuadtree::IntersectVsCapsuleInNode(
 				XMLoadFloat3(&oft->m_pMesh->position[2])
 			};
 
-			if (Collision::IntersectCapsuleVsTriangle(capsulePos, direction, radius, length, triPos, &result))
+			if (Collision::IntersectCapsuleVsTriangle(capsulePos, direction, radius, length, triPos, &intersect))
 			{
 				if (wallCheck)
 				{
+					if (result)
+					{
+						XMStoreFloat3(&result->position, intersect.pointB);
+						result->distance = XMVectorGetX(XMVector3Length(XMVectorSubtract(intersect.pointB, capsulePos)));
+						result->triangleVerts[0] = oft->m_pMesh->position[0];
+						result->triangleVerts[1] = oft->m_pMesh->position[1];
+						result->triangleVerts[2] = oft->m_pMesh->position[2];
+					}
+
 					// wallCheckがtrueのときは壁に当たっている時true
-					if (result.normal.m128_f32[1] < 0.4f)	// 66度以上の壁
+					if (intersect.normal.m128_f32[1] < 0.4f)	// 66度以上の壁
 					{
 						hit = true;
 						ret = true;
@@ -636,7 +647,7 @@ bool MapQuadtree::IntersectVsCapsuleInNode(
 				else
 				{
 					// カプセルのみ押し戻し処理
-					capsulePos = XMVectorAdd(capsulePos, XMVectorScale(result.normal, result.penetration));
+					capsulePos = XMVectorAdd(capsulePos, XMVectorScale(intersect.normal, intersect.penetration));
 					hit = true;
 					ret = true;
 				}
@@ -644,6 +655,6 @@ bool MapQuadtree::IntersectVsCapsuleInNode(
 		}
 		oft = oft->m_pNext;
 	}
-
+	
 	return ret;
 }

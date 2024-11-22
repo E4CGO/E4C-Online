@@ -37,10 +37,10 @@ public:
 	bool IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayDirection, float rayDist, float radius, HitResult& result);
 
 	// 球の押し戻し
-	bool IntersectVsSphere(Sphere& sphere, bool wallCheck = false);
+	bool IntersectVsSphere(Sphere& sphere, bool wallCheck = false, HitResult* result = nullptr);
 
 	// カプセルの押し戻し
-	bool IntersectVsCapsule(Capsule& capsule, bool wallCheck = false);
+	bool IntersectVsCapsule(Capsule& capsule, bool wallCheck = false, HitResult* result = nullptr);
 	
 private:
 	struct OFT	// OBJECT_FOR_TREE構造体
@@ -115,6 +115,7 @@ private:
 		float radius,
 		float length,
 		bool wallCheck,
+		HitResult* result,
 		bool& hit);
 
 private:
