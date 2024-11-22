@@ -33,6 +33,9 @@ public:
 	// 全てのノードで三角形とレイの交差判定を行う（最初に交差する三角形のみを返す方式）
 	bool IntersectVsRay(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayDirection, float rayDist, HitResult& result);
 
+	// 全てのノードで三角形とスフィアキャストの交差判定を行う（最初に交差する三角形のみを返す方式）
+	bool IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayDirection, float rayDist, float radius, HitResult& result);
+
 	// 球の押し戻し
 	bool IntersectVsSphere(Sphere& sphere, bool wallCheck = false);
 
@@ -43,7 +46,7 @@ private:
 	struct OFT	// OBJECT_FOR_TREE構造体
 	{
 		uint32_t	m_index = 0;		// 登録空間の配列番号
-		uint32_t	m_mortonArea = 0;	// 登録空間を分割した時のモートンコード（０～３）の、どの場所に存在するか。右からその数分シフトさせた位置にフラグを立てる（例：1と3→0b1010）
+		uint8_t		m_mortonArea = 0;	// 登録空間を分割した時のモートンコード（０～３）の、どの場所に存在するか。右からその数分シフトさせた位置にフラグを立てる（例：1と3→0b1010）
 		Triangle*	m_pMesh = nullptr;	// 判定対象オブジェクト
 		OFT*		m_pPre = nullptr;	// 前のOFTオブジェクト
 		OFT*		m_pNext = nullptr;	// 次のOFTオブジェクト
@@ -93,18 +96,10 @@ private:
 		return n;
 	}
 
-	// 同階層の隣のモートンコードの増減量を取得
-	//int GetNextMortonCodeDiff(uint32_t before, uint32_t shiftXZ, bool minus);
-	// 同階層の隣のモートンコードを取得
-	//int GetNextMortonCode(uint32_t before, uint32_t shiftXZ, bool minus)
-	//{
-	//	return before + GetNextMortonCodeDiff(before, shiftXZ, minus);
-	//}
-
 	// ある空間内でのレイの交差判定
 	bool IntersectVsRayInNode(
 		uint32_t index,
-		uint32_t mortonArea,
+		uint8_t mortonArea,
 		const DirectX::XMFLOAT3& start,
 		const DirectX::XMFLOAT3& direction,
 		float dist,
@@ -114,7 +109,7 @@ private:
 	// ある空間内でのカプセルの押し戻し
 	bool IntersectVsCapsuleInNode(
 		uint32_t index,
-		uint32_t mortonArea,
+		uint8_t mortonArea,
 		DirectX::XMVECTOR& capsulePos,
 		const DirectX::XMVECTOR& direction,
 		float radius,
