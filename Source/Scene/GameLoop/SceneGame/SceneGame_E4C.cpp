@@ -32,7 +32,7 @@ void SceneGame_E4C::Initialize()
 	cameraManager.Register(mainCamera);
 	cameraManager.SetCamera(0);
 
-	Console::Instance().Open();
+	//Console::Instance().Open();
 
 	// 選択した自機
 	const PlayerCharacterData::CharacterInfo info = PlayerCharacterData::Instance().GetCurrentCharacter();
