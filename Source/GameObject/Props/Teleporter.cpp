@@ -158,6 +158,7 @@ void Teleporter::Teleport()
 	UI.Remove(m_pWidgetMatching);
 	m_pWidgetMatching = nullptr;
 	m_pStage = nullptr;
+	m_timer = -10.0f;
 }
 
 /**************************************************************************//**

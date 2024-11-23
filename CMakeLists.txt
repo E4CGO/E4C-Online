@@ -10,6 +10,8 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /source-charset:.932")
 
+option(TO_DOWNLOAD_DATA "Decide whether to download a data" OFF)
+
 # ###############################################################################
 # Set target arch type if empty. Visual studio solution generator provides it.
 # ###############################################################################
@@ -146,10 +148,10 @@ source_group("Source" FILES ${Source})
 set(Source__GameObject
     "Source/GameObject/GameObject.cpp"
     "Source/GameObject/GameObject.h"
+    "Source/GameObject/GameObjectManager.h"
     "Source/GameObject/ModelObject.cpp"
     "Source/GameObject/ModelObject.h"
     "Source/GameObject/ObjectManager.h"
-    "Source/GameObject/GameObjectManager.h"
 )
 source_group("Source\\GameObject" FILES ${Source__GameObject})
 
@@ -1173,66 +1175,72 @@ endif()
 # Post build events
 # ###############################################################################
 
-# URL of the ZIP files
-set(ZIP_FILE_URLS
-    "https://www.dropbox.com/scl/fi/ovb2dkjr3n1ayljdb0ftn/Data.zip?rlkey=2th7h96r3p4qsxn12oqnnp1wv&st=uywpwppu&dl=0"
-    "https://www.dropbox.com/scl/fi/nm7h69ap66e62978butip/Dependencies.zip?rlkey=9icgfv9xwc9is1hziwhk5kjjs&st=gv2qvxdg&dl=0"
-    "https://www.dropbox.com/scl/fi/1nbbetvdxp4dthu45kayx/External.zip?rlkey=ndtf9xh27fhaiuhnwnn4btf26&st=16hvp0yp&dl=0"
-    "https://www.dropbox.com/scl/fi/hvu3y0cztxca9ztosju2j/Docs.zip?rlkey=24lazv9kbo0y86cnihpxff6re&st=8ulu8iw1&dl=0"
-)
-
-# Local path where the ZIP file will be downloaded
-set(ZIP_FILE_PATHS
-    "${CMAKE_SOURCE_DIR}/Data.zip"
-    "${CMAKE_SOURCE_DIR}/Dependencies.zip"
-    "${CMAKE_SOURCE_DIR}/External.zip"
-    "${CMAKE_SOURCE_DIR}/Docs.zip"
-)
-
-# Local path where ZIP file will be unarchived
-set(DESTINATION_DIRS
-    "${CMAKE_SOURCE_DIR}/Data"
-    "${CMAKE_SOURCE_DIR}/Dependencies"
-    "${CMAKE_SOURCE_DIR}/External"
-    "${CMAKE_SOURCE_DIR}/Docs"
-)
-
-foreach(i RANGE 0 3)
-    list(GET ZIP_FILE_URLS ${i} ZIP_FILE_URL)
-    list(GET ZIP_FILE_PATHS ${i} ZIP_FILE_PATH)
-    list(GET DESTINATION_DIRS ${i} DESTINATION_DIR)
-
-    # Command to download the ZIP file
-    file(DOWNLOAD ${ZIP_FILE_URL} ${ZIP_FILE_PATH}
-        SHOW_PROGRESS
-        STATUS status)
-
-    list(GET status 0 status_code)
-    list(GET status 1 status_string)
-
-    if(NOT status_code EQUAL 0)
-        message(FATAL_ERROR "Error downloading file: ${status_string}")
-    endif()
-
-    message(STATUS "File downloaded and verified successfully!")
-
-    file(MAKE_DIRECTORY ${DESTINATION_DIR})
-
-    # Unzip the file
-    execute_process(
-        COMMAND ${CMAKE_COMMAND} -E tar xvf ${ZIP_FILE_PATH}
-        WORKING_DIRECTORY ${DESTINATION_DIR}
-        RESULT_VARIABLE result
+if(TO_DOWNLOAD_DATA)
+    # URL of the ZIP files
+    set(ZIP_FILE_URLS
+        "https://www.dropbox.com/scl/fi/ovb2dkjr3n1ayljdb0ftn/Data.zip?rlkey=2th7h96r3p4qsxn12oqnnp1wv&st=uywpwppu&dl=0"
+        "https://www.dropbox.com/scl/fi/nm7h69ap66e62978butip/Dependencies.zip?rlkey=9icgfv9xwc9is1hziwhk5kjjs&st=gv2qvxdg&dl=0"
+        "https://www.dropbox.com/scl/fi/1nbbetvdxp4dthu45kayx/External.zip?rlkey=ndtf9xh27fhaiuhnwnn4btf26&st=16hvp0yp&dl=0"
+        "https://www.dropbox.com/scl/fi/hvu3y0cztxca9ztosju2j/Docs.zip?rlkey=24lazv9kbo0y86cnihpxff6re&st=8ulu8iw1&dl=0"
     )
 
-    if(result)
-        message(FATAL_ERROR "Failed to unzip file")
-    else()
-        message(STATUS "Successfully unzipped file")
-    endif()
+    # Local path where the ZIP file will be downloaded
+    set(ZIP_FILE_PATHS
+        "${CMAKE_SOURCE_DIR}/Data.zip"
+        "${CMAKE_SOURCE_DIR}/Dependencies.zip"
+        "${CMAKE_SOURCE_DIR}/External.zip"
+        "${CMAKE_SOURCE_DIR}/Docs.zip"
+    )
 
-    file(REMOVE ${ZIP_FILE_PATH})
-endforeach()
+    # Local path where ZIP file will be unarchived
+    set(DESTINATION_DIRS
+        "${CMAKE_SOURCE_DIR}/Data"
+        "${CMAKE_SOURCE_DIR}/Dependencies"
+        "${CMAKE_SOURCE_DIR}/External"
+        "${CMAKE_SOURCE_DIR}/Docs"
+    )
+
+    foreach(i RANGE 0 3)
+        list(GET ZIP_FILE_URLS ${i} ZIP_FILE_URL)
+        list(GET ZIP_FILE_PATHS ${i} ZIP_FILE_PATH)
+        list(GET DESTINATION_DIRS ${i} DESTINATION_DIR)
+
+        # Command to download the ZIP file
+        file(DOWNLOAD ${ZIP_FILE_URL} ${ZIP_FILE_PATH}
+            SHOW_PROGRESS
+            STATUS status)
+
+        list(GET status 0 status_code)
+        list(GET status 1 status_string)
+
+        if(NOT status_code EQUAL 0)
+            message(FATAL_ERROR "Error downloading file: ${status_string}")
+        endif()
+
+        message(STATUS "File downloaded and verified successfully!")
+
+        file(MAKE_DIRECTORY ${DESTINATION_DIR})
+
+        # Unzip the file
+        execute_process(
+            COMMAND ${CMAKE_COMMAND} -E tar xvf ${ZIP_FILE_PATH}
+            WORKING_DIRECTORY ${DESTINATION_DIR}
+            RESULT_VARIABLE result
+        )
+
+        if(result)
+            message(FATAL_ERROR "Failed to unzip file")
+        else()
+            message(STATUS "Successfully unzipped file")
+        endif()
+
+        file(REMOVE ${ZIP_FILE_PATH})
+    endforeach()
+else()
+    message(STATUS "No data download.")
+endif()
+
+unset(TO_DOWNLOAD_DATA CACHE)
 
 set(SOURCE_DIR_DATA "${CMAKE_SOURCE_DIR}/Data")
 set(SOURCE_DIR_DEPENDENCY "${CMAKE_SOURCE_DIR}/Dependencies")

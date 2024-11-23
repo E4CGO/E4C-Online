@@ -1,6 +1,8 @@
 ﻿#include "StageDungeon_E4C.h"
 #include "StageOpenWorld_E4C.h"
 
+#include "TAKOEngine/GUI/UIManager.h"
+
 #include "GameObject/GameObjectManager.h"
 
 #include "GameObject/ModelObject.h"
@@ -213,20 +215,6 @@ void StageDungeon_E4C::Initialize()
 	cameraController->SetPlayer(player);
 	CURSOR_OFF;
 
-	{
-		HRESULT hr;
-
-		D3D11_BUFFER_DESC buffer_desc{};
-		buffer_desc.ByteWidth = (sizeof(CbScene) + 15) / 16 * 16;
-		buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-		buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		buffer_desc.CPUAccessFlags = 0;
-		buffer_desc.MiscFlags = 0;
-		buffer_desc.StructureByteStride = 0;
-		hr = T_GRAPHICS.GetDevice()->CreateBuffer(&buffer_desc, nullptr, constant_buffers[1].GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-	}
-
 	GenerateDungeon();
 
 	// 一番遠い部屋のうち、ランダムな一つを抽選しテレポーターを設置する
@@ -234,7 +222,7 @@ void StageDungeon_E4C::Initialize()
 
 	TeleportToOpenworld* teleporter = new TeleportToOpenworld();
 	teleporter->SetPosition(lastRoom->GetCenterPos());
-	teleporter->SetAngle({ 90.0f * RADIAN1, 0.0f, 0.0f});
+	teleporter->SetAngle({ 90.0f * RADIAN1, 0.0f, 0.0f });
 	teleporter->SetScale({ 10.0f, 10.0f, 1.0f });
 	GameObjectManager::Instance().Register(teleporter);
 
@@ -329,7 +317,6 @@ void StageDungeon_E4C::Render()
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
 	rootRoom->DrawDebugGUI();
 #endif // _DEBUG
-
 }
 
 void StageDungeon_E4C::OnPhase()
