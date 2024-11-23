@@ -89,12 +89,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	cameraController->SyncContrllerToCamera(camera);
 	cameraController->Update(elapsedTime);
 
-	// 展示会だけ
-	if (T_INPUT.KeyDown(VK_ESCAPE))
-	{
-		isPause = !isPause;
-	}
-
 	if (T_INPUT.KeyDown(VK_MENU))
 	{
 		if (TentacleLib::isShowCursor())
@@ -124,72 +118,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	teleporter->Update(elapsedTime);
 
 	timer += elapsedTime;
-
-	if (isPause)
-	{
-		if (btnExit == nullptr)
-		{
-			auto widgets = UI.GetAll();
-			for (auto it : widgets)
-			{
-				if (it == btnExit)
-				{
-					return;
-				}
-			}
-			btnExit = new WidgetButtonImage("", "Data/Sprites/UI/exit.png", [&](WidgetButton*) {
-				m_pScene->GetStateMachine()->ChangeState(SceneGame_E4C::GAME_STATE::EXIT);
-				});
-			btnExit->SetPosition({ SCREEN_W * 0.5f - 163.0f * 0.5f * 1.5f, SCREEN_H * 0.8f });
-			btnExit->SetSize({ 163.0f * 1.5f, 128.0f });
-			UI.Register(btnExit);
-		}
-		if (background == nullptr)
-		{
-			auto widgets = UI.GetAll();
-			for (auto it : widgets)
-			{
-				if (it == background)
-				{
-					return;
-				}
-			}
-			background = new WidgetImage("Data/Sprites/big_background.t.png");
-			background->SetPosition({ 0, 0 });
-			background->SetSize({ SCREEN_W, SCREEN_H });
-			background->SetColor(DirectX::XMFLOAT4{ 1.0f, 1.0f, 1.0f, 0.5f });
-			UI.Register(background);
-		}
-	}
-	else
-	{
-		if (background != nullptr)
-		{
-			auto widgets = UI.GetAll();
-			for (auto it : widgets)
-			{
-				if (it == background)
-				{
-					UI.Remove(background);
-					background = nullptr;
-				}
-			}
-		}
-		if (btnExit != nullptr)
-		{
-			auto widgets = UI.GetAll();
-			for (auto it : widgets)
-			{
-				if (it == btnExit)
-				{
-					UI.Remove(btnExit);
-					btnExit = nullptr;
-				}
-			}
-		}
-	}
-
-	UI.Update(elapsedTime);
 }
 
 void StageOpenWorld_E4C::Render()

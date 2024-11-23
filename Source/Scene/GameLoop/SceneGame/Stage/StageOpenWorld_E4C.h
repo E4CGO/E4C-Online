@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unordered_set>
 #include <memory>
 #include <array>
 
@@ -16,11 +17,6 @@
 
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
-
-#include "Source/UI/Widget/WidgetButtonImage.h"
-#include "Source/UI/Widget/WidgetImage.h"
-
-#include <unordered_set>
 
 class SceneGame_E4C;
 
@@ -51,16 +47,9 @@ private:
 	MapTile* stage_collision = nullptr;
 
 	std::unique_ptr <Teleporter> teleporter;
-	std::unique_ptr <Plane> plane;
-
-	std::unique_ptr <Billboard> billboard;
 
 	std::unique_ptr<ModelObject> map;
 	std::unique_ptr<ModelObject> tower;
-	std::unique_ptr<ModelObject> houses;
-
-	WidgetButtonImage* btnExit;
-	WidgetImage* background;
 
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {
@@ -75,8 +64,6 @@ private:
 	float transitionTime = 0.0f;
 	float transitionDuration = 2.f;  // 5秒かけて移動
 	int currentSegment = 0;
-
-	bool isPause = false;
 
 	std::vector<DirectX::XMFLOAT3> cameraPositions = {
 		{0,3,0},

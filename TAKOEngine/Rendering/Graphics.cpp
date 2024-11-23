@@ -497,6 +497,7 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	m_sampler[static_cast<int>(SamplerState::LinearWrap)] = std::make_unique<SamplerManager>(SamplerState::LinearWrap);
 	m_sampler[static_cast<int>(SamplerState::LinearClamp)] = std::make_unique<SamplerManager>(SamplerState::LinearClamp);
 	m_sampler[static_cast<int>(SamplerState::LinearBorder)] = std::make_unique<SamplerManager>(SamplerState::LinearBorder);
+	m_sampler[static_cast<int>(SamplerState::LinearMirror)] = std::make_unique<SamplerManager>(SamplerState::LinearMirror);
 	m_sampler[static_cast<int>(SamplerState::AnisotropicWrap)] = std::make_unique<SamplerManager>(SamplerState::AnisotropicWrap);
 	m_sampler[static_cast<int>(SamplerState::ShadowMap)] = std::make_unique<SamplerManager>(SamplerState::ShadowMap);
 

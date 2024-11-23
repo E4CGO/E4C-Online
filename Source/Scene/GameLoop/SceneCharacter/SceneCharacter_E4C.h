@@ -75,11 +75,6 @@ private:
 
 	// Model Preload
 	std::unordered_set<const char*> modelList = {
-		"Data/Model/Character/WEAPON_BARB.glb",
-		"Data/Model/Character/WEAPON_MAGE.glb",
-		"Data/Model/Character/HEAD_BARB.glb",
-		"Data/Model/Character/BODY_BARB.glb",
-		"Data/Model/Character/HEAD_MAGE.glb",
 		"Data/Model/Character/PlayerModels/MDL_PLAYER_BODY_ANIMATION.glb",
 		"Data/Model/Character/PlayerModels/MDL_PLAYER_BOTTOM_ANIMATION.glb",
 		"Data/Model/Character/PlayerModels/MDL_PLAYER_TOP_ANIMATION.glb",

@@ -25,9 +25,6 @@
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
 #include "TAKOEngine/Tool/GLTFImporter.h"
 
-#include "Source/UI/Widget/WidgetButtonImage.h"
-#include "Source/UI/Widget/WidgetImage.h"
-
 class SceneGame_E4C;
 
 class StageDungeon_E4C : public Stage
@@ -73,11 +70,7 @@ protected:
 
 	bool isLeader = true;
 
-	std::unique_ptr <Plane> plane;
 	std::unique_ptr <Plane> portal;
-
-	WidgetButtonImage* btnExit;
-	WidgetImage* background;
 
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {
@@ -86,8 +79,6 @@ protected:
 		"Data/Sprites/UI/start.png",
 		"Data/Sprites/big_background.t.png"
 	};
-
-	bool isPause = false;
 
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
 
