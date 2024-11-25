@@ -31,6 +31,8 @@ public:
 	void Update(float elapsedTime) override;
 
 	void Render() override;
+
+	void RenderDX12() override;
 protected:
 	void OnPhase() override;
 public:
@@ -59,6 +61,9 @@ private:
 		"Data/Sprites/big_background.t.png"
 	};
 
+	std::unique_ptr<ModelObject> map;
+	std::unique_ptr<ModelObject> map12;
+	std::unique_ptr<ModelObject> shrine;
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
 
 	float transitionTime = 0.0f;
@@ -71,4 +76,10 @@ private:
 		{5,3,4},
 		{8,3,8}
 	};
+
+	// フレームバッファマネージャー
+	FrameBufferManager* m_frameBuffer = nullptr;
+
+	// ポストエフェクト
+	std::unique_ptr<PostprocessingRendererDX12>	postprocessingRenderer = std::make_unique<PostprocessingRendererDX12>();
 };

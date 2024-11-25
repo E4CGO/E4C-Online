@@ -152,7 +152,7 @@ PhongShaderDX12::~PhongShaderDX12()
 // @param[in]   model  描画対象のモデルデータを指すポインタ
 // @return      なし
 //***********************************************************
-void PhongShaderDX12::Render(const RenderContextDX12& rc, ModelDX12* model)
+void PhongShaderDX12::Render(const RenderContextDX12& rc, iModel* model)
 {
 	Graphics& graphics = Graphics::Instance();
 

@@ -42,12 +42,16 @@ void ModelObject::LoadModel(const char* filename, float scaling, ModelObject::RE
 		m_pmodels.push_back(std::make_unique<GLTFModelDX11>(T_GRAPHICS.GetDevice(), filename, scaling, modelType));
 		break;
 	case ModelObject::RENDER_MODE::DX12:
+		m_pmodels.push_back(std::make_unique<ModelDX12>(T_GRAPHICS.GetDeviceDX12(), filename, scaling, modelType));
 		break;
 	case ModelObject::RENDER_MODE::DX12GLTF:
 		break;
 	case ModelObject::RENDER_MODE::NOMODEL:
 		break;
 	}
+
+	//スキニング
+	m_skinning_pipeline = T_GRAPHICS.GetSkinningPipeline();
 }
 
 void ModelObject::CleanModels()
@@ -70,6 +74,7 @@ void ModelObject::SetAnimation(const int index, bool loop, float blendSeconds)
 			model->PlayAnimation(index, loop, blendSeconds);
 	}
 }
+
 /**************************************************************************//**
 	@brief		個別モデルアニメーション設定
 	@param[in]	model_idx		モデルインデックス
@@ -83,6 +88,7 @@ void ModelObject::SetModelAnimation(const int model_idx, const int animation_ind
 	if (m_pmodels.size() <= model_idx) return;
 	m_pmodels[model_idx]->PlayAnimation(animation_index, loop, blendSeconds);
 }
+
 /**************************************************************************//**
 	@brief	全てのモデルのアニメーション判定
 	@return	アニメーション中判定
@@ -95,6 +101,7 @@ bool ModelObject::IsPlayAnimation(void)
 	}
 	return false;
 }
+
 /**************************************************************************//**
 	@brief	個別てのモデルのアニメーション判定
 	@param[in]	idx モデルインデックス
@@ -115,17 +122,35 @@ void ModelObject::Update(float elapsedTime)
 	// 行列更新
 	UpdateTransform();
 
-	for (auto& model : m_pmodels)
+	if (T_GRAPHICS.isDX11Active)
 	{
-		if (model == nullptr) continue;
+		for (auto& model : m_pmodels)
+		{
+			if (model == nullptr) continue;
 
-		// アニメーション更新
-		model->UpdateAnimation(elapsedTime * m_animationSpeed);
+			// アニメーション更新
+			model->UpdateAnimation(elapsedTime * m_animationSpeed);
 
-		// トランスフォーム更新
-		model->UpdateTransform(transform);
+			// トランスフォーム更新
+			model->UpdateTransform(transform);
+		}
+	}
+
+	if (T_GRAPHICS.isDX12Active)
+	{
+		for (auto& model : m_pmodels)
+		{
+			if (model == nullptr) continue;
+
+			// アニメーション更新
+			model->UpdateAnimation(elapsedTime * m_animationSpeed);
+
+			// トランスフォーム更新
+			model->UpdateTransform(transform);
+		}
 	}
 }
+
 /**************************************************************************//**
 	@brief	描画処理
 	@param[in]	rc	レンダーコンテクスト参照
@@ -151,6 +176,30 @@ void ModelObject::Render(const RenderContext& rc)
 		shader->End(rc);
 	}
 }
+
+/**************************************************************************//**
+	@brief	描画処理
+	@param[in]	rc	レンダーコンテクスト参照
+	@return なし
+*//***************************************************************************/
+void ModelObject::RenderDX12(const RenderContextDX12& rc)
+{
+	if (!m_visible) return;
+	for (auto& model : m_pmodels)
+	{
+		if (model == nullptr) return;
+
+		// スキニング
+		m_skinning_pipeline->Compute(rc, model.get());
+
+		// シェーダー
+		ModelShaderDX12* shader = T_GRAPHICS.GetModelShaderDX12(m_dx12_ShaderId);
+
+		//描画
+		shader->Render(rc, model.get());
+	}
+}
+
 /**************************************************************************//**
 	@brief		コライダー設定
 	@param[in]	collider	コライダータイプ
@@ -185,6 +234,7 @@ void ModelObject::SetCollider(Collider::COLLIDER_TYPE collider, int idx)
 		break;
 	}
 }
+
 /**************************************************************************//**
 	@brief		モデルノード座標を取得
 	@param[in]	idx			モデルインデックス
