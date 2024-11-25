@@ -97,8 +97,3 @@ void SceneGame_E4C::Render()
 	// デバッグレンダラ描画実行
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
 }
-
-void SceneGame_E4C::RenderDX12()
-{
-	STAGES.RenderDX12();
-}

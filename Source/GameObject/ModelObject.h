@@ -31,11 +31,11 @@ public:
 	// コンストラクタ
 	ModelObject(void) {};
 	// コンストラクタ（引数付き）
-	ModelObject(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::DX11, int modelType = 1);
+	ModelObject(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::DX11, int modelType = 0);
 	virtual ~ModelObject() = default;
 
 	// モデルを読み取り
-	void LoadModel(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX12, int modelType = 1);
+	void LoadModel(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX12, int modelType = 0);
 
 	void CleanModels();
 
@@ -102,7 +102,7 @@ protected:
 
 	// シェーダーID
 	ModelShaderId m_shaderId = ModelShaderId::Toon;
-	ModelShaderDX12Id m_dx12_ShaderId = ModelShaderDX12Id::Toon;
+	ModelShaderDX12Id m_dx12_ShaderId = ModelShaderDX12Id::Lambert;
 
 	// モデルリスト
 	std::vector<std::unique_ptr<iModel>> m_pmodels;
