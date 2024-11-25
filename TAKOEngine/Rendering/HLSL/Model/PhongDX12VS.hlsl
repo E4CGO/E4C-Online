@@ -30,7 +30,7 @@ VS_OUT main(
     vout.position = position.xyz;
     vout.tangent  = tangent;
     vout.binormal = normalize(cross(vout.normal, vout.tangent));
-    vout.color    = materialColor;
+    vout.color    = color * materialColor;
 
     return vout;
 }

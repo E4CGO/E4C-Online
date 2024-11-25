@@ -186,7 +186,7 @@ void ToonShaderDX12::Render(const RenderContextDX12& rc, iModel* model)
 
 	for (const ModelDX12::Mesh& mesh : model->GetMeshes())
 	{
-		//if (!visibleObjects[culling++]) continue;
+		if (!visibleObjects[culling++]) continue;
 
 		const ModelResource::Mesh* res_mesh = mesh.mesh;
 		const ModelDX12::Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());

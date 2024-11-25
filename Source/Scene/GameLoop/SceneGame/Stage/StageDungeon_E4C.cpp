@@ -178,6 +178,9 @@ void StageDungeon_E4C::GenerateDungeon()
 		}
 	}
 }
+		portal = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, positions);
+		portal.get()->SetShader(ModelShaderId::Portal);
+	}
 
 void StageDungeon_E4C::Initialize()
 {

@@ -172,7 +172,29 @@ void SceneCharacter_E4C::RenderDX12()
 		rc.d3d_command_list = m_frameBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
-		UI.RenderDX12(rc);
+		// 3Dモデル描画
+		{
+			m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+			m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+			m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+
+			for (auto& it : m_previewCharacters)
+			{
+				if (it != nullptr) {
+					if (it->GetMenuVisibility())
+						it->RenderDX12(rc);
+				}
+			}
+			// レンダーターゲットへの書き込み終了待ち
+			m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		}
+
+		// ポストエフェクト描画
+		{
+			postprocessingRenderer->Render(m_frameBuffer);
+		}
+
+		//UI.RenderDX12(rc);
 	}
 	TentacleLib::graphics.End();
 }

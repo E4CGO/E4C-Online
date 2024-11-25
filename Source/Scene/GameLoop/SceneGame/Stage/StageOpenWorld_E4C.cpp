@@ -31,20 +31,21 @@ void StageOpenWorld_E4C::Initialize()
 	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
 
 	// Sprite Resource Preload
-	for (auto& filename : spriteList)
+	/*for (auto& filename : spriteList)
 	{
 		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
-	}
+	}*/
 
 	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
 	stage_collision->Update(0);
 	MAPTILES.Register(stage_collision);
 	MAPTILES.CreateSpatialIndex(5, 7);
 
-	map = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 2.5f, ModelObject::RENDER_MODE::DX12);
-	
+	map = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, 0);
+	//tower = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, 0);
+
 	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene));
-	teleporter->SetPosition({ 0, 5, 0 });
+	teleporter->SetPosition({ 16, 8.5, -46 });
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
 
 	{
@@ -63,7 +64,7 @@ void StageOpenWorld_E4C::Initialize()
 	map12 = std::make_unique<ModelObject>("Data/Model/Enemy/Goblin.glb", 1.0f, ModelObject::RENDER_MODE::DX12);
 
 	// 光
-	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
+	LightManager::Instance().SetAmbientColor({ 0.1f, 0.1f, 0.1f, 0.1f});
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
@@ -206,7 +207,7 @@ void StageOpenWorld_E4C::RenderDX12()
 		PlayerCharacterManager::Instance().RenderDX12(rc);
 
 		map->RenderDX12(rc);
-		map12->RenderDX12(rc);
+		//tower->RenderDX12(rc);
 
 		// レンダーターゲットへの書き込み終了待ち
 		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
