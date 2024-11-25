@@ -42,26 +42,11 @@ void StageOpenWorld_E4C::Initialize()
 	MAPTILES.CreateSpatialIndex(5, 7);
 
 	map = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, 0);
-	//tower = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, 0);
+	tower = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, 0);
 
 	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene));
 	teleporter->SetPosition({ 16, 8.5, -46 });
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
-
-	{
-		std::array<DirectX::XMFLOAT3, 4 > positions = {
-			DirectX::XMFLOAT3{ 10.0f, 10.0f, 5.0f},
-			DirectX::XMFLOAT3{ 10.0f, 20.0f, 5.0f },
-			DirectX::XMFLOAT3{ 5.0f, 10.0f, 5.0f },
-			DirectX::XMFLOAT3{ 5.0f, 20.0f, 5.0f }
-		};
-
-		plane = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "Data/Sprites/gem.png", 1.0f, positions);
-
-		billboard = std::make_unique<Fireball>(T_GRAPHICS.GetDevice(), "Data/Sprites/fire.png", 1.0f, positions[0]);
-	}
-
-	map12 = std::make_unique<ModelObject>("Data/Model/Enemy/Goblin.glb", 1.0f, ModelObject::RENDER_MODE::DX12);
 
 	// 光
 	LightManager::Instance().SetAmbientColor({ 0.1f, 0.1f, 0.1f, 0.1f});
@@ -133,13 +118,11 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	map->Update(elapsedTime);
 	tower->Update(elapsedTime);
 
-	//teleporter->Update(elapsedTime);
+	teleporter->Update(elapsedTime);
 	//plane->Update(elapsedTime);
 	//billboard->Update(elapsedTime);
 
-	//timer += elapsedTime;
-
-	map12->Update(elapsedTime);
+	timer += elapsedTime;
 }
 
 void StageOpenWorld_E4C::Render()
@@ -207,7 +190,7 @@ void StageOpenWorld_E4C::RenderDX12()
 		PlayerCharacterManager::Instance().RenderDX12(rc);
 
 		map->RenderDX12(rc);
-		//tower->RenderDX12(rc);
+		tower->RenderDX12(rc);
 
 		// レンダーターゲットへの書き込み終了待ち
 		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
@@ -220,7 +203,6 @@ void StageOpenWorld_E4C::RenderDX12()
 
 	// 2D描画
 	{
-
 	}
 
 	T_GRAPHICS.End();

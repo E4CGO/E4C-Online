@@ -12,7 +12,7 @@
 class ModelDX12 : public iModel
 {
 public:
-	ModelDX12(ID3D12Device* device, const char* filename, float scaling = 1.0f, int modelType = 0);
+	ModelDX12(ID3D12Device* device, const char* filename, float scaling = 1.0f, int modelType = 1);
 	~ModelDX12() override;
 
 	// 行列計算
@@ -27,10 +27,10 @@ public:
 	// アニメーション----------------------------------------------------------------------
 	// アニメーション再生中か
 	bool IsPlayAnimation() const override;
-	
+
 	// アニメーション再生
 	void PlayAnimation(int animationIndex, bool loop = false, float blendSeconds = 0.2f) override;
-	
+
 	// アニメーション停止
 	void StopAnimation();
 
@@ -52,7 +52,7 @@ public:
 	// 現在のアニメーション再生時間取得
 	float GetCurrentAnimationSeconds() const override { return m_currentAnimationBlendSeconds; }
 
-	float GetAnimationRate() const override { return m_currentAnimationBlendSeconds / m_resource->GetAnimations().at(m_current_animation_Index).secondsLength;}
+	float GetAnimationRate() const override { return m_currentAnimationBlendSeconds / m_resource->GetAnimations().at(m_current_animation_Index).secondsLength; }
 
 	void SetAnimationRate(float rate) override { m_currentAnimationBlendSeconds = m_resource->GetAnimations().at(m_current_animation_Index).secondsLength * rate; }
 
@@ -95,6 +95,7 @@ public:
 	const DirectX::XMFLOAT4X4& GetTransform(int instancingIndex) const;
 
 	float scaling = 1.0f;
+	int modelType = 0;
 
 private:
 	// インスタンシング用
