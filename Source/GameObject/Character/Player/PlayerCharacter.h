@@ -251,6 +251,7 @@ public:
 protected:
 	void RegisterCommonState();
 	void UpdateTarget();													// 自機用アイム目標更新
+	void UpdateHorizontalMove(float elapsedTime) override;					// 水平移動更新処理
 	virtual void UpdateColliders() override;								// 衝突判定の更新
 
 	void UpdateSkillTimers(float elapsedTime);								// スキルタイマー

@@ -6,6 +6,7 @@
 #include <profiler.h>
 #include <iostream>
 
+#include "Map/MapTileManager.h"
 #include "TAKOEngine/Physics/CollisionDataManager.h"
 #include "TAKOEngine/Effects/EffectManager.h"
 #include "TAKOEngine/Editor/Camera/Camera.h"
@@ -125,25 +126,76 @@ void PlayerCharacter::UpdateTarget()
 	}
 }
 
-void PlayerCharacter::UpdateColliders()
+void PlayerCharacter::UpdateHorizontalMove(float elapsedTime)
 {
-	//collider->SetPosition(position + DirectX::XMFLOAT3{ 0, height * 0.5f, 0 } *scale);
-	Capsule capsule{};
-	capsule.position = position + DirectX::XMFLOAT3{ 0, 0.4f, 0 };
-	capsule.direction = { 0, 1, 0 };
-	capsule.radius = 0.4f;
-	capsule.length = height - capsule.radius * 2;
-	collider->SetParam(capsule);
-	//if(!isGround)
-	if (XMFLOAT3LengthSq(velocity) > 0.0f)
+	// 水平速力量計算
+	float velocityLengthXZ = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);
+	if (velocityLengthXZ > 0.0f)
 	{
-		if (collider->CollisionVsMap())
+		// 水平移動地
+		float mx = velocity.x * elapsedTime;
+		float mz = velocity.z * elapsedTime;
+
+		// マップ
+		if (collider != nullptr) {
+			if (IsPlayer())
+			{
+				XMFLOAT3 pos = position + XMFLOAT3{ 0, height * 0.5f, 0 };
+				XMFLOAT3 dir = { mx, 0.0f, mz };
+				float dist = XMFLOAT3Length(dir);
+				dir = XMFLOAT3Normalize(dir);
+				float radius = 0.4f;
+
+				Capsule sphereCast;
+				sphereCast.position = pos;
+				sphereCast.direction = dir;
+				sphereCast.length = dist;
+				sphereCast.radius = radius;
+
+				if (MAPTILES.IntersectCapsuleVsMap(sphereCast))
+				{
+					pos = sphereCast.position + sphereCast.direction * sphereCast.length;
+					position = pos - XMFLOAT3{ 0, height * 0.5f, 0 };
+				}
+				else
+				{
+					position.x += mx;
+					position.z += mz;
+				}
+			}
+			else
+			{
+				position.x += mx;
+				position.z += mz;
+			}		
+		}
+		else
 		{
-			position = collider->GetPosition();
-			position.y -= 0.4f;
+			position.x += mx;
+			position.z += mz;
 		}
 	}
-	//collider->SetScale(DirectX::XMFLOAT3{ height * 0.3f, height * 0.3f, height * 0.3f } *scale);
+}
+
+void PlayerCharacter::UpdateColliders()
+{
+	if(IsPlayer())
+	{
+		Capsule capsule{};
+		capsule.position = position + DirectX::XMFLOAT3{ 0, 0.4f, 0 };
+		capsule.direction = { 0, 1, 0 };
+		capsule.radius = 0.4f;
+		capsule.length = height - capsule.radius * 2;
+		collider->SetParam(capsule);
+		if (XMFLOAT3LengthSq(velocity) > 0.0f)
+		{
+			if (collider->CollisionVsMap())
+			{
+				position = collider->GetPosition();
+				position.y -= 0.4f;
+			}
+		}
+	}
 }
 
 bool  PlayerCharacter::CollisionVsEnemies(Collider* collider, int damage, bool power, float force, int effectIdx, float effectScale)
@@ -496,9 +548,11 @@ bool PlayerCharacter::InputDodge()
 	if (input & Input_Dodge)
 	{
 		DirectX::XMFLOAT2 direction = GetInputDirection();
-		velocity.x = direction.x * dodgeSpeed;
-		velocity.z = direction.y * dodgeSpeed;
+		//velocity.x = direction.x * dodgeSpeed;
+		//velocity.z = direction.y * dodgeSpeed;
 		angle.y = atan2f(direction.x, direction.y);
+		velocity.x = sinf(angle.y) * dodgeSpeed;
+		velocity.z = cosf(angle.y) * dodgeSpeed;
 
 		return true;
 	}

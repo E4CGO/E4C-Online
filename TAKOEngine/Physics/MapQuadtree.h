@@ -34,13 +34,13 @@ public:
 	bool IntersectVsRay(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayDirection, float rayDist, HitResult& result);
 
 	// 全てのノードで三角形とスフィアキャストの交差判定を行う（最初に交差する三角形のみを返す方式）
-	bool IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayDirection, float rayDist, float radius, HitResult& result);
+	bool IntersectVsSphereCast(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayDirection, float rayDist, float radius, HitResult& result);
 
-	// 球の押し戻し
-	bool IntersectVsSphere(Sphere& sphere, bool wallCheck = false, HitResult* result = nullptr);
+	// 球の衝突判定
+	bool IntersectVsSphere(Sphere& sphere);
 
-	// カプセルの押し戻し
-	bool IntersectVsCapsule(Capsule& capsule, bool wallCheck = false, HitResult* result = nullptr);
+	// カプセルの衝突判定
+	bool IntersectVsCapsule(Capsule& capsule, HitResult* result = nullptr);
 	
 private:
 	struct OFT	// OBJECT_FOR_TREE構造体
@@ -106,7 +106,15 @@ private:
 		HitResult& result,
 		bool& hit);
 
-	// ある空間内でのカプセルの押し戻し
+	// ある空間内での球の衝突判定
+	bool IntersectVsSphereInNode(
+		uint32_t index,
+		uint8_t mortonArea,
+		DirectX::XMVECTOR& spherePos,
+		float radius,
+		bool& hit);
+
+	// ある空間内でのカプセルの衝突判定
 	bool IntersectVsCapsuleInNode(
 		uint32_t index,
 		uint8_t mortonArea,
@@ -114,9 +122,8 @@ private:
 		const DirectX::XMVECTOR& direction,
 		float radius,
 		float length,
-		bool wallCheck,
-		HitResult* result,
-		bool& hit);
+		bool& hit,
+		HitResult* result = nullptr);
 
 private:
 	Node*		m_quadtreeNodes = nullptr;	// 四分木ノード配列ポインタ
