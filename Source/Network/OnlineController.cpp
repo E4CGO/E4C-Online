@@ -268,6 +268,11 @@ namespace Online
 
 				PlayerCharacterManager::Instance().ClearOtherPlayers();
 				std::cout << "Clean PlayerCharacterManager" << std::endl;
+				
+				PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
+				player->SetPosition({ 0.0f, 0.0f, 0.0f });
+				m_udpCommands[UDP_CMD::SYNC]->Send(nullptr);
+
 				EndSync();
 				m_pMatchingUI = nullptr;
 			}
