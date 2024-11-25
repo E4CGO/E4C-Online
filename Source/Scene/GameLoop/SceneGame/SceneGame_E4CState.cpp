@@ -5,10 +5,7 @@
 #include "TAKOEngine/GUI/UIManager.h"
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 
-#include "GameObject/Character/Player/PlayerManager.h"
-
 #include "Scene/SceneManager.h"
-#include "Scene/SceneTitle.h"
 
 // 初期化ステート
 void SceneGame_E4CState::InitState::Enter()

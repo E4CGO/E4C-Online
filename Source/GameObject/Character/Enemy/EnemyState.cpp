@@ -47,7 +47,7 @@ void EnemyState::FollowState::Enter()
 }
 void EnemyState::FollowState::Execute(float elapsedTime)
 {
-	Player* target = owner->GetTarget();
+	PlayerCharacter* target = owner->GetTarget();
 	if (!target)
 	{
 		owner->GetStateMachine()->ChangeState(EnemyState::ID::Idle);
