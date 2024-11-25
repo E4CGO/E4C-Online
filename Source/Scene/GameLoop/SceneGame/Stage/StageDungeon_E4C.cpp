@@ -21,7 +21,6 @@
 
 #include "Scene/Stage/StageManager.h"
 
-#include "Scene/Stage/TestingStage.h"
 #include "GameObject/Props/Teleporter.h"
 
 #include "Network/OnlineController.h"

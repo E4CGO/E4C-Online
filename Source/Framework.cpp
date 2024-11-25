@@ -9,9 +9,7 @@
 
 #define MINIMP3_IMPLEMENTATION
 #include "TAKOEngine/Sound/Sound.h"
-
-#include "Scene/SceneGame.h"
-#include "Scene/SceneTitle.h"
+#include "TAKOEngine/Network/Network.h"
 #include "Scene/SceneManager.h"
 #include "Scene/SceneTest.h"
 #include "Scene/GameLoop/SceneTitle/SceneTitle_E4C.h"

@@ -1,11 +1,11 @@
-#pragma once
+ï»¿#pragma once
 
 #include "TAKOEngine/AI/StateMachine.h"
 
 #include <memory>
 #include <unordered_map>
 
-#include "GameObject/Character/Player/Player.h"
+#include "GameObject/Character/Player/PlayerCharacter.h"
 
 struct ENEMY_COLLISION
 {
@@ -34,13 +34,13 @@ struct ENEMY_DATA
 
 enum ENEMY_TYPE
 {
-	CHEST_COIN = 0,							// •ó” 
-	CHEST_EMPTY = 1,						// •ó” (‹ó)
+	CHEST_COIN = 0,							// å®ç®±
+	CHEST_EMPTY = 1,						// å®ç®±(ç©º)
 
-	CHEST_EMPTY_SKELETON_MINION,			// •ó” (‹ó) ƒXƒPƒ‹ƒgƒ“¶¬
+	CHEST_EMPTY_SKELETON_MINION,			// å®ç®±(ç©º) ã‚¹ã‚±ãƒ«ãƒˆãƒ³ç”Ÿæˆ
 
-	SKELETON_MINION,						// ƒfƒtƒHƒ‹ƒgœ
-	SKELETON_MINION_BOSS,					// ƒfƒtƒHƒ‹ƒgœƒ{ƒX
+	SKELETON_MINION,						// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆéª¨
+	SKELETON_MINION_BOSS,					// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆéª¨ãƒœã‚¹
 	END,
 };
 
@@ -69,10 +69,10 @@ public:
 	bool MoveTo(float elapsedTime, const DirectX::XMFLOAT3& target);
 	void TurnTo(float elapsedTime, const DirectX::XMFLOAT3& target);
 
-	Player* GetClosestPlayer(float limit = FLT_MAX);
+	PlayerCharacter* GetClosestPlayer(float limit = FLT_MAX);
 	virtual void UpdateTarget() { target = nullptr; }
-	void SetTarget(Player* player) { target = player; }
-	Player* GetTarget() { return target; }
+	void SetTarget(PlayerCharacter* player) { target = player; }
+	PlayerCharacter* GetTarget() { return target; }
 
 	int GetState() { return stateMachine->GetStateIndex(); }
 	StateMachine<Enemy>* GetStateMachine() { return stateMachine; }
@@ -122,9 +122,9 @@ protected:
 	int enemy_id = -1;
 	int enemyType = -1;
 
-	int atk = 10; // UŒ‚—Í
+	int atk = 10; // æ”»æ’ƒåŠ›
 
-	Player* target = nullptr;
+	PlayerCharacter* target = nullptr;
 
 	float moveSpeed = 0.0f;
 	float turnSpeed = 0.0f;
@@ -134,8 +134,8 @@ protected:
 
 	int subState = -1;
 
-	std::unordered_map<int, Collider*> colliders;		// “–‚½‚è”»’è
-	std::unordered_map<int, Collider*> attackColliders;	// UŒ‚”»’è
+	std::unordered_map<int, Collider*> colliders;		// å½“ãŸã‚Šåˆ¤å®š
+	std::unordered_map<int, Collider*> attackColliders;	// æ”»æ’ƒåˆ¤å®š
 
-	bool showHp = true;	// HP•\¦
+	bool showHp = true;	// HPè¡¨ç¤º
 };
