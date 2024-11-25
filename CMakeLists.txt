@@ -1032,11 +1032,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUN
 target_include_directories(${PROJECT_NAME} PUBLIC
     "$<$<CONFIG:Debug>:"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
-    "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/include"
     ">"
     "$<$<CONFIG:Release>:"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
-    "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/include"
     ">"
     "${CMAKE_CURRENT_SOURCE_DIR}/Source"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/imgui-docking"
@@ -1080,7 +1078,6 @@ if(MSVC)
         >
         /permissive-
         /MP
-        /sdl
         /W3
         /Zi
         ${DEFAULT_CXX_EXCEPTION_HANDLING}
@@ -1240,7 +1237,6 @@ endif()
 # Link with other targets.
 set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "$<$<CONFIG:Debug>:"
-    "SDL2"
     "DirectXTK"
     "DirectXTex"
     "d3d11"
@@ -1251,10 +1247,6 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "winmm"
     "zlibstatic"
     "assimp"
-    "SDL2"
-    "SDL2main"
-    "SDL2_mixer"
-    "SDL2-static"
     "Effekseerd"
     "EffekseerRendererDX11d"
     "EffekseerRendererDX12d"
@@ -1266,7 +1258,6 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "OpenAL32"
     ">"
     "$<$<CONFIG:Release>:"
-    "SDL2"
     "DirectXTK"
     "DirectXTex"
     "d3d11"
@@ -1277,10 +1268,6 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "winmm"
     "zlibstatic"
     "assimp"
-    "SDL2"
-    "SDL2main"
-    "SDL2_mixer"
-    "SDL2-static"
     "Effekseer"
     "EffekseerRendererDX11"
     "EffekseerRendererDX12"
@@ -1309,7 +1296,6 @@ target_link_directories(${PROJECT_NAME} PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/External/nlohmann/$<CONFIG>"
     "${CMAKE_CURRENT_SOURCE_DIR}/$<CONFIG>"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/assimp/lib/x64/$<CONFIG>"
-    "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/lib/x64"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/Effekseer170e/lib/vs2022/MD/x64/$<CONFIG>"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/openssl/x64/lib"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
@@ -1326,7 +1312,6 @@ target_link_directories(${PROJECT_NAME} PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtex/native/lib/x64/$<CONFIG>"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtk/native/lib/x64/$<CONFIG>"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
-    "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/lib/x64"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/OpenAL/libs/Win64/"
     ">"
 )
