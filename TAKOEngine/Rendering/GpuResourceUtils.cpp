@@ -247,11 +247,11 @@ HRESULT GpuResourceUtils::LoadTexture(
 	}
 	else // WIC
 	{
-		//TODO: FIX ERROR
+		
 		hr = DirectX::GetMetadataFromWICFile(wfilename.c_str(), DirectX::WIC_FLAGS_NONE, metadata);
-		//_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 		hr = DirectX::LoadFromWICFile(wfilename.c_str(), DirectX::WIC_FLAGS_NONE, &metadata, scratch_image);
-		//_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 
 	if (metadata.mipLevels == 1)
@@ -265,8 +265,7 @@ HRESULT GpuResourceUtils::LoadTexture(
 
 	// シェーダーリソースビュー作成
 	hr = DirectX::CreateShaderResourceView(device, scratch_image.GetImages(), scratch_image.GetImageCount(), metadata, shaderResourceView);
-	//TODO: FIX ERROR
-	//_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
 	if (texture2dDesc != nullptr)
 	{

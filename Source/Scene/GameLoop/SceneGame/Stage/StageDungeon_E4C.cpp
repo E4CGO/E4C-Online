@@ -46,6 +46,9 @@ void StageDungeon_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
 
+	// フレームバッファマネージャー
+	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
+
 	{
 		std::array<DirectX::XMFLOAT3, 4 > positions = {
 		DirectX::XMFLOAT3{ 10.0f, 10.0f, 5.0f},
@@ -119,6 +122,9 @@ void StageDungeon_E4C::Initialize()
 		room->PlaceMapTile();
 	}
 
+	//test = std::make_unique<ModelDX12>("Data/Model/Enemy/Goblin.glb");
+	//test->PlayAnimation(0, true);
+
 	MAPTILES.CreateSpatialIndex(5, 7);
 }
 
@@ -167,6 +173,9 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	portal->Update(elapsedTime);
 
 	timer += elapsedTime;
+
+	//test->UpdateAnimation(elapsedTime);
+	//test->UpdateTransform();
 }
 
 void StageDungeon_E4C::Render()
@@ -199,6 +208,49 @@ void StageDungeon_E4C::Render()
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
 
 	rootRoom->DrawDebugGUI();
+}
+
+void StageDungeon_E4C::RenderDX12()
+{
+	//T_GRAPHICS.BeginRender();
+
+	//// シーン用定数バッファ更新
+	//const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
+	//	CameraManager::Instance().GetCamera());
+
+	//// レンダーコンテキスト設定
+	//RenderContextDX12 rc;
+	//rc.d3d_command_list = m_frameBuffer->GetCommandList();
+	//rc.scene_cbv_descriptor = scene_cbv_descriptor;
+
+	//// 3Dモデル描画
+	//{
+	//	m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+	//	m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+	//	m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+
+	//	// モデル描画
+	//	ModelShaderDX12* shader = T_GRAPHICS.GetModelShaderDX12(ModelShaderDX12Id::Toon);
+	//	if (test != nullptr)
+	//	{
+	//		shader->Render(rc, test.get());
+	//	}
+
+	//	// レンダーターゲットへの書き込み終了待ち
+	//	m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+	//}
+
+	//// ポストエフェクト描画
+	//{
+	//	postprocessingRenderer->Render(m_frameBuffer);
+	//}
+
+	//// 2D描画
+	//{
+
+	//}
+
+	//T_GRAPHICS.End();
 }
 
 void StageDungeon_E4C::OnPhase()

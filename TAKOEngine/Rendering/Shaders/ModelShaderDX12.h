@@ -27,7 +27,7 @@ public:
 	virtual ~ModelShaderDX12() {};
 
 	//•`‰æ
-	virtual void Render(const RenderContextDX12& rc, ModelDX12* model) = 0;
+	virtual void Render(const RenderContextDX12& rc, iModel* model) = 0;
 };
 
 //******************************************************************
@@ -43,7 +43,7 @@ public:
 	~SkinningPipeline();
 
 	//ŒvŽZ
-	void Compute(const RenderContextDX12& rc, ModelDX12* model);
+	void Compute(const RenderContextDX12& rc, iModel* model);
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> m_d3d_pipeline_state;

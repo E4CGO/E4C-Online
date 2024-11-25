@@ -23,6 +23,7 @@ public:
 
 	// モデルリソース読み込み
 	std::shared_ptr<ModelResource> LoadModelResource(const char* filename);
+	std::shared_ptr<ModelResource> LoadModelDX12Resource(const char* filename);
 	std::shared_ptr<ModelResource> LoadModelResourceGLTF(std::string filename);
 	std::shared_ptr<Sprite> LoadSpriteResource(const char* filename);
 

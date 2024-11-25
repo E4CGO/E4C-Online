@@ -25,13 +25,16 @@ void StageOpenWorld_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
 
+	// フレームバッファマネージャー
+	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
+
 	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.025f);
 	stage_collision->Update(0);
 	MAPTILES.Register(stage_collision);
 	MAPTILES.CreateSpatialIndex(5, 7);
 
-	map = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 2.5f, ModelObject::RENDER_MODE::DX11GLTF);
-
+	map = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 2.5f, ModelObject::RENDER_MODE::DX12);
+	
 	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene));
 	teleporter->SetPosition({ 0, 5, 0 });
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
@@ -48,6 +51,8 @@ void StageOpenWorld_E4C::Initialize()
 
 		billboard = std::make_unique<Fireball>(T_GRAPHICS.GetDevice(), "Data/Sprites/fire.png", 1.0f, positions[0]);
 	}
+
+	map12 = std::make_unique<ModelObject>("Data/Model/Enemy/Goblin.glb", 1.0f, ModelObject::RENDER_MODE::DX12);
 
 	// 光
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
@@ -119,11 +124,13 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	PlayerCharacterManager::Instance().Update(elapsedTime);
 	map->Update(elapsedTime);
 
-	teleporter->Update(elapsedTime);
-	plane->Update(elapsedTime);
-	billboard->Update(elapsedTime);
+	//teleporter->Update(elapsedTime);
+	//plane->Update(elapsedTime);
+	//billboard->Update(elapsedTime);
 
-	timer += elapsedTime;
+	//timer += elapsedTime;
+
+	map12->Update(elapsedTime);
 }
 
 void StageOpenWorld_E4C::Render()
@@ -166,6 +173,47 @@ void StageOpenWorld_E4C::Render()
 	// デバッグレンダラ描画実行
 
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
+}
+
+void StageOpenWorld_E4C::RenderDX12()
+{
+	T_GRAPHICS.BeginRender();
+
+	// シーン用定数バッファ更新
+	const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
+		CameraManager::Instance().GetCamera());
+
+	// レンダーコンテキスト設定
+	RenderContextDX12 rc;
+	rc.d3d_command_list = m_frameBuffer->GetCommandList();
+	rc.scene_cbv_descriptor = scene_cbv_descriptor;
+
+	// 3Dモデル描画
+	{
+		m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+
+		PlayerCharacterManager::Instance().RenderDX12(rc);
+
+		map->RenderDX12(rc);
+		map12->RenderDX12(rc);
+
+		// レンダーターゲットへの書き込み終了待ち
+		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+	}
+
+	// ポストエフェクト描画
+	{
+		postprocessingRenderer->Render(m_frameBuffer);
+	}
+
+	// 2D描画
+	{
+
+	}
+
+	T_GRAPHICS.End();
 }
 
 void StageOpenWorld_E4C::OnPhase()

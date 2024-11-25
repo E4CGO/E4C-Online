@@ -35,7 +35,7 @@ public:
 	virtual ~ModelObject() = default;
 
 	// モデルを読み取り
-	void LoadModel(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX11, int modelType = 0);
+	void LoadModel(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX12, int modelType = 0);
 
 	void CleanModels();
 
@@ -43,6 +43,7 @@ public:
 	virtual void Update(float elapsedTime) override;
 	// 描画処理
 	virtual void Render(const RenderContext& rc) override;
+	virtual void RenderDX12(const RenderContextDX12& rc) override;
 
 	// モデルを取得
 	std::unique_ptr<iModel>& GetModel(int idx = 0) { return m_pmodels[idx]; }
@@ -101,6 +102,7 @@ protected:
 
 	// シェーダーID
 	ModelShaderId m_shaderId = ModelShaderId::Toon;
+	ModelShaderDX12Id m_dx12_ShaderId = ModelShaderDX12Id::Lambert;
 
 	// モデルリスト
 	std::vector<std::unique_ptr<iModel>> m_pmodels;
@@ -110,6 +112,9 @@ protected:
 
 	// アニメーションスピード
 	float m_animationSpeed = 1.0f;
+
+	//スキニング
+	SkinningPipeline* m_skinning_pipeline;
 };
 
 #endif //__INCLUDED_MODEL_OBJECT_H__

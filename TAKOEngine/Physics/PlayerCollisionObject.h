@@ -13,10 +13,11 @@ public:
 	PlayerCollisionObject(float radius = 1.0f);
 	~PlayerCollisionObject() {};
 
-	// XVˆ—
+	// æ›´æ–°å‡¦ç†
 	virtual void Update(float elapsedTime) override;
-	// •`‰æˆ—
+	// æç”»å‡¦ç†
 	virtual void Render(const RenderContext& rc) override;
+	virtual void RenderDX12(const RenderContextDX12& rc) override;
 
 protected:
 	virtual void OnHit(Player* player) {};

@@ -22,9 +22,17 @@
 
 #include "UI/Widget/WidgetCrosshair.h"
 #include "TAKOEngine/GUI/UIManager.h"
+#include "Source\PlayerCharacterData.h"
 
 void SceneGame_E4C::Initialize()
 {
+	std::ifstream file_in("CharacterInfos.json");
+	nlohmann::json savedData;
+	file_in >> savedData;
+	file_in.close();
+	PLAYER_CHARACTER_DATA.SetCharacterInfos(savedData);
+	PLAYER_CHARACTER_DATA.ParseData();
+
 	stateMachine = std::make_unique<StateMachine<SceneGame_E4C>>();
 	stateMachine->RegisterState(GAME_STATE::INIT, new SceneGame_E4CState::InitState(this));
 	stateMachine->SetState(GAME_STATE::INIT);
@@ -84,4 +92,9 @@ void SceneGame_E4C::Render()
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
 	STAGES.Render();
+}
+
+void SceneGame_E4C::RenderDX12()
+{
+	STAGES.RenderDX12();
 }

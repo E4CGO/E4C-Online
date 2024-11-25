@@ -166,7 +166,7 @@ ToonShaderDX12::~ToonShaderDX12()
 // @param[in]   model  描画対象のモデルデータを指すポインタ
 // @return      なし
 //***********************************************************
-void ToonShaderDX12::Render(const RenderContextDX12& rc, ModelDX12* model)
+void ToonShaderDX12::Render(const RenderContextDX12& rc, iModel* model)
 {
 	Graphics& graphics = Graphics::Instance();
 
@@ -186,7 +186,7 @@ void ToonShaderDX12::Render(const RenderContextDX12& rc, ModelDX12* model)
 
 	for (const ModelDX12::Mesh& mesh : model->GetMeshes())
 	{
-		if (!visibleObjects[culling++]) continue;
+		//if (!visibleObjects[culling++]) continue;
 
 		const ModelResource::Mesh* res_mesh = mesh.mesh;
 		const ModelDX12::Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());

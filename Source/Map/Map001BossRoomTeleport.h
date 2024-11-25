@@ -8,10 +8,11 @@ public:
 	Map001BossRoomTeleport();
 	~Map001BossRoomTeleport() {};
 
-	// XVˆ—
+	// æ›´æ–°å‡¦ç†
 	virtual void Update(float elapsedTime) override;
-	// •`‰æˆ—
+	// æç”»å‡¦ç†
 	void Render(const RenderContext& rc) override;
+	void RenderDX12(const RenderContextDX12& rc) override;
 
 protected:
 	void OnHit(Player* player);

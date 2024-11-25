@@ -41,6 +41,14 @@ public:
 		}
 	}
 
+	void RenderDX12(const RenderContextDX12& rc)
+	{
+		for (T* item : this->items)
+		{
+			item->RenderDX12(rc);
+		}
+	}
+
 	void MoveToEnd(T* item)
 	{
 		typename std::vector<T*>::iterator it = std::find(this->items.begin(), this->items.end(), item);

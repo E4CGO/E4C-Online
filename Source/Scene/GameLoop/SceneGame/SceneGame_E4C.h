@@ -22,6 +22,8 @@ public:
 	// 描画処理
 	void Render() override;
 
+	void RenderDX12() override;
+
 	StateMachine<SceneGame_E4C>* GetStateMachine() { return stateMachine.get(); }
 	
 	Online::OnlineController* GetOnlineController() { return m_ponlineController; };
