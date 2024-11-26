@@ -235,8 +235,13 @@ void ModelDX12::UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform)
 
 	for (Node& node : m_nodes)
 	{
+		DirectX::XMMATRIX C{ DirectX::XMLoadFloat4x4(&coordinate_system_transforms[1]) * DirectX::XMMatrixScaling(scaling, scaling, scaling) };
 		// ローカル行列算出
-		DirectX::XMMATRIX C{ DirectX::XMLoadFloat4x4(&coordinate_system_transforms[modelType]) * DirectX::XMMatrixScaling(scaling, scaling, scaling) };
+		if (modelType == 0)
+		{
+			C = { DirectX::XMLoadFloat4x4(&coordinate_system_transforms[0]) * DirectX::XMMatrixScaling(scaling, scaling, scaling) };
+		}
+
 		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(node.scale.x, node.scale.y, node.scale.z);
 		DirectX::XMMATRIX R = DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&node.rotation));
 		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(node.position.x, node.position.y, node.position.z);

@@ -294,9 +294,9 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 		}
 
 		m_rtv_descriptor_heap = std::make_unique<DescriptorHeap>(m_d3d_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 10);
-		m_dsv_descriptor_heap = std::make_unique<DescriptorHeap>(m_d3d_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1000);
-		m_shader_resource_descriptor_heap = std::make_unique<DescriptorHeap>(m_d3d_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1000);
-		m_sampler_descriptor_heap = std::make_unique<DescriptorHeap>(m_d3d_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, 1000);
+		m_dsv_descriptor_heap = std::make_unique<DescriptorHeap>(m_d3d_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 10);
+		m_shader_resource_descriptor_heap = std::make_unique<DescriptorHeap>(m_d3d_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 50000);
+		m_sampler_descriptor_heap = std::make_unique<DescriptorHeap>(m_d3d_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, 10);
 
 		m_viewport.TopLeftX = 0;
 		m_viewport.TopLeftY = 0;

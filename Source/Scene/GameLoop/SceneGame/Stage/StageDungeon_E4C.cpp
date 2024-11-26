@@ -177,6 +177,7 @@ void StageDungeon_E4C::GenerateDungeon()
 			break;
 		}
 	}
+}
 
 void StageDungeon_E4C::Initialize()
 {

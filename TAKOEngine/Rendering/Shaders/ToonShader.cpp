@@ -91,11 +91,11 @@ ToonShaderDX12::ToonShaderDX12(ID3D12Device* device, bool instancing)
 		pipeline_state_desc.pRootSignature = m_d3d_root_signature.Get();
 
 		pipeline_state_desc.VS.pShaderBytecode = vsData.data();
-		pipeline_state_desc.VS.BytecodeLength  = vsData.size();
+		pipeline_state_desc.VS.BytecodeLength = vsData.size();
 		pipeline_state_desc.PS.pShaderBytecode = psData.data();
-		pipeline_state_desc.PS.BytecodeLength  = psData.size();
+		pipeline_state_desc.PS.BytecodeLength = psData.size();
 		pipeline_state_desc.GS.pShaderBytecode = gsData.data();
-		pipeline_state_desc.GS.BytecodeLength  = gsData.size();
+		pipeline_state_desc.GS.BytecodeLength = gsData.size();
 
 		// 入力レイアウト
 		D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
@@ -128,11 +128,11 @@ ToonShaderDX12::ToonShaderDX12(ID3D12Device* device, bool instancing)
 
 		//レンダーターゲット数
 		pipeline_state_desc.NumRenderTargets = 1;
-		pipeline_state_desc.RTVFormats[0]    = RenderTargetFormat;
-		pipeline_state_desc.DSVFormat        = DepthStencilFormat;
+		pipeline_state_desc.RTVFormats[0] = RenderTargetFormat;
+		pipeline_state_desc.DSVFormat = DepthStencilFormat;
 
 		//マルチサンプリング
-		pipeline_state_desc.SampleDesc.Count   = 1;
+		pipeline_state_desc.SampleDesc.Count = 1;
 		pipeline_state_desc.SampleDesc.Quality = 0;
 
 		//アダプタ
@@ -148,7 +148,7 @@ ToonShaderDX12::ToonShaderDX12(ID3D12Device* device, bool instancing)
 	}
 
 	//サンプラーステート設定
-	m_sampler = graphics.GetSampler(SamplerState::LinearClamp);
+	m_sampler = graphics.GetSampler(SamplerState::AnisotropicWrap);
 }
 
 //***********************************************************
