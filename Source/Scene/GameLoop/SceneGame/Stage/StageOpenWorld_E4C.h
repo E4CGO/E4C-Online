@@ -53,6 +53,16 @@ private:
 	std::unique_ptr<ModelObject> map;
 	std::unique_ptr<ModelObject> tower;
 
+	std::unique_ptr<ModelObject> sky;
+	DirectX::XMFLOAT4X4 test_transform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+	DirectX::XMFLOAT3 test_position = { 0, 0, 0 };
+	DirectX::XMFLOAT4 test_rotation = { 0, 0, 0, 0 };
+	DirectX::XMFLOAT3 test_scale = { 1, 1, 1 };
+
+	std::unique_ptr<SpriteDX12>			m_sprites[8];
+
+	std::vector<std::unique_ptr<ModelObject>> playerModels;
+
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {
 		"",											// マスク
@@ -61,9 +71,6 @@ private:
 		"Data/Sprites/big_background.t.png"
 	};
 
-	std::unique_ptr<ModelObject> map;
-	std::unique_ptr<ModelObject> map12;
-	std::unique_ptr<ModelObject> shrine;
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
 
 	float transitionTime = 0.0f;

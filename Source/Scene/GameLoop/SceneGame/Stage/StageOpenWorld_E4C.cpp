@@ -44,7 +44,10 @@ void StageOpenWorld_E4C::Initialize()
 	map = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, 0);
 	//tower = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, 0);
 
-	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene));
+	sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 100.0f, ModelObject::RENDER_MODE::DX12);
+	m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
+
+	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
 	teleporter->SetPosition({ 16, 8.5, -46 });
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
 
@@ -64,7 +67,7 @@ void StageOpenWorld_E4C::Initialize()
 	map12 = std::make_unique<ModelObject>("Data/Model/Enemy/Goblin.glb", 1.0f, ModelObject::RENDER_MODE::DX12);
 
 	// 光
-	LightManager::Instance().SetAmbientColor({ 0.1f, 0.1f, 0.1f, 0.1f});
+	LightManager::Instance().SetAmbientColor({ 0.1f, 0.1f, 0.1f, 0.1f });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
@@ -72,6 +75,15 @@ void StageOpenWorld_E4C::Initialize()
 	// プレイヤー
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
 	player->SetPosition({ 15.0f, 15.0f, 5.0f });
+
+	playerModels.resize(50);
+
+	for (size_t i = 0; i < playerModels.size(); i++)
+	{
+		playerModels[i] = std::make_unique<ModelObject>("Data/Model/Character/PlayerModels/ANM_PCMsword_Prototype_3_ANIMATION.glb", 1.0f, ModelObject::RENDER_MODE::DX12);
+		playerModels[i]->SetPosition({ 3.0f * ((i % 5)), 1.0f, 3.0f * (i / 5) });
+		playerModels[i]->SetAnimation(0, true);
+	}
 
 	// カメラ設定
 	Camera* mainCamera = CameraManager::Instance().GetCamera();
@@ -133,7 +145,14 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	map->Update(elapsedTime);
 	tower->Update(elapsedTime);
 
-	//teleporter->Update(elapsedTime);
+	for (size_t i = 0; i < playerModels.size(); i++)
+	{
+		playerModels[i]->Update(elapsedTime + (elapsedTime / 100.0f) * i);
+	}
+
+	sky->Update(elapsedTime);
+
+	teleporter->Update(elapsedTime);
 	//plane->Update(elapsedTime);
 	//billboard->Update(elapsedTime);
 
@@ -208,6 +227,18 @@ void StageOpenWorld_E4C::RenderDX12()
 
 		map->RenderDX12(rc);
 		//tower->RenderDX12(rc);
+
+		for (size_t i = 0; i < playerModels.size(); i++)
+		{
+			playerModels[i]->RenderDX12(rc);
+		}
+
+		// skyBox
+		{
+			rc.skydomeData.skyTexture = m_sprites[1]->GetDescriptor();
+			ModelShaderDX12* shader = T_GRAPHICS.GetModelShaderDX12(ModelShaderDX12Id::Skydome);
+			//shader->Render(rc, sky->GetModel().get());
+		}
 
 		// レンダーターゲットへの書き込み終了待ち
 		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
