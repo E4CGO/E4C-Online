@@ -1,5 +1,5 @@
 ﻿//! @file WidgetSettingWindow.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDED_WIDGET_SETTING_WINDOW__
 #define __INCLUDED_WIDGET_SETTING_WINDOW__
@@ -32,6 +32,8 @@ public:
 	void Update(float elapsedTime) override;
 	void Render(const RenderContext& rc)override;
 
+	void RenderDX12(const RenderContextDX12& rc) override;
+
 	bool IsEnd() { return isEnd; }
 private:
 	bool isEnd = false; // 完結フラグ
@@ -45,6 +47,5 @@ private:
 
 	std::vector<Widget*> OptionsList;
 };
-
 
 #endif // !__INCLUDED_WIDGET_SETTING_WINDOW__

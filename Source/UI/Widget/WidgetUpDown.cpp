@@ -1,5 +1,5 @@
 //! @file WidgetUpDown.cpp
-//! @note 
+//! @note
 
 #include "WidgetUpDown.h"
 #include "TAKOEngine/Runtime/tentacle_lib.h"
@@ -14,6 +14,7 @@
 WidgetArrowLeft::WidgetArrowLeft(uint8_t* value, uint8_t minValue, uint8_t maxValue)
 {
 	btn = RESOURCE.LoadSpriteResource("Data/Sprites/UI/keybinds/key_Left.png");
+	btnDX12 = RESOURCE.LoadSpriteResourceDX12("Data/Sprites/UI/keybinds/key_Left.png");
 	this->value = value;
 	this->minValue = minValue;
 	this->maxValue = maxValue;
@@ -30,6 +31,18 @@ void WidgetArrowLeft::Render(const RenderContext& rc)
 		m_position.x, m_position.y, 0,
 		m_size.x, m_size.y
 	);
+}
+
+void WidgetArrowLeft::RenderDX12(const RenderContextDX12& rc)
+{
+	btnDX12->Begin(rc);
+	btnDX12->Draw(
+		m_position.x, m_position.y,
+		m_size.x, m_size.y,
+		0,
+		1.0f, 1.0f, 1.0f, 1.0f
+	);
+	btnDX12->End(rc.d3d_command_list);
 }
 
 /**************************************************************************//**
@@ -56,6 +69,7 @@ void WidgetArrowLeft::OnClick()
 WidgetArrowRight::WidgetArrowRight(uint8_t* value, uint8_t minValue, uint8_t maxValue)
 {
 	btn = RESOURCE.LoadSpriteResource("Data/Sprites/UI/keybinds/key_Right.png");
+	btnDX12 = RESOURCE.LoadSpriteResourceDX12("Data/Sprites/UI/keybinds/key_Right.png");
 	this->value = value;
 	this->minValue = minValue;
 	this->maxValue = maxValue;
@@ -72,6 +86,18 @@ void WidgetArrowRight::Render(const RenderContext& rc)
 		m_position.x, m_position.y, 0,
 		m_size.x, m_size.y
 	);
+}
+
+void WidgetArrowRight::RenderDX12(const RenderContextDX12& rc)
+{
+	btnDX12->Begin(rc);
+	btnDX12->Draw(
+		m_position.x, m_position.y,
+		m_size.x, m_size.y,
+		0,
+		1.0f, 1.0f, 1.0f, 1.0f
+	);
+	btnDX12->End(rc.d3d_command_list);
 }
 
 /**************************************************************************//**
@@ -153,4 +179,10 @@ void WidgetUpDown::Render(const RenderContext& rc)
 	);
 	m_ArrowLeft->Render(rc);
 	m_ArrowRight->Render(rc);
+}
+
+void WidgetUpDown::RenderDX12(const RenderContextDX12& rc)
+{
+	m_ArrowLeft->RenderDX12(rc);
+	m_ArrowRight->RenderDX12(rc);
 }

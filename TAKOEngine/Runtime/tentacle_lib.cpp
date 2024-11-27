@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <tchar.h>
 
-//#define FULLSCREEN
+#define FULLSCREEN
 
 namespace TentacleLib
 {
@@ -57,10 +57,8 @@ namespace TentacleLib
 
 		setting.title = APPLICATION_NAME;
 
-		//SDL_Init(SDL_INIT_AUDIO);
 		input.Init(hWnd);
 		timer.Init();
-		//audio.Init();
 		graphics.Initalize(hWnd, 2);
 
 		textSprite.Init(graphics.GetDevice());

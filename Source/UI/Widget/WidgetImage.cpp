@@ -1,11 +1,11 @@
 ﻿//! @file WidgetImage.cpp
-//! @note 
+//! @note
 
 #include "WidgetImage.h"
 #include "TAKOEngine/Rendering/ResourceManager.h"
 
 /**************************************************************************//**
- 	@brief		コンストラクタ
+	@brief		コンストラクタ
 	@param[in]	filename ファイル名前
 *//***************************************************************************/
 WidgetImage::WidgetImage(const char* filename)
@@ -14,7 +14,7 @@ WidgetImage::WidgetImage(const char* filename)
 }
 
 /**************************************************************************//**
- 	@brief		描画処理
+	@brief		描画処理
 	@param[in]	rc
 *//***************************************************************************/
 void WidgetImage::Render(const RenderContext& rc)
@@ -26,4 +26,8 @@ void WidgetImage::Render(const RenderContext& rc)
 		m_angle,
 		m_color.x, m_color.y, m_color.z, m_color.w
 	);
+}
+
+void WidgetImage::RenderDX12(const RenderContextDX12& rc)
+{
 }

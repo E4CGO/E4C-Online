@@ -1,5 +1,5 @@
 ﻿//! @file WidgetSettingWindow.cpp
-//! @note 
+//! @note
 
 #include "UI/Widget/WidgetSettingWindow.h"
 #include "TAKOEngine/Rendering/ResourceManager.h"
@@ -94,4 +94,8 @@ void WidgetSettingWindow::Render(const RenderContext& rc)
 	{
 		option->Render(rc);
 	}
+}
+
+void WidgetSettingWindow::RenderDX12(const RenderContextDX12& rc)
+{
 }

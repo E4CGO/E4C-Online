@@ -18,7 +18,7 @@ void WidgetEnemiesHp::Render(const RenderContext& rc)
 {
 	// ビューボード
 	D3D11_VIEWPORT viewport;
-	
+
 	UINT numViewports = 1;
 	rc.deviceContext->RSGetViewports(&numViewports, &viewport);
 
@@ -62,4 +62,8 @@ void WidgetEnemiesHp::Render(const RenderContext& rc)
 			0.7f, 0.0f, 0.0f, 1.0f
 		);
 	}
+}
+
+void WidgetEnemiesHp::RenderDX12(const RenderContextDX12& rc)
+{
 }

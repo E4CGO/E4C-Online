@@ -497,6 +497,7 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	m_sampler[static_cast<int>(SamplerState::LinearWrap)] = std::make_unique<SamplerManager>(SamplerState::LinearWrap);
 	m_sampler[static_cast<int>(SamplerState::LinearClamp)] = std::make_unique<SamplerManager>(SamplerState::LinearClamp);
 	m_sampler[static_cast<int>(SamplerState::LinearBorder)] = std::make_unique<SamplerManager>(SamplerState::LinearBorder);
+	m_sampler[static_cast<int>(SamplerState::LinearMirror)] = std::make_unique<SamplerManager>(SamplerState::LinearMirror);
 	m_sampler[static_cast<int>(SamplerState::AnisotropicWrap)] = std::make_unique<SamplerManager>(SamplerState::AnisotropicWrap);
 	m_sampler[static_cast<int>(SamplerState::ShadowMap)] = std::make_unique<SamplerManager>(SamplerState::ShadowMap);
 
@@ -536,10 +537,10 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	// DX12のスプライトシェーダー生成
 	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::Default)] = std::make_unique<DefaultSpriteShaderDX12>(m_d3d_device.Get());
 	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::LuminanceExtraction)] = std::make_unique<LuminanceExtractionShaderDX12>(m_d3d_device.Get());
-	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::GaussianBlur)]        = std::make_unique<GaussianBlurShaderDX12>(m_d3d_device.Get());
-	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::ColorGrading)]        = std::make_unique<ColorGradingShaderDX12>(m_d3d_device.Get());
-	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::Finalpass)]           = std::make_unique<FinalpassShaderDX12>(m_d3d_device.Get());
-	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::Particle)]            = std::make_unique<ParticleShader>(m_d3d_device.Get());
+	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::GaussianBlur)] = std::make_unique<GaussianBlurShaderDX12>(m_d3d_device.Get());
+	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::ColorGrading)] = std::make_unique<ColorGradingShaderDX12>(m_d3d_device.Get());
+	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::Finalpass)] = std::make_unique<FinalpassShaderDX12>(m_d3d_device.Get());
+	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::Particle)] = std::make_unique<ParticleShader>(m_d3d_device.Get());
 
 	// レンダラ
 	debugRenderer = std::make_unique<DebugRenderer>(device.Get());
@@ -647,7 +648,7 @@ void Graphics::BeginRender()
 	// レンダーターゲットを設定
 	m_framebufferManager->SetRenderTarget(rtv_descriptor[frame_buffer_index]->GetCpuHandle(), dsv_descriptor->GetCpuHandle());
 
-	const float clearColor[] = { 0.0f, 0.0f, 1.0f, 1.0f };
+	const float clearColor[] = { 0.6f, 0.6f, 0.6f, 1.0f };
 	m_framebufferManager->ClearRenderTargetView(rtv_descriptor[frame_buffer_index]->GetCpuHandle(), clearColor);
 	m_framebufferManager->ClearDepthStencilView(dsv_descriptor->GetCpuHandle(), 1.0f);
 }
@@ -1335,7 +1336,7 @@ HRESULT Graphics::CopyImageForCubeMap(const D3D12_SUBRESOURCE_DATA* subresources
 	// アップロード用リソースのマッピングとデータコピー
 	{
 		void* mapped = nullptr;
-		D3D12_RANGE readRange = { 0, uploadSize }; 
+		D3D12_RANGE readRange = { 0, uploadSize };
 		hr = d3d_upload_resource->Map(0, &readRange, &mapped);
 		if (FAILED(hr)) return hr;
 

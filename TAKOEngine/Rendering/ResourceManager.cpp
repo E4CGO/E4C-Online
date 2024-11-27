@@ -84,3 +84,34 @@ std::shared_ptr<Sprite> ResourceManager::LoadSpriteResource(const char* filename
 
 	return sprite;
 }
+
+std::shared_ptr<SpriteDX12> ResourceManager::LoadSpriteResourceDX12(const char* filename)
+{
+	// スプライト検索
+	SpriteMapDX12::iterator it = spritesDX12.find(filename);
+	//if (it != spritesDX12.end())
+	//{
+	//	// リンク(寿命)が切れていないか確認
+	//	if (!it->second.expired())
+	//	{
+	//		// 読み込み済みスプライトのリソースを返す
+	//		return it->second.lock();
+	//	}
+	//}
+
+	// 新規スプライトリソース作成&読み込み
+	std::shared_ptr<SpriteDX12> sprite;
+	if (std::string(filename).length() == 0)
+	{
+		sprite = std::make_shared<SpriteDX12>(1);
+	}
+	else
+	{
+		sprite = std::make_shared<SpriteDX12>(1, filename);
+	}
+
+	// マップに登録
+	spritesDX12[filename] = sprite;
+
+	return sprite;
+}

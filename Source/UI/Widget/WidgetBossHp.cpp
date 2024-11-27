@@ -78,3 +78,7 @@ void WidgetBossHp::Render(const RenderContext& rc)
 		1
 	);
 }
+
+void WidgetBossHp::RenderDX12(const RenderContextDX12& rc)
+{
+}

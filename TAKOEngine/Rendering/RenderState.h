@@ -18,6 +18,7 @@ enum class SamplerState
 	LinearWrap,
 	LinearClamp,
 	LinearBorder,
+	LinearMirror,
 	AnisotropicWrap,
 	ShadowMap,
 

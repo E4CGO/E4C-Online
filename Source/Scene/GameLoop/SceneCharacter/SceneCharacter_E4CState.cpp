@@ -308,8 +308,9 @@ void SceneCharacter_E4CState::CharacterCreationState::Enter()
 	SceneCharacter_E4CState::btnStartCharacter->SetSize({ 196.0f * 1.5f, 92.0f * 1.5f });
 	UIManager::Instance().Register(SceneCharacter_E4CState::btnStartCharacter);
 
-	WidgetUpDown* GenderSelector = new WidgetUpDown("SHIELD", &SceneCharacter_E4CState::currentCharacterInfo.Character.pattern[PlayerCharacterData::APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT], 0, 2);
 	WidgetUpDown* WeaponSelector = new WidgetUpDown("WEAPON", &SceneCharacter_E4CState::currentCharacterInfo.Character.pattern[PlayerCharacterData::APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT], 0, 1);
+	WidgetUpDown* OffHandSelector = new WidgetUpDown("SHIELD", &SceneCharacter_E4CState::currentCharacterInfo.Character.pattern[PlayerCharacterData::APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT], 0, 2);
+	WidgetUpDown* HairSelector = new WidgetUpDown("HAIR", &SceneCharacter_E4CState::currentCharacterInfo.Character.pattern[PlayerCharacterData::APPEARANCE_PATTERN::HAIR], 0, 1);
 
 	SceneCharacter_E4CState::background = RESOURCE.LoadSpriteResource("Data/Sprites/UI/keybinds/key_Left.png");
 	DirectX::XMFLOAT2 size = SceneCharacter_E4CState::background->GetTextureSize() * 0.2f;
@@ -323,15 +324,19 @@ void SceneCharacter_E4CState::CharacterCreationState::Enter()
 	float optionHeight = size.y / 5.0f;
 	DirectX::XMFLOAT2 optionPos = { position.x + 20.0f, 20.0f };
 	DirectX::XMFLOAT2 optionPos2 = { position.x + 20.0f, 120.0f };
+	DirectX::XMFLOAT2 optionPos3 = { position.x + 20.0f, 220.0f };
 
-	GenderSelector->SetSize({ size.x - 40.0f , optionHeight });
 	WeaponSelector->SetSize({ size.x - 40.0f , optionHeight });
+	OffHandSelector->SetSize({ size.x - 40.0f , optionHeight });
+	HairSelector->SetSize({ size.x - 40.0f , optionHeight });
 
-	GenderSelector->SetPosition(optionPos);
-	WeaponSelector->SetPosition(optionPos2);
+	WeaponSelector->SetPosition(optionPos);
+	OffHandSelector->SetPosition(optionPos2);
+	HairSelector->SetPosition(optionPos3);
 
-	UIManager::Instance().Register(GenderSelector);
 	UIManager::Instance().Register(WeaponSelector);
+	UIManager::Instance().Register(OffHandSelector);
+	UIManager::Instance().Register(HairSelector);
 }
 
 /**************************************************************************//**

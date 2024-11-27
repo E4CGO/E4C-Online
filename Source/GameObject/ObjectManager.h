@@ -1,5 +1,5 @@
 //! @file ObjectManager.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDED_OBJECT_MANAGER__
 #define __INCLUDED_OBJECT_MANAGER__
@@ -38,6 +38,14 @@ public:
 		for (T* item : this->items)
 		{
 			item->Render(rc);
+		}
+	}
+
+	void RenderDX12(const RenderContextDX12& rc)
+	{
+		for (T* item : this->items)
+		{
+			item->RenderDX12(rc);
 		}
 	}
 

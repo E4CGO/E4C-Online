@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unordered_set>
 #include <memory>
 #include <array>
 
@@ -37,6 +38,7 @@ public:
 	{
 		NORMAL,
 	};
+
 private:
 	SceneGame_E4C* m_pScene;
 
@@ -45,12 +47,19 @@ private:
 	MapTile* stage_collision = nullptr;
 
 	std::unique_ptr <Teleporter> teleporter;
-	std::unique_ptr <Plane> plane;
-
-	std::unique_ptr <Billboard> billboard;
 
 	std::unique_ptr<ModelObject> map;
-	std::unique_ptr<ModelObject> shrine;
+	std::unique_ptr<ModelObject> tower;
+
+	// Sprite Preload
+	std::unordered_set<const char*> spriteList = {
+		"",											// マスク
+		// Setting UI
+		"Data/Sprites/UI/start.png",
+		"Data/Sprites/big_background.t.png"
+	};
+
+	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
 
 	float transitionTime = 0.0f;
 	float transitionDuration = 2.f;  // 5秒かけて移動

@@ -1,5 +1,5 @@
 ﻿//! @file WidgetInputBool.cpp
-//! @note 
+//! @note
 
 #include "WidgetInputBool.h"
 
@@ -7,7 +7,7 @@
 #include "TAKOEngine/Rendering/ResourceManager.h"
 
 /**************************************************************************//**
- 	@brief	コンストラクタ
+	@brief	コンストラクタ
 	@param[in]	label	ラベル
 	@param[in]	value	bool値の参照ポインタ
 *//***************************************************************************/
@@ -18,7 +18,7 @@ WidgetInputBool::WidgetInputBool(const char* label, bool* value) : m_label(label
 };
 
 /**************************************************************************//**
- 	@brief		描画処理
+	@brief		描画処理
 	@param[in]	rc レンダーコンテンツ
 	@return		なし
 *//***************************************************************************/
@@ -56,4 +56,8 @@ void WidgetInputBool::Render(const RenderContext& rc)
 			checkboxSize.x, checkboxSize.y
 		);
 	}
+}
+
+void WidgetInputBool::RenderDX12(const RenderContextDX12& rc)
+{
 }
