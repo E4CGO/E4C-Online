@@ -384,6 +384,8 @@ AABB RoomBase::CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const
 
 void RoomBase::PlaceMapTile(bool isLeader)
 {
+	int count = 0;
+
 	for (const TILE_DATA& tileData : m_tileDatas)
 	{
 		std::vector<std::string> colliderFileNames;
@@ -396,7 +398,16 @@ void RoomBase::PlaceMapTile(bool isLeader)
 			break;
 		case TileType::WALL:
 			colliderFileNames.emplace_back("Data/Model/DungeonAssets/WALL.glb");
-			break;
+			//switch (count)
+			//{
+			//case 0:	colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_01a.glb");
+			//case 1:	colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_01b.glb");
+			//case 2:	colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_02a.glb");
+			//case 3:	colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_02b.glb");
+			//case 4:	colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_03a.glb");
+			//case 5:	colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_04a.glb");
+			//}
+			//break;
 		case TileType::PILLAR:
 			modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_01a.glb");
 			modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_Base_01a.glb");
@@ -409,6 +420,9 @@ void RoomBase::PlaceMapTile(bool isLeader)
 			modelFileNames.emplace_back("Data/Model/Cube/testCubes.glb");
 			break;
 		}
+
+		count++;
+		if (count > 5) count = 0;
 
 		MapTile* newTile = new MapTile("", 1.0f, this);
 
