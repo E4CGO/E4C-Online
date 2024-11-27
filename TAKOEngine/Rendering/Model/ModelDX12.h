@@ -12,7 +12,7 @@
 class ModelDX12 : public iModel
 {
 public:
-	ModelDX12(ID3D12Device* device, const char* filename, float scaling = 1.0f, int modelType = 0);
+	ModelDX12(ID3D12Device* device, const char* filename, float scaling = 1.0f, int modelType = 1);
 	~ModelDX12() override;
 
 	// 行列計算
@@ -100,4 +100,6 @@ private:
 	// インスタンシング用
 	bool exist[InstancingMax] = {};
 	DirectX::XMFLOAT4X4 m_transform[InstancingMax];
+
+	int modelType = 0;
 };

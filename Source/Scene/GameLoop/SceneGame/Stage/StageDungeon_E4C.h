@@ -88,8 +88,6 @@ protected:
 	float transitionDuration = 2.f;  // 5秒かけて移動
 	int currentSegment = 0;
 
-	std::unique_ptr<ModelDX12> test;
-
 	// フレームバッファマネージャー
 	FrameBufferManager* m_frameBuffer;
 

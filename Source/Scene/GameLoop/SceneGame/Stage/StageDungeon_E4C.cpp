@@ -178,8 +178,8 @@ void StageDungeon_E4C::GenerateDungeon()
 		}
 	}
 
-		portal = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, positions);
-		portal.get()->SetShader(ModelShaderId::Portal);
+	//portal = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, positions);
+	//portal.get()->SetShader(ModelShaderId::Portal);
 }
 
 void StageDungeon_E4C::Initialize()
@@ -288,9 +288,6 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	PlayerCharacterManager::Instance().Update(elapsedTime);
 
 	timer += elapsedTime;
-
-	//test->UpdateAnimation(elapsedTime);
-	//test->UpdateTransform();
 }
 
 void StageDungeon_E4C::Render()
@@ -326,45 +323,40 @@ void StageDungeon_E4C::Render()
 
 void StageDungeon_E4C::RenderDX12()
 {
-	//T_GRAPHICS.BeginRender();
+	T_GRAPHICS.BeginRender();
 
-	//// シーン用定数バッファ更新
-	//const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
-	//	CameraManager::Instance().GetCamera());
+	// シーン用定数バッファ更新
+	const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
+		CameraManager::Instance().GetCamera());
 
-	//// レンダーコンテキスト設定
-	//RenderContextDX12 rc;
-	//rc.d3d_command_list = m_frameBuffer->GetCommandList();
-	//rc.scene_cbv_descriptor = scene_cbv_descriptor;
+	// レンダーコンテキスト設定
+	RenderContextDX12 rc;
+	rc.d3d_command_list = m_frameBuffer->GetCommandList();
+	rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
-	//// 3Dモデル描画
-	//{
-	//	m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
-	//	m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
-	//	m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+	// 3Dモデル描画
+	{
+		m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 
-	//	// モデル描画
-	//	ModelShaderDX12* shader = T_GRAPHICS.GetModelShaderDX12(ModelShaderDX12Id::Toon);
-	//	if (test != nullptr)
-	//	{
-	//		shader->Render(rc, test.get());
-	//	}
+		// モデル描画
+		
+		// レンダーターゲットへの書き込み終了待ち
+		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+	}
 
-	//	// レンダーターゲットへの書き込み終了待ち
-	//	m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
-	//}
+	// ポストエフェクト描画
+	{
+		postprocessingRenderer->Render(m_frameBuffer);
+	}
 
-	//// ポストエフェクト描画
-	//{
-	//	postprocessingRenderer->Render(m_frameBuffer);
-	//}
+	// 2D描画
+	{
 
-	//// 2D描画
-	//{
+	}
 
-	//}
-
-	//T_GRAPHICS.End();
+	T_GRAPHICS.End();
 }
 
 void StageDungeon_E4C::OnPhase()

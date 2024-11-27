@@ -33,6 +33,11 @@ void ModelObject::LoadModel(const char* filename, float scaling, ModelObject::RE
 
 	m_renderMode = renderMode;
 
+	if (modelType == 0)
+	{
+		m_dx12_ShaderId = ModelShaderDX12Id::Lambert;
+	}
+
 	switch (m_renderMode)
 	{
 	case ModelObject::RENDER_MODE::DX11:

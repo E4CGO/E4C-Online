@@ -31,10 +31,10 @@ void StageOpenWorld_E4C::Initialize()
 	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
 
 	// Sprite Resource Preload
-	/*for (auto& filename : spriteList)
+	for (auto& filename : spriteList)
 	{
 		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
-	}*/
+	}
 
 	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
 	stage_collision->Update(0);
@@ -42,32 +42,17 @@ void StageOpenWorld_E4C::Initialize()
 	MAPTILES.CreateSpatialIndex(5, 7);
 
 	map = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, 0);
-	//tower = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, 0);
+	tower = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, 0);
 
-	sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 100.0f, ModelObject::RENDER_MODE::DX12);
+	sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 50.0f, ModelObject::RENDER_MODE::DX12);
 	m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
 
 	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
 	teleporter->SetPosition({ 16, 8.5, -46 });
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
 
-	{
-		std::array<DirectX::XMFLOAT3, 4 > positions = {
-			DirectX::XMFLOAT3{ 10.0f, 10.0f, 5.0f},
-			DirectX::XMFLOAT3{ 10.0f, 20.0f, 5.0f },
-			DirectX::XMFLOAT3{ 5.0f, 10.0f, 5.0f },
-			DirectX::XMFLOAT3{ 5.0f, 20.0f, 5.0f }
-		};
-
-		plane = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "Data/Sprites/gem.png", 1.0f, positions);
-
-		billboard = std::make_unique<Fireball>(T_GRAPHICS.GetDevice(), "Data/Sprites/fire.png", 1.0f, positions[0]);
-	}
-
-	map12 = std::make_unique<ModelObject>("Data/Model/Enemy/Goblin.glb", 1.0f, ModelObject::RENDER_MODE::DX12);
-
 	// 光
-	LightManager::Instance().SetAmbientColor({ 0.1f, 0.1f, 0.1f, 0.1f });
+	LightManager::Instance().SetAmbientColor({ 0.0f, 0.0f, 0.0f, 0.0f });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
@@ -156,9 +141,7 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	//plane->Update(elapsedTime);
 	//billboard->Update(elapsedTime);
 
-	//timer += elapsedTime;
-
-	map12->Update(elapsedTime);
+	timer += elapsedTime;
 }
 
 void StageOpenWorld_E4C::Render()
@@ -226,7 +209,7 @@ void StageOpenWorld_E4C::RenderDX12()
 		PlayerCharacterManager::Instance().RenderDX12(rc);
 
 		map->RenderDX12(rc);
-		//tower->RenderDX12(rc);
+		tower->RenderDX12(rc);
 
 		for (size_t i = 0; i < playerModels.size(); i++)
 		{
@@ -237,7 +220,7 @@ void StageOpenWorld_E4C::RenderDX12()
 		{
 			rc.skydomeData.skyTexture = m_sprites[1]->GetDescriptor();
 			ModelShaderDX12* shader = T_GRAPHICS.GetModelShaderDX12(ModelShaderDX12Id::Skydome);
-			//shader->Render(rc, sky->GetModel().get());
+			shader->Render(rc, sky->GetModel().get());
 		}
 
 		// レンダーターゲットへの書き込み終了待ち

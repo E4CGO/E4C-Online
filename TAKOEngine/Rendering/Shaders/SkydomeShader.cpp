@@ -93,7 +93,7 @@ SkydomeShaderDX12::SkydomeShaderDX12(ID3D12Device* device)
 		pipeline_state_desc.BlendState = renderState->GetBlendState(BlendState::Opaque);
 
 		//深度ステンシルステート
-		pipeline_state_desc.DepthStencilState = renderState->GetDepthState(DepthState::NoTestNoWrite);
+		pipeline_state_desc.DepthStencilState = renderState->GetDepthState(DepthState::TestAndWrite);
 
 		//ラスタライザーステート
 		pipeline_state_desc.RasterizerState = renderState->GetRasterizer(RasterizerState::SolidCullNone);
@@ -124,9 +124,6 @@ SkydomeShaderDX12::SkydomeShaderDX12(ID3D12Device* device)
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 		m_d3d_pipeline_state->SetName(L"SkydomeShaderPipelineState");
 	}
-
-	//サンプラーステート設定
-	m_sampler = graphics.GetSampler(SamplerState::LinearWrap);
 }
 
 //***********************************************************

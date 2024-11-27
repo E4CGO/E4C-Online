@@ -4,7 +4,7 @@
 #include "TAKOEngine/Rendering/ResourceManager.h"
 
 // コンストラクタ
-ModelDX12::ModelDX12(ID3D12Device* device, const char* filename, float scaling, int modelType) :scaling(scaling)
+ModelDX12::ModelDX12(ID3D12Device* device, const char* filename, float scaling, int modelType) :scaling(scaling), modelType(modelType)
 {
 	Graphics& graphics = Graphics::Instance();
 
@@ -210,6 +210,29 @@ ModelDX12::~ModelDX12()
 // 変換行列計算
 void ModelDX12::UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform)
 {
+	const DirectX::XMFLOAT4X4 coordinate_system_transforms[]
+	{
+		{-1, 0, 0, 0,
+		  0, 1, 0, 0,
+		  0, 0, 1, 0,
+		  0, 0, 0, 1}, // 0:RHS Y-UP
+
+		{ 1, 0, 0, 0,
+		  0, 1, 0, 0,
+		  0, 0, 1, 0,
+		  0, 0, 0, 1}, // 1:LHS Y-UP
+
+		{-1, 0, 0, 0,
+		  0, 0,-1, 0,
+		  0, 1, 0, 0,
+		  0, 0, 0, 1}, // 2:RHS Z-UP
+
+		{ 1, 0, 0, 0,
+		  0, 0, 1, 0,
+		  0, 1, 0, 0,
+		  0, 0, 0, 1}, //3:LHS Z - UP
+	};
+
 	for (Node& node : m_nodes)
 	{
 		DirectX::XMMATRIX C{ DirectX::XMLoadFloat4x4(&coordinate_system_transforms[1]) * DirectX::XMMatrixScaling(scaling, scaling, scaling) };
@@ -222,7 +245,7 @@ void ModelDX12::UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform)
 		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(node.scale.x, node.scale.y, node.scale.z);
 		DirectX::XMMATRIX R = DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&node.rotation));
 		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(node.position.x, node.position.y, node.position.z);
-		DirectX::XMMATRIX LocalTransform = S * R * T;
+		DirectX::XMMATRIX LocalTransform = C * S * R * T;
 		DirectX::XMStoreFloat4x4(&node.localTransform, LocalTransform);
 
 		// ワールド行列算出

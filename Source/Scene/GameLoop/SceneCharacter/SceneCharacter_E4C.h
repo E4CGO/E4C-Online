@@ -66,6 +66,9 @@ private:
 	// フレームバッファマネージャー
 	FrameBufferManager* m_frameBuffer;
 
+	// ポストエフェクト
+	std::unique_ptr<PostprocessingRendererDX12>	postprocessingRenderer = std::make_unique<PostprocessingRendererDX12>();
+
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {
 		"",											// マスク
@@ -73,17 +76,17 @@ private:
 	};
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
 
-	// Model Preload
-	std::unordered_set<const char*> modelList = {
-		"Data/Model/Character/PlayerModels/MDL_PLAYER_BODY_ANIMATION.glb",
-		"Data/Model/Character/PlayerModels/MDL_PLAYER_BOTTOM_ANIMATION.glb",
-		"Data/Model/Character/PlayerModels/MDL_PLAYER_TOP_ANIMATION.glb",
-		"Data/Model/Character/PlayerModels/MDL_PLAYER_HAIR_ANIMATION.glb",
-		"Data/Model/Character/PlayerModels/MDL_PLAYER_SWORD_ANIMATION.glb",
-		"Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD1_ANIMATION.glb",
-		"Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD2_ANIMATION.glb",
-	};
-	std::unordered_set<std::shared_ptr<ModelResource>> modelPreLoad;
+	//// Model Preload
+	//std::unordered_set<const char*> modelList = {
+	//	"Data/Model/Character/PlayerModels/MDL_PLAYER_BODY_ANIMATION.glb",
+	//	"Data/Model/Character/PlayerModels/MDL_PLAYER_BOTTOM_ANIMATION.glb",
+	//	"Data/Model/Character/PlayerModels/MDL_PLAYER_TOP_ANIMATION.glb",
+	//	"Data/Model/Character/PlayerModels/MDL_PLAYER_HAIR_ANIMATION.glb",
+	//	"Data/Model/Character/PlayerModels/MDL_PLAYER_SWORD_ANIMATION.glb",
+	//	"Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD1_ANIMATION.glb",
+	//	"Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD2_ANIMATION.glb",
+	//};
+	//std::unordered_set<std::shared_ptr<ModelResource>> modelPreLoad;
 
 	static const int m_maxCharacters;
 

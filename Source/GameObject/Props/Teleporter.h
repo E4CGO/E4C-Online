@@ -22,6 +22,7 @@ public:
 
 	virtual void Update(float elapsedTime) override;
 	void Render(const RenderContext& rc) override;
+	void RenderDX12(const RenderContextDX12& rc) override;
 
 	void Teleport();
 

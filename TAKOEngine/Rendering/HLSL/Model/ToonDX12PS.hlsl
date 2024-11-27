@@ -97,8 +97,5 @@ float4 main(VS_OUT pin) : SV_TARGET
     C.rgb *= A + (D + pointDiffuse + spotDiffuse);
     C.rgb += S + pointSpecular + spotSpecular;
     
-    // リムライト
-    C.rgb += R;
-    
     return C;
 }

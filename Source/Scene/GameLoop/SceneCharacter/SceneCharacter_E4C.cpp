@@ -27,11 +27,11 @@ void SceneCharacter_E4C::Initialize()
 	{
 		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
 	}
-	// Model Resource Preload
-	for (auto& filename : modelList)
-	{
-		modelPreLoad.insert(RESOURCE.LoadModelResource(filename));
-	}
+	//// Model Resource Preload
+	//for (auto& filename : modelList)
+	//{
+	//	modelPreLoad.insert(RESOURCE.LoadModelResource(filename));
+	//}
 
 	//シャドウマップレンダラ
 	shadowMapRenderer->Initialize();
@@ -194,7 +194,10 @@ void SceneCharacter_E4C::RenderDX12()
 			postprocessingRenderer->Render(m_frameBuffer);
 		}
 
-		//UI.RenderDX12(rc);
+		// 2D描画
+		{
+			UI.RenderDX12(rc);
+		}
 	}
 	TentacleLib::graphics.End();
 }
