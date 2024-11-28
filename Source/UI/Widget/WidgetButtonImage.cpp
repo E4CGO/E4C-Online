@@ -5,6 +5,7 @@
 
 #include "TAKOEngine/Rendering/ResourceManager.h"
 #include "TAKOEngine/Tool/XMFLOAT.h"
+#include "TAKOEngine/Runtime/tentacle_lib.h"
 
 /**************************************************************************//**
 	@brief		コンストラクタ
@@ -15,11 +16,16 @@
 *//***************************************************************************/
 WidgetButtonImage::WidgetButtonImage(const char* text, const char* image, const char* hoverImage, std::function<void(WidgetButton*)> f)
 {
-	m_btnImage = RESOURCE.LoadSpriteResource(image);
-	m_btnImageDX12 = RESOURCE.LoadSpriteResourceDX12(image);
-
-	m_hoverBtnImage = RESOURCE.LoadSpriteResource(hoverImage);
-	m_hoverBtnImageDX12 = RESOURCE.LoadSpriteResourceDX12(hoverImage);
+	if (T_GRAPHICS.isDX11Active)
+	{
+		m_btnImage = RESOURCE.LoadSpriteResource(image);
+		m_hoverBtnImage = RESOURCE.LoadSpriteResource(hoverImage);
+	}
+	else
+	{
+		m_btnImageDX12 = RESOURCE.LoadSpriteResourceDX12(image);
+		m_hoverBtnImageDX12 = RESOURCE.LoadSpriteResourceDX12(hoverImage);
+	}
 
 	m_size = m_btnImage->GetTextureSize();
 
@@ -90,4 +96,7 @@ void WidgetButtonImage::RenderDX12(const RenderContextDX12& rc)
 		);
 		this->m_btnImageDX12->End(rc.d3d_command_list);
 	}
+
+	this->m_text->SetPosition(m_position + (m_size * 0.5f));
+	this->m_text->RenderDX12(rc);
 }

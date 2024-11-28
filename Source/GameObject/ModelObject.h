@@ -26,7 +26,13 @@ public:
 		NOMODEL,
 	};
 
-	RENDER_MODE m_renderMode;
+	RENDER_MODE m_renderMode = DX11;
+
+	struct ModelInfo
+	{
+		std::string name;
+		std::unique_ptr<iModel> model;
+	};
 
 	// コンストラクタ
 	ModelObject(void) {};
@@ -46,9 +52,9 @@ public:
 	virtual void RenderDX12(const RenderContextDX12& rc) override;
 
 	// モデルを取得
-	std::unique_ptr<iModel>& GetModel(int idx = 0) { return m_pmodels[idx]; }
+	std::unique_ptr<iModel>& GetModel(int idx = 0) { return m_pmodels[idx].model; }
 	// モデルリストを取得
-	std::vector<std::unique_ptr<iModel>>& GetModels() { return m_pmodels; }
+	std::vector<ModelInfo>& GetModels() { return m_pmodels; }
 
 	// 表示設定
 	void Show() { m_visible = true; }
@@ -57,6 +63,13 @@ public:
 
 	// シェーダー設定
 	void SetShader(const ModelShaderId id) { m_shaderId = id; };
+	void SetShader(const char* modelName, const ModelShaderDX12Id id);
+
+	// モデルの名前抜き取り
+	const char* extractBaseName(const char* filePath);
+
+	// モデルの名前検索
+	ModelInfo* FindModelName(const char* name);
 
 	// アニメーション設定
 	void SetAnimation(const int index, const bool loop, const float blendSeconds = 0.2f);
@@ -105,7 +118,7 @@ protected:
 	ModelShaderDX12Id m_dx12_ShaderId = ModelShaderDX12Id::Toon;
 
 	// モデルリスト
-	std::vector<std::unique_ptr<iModel>> m_pmodels;
+	std::vector<ModelInfo> m_pmodels;
 
 	// 可視化
 	bool m_visible = true;
@@ -114,7 +127,7 @@ protected:
 	float m_animationSpeed = 1.0f;
 
 	//スキニング
-	SkinningPipeline* m_skinning_pipeline;
+	SkinningPipeline* m_skinning_pipeline = nullptr;
 };
 
 #endif //__INCLUDED_MODEL_OBJECT_H__

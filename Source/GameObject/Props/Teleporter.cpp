@@ -19,7 +19,6 @@
 Teleporter::Teleporter(Stage* stage, Online::OnlineController* onlineController) : m_pStage(stage), m_pOnlineController(onlineController), ModelObject()
 {
 	m_timer = 0.0f;
-
 	if (T_GRAPHICS.isDX11Active)
 	{
 		SetShader(ModelShaderId::Portal);
@@ -79,46 +78,46 @@ Teleporter::Teleporter(Stage* stage, Online::OnlineController* onlineController)
 			static_cast<float>(desc.Height)
 		};
 	}
-	else
-	{
-		ID3D12Device* device = T_GRAPHICS.GetDeviceDX12();
+	//else
+	//{
+	//	ID3D12Device* device = T_GRAPHICS.GetDeviceDX12();
 
-		HRESULT hr = S_OK;
+	//	HRESULT hr = S_OK;
 
-		m_mesh.vertices = m_defaultVertices;
+	//	m_mesh.vertices = m_defaultVertices;
 
-		// ヒーププロパティの設定
-		D3D12_HEAP_PROPERTIES d3d_head_props{};
-		d3d_head_props.Type                 = D3D12_HEAP_TYPE_UPLOAD;
-		d3d_head_props.CPUPageProperty      = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-		d3d_head_props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-		d3d_head_props.CreationNodeMask     = 1;
-		d3d_head_props.VisibleNodeMask      = 1;
+	//	// ヒーププロパティの設定
+	//	D3D12_HEAP_PROPERTIES d3d_head_props{};
+	//	d3d_head_props.Type                 = D3D12_HEAP_TYPE_UPLOAD;
+	//	d3d_head_props.CPUPageProperty      = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	//	d3d_head_props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	//	d3d_head_props.CreationNodeMask     = 1;
+	//	d3d_head_props.VisibleNodeMask      = 1;
 
-		// リソースの設定
-		D3D12_RESOURCE_DESC d3d_resource_desc{};
-		d3d_resource_desc.Dimension          = D3D12_RESOURCE_DIMENSION_BUFFER;
-		d3d_resource_desc.Alignment          = 0;
-		d3d_resource_desc.Width              = sizeof(ModelResource::Vertex) * 4; // 4頂点
-		d3d_resource_desc.Height             = 1;
-		d3d_resource_desc.DepthOrArraySize   = 1;
-		d3d_resource_desc.MipLevels          = 1;
-		d3d_resource_desc.Format             = DXGI_FORMAT_UNKNOWN;
-		d3d_resource_desc.SampleDesc.Count   = 1;
-		d3d_resource_desc.SampleDesc.Quality = 0;
-		d3d_resource_desc.Layout             = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-		d3d_resource_desc.Flags              = D3D12_RESOURCE_FLAG_NONE;
+	//	// リソースの設定
+	//	D3D12_RESOURCE_DESC d3d_resource_desc{};
+	//	d3d_resource_desc.Dimension          = D3D12_RESOURCE_DIMENSION_BUFFER;
+	//	d3d_resource_desc.Alignment          = 0;
+	//	d3d_resource_desc.Width              = sizeof(ModelResource::Vertex) * 4; // 4頂点
+	//	d3d_resource_desc.Height             = 1;
+	//	d3d_resource_desc.DepthOrArraySize   = 1;
+	//	d3d_resource_desc.MipLevels          = 1;
+	//	d3d_resource_desc.Format             = DXGI_FORMAT_UNKNOWN;
+	//	d3d_resource_desc.SampleDesc.Count   = 1;
+	//	d3d_resource_desc.SampleDesc.Quality = 0;
+	//	d3d_resource_desc.Layout             = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	//	d3d_resource_desc.Flags              = D3D12_RESOURCE_FLAG_NONE;
 
-		// バッファ生成
-		/*hr = device->CreateCommittedResource(
-			&d3d_head_props,
-			D3D12_HEAP_FLAG_NONE,
-			&d3d_resource_desc,
-			D3D12_RESOURCE_STATE_GENERIC_READ,
-			nullptr,
-			IID_PPV_ARGS()
-		)*/
-	}
+	//	// バッファ生成
+	//	/*hr = device->CreateCommittedResource(
+	//		&d3d_head_props,
+	//		D3D12_HEAP_FLAG_NONE,
+	//		&d3d_resource_desc,
+	//		D3D12_RESOURCE_STATE_GENERIC_READ,
+	//		nullptr,
+	//		IID_PPV_ARGS()
+	//	)*/
+	//}
 }
 
 /**************************************************************************//**

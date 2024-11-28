@@ -334,11 +334,6 @@ void ModelDX12::ComputeWorldBounds()
 		DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&frame_resource.cbv_data->world_transform);
 		mesh.mesh->localBounds.Transform(mesh.worldBounds, WorldTransform);
 		DirectX::BoundingBox::CreateMerged(m_bounds, m_bounds, mesh.worldBounds);
-
-		for (Node& node : m_nodes)
-		{
-			DirectX::XMStoreFloat4x4(&node.worldTransform, WorldTransform);
-		}
 	}
 }
 

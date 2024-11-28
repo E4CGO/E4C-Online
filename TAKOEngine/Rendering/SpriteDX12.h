@@ -88,8 +88,7 @@ public:
 		float sx, float sy,
 		float sw, float sh,
 		float angle,
-		float r, float g, float b, float a,
-		D3D12_VIEWPORT viewport);
+		float r, float g, float b, float a);
 
 	// 描画終了
 	void End(ID3D12GraphicsCommandList* d3d_command_list);
@@ -122,6 +121,7 @@ private:
 	int													m_texture_height = 0;
 	int													m_sprite_index = 0;
 	int													m_sprite_count = 0;
+	D3D12_VIEWPORT m_viewport = {};
 };
 
 #endif  // __INCLUDED_SPRITEDX12_H__

@@ -54,6 +54,8 @@ public:
 		const Descriptor* srv_descriptor = nullptr;
 		const Descriptor* srv_normal_descriptor = nullptr;
 
+		int shaderId = 0;
+
 		template<class Archive>
 		void serialize(Archive& archive);
 	};

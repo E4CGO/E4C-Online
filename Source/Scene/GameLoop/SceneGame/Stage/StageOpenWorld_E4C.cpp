@@ -57,7 +57,8 @@ void StageOpenWorld_E4C::Initialize()
 		map = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, 0);
 		tower = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, 0);
 
-		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 70.0f, ModelObject::RENDER_MODE::DX12);
+		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 50.0f, ModelObject::RENDER_MODE::DX12);
+		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
 		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
 	}
 
@@ -204,16 +205,17 @@ void StageOpenWorld_E4C::RenderDX12()
 		m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 		m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 
+		// プレイヤー
 		PlayerCharacterManager::Instance().RenderDX12(rc);
 
+		// ステージ
 		map->RenderDX12(rc);
 		tower->RenderDX12(rc);
 
 		// skyBox
 		{
 			rc.skydomeData.skyTexture = m_sprites[1]->GetDescriptor();
-			ModelShaderDX12* shader = T_GRAPHICS.GetModelShaderDX12(ModelShaderDX12Id::Skydome);
-			shader->Render(rc, sky->GetModel().get());
+			sky->RenderDX12(rc);
 		}
 
 		// レンダーターゲットへの書き込み終了待ち
@@ -227,6 +229,7 @@ void StageOpenWorld_E4C::RenderDX12()
 
 	// 2D描画
 	{
+		UI.RenderDX12(rc);
 	}
 
 	T_GRAPHICS.End();

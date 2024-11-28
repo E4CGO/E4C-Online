@@ -12,6 +12,7 @@
 #include "TAKOEngine/Rendering/Model/ModelResource.h"
 #include "TAKOEngine/Rendering/GpuResourceUtils.h"
 #include "TAKOEngine/Rendering/FrustumCulling.h"
+#include "TAKOEngine/Rendering/PipelineState.h"
 
 //******************************************************************
 //  @class  ModelShaderDX12
@@ -27,7 +28,7 @@ public:
 	virtual ~ModelShaderDX12() {};
 
 	//•`‰æ
-	virtual void Render(const RenderContextDX12& rc, iModel* model) = 0;
+	virtual void Render(const RenderContextDX12& rc, const ModelDX12::Mesh& mesh) = 0;
 };
 
 //******************************************************************

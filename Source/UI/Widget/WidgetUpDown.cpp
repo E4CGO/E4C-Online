@@ -88,6 +88,10 @@ void WidgetArrowRight::Render(const RenderContext& rc)
 	);
 }
 
+/**************************************************************************//**
+	 @brief		レンダリング関数
+	@param[in]    rc	RenderContext
+*//***************************************************************************/
 void WidgetArrowRight::RenderDX12(const RenderContextDX12& rc)
 {
 	btnDX12->Begin(rc);

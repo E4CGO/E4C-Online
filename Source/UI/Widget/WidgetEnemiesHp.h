@@ -3,7 +3,6 @@
 #include <memory>
 
 #include "TAKOEngine/Rendering/Sprite.h"
-#include "TAKOEngine/Rendering/SpriteDX12.h"
 #include "TAKOEngine/GUI/Widget.h"
 #include "TAKOEngine/Rendering/FrameBufferManager.h"
 
