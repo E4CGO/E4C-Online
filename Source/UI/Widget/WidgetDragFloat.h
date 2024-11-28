@@ -8,6 +8,7 @@
 #include <memory>
 
 #include "TAKOEngine/Rendering/Sprite.h"
+#include "TAKOEngine/Rendering/SpriteDX12.h"
 
 #include "UI/Widget/WidgetButton.h"
 
@@ -41,6 +42,9 @@ private:
 	// UI画像スプライト
 	std::shared_ptr<Sprite> m_scrollBar;
 	std::shared_ptr<Sprite> m_scrollBtn;
+
+	std::shared_ptr<SpriteDX12> m_scrollBarDX12;
+	std::shared_ptr<SpriteDX12> m_scrollBtnDX12;
 };
 
 /**************************************************************************//**

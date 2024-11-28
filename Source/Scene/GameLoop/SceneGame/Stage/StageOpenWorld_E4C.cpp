@@ -52,7 +52,7 @@ void StageOpenWorld_E4C::Initialize()
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
 
 	// 光
-	LightManager::Instance().SetAmbientColor({ 0.0f, 0.0f, 0.0f, 0.0f });
+	LightManager::Instance().SetAmbientColor({ 0.3f, 0.3f, 0.3f, 0.0f });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);

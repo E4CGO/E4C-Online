@@ -23,9 +23,8 @@ float4 main(VS_OUT pin) : SV_TARGET
 	//	拡散反射
     float3 D;
 	{
-        float toonScale = 0.5f; // トーンを調整する係数
         float U = dot(-L, N) * 0.5f + 0.5f;
-        D = ToonTex.Sample(sampler0, float2(U, 1)).rgb * toonScale;
+        D = ToonTex.Sample(sampler0, float2(U, 1)).rgb;
     }
 
 	//	鏡面反射
@@ -41,7 +40,7 @@ float4 main(VS_OUT pin) : SV_TARGET
 	{
         float Rim = 1.0f - max(dot(N, E), 0.0f);
         float Ratio = max(dot(L, E), 0);
-        R = ToonTex.Sample(sampler0, float2(Rim * Ratio, 1)).r * 0.4f;
+        R = ToonTex.Sample(sampler0, float2(Rim * Ratio, 1)).r * 0.2f;
     }
     
     // 点光源の処理
@@ -96,6 +95,8 @@ float4 main(VS_OUT pin) : SV_TARGET
     
     C.rgb *= A + (D + pointDiffuse + spotDiffuse);
     C.rgb += S + pointSpecular + spotSpecular;
+    
+    C.rgb += R;
     
     return C;
 }

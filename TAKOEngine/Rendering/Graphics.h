@@ -217,6 +217,12 @@ public:
 		const  DirectX::XMMATRIX& View,
 		const  DirectX::XMMATRIX& Projection,
 		const DirectX::XMMATRIX World);
+	DirectX::XMFLOAT3 GetScreenPosition(
+		const DirectX::XMFLOAT3 worldPosition,
+		const D3D12_VIEWPORT& viewport,
+		const  DirectX::XMMATRIX& View,
+		const  DirectX::XMMATRIX& Projection,
+		const DirectX::XMMATRIX World);
 	DirectX::XMFLOAT3 GetScreenPosition(const DirectX::XMFLOAT3 worldPosition);
 
 	void WaitIdle();

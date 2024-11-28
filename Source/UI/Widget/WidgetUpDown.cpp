@@ -181,6 +181,10 @@ void WidgetUpDown::Render(const RenderContext& rc)
 	m_ArrowRight->Render(rc);
 }
 
+/**************************************************************************//**
+	@brief		レンダリング関数
+	@param[in]    rc
+*//***************************************************************************/
 void WidgetUpDown::RenderDX12(const RenderContextDX12& rc)
 {
 	m_ArrowLeft->RenderDX12(rc);

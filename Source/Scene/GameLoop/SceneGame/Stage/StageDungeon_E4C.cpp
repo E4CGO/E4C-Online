@@ -186,8 +186,11 @@ void StageDungeon_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
 
+	// フレームバッファマネージャー
+	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
+
 	// 光
-	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
+	LightManager::Instance().SetAmbientColor({ 0.3f, 0.3f, 0.3f, 0.0f });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
@@ -259,8 +262,8 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	// 部屋を全てアップデート
 	rootRoom->Update(elapsedTime);
 
+	PlayerCharacterManager::Instance().Update(elapsedTime);
 	GameObjectManager::Instance().Update(elapsedTime);
-
 	MAPTILES.Update(elapsedTime);
 
 	if (T_INPUT.KeyDown(VK_MENU))
@@ -285,7 +288,6 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	{
 		T_INPUT.KeepCursorCenter();
 	}
-	PlayerCharacterManager::Instance().Update(elapsedTime);
 
 	timer += elapsedTime;
 }
@@ -341,7 +343,12 @@ void StageDungeon_E4C::RenderDX12()
 		m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 
 		// モデル描画
+		//PlayerCharacterManager::Instance().RenderDX12(rc);
 		
+		GameObjectManager::Instance().RenderDX12(rc);
+
+		MAPTILES.RenderDX12(rc);
+
 		// レンダーターゲットへの書き込み終了待ち
 		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 	}
