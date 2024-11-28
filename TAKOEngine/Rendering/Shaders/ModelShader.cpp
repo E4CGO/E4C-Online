@@ -185,6 +185,7 @@ void ModelShader::Draw(const RenderContext& rc, const iModel* model, DirectX::XM
 
 	// カメラに写っている範囲のオブジェクトをフラグでマークする配列を用意
 	std::vector<bool> visibleObjects(model->GetMeshes().size(), false);
+
 	// TODO: visibleObjects.size == 0
 	if (visibleObjects.size() == 0) return;
 

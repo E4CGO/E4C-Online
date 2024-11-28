@@ -31,28 +31,133 @@ void ModelObject::LoadModel(const char* filename, float scaling, ModelObject::RE
 {
 	if (strlen(filename) == 0) return;
 
+	const char* modelName = extractBaseName(filename);
 	m_renderMode = renderMode;
+
+	if (modelType == 0)
+	{
+		m_dx12_ShaderId = ModelShaderDX12Id::Lambert;
+		m_shaderId = ModelShaderId::Toon;
+	}
+	else
+	{
+		m_dx12_ShaderId = ModelShaderDX12Id::Toon;
+	}
 
 	switch (m_renderMode)
 	{
 	case ModelObject::RENDER_MODE::DX11:
-		m_pmodels.push_back(std::make_unique<ModelDX11>(T_GRAPHICS.GetDevice(), filename, scaling, modelType));
+		m_pmodels.push_back({ modelName,std::make_unique<ModelDX11>(T_GRAPHICS.GetDevice(), filename, scaling, modelType) });
 		break;
 	case ModelObject::RENDER_MODE::DX11GLTF:
-		m_pmodels.push_back(std::make_unique<GLTFModelDX11>(T_GRAPHICS.GetDevice(), filename, scaling, modelType));
+		m_pmodels.push_back({ modelName, std::make_unique<GLTFModelDX11>(T_GRAPHICS.GetDevice(), filename, scaling, modelType) });
 		break;
 	case ModelObject::RENDER_MODE::DX12:
+		m_pmodels.push_back({ modelName, std::make_unique<ModelDX12>(T_GRAPHICS.GetDeviceDX12(), filename, scaling, modelType) });
+		SetShader(modelName, m_dx12_ShaderId);
 		break;
 	case ModelObject::RENDER_MODE::DX12GLTF:
 		break;
 	case ModelObject::RENDER_MODE::NOMODEL:
 		break;
 	}
+
+	//スキニング
+	m_skinning_pipeline = T_GRAPHICS.GetSkinningPipeline();
 }
 
+/**************************************************************************//**
+	@brief		モデルリストをクリーン
+	@param[in]	なし
+	@return なし
+*//***************************************************************************/
 void ModelObject::CleanModels()
 {
 	m_pmodels.clear();
+}
+
+/**************************************************************************//**
+	@brief		shaderの設定
+	@param[in]	id			シェーダーID
+	@param[in]	resource	Modelのリソース
+	@return なし
+*//***************************************************************************/
+void ModelObject::SetShader(const char* modelName, const ModelShaderDX12Id id)
+{
+	// 名前検索
+	ModelInfo* model = FindModelName(modelName);
+
+	// シェーダー設定
+	const ModelResource* resource = model->model->GetResource();
+	for (const ModelResource::Material& material : resource->GetMaterials())
+	{
+		ModelResource::Material& mat = const_cast<ModelResource::Material&>(material);
+		mat.shaderId = static_cast<int>(id);
+	}
+}
+
+/**************************************************************************//**
+	@brief		モデルの名前抜き取り
+	@param[in]	filePath	ファイルパス
+	@return     const char*
+*//***************************************************************************/
+const char* ModelObject::extractBaseName(const char* filePath)
+{
+	// 静的文字列バッファ（固定サイズ）
+	static char baseName[256];
+
+	// 最後のスラッシュ（UNIX 系）を探す
+	const char* lastSlashUnix = strrchr(filePath, '/');
+	// 最後のバックスラッシュ（Windows 系）を探す
+	const char* lastSlashWindows = strrchr(filePath, '\\');
+
+	// スラッシュのどちらか最後に現れる方を選ぶ
+	const char* lastSlash = nullptr;
+	if (lastSlashUnix && lastSlashWindows) 
+	{
+		lastSlash = (lastSlashUnix > lastSlashWindows) ? lastSlashUnix : lastSlashWindows;
+	}
+	else if (lastSlashUnix) 
+	{
+		lastSlash = lastSlashUnix;
+	}
+	else if (lastSlashWindows)
+	{
+		lastSlash = lastSlashWindows;
+	}
+
+	// ファイル名部分を取得（スラッシュがない場合はそのまま全体）
+	const char* fileName = (lastSlash != nullptr) ? lastSlash + 1 : filePath;
+
+	// 最後のドットを見つける（拡張子の開始位置）
+	const char* dot = strrchr(fileName, '.');
+	size_t length = (dot != nullptr) ? static_cast<size_t>(dot - fileName) : strlen(fileName);
+
+	// ファイル名をコピーし、終端文字を追加
+	strncpy(baseName, fileName, length);
+	baseName[length] = '\0';
+
+	return baseName;
+}
+
+/**************************************************************************//**
+	@brief		モデルの名前検索
+	@param[in]	name	ファイルパス
+	@return     ModelInfo*
+*//***************************************************************************/
+ModelObject::ModelInfo* ModelObject::FindModelName(const char* name)
+{
+	// 全て総当たりで名前比較する
+	for (ModelInfo& model : m_pmodels)
+	{
+		if (model.name == name)
+		{
+			return &model;
+		}
+	}
+
+	// 見つからなかった
+	return nullptr;
 }
 
 /**************************************************************************//**
@@ -66,10 +171,11 @@ void ModelObject::SetAnimation(const int index, bool loop, float blendSeconds)
 {
 	for (auto& model : m_pmodels)
 	{
-		if (model != nullptr)
-			model->PlayAnimation(index, loop, blendSeconds);
+		if (model.model != nullptr)
+			model.model->PlayAnimation(index, loop, blendSeconds);
 	}
 }
+
 /**************************************************************************//**
 	@brief		個別モデルアニメーション設定
 	@param[in]	model_idx		モデルインデックス
@@ -81,8 +187,9 @@ void ModelObject::SetAnimation(const int index, bool loop, float blendSeconds)
 void ModelObject::SetModelAnimation(const int model_idx, const int animation_index, const bool loop, const float blendSeconds)
 {
 	if (m_pmodels.size() <= model_idx) return;
-	m_pmodels[model_idx]->PlayAnimation(animation_index, loop, blendSeconds);
+	m_pmodels[model_idx].model->PlayAnimation(animation_index, loop, blendSeconds);
 }
+
 /**************************************************************************//**
 	@brief	全てのモデルのアニメーション判定
 	@return	アニメーション中判定
@@ -91,10 +198,11 @@ bool ModelObject::IsPlayAnimation(void)
 {
 	for (auto& model : m_pmodels)
 	{
-		if (model->IsPlayAnimation()) return true;
+		if (model.model->IsPlayAnimation()) return true;
 	}
 	return false;
 }
+
 /**************************************************************************//**
 	@brief	個別てのモデルのアニメーション判定
 	@param[in]	idx モデルインデックス
@@ -102,7 +210,7 @@ bool ModelObject::IsPlayAnimation(void)
 *//***************************************************************************/
 bool ModelObject::IsPlayAnimation(int idx)
 {
-	return m_pmodels[idx]->IsPlayAnimation();
+	return m_pmodels[idx].model->IsPlayAnimation();
 }
 
 /**************************************************************************//**
@@ -115,17 +223,35 @@ void ModelObject::Update(float elapsedTime)
 	// 行列更新
 	UpdateTransform();
 
-	for (auto& model : m_pmodels)
+	if (T_GRAPHICS.isDX11Active)
 	{
-		if (model == nullptr) continue;
+		for (auto& model : m_pmodels)
+		{
+			if (model.model == nullptr) continue;
 
-		// アニメーション更新
-		model->UpdateAnimation(elapsedTime * m_animationSpeed);
+			// アニメーション更新
+			model.model->UpdateAnimation(elapsedTime * m_animationSpeed);
 
-		// トランスフォーム更新
-		model->UpdateTransform(transform);
+			// トランスフォーム更新
+			model.model->UpdateTransform(transform);
+		}
+	}
+
+	if (T_GRAPHICS.isDX12Active)
+	{
+		for (auto& model : m_pmodels)
+		{
+			if (model.model == nullptr) continue;
+
+			// アニメーション更新
+			model.model->UpdateAnimation(elapsedTime * m_animationSpeed);
+
+			// トランスフォーム更新
+			model.model->UpdateTransform(transform);
+		}
 	}
 }
+
 /**************************************************************************//**
 	@brief	描画処理
 	@param[in]	rc	レンダーコンテクスト参照
@@ -136,7 +262,7 @@ void ModelObject::Render(const RenderContext& rc)
 	if (!m_visible) return;
 	for (auto& model : m_pmodels)
 	{
-		if (model == nullptr) return;
+		if (model.model == nullptr) return;
 
 		ModelShader* shader = T_GRAPHICS.GetModelShader(m_shaderId);
 
@@ -147,10 +273,65 @@ void ModelObject::Render(const RenderContext& rc)
 
 		// 描画
 		shader->Begin(rc);
-		shader->Draw(rc, model.get(), m_color);
+		shader->Draw(rc, model.model.get(), m_color);
 		shader->End(rc);
 	}
 }
+
+/**************************************************************************//**
+	@brief	描画処理
+	@param[in]	rc	レンダーコンテクスト参照
+	@return なし
+*//***************************************************************************/
+void ModelObject::RenderDX12(const RenderContextDX12& rc)
+{
+	if (!m_visible) return;
+
+	for (auto& model : m_pmodels)
+	{
+		if (model.model == nullptr) return;
+
+		// スキニング
+		m_skinning_pipeline->Compute(rc, model.model.get());
+
+		// カメラに写っている範囲のオブジェクトをフラグでマークする配列を用意
+		std::vector<bool> visibleObjects(model.model->GetMeshes().size(), false);
+
+		// 視錐台カリングを実行して可視オブジェクトをマーク
+		FrustumCulling::FrustumCullingFlag(model.model->GetMeshes(), visibleObjects);
+
+		// モデル描画
+		ModelShaderDX12Id shaderId = static_cast<ModelShaderDX12Id>(0xFFFFFFFF);
+		ModelShaderDX12* shader = nullptr;
+		int culling = 0;
+
+		for (const ModelDX12::Mesh& mesh : model.model->GetMeshes())
+		{
+			ModelShaderDX12Id currentShaderId = static_cast<ModelShaderDX12Id>(mesh.mesh->material->shaderId);
+
+			if (shaderId != currentShaderId)
+			{
+				// シェーダー変更
+				shaderId = currentShaderId;
+
+				//currentShaderIdがEnumCountより多かったら
+				if (currentShaderId == ModelShaderDX12Id::EnumCount) continue;
+
+				// パイプライン設定
+				shader = T_GRAPHICS.GetModelShaderDX12(currentShaderId);
+			}
+
+			if (mesh.frame_resources.size() == 0) continue;
+
+			// フラグがfalseの場合はフラスタム外なのでスキップ
+			//if (!visibleObjects[culling++]) continue;
+
+			//描画
+			shader->Render(rc, mesh);
+		}
+	}
+}
+
 /**************************************************************************//**
 	@brief		コライダー設定
 	@param[in]	collider	コライダータイプ
@@ -171,20 +352,21 @@ void ModelObject::SetCollider(Collider::COLLIDER_TYPE collider, int idx)
 		this->collider = std::make_unique<CapsuleCollider>();
 		break;
 	case Collider::COLLIDER_TYPE::MODEL:
-		this->collider = std::make_unique<ModelCollider>(m_pmodels[idx].get());
+		this->collider = std::make_unique<ModelCollider>(m_pmodels[idx].model.get());
 		break;
 	case Collider::COLLIDER_TYPE::BOUNDING_BOX:
-		this->collider = std::make_unique<BoundingBoxCollider>(m_pmodels[idx].get());
+		this->collider = std::make_unique<BoundingBoxCollider>(m_pmodels[idx].model.get());
 		break;
 	case Collider::COLLIDER_TYPE::MAP:
 		//this->collider = std::make_unique<ModelCollider>(model.get());
-		this->collider = std::make_unique<MapCollider>(m_pmodels[idx].get());
+		this->collider = std::make_unique<MapCollider>(m_pmodels[idx].model.get());
 		break;
 	default:
 		this->collider = nullptr;
 		break;
 	}
 }
+
 /**************************************************************************//**
 	@brief		モデルノード座標を取得
 	@param[in]	idx			モデルインデックス
@@ -195,7 +377,7 @@ void ModelObject::SetCollider(Collider::COLLIDER_TYPE collider, int idx)
 DirectX::XMFLOAT3 ModelObject::GetNodePosition(int idx, const char* nodeName, const DirectX::XMFLOAT3& offset)
 {
 	DirectX::XMFLOAT3 pos = {};
-	iModel::Node* node = m_pmodels[idx]->FindNode(nodeName);
+	iModel::Node* node = m_pmodels[idx].model->FindNode(nodeName);
 	if (node == nullptr) return pos;
 
 	DirectX::XMVECTOR Offset = DirectX::XMLoadFloat3(&offset);
@@ -214,7 +396,7 @@ DirectX::XMFLOAT3 ModelObject::GetNodePosition(int idx, const char* nodeName, co
 DirectX::XMFLOAT3 ModelObject::GetNodePosition(int idx, const DirectX::XMFLOAT3& offset)
 {
 	DirectX::XMFLOAT3 pos = {};
-	iModel::Node* node = m_pmodels[idx]->GetRootNode();
+	iModel::Node* node = m_pmodels[idx].model->GetRootNode();
 
 	DirectX::XMVECTOR Offset = DirectX::XMLoadFloat3(&offset);
 	DirectX::XMMATRIX W = DirectX::XMLoadFloat4x4(&node->worldTransform);

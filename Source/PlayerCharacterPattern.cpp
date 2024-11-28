@@ -15,11 +15,25 @@ void PlayerCharacterPatternGender::Execute(PlayerCharacter* chara)
 {
 	if (m_isMale) // MALE
 	{
-		chara->LoadModel("Data/Model/Character/PlayerModels/MDL_PLAYER_BODY_ANIMATION.glb");
+		if (T_GRAPHICS.isDX12Active)
+		{
+			chara->LoadModel("Data/Model/Character/PlayerModels/MDL_PLAYER_BODY_ANIMATION.glb", 1.0f, ModelObject::RENDER_MODE::DX12);
+		}
+		if (T_GRAPHICS.isDX11Active)
+		{
+			chara->LoadModel("Data/Model/Character/PlayerModels/MDL_PLAYER_BODY_ANIMATION.glb", 1.0f, ModelObject::RENDER_MODE::DX11);
+		}
 	}
 	else //FEMALE
 	{
-		chara->LoadModel("Data/Model/Character/PlayerModels/MDL_PLAYER_BODY_ANIMATION.glb");
+		if (T_GRAPHICS.isDX12Active)
+		{
+			chara->LoadModel("Data/Model/Character/PlayerModels/MDL_PLAYER_BODY_ANIMATION.glb", 1.0f, ModelObject::RENDER_MODE::DX12);
+		}
+		if (T_GRAPHICS.isDX11Active)
+		{
+			chara->LoadModel("Data/Model/Character/PlayerModels/MDL_PLAYER_BODY_ANIMATION.glb", 1.0f, ModelObject::RENDER_MODE::DX11);
+		}
 	}
 
 	StateMachine<PlayerCharacter>* stateMachine = chara->GetStateMachine();
@@ -42,7 +56,16 @@ void PlayerCharacterPatternGender::Execute(PlayerCharacter* chara)
 void PlayerCharacterPatternSingleModel::Execute(PlayerCharacter* chara)
 {
 	if (m_filename != "")
-		chara->LoadModel(m_filename.c_str());
+	{
+		if (T_GRAPHICS.isDX12Active)
+		{
+			chara->LoadModel(m_filename.c_str(), 1.0f, ModelObject::RENDER_MODE::DX12);
+		}
+		if (T_GRAPHICS.isDX11Active)
+		{
+			chara->LoadModel(m_filename.c_str(), 1.0f, ModelObject::RENDER_MODE::DX11);
+		}
+	}
 }
 
 /**************************************************************************//**

@@ -1,15 +1,13 @@
 ﻿#include "MapTile.h"
 
 MapTile::MapTile(const char* filename, float scaling, RoomBase* parent) :
-	ModelObject(filename, scaling)
+	ModelObject(filename, scaling, ModelObject::RENDER_MODE::DX11, 0)
 {
 	this->parent = parent;
 
 	Update(0);// モデル更新
 
 	if (strlen(filename) == 0) return;
-	SetCollider(Collider::COLLIDER_TYPE::MAP);
-	//SetCollider(Collider::COLLIDER_TYPE::MODEL);
 }
 
 void MapTile::UpdateTransform()
@@ -42,15 +40,15 @@ void MapTile::Update(float elapsedTime)
 {
 	for (auto& model : m_pmodels)
 	{
-		if (model == nullptr) continue;
+		if (model.model == nullptr) continue;
 
 		// 行列更新
 		UpdateTransform();
 
 		// アニメーション更新
-		model->UpdateAnimation(elapsedTime * m_animationSpeed);
+		model.model->UpdateAnimation(elapsedTime * m_animationSpeed);
 
 		// トランスフォーム更新
-		model->UpdateTransform(transform);
+		model.model->UpdateTransform(transform);
 	}
 }

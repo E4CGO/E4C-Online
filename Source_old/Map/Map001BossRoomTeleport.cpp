@@ -56,3 +56,8 @@ void Map001BossRoomTeleport::Render(const RenderContext& rc)
 		);
 	}
 }
+
+void Map001BossRoomTeleport::RenderDX12(const RenderContextDX12& rc)
+{
+
+}

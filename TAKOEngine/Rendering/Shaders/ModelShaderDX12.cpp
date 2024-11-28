@@ -66,7 +66,7 @@ SkinningPipeline::~SkinningPipeline()
 // @param[in]   model  描画対象のモデルデータを指すポインタ(DX12)
 // @return      なし
 //*************************************************************
-void SkinningPipeline::Compute(const RenderContextDX12& rc, ModelDX12* model)
+void SkinningPipeline::Compute(const RenderContextDX12& rc, iModel* model)
 {
 	Graphics& graphics = Graphics::Instance();
 
