@@ -185,11 +185,12 @@ void ModelShader::Draw(const RenderContext& rc, const iModel* model, DirectX::XM
 
 	// カメラに写っている範囲のオブジェクトをフラグでマークする配列を用意
 	std::vector<bool> visibleObjects(model->GetMeshes().size(), false);
+
 	// TODO: visibleObjects.size == 0
 	if (visibleObjects.size() == 0) return;
 
 	// 視錐台カリングを実行して可視オブジェクトをマーク
-	FrustumCulling::FrustumCullingFlag(model->GetMeshes(), visibleObjects);
+	FrustumCulling::FrustumCullingFlag(CameraManager::Instance().GetCamera(), model->GetMeshes(), visibleObjects);
 	int culling = 0;
 
 	for (const ModelResource::Mesh& mesh : resource->GetMeshes())

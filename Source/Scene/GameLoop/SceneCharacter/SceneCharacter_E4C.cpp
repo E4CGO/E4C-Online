@@ -1,3 +1,5 @@
+#include "SceneCharacter_E4C.h"
+
 #include "TAKOEngine/Runtime/tentacle_lib.h"
 #include "TAKOEngine/Network/HttpRequest.h"
 #include "TAKOEngine/Rendering/ResourceManager.h"
@@ -8,7 +10,6 @@
 #include <string>
 
 #include "Scene/SceneManager.h"
-#include "SceneCharacter_E4C.h"
 #include "SceneCharacter_E4CState.h"
 
 #include "GameData.h"
@@ -22,16 +23,19 @@ const int SceneCharacter_E4C::m_maxCharacters{ 3 };
 *//***************************************************************************/
 void SceneCharacter_E4C::Initialize()
 {
-	// Sprite Resource Preload
-	for (auto& filename : spriteList)
+	if (T_GRAPHICS.isDX11Active)
 	{
-		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
+		// Sprite Resource Preload
+		for (auto& filename : spriteList)
+		{
+			spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
+		}
+		// Model Resource Preload
+		for (auto& filename : modelList)
+		{
+			modelPreLoad.insert(RESOURCE.LoadModelResource(filename));
+		}
 	}
-	//// Model Resource Preload
-	//for (auto& filename : modelList)
-	//{
-	//	modelPreLoad.insert(RESOURCE.LoadModelResource(filename));
-	//}
 
 	//シャドウマップレンダラ
 	shadowMapRenderer->Initialize();

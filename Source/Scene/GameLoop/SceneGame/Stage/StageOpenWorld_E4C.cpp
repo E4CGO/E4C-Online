@@ -38,14 +38,28 @@ void StageOpenWorld_E4C::Initialize()
 
 	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
 	stage_collision->Update(0);
+	stage_collision->SetCollider(Collider::COLLIDER_TYPE::MAP);
+
 	MAPTILES.Register(stage_collision);
 	MAPTILES.CreateSpatialIndex(5, 7);
 
-	map = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, 0);
-	tower = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, 0);
+	if (T_GRAPHICS.isDX11Active)
+	{
+		map = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX11, 0);
+		tower = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX11, 0);
 
-	sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 50.0f, ModelObject::RENDER_MODE::DX12);
-	m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
+		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 70.0f, ModelObject::RENDER_MODE::DX11);
+		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
+	}
+
+	if (T_GRAPHICS.isDX12Active)
+	{
+		map = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, 0);
+		tower = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, 0);
+
+		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 70.0f, ModelObject::RENDER_MODE::DX12);
+		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
+	}
 
 	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
 	teleporter->SetPosition({ 16, 8.5, -46 });
@@ -59,16 +73,7 @@ void StageOpenWorld_E4C::Initialize()
 
 	// プレイヤー
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
-	player->SetPosition({ 15.0f, 15.0f, 5.0f });
-
-	playerModels.resize(50);
-
-	for (size_t i = 0; i < playerModels.size(); i++)
-	{
-		playerModels[i] = std::make_unique<ModelObject>("Data/Model/Character/PlayerModels/ANM_PCMsword_Prototype_3_ANIMATION.glb", 1.0f, ModelObject::RENDER_MODE::DX12);
-		playerModels[i]->SetPosition({ 3.0f * ((i % 5)), 1.0f, 3.0f * (i / 5) });
-		playerModels[i]->SetAnimation(0, true);
-	}
+	player->SetPosition({ 5.0f, 10.0f, 5.0f });
 
 	// カメラ設定
 	Camera* mainCamera = CameraManager::Instance().GetCamera();
@@ -130,16 +135,9 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	map->Update(elapsedTime);
 	tower->Update(elapsedTime);
 
-	for (size_t i = 0; i < playerModels.size(); i++)
-	{
-		playerModels[i]->Update(elapsedTime + (elapsedTime / 100.0f) * i);
-	}
-
 	sky->Update(elapsedTime);
 
 	teleporter->Update(elapsedTime);
-	//plane->Update(elapsedTime);
-	//billboard->Update(elapsedTime);
 
 	timer += elapsedTime;
 }
@@ -211,11 +209,6 @@ void StageOpenWorld_E4C::RenderDX12()
 		map->RenderDX12(rc);
 		tower->RenderDX12(rc);
 
-		for (size_t i = 0; i < playerModels.size(); i++)
-		{
-			playerModels[i]->RenderDX12(rc);
-		}
-
 		// skyBox
 		{
 			rc.skydomeData.skyTexture = m_sprites[1]->GetDescriptor();
@@ -234,7 +227,6 @@ void StageOpenWorld_E4C::RenderDX12()
 
 	// 2D描画
 	{
-
 	}
 
 	T_GRAPHICS.End();

@@ -19,8 +19,6 @@
 
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 
-#include "Scene/Stage/StageManager.h"
-
 #include "GameObject/Props/Teleporter.h"
 
 #include "Network/OnlineController.h"
@@ -177,9 +175,6 @@ void StageDungeon_E4C::GenerateDungeon()
 			break;
 		}
 	}
-
-	//portal = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, positions);
-	//portal.get()->SetShader(ModelShaderId::Portal);
 }
 
 void StageDungeon_E4C::Initialize()
@@ -343,8 +338,8 @@ void StageDungeon_E4C::RenderDX12()
 		m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 
 		// モデル描画
-		//PlayerCharacterManager::Instance().RenderDX12(rc);
-		
+		PlayerCharacterManager::Instance().RenderDX12(rc);
+
 		GameObjectManager::Instance().RenderDX12(rc);
 
 		MAPTILES.RenderDX12(rc);
@@ -360,7 +355,6 @@ void StageDungeon_E4C::RenderDX12()
 
 	// 2D描画
 	{
-
 	}
 
 	T_GRAPHICS.End();

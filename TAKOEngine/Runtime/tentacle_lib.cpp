@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <tchar.h>
 
-//#define FULLSCREEN
+#define FULLSCREEN
 
 namespace TentacleLib
 {
@@ -56,6 +56,9 @@ namespace TentacleLib
 		SetWindowTextW(hWnd, APPLICATION_NAME);
 
 		setting.title = APPLICATION_NAME;
+
+		graphics.SetDX12Render(false);
+		graphics.SetDX11Render(true);
 
 		input.Init(hWnd);
 		timer.Init();

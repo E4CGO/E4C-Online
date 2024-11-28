@@ -52,7 +52,6 @@ private:
 
 	std::unique_ptr<ModelObject> map;
 	std::unique_ptr<ModelObject> tower;
-	std::unique_ptr<ModelObject> shrine;
 
 	std::unique_ptr<ModelObject> sky;
 	DirectX::XMFLOAT4X4 test_transform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
@@ -62,14 +61,10 @@ private:
 
 	std::unique_ptr<SpriteDX12>			m_sprites[8];
 
-	std::vector<std::unique_ptr<ModelObject>> playerModels;
-
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {
 		"",											// マスク
 		// Setting UI
-		"Data/Sprites/UI/start.png",
-		"Data/Sprites/big_background.t.png"
 	};
 
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;

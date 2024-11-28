@@ -12,8 +12,8 @@
 
 #include "SceneGame_E4CState.h"
 #include "Scene/GameLoop/SceneGame/Stage/StageOpenWorld_E4C.h"
+#include "Scene/GameLoop/SceneGame/Stage/StageDungeon_E4C.h"
 
-#include "Scene/Stage/StageManager.h"
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "TAKOEngine/Tool/Console.h"
 

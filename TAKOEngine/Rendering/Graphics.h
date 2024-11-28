@@ -135,7 +135,7 @@ public:
 		return instance;
 	}
 
-	bool isDX12Active = true;
+	bool isDX12Active = false;
 	bool isDX11Active = false;
 
 	struct CommandQueue
@@ -276,6 +276,9 @@ public:
 	{
 		return m_viewport;
 	}
+
+	void SetDX12Render(bool isRender) { isDX12Active = isRender; }
+	void SetDX11Render(bool isRender) { isDX11Active = isRender; }
 
 private:
 	// イメージコピー

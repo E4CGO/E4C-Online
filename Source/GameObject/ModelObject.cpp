@@ -36,6 +36,7 @@ void ModelObject::LoadModel(const char* filename, float scaling, ModelObject::RE
 	if (modelType == 0)
 	{
 		m_dx12_ShaderId = ModelShaderDX12Id::Lambert;
+		m_shaderId = ModelShaderId::Toon;
 	}
 
 	switch (m_renderMode)
