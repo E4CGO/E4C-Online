@@ -398,11 +398,14 @@ void PlayerCharacter::Update(float elapsedTime)
 
 		Character::Update(elapsedTime);
 	}
+	iModel::Node* node = this->GetModel()->FindNode("Mesh_0");
 }
 
 void PlayerCharacter::Render(const RenderContext& rc)
 {
 	Character::Render(rc);
+
+	
 
 	DirectX::XMFLOAT3 front = CameraManager::Instance().GetCamera()->GetFront();
 	DirectX::XMFLOAT3 eye = CameraManager::Instance().GetCamera()->GetEye();

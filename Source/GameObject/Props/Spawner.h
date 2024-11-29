@@ -5,9 +5,14 @@
 #include "Source/GameObject/GameObject.h"
 #include "Source/Scene/Stage/Stage.h"
 #include "Source/GameObject/Character/Enemy/Enemy.h"
+#include "Source/GameObject/Character/Enemy/SkeletonMinion.h"
 #include "TAKOEngine/Rendering/Model/ModelDX11.h"
-#include "TAKOEngine/Rendering/Model/NewModelDX11.h"
 #include "TAKOEngine/Rendering/Model/ModelDX12.h"
+#include <vector>
+#include <algorithm>
+
+
+
 
 
 /**************************************************************************//**
@@ -30,6 +35,8 @@ public:
 
     void SpawnEnemy(float elapsedTime);
 
+    int GetSpawnedEnemyCount() { return spawnedEnemyCount; }
+
     //ÉvÉåÉCÉÑÅ[çıìG
     bool SearchPlayer();
     float GetSerchRenge() { return serchRange; }
@@ -40,7 +47,8 @@ public:
 private:
     DirectX::XMFLOAT3 territoryOrigin = { 0,0,0 };
     float territoryRange = 7.0f; 
-    float serchRange = 10.f;
+    float serchRange = 10000.f;
+    float enemyCountRange=FLT_MAX;
 
     DirectX::XMFLOAT3 playerPosition = {};
 

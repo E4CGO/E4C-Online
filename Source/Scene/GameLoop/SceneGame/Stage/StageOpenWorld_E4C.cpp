@@ -12,6 +12,7 @@
 #include "TAKOEngine/Tool/Timer.h"
 
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
+#include "GameObject/Character/Enemy/EnemyManager.h"
 
 #include "Scene/GameLoop/SceneGame/Stage/StageDungeon_E4C.h"
 
@@ -35,6 +36,10 @@ void StageOpenWorld_E4C::Initialize()
 	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
 	teleporter->SetPosition({ 0, 5, 0 });
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
+
+	spawner = std::make_unique<Spawner>();
+	spawner->SetPosition({ 5,1,10 });
+
 
 	{
 		std::array<DirectX::XMFLOAT3, 4 > positions = {
@@ -79,6 +84,11 @@ void StageOpenWorld_E4C::Initialize()
 	cameraController->SetPlayer(player);
 	CURSOR_OFF;
 }
+void StageOpenWorld_E4C::Finalize()
+{
+	ENEMIES.Clear();
+}
+
 
 void StageOpenWorld_E4C::Update(float elapsedTime)
 {
@@ -121,12 +131,16 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	teleporter->Update(elapsedTime);
 	plane->Update(elapsedTime);
 	billboard->Update(elapsedTime);
+	spawner->Update(elapsedTime);
+
+	ENEMIES.Update(elapsedTime);
 
 	timer += elapsedTime;
 }
 
 void StageOpenWorld_E4C::Render()
 {
+	int a = spawner->GetSpawnedEnemyCount();
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->Clear(T_GRAPHICS.GetDeviceContext(), 0.2f, 0.2f, 0.2f, 1);
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
 
@@ -150,20 +164,21 @@ void StageOpenWorld_E4C::Render()
 	teleporter->Render(rc);
 	plane->Render(rc);
 	billboard->Render(rc);
+	spawner->Render(rc);
+
+	ENEMIES.Render(rc);
+	
+
+	if (ImGui::TreeNode("spawnedenemycount"))
+	{
+		ImGui::InputInt("spawned", &a);
+		ImGui::TreePop();
+	}
 
 	//MAPTILES.Render(rc);
 
-	//if (ImGui::TreeNode("Camera Positions"))
-	//{
-	//	for (size_t i = 0; i < cameraPositions.size(); ++i)
-	//	{
-	//		std::string label = "Position " + std::to_string(i);  // 各カメラポジションのラベル
-	//		ImGui::DragFloat3(label.c_str(), &cameraPositions[i].x, 1.0f, -FLT_MAX, FLT_MAX);  // カメラポジションの設定
-	//	}
-	//	ImGui::TreePop();
-	//}
+	
 	// デバッグレンダラ描画実行
-
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
 }
 

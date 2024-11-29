@@ -4,23 +4,28 @@
 #include "TAKOEngine/Tool/Mathf.h"
 #include "Source/Scene/Stage/TestingStage.h"
 #include <GameObject/Character/Enemy/EnemyManager.h>
+#include "GameObject/Character/Player/PlayerCharacterManager.h"
 /**************************************************************************//**
      @brief  コンストラクタ  
 *//***************************************************************************/
 Spawner::Spawner()
+	: maxEnemies(20), // 最大エネミー数
+	spawnedEnemyCount(0), // 現在の生成済みエネミー数
+	spawntime(2.0f), // スポーン間隔
+	spawntimer(0.0f) // タイマー
 {
-	
 }
+
 /**************************************************************************//**
      @brief    更新
     @param[in]    elapsedTime
 *//***************************************************************************/
 void Spawner::Update(float elapsedTime)
 {
-	if (SearchPlayer())
-	{
-		SpawnEnemy(elapsedTime);
-	}
+	
+	SpawnEnemy(elapsedTime);
+	
+	
 }
 /**************************************************************************//**
      @brief    テリトリー配置
@@ -38,7 +43,7 @@ void Spawner::SetTerritory(const DirectX::XMFLOAT3& origin, float range)
 *//***************************************************************************/
 bool Spawner::SearchPlayer()
 {
-	for (Player*& player : PLAYERS.GetAll())
+	for (auto& player : PlayerCharacterManager::Instance().GetAll())
 	{
 		// プレイヤーの位置を取得
 		playerPosition = player->GetPosition();
@@ -64,7 +69,7 @@ void Spawner::SpawnEnemy(float elapsedTime)
 	float range = Mathf::RandomRange(0, territoryRange);
 
 	spawnPos.x =position.x + territoryOrigin.x + range * sinf(theta);
-	spawnPos.y = 2.0f;
+	spawnPos.y = 10.0f;
 	spawnPos.z = position.z +territoryOrigin.z + range * cosf(theta);
 
 
@@ -88,15 +93,19 @@ void Spawner::SpawnEnemy(float elapsedTime)
 
 			SkeletonMinion* enemy = new SkeletonMinion();
 			enemy->SetPosition({ spawnPos.x + offsetX, spawnPos.y, spawnPos.z + offsetZ });
+
+			if (T_INPUT.KeyPress(VK_SHIFT))
+			{
+				//enemy->GetHp() - 100;
+			}
+			
 			ENEMIES.Register(enemy);
 
 			spawnedEnemyCount++; // 生成した敵の数をカウント
 		}
 		spawntimer = 0; // タイマーをリセット
 	}
-
 }
-
 int Spawner::CountEnemiesInRange()
 {
 	int count = 0;
@@ -115,10 +124,12 @@ int Spawner::CountEnemiesInRange()
 		float dist = sqrtf(vx * vx + vy * vy + vz * vz);
 
 		// レンジ内ならカウント
-		if (dist <= serchRange)
+		if (dist <=enemyCountRange)
 		{
 			count++;
 		}
+		
+
 	}
 	return count;
 }
@@ -129,6 +140,7 @@ int Spawner::CountEnemiesInRange()
 *//***************************************************************************/
 void Spawner::Render(const RenderContext& rc)
 {
+	
 	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, territoryRange, 1.5f, { 1,0,0,1 });
 	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, serchRange, 1.5f, { 1,0,1,1 });
 }
