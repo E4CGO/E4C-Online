@@ -142,6 +142,50 @@ public:
 
 	virtual void SetAnimationRate(float rate) = 0;
 
+	// モデルの名前取得
+	std::string GetModelName() { return name; }
+
+	// モデルの名前抜き取り
+	void extractBaseName(const char* filePath)
+	{
+		// ファイルパスが nullptr の場合は空文字列を代入
+		if (!filePath)
+		{
+			name = "";
+			return;
+		}
+
+		// 最後のスラッシュ（UNIX 系）を探す
+		const char* lastSlashUnix = strrchr(filePath, '/');
+		// 最後のバックスラッシュ（Windows 系）を探す
+		const char* lastSlashWindows = strrchr(filePath, '\\');
+
+		// スラッシュのどちらか最後に現れる方を選ぶ
+		const char* lastSlash = nullptr;
+		if (lastSlashUnix && lastSlashWindows)
+		{
+			lastSlash = (lastSlashUnix > lastSlashWindows) ? lastSlashUnix : lastSlashWindows;
+		}
+		else if (lastSlashUnix)
+		{
+			lastSlash = lastSlashUnix;
+		}
+		else if (lastSlashWindows)
+		{
+			lastSlash = lastSlashWindows;
+		}
+
+		// ファイル名部分を取得（スラッシュがない場合はそのまま全体）
+		const char* fileName = (lastSlash != nullptr) ? lastSlash + 1 : filePath;
+
+		// 最後のドットを見つける（拡張子の開始位置）
+		const char* dot = strrchr(fileName, '.');
+		size_t length = (dot != nullptr) ? static_cast<size_t>(dot - fileName) : strlen(fileName);
+
+		// ファイル名部分を std::string にして代入
+		name = std::string(fileName, length);
+	};
+
 	void SetLinearGamma(float g) { linearGamma = g; }
 	float GetLinearGamma() const { return linearGamma; }
 
@@ -199,4 +243,5 @@ protected:
 	float m_animationBlendSecondsLength = -1.0f;
 	float m_currentAnimationBlendSeconds = 0.0f;
 	bool  m_animationBlending = false;
+	std::string name = ""; // モデルの名前
 };
