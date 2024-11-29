@@ -124,6 +124,7 @@ void SceneCharacter_E4CState::InitState::Execute(float elapsedTime)
 *//***************************************************************************/
 void SceneCharacter_E4CState::InitState::Exit()
 {
+
 }
 
 /**************************************************************************//**

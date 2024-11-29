@@ -9,6 +9,7 @@
 #include <unordered_map>
 
 #include "GameObject/Character/Player/Player.h"
+#include "GameObject/Character/Player/PlayerCharacter.h"
 
 struct ENEMY_COLLISION
 {
@@ -16,7 +17,7 @@ struct ENEMY_COLLISION
 	int player_id = -1;
 	int colider_id = -1;
 	int count = -1;
-	int damage = 0;
+	int damage = 10;
 	DirectX::XMFLOAT3 force = {};
 	bool power = false;
 };
@@ -74,10 +75,10 @@ public:
 	bool MoveTo(float elapsedTime, const DirectX::XMFLOAT3& target);
 	void TurnTo(float elapsedTime, const DirectX::XMFLOAT3& target);
 
-	Player* GetClosestPlayer(float limit = FLT_MAX);
+	PlayerCharacter* GetClosestPlayer(float limit = FLT_MAX);
 	virtual void UpdateTarget() { target = nullptr; }
-	void SetTarget(Player* player) { target = player; }
-	Player* GetTarget() { return target; }
+	void SetTarget(PlayerCharacter* player) { target = player; }
+	PlayerCharacter* GetTarget() { return target; }
 
 	int GetState() { return stateMachine->GetStateIndex(); }
 	StateMachine<Enemy>* GetStateMachine() { return stateMachine; }
@@ -129,7 +130,7 @@ protected:
 
 	int atk = 10; // UŒ‚—Í
 
-	Player* target = nullptr;
+	PlayerCharacter* target = nullptr;
 
 	float moveSpeed = 0.0f;
 	float turnSpeed = 0.0f;

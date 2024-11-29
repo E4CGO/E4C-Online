@@ -1,10 +1,12 @@
 #include "TAKOEngine/Tool/Mathf.h"
 
 #include "GameObject/Character/Player/PlayerManager.h"
+#include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Character/Enemy/Enemy.h"
 #include "GameObject/Character/Enemy/Chest.h"
 #include "GameObject/Character/Enemy/SkeletonMinion.h"
+
 
 Enemy::Enemy(const char* filename, float scaling) : Character(filename, scaling)
 {
@@ -52,12 +54,12 @@ void Enemy::TurnTo(float elapsedTime, const DirectX::XMFLOAT3& target)
 	Turn(elapsedTime, d.x, d.z, turnSpeed);
 }
 
-Player* Enemy::GetClosestPlayer(float limit)
+PlayerCharacter* Enemy::GetClosestPlayer(float limit)
 {
-	Player* result = nullptr;
+	PlayerCharacter* result = nullptr;
 	limit *= limit;
 
-	for (Player*& player : PLAYERS.GetAll())
+	for (auto& player : PlayerCharacterManager::Instance().GetAll())
 	{
 		float d = XMFLOAT3LengthSq(player->GetPosition() - position);
 		if (d < limit)
@@ -86,7 +88,7 @@ void Enemy::Render(const RenderContext& rc)
 		collider.second->DrawDebugPrimitive({ 1, 1, 1, 1 });
 	}
 
-	Collider* playerCollider = PLAYERS.GetPlayerById(GAME_DATA.GetClientId())->GetCollider();
+	/*Collider* playerCollider = PLAYERS.GetPlayerById(GAME_DATA.GetClientId())->GetCollider();
 	for (const std::pair<int, Collider*>& collider : attackColliders)
 	{
 		DirectX::XMFLOAT4 color = { 1, 0, 0, 1 };
@@ -94,14 +96,15 @@ void Enemy::Render(const RenderContext& rc)
 		if (collider.second->Collision(playerCollider, {}, hit)) color = { 0, 0, 1, 1 };
 
 		collider.second->DrawDebugPrimitive(color);
-	}
+	}*/
 #endif // DEBUG
 }
 void Enemy::AttackCollision()
 {
-	Player* player = PLAYERS.GetPlayerById(GAME_DATA.GetClientId());
+	PlayerCharacterManager& pMnager = PlayerCharacterManager::Instance();
+	PlayerCharacter* player = pMnager.GetPlayerCharacterById(GAME_DATA.GetClientId());
 	if (!player) return;
-	Collider* playerCollider = PLAYERS.GetPlayerById(GAME_DATA.GetClientId())->GetCollider();
+	Collider* playerCollider = pMnager.GetPlayerCharacterById(GAME_DATA.GetClientId())->GetCollider();
 	if (!playerCollider->IsEnable()) return;
 
 	for (const std::pair<int, Collider*>& collider : attackColliders)
@@ -110,6 +113,7 @@ void Enemy::AttackCollision()
 		if (collider.second->Collision(playerCollider, {}, hit))
 		{
 			player->OnDamage(hit, atk);
+
 		}
 	}
 }
@@ -131,9 +135,11 @@ void Enemy::OnDeath() { ENEMIES.Remove(this); }
 
 void Enemy::ImportData(ENEMY_DATA data)
 {
+	PlayerCharacterManager& pMnager = PlayerCharacterManager::Instance();
+
 	position = data.position;
 	velocity = data.velocity;
-	target = PLAYERS.GetPlayerById(data.target);
+	target = pMnager.GetPlayerCharacterById(data.target);
 	angle = data.angle;
 	if (stateMachine->GetStateIndex() != data.state)
 	{

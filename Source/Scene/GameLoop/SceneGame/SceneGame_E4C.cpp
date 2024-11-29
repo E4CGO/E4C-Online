@@ -20,6 +20,7 @@
 
 #include "UI/Widget/WidgetCrosshair.h"
 #include "TAKOEngine/GUI/UIManager.h"
+#include "GameObject/Character/Enemy/EnemyManager.h"
 
 void SceneGame_E4C::Initialize()
 {
@@ -42,6 +43,7 @@ void SceneGame_E4C::Initialize()
 
 	STAGES.ChangeStage(new StageOpenWorld_E4C(this));
 
+
 	m_ponlineController = new Online::OnlineController;
 	if (m_ponlineController->Initialize())
 	{
@@ -61,6 +63,7 @@ void SceneGame_E4C::Finalize()
 	CameraManager::Instance().Clear();
 	STAGES.Clear();
 	MAPTILES.Clear();
+	
 	PlayerCharacterManager::Instance().Clear();
 	UI.Clear();
 }
@@ -70,6 +73,7 @@ void SceneGame_E4C::Update(float elapsedTime)
 {
 	STAGES.Update(elapsedTime);
 	UI.Update(elapsedTime);
+	
 	stateMachine->Update(elapsedTime);
 }
 
@@ -82,9 +86,8 @@ void SceneGame_E4C::Render()
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
 	STAGES.Render();
-
+	
 	UI.Render(rc);
-
 	T_TEXT.End();
 	// デバッグレンダラ描画実行
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());

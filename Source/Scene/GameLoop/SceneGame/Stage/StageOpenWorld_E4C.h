@@ -28,6 +28,8 @@ public:
 
 	void Initialize() override;
 
+	void Finalize();
+
 	void Update(float elapsedTime) override;
 
 	void Render() override;
@@ -44,7 +46,7 @@ private:
 	std::unique_ptr<ThridPersonCameraController> cameraController;
 	MapTile* stage_collision = nullptr;
 
-	GameObject* spawners;
+	std::unique_ptr<Spawner>spawner;
 
 	std::unique_ptr <Teleporter> teleporter;
 	std::unique_ptr <Plane> plane;

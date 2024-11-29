@@ -210,9 +210,9 @@ void SceneGame::Update(float elapsedTime)
 	}
 
 	{
-		ProfileScopedSection_2("Collision", ImGuiControl::Profiler::Yellow);
-		// オブジェクト間衝突判定
-		COLLISION.Update(elapsedTime);
+		//ProfileScopedSection_2("Collision", ImGuiControl::Profiler::Yellow);
+		//// オブジェクト間衝突判定
+		//COLLISION.Update(elapsedTime);
 	}
 
 	{
@@ -376,7 +376,7 @@ void SceneGame::Render()
 		PLAYERS.Render(rc);						// プレイヤー
 		ENEMIES.Render(rc);						// エネミー
 		PROJECTILES.Render(rc);						// 発射物
-		STAGES.Render(rc);						// ステージオブジェクト
+		STAGES.Render();						// ステージオブジェクト
 		EFFECTS.Render(CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection()); 	// エフェクト
 		CameraGUI();
 	}
