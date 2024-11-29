@@ -1,6 +1,8 @@
 ﻿#include "StageDungeon_E4C.h"
 #include "StageOpenWorld_E4C.h"
 
+#include "TAKOEngine/GUI/UIManager.h"
+
 #include "GameObject/GameObjectManager.h"
 
 #include "GameObject/ModelObject.h"
@@ -17,9 +19,6 @@
 
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 
-#include "Scene/Stage/StageManager.h"
-
-#include "Scene/Stage/TestingStage.h"
 #include "GameObject/Props/Teleporter.h"
 
 #include "Network/OnlineController.h"
@@ -182,8 +181,11 @@ void StageDungeon_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
 
+	// フレームバッファマネージャー
+	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
+
 	// 光
-	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
+	LightManager::Instance().SetAmbientColor({ 0.3f, 0.3f, 0.3f, 0.0f });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
@@ -213,20 +215,6 @@ void StageDungeon_E4C::Initialize()
 	cameraController->SetPlayer(player);
 	CURSOR_OFF;
 
-	{
-		HRESULT hr;
-
-		D3D11_BUFFER_DESC buffer_desc{};
-		buffer_desc.ByteWidth = (sizeof(CbScene) + 15) / 16 * 16;
-		buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-		buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		buffer_desc.CPUAccessFlags = 0;
-		buffer_desc.MiscFlags = 0;
-		buffer_desc.StructureByteStride = 0;
-		hr = T_GRAPHICS.GetDevice()->CreateBuffer(&buffer_desc, nullptr, constant_buffers[1].GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-	}
-
 	GenerateDungeon();
 
 	// 一番遠い部屋のうち、ランダムな一つを抽選しテレポーターを設置する
@@ -234,7 +222,7 @@ void StageDungeon_E4C::Initialize()
 
 	TeleportToOpenworld* teleporter = new TeleportToOpenworld();
 	teleporter->SetPosition(lastRoom->GetCenterPos());
-	teleporter->SetAngle({ 90.0f * RADIAN1, 0.0f, 0.0f});
+	teleporter->SetAngle({ 90.0f * RADIAN1, 0.0f, 0.0f });
 	teleporter->SetScale({ 10.0f, 10.0f, 1.0f });
 	GameObjectManager::Instance().Register(teleporter);
 
@@ -269,8 +257,8 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	// 部屋を全てアップデート
 	rootRoom->Update(elapsedTime);
 
+	PlayerCharacterManager::Instance().Update(elapsedTime);
 	GameObjectManager::Instance().Update(elapsedTime);
-
 	MAPTILES.Update(elapsedTime);
 
 	if (T_INPUT.KeyDown(VK_MENU))
@@ -295,7 +283,6 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	{
 		T_INPUT.KeepCursorCenter();
 	}
-	PlayerCharacterManager::Instance().Update(elapsedTime);
 
 	timer += elapsedTime;
 }
@@ -329,7 +316,48 @@ void StageDungeon_E4C::Render()
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
 	rootRoom->DrawDebugGUI();
 #endif // _DEBUG
+}
 
+void StageDungeon_E4C::RenderDX12()
+{
+	T_GRAPHICS.BeginRender();
+
+	// シーン用定数バッファ更新
+	const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
+		CameraManager::Instance().GetCamera());
+
+	// レンダーコンテキスト設定
+	RenderContextDX12 rc;
+	rc.d3d_command_list = m_frameBuffer->GetCommandList();
+	rc.scene_cbv_descriptor = scene_cbv_descriptor;
+
+	// 3Dモデル描画
+	{
+		m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+
+		// モデル描画
+		PlayerCharacterManager::Instance().RenderDX12(rc);
+
+		GameObjectManager::Instance().RenderDX12(rc);
+
+		MAPTILES.RenderDX12(rc);
+
+		// レンダーターゲットへの書き込み終了待ち
+		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+	}
+
+	// ポストエフェクト描画
+	{
+		postprocessingRenderer->Render(m_frameBuffer);
+	}
+
+	// 2D描画
+	{
+	}
+
+	T_GRAPHICS.End();
 }
 
 void StageDungeon_E4C::OnPhase()

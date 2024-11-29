@@ -10,6 +10,8 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /source-charset:.932")
 
+option(TO_DOWNLOAD_DATA "Decide whether to download a data" OFF)
+
 # ###############################################################################
 # Set target arch type if empty. Visual studio solution generator provides it.
 # ###############################################################################
@@ -164,12 +166,6 @@ set(Source__Map
     "Source/Map/DungeonData.h"
     "Source/Map/EndRoom1.cpp"
     "Source/Map/EndRoom1.h"
-    "Source/Map/Map001.cpp"
-    "Source/Map/Map001.h"
-    "Source/Map/Map001BossRoomTeleport.cpp"
-    "Source/Map/Map001BossRoomTeleport.h"
-    "Source/Map/Map001Key.cpp"
-    "Source/Map/Map001Key.h"
     "Source/Map/MapTile.cpp"
     "Source/Map/MapTile.h"
     "Source/Map/MapTileManager.cpp"
@@ -192,21 +188,11 @@ source_group("Source\\Network" FILES ${Source__Network})
 set(Source__Scene
     "Source/Scene/Scene.cpp"
     "Source/Scene/Scene.h"
-    "Source/Scene/SceneDungeon.cpp"
-    "Source/Scene/SceneDungeon.h"
-    "Source/Scene/SceneGame.cpp"
-    "Source/Scene/SceneGame.h"
-    "Source/Scene/SceneGameState.cpp"
-    "Source/Scene/SceneGameState.h"
     "Source/Scene/SceneLoading.cpp"
     "Source/Scene/SceneManager.cpp"
     "Source/Scene/SceneManager.h"
     "Source/Scene/SceneTest.cpp"
     "Source/Scene/SceneTest.h"
-    "Source/Scene/SceneTitle.cpp"
-    "Source/Scene/SceneTitle.h"
-    "Source/Scene/SceneTitleState.cpp"
-    "Source/Scene/SceneTitleState.h"
 )
 source_group("Source\\Scene" FILES ${Source__Scene})
 
@@ -217,15 +203,9 @@ set(Source__GameObject__Character
 source_group("Source\\GameObject\\Character" FILES ${Source__GameObject__Character})
 
 set(Source__GameObject__Projectile
-    "Source/GameObject/Projectile/Arrow.cpp"
-    "Source/GameObject/Projectile/Arrow.h"
-    "Source/GameObject/Projectile/Grenade.cpp"
-    "Source/GameObject/Projectile/Grenade.h"
     "Source/GameObject/Projectile/Projectile.cpp"
     "Source/GameObject/Projectile/Projectile.h"
     "Source/GameObject/Projectile/ProjectileManager.h"
-    "Source/GameObject/Projectile/TwoHandedAxe.cpp"
-    "Source/GameObject/Projectile/TwoHandedAxe.h"
 )
 source_group("Source\\GameObject\\Projectile" FILES ${Source__GameObject__Projectile})
 
@@ -238,10 +218,6 @@ set(Source__GameObject__Props
 source_group("Source\\GameObject\\Props" FILES ${Source__GameObject__Props})
 
 set(Source__GameObject__Character__Enemy
-    "Source/GameObject/Character/Enemy/Chest.cpp"
-    "Source/GameObject/Character/Enemy/Chest.h"
-    "Source/GameObject/Character/Enemy/ChestState.cpp"
-    "Source/GameObject/Character/Enemy/ChestState.h"
     "Source/GameObject/Character/Enemy/Enemy.cpp"
     "Source/GameObject/Character/Enemy/Enemy.h"
     "Source/GameObject/Character/Enemy/EnemyManager.cpp"
@@ -256,32 +232,12 @@ set(Source__GameObject__Character__Enemy
 source_group("Source\\GameObject\\Character\\Enemy" FILES ${Source__GameObject__Character__Enemy})
 
 set(Source__GameObject__Character__Player
-    "Source/GameObject/Character/Player/Barbarian.cpp"
-    "Source/GameObject/Character/Player/Barbarian.h"
-    "Source/GameObject/Character/Player/BarbarianState.cpp"
-    "Source/GameObject/Character/Player/BarbarianState.h"
-    "Source/GameObject/Character/Player/Knight.cpp"
-    "Source/GameObject/Character/Player/Knight.h"
-    "Source/GameObject/Character/Player/KnightState.cpp"
-    "Source/GameObject/Character/Player/KnightState.h"
-    "Source/GameObject/Character/Player/Mage.cpp"
-    "Source/GameObject/Character/Player/Mage.h"
     "Source/GameObject/Character/Player/NonPlayerCharacter.cpp"
     "Source/GameObject/Character/Player/NonPlayerCharacter.h"
-    "Source/GameObject/Character/Player/Player.cpp"
-    "Source/GameObject/Character/Player/Player.h"
     "Source/GameObject/Character/Player/PlayerCharacter.cpp"
     "Source/GameObject/Character/Player/PlayerCharacter.h"
     "Source/GameObject/Character/Player/PlayerCharacterManager.cpp"
     "Source/GameObject/Character/Player/PlayerCharacterManager.h"
-    "Source/GameObject/Character/Player/PlayerManager.cpp"
-    "Source/GameObject/Character/Player/PlayerManager.h"
-    "Source/GameObject/Character/Player/PlayerState.cpp"
-    "Source/GameObject/Character/Player/PlayerState.h"
-    "Source/GameObject/Character/Player/Rogue.cpp"
-    "Source/GameObject/Character/Player/Rogue.h"
-    "Source/GameObject/Character/Player/RogueState.cpp"
-    "Source/GameObject/Character/Player/RogueState.h"
 )
 source_group("Source\\GameObject\\Character\\Player" FILES ${Source__GameObject__Character__Player})
 
@@ -326,8 +282,6 @@ set(Source__Scene__Stage
     "Source/Scene/Stage/Stage.h"
     "Source/Scene/Stage/StageManager.cpp"
     "Source/Scene/Stage/StageManager.h"
-    "Source/Scene/Stage/TestingStage.cpp"
-    "Source/Scene/Stage/TestingStage.h"
 )
 source_group("Source\\Scene\\Stage" FILES ${Source__Scene__Stage})
 
@@ -378,26 +332,14 @@ set(Source__UI__Widget
     "Source/UI/Widget/WidgetDragFloat.h"
     "Source/UI/Widget/WidgetEnemiesHp.cpp"
     "Source/UI/Widget/WidgetEnemiesHp.h"
-    "Source/UI/Widget/WidgetGem.cpp"
-    "Source/UI/Widget/WidgetGem.h"
     "Source/UI/Widget/WidgetImage.cpp"
     "Source/UI/Widget/WidgetImage.h"
     "Source/UI/Widget/WidgetInputBool.cpp"
     "Source/UI/Widget/WidgetInputBool.h"
-    "Source/UI/Widget/WidgetLogin.cpp"
-    "Source/UI/Widget/WidgetLogin.h"
     "Source/UI/Widget/WidgetMatching.cpp"
     "Source/UI/Widget/WidgetMatching.h"
-    "Source/UI/Widget/WidgetMenu.cpp"
-    "Source/UI/Widget/WidgetMenu.h"
-    "Source/UI/Widget/WidgetPlayerHP.cpp"
-    "Source/UI/Widget/WidgetPlayerHP.h"
-    "Source/UI/Widget/WidgetRoomOption.cpp"
-    "Source/UI/Widget/WidgetRoomOption.h"
     "Source/UI/Widget/WidgetSettingWindow.cpp"
     "Source/UI/Widget/WidgetSettingWindow.h"
-    "Source/UI/Widget/WidgetSkillTimer.cpp"
-    "Source/UI/Widget/WidgetSkillTimer.h"
     "Source/UI/Widget/WidgetText.cpp"
     "Source/UI/Widget/WidgetText.h"
     "Source/UI/Widget/WidgetUpDown.cpp"
@@ -429,13 +371,10 @@ set(TAKOEngine__GUI
 source_group("TAKOEngine\\GUI" FILES ${TAKOEngine__GUI})
 
 set(TAKOEngine__Network
-    "TAKOEngine/Network/ClientNetworkController.cpp"
-    "TAKOEngine/Network/HostNetworkController.cpp"
     "TAKOEngine/Network/HttpRequest.cpp"
     "TAKOEngine/Network/HttpRequest.h"
     "TAKOEngine/Network/Network.cpp"
     "TAKOEngine/Network/Network.h"
-    "TAKOEngine/Network/NetworkController.h"
     "TAKOEngine/Network/Socket.cpp"
     "TAKOEngine/Network/Socket.h"
     "TAKOEngine/Network/TCPSocket.cpp"
@@ -472,8 +411,6 @@ set(TAKOEngine__Physics
     "TAKOEngine/Physics/ModelCollider.h"
     "TAKOEngine/Physics/OctreeNode.cpp"
     "TAKOEngine/Physics/OctreeNode.h"
-    "TAKOEngine/Physics/PlayerCollisionObject.cpp"
-    "TAKOEngine/Physics/PlayerCollisionObject.h"
     "TAKOEngine/Physics/QuadtreeNode.cpp"
     "TAKOEngine/Physics/QuadtreeNode.h"
     "TAKOEngine/Physics/RigidBody.h"
@@ -521,8 +458,6 @@ set(TAKOEngine__Rendering
     "TAKOEngine/Rendering/MyRender.h"
     "TAKOEngine/Rendering/ParticleRenderer.cpp"
     "TAKOEngine/Rendering/ParticleRenderer.h"
-    "TAKOEngine/Rendering/PipelineState.cpp"
-    "TAKOEngine/Rendering/PipelineState.h"
     "TAKOEngine/Rendering/Plane.cpp"
     "TAKOEngine/Rendering/Plane.h"
     "TAKOEngine/Rendering/PostEffect.cpp"
@@ -554,8 +489,6 @@ set(TAKOEngine__Runtime
 source_group("TAKOEngine\\Runtime" FILES ${TAKOEngine__Runtime})
 
 set(TAKOEngine__Sound
-    "TAKOEngine/Sound/Audio.cpp"
-    "TAKOEngine/Sound/Audio.h"
     "TAKOEngine/Sound/Sound.cpp"
     "TAKOEngine/Sound/Sound.h"
 )
@@ -1108,11 +1041,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUN
 target_include_directories(${PROJECT_NAME} PUBLIC
     "$<$<CONFIG:Debug>:"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
-    "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/include"
     ">"
     "$<$<CONFIG:Release>:"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
-    "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/include"
     ">"
     "${CMAKE_CURRENT_SOURCE_DIR}/Source"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/imgui-docking"
@@ -1156,7 +1087,6 @@ if(MSVC)
         >
         /permissive-
         /MP
-        /sdl
         /W3
         /Zi
         ${DEFAULT_CXX_EXCEPTION_HANDLING}
@@ -1184,66 +1114,72 @@ endif()
 # Post build events
 # ###############################################################################
 
-# URL of the ZIP files
-set(ZIP_FILE_URLS
-    "https://www.dropbox.com/scl/fi/ovb2dkjr3n1ayljdb0ftn/Data.zip?rlkey=2th7h96r3p4qsxn12oqnnp1wv&st=uywpwppu&dl=0"
-    "https://www.dropbox.com/scl/fi/nm7h69ap66e62978butip/Dependencies.zip?rlkey=9icgfv9xwc9is1hziwhk5kjjs&st=gv2qvxdg&dl=0"
-    "https://www.dropbox.com/scl/fi/1nbbetvdxp4dthu45kayx/External.zip?rlkey=ndtf9xh27fhaiuhnwnn4btf26&st=16hvp0yp&dl=0"
-    "https://www.dropbox.com/scl/fi/hvu3y0cztxca9ztosju2j/Docs.zip?rlkey=24lazv9kbo0y86cnihpxff6re&st=8ulu8iw1&dl=0"
-)
-
-# Local path where the ZIP file will be downloaded
-set(ZIP_FILE_PATHS
-    "${CMAKE_SOURCE_DIR}/Data.zip"
-    "${CMAKE_SOURCE_DIR}/Dependencies.zip"
-    "${CMAKE_SOURCE_DIR}/External.zip"
-    "${CMAKE_SOURCE_DIR}/Docs.zip"
-)
-
-# Local path where ZIP file will be unarchived
-set(DESTINATION_DIRS
-    "${CMAKE_SOURCE_DIR}/Data"
-    "${CMAKE_SOURCE_DIR}/Dependencies"
-    "${CMAKE_SOURCE_DIR}/External"
-    "${CMAKE_SOURCE_DIR}/Docs"
-)
-
-foreach(i RANGE 0 3)
-    list(GET ZIP_FILE_URLS ${i} ZIP_FILE_URL)
-    list(GET ZIP_FILE_PATHS ${i} ZIP_FILE_PATH)
-    list(GET DESTINATION_DIRS ${i} DESTINATION_DIR)
-
-    # Command to download the ZIP file
-    file(DOWNLOAD ${ZIP_FILE_URL} ${ZIP_FILE_PATH}
-        SHOW_PROGRESS
-        STATUS status)
-
-    list(GET status 0 status_code)
-    list(GET status 1 status_string)
-
-    if(NOT status_code EQUAL 0)
-        message(FATAL_ERROR "Error downloading file: ${status_string}")
-    endif()
-
-    message(STATUS "File downloaded and verified successfully!")
-
-    file(MAKE_DIRECTORY ${DESTINATION_DIR})
-
-    # Unzip the file
-    execute_process(
-        COMMAND ${CMAKE_COMMAND} -E tar xvf ${ZIP_FILE_PATH}
-        WORKING_DIRECTORY ${DESTINATION_DIR}
-        RESULT_VARIABLE result
+if(TO_DOWNLOAD_DATA)
+    # URL of the ZIP files
+    set(ZIP_FILE_URLS
+        "https://www.dropbox.com/scl/fi/ovb2dkjr3n1ayljdb0ftn/Data.zip?rlkey=2th7h96r3p4qsxn12oqnnp1wv&st=uywpwppu&dl=0"
+        "https://www.dropbox.com/scl/fi/nm7h69ap66e62978butip/Dependencies.zip?rlkey=9icgfv9xwc9is1hziwhk5kjjs&st=gv2qvxdg&dl=0"
+        "https://www.dropbox.com/scl/fi/1nbbetvdxp4dthu45kayx/External.zip?rlkey=ndtf9xh27fhaiuhnwnn4btf26&st=16hvp0yp&dl=0"
+        "https://www.dropbox.com/scl/fi/hvu3y0cztxca9ztosju2j/Docs.zip?rlkey=24lazv9kbo0y86cnihpxff6re&st=8ulu8iw1&dl=0"
     )
 
-    if(result)
-        message(FATAL_ERROR "Failed to unzip file")
-    else()
-        message(STATUS "Successfully unzipped file")
-    endif()
+    # Local path where the ZIP file will be downloaded
+    set(ZIP_FILE_PATHS
+        "${CMAKE_SOURCE_DIR}/Data.zip"
+        "${CMAKE_SOURCE_DIR}/Dependencies.zip"
+        "${CMAKE_SOURCE_DIR}/External.zip"
+        "${CMAKE_SOURCE_DIR}/Docs.zip"
+    )
 
-    file(REMOVE ${ZIP_FILE_PATH})
-endforeach()
+    # Local path where ZIP file will be unarchived
+    set(DESTINATION_DIRS
+        "${CMAKE_SOURCE_DIR}/Data"
+        "${CMAKE_SOURCE_DIR}/Dependencies"
+        "${CMAKE_SOURCE_DIR}/External"
+        "${CMAKE_SOURCE_DIR}/Docs"
+    )
+
+    foreach(i RANGE 0 3)
+        list(GET ZIP_FILE_URLS ${i} ZIP_FILE_URL)
+        list(GET ZIP_FILE_PATHS ${i} ZIP_FILE_PATH)
+        list(GET DESTINATION_DIRS ${i} DESTINATION_DIR)
+
+        # Command to download the ZIP file
+        file(DOWNLOAD ${ZIP_FILE_URL} ${ZIP_FILE_PATH}
+            SHOW_PROGRESS
+            STATUS status)
+
+        list(GET status 0 status_code)
+        list(GET status 1 status_string)
+
+        if(NOT status_code EQUAL 0)
+            message(FATAL_ERROR "Error downloading file: ${status_string}")
+        endif()
+
+        message(STATUS "File downloaded and verified successfully!")
+
+        file(MAKE_DIRECTORY ${DESTINATION_DIR})
+
+        # Unzip the file
+        execute_process(
+            COMMAND ${CMAKE_COMMAND} -E tar xvf ${ZIP_FILE_PATH}
+            WORKING_DIRECTORY ${DESTINATION_DIR}
+            RESULT_VARIABLE result
+        )
+
+        if(result)
+            message(FATAL_ERROR "Failed to unzip file")
+        else()
+            message(STATUS "Successfully unzipped file")
+        endif()
+
+        file(REMOVE ${ZIP_FILE_PATH})
+    endforeach()
+else()
+    message(STATUS "No data download.")
+endif()
+
+unset(TO_DOWNLOAD_DATA CACHE)
 
 set(SOURCE_DIR_DATA "${CMAKE_SOURCE_DIR}/Data")
 set(SOURCE_DIR_DEPENDENCY "${CMAKE_SOURCE_DIR}/Dependencies")
@@ -1310,7 +1246,6 @@ endif()
 # Link with other targets.
 set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "$<$<CONFIG:Debug>:"
-    "SDL2"
     "DirectXTK"
     "DirectXTex"
     "d3d11"
@@ -1321,10 +1256,6 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "winmm"
     "zlibstatic"
     "assimp"
-    "SDL2"
-    "SDL2main"
-    "SDL2_mixer"
-    "SDL2-static"
     "Effekseerd"
     "EffekseerRendererDX11d"
     "EffekseerRendererDX12d"
@@ -1336,7 +1267,6 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "OpenAL32"
     ">"
     "$<$<CONFIG:Release>:"
-    "SDL2"
     "DirectXTK"
     "DirectXTex"
     "d3d11"
@@ -1347,10 +1277,6 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "winmm"
     "zlibstatic"
     "assimp"
-    "SDL2"
-    "SDL2main"
-    "SDL2_mixer"
-    "SDL2-static"
     "Effekseer"
     "EffekseerRendererDX11"
     "EffekseerRendererDX12"
@@ -1379,7 +1305,6 @@ target_link_directories(${PROJECT_NAME} PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/External/nlohmann/$<CONFIG>"
     "${CMAKE_CURRENT_SOURCE_DIR}/$<CONFIG>"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/assimp/lib/x64/$<CONFIG>"
-    "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/lib/x64"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/Effekseer170e/lib/vs2022/MD/x64/$<CONFIG>"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/openssl/x64/lib"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
@@ -1396,7 +1321,6 @@ target_link_directories(${PROJECT_NAME} PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtex/native/lib/x64/$<CONFIG>"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX/directxtk/native/lib/x64/$<CONFIG>"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectX"
-    "${CMAKE_CURRENT_SOURCE_DIR}/External/SDL2/lib/x64"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/OpenAL/libs/Win64/"
     ">"
 )

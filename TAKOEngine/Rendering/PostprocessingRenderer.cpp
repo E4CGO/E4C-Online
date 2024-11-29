@@ -237,8 +237,7 @@ void PostprocessingRendererDX12::Render(FrameBufferManager* framBuffer)
 			T_GRAPHICS.GetScreenWidth(), 
 			T_GRAPHICS.GetScreenHeight(),
 			0,
-			1, 1, 1, 1,
-			framBuffer->GetViewport());
+			1, 1, 1, 1);
 		
 		shader->Render(rc, renderSprite[static_cast<int>(RenderTarget::Luminance)].get());
 
@@ -261,8 +260,7 @@ void PostprocessingRendererDX12::Render(FrameBufferManager* framBuffer)
 			T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance)->GetWidth(),
 			T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance)->GetHeight(),
 			0,
-			1, 1, 1, 1,
-			framBuffer->GetViewport());
+			1, 1, 1, 1);
 		shader->Render(rc, renderSprite[static_cast<int>(RenderTarget::GaussianBlur)].get());
 
 		framBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::GaussianBlur));
@@ -285,8 +283,7 @@ void PostprocessingRendererDX12::Render(FrameBufferManager* framBuffer)
 			0, 0,
 			T_GRAPHICS.GetScreenWidth(), T_GRAPHICS.GetScreenHeight(),
 			0,
-			1, 1, 1, 1,
-			framBuffer->GetViewport());
+			1, 1, 1, 1);
 		
 		rc.finalpassnData.bloomTexture = renderSprite[static_cast<int>(RenderTarget::GaussianBlur)]->GetDescriptor();
 		rc.colorGradingData = colorGradingData;

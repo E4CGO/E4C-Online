@@ -3,7 +3,7 @@
 
 
 #include "OnlineController.h"
-
+#include <fstream>
 #include "TCPCommand/TCPToken.h"
 #include "TCPCommand/TCPLogin.h"
 #include "TCPCommand/TCPClientData.h"
@@ -53,8 +53,21 @@ namespace Online
 	*//***************************************************************************/
 	bool OnlineController::Initialize()
 	{
+		std::string server_ip = "";
+		std::ifstream file("ip.txt");
+		if (file)
+		{
+			server_ip = std::string((std::istreambuf_iterator<char>(file)),
+				std::istreambuf_iterator<char>());
+		}
+		else
+		{
+			server_ip = Online::SV_IP;
+		}
+
+
 		m_ptcpSocket = new TCPClientSocket;
-		if (!m_ptcpSocket->Connect(Online::SV_IP, Online::port))
+		if (!m_ptcpSocket->Connect(server_ip.c_str(), Online::port))
 		{
 			m_state = Online::OnlineController::STATE::OFFLINE;
 			delete m_ptcpSocket;
@@ -62,7 +75,7 @@ namespace Online
 			return false;
 		}
 		m_pudpSocket = new UDPClientSocket;
-		if (!m_pudpSocket->Connect(Online::SV_IP, Online::port))
+		if (!m_pudpSocket->Connect(server_ip.c_str(), Online::port))
 		{
 			m_state = Online::OnlineController::STATE::OFFLINE;
 			delete m_pudpSocket;
@@ -84,6 +97,7 @@ namespace Online
 	*//***************************************************************************/
 	void OnlineController::TCPRecvThread()
 	{
+		srand(static_cast <unsigned> (time(NULL)));
 		DATA_HEADER header;
 		size_t size = sizeof(DATA_HEADER);
 		while (m_ptcpSocket->IsConnecting())
@@ -188,7 +202,7 @@ namespace Online
 		m_tcpCommands[TCP_CMD::CHAT]->Send(&message);
 	}
 
-	
+
 	/**************************************************************************//**
 		@brief		マッチング開始
 		@param[in]	なし
@@ -224,7 +238,7 @@ namespace Online
 	}
 
 	/**************************************************************************//**
-	 	@brief		ダンジョンを生成する(ホスト)
+		@brief		ダンジョンを生成する(ホスト)
 		@param[in]	なし
 		@return		なし
 	*//***************************************************************************/
@@ -251,7 +265,7 @@ namespace Online
 			{
 				dungeon->SetRoomOrder(roomOrder);
 				m_pMatchingUI->GetTeleporter()->Teleport();
-			
+
 				PlayerCharacterManager::Instance().ClearOtherPlayers();
 				std::cout << "Clean PlayerCharacterManager" << std::endl;
 				EndSync();

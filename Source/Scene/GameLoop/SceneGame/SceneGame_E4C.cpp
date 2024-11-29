@@ -1,5 +1,5 @@
 //! @file SceneGame_E4C.cpp
-//! @note 
+//! @note
 
 #include "SceneGame_E4C.h"
 
@@ -8,24 +8,31 @@
 #include "Map/MapTileManager.h"
 #include "TAKOEngine/Tool/GLTFImporter.h"
 
-
 #include "Source/Scene/Stage/StageManager.h"
 
 #include "SceneGame_E4CState.h"
 #include "Scene/GameLoop/SceneGame/Stage/StageOpenWorld_E4C.h"
+#include "Scene/GameLoop/SceneGame/Stage/StageDungeon_E4C.h"
 
-#include "Scene/Stage/StageManager.h"
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "TAKOEngine/Tool/Console.h"
 
 #include "UI/Widget/WidgetCrosshair.h"
 #include "TAKOEngine/GUI/UIManager.h"
-#include "GameObject/Character/Enemy/EnemyManager.h"
+#include "Source\PlayerCharacterData.h"
 
 void SceneGame_E4C::Initialize()
 {
+	std::ifstream file_in("CharacterInfos.json");
+	nlohmann::json savedData;
+	file_in >> savedData;
+	file_in.close();
+	PLAYER_CHARACTER_DATA.SetCharacterInfos(savedData);
+	PLAYER_CHARACTER_DATA.ParseData();
+
 	stateMachine = std::make_unique<StateMachine<SceneGame_E4C>>();
 	stateMachine->RegisterState(GAME_STATE::INIT, new SceneGame_E4CState::InitState(this));
+	stateMachine->RegisterState(GAME_STATE::EXIT, new SceneGame_E4CState::ExitState(this));
 	stateMachine->SetState(GAME_STATE::INIT);
 
 	CameraManager& cameraManager = CameraManager::Instance();
@@ -33,7 +40,7 @@ void SceneGame_E4C::Initialize()
 	cameraManager.Register(mainCamera);
 	cameraManager.SetCamera(0);
 
-	Console::Instance().Open();
+	//Console::Instance().Open();
 
 	// 選択した自機
 	const PlayerCharacterData::CharacterInfo info = PlayerCharacterData::Instance().GetCurrentCharacter();
@@ -42,7 +49,6 @@ void SceneGame_E4C::Initialize()
 	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 
 	STAGES.ChangeStage(new StageOpenWorld_E4C(this));
-
 
 	m_ponlineController = new Online::OnlineController;
 	if (m_ponlineController->Initialize())
@@ -63,7 +69,6 @@ void SceneGame_E4C::Finalize()
 	CameraManager::Instance().Clear();
 	STAGES.Clear();
 	MAPTILES.Clear();
-	
 	PlayerCharacterManager::Instance().Clear();
 	UI.Clear();
 }
@@ -73,7 +78,6 @@ void SceneGame_E4C::Update(float elapsedTime)
 {
 	STAGES.Update(elapsedTime);
 	UI.Update(elapsedTime);
-	
 	stateMachine->Update(elapsedTime);
 }
 
@@ -86,10 +90,15 @@ void SceneGame_E4C::Render()
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
 	STAGES.Render();
-	
+
 	UI.Render(rc);
+
 	T_TEXT.End();
 	// デバッグレンダラ描画実行
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
+}
 
+void SceneGame_E4C::RenderDX12()
+{
+	STAGES.RenderDX12();
 }

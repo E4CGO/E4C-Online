@@ -16,13 +16,23 @@ void PlayerCharacterManager::Update(float elapsedTime)
 }
 /**************************************************************************//**
 	@brief		プレイヤーキャラクター描画処理
-	@param[in]	elapsedTime 経過時間
+	@param[in]	rc レンダーコンテキスト
 	@return		なし
 *//***************************************************************************/
 void PlayerCharacterManager::Render(const RenderContext& rc)
 {
 	std::lock_guard<std::mutex> lock(m_mut);
 	ObjectManager<PlayerCharacter>::Render(rc);
+}
+/**************************************************************************//**
+	@brief		プレイヤーキャラクター描画処理
+	@param[in]	rc レンダーコンテキスト
+	@return		なし
+*//***************************************************************************/
+void PlayerCharacterManager::RenderDX12(const RenderContextDX12& rc)
+{
+	std::lock_guard<std::mutex> lock(m_mut);
+	ObjectManager<PlayerCharacter>::RenderDX12(rc);
 }
 
 /**************************************************************************//**

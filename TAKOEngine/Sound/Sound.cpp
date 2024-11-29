@@ -53,6 +53,7 @@ void Sound::LoadAudio(const char* filepath)
 void Sound::PlayAudio(int number) {
 	alSourcei(m_Sources[number], AL_BUFFER, m_Buffers[number]);
 
+	alSourcef(m_Sources[number], AL_GAIN, 0.4f);
 	alSourcePlay(m_Sources[number]);
 }
 

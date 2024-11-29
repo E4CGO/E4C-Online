@@ -31,32 +31,6 @@ void FrustumCulling::FrustumCullingFlag(const std::vector<iModel::Mesh>& meshes,
 }
 
 //*********************************************************************
-// @brief      視錐台カリングを行う関数
-// @param[in]  camera          カメラ情報
-// @param[in]  meshes          メッシュデータのリスト
-// @param[in]  visibleObjects  メッシュが視錐台内にあるかどうかのフラグを格納するブール値のリスト
-// @return     なし
-//*********************************************************************
-void FrustumCulling::FrustumCullingFlag(const Camera* camera, const std::vector<ModelDX12::Mesh>& meshes, std::vector<bool>& visibleObjects)
-{
-    // カメラのビュー行列と射影行列を取得
-    DirectX::XMFLOAT4X4 viewMatrix = camera->GetView();
-    DirectX::XMFLOAT4X4 projectionMatrix = camera->GetProjection();
-
-    // カメラの視錐台（フラスタム）を計算
-    Frustum frustum;
-    CalculateFrustumFromViewProjection(frustum, viewMatrix, projectionMatrix);
-
-    // 各メッシュに対してフラスタム内に収まるか判定してフラグをセット
-    for (size_t i = 0; i < meshes.size(); ++i)
-    {
-        const ModelDX12::Mesh& mesh = meshes[i];
-        DirectX::BoundingBox meshBounds = mesh.worldBounds;
-        visibleObjects[i] = IsObjectInFrustum(frustum, meshBounds);
-    }
-}
-
-//*********************************************************************
 // @brief      フラスタムを計算する関数
 // @param[in]  frustum           結果として計算される視錐台（フラスタム）情報を格納するためのオブジェクト
 // @param[in]  viewMatrix        ビュー行列

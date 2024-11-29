@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <array>
+#include <unordered_set>
 
 #include "GameObject/ModelObject.h"
 #include "GameObject/GameObject.h"
@@ -35,12 +36,11 @@ public:
 	// 部屋の生成順番のセッター・ゲッター
 	void SetRoomOrder(const std::vector<uint8_t>& newRoomOrder) { m_roomOrder = newRoomOrder; }
 	std::vector<uint8_t> GetRoomOrder() { return m_roomOrder; }
-	
+
 	// 生成順番配列がない場合は自動生成、
 	// ある場合は配列に従い生成を行う
 	void GenerateDungeon();
 
-	
 	enum PHASE
 	{
 		NORMAL,
@@ -48,7 +48,6 @@ public:
 
 	enum STATE
 	{
-
 	};
 
 	void Initialize() override;
@@ -58,6 +57,8 @@ public:
 	void Update(float elapsedTime) override;
 
 	void Render() override;
+
+	void RenderDX12() override;
 protected:
 	void OnPhase() override;
 protected:
@@ -71,17 +72,25 @@ protected:
 
 	bool isLeader = true;
 
-	std::unique_ptr<ModelObject> testModel;
-
-	std::unique_ptr <Plane> plane;
 	std::unique_ptr <Plane> portal;
 
-	std::unique_ptr<ModelObject> Locator;
-	Microsoft::WRL::ComPtr<ID3D11Buffer> constant_buffers[8];
+	// Sprite Preload
+	std::unordered_set<const char*> spriteList = {
+		"",											// マスク
+		// Setting UI
+		"Data/Sprites/UI/start.png",
+		"Data/Sprites/big_background.t.png"
+	};
+
+	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
 
 	float transitionTime = 0.0f;
 	float transitionDuration = 2.f;  // 5秒かけて移動
 	int currentSegment = 0;
 
-	
+	// フレームバッファマネージャー
+	FrameBufferManager* m_frameBuffer;
+
+	// ポストエフェクト
+	std::unique_ptr<PostprocessingRendererDX12>	postprocessingRenderer = std::make_unique<PostprocessingRendererDX12>();
 };

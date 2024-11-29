@@ -5,10 +5,7 @@
 #include "TAKOEngine/GUI/UIManager.h"
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 
-#include "GameObject/Character/Player/PlayerManager.h"
-
 #include "Scene/SceneManager.h"
-#include "Scene/SceneTitle.h"
 
 // 初期化ステート
 void SceneGame_E4CState::InitState::Enter()
@@ -51,5 +48,17 @@ void SceneGame_E4CState::MatchingState::Execute(float elapsedTime)
 {
 }
 void SceneGame_E4CState::MatchingState::Exit()
+{
+}
+
+// ゲームステート
+void SceneGame_E4CState::ExitState::Enter()
+{
+	PostMessage(TentacleLib::hWnd, WM_QUIT, 0, 0);
+}
+void SceneGame_E4CState::ExitState::Execute(float elapsedTime)
+{
+}
+void SceneGame_E4CState::ExitState::Exit()
 {
 }

@@ -22,18 +22,23 @@ public:
 	// 描画処理
 	void Render() override;
 
+	void RenderDX12() override;
+
 	StateMachine<SceneGame_E4C>* GetStateMachine() { return stateMachine.get(); }
-	
+
 	Online::OnlineController* GetOnlineController() { return m_ponlineController; };
-private:
 
 	enum GAME_STATE
 	{
 		INIT,
 		GAME,
 		LOADING,
-		MATCHING
+		MATCHING,
+		EXIT
 	};
+
+private:
+
 	std::unique_ptr<StateMachine<SceneGame_E4C>> stateMachine;
 
 	int stageNumber = 0;
