@@ -30,6 +30,7 @@ public:
     virtual void Update(float elapsedTime) override;
     //描画実行
     virtual void Render(const RenderContext& rc)override;
+    virtual void RenderDX12(const RenderContextDX12& rc)override;
     //テリトリー設置
     void SetTerritory(const DirectX::XMFLOAT3& origin, float range);
     //エネミースポーン

@@ -1,8 +1,6 @@
 ﻿#include "Spawner.h"
-#include "GameObject/Character/Player/PlayerManager.h"
 #include "Scene/Stage/StageManager.h"
 #include "TAKOEngine/Tool/Mathf.h"
-#include "Source/Scene/Stage/TestingStage.h"
 #include <GameObject/Character/Enemy/EnemyManager.h>
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 /**************************************************************************//**
@@ -97,12 +95,6 @@ void Spawner::SpawnEnemy(float elapsedTime)
 
 			SkeletonMinion* enemy = new SkeletonMinion();
 			enemy->SetPosition({ spawnPos.x + offsetX, spawnPos.y, spawnPos.z + offsetZ });
-
-			if (T_INPUT.KeyPress(VK_SHIFT))
-			{
-				//enemy->GetHp() - 100;
-			}
-			
 			ENEMIES.Register(enemy);
 
 			spawnedEnemyCount++; // 生成した敵の数をカウント
@@ -149,6 +141,13 @@ int Spawner::CountEnemiesInRange()
 void Spawner::Render(const RenderContext& rc)
 {
 	
+	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, territoryRange, 1.5f, { 1,0,0,1 });
+	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, serchRange, 1.5f, { 1,0,1,1 });
+}
+
+void Spawner::RenderDX12(const RenderContextDX12& rc)
+{
+
 	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, territoryRange, 1.5f, { 1,0,0,1 });
 	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, serchRange, 1.5f, { 1,0,1,1 });
 }

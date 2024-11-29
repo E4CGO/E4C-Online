@@ -1,10 +1,7 @@
 #include "TAKOEngine/Tool/Mathf.h"
-
-#include "GameObject/Character/Player/PlayerManager.h"
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Character/Enemy/Enemy.h"
-#include "GameObject/Character/Enemy/Chest.h"
 #include "GameObject/Character/Enemy/SkeletonMinion.h"
 
 
@@ -167,19 +164,6 @@ Enemy* Enemy::EnemyFactory(int enemyType)
 {
 	switch (enemyType)
 	{
-	case ENEMY_TYPE::CHEST_COIN: return new VictoryChest; break;
-	case ENEMY_TYPE::CHEST_EMPTY: return new EmptyChest; break;
-	case ENEMY_TYPE::CHEST_EMPTY_SKELETON_MINION:
-	{
-		EmptyChest* enemy = new EmptyChest;
-		enemy->SetOnOpen([chest = enemy](Enemy*) mutable {
-			Enemy* sketelon = ENEMIES.Register(new SkeletonMinion);
-			sketelon->SetPosition(chest->GetPosition());
-			sketelon->SetAngle(chest->GetAngle());
-			});
-		return enemy;
-		break;
-	}
 	case ENEMY_TYPE::SKELETON_MINION: return new SkeletonMinion; break;
 	case ENEMY_TYPE::SKELETON_MINION_BOSS: return new SkeletonMinionBoss; break;
 	}

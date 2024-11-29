@@ -8,6 +8,7 @@
 #include "GameObject/GameObject.h"
 #include "GameObject/Character/Player/PlayerCharacter.h"
 #include "GameObject/Props/Teleporter.h"
+#include "GameObject/Props/Spawner.h"
 #include "TAKOEngine/Rendering/Shaders/PlaneShader.h"
 
 #include "Scene/Scene.h"
@@ -50,6 +51,8 @@ private:
 
 	std::unique_ptr <Teleporter> teleporter;
 
+	std::unique_ptr<Spawner>spawner;
+	
 	std::unique_ptr<ModelObject> map;
 	std::unique_ptr<ModelObject> tower;
 
