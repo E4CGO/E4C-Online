@@ -12,7 +12,6 @@
 #include "TAKOEngine/Rendering/Model/ModelResource.h"
 #include "TAKOEngine/Rendering/GpuResourceUtils.h"
 #include "TAKOEngine/Rendering/FrustumCulling.h"
-#include "TAKOEngine/Rendering/PipelineState.h"
 
 //******************************************************************
 //  @class  ModelShaderDX12

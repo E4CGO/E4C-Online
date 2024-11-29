@@ -13,6 +13,9 @@ ModelDX12::ModelDX12(ID3D12Device* device, const char* filename, float scaling, 
 	// リソース読み込み
 	m_resource = ResourceManager::Instance().LoadModelDX12Resource(filename);
 
+	// モデルの名前設定
+	extractBaseName(filename);
+
 	// ノード
 	{
 		const std::vector<ModelResource::Node>& res_nodes = m_resource->GetNodes();

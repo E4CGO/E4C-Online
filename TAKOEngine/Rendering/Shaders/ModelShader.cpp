@@ -190,7 +190,7 @@ void ModelShader::Draw(const RenderContext& rc, const iModel* model, DirectX::XM
 	if (visibleObjects.size() == 0) return;
 
 	// 視錐台カリングを実行して可視オブジェクトをマーク
-	FrustumCulling::FrustumCullingFlag(CameraManager::Instance().GetCamera(), model->GetMeshes(), visibleObjects);
+	FrustumCulling::FrustumCullingFlag(model->GetMeshes(), visibleObjects);
 	int culling = 0;
 
 	for (const ModelResource::Mesh& mesh : resource->GetMeshes())

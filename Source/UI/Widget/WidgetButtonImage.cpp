@@ -20,14 +20,14 @@ WidgetButtonImage::WidgetButtonImage(const char* text, const char* image, const 
 	{
 		m_btnImage = RESOURCE.LoadSpriteResource(image);
 		m_hoverBtnImage = RESOURCE.LoadSpriteResource(hoverImage);
+		m_size = m_btnImage->GetTextureSize();
 	}
 	else
 	{
 		m_btnImageDX12 = RESOURCE.LoadSpriteResourceDX12(image);
 		m_hoverBtnImageDX12 = RESOURCE.LoadSpriteResourceDX12(hoverImage);
+		m_size = { static_cast<float>(m_btnImageDX12->GetTextureWidth()), static_cast<float>(m_btnImageDX12->GetTextureHeight()) };
 	}
-
-	m_size = m_btnImage->GetTextureSize();
 
 	this->m_text = std::make_unique<WidgetText>(text);
 	this->m_text->SetAlign(FONT_ALIGN::CENTER);

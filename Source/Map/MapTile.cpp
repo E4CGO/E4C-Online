@@ -40,15 +40,15 @@ void MapTile::Update(float elapsedTime)
 {
 	for (auto& model : m_pmodels)
 	{
-		if (model.model == nullptr) continue;
+		if (model == nullptr) continue;
 
 		// 行列更新
 		UpdateTransform();
 
 		// アニメーション更新
-		model.model->UpdateAnimation(elapsedTime * m_animationSpeed);
+		model->UpdateAnimation(elapsedTime * m_animationSpeed);
 
 		// トランスフォーム更新
-		model.model->UpdateTransform(transform);
+		model->UpdateTransform(transform);
 	}
 }
