@@ -14,7 +14,7 @@
 	@param[in]	scaling		モデルスケール
 	@param[in]	renderMode	レンダーボード
 *//***************************************************************************/
-ModelObject::ModelObject(const char* filename, float scaling, ModelObject::RENDER_MODE renderMode, int modelType)
+ModelObject::ModelObject(const char* filename, float scaling, ModelObject::RENDER_MODE renderMode, ModelObject::MODEL_TYPE modelType)
 {
 	LoadModel(filename, scaling, renderMode, modelType);
 }
@@ -27,20 +27,32 @@ ModelObject::ModelObject(const char* filename, float scaling, ModelObject::RENDE
 	@param[in]	modelType	モデル作り方分け
 	return		なし
 *//***************************************************************************/
-void ModelObject::LoadModel(const char* filename, float scaling, ModelObject::RENDER_MODE renderMode, int modelType)
+void ModelObject::LoadModel(const char* filename, float scaling, ModelObject::RENDER_MODE renderMode, ModelObject::MODEL_TYPE modelType)
 {
 	if (strlen(filename) == 0) return;
 
 	m_renderMode = renderMode;
 
-	if (modelType == 0)
+
+	switch (modelType)
 	{
-		m_dx12_ShaderId = ModelShaderDX12Id::Lambert;
+	case ModelObject::RHS_PBR:
+		m_shaderId = ModelShaderId::Lambert;
+		break;
+	case ModelObject::RHS_TOON:
 		m_shaderId = ModelShaderId::Toon;
-	}
-	else
-	{
 		m_dx12_ShaderId = ModelShaderDX12Id::Toon;
+		break;
+	case ModelObject::LHS_PBR:
+		m_shaderId = ModelShaderId::Phong;
+		m_dx12_ShaderId = ModelShaderDX12Id::Lambert;
+		break;
+	case ModelObject::LHS_TOON:
+		m_shaderId = ModelShaderId::Toon;
+		m_dx12_ShaderId = ModelShaderDX12Id::Toon;
+		break;
+	default:
+		break;
 	}
 
 	switch (m_renderMode)

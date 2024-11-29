@@ -240,7 +240,7 @@ void ModelDX12::UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform)
 	{
 		DirectX::XMMATRIX C{ DirectX::XMLoadFloat4x4(&coordinate_system_transforms[1]) * DirectX::XMMatrixScaling(scaling, scaling, scaling) };
 		// ローカル行列算出
-		if (modelType == 0)
+		if (modelType == 0 || modelType == 2)
 		{
 			C = { DirectX::XMLoadFloat4x4(&coordinate_system_transforms[0]) * DirectX::XMMatrixScaling(scaling, scaling, scaling) };
 		}

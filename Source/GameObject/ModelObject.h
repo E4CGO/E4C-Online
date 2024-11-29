@@ -17,6 +17,7 @@
 class ModelObject : public GameObject
 {
 public:
+	// TODO: iModelに移動
 	enum RENDER_MODE
 	{
 		DX11 = 0,
@@ -25,17 +26,25 @@ public:
 		DX12GLTF,
 		NOMODEL,
 	};
+	// TODO: iModelに移動
+	enum MODEL_TYPE
+	{
+		RHS_PBR,
+		RHS_TOON,
+		LHS_PBR,
+		LHS_TOON,
+	};
 
 	RENDER_MODE m_renderMode = DX11;
 
 	// コンストラクタ
 	ModelObject(void) {};
 	// コンストラクタ（引数付き）
-	ModelObject(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::DX11, int modelType = 1);
+	ModelObject(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::DX11, ModelObject::MODEL_TYPE modelType = ModelObject::MODEL_TYPE::LHS_TOON);
 	virtual ~ModelObject() = default;
 
 	// モデルを読み取り
-	void LoadModel(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX12, int modelType = 1);
+	void LoadModel(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE modelType = ModelObject::MODEL_TYPE::LHS_TOON);
 
 	void CleanModels();
 

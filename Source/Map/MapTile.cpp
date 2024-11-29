@@ -1,7 +1,7 @@
 ﻿#include "MapTile.h"
 
 MapTile::MapTile(const char* filename, float scaling, RoomBase* parent) :
-	ModelObject(filename, scaling, ModelObject::RENDER_MODE::DX11, 0)
+	ModelObject(filename, scaling, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_TOON)
 {
 	this->parent = parent;
 
