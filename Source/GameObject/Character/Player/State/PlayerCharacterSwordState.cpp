@@ -34,7 +34,7 @@ namespace PlayerCharacterState
 		//  一般攻撃1
 		void AttackNormalState_1::Enter()
 		{
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ATTACK_SIMPLE, false, 0.05f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ATTACK_SIMPLE_FIRST, false, 0.05f);
 		}
 		void AttackNormalState_1::Execute(float elapsedTime)
 		{
@@ -57,7 +57,7 @@ namespace PlayerCharacterState
 		//  一般攻撃2
 		void AttackNormalState_2::Enter()
 		{
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ATTACK_SIMPLE, false, 0.05f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ATTACK_SIMPLE_SECOND, false, 0.05f);
 		}
 		void AttackNormalState_2::Execute(float elapsedTime)
 		{
@@ -81,7 +81,7 @@ namespace PlayerCharacterState
 		void AttackNormalState_3::Enter()
 		{
 			owner->SetAnimationSpeed(1.2f);
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ATTACK_SIMPLE, false, 0.05f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ATTACK_SIMPLE_THIRD, false, 0.05f);
 		}
 		void AttackNormalState_3::Execute(float elapsedTime)
 		{

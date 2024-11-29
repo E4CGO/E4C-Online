@@ -66,9 +66,17 @@ private:
 	// フレームバッファマネージャー
 	FrameBufferManager* m_frameBuffer;
 
+	// ポストエフェクト
+	std::unique_ptr<PostprocessingRendererDX12>	postprocessingRenderer = std::make_unique<PostprocessingRendererDX12>();
+
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {
 		"",											// マスク
+		"Data/Sprites/UI/start.png",
+		"Data/Sprites/UI/back.png",
+		"Data/Sprites/UI/keybinds/key_Left.png",
+		"Data/Sprites/UI/keybinds/key_Right.png",
+		"Data/Sprites/big_background.t.png"
 		// Setting UI
 	};
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;

@@ -1,5 +1,5 @@
 //! @file PlayerCharacter.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDED_PLAYER_CHARACTER_H__
 #define __INCLUDED_PLAYER_CHARACTER_H__
@@ -45,7 +45,6 @@ public:
 	// デストラクタ
 	~PlayerCharacter();
 
-
 #pragma pack(push, 1)
 	// 同期用
 	struct SYNC_DATA
@@ -60,14 +59,22 @@ public:
 	};
 #pragma pack(pop)
 
-
 	// KayKit Adventurers
 	enum Animation
 	{
 		ANIM_IDLE,
 		ANIM_MOVE_START,
-		ANIM_MOVE,
-		ANIM_ATTACK_SIMPLE,
+		ANIM_MOVE_CONTINUE,
+		ANIM_ATTACK_SIMPLE_FIRST,
+		ANIM_ATTACK_SIMPLE_SECOND,
+		ANIM_ATTACK_SIMPLE_THIRD,
+		ANIM_ATTACK_SPECIAL_FIRST,
+		ANIM_ATTACK_SPECIAL_SECOND,
+		ANIM_GUARD_START,
+		ANIM_GUARD_CONTINUE,
+		ANIM_GUARD_FINISH,
+		ANIM_HURT,
+		ANIM_DEATH
 	};
 
 	enum STATE : uint8_t
@@ -103,6 +110,7 @@ public:
 	virtual void Update(float elapsedTime) override;
 	// 描画処理
 	void Render(const RenderContext& rc) override;
+	void RenderDX12(const RenderContextDX12& rc) override;
 
 	// 外見パターンを読み取る
 	void LoadAppearance(const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
@@ -187,7 +195,6 @@ public:
 	Collider* GetAttackCollider(int idx) { return m_pattackColliders[idx]; }
 	std::unordered_map<int, Collider*> GetAttackColliders() { return m_pattackColliders; }
 	void EnableAttackColliders(bool enable = true) { for (const std::pair<int, Collider*>& collider : m_pattackColliders) collider.second->SetEnable(enable); }
-
 
 	// 同期用データを取得
 	void GetSyncData(SYNC_DATA& data);

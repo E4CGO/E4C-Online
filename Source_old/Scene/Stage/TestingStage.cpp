@@ -71,6 +71,10 @@ void TestingStage::Render()
 {
 }
 
+void TestingStage::RenderDX12()
+{
+}
+
 void TestingStage::OnPhase()
 {
 	if (phase == PHASE::BOSS) // ボス出現時・現存敵を削除

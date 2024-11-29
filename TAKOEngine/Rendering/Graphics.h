@@ -136,7 +136,7 @@ public:
 	}
 
 	bool isDX12Active = false;
-	bool isDX11Active = true;
+	bool isDX11Active = false;
 
 	struct CommandQueue
 	{
@@ -217,6 +217,12 @@ public:
 		const  DirectX::XMMATRIX& View,
 		const  DirectX::XMMATRIX& Projection,
 		const DirectX::XMMATRIX World);
+	DirectX::XMFLOAT3 GetScreenPosition(
+		const DirectX::XMFLOAT3 worldPosition,
+		const D3D12_VIEWPORT& viewport,
+		const  DirectX::XMMATRIX& View,
+		const  DirectX::XMMATRIX& Projection,
+		const DirectX::XMMATRIX World);
 	DirectX::XMFLOAT3 GetScreenPosition(const DirectX::XMFLOAT3 worldPosition);
 
 	void WaitIdle();
@@ -270,6 +276,9 @@ public:
 	{
 		return m_viewport;
 	}
+
+	void SetDX12Render(bool isRender) { isDX12Active = isRender; }
+	void SetDX11Render(bool isRender) { isDX11Active = isRender; }
 
 private:
 	// イメージコピー

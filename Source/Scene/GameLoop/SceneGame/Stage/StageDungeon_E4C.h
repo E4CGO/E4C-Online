@@ -57,6 +57,8 @@ public:
 	void Update(float elapsedTime) override;
 
 	void Render() override;
+
+	void RenderDX12() override;
 protected:
 	void OnPhase() override;
 protected:
@@ -85,4 +87,10 @@ protected:
 	float transitionTime = 0.0f;
 	float transitionDuration = 2.f;  // 5秒かけて移動
 	int currentSegment = 0;
+
+	// フレームバッファマネージャー
+	FrameBufferManager* m_frameBuffer;
+
+	// ポストエフェクト
+	std::unique_ptr<PostprocessingRendererDX12>	postprocessingRenderer = std::make_unique<PostprocessingRendererDX12>();
 };

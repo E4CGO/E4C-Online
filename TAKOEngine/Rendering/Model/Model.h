@@ -5,7 +5,9 @@
 #include <DirectXMath.h>
 #include <wrl.h>
 #include <d3d11.h>
+#include <d3d12.h>
 
+#include "TAKOEngine/Rendering/Constant.h"
 #include "ModelResource.h"
 
 class iModel
@@ -34,18 +36,43 @@ public:
 		bool visible = true;
 	};
 
-	struct FrameResource
+	struct Bone
 	{
-		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cbv_resource;
-		Descriptor* cbv_descriptor = nullptr;
-		DirectX::XMFLOAT4X4* cbv_data = nullptr;
+		DirectX::XMFLOAT4X4	offset_transform;
+		Node* node = nullptr;
 	};
 
 	struct Mesh
 	{
+		struct Constants
+		{
+			DirectX::XMFLOAT4X4	world_transform;
+			DirectX::XMFLOAT4X4	bone_transforms[255];
+
+			// インスタンシング用データ
+			DirectX::XMFLOAT4X4 transform[InstancingMax] = {};  //姿勢行列
+		};
+
+		struct FrameResource
+		{
+			Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_vbv_uav_resource;
+			D3D12_VERTEX_BUFFER_VIEW				d3d_vbv;
+			const Descriptor* uav_descriptor = nullptr;
+
+			Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cbv_resource;
+			const Descriptor* cbv_descriptor = nullptr;
+			Constants* cbv_data = nullptr;
+
+			int instancingCount = 0;	  //インスタンシング描画数
+		};
+		std::vector<FrameResource> frame_resources;
+
 		const ModelResource::Mesh* mesh = nullptr;
 		DirectX::BoundingBox	   worldBounds;
-		std::vector<FrameResource> frame_resources;
+
+		std::vector<Bone>	bones;
+		Node* node = nullptr;
+		UINT  vertex_count;
 	};
 
 	//
@@ -72,10 +99,11 @@ public:
 	//
 
 	// ノードデータ取得
-	const std::vector<Node>& GetNodes() const { return nodes; }
+	virtual const std::vector<Node>& GetNodes() const = 0;
 
 	// メッシュ取得
-	const std::vector<Mesh>& GetMeshes() const { return m_meshes; }
+	virtual const std::vector<Mesh>& GetMeshes() const = 0;
+	std::vector<Mesh>& GetMeshes() { return m_meshes; }
 
 	const DirectX::XMFLOAT4X4 GetWorldMatrix() const { return m_WorldMatrix; }
 	DirectX::XMFLOAT4X4 SetWorldMatrix(const DirectX::XMFLOAT4X4 world) { this->m_WorldMatrix = world; }
@@ -84,13 +112,13 @@ public:
 	virtual void UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform) = 0;
 
 	// ルートノード取得
-	Node* GetRootNode() { return nodes.data(); }
+	virtual Node* GetRootNode() = 0;
 
 	// ノード検索
 	virtual Node* FindNode(const char* name) = 0;
 
 	// リソース取得
-	const ModelResource* GetResource() const { return resource.get(); }
+	virtual const ModelResource* GetResource() const = 0;
 
 	// アニメーション再生
 	virtual void PlayAnimation(int index, bool loop, float blendSeconds = 0.2f) = 0;
@@ -101,30 +129,65 @@ public:
 	// アニメーション更新処理
 	virtual void UpdateAnimation(float elapsedTime) = 0;
 
-	// アニメーション取得
-	int GetAnimationId() { return currentAnimationIndex; }
-
 	virtual void CopyAnimations(iModel* model) = 0;
 	virtual void CopyNodes(iModel* model) = 0;
 
-	int GetCurrentAnimationIndex() const { return  currentAnimationIndex; }
+	// アニメーション取得
+	virtual int GetCurrentAnimationIndex() const = 0;
 
 	// 現在のアニメーション再生時間取得
-	float GetCurrentAnimationSeconds() const { return  currentAnimationSeconds; }
-	float GetAnimationRate() const { return currentAnimationSeconds / resource->GetAnimations().at(currentAnimationIndex).secondsLength; }
-	void SetAnimationRate(float rate) { currentAnimationSeconds = resource->GetAnimations().at(currentAnimationIndex).secondsLength * rate; }
+	virtual float GetCurrentAnimationSeconds() const = 0;
+
+	virtual float GetAnimationRate() const = 0;
+
+	virtual void SetAnimationRate(float rate) = 0;
+
+	// モデルの名前取得
+	std::string GetModelName() { return name; }
+
+	// モデルの名前抜き取り
+	void extractBaseName(const char* filePath)
+	{
+		// ファイルパスが nullptr の場合は空文字列を代入
+		if (!filePath)
+		{
+			name = "";
+			return;
+		}
+
+		// 最後のスラッシュ（UNIX 系）を探す
+		const char* lastSlashUnix = strrchr(filePath, '/');
+		// 最後のバックスラッシュ（Windows 系）を探す
+		const char* lastSlashWindows = strrchr(filePath, '\\');
+
+		// スラッシュのどちらか最後に現れる方を選ぶ
+		const char* lastSlash = nullptr;
+		if (lastSlashUnix && lastSlashWindows)
+		{
+			lastSlash = (lastSlashUnix > lastSlashWindows) ? lastSlashUnix : lastSlashWindows;
+		}
+		else if (lastSlashUnix)
+		{
+			lastSlash = lastSlashUnix;
+		}
+		else if (lastSlashWindows)
+		{
+			lastSlash = lastSlashWindows;
+		}
+
+		// ファイル名部分を取得（スラッシュがない場合はそのまま全体）
+		const char* fileName = (lastSlash != nullptr) ? lastSlash + 1 : filePath;
+
+		// 最後のドットを見つける（拡張子の開始位置）
+		const char* dot = strrchr(fileName, '.');
+		size_t length = (dot != nullptr) ? static_cast<size_t>(dot - fileName) : strlen(fileName);
+
+		// ファイル名部分を std::string にして代入
+		name = std::string(fileName, length);
+	};
 
 	void SetLinearGamma(float g) { linearGamma = g; }
 	float GetLinearGamma() const { return linearGamma; }
-
-	const std::vector<Node>& GetNodesDX12() const { return m_nodes; }
-	std::vector<Node>& GetNodesDX12() { return m_nodes; }
-
-	// メッシュリスト取得
-	std::vector<Mesh>& GetMeshes() { return m_meshes; }
-
-	// リソース取得
-	const ModelResource* GetResourceDX12() const { return m_resource.get(); }
 
 	//デバッグ情報
 	virtual void DrawDebugGUI() = 0;
@@ -156,8 +219,6 @@ protected:
 	};
 	std::vector<NodeCache> nodeCaches;
 
-	DirectX::XMFLOAT4X4 m_WorldMatrix;
-
 	float currentAnimationBlendSeconds = 0.0f;
 	float animationBlendSecondsLength = -1.0f;
 	bool animationBlending = false;
@@ -166,12 +227,21 @@ protected:
 
 	float linearGamma = 1.0f;
 
+	DirectX::XMFLOAT4X4 m_WorldMatrix;
+
+	// DX12
 	std::shared_ptr<ModelResource>			m_resource;
 	std::vector<Node>						m_nodes;
 	std::vector<Mesh>						m_meshes;
+	DirectX::BoundingBox	                m_bounds;
 
-	int								m_current_animation = -1;
-	float							m_current_seconds = 0.0f;
-	bool							m_loop_animation = false;
-	bool							m_end_animation = false;
+	int	  m_current_animation_Index = -1;
+	float m_current_seconds = 0.0f;
+	bool  m_playing_animation = false;
+	bool  m_loop_animation = false;
+
+	float m_animationBlendSecondsLength = -1.0f;
+	float m_currentAnimationBlendSeconds = 0.0f;
+	bool  m_animationBlending = false;
+	std::string name = ""; // モデルの名前
 };

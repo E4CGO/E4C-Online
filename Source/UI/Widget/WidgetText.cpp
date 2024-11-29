@@ -32,6 +32,11 @@ void WidgetText::Render(const RenderContext& rc)
 	);
 }
 
+/**************************************************************************//**
+	@brief		描画処理
+	@param[in]	rc	レンダーコンテンツ参照
+*//***************************************************************************/
 void WidgetText::RenderDX12(const RenderContextDX12& rc)
 {
+	if (!m_enable) return;
 }
