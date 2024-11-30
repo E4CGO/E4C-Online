@@ -106,7 +106,7 @@ void ModelObject::SetShader(const char* modelName, const ModelShaderDX12Id id, c
 	for (const ModelResource::Material& material : resource->GetMaterials())
 	{
 		ModelResource::Material& mat = const_cast<ModelResource::Material&>(material);
-		
+
 		// マテリアル名が指定されていない場合、または一致する場合にシェーダーを設定
 		if (materialNames.empty() || std::find(materialNames.begin(), materialNames.end(), mat.name) != materialNames.end())
 		{
@@ -265,9 +265,6 @@ void ModelObject::RenderDX12(const RenderContextDX12& rc)
 	for (auto& model : m_pmodels)
 	{
 		if (model == nullptr) return;
-		
-		// スキニング
-		m_skinning_pipeline->Compute(rc, model.get());
 
 		// カメラに写っている範囲のオブジェクトをフラグでマークする配列を用意
 		std::vector<bool> visibleObjects(model->GetMeshes().size(), false);
@@ -276,6 +273,9 @@ void ModelObject::RenderDX12(const RenderContextDX12& rc)
 		// 視錐台カリングを実行して可視オブジェクトをマーク
 		FrustumCulling::FrustumCullingFlag(model->GetMeshes(), visibleObjects);
 		int culling = 0;
+
+		// スキニング
+		m_skinning_pipeline->Compute(rc, model.get());
 
 		// モデル描画
 		ModelShaderDX12Id shaderId = static_cast<ModelShaderDX12Id>(0xFFFFFFFF);

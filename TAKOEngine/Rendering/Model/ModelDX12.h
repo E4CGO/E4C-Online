@@ -47,14 +47,12 @@ public:
 	void CopyAnimations(iModel* model) override;
 
 	// アニメーション取得
-	int GetCurrentAnimationIndex() const override { return m_current_animation_Index; }
+	int GetCurrentAnimationIndex() const override { return currentAnimationIndex; }
 
 	// 現在のアニメーション再生時間取得
-	float GetCurrentAnimationSeconds() const override { return m_currentAnimationBlendSeconds; }
-
-	float GetAnimationRate() const override { return m_currentAnimationBlendSeconds / m_resource->GetAnimations().at(m_current_animation_Index).secondsLength;}
-
-	void SetAnimationRate(float rate) override { m_currentAnimationBlendSeconds = m_resource->GetAnimations().at(m_current_animation_Index).secondsLength * rate; }
+	float GetCurrentAnimationSeconds() const override { return  currentAnimationSeconds; }
+	float GetAnimationRate() const override { return currentAnimationSeconds / m_resource->GetAnimations().at(currentAnimationIndex).secondsLength; }
+	void SetAnimationRate(float rate) override { currentAnimationSeconds = m_resource->GetAnimations().at(currentAnimationIndex).secondsLength * rate; }
 
 	//-------------------------------------------------------------------------------------
 	// バウンディングボックス計算

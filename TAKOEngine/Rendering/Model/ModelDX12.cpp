@@ -183,15 +183,6 @@ ModelDX12::ModelDX12(ID3D12Device* device, const char* filename, float scaling, 
 			}
 		}
 	}
-
-	DirectX::XMFLOAT4X4 transform = 
-	{
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1
-	};
-	UpdateTransform(transform);
 }
 
 ModelDX12::~ModelDX12()
@@ -222,69 +213,52 @@ ModelDX12::~ModelDX12()
 // 変換行列計算
 void ModelDX12::UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform)
 {
-	const DirectX::XMFLOAT4X4 coordinate_system_transforms[]
-	{
-		{-1, 0, 0, 0,
-		  0, 1, 0, 0,
-		  0, 0, 1, 0,
-		  0, 0, 0, 1}, // 0:RHS Y-UP
+	DirectX::XMMATRIX ParentWorldTransform = DirectX::XMLoadFloat4x4(&worldTransform);
 
-		{ 1, 0, 0, 0,
-		  0, 1, 0, 0,
-		  0, 0, 1, 0,
-		  0, 0, 0, 1}, // 1:LHS Y-UP
-
-		{-1, 0, 0, 0,
-		  0, 0,-1, 0,
-		  0, 1, 0, 0,
-		  0, 0, 0, 1}, // 2:RHS Z-UP
-
-		{ 1, 0, 0, 0,
-		  0, 0, 1, 0,
-		  0, 1, 0, 0,
-		  0, 0, 0, 1}, //3:LHS Z - UP
-	};
+	// 右手座標系から左手座標系へ変換する行列
+	DirectX::XMMATRIX CoordinateSystemTransform = DirectX::XMMatrixScaling(-scaling, scaling, scaling);
 
 	for (Node& node : m_nodes)
 	{
-		DirectX::XMMATRIX C{ DirectX::XMLoadFloat4x4(&coordinate_system_transforms[1]) * DirectX::XMMatrixScaling(scaling, scaling, scaling) };
+		if (!node.visible) node.scale = {};
+
 		// ローカル行列算出
-		if (modelType == 0 || modelType == 2)
-		{
-			C = { DirectX::XMLoadFloat4x4(&coordinate_system_transforms[0]) * DirectX::XMMatrixScaling(scaling, scaling, scaling) };
-		}
-
 		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(node.scale.x, node.scale.y, node.scale.z);
-		DirectX::XMMATRIX R = DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&node.rotation));
+		DirectX::XMMATRIX R = DirectX::XMMatrixRotationQuaternion(DirectX::XMVectorSet(node.rotation.x, node.rotation.y, node.rotation.z, node.rotation.w));
 		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(node.position.x, node.position.y, node.position.z);
-		DirectX::XMMATRIX LocalTransform = C * S * R * T;
-		DirectX::XMStoreFloat4x4(&node.localTransform, LocalTransform);
+		DirectX::XMMATRIX LocalTransform = S * R * T;
 
-		// ワールド行列算出
+		// グローバル行列算出
+		DirectX::XMMATRIX ParentGlobalTransform;
 		if (node.parent != nullptr)
 		{
-			DirectX::XMMATRIX ParentTransform = DirectX::XMLoadFloat4x4(&node.parent->globalTransform);
-			DirectX::XMMATRIX GlobalTransform = LocalTransform * ParentTransform;
-			DirectX::XMStoreFloat4x4(&node.globalTransform, GlobalTransform);
+			ParentGlobalTransform = DirectX::XMLoadFloat4x4(&node.parent->globalTransform);
 		}
 		else
 		{
-			DirectX::XMStoreFloat4x4(&node.globalTransform, LocalTransform);
+			ParentGlobalTransform = DirectX::XMMatrixIdentity();
 		}
-	}
+		DirectX::XMMATRIX GlobalTransform = LocalTransform * ParentGlobalTransform;
 
-	// フレームリソース更新処理
-	UpdateFrameResource(worldTransform);
+		// ワールド行列算出
+		DirectX::XMMATRIX WorldTransform = GlobalTransform * CoordinateSystemTransform * ParentWorldTransform;
+
+		// 計算結果を格納
+		DirectX::XMStoreFloat4x4(&node.localTransform, LocalTransform);
+		DirectX::XMStoreFloat4x4(&node.globalTransform, GlobalTransform);
+		DirectX::XMStoreFloat4x4(&node.worldTransform, WorldTransform);
+	}
 
 	// バウンディングボックス計算
 	ComputeWorldBounds();
+
+	UpdateFrameResource(worldTransform);
 }
 
 // フレームリソース更新処理
 void ModelDX12::UpdateFrameResource(const DirectX::XMFLOAT4X4 transform)
 {
 	Graphics& graphics = Graphics::Instance();
-	DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&transform);
 
 	//メッシュの更新
 	for (Mesh& mesh : m_meshes)
@@ -293,20 +267,20 @@ void ModelDX12::UpdateFrameResource(const DirectX::XMFLOAT4X4 transform)
 
 		if (mesh.bones.size() > 0)
 		{
-			for (size_t bone_index = 0; bone_index < mesh.bones.size(); ++bone_index)
+			for (size_t i = 0; i < mesh.bones.size(); ++i)
 			{
-				const Bone& bone = mesh.bones.at(bone_index);
+				const Bone& bone = mesh.bones.at(i);
 				DirectX::XMMATRIX GlobalTransform = DirectX::XMLoadFloat4x4(&bone.node->globalTransform);
 				DirectX::XMMATRIX OffsetTransform = DirectX::XMLoadFloat4x4(&bone.offset_transform);
 				DirectX::XMMATRIX BoneTransform = OffsetTransform * GlobalTransform;
-				DirectX::XMStoreFloat4x4(&frame_resource.cbv_data->bone_transforms[bone_index], BoneTransform);
+				DirectX::XMStoreFloat4x4(&frame_resource.cbv_data->bone_transforms[i], BoneTransform);
 			}
 			frame_resource.cbv_data->world_transform = transform;
 		}
 		else
 		{
-			DirectX::XMMATRIX GlobalTransform = DirectX::XMLoadFloat4x4(&mesh.node->globalTransform);
-			DirectX::XMStoreFloat4x4(&frame_resource.cbv_data->world_transform, GlobalTransform * WorldTransform);
+			frame_resource.cbv_data->bone_transforms[0] = mesh.node->worldTransform;
+			frame_resource.cbv_data->world_transform = mesh.node->worldTransform;
 		}
 
 		bool updateBuffers = true;
@@ -341,11 +315,9 @@ void ModelDX12::ComputeWorldBounds()
 	m_bounds.Center = m_bounds.Extents = { 0, 0, 0 };
 	for (Mesh& mesh : m_meshes)
 	{
-		const Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
-
-		DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&frame_resource.cbv_data->world_transform);
+		DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&m_nodes.at(mesh.mesh->nodeIndex).worldTransform);
 		mesh.mesh->localBounds.Transform(mesh.worldBounds, WorldTransform);
-		DirectX::BoundingBox::CreateMerged(m_bounds, m_bounds, mesh.worldBounds);
+		DirectX::BoundingBox::CreateMerged(bounds, bounds, mesh.worldBounds);
 	}
 }
 
@@ -375,29 +347,28 @@ void ModelDX12::CopyNodes(iModel* model)
 // アニメーション再生中か
 bool ModelDX12::IsPlayAnimation() const
 {
-	if (m_current_animation_Index < 0) return false;
-	if (m_current_animation_Index > m_resource->GetAnimations().size()) return false;
-
-	return m_playing_animation;
+	if (currentAnimationIndex < 0) return false;
+	if (currentAnimationIndex > m_resource->GetAnimations().size()) return false;
+	return animationPlaying;
 }
 
 // アニメーション再生
 void ModelDX12::PlayAnimation(int animationIndex, bool loop, float blendSeconds)
 {
-	m_current_animation_Index = animationIndex;
-	m_current_seconds = 0;
-	m_loop_animation = loop;
-	m_playing_animation = true;
+	currentAnimationIndex = animationIndex;
+	currentAnimationSeconds = 0;
+	animationLoop = loop;
+	animationPlaying = true;
 
-	// ブレンドパラーメータ
-	m_animationBlending = blendSeconds > 0.0f;
-	m_currentAnimationBlendSeconds = 0.0f;
-	m_animationBlendSecondsLength = blendSeconds;
+	// ブレンドパラメータ
+	animationBlending = blendSeconds > 0.0f;
+	currentAnimationBlendSeconds = 0.0f;
+	animationBlendSecondsLength = blendSeconds;
 
 	// 現在の姿勢をキャッシュする
-	for (size_t i = 0; i < nodes.size(); ++i)
+	for (size_t i = 0; i < m_nodes.size(); ++i)
 	{
-		const ModelDX12::Node& src = nodes.at(i);
+		const ModelDX12::Node& src = m_nodes.at(i);
 		NodeCache& dst = nodeCaches.at(i);
 
 		dst.position = src.position;
@@ -409,14 +380,13 @@ void ModelDX12::PlayAnimation(int animationIndex, bool loop, float blendSeconds)
 // アニメーション停止
 void ModelDX12::StopAnimation()
 {
-	m_current_animation_Index = -1;
+	currentAnimationIndex = -1;
 }
 
 // アニメーション計算
 void ModelDX12::UpdateAnimation(float elapsedTime)
 {
-	if (m_current_animation_Index < 0) return;
-
+	if (currentAnimationIndex < 0) return;
 	if (m_resource->GetAnimations().empty()) return;
 
 	ComputeAnimation(elapsedTime);
@@ -428,8 +398,8 @@ void ModelDX12::ComputeAnimation(float elapsedTime)
 {
 	if (!IsPlayAnimation()) return;
 
-	// 指定のアニメーションデータ処理
-	const ModelResource::Animation& animation = m_resource->GetAnimations().at(m_current_animation_Index);
+	// 指定のアニメーションデータを取得
+	const ModelResource::Animation& animation = m_resource->GetAnimations().at(currentAnimationIndex);
 
 	// ノード毎のアニメーションデータ処理
 	for (size_t nodeIndex = 0; nodeIndex < animation.nodeAnims.size(); nodeIndex++)
@@ -444,16 +414,16 @@ void ModelDX12::ComputeAnimation(float elapsedTime)
 			//現在の時間がどのキーフレームの間にいるか判明する
 			const ModelResource::VectorKeyframe& keyframe0 = nodeAnim.positionKeyframes.at(index);
 			const ModelResource::VectorKeyframe& keyframe1 = nodeAnim.positionKeyframes.at(index + 1);
-			if (m_current_seconds >= keyframe0.seconds && m_current_seconds < keyframe1.seconds)
+			if (currentAnimationSeconds >= keyframe0.seconds && currentAnimationSeconds < keyframe1.seconds)
 			{
 				// 再生時間とキーフレームの時間から補完率を算出する
-				float rate = (m_current_seconds - keyframe0.seconds) / (keyframe1.seconds - keyframe0.seconds);
-
+				float rate = (currentAnimationSeconds - keyframe0.seconds) / (keyframe1.seconds - keyframe0.seconds);
+				
 				// 前のキーフレームと次のキーフレームの姿勢を補完
 				DirectX::XMVECTOR V0 = DirectX::XMLoadFloat3(&keyframe0.value);
 				DirectX::XMVECTOR V1 = DirectX::XMLoadFloat3(&keyframe1.value);
 				DirectX::XMVECTOR V = DirectX::XMVectorLerp(V0, V1, rate);
-
+				
 				// 計算結果をノードに格納
 				DirectX::XMStoreFloat3(&node.position, V);
 			}
@@ -464,16 +434,16 @@ void ModelDX12::ComputeAnimation(float elapsedTime)
 			//現在の時間がどのキーフレームの間にいるか判明する
 			const ModelResource::QuaternionKeyframe& keyframe0 = nodeAnim.rotationKeyframes.at(index);
 			const ModelResource::QuaternionKeyframe& keyframe1 = nodeAnim.rotationKeyframes.at(index + 1);
-			if (m_current_seconds >= keyframe0.seconds && m_current_seconds < keyframe1.seconds)
+			if (currentAnimationSeconds >= keyframe0.seconds && currentAnimationSeconds < keyframe1.seconds)
 			{
 				// 再生時間とキーフレームの時間から補完率を算出する
-				float rate = (m_current_seconds - keyframe0.seconds) / (keyframe1.seconds - keyframe0.seconds);
-
+				float rate = (currentAnimationSeconds - keyframe0.seconds) / (keyframe1.seconds - keyframe0.seconds);
+				
 				// 前のキーフレームと次のキーフレームの姿勢を補完
 				DirectX::XMVECTOR Q0 = DirectX::XMLoadFloat4(&keyframe0.value);
 				DirectX::XMVECTOR Q1 = DirectX::XMLoadFloat4(&keyframe1.value);
 				DirectX::XMVECTOR Q = DirectX::XMQuaternionSlerp(Q0, Q1, rate);
-
+				
 				// 計算結果をノードに格納
 				DirectX::XMStoreFloat4(&node.rotation, Q);
 			}
@@ -484,16 +454,16 @@ void ModelDX12::ComputeAnimation(float elapsedTime)
 			//現在の時間がどのキーフレームの間にいるか判明する
 			const ModelResource::VectorKeyframe& keyframe0 = nodeAnim.scaleKeyframes.at(index);
 			const ModelResource::VectorKeyframe& keyframe1 = nodeAnim.scaleKeyframes.at(index + 1);
-			if (m_current_seconds >= keyframe0.seconds && m_current_seconds < keyframe1.seconds)
+			if (currentAnimationSeconds >= keyframe0.seconds && currentAnimationSeconds < keyframe1.seconds)
 			{
 				// 再生時間とキーフレームの時間から補完率を算出する
-				float rate = (m_current_seconds - keyframe0.seconds) / (keyframe1.seconds - keyframe0.seconds);
-
+				float rate = (currentAnimationSeconds - keyframe0.seconds) / (keyframe1.seconds - keyframe0.seconds);
+				
 				// 前のキーフレームと次のキーフレームの姿勢を補完
 				DirectX::XMVECTOR V0 = DirectX::XMLoadFloat3(&keyframe0.value);
 				DirectX::XMVECTOR V1 = DirectX::XMLoadFloat3(&keyframe1.value);
 				DirectX::XMVECTOR V = DirectX::XMVectorLerp(V0, V1, rate);
-
+				
 				// 計算結果をノードに格納
 				DirectX::XMStoreFloat3(&node.scale, V);
 			}
@@ -501,21 +471,21 @@ void ModelDX12::ComputeAnimation(float elapsedTime)
 	}
 
 	// 時間経過
-	m_current_seconds += elapsedTime;
+	currentAnimationSeconds += elapsedTime;
 
 	// 再生時間が終端時間を超えたら
-	if (m_current_seconds >= animation.secondsLength)
+	if (currentAnimationSeconds >= animation.secondsLength)
 	{
-		if (m_loop_animation)
+		if (animationLoop)
 		{
 			// 再生時間を巻き戻す
-			m_current_seconds -= animation.secondsLength;
+			currentAnimationSeconds -= animation.secondsLength;
 		}
 		else
 		{
 			// 再生終了時間にする
-			m_current_seconds = animation.secondsLength;
-			m_playing_animation = false;
+			currentAnimationSeconds = animation.secondsLength;
+			animationPlaying = false;
 		}
 	}
 }
@@ -523,11 +493,11 @@ void ModelDX12::ComputeAnimation(float elapsedTime)
 // ブレンディング計算処理
 void ModelDX12::ComputeBlending(float elapsedTime)
 {
-	if (m_animationBlending) return;
+	if (!animationBlending) return;
 
 	// ブレンド率の計算
-	float rate = m_currentAnimationBlendSeconds / m_animationBlendSecondsLength;
-
+	float rate = currentAnimationBlendSeconds / animationBlendSecondsLength;
+	
 	// ブレンド計算
 	int count = static_cast<int>(m_nodes.size());
 	for (int i = 0; i < count; i++)
@@ -552,11 +522,11 @@ void ModelDX12::ComputeBlending(float elapsedTime)
 	}
 
 	// 時間経過
-	m_currentAnimationBlendSeconds += elapsedTime;
-	if (m_currentAnimationBlendSeconds >= m_animationBlendSecondsLength)
+	currentAnimationBlendSeconds += elapsedTime;
+	if (currentAnimationBlendSeconds >= animationBlendSecondsLength)
 	{
-		m_currentAnimationBlendSeconds = m_animationBlendSecondsLength;
-		m_animationBlending = false;
+		currentAnimationBlendSeconds = animationBlendSecondsLength;
+		animationBlending = false;
 	}
 }
 

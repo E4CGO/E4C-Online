@@ -103,7 +103,6 @@ public:
 
 	// メッシュ取得
 	virtual const std::vector<Mesh>& GetMeshes() const = 0;
-	std::vector<Mesh>& GetMeshes() { return m_meshes; }
 
 	const DirectX::XMFLOAT4X4 GetWorldMatrix() const { return m_WorldMatrix; }
 	DirectX::XMFLOAT4X4 SetWorldMatrix(const DirectX::XMFLOAT4X4 world) { this->m_WorldMatrix = world; }
@@ -234,14 +233,5 @@ protected:
 	std::vector<Node>						m_nodes;
 	std::vector<Mesh>						m_meshes;
 	DirectX::BoundingBox	                m_bounds;
-
-	int	  m_current_animation_Index = -1;
-	float m_current_seconds = 0.0f;
-	bool  m_playing_animation = false;
-	bool  m_loop_animation = false;
-
-	float m_animationBlendSecondsLength = -1.0f;
-	float m_currentAnimationBlendSeconds = 0.0f;
-	bool  m_animationBlending = false;
 	std::string name = ""; // モデルの名前
 };

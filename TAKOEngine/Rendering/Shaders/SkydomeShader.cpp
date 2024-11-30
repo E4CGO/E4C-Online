@@ -124,8 +124,6 @@ SkydomeShaderDX12::SkydomeShaderDX12(ID3D12Device* device)
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 		m_d3d_pipeline_state->SetName(L"SkydomeShaderPipelineState");
 	}
-
-	m_sampler = graphics.GetSampler(SamplerState::AnisotropicWrap);
 }
 
 //***********************************************************
