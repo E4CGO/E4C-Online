@@ -33,7 +33,6 @@ void ModelObject::LoadModel(const char* filename, float scaling, ModelObject::RE
 
 	m_renderMode = renderMode;
 
-
 	switch (modelType)
 	{
 	case ModelObject::RHS_PBR:
@@ -266,20 +265,21 @@ void ModelObject::RenderDX12(const RenderContextDX12& rc)
 	for (auto& model : m_pmodels)
 	{
 		if (model == nullptr) return;
-
+		
 		// スキニング
 		m_skinning_pipeline->Compute(rc, model.get());
 
 		// カメラに写っている範囲のオブジェクトをフラグでマークする配列を用意
 		std::vector<bool> visibleObjects(model->GetMeshes().size(), false);
+		if (visibleObjects.size() == 0) continue;
 
 		// 視錐台カリングを実行して可視オブジェクトをマーク
 		FrustumCulling::FrustumCullingFlag(model->GetMeshes(), visibleObjects);
+		int culling = 0;
 
 		// モデル描画
 		ModelShaderDX12Id shaderId = static_cast<ModelShaderDX12Id>(0xFFFFFFFF);
 		ModelShaderDX12* shader = nullptr;
-		int culling = 0;
 
 		for (const ModelDX12::Mesh& mesh : model->GetMeshes())
 		{
@@ -297,10 +297,10 @@ void ModelObject::RenderDX12(const RenderContextDX12& rc)
 				shader = T_GRAPHICS.GetModelShaderDX12(currentShaderId);
 			}
 
-			if (mesh.frame_resources.size() == 0) continue;
-
 			// フラグがfalseの場合はフラスタム外なのでスキップ
-			//if (!visibleObjects[culling++]) continue;
+			if (!visibleObjects[culling++]) continue;
+
+			if (mesh.frame_resources.size() == 0) continue;
 
 			//描画
 			shader->Render(rc, mesh);

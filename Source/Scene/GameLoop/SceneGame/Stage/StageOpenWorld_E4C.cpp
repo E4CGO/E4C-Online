@@ -86,7 +86,7 @@ void StageOpenWorld_E4C::Initialize()
 	);
 	mainCamera->SetLookAt(
 		{ 0, 5.0f, 5.0f },		// 視点
-		player->GetPosition(),			// 注視点
+		player->GetPosition(),	// 注視点
 		{ 0, 0.969f, -0.248f }	// 上ベクトル
 	);
 

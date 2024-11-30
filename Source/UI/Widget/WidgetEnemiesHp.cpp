@@ -11,8 +11,8 @@ WidgetEnemiesHp::WidgetEnemiesHp(DirectX::XMFLOAT2 size)
 	// フレームバッファマネージャー
 	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
 
-	this->gauge = RESOURCE.LoadSpriteResource(""); // 長方形
-	this->m_gaugeDX12 = RESOURCE.LoadSpriteResourceDX12("");
+	if (T_GRAPHICS.isDX11Active) this->gauge = RESOURCE.LoadSpriteResource(""); // 長方形
+	else this->m_gaugeDX12 = RESOURCE.LoadSpriteResourceDX12("");
 
 	this->m_size = size; // ゲージサイズ
 }

@@ -183,6 +183,15 @@ ModelDX12::ModelDX12(ID3D12Device* device, const char* filename, float scaling, 
 			}
 		}
 	}
+
+	DirectX::XMFLOAT4X4 transform = 
+	{
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1
+	};
+	UpdateTransform(transform);
 }
 
 ModelDX12::~ModelDX12()

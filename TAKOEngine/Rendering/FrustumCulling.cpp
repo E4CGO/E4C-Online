@@ -24,7 +24,7 @@ void FrustumCulling::FrustumCullingFlag(const std::vector<iModel::Mesh>& meshes,
     // 各メッシュに対してフラスタム内に収まるか判定してフラグをセット
     for (size_t i = 0; i < meshes.size(); ++i)
     {
-        const iModel::Mesh&   mesh       = meshes[i];
+        const iModel::Mesh&  mesh       = meshes[i];
         DirectX::BoundingBox meshBounds = mesh.worldBounds;
         visibleObjects[i] = IsObjectInFrustum(frustum, meshBounds);
     }
@@ -105,7 +105,6 @@ bool FrustumCulling::IsObjectInFrustum(const Frustum& frustum, const DirectX::Bo
     {
         DirectX::XMFLOAT4 plane  = frustum.planes[i];
         DirectX::XMVECTOR normal = DirectX::XMVectorSet(plane.x, plane.y, plane.z, 0.0f);
-        DirectX::XMVECTOR origin = DirectX::XMVectorScale(normal, -plane.w);
 
         // オブジェクトの頂点をフラスタムの平面と比較
         bool allOutside = true;
