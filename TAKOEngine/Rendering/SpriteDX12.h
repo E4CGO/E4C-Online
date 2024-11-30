@@ -99,6 +99,10 @@ public:
 	// テクスチャ高さ取得
 	int GetTextureHeight() const { return m_texture_height; }
 
+	const DirectX::XMFLOAT2 GetTextureSize() const {
+		return DirectX::XMFLOAT2(m_texture_width, m_texture_height);
+	}
+
 	// ディスクリプタ取得
 	const Descriptor* GetDescriptor() { return m_srv_descriptor; }
 

@@ -45,13 +45,13 @@ cbuffer CbMaterial : register(b2)
                   DescriptorTable(CBV(b2), visibility=SHADER_VISIBILITY_ALL), \
                   DescriptorTable(SRV(t0), visibility=SHADER_VISIBILITY_PIXEL), \
                   StaticSampler(s0 ,\
-                  filter = FILTER_MIN_MAG_MIP_LINEAR,\
+                  filter = FILTER_ANISOTROPIC,\
                   addressU = TEXTURE_ADDRESS_WRAP,\
                   addressV = TEXTURE_ADDRESS_WRAP,\
                   addressW = TEXTURE_ADDRESS_WRAP,\
                   mipLodBias = 0.0f,\
-                  maxAnisotropy = 1,\
-                  comparisonFunc  = COMPARISON_NEVER,\
+                  maxAnisotropy = 16,\
+                  comparisonFunc  = COMPARISON_ALWAYS,\
                   borderColor = STATIC_BORDER_COLOR_TRANSPARENT_BLACK,\
                   minLOD = 0.0f,\
                   maxLOD = 3.402823466e+38f,\

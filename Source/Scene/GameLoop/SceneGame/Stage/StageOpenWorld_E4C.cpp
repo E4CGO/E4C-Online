@@ -59,7 +59,7 @@ void StageOpenWorld_E4C::Initialize()
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 50.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
 		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
-		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
+		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/pinkSky.dds");
 	}
 
 	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());

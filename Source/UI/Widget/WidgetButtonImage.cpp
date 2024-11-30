@@ -1,4 +1,4 @@
-﻿//! @file WidgetButtonImage.cpp
+//! @file WidgetButtonImage.cpp
 //! @note
 
 #include "WidgetButtonImage.h"
