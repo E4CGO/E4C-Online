@@ -34,12 +34,13 @@ namespace PlayerCharacterState
 		//  一般攻撃1
 		void AttackNormalState_1::Enter()
 		{
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ATTACK_SIMPLE_FIRST, false, 0.05f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ATTACK_SWORD_COMBO_FIRST, false, 0.05f);
 		}
 		void AttackNormalState_1::Execute(float elapsedTime)
 		{
 			if (owner->IsPlayer())
 			{
+				float time = owner->GetModel()->GetAnimationRate();
 				if (owner->GetModel()->GetAnimationRate() > 0.75f)
 				{
 					if (owner->InputAttackNormal()) // アニメーション75%完成
@@ -57,7 +58,7 @@ namespace PlayerCharacterState
 		//  一般攻撃2
 		void AttackNormalState_2::Enter()
 		{
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ATTACK_SIMPLE_SECOND, false, 0.05f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ATTACK_SWORD_COMBO_SECOND, false, 0.05f);
 		}
 		void AttackNormalState_2::Execute(float elapsedTime)
 		{
@@ -81,11 +82,31 @@ namespace PlayerCharacterState
 		void AttackNormalState_3::Enter()
 		{
 			owner->SetAnimationSpeed(1.2f);
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ATTACK_SIMPLE_THIRD, false, 0.05f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ATTACK_SWORD_COMBO_THIRD, false, 0.05f);
 		}
 		void AttackNormalState_3::Execute(float elapsedTime)
 		{
 			if (!owner->IsPlayer()) return;
+		}
+
+		// 特殊攻撃ステート
+		void AttackSpecialState::Enter()
+		{
+			owner->SetAnimationSpeed(1.2f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_GUARD_SHIELD_START, false, 0.05f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_GUARD_SHIELD_CONTINUE, true);
+		}
+		void AttackSpecialState::Execute(float elapsedTime)
+		{
+			if (!owner->InputAttackSpecial())
+			{
+				owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
+			}
+		}
+		void AttackSpecialState::Exit()
+		{
+			owner->SetAnimationSpeed(1.0f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_GUARD_SHIELD_FINISH, false, 0.05f);
 		}
 	}
 }

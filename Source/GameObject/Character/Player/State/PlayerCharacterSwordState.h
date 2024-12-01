@@ -1,5 +1,5 @@
 ﻿//! @file PlayerCharacterState.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDED_PLAYER_CHARACTER_SWORD_STATE__
 #define __INCLUDED_PLAYER_CHARACTER_SWORD_STATE__
@@ -10,7 +10,7 @@ namespace PlayerCharacterState
 {
 	namespace Sword
 	{
-		enum NORMAL_ATTACK_STATE {	
+		enum NORMAL_ATTACK_STATE {
 			ATTACK_1,
 			ATTACK_2,
 			ATTACK_3,
@@ -75,6 +75,21 @@ namespace PlayerCharacterState
 			void Execute(float elapsedTime) override;
 			// ステートから出ていくときのメソッド
 			void Exit() override {};
+		};
+
+		class AttackSpecialState : public HierarchicalState<PlayerCharacter>
+		{
+		public:
+			// コンストラクタ
+			AttackSpecialState(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
+			// デストラクタ
+			~AttackSpecialState() {}
+			// ステートに入った時のメソッド
+			void Enter() override;
+			// ステートで実行するメソッド
+			void Execute(float elapsedTime) override;
+			// ステートから出ていくときのメソッド
+			void Exit() override;
 		};
 	}
 }
