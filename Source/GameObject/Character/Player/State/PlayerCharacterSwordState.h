@@ -1,8 +1,8 @@
 ﻿//! @file PlayerCharacterState.h
 //! @note
 
-#ifndef __INCLUDED_PLAYER_CHARACTER_SWORD_STATE__
-#define __INCLUDED_PLAYER_CHARACTER_SWORD_STATE__
+#ifndef __INCLUDED_PLAYER_CHARACTER_SWORD_STATE_H__
+#define __INCLUDED_PLAYER_CHARACTER_SWORD_STATE_H__
 
 #include "GameObject/Character/Player/PlayerCharacter.h"
 
@@ -83,21 +83,6 @@ namespace PlayerCharacterState
 			void Exit() override {};
 		};
 
-		class AttackSpecialState : public HierarchicalState<PlayerCharacter>
-		{
-		public:
-			// コンストラクタ
-			AttackSpecialState(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
-			// デストラクタ
-			~AttackSpecialState() {}
-			// ステートに入った時のメソッド
-			void Enter() override;
-			// ステートで実行するメソッド
-			void Execute(float elapsedTime) override;
-			// ステートから出ていくときのメソッド
-			void Exit() override;
-		};
-
 		// スキル_1 回レ
 		class Skill1State : public HierarchicalState<PlayerCharacter>
 		{
@@ -165,4 +150,4 @@ namespace PlayerCharacterState
 		};
 	}
 }
-#endif // !__INCLUDED_PLAYER_CHARACTER_SWORD_STATE__
+#endif // !__INCLUDED_PLAYER_CHARACTER_SWORD_STATE_H__
