@@ -3,15 +3,13 @@
 #include "TAKOEngine/Tool/Mathf.h"
 #include <GameObject/Character/Enemy/EnemyManager.h>
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
+#include "TAKOEngine/Tool/XMFLOAT.h"
 /**************************************************************************//**
      @brief  コンストラクタ  
 *//***************************************************************************/
 Spawner::Spawner()
-	: maxEnemies(20), // 最大エネミー数
-	spawnedEnemyCount(0), // 現在の生成済みエネミー数
-	spawntime(2.0f), // スポーン間隔
-	spawntimer(0.0f) // タイマー
 {
+	
 }
 
 /**************************************************************************//**
@@ -21,7 +19,7 @@ Spawner::Spawner()
 void Spawner::Update(float elapsedTime)
 {
 	
-	SpawnEnemy(elapsedTime);
+	
 	
 	
 }
@@ -47,10 +45,8 @@ bool Spawner::SearchPlayer()
 		playerPosition = player->GetPosition();
 
 		// 自身とプレイヤーの間の距離を計算
-		float vx = playerPosition.x - position.x;
-		float vy = playerPosition.y - position.y;
-		float vz = playerPosition.z - position.z;
-		float dist = sqrtf(vx * vx + vy * vy + vz * vz);
+		DirectX::XMFLOAT3 v = playerPosition - position;
+		float dist = sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
 
 		// 検知範囲内か確認
 		if (dist < serchRange)
@@ -65,73 +61,72 @@ bool Spawner::SearchPlayer()
      @brief    エネミースポーン
     @param[in]    elapsedTime
 *//***************************************************************************/
-void Spawner::SpawnEnemy(float elapsedTime)
+void Spawner::SpawnEnemy(float elapsedTime, const std::string& enemyType, int maxEnemies, int activeEnemies)
 {
-	float theta = Mathf::RandomRange(0, DirectX::XM_2PI);
-	float range = Mathf::RandomRange(0, territoryRange);
+spawntimer += elapsedTime;
 
-	spawnPos.x =position.x + territoryOrigin.x + range * sinf(theta);
-	spawnPos.y = 10.0f;
-	spawnPos.z = position.z +territoryOrigin.z + range * cosf(theta);
+// 不要な敵を整理
+CleanupEnemies();
 
+// 現在の生存している敵の数を確認
+currentAliveCount = spawnedEnemies.size();
 
-	spawntimer += elapsedTime;
-	if (spawntimer > spawntime && spawnedEnemyCount < maxEnemies)
-	{
-		// 一度に3匹のモンスターをスポーン（ただし、生成可能なエネミー数を確認）
-		int spawnCount = min(3, maxEnemies - spawnedEnemyCount); // 残り生成可能数を計算
-		for (int i = 0; i < spawnCount; ++i)
-		{
-			// レンジ内の敵を確認
-			int enemiesInRange = CountEnemiesInRange();
-			if (enemiesInRange >= 3)
-			{
-				break; // レンジ内の敵が3体以上ならスポーンを停止
-			}
+// 敵が3匹未満かつ合計生成数がmaxEnemiesを超えない場合にのみスポーン処理を実行
+if (spawntimer > spawntime && currentAliveCount < activeEnemies && spawnedEnemyCount < maxEnemies) {
+	// 生成可能な数を計算
+	int spawnCount = min( activeEnemies - currentAliveCount, maxEnemies - spawnedEnemyCount );
 
-			// ランダム位置を生成
-			float offsetX = static_cast<float>(i) * 2.0f - 2.0f; // スポーン位置を調整
-			float offsetZ = static_cast<float>(i) * 1.0f - 1.0f;
+	for (int i = 0; i < spawnCount; ++i) {
+		// スポーン位置の計算
+		float theta = Mathf::RandomRange(0, DirectX::XM_2PI);
+		float range = Mathf::RandomRange(0, territoryRange);
+		float offsetX = static_cast<float>(i) * 2.0f - 2.0f; // スポーン位置を調整
+		float offsetZ = static_cast<float>(i) * 1.0f - 1.0f;
 
-			SkeletonMinion* enemy = new SkeletonMinion();
-			enemy->SetPosition({ spawnPos.x + offsetX, spawnPos.y, spawnPos.z + offsetZ });
+		DirectX::XMFLOAT3 spawnPos;
+		spawnPos.x = position.x + territoryOrigin.x + range * sinf(theta) + offsetX;
+		spawnPos.y = 10.0f;
+		spawnPos.z = position.z + territoryOrigin.z + range * cosf(theta) + offsetZ;
+
+		// 敵を生成
+		Enemy* enemy = SetEnemy(enemyType);
+		if (enemy) {
+			enemy->SetPosition(spawnPos);
+
+			// 管理リストに追加
+			spawnedEnemies.push_back(enemy);
 			ENEMIES.Register(enemy);
 
-			spawnedEnemyCount++; // 生成した敵の数をカウント
+			// カウンターを更新
+			spawnedEnemyCount++;
+            
+			currentAliveCount++;
 		}
-		spawntimer = 0; // タイマーをリセット
 	}
+	spawntimer = 0; // タイマーをリセット
 }
-/**************************************************************************//**
-     @brief    生成するエネミーの数を管理する
-    @return    
-*//***************************************************************************/
-int Spawner::CountEnemiesInRange()
+}
+void Spawner::CleanupEnemies() {
+	spawnedEnemies.erase(
+		std::remove_if(spawnedEnemies.begin(), spawnedEnemies.end(),
+			[this](Enemy* enemy) {
+				if (!enemy->IsAlive()) {
+					currentAliveCount--;
+					return true;
+				}
+				return false;
+			}),
+		spawnedEnemies.end());
+}
+Enemy* Spawner::SetEnemy(const std::string& enemyType)
 {
-	int count = 0;
-	for (Enemy*& enemy : ENEMIES.GetAll())
-	{
-		if (!enemy->IsAlive())
-			continue; // 死亡した敵はスキップ
-
-		// 敵の位置を取得
-		DirectX::XMFLOAT3 enemyPos = enemy->GetPosition();
-
-		// 距離を計算
-		float vx = enemyPos.x - position.x;
-		float vy = enemyPos.y - position.y;
-		float vz = enemyPos.z - position.z;
-		float dist = sqrtf(vx * vx + vy * vy + vz * vz);
-
-		// レンジ内ならカウント
-		if (dist <=enemyCountRange)
-		{
-			count++;
-		}
-		
-
+	if (enemyType == "Skeleton") {
+		return new SkeletonMinion();
 	}
-	return count;
+	else if (enemyType == "SkeletonBoss")
+	{
+		return new SkeletonMinionBoss();
+	}
 }
 
 /**************************************************************************//**

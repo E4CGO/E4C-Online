@@ -113,7 +113,7 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	cameraController->SyncContrllerToCamera(camera);
 	cameraController->Update(elapsedTime);
 
-	spawner->Update(elapsedTime);
+	spawner->SpawnEnemy(elapsedTime, "Skeleton",10,3);
 
 	ENEMIES.Update(elapsedTime);
 
