@@ -41,7 +41,7 @@ public:
 	// コンストラクタ(引数付き)
 	PlayerCharacter(uint64_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
 	// コンストラクタ(引数付き)
-	PlayerCharacter(PlayerCharacterData::CharacterInfo dataInfo);
+	PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataInfo);
 	// デストラクタ
 	~PlayerCharacter();
 
@@ -142,9 +142,6 @@ public:
 
 	const std::string& GetName() { return m_name; }
 	void SetName(const char* name) { this->m_name = name; }
-
-	void SetMenuVisibility(bool value) { this->m_menuVisible = value; }
-	bool GetMenuVisibility() { return this->m_menuVisible; }
 
 	void SetSaveFileName(std::string value) { this->m_SaveFile = value; }
 	std::string GetCharacterSaveFileName() { return this->m_SaveFile; }

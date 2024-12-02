@@ -186,7 +186,7 @@ namespace Online
 		data.name = "テスト";
 		for (int i = 0; i < PlayerCharacterData::APPEARANCE_PATTERN::NUM; i++)
 		{
-			data.appearance[i] = info.Character.pattern[i];
+			data.appearance[i] = info.pattern[i];
 		}
 
 		return m_tcpCommands[TCP_CMD::LOGIN]->Send(&data);

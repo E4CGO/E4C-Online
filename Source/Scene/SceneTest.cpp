@@ -9,9 +9,8 @@ void SceneTest::Initialize()
 	MAPTILES.Register(stage);
 
 	PlayerCharacterData::CharacterInfo charInfo = {
-		true,			// visible
-		"",				// save
-		{				//Character
+		"",				// NAME
+		{				// APPEARANCE
 			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 		}
 	};
