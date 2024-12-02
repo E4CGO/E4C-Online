@@ -78,7 +78,7 @@ bool MapTileManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFL
 	//return ret;
 
 	return mapQuadtree.IntersectVsRay(start, direction, dist, hit);
-	
+
 	/* 作成中
 	/////////////////////////////////////////////////////
 	// 制御用変数
@@ -260,7 +260,6 @@ bool MapTileManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFL
 				// 隣の空間のモートンコード（非線形）を算出し上書きする
 				mortonCode = GetNextMortonCode(mortonCode, 2, directionZ == -1);
 			}
-
 		}
 	}*/
 }
@@ -425,7 +424,7 @@ void MapTileManager::CreateSpatialIndex(uint32_t quadDepth, uint32_t octDepth, D
 int MapTileManager::InsertMapMesh()
 {
 	int count = 0;
-	
+
 	for (ModelObject*& item : items)
 	{
 		int nowMeshNum = 0;
@@ -514,7 +513,7 @@ bool MapTileManager::SearchChildren(	// 子空間探索
 		{
 			hit = true;
 		}
-		
+
 		oft = oft->m_pNext;
 	}
 
@@ -548,7 +547,7 @@ bool MapTileManager::SearchChildren(
 	// この空間に登録されているポリゴンとの当たり判定
 	Liner8TreeManager<Triangle>::OFT<Triangle>* oft = tree.ppCellAry[Elem]->pLatest;
 	IntersectionResult result;
-	
+
 	while (oft)
 	{
 		DirectX::XMVECTOR triPos[3] =
@@ -558,7 +557,7 @@ bool MapTileManager::SearchChildren(
 			DirectX::XMLoadFloat3(&oft->m_pObject->position[2])
 		};
 
-		if(wallCheck)
+		if (wallCheck)
 		{
 			if (Collision::IntersectSphereVsTriangle(spherePos, radius, triPos, &result, true))
 			{
@@ -578,7 +577,7 @@ bool MapTileManager::SearchChildren(
 				hit = true;
 			}
 		}
-		
+
 		oft = oft->m_pNext;
 	}
 
@@ -724,7 +723,7 @@ bool MapTileManager::SearchParent(	// 球探索
 				DirectX::XMLoadFloat3(&oft->m_pObject->position[1]),
 				DirectX::XMLoadFloat3(&oft->m_pObject->position[2])
 			};
-			
+
 			if (wallCheck)
 			{
 				if (Collision::IntersectSphereVsTriangle(spherePos, radius, triPos, &result, true))

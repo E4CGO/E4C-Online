@@ -12,16 +12,24 @@
 
 #include "SceneGame_E4CState.h"
 #include "Scene/GameLoop/SceneGame/Stage/StageOpenWorld_E4C.h"
+#include "Scene/GameLoop/SceneGame/Stage/StageDungeon_E4C.h"
 
-#include "Scene/Stage/StageManager.h"
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "TAKOEngine/Tool/Console.h"
 
 #include "UI/Widget/WidgetCrosshair.h"
 #include "TAKOEngine/GUI/UIManager.h"
+#include "Source\PlayerCharacterData.h"
 
 void SceneGame_E4C::Initialize()
 {
+	std::ifstream file_in("CharacterInfos.json");
+	nlohmann::json savedData;
+	file_in >> savedData;
+	file_in.close();
+	PLAYER_CHARACTER_DATA.SetCharacterInfos(savedData);
+	PLAYER_CHARACTER_DATA.ParseData();
+
 	stateMachine = std::make_unique<StateMachine<SceneGame_E4C>>();
 	stateMachine->RegisterState(GAME_STATE::INIT, new SceneGame_E4CState::InitState(this));
 	stateMachine->RegisterState(GAME_STATE::EXIT, new SceneGame_E4CState::ExitState(this));
@@ -88,4 +96,9 @@ void SceneGame_E4C::Render()
 	T_TEXT.End();
 	// デバッグレンダラ描画実行
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
+}
+
+void SceneGame_E4C::RenderDX12()
+{
+	STAGES.RenderDX12();
 }

@@ -1,3 +1,5 @@
+#include "SceneCharacter_E4C.h"
+
 #include "TAKOEngine/Runtime/tentacle_lib.h"
 #include "TAKOEngine/Network/HttpRequest.h"
 #include "TAKOEngine/Rendering/ResourceManager.h"
@@ -8,7 +10,6 @@
 #include <string>
 
 #include "Scene/SceneManager.h"
-#include "SceneCharacter_E4C.h"
 #include "SceneCharacter_E4CState.h"
 
 #include "GameData.h"
@@ -18,15 +19,18 @@
 *//***************************************************************************/
 void SceneCharacter_E4C::Initialize()
 {
-	// Sprite Resource Preload
-	for (auto& filename : spriteList)
+	if (T_GRAPHICS.isDX11Active)
 	{
-		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
-	}
-	// Model Resource Preload
-	for (auto& filename : modelList)
-	{
-		modelPreLoad.insert(RESOURCE.LoadModelResource(filename));
+		// Sprite Resource Preload
+		for (auto& filename : spriteList)
+		{
+			spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
+		}
+		// Model Resource Preload
+		for (auto& filename : modelList)
+		{
+			modelPreLoad.insert(RESOURCE.LoadModelResource(filename));
+		}
 	}
 
 	//シャドウマップレンダラ
@@ -36,7 +40,7 @@ void SceneCharacter_E4C::Initialize()
 	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
 
 	// 光
-	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
+	LightManager::Instance().SetAmbientColor({ 0.3f, 0.3f, 0.3f, 0.0f });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
@@ -171,7 +175,32 @@ void SceneCharacter_E4C::RenderDX12()
 		rc.d3d_command_list = m_frameBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
-		UI.RenderDX12(rc);
+		// 3Dモデル描画
+		{
+			m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+			m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+			m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+
+			for (auto& it : m_previewCharacters)
+			{
+				if (it != nullptr) {
+					if (it->GetMenuVisibility())
+						it->RenderDX12(rc);
+				}
+			}
+			// レンダーターゲットへの書き込み終了待ち
+			m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		}
+
+		// ポストエフェクト描画
+		{
+			postprocessingRenderer->Render(m_frameBuffer);
+		}
+
+		// 2D描画
+		{
+			UI.RenderDX12(rc);
+		}
 	}
 	TentacleLib::graphics.End();
 }

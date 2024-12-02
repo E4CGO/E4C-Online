@@ -448,6 +448,17 @@ void PlayerCharacter::Render(const RenderContext& rc)
 #endif // _DEBUG
 }
 
+void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
+{
+	Character::RenderDX12(rc);
+
+	DirectX::XMFLOAT3 front = CameraManager::Instance().GetCamera()->GetFront();
+	DirectX::XMFLOAT3 eye = CameraManager::Instance().GetCamera()->GetEye();
+	DirectX::XMFLOAT3 namePos = this->position + DirectX::XMFLOAT3{ 0, 2.2f, 0 };
+	float dot = XMFLOAT3Dot(front, namePos - eye);
+	if (dot < 0.0f) return;
+}
+
 void PlayerCharacter::OnDamage(const HitResult& hit, int damage)
 {
 	if (hurtCoolTime > 0.0f) return;

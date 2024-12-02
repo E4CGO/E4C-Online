@@ -41,6 +41,7 @@ private:
 	GameData::GameSetting cacheGameSetting;
 
 	std::shared_ptr<Sprite> background;
+	std::shared_ptr<SpriteDX12> backgroundDX12;
 
 	WidgetButton* closeBtn;
 	WidgetButton* saveBtn;

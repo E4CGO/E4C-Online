@@ -17,6 +17,7 @@ public:
 	virtual void Update(float elapsedTime) override;
 	// 描画処理
 	virtual void Render(const RenderContext& rc) override;
+	virtual void RenderDX12(const RenderContextDX12& rc) override;
 
 protected:
 	virtual void OnHit(Player* player) {};

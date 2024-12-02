@@ -530,7 +530,7 @@ SamplerManager::SamplerManager(SamplerState state)
 	case 6:
 		//! 異方サンプリング  AnisotropicWrap
 		samplerDesc.MipLODBias = 0.0f;
-		samplerDesc.MaxAnisotropy = 8;
+		samplerDesc.MaxAnisotropy = 16;
 		samplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_ALWAYS;
 		samplerDesc.MinLOD = -D3D11_FLOAT32_MAX;
 		samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;

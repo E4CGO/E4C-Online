@@ -13,6 +13,9 @@
 ModelDX11::ModelDX11(ID3D11Device* device, const char* filename, float scaling, int modelType) : scaling(scaling)
 {
 	resource = ResourceManager::Instance().LoadModelResource(filename);
+	
+	// モデルの名前設定
+	extractBaseName(filename);
 
 	// ノードキャッシュ
 	const std::vector<ModelResource::Node>& resNodes = resource->GetNodes();

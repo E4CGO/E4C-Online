@@ -462,8 +462,6 @@ set(TAKOEngine__Rendering
     "TAKOEngine/Rendering/MyRender.h"
     "TAKOEngine/Rendering/ParticleRenderer.cpp"
     "TAKOEngine/Rendering/ParticleRenderer.h"
-    "TAKOEngine/Rendering/PipelineState.cpp"
-    "TAKOEngine/Rendering/PipelineState.h"
     "TAKOEngine/Rendering/Plane.cpp"
     "TAKOEngine/Rendering/Plane.h"
     "TAKOEngine/Rendering/PostEffect.cpp"

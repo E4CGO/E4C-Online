@@ -41,7 +41,7 @@ public:
 		}
 	}
 
-	void RenderDX12(const RenderContextDX12& rc)
+	virtual void RenderDX12(const RenderContextDX12& rc)
 	{
 		for (T* item : this->items)
 		{
