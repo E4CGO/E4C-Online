@@ -268,7 +268,7 @@ void LambertShader::SetRenderState(const RenderContext& rc)
 	const float blend_factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	dc->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Opaque), blend_factor, 0xFFFFFFFF);
 	dc->OMSetDepthStencilState(rc.renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
-	dc->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullBack));
+	dc->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullBackCCW));
 }
 
 void LambertShader::SetShaderResourceView(const ModelResource::Mesh& mesh, ID3D11DeviceContext*& dc)

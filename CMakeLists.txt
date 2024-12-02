@@ -242,6 +242,8 @@ source_group("Source\\GameObject\\Character\\Player" FILES ${Source__GameObject_
 set(Source__GameObject__Character__Player__State
     "Source/GameObject/Character/Player/State/NonPlayerCharacterState.cpp"
     "Source/GameObject/Character/Player/State/NonPlayerCharacterState.h"
+    "Source/GameObject/Character/Player/State/PlayerCharacterShieldState.cpp"
+    "Source/GameObject/Character/Player/State/PlayerCharacterShieldState.h"
     "Source/GameObject/Character/Player/State/PlayerCharacterState.cpp"
     "Source/GameObject/Character/Player/State/PlayerCharacterState.h"
     "Source/GameObject/Character/Player/State/PlayerCharacterSwordState.cpp"

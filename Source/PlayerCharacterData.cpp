@@ -25,8 +25,8 @@ PlayerCharacterData::PlayerCharacterData()
 	m_pAppearancePatterns[APPEARANCE_PATTERN::HAIR].push_back(new PlayerCharacterPatternNone);
 
 	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternNone);
-	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD1_ANIMATION.glb"));
-	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD2_ANIMATION.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternShield("Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD1_ANIMATION.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternShield("Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD2_ANIMATION.glb"));
 }
 
 /**************************************************************************//**
