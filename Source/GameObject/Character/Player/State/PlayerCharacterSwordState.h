@@ -16,6 +16,12 @@ namespace PlayerCharacterState
 			ATTACK_3,
 		};
 
+		enum SKILL_1_STATE
+		{
+			ATTACK_START,
+			ATTACK_CONTINUE,
+		};
+
 		// 一般攻撃
 		class AttackNormalState : public HierarchicalState<PlayerCharacter>
 		{
@@ -90,6 +96,72 @@ namespace PlayerCharacterState
 			void Execute(float elapsedTime) override;
 			// ステートから出ていくときのメソッド
 			void Exit() override;
+		};
+
+		// スキル_1 回レ
+		class Skill1State : public HierarchicalState<PlayerCharacter>
+		{
+		public:
+			// コンストラクタ
+			Skill1State(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
+			// デストラクタ
+			~Skill1State() {}
+			// ステートに入った時のメソッド
+			void Enter() override;
+			// ステートで実行するメソッド
+			void Execute(float elapsedTime) override;
+			// ステートから出ていくときのメソッド
+			void Exit() override;
+		private:
+			float cacheTurnSpeed = 0.0f;
+		};
+
+		class Skill1StateStart : public HierarchicalState<PlayerCharacter>
+		{
+		public:
+			// コンストラクタ
+			Skill1StateStart(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
+			// デストラクタ
+			~Skill1StateStart() {}
+			// ステートに入った時のメソッド
+			void Enter() override;
+			// ステートで実行するメソッド
+			void Execute(float elapsedTime) override;
+			// ステートから出ていくときのメソッド
+			void Exit() override {};
+		};
+
+		class Skill1ContinueStart : public HierarchicalState<PlayerCharacter>
+		{
+		public:
+
+			float impulseSpeed = 50.0f;
+
+			// コンストラクタ
+			Skill1ContinueStart(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
+			// デストラクタ
+			~Skill1ContinueStart() {}
+			// ステートに入った時のメソッド
+			void Enter() override;
+			// ステートで実行するメソッド
+			void Execute(float elapsedTime) override;
+			// ステートから出ていくときのメソッド
+			void Exit() override {};
+		};
+
+		class Skill2State : public HierarchicalState<PlayerCharacter>
+		{
+		public:
+			// コンストラクタ
+			Skill2State(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
+			// デストラクタ
+			~Skill2State() {}
+			// ステートに入った時のメソッド
+			void Enter() override;
+			// ステートで実行するメソッド
+			void Execute(float elapsedTime) override;
+			// ステートから出ていくときのメソッド
+			void Exit() override {};
 		};
 	}
 }

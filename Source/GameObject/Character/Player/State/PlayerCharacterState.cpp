@@ -68,6 +68,12 @@ namespace PlayerCharacterState
 			owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::SKILL_1));
 			return;
 		}
+
+		if (flags & flag_Skill_2 && owner->InputSkill2())
+		{
+			owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::SKILL_2));
+			return;
+		}
 	}
 	// 待機ステート
 	void IdleState::Enter()
@@ -83,7 +89,7 @@ namespace PlayerCharacterState
 
 		PlayerTransition(
 			owner,
-			flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1
+			flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2
 		);
 	}
 	void IdleState::Exit()
@@ -104,7 +110,7 @@ namespace PlayerCharacterState
 
 		PlayerTransition(
 			owner,
-			flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1
+			flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2
 		);
 	}
 	void MoveState::Exit()
@@ -122,7 +128,7 @@ namespace PlayerCharacterState
 
 		PlayerTransition(
 			owner,
-			flag_Fall | flag_Dodge | flag_Ground | flag_AttackN | flag_AttackS | flag_Skill_1
+			flag_Fall | flag_Dodge | flag_Ground | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2
 		);
 	}
 	void JumpState::Exit()
@@ -140,7 +146,7 @@ namespace PlayerCharacterState
 
 		PlayerTransition(
 			owner,
-			flag_Fall | flag_Dodge | flag_Ground | flag_AttackN | flag_AttackS | flag_Skill_1
+			flag_Fall | flag_Dodge | flag_Ground | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2
 		);
 	}
 	void FallState::Exit()
@@ -159,7 +165,7 @@ namespace PlayerCharacterState
 
 		PlayerTransition(
 			owner,
-			flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1
+			flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2
 		);
 
 		if (!owner->IsPlayAnimation()) owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE)); return;
