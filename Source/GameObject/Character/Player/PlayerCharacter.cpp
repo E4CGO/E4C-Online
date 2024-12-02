@@ -42,16 +42,13 @@ PlayerCharacter::PlayerCharacter(uint64_t id, const char* name, const uint8_t ap
 	LoadAppearance(appearance);
 }
 
-PlayerCharacter::PlayerCharacter(PlayerCharacterData::CharacterInfo dataInfo) : Character()
+PlayerCharacter::PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataInfo) : Character()
 {
 	scale = { 0.5f, 0.5f, 0.5f };
 	moveSpeed = 10.0f;
 	turnSpeed = DirectX::XMConvertToRadians(720);
 	jumpSpeed = 20.0f;
 	dodgeSpeed = 20.0f;
-
-	m_menuVisible = dataInfo.visible;
-	std::string m_SaveFile = dataInfo.save;
 
 	stateMachine = new StateMachine<PlayerCharacter>;
 	RegisterCommonState();
@@ -62,7 +59,7 @@ PlayerCharacter::PlayerCharacter(PlayerCharacterData::CharacterInfo dataInfo) : 
 	// 衝突判定
 	SetCollider(Collider::COLLIDER_TYPE::CAPSULE);
 
-	LoadAppearance(dataInfo.Character.pattern);
+	LoadAppearance(dataInfo.pattern);
 }
 
 /**************************************************************************//**
