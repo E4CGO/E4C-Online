@@ -1,6 +1,6 @@
 #include "SkeletonMinion.h"
 
-#include "TAKOEngine/Physics/SphereCollider.h"
+#include "TAKOEngine/Physics/Collider/SphereCollider.h"
 #include "TAKOEngine/GUI/UIManager.h"
 
 #include "UI/Widget/WidgetBossHp.h"
@@ -16,11 +16,15 @@ SkeletonMinion::SkeletonMinion(float scaling) : Enemy("Data/Model/Enemy/characte
 	turnSpeed = DirectX::XMConvertToRadians(180);
 
 	// “–‚½‚è”»’è
-	colliders[HitCollider::Body] = new SphereCollider(scaling * 0.4f);
-	colliders[HitCollider::Head] = new SphereCollider(scaling * 0.5f);
+	//colliders[HitCollider::Body] = new SphereCollider(scaling * 0.4f);
+	//colliders[HitCollider::Head] = new SphereCollider(scaling * 0.5f);
+	colliders[HitCollider::Body] = new SphereCollider(Collider::COLLIDER_OBJ::ENEMY, &transform);
+	colliders[HitCollider::Head] = new SphereCollider(Collider::COLLIDER_OBJ::ENEMY, &transform);
 	// UŒ‚”»’è
-	attackColliders[AttackCollider::LeftHand] = new SphereCollider(scaling * 0.2f);
-	attackColliders[AttackCollider::RightHand] = new SphereCollider(scaling * 0.2f);
+	//attackColliders[AttackCollider::LeftHand] = new SphereCollider(scaling * 0.2f);
+	//attackColliders[AttackCollider::RightHand] = new SphereCollider(scaling * 0.2f);
+	attackColliders[AttackCollider::LeftHand] = new SphereCollider(Collider::COLLIDER_OBJ::ENEMY_ATTACK, &transform);
+	attackColliders[AttackCollider::RightHand] = new SphereCollider(Collider::COLLIDER_OBJ::ENEMY_ATTACK, &transform);
 	EnableAttackColliders(false);
 
 	stateMachine->RegisterState(EnemyState::ID::TargetFound, new EnemyState::FollowState(this, 2.0f, SkeletonMinion::State::Attack));
@@ -38,12 +42,12 @@ void SkeletonMinion::UpdateTarget()
 void SkeletonMinion::UpdateColliders()
 {
 	// “–‚½‚è”»’è
-	colliders[HitCollider::Body]->SetPosition(GetNodePosition("character_skeleton_minion_body", DirectX::XMFLOAT3{ 0.0f, 0.3f, 0.0f } *scale));
-	colliders[HitCollider::Head]->SetPosition(GetNodePosition("character_skeleton_minion_head", DirectX::XMFLOAT3{ 0.0f, 0.4f, 0.0f } *scale));
+	//colliders[HitCollider::Body]->SetPosition(GetNodePosition("character_skeleton_minion_body", DirectX::XMFLOAT3{ 0.0f, 0.3f, 0.0f } *scale));
+	//colliders[HitCollider::Head]->SetPosition(GetNodePosition("character_skeleton_minion_head", DirectX::XMFLOAT3{ 0.0f, 0.4f, 0.0f } *scale));
 
 	// UŒ‚”»’è
-	attackColliders[AttackCollider::LeftHand]->SetPosition(GetNodePosition("character_skeleton_minion_armLeft", DirectX::XMFLOAT3{ 0.25f, -0.45f, 0.0f } *scale));
-	attackColliders[AttackCollider::RightHand]->SetPosition(GetNodePosition("character_skeleton_minion_armRight", DirectX::XMFLOAT3{ -0.25f, -0.45f, 0.0f } *scale));
+	//attackColliders[AttackCollider::LeftHand]->SetPosition(GetNodePosition("character_skeleton_minion_armLeft", DirectX::XMFLOAT3{ 0.25f, -0.45f, 0.0f } *scale));
+	//attackColliders[AttackCollider::RightHand]->SetPosition(GetNodePosition("character_skeleton_minion_armRight", DirectX::XMFLOAT3{ -0.25f, -0.45f, 0.0f } *scale));
 }
 
 SkeletonMinionBoss::SkeletonMinionBoss() : SkeletonMinion(3.0f)

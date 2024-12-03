@@ -6,7 +6,9 @@
 
 PlayerCollisionObject::PlayerCollisionObject(float radius)
 {
-	collider = std::make_unique<SphereCollider>(radius);
+	collider = std::make_unique<SphereCollider>(Collider::COLLIDER_OBJ::PLAYER, &transform);
+	Sphere sphere({}, radius);
+	collider->SetParam(sphere);
 }
 
 void PlayerCollisionObject::Update(float elapsedTime)

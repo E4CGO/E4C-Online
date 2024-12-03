@@ -1,5 +1,5 @@
 #include "MapCollisionManager.h"
-#include "UnrotatedBoxCollider.h"
+#include "TAKOEngine/Physics/Collider/AABBCollider.h"
 #include "imgui.h"
 
 MapCollisionManager::~MapCollisionManager()
@@ -11,9 +11,9 @@ void MapCollisionManager::DrawDebugGUI()
 {
 	if (ImGui::TreeNode("MapColliders"))
 	{
-		if (ImGui::Button("+")) {
-			Register(new UnrotatedBoxCollider);
-		}
+		//if (ImGui::Button("+")) {
+		//	Register(new AABBCollider());
+		//}
 
 		int nodeId = 0;
 		for (Collider* collider : items)

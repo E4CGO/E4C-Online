@@ -7,9 +7,9 @@
 Map001Key::Map001Key() : ModelObject("Data/Model/Object/key.gltf.glb")
 {
 	position = { -38.0f, 2.0f, -48.0f };
-	SetCollider(Collider::COLLIDER_TYPE::SPHERE);
-	collider->SetScale({ 1.0f, 1.0f, 1.0f });
-	collider->SetPosition(position);
+	SetCollider(Collider::COLLIDER_TYPE::SPHERE, Collider::COLLIDER_OBJ::ITEM);
+	//collider->SetScale({ 1.0f, 1.0f, 1.0f });
+	//collider->SetPosition(position);
 }
 // XVˆ—
 void Map001Key::Update(float elapsedTime)

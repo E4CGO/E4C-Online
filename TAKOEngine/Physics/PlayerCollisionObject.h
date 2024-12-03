@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "TAKOEngine/Physics/SphereCollider.h"
+#include "TAKOEngine/Physics/Collider/SphereCollider.h"
 
 #include "GameObject/GameObject.h"
 #include "GameObject/Character/Player/Player.h"

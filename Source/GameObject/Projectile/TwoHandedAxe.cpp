@@ -15,8 +15,8 @@ TwoHandedAxe::TwoHandedAxe(Character* owner) : Projectile("Data/Model/Object/axe
 	force = 8.0f;
 
 	// 衝突判定
-	SetCollider(Collider::COLLIDER_TYPE::SPHERE);
-	collider->SetScale({ 0.5f, 0.5f, 0.5f });
+	SetCollider(Collider::COLLIDER_TYPE::SPHERE, Collider::COLLIDER_OBJ::PLAYER_PROJECTILE);
+	//collider->SetScale({ 0.5f, 0.5f, 0.5f });
 }
 
 void TwoHandedAxe::Update(float elapsedTime)
@@ -47,7 +47,7 @@ void TwoHandedAxe::DrawDebugPrimitive()
 
 void TwoHandedAxe::UpdateColliders()
 {
-	collider->SetPosition(GetNodePosition(DirectX::XMFLOAT3{ 0.0f, 0.6f, 0.0f }));
+	//collider->SetPosition(GetNodePosition(DirectX::XMFLOAT3{ 0.0f, 0.6f, 0.0f }));
 }
 
 void TwoHandedAxe::OnHitWall(HitResult& hit)

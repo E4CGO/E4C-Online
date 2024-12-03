@@ -3,7 +3,7 @@
 #include <profiler.h>
 #include <iostream>
 
-#include "TAKOEngine/Physics/SphereCollider.h"
+#include "TAKOEngine/Physics/Collider/SphereCollider.h"
 #include "TAKOEngine/Physics/CollisionDataManager.h"
 #include "TAKOEngine/Effects/EffectManager.h"
 #include "TAKOEngine/Editor/Camera/Camera.h"
@@ -31,7 +31,7 @@ Player::Player(const char* filename, float scaling) : Character(filename, scalin
 	mpCost[static_cast<int>(State::Dodge)] = 20.0f;
 
 	// Õ“Ë”»’è
-	SetCollider(Collider::COLLIDER_TYPE::SPHERE);
+	SetCollider(Collider::COLLIDER_TYPE::SPHERE, Collider::COLLIDER_OBJ::PLAYER);
 }
 
 Player::~Player()
@@ -83,8 +83,8 @@ void Player::UpdateTarget()
 
 void Player::UpdateColliders()
 {
-	collider->SetPosition(position + DirectX::XMFLOAT3{ 0, height * 0.5f, 0 } *scale);
-	collider->SetScale(DirectX::XMFLOAT3{ height * 0.3f, height * 0.3f, height * 0.3f } *scale);
+	//collider->SetPosition(position + DirectX::XMFLOAT3{ 0, height * 0.5f, 0 } *scale);
+	//collider->SetScale(DirectX::XMFLOAT3{ height * 0.3f, height * 0.3f, height * 0.3f } *scale);
 }
 
 bool  Player::CollisionVsEnemies(Collider* collider, int damage, bool power, float force, int effectIdx, float effectScale)

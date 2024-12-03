@@ -18,13 +18,13 @@ Grenade::Grenade(Character* owner) : Projectile("Data/Model/Object/smokebomb.glt
 	force = 30.0f;
 
 	// Õ“Ë”»’è
-	SetCollider(Collider::COLLIDER_TYPE::SPHERE);
-	collider->SetScale({ 0.4f, 0.4f, 0.4f });
+	SetCollider(Collider::COLLIDER_TYPE::SPHERE, Collider::COLLIDER_OBJ::PLAYER_PROJECTILE);
+	//collider->SetScale({ 0.4f, 0.4f, 0.4f });
 }
 
 void Grenade::UpdateColliders()
 {
-	collider->SetPosition(GetNodePosition(DirectX::XMFLOAT3{ 0.0f, 0.2f, 0.0f }));
+	//collider->SetPosition(GetNodePosition(DirectX::XMFLOAT3{ 0.0f, 0.2f, 0.0f }));
 }
 
 void Grenade::OnDestory()
@@ -39,7 +39,7 @@ void Grenade::OnDestory()
 		for (const std::pair<int, Collider*>& collider : enemy->GetColliders())
 		{
 			direction = collider.second->GetPosition() - position;
-			if (XMFLOAT3LengthSq(direction) < powf(range + collider.second->GetScale().x, 2.0f))
+			//if (XMFLOAT3LengthSq(direction) < powf(range + collider.second->GetScale().x, 2.0f))
 			{
 				direction = XMFLOAT3Normalize(direction);
 				SendCollision(enemy, collider.first);

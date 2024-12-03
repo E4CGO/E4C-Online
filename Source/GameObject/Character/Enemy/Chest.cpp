@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include "TAKOEngine/Physics/SphereCollider.h"
+#include "TAKOEngine/Physics/Collider/SphereCollider.h"
 
 #include "GameObject/Character/Enemy/ChestState.h"
 
@@ -19,7 +19,7 @@ Chest::Chest(const char* filename) : Enemy(filename, 1.0f)
 	showHp = false;
 
 	// “–‚½‚è”»’è
-	colliders[0] = new SphereCollider(1.0f);
+	colliders[0] = new SphereCollider(Collider::COLLIDER_OBJ::ITEM, &transform);
 
 	stateMachine->RegisterState(CHEST_STATE::CLOSE, new ChestState::ChestCloseState(this));
 
@@ -29,7 +29,7 @@ Chest::Chest(const char* filename) : Enemy(filename, 1.0f)
 // Õ“Ë”»’èXV
 void Chest::UpdateColliders()
 {
-	colliders[0]->SetPosition(GetNodePosition(DirectX::XMFLOAT3{ 0.0f, 0.5f, 0.0f }));
+	//colliders[0]->SetPosition(GetNodePosition(DirectX::XMFLOAT3{ 0.0f, 0.5f, 0.0f }));
 }
 
 void Chest::OnDeath()

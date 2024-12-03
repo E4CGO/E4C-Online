@@ -9,7 +9,7 @@
 Map001BossRoomTeleport::Map001BossRoomTeleport() : PlayerCollisionObject(5.0f)
 {
 	position = { 20.0f, 1.0f, -65.6f };
-	collider->SetPosition(position);
+	//collider->SetPosition(position);
 }
 
 void Map001BossRoomTeleport::Update(float elapsedTime)

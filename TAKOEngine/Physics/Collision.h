@@ -81,7 +81,13 @@ struct Sphere
 struct AABB
 {
 	DirectX::XMFLOAT3	position;	// 中心
-	DirectX::XMFLOAT3	radii;	// 半径
+	DirectX::XMFLOAT3	radii;	// 反辺長
+};
+struct OBB
+{
+	DirectX::XMFLOAT3	position;	// 中心
+	DirectX::XMFLOAT3	radii;	// 反辺長
+	DirectX::XMFLOAT4	orientation;	// 姿勢
 };
 struct Capsule
 {

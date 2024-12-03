@@ -5,7 +5,7 @@
 #define __INCLUDED_GAME_OBJECT_H__
 
 #include "TAKOEngine/Runtime/tentacle_lib.h"
-#include "TAKOEngine/Physics/Collider.h"
+#include "TAKOEngine/Physics/Collider/Collider.h"
 
 #include <DirectXMath.h>
 

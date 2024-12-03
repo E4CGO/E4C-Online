@@ -1,6 +1,6 @@
 #include "Knight.h"
 
-#include "TAKOEngine/Physics/SphereCollider.h"
+#include "TAKOEngine/Physics/Collider/SphereCollider.h"
 #include "TAKOEngine/Effects/EffectManager.h"
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 
@@ -18,10 +18,10 @@ Knight::Knight() : Player("Data/Model/Character/Knight.glb", 1.0f)
 	m_pmodels[0]->FindNode("Spike_Shield")->visible = false;
 
 	// 攻撃判定
-	attackColliders[AttackCollider::Sword_1] = new SphereCollider(0.3f);
-	attackColliders[AttackCollider::Sword_2] = new SphereCollider(0.3f);
-	attackColliders[AttackCollider::Sword_3] = new SphereCollider(0.3f);
-	attackColliders[AttackCollider::Shield] = new SphereCollider(0.8f);
+	//attackColliders[AttackCollider::Sword_1] = new SphereCollider(0.3f);
+	//attackColliders[AttackCollider::Sword_2] = new SphereCollider(0.3f);
+	//attackColliders[AttackCollider::Sword_3] = new SphereCollider(0.3f);
+	//attackColliders[AttackCollider::Shield] = new SphereCollider(0.8f);
 	EnableAttackColliders(false);
 
 	stateMachine->RegisterState(static_cast<int>(Player::State::AttackNormal), new KnightState::AttackNormalState(this));
@@ -98,12 +98,12 @@ void Knight::UpdateColliders()
 	Player::UpdateColliders();
 
 	// 攻撃判定
-	float Yoffset = 0.2f;
-	attackColliders[AttackCollider::Sword_1]->SetPosition(GetNodePosition("1H_Sword", DirectX::XMFLOAT3{ 0.0f, Yoffset, 0.0f }));
-	Yoffset += attackColliders[AttackCollider::Sword_1]->GetScale().x + attackColliders[AttackCollider::Sword_2]->GetScale().x;
-	attackColliders[AttackCollider::Sword_2]->SetPosition(GetNodePosition("1H_Sword", DirectX::XMFLOAT3{ 0.0f, Yoffset, 0.0f }));
-	Yoffset += attackColliders[AttackCollider::Sword_2]->GetScale().x + attackColliders[AttackCollider::Sword_3]->GetScale().x;
-	attackColliders[AttackCollider::Sword_3]->SetPosition(GetNodePosition("1H_Sword", DirectX::XMFLOAT3{ 0.0f, Yoffset, 0.0f }));
+	//float Yoffset = 0.2f;
+	//attackColliders[AttackCollider::Sword_1]->SetPosition(GetNodePosition("1H_Sword", DirectX::XMFLOAT3{ 0.0f, Yoffset, 0.0f }));
+	//Yoffset += attackColliders[AttackCollider::Sword_1]->GetScale().x + attackColliders[AttackCollider::Sword_2]->GetScale().x;
+	//attackColliders[AttackCollider::Sword_2]->SetPosition(GetNodePosition("1H_Sword", DirectX::XMFLOAT3{ 0.0f, Yoffset, 0.0f }));
+	//Yoffset += attackColliders[AttackCollider::Sword_2]->GetScale().x + attackColliders[AttackCollider::Sword_3]->GetScale().x;
+	//attackColliders[AttackCollider::Sword_3]->SetPosition(GetNodePosition("1H_Sword", DirectX::XMFLOAT3{ 0.0f, Yoffset, 0.0f }));
 
-	attackColliders[AttackCollider::Shield]->SetPosition(GetNodePosition("Rectangle_Shield", DirectX::XMFLOAT3{ 0.0f, 0.0f, -0.1f }));
+	//attackColliders[AttackCollider::Shield]->SetPosition(GetNodePosition("Rectangle_Shield", DirectX::XMFLOAT3{ 0.0f, 0.0f, -0.1f }));
 }

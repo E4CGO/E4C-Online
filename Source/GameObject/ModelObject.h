@@ -71,7 +71,7 @@ public:
 
 	// 衝突判定
 	Collider* GetCollider() { return collider.get(); }
-	void SetCollider(Collider::COLLIDER_TYPE collider, int idx = 0);
+	void SetCollider(Collider::COLLIDER_TYPE collider, Collider::COLLIDER_OBJ objType, int idx = 0);
 
 	// アニメーションのスピードを取得
 	float GetAnimationSpeed() { return m_animationSpeed; }

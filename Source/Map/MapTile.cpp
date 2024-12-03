@@ -8,7 +8,7 @@ MapTile::MapTile(const char* filename, float scaling, RoomBase* parent) :
 	Update(0);// モデル更新
 
 	if (strlen(filename) == 0) return;
-	SetCollider(Collider::COLLIDER_TYPE::MAP);
+	SetCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
 	//SetCollider(Collider::COLLIDER_TYPE::MODEL);
 }
 

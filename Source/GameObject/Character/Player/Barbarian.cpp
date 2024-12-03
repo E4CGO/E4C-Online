@@ -1,6 +1,6 @@
 #include "Barbarian.h"
 
-#include "TAKOEngine/Physics/SphereCollider.h"
+#include "TAKOEngine/Physics/Collider/SphereCollider.h"
 #include "TAKOEngine/Effects/EffectManager.h"
 
 #include "GameObject/Character/Player/BarbarianState.h"
@@ -16,7 +16,7 @@ Barbarian::Barbarian() : Player("Data/Model/Character/Barbarian.glb", 1.0f)
 	m_pmodels[0]->FindNode("1H_Axe_Offhand")->visible = false;
 
 	// UŒ‚”»’è
-	attackColliders[AttackCollider::Axe] = new SphereCollider(0.7f);
+	//attackColliders[AttackCollider::Axe] = new SphereCollider(0.7f);
 	EnableAttackColliders(false);
 
 	stateMachine->RegisterState(static_cast<int>(Player::State::Idle), new BarbarianState::IdleState(this));
@@ -69,5 +69,5 @@ void Barbarian::UpdateColliders()
 	Player::UpdateColliders();
 
 	// UŒ‚”»’è
-	attackColliders[AttackCollider::Axe]->SetPosition(GetNodePosition("2H_Axe", DirectX::XMFLOAT3{ 0.0f, 0.7f, 0.0f }));
+	//attackColliders[AttackCollider::Axe]->SetPosition(GetNodePosition("2H_Axe", DirectX::XMFLOAT3{ 0.0f, 0.7f, 0.0f }));
 }

@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "TAKOEngine/Tool/Singleton.h"
-#include "TAKOEngine/Physics/Collider.h"
+#include "TAKOEngine/Physics/Collider/Collider.h"
 
 #include "Manager.h"
 

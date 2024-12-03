@@ -25,7 +25,8 @@ void MapQuadtree::CreateQuadtree(DirectX::XMFLOAT3 minPos, DirectX::XMFLOAT3 max
 	m_level = level;
 
 	// 空間配列サイズ保存
-	m_linerLength = ((1 << ((m_level + 1) << 1)) - 1) / 3;	// (4 ^ (m_level + 1) - 1) / (4 - 1)
+	//m_linerLength = ((1 << ((m_level + 1) << 1)) - 1) / 3;	// (4 ^ (m_level + 1) - 1) / (4 - 1)
+	m_linerLength = GetLevelStart(m_level + 1) - 1;
 
 	// 空間配列作成
 	m_quadtreeNodes = new Node[m_linerLength];
@@ -146,19 +147,19 @@ bool MapQuadtree::Regist(Triangle* mesh)
 
 	uint8_t mortonArea = 0b1111;	// その空間を分割した時に位置するエリア
 	
-	if ((mortonCodeMin >> ((shift - 1) * 2)) & 0x01)	// 最小点が空間の1, 3側にある時
+	if (((mortonCodeMin << 2) >> (shift * 2)) & 0x01)	// 最小点が空間の1, 3側にある時
 	{
 		mortonArea &= ~0b0101;	// 0,2側のフラグを消す
 	}
-	if ((~mortonCodeMax >> ((shift - 1) * 2)) & 0x01)	// 最大点が空間の0, 2側にある時
+	if (((~mortonCodeMax << 2) >> (shift * 2)) & 0x01)	// 最大点が空間の0, 2側にある時
 	{
 		mortonArea &= ~0b1010;	// 1,3側のフラグを消す
 	}
-	if ((mortonCodeMin >> ((shift - 1) * 2)) & 0x02)	// 最小点が空間の2, 3側にある時
+	if (((mortonCodeMin << 2) >> (shift * 2)) & 0x02)	// 最小点が空間の2, 3側にある時
 	{
 		mortonArea &= ~0b0011;	// 0,1側のフラグを消す
 	}
-	if ((~mortonCodeMax >> ((shift - 1) * 2)) & 0x02)	// 最大点が空間の0, 1側にある時
+	if (((~mortonCodeMax << 2) >> (shift * 2)) & 0x02)	// 最大点が空間の0, 1側にある時
 	{
 		mortonArea &= ~0b1100;	// 2,3側のフラグを消す
 	}
@@ -471,19 +472,13 @@ bool MapQuadtree::IntersectVsRayInNode(
 *//***************************************************************************/
 bool MapQuadtree::IntersectVsSphereCast(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayDirection, float rayDist, float rayRadius, HitResult& result)
 {
-	Capsule spherecast;
-	spherecast.position = rayStart;
-	spherecast.direction = rayDirection;
-	spherecast.length = rayDist;
-	spherecast.radius = rayRadius;
-
+	Capsule spherecast(rayStart, rayDirection, rayDist, rayRadius);
 	return IntersectVsCapsule(spherecast, &result);
 }
 
 /**************************************************************************//**
 	@brief		球の衝突判定
-	@param[in]	sphere		: カプセルオブジェクト
-				result		: 最短距離のメッシュを返す
+	@param[in]	sphere		: 球オブジェクト
 	@return		衝突判定
 *//***************************************************************************/
 bool MapQuadtree::IntersectVsSphere(Sphere& sphere)
@@ -595,7 +590,6 @@ bool MapQuadtree::IntersectVsSphere(Sphere& sphere)
 				spherePos	: 位置
 				radius		: 半径
 				hit			: 全体の返り値となるフラグ
-				result		: 最短距離のメッシュを返す（スフィアキャスト利用時に使用）
 	@return		衝突判定
 *//***************************************************************************/
 bool MapQuadtree::IntersectVsSphereInNode(

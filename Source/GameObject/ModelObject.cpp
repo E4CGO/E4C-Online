@@ -1,12 +1,12 @@
 //! @file ModelObject.cpp
 //! @note
 #include "ModelObject.h"
-#include "TAKOEngine/Physics/UnrotatedBoxCollider.h"
-#include "TAKOEngine/Physics/BoundingBoxCollider.h"
-#include "TAKOEngine/Physics/SphereCollider.h"
-#include "TAKOEngine/Physics/CapsuleCollider.h"
-#include "TAKOEngine/Physics/ModelCollider.h"
-#include "TAKOEngine/Physics/MapCollider.h"
+#include "TAKOEngine/Physics/Collider/SphereCollider.h"
+#include "TAKOEngine/Physics/Collider/AABBCollider.h"
+#include "TAKOEngine/Physics/Collider/OBBCollider.h"
+#include "TAKOEngine/Physics/Collider/CapsuleCollider.h"
+#include "TAKOEngine/Physics/Collider/ModelCollider.h"
+#include "TAKOEngine/Physics/Collider/MapCollider.h"
 
 /**************************************************************************//**
 	@brief		コンストラクタ（引数付き）
@@ -157,28 +157,28 @@ void ModelObject::Render(const RenderContext& rc)
 	@param[in]	idx			モデルID
 	@return		なし
 *//***************************************************************************/
-void ModelObject::SetCollider(Collider::COLLIDER_TYPE collider, int idx)
+void ModelObject::SetCollider(Collider::COLLIDER_TYPE collider, Collider::COLLIDER_OBJ objType, int idx)
 {
 	switch (collider)
 	{
 	case Collider::COLLIDER_TYPE::SPHERE:
-		this->collider = std::make_unique<SphereCollider>();
+		this->collider = std::make_unique<SphereCollider>(objType, &transform);
 		break;
-	case Collider::COLLIDER_TYPE::UNROTATED_BOX:
-		this->collider = std::make_unique<UnrotatedBoxCollider>();
+	case Collider::COLLIDER_TYPE::AABB:
+		this->collider = std::make_unique<AABBCollider>(objType, &transform);
+		break;
+	case Collider::COLLIDER_TYPE::OBB:
+		this->collider = std::make_unique<OBBCollider>(objType, &transform);
 		break;
 	case Collider::COLLIDER_TYPE::CAPSULE:
-		this->collider = std::make_unique<CapsuleCollider>();
+		this->collider = std::make_unique<CapsuleCollider>(objType, &transform);
 		break;
 	case Collider::COLLIDER_TYPE::MODEL:
-		this->collider = std::make_unique<ModelCollider>(m_pmodels[idx].get());
-		break;
-	case Collider::COLLIDER_TYPE::BOUNDING_BOX:
-		this->collider = std::make_unique<BoundingBoxCollider>(m_pmodels[idx].get());
+		this->collider = std::make_unique<ModelCollider>(m_pmodels[idx].get(), objType, &transform);
 		break;
 	case Collider::COLLIDER_TYPE::MAP:
 		//this->collider = std::make_unique<ModelCollider>(model.get());
-		this->collider = std::make_unique<MapCollider>(m_pmodels[idx].get());
+		this->collider = std::make_unique<MapCollider>(m_pmodels[idx].get(), objType, &transform);
 		break;
 	default:
 		this->collider = nullptr;

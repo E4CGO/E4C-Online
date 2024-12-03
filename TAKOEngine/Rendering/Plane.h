@@ -10,7 +10,7 @@
 #include <DirectXMath.h>
 
 #include "TAKOEngine/Rendering/RenderContext.h"
-#include "TAKOEngine/Physics/Collider.h"
+#include "TAKOEngine/Physics/Collider/Collider.h"
 #include "TAKOEngine/Rendering/Sprite.h"
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 
