@@ -23,12 +23,7 @@
 
 void SceneGame_E4C::Initialize()
 {
-	std::ifstream file_in("CharacterInfos.json");
-	nlohmann::json savedData;
-	file_in >> savedData;
-	file_in.close();
-	PLAYER_CHARACTER_DATA.SetCharacterInfos(savedData);
-	PLAYER_CHARACTER_DATA.ParseData();
+
 
 	stateMachine = std::make_unique<StateMachine<SceneGame_E4C>>();
 	stateMachine->RegisterState(GAME_STATE::INIT, new SceneGame_E4CState::InitState(this));
@@ -44,7 +39,7 @@ void SceneGame_E4C::Initialize()
 
 	// 選択した自機
 	const PlayerCharacterData::CharacterInfo info = PlayerCharacterData::Instance().GetCurrentCharacter();
-	PlayerCharacter* player = PlayerCharacterManager::Instance().UpdatePlayerData(0, "", info.Character.pattern);
+	PlayerCharacter* player = PlayerCharacterManager::Instance().UpdatePlayerData(0, "", info.pattern);
 	player->Show();
 	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 

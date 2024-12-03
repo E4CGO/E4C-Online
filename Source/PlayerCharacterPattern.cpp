@@ -5,6 +5,7 @@
 #include "GameObject/Character/Player/PlayerCharacter.h"
 #include "GameObject/Character/Player/State/PlayerCharacterState.h"
 #include "GameObject/Character/Player/State/PlayerCharacterSwordState.h"
+#include "GameObject/Character/Player/State/PlayerCharacterShieldState.h"
 
 /**************************************************************************//**
 	@brief		性別処理
@@ -85,5 +86,28 @@ void PlayerCharacterPatternSword::Execute(PlayerCharacter* chara)
 		stateMachine->RegisterSubState(static_cast<int>(PlayerCharacter::STATE::ATTACK_NORMAL), ATTACK_1, new AttackNormalState_1(chara));
 		stateMachine->RegisterSubState(static_cast<int>(PlayerCharacter::STATE::ATTACK_NORMAL), ATTACK_2, new AttackNormalState_2(chara));
 		stateMachine->RegisterSubState(static_cast<int>(PlayerCharacter::STATE::ATTACK_NORMAL), ATTACK_3, new AttackNormalState_3(chara));
+		
+		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::SKILL_1), new Skill1State(chara));
+		stateMachine->RegisterSubState(static_cast<int>(PlayerCharacter::STATE::SKILL_1), ATTACK_START, new Skill1StateStart(chara));
+		stateMachine->RegisterSubState(static_cast<int>(PlayerCharacter::STATE::SKILL_1), ATTACK_CONTINUE, new Skill1ContinueStart(chara));
+		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::SKILL_2), new Skill2State(chara));
+	}
+}
+
+
+/**************************************************************************//**
+	@brief	左盾モデル実装、盾モーション付き
+	@param[in]	chara プレイヤーキャラクター参照ポインタ
+	@return		なし
+*//***************************************************************************/
+void PlayerCharacterPatternShield::Execute(PlayerCharacter * chara)
+{
+	PlayerCharacterPatternSingleModel::Execute(chara);
+
+	StateMachine<PlayerCharacter>* stateMachine = chara->GetStateMachine();
+
+	{
+		using namespace PlayerCharacterState::Shield;
+		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::ATTACK_SPECIAL), new AttackSpecialState(chara));
 	}
 }

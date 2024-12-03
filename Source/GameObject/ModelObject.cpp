@@ -241,11 +241,6 @@ void ModelObject::Render(const RenderContext& rc)
 
 		ModelShader* shader = T_GRAPHICS.GetModelShader(m_shaderId);
 
-		if (m_renderMode == DX11GLTF)
-		{
-			shader = T_GRAPHICS.GetModelShader(ModelShaderId::Lambert);
-		}
-
 		// 描画
 		shader->Begin(rc);
 		shader->Draw(rc, model.get(), m_color);

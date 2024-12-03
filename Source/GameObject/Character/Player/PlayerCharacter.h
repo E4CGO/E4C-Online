@@ -41,7 +41,7 @@ public:
 	// コンストラクタ(引数付き)
 	PlayerCharacter(uint64_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
 	// コンストラクタ(引数付き)
-	PlayerCharacter(PlayerCharacterData::CharacterInfo dataInfo);
+	PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataInfo);
 	// デストラクタ
 	~PlayerCharacter();
 
@@ -65,14 +65,14 @@ public:
 		ANIM_IDLE,
 		ANIM_MOVE_START,
 		ANIM_MOVE_CONTINUE,
-		ANIM_ATTACK_SIMPLE_FIRST,
-		ANIM_ATTACK_SIMPLE_SECOND,
-		ANIM_ATTACK_SIMPLE_THIRD,
-		ANIM_ATTACK_SPECIAL_FIRST,
-		ANIM_ATTACK_SPECIAL_SECOND,
-		ANIM_GUARD_START,
-		ANIM_GUARD_CONTINUE,
-		ANIM_GUARD_FINISH,
+		ANIM_ATTACK_SWORD_COMBO_FIRST,
+		ANIM_ATTACK_SWORD_COMBO_SECOND,
+		ANIM_ATTACK_SWORD_COMBO_THIRD,
+		ANIM_ATTACK_SWORD_SPECIAL_FIRST,
+		ANIM_ATTACK_SWORD_SPECIAL_SECOND,
+		ANIM_GUARD_SHIELD_START,
+		ANIM_GUARD_SHIELD_CONTINUE,
+		ANIM_GUARD_SHIELD_FINISH,
 		ANIM_HURT,
 		ANIM_DEATH
 	};
@@ -151,9 +151,6 @@ public:
 	const std::string& GetName() { return m_name; }
 	void SetName(const char* name) { this->m_name = name; }
 
-	void SetMenuVisibility(bool value) { this->m_menuVisible = value; }
-	bool GetMenuVisibility() { return this->m_menuVisible; }
-
 	void SetSaveFileName(std::string value) { this->m_SaveFile = value; }
 	std::string GetCharacterSaveFileName() { return this->m_SaveFile; }
 
@@ -205,6 +202,7 @@ public:
 protected:
 	void RegisterCommonState();
 	void UpdateTarget();													// 自機用アイム目標更新
+	void UpdateHorizontalMove(float elapsedTime) override;					// 水平移動更新処理
 	virtual void UpdateColliders() override;								// 衝突判定の更新
 
 	void UpdateSkillTimers(float elapsedTime);								// スキルタイマー

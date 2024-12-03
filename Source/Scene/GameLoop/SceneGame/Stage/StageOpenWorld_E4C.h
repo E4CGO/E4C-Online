@@ -50,8 +50,7 @@ private:
 
 	std::unique_ptr <Teleporter> teleporter;
 
-	std::unique_ptr<ModelObject> map;
-	std::unique_ptr<ModelObject> tower;
+	std::unordered_map<std::string, std::unique_ptr<ModelObject>> models;
 
 	std::unique_ptr<ModelObject> sky;
 	DirectX::XMFLOAT4X4 test_transform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };

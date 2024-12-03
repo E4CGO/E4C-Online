@@ -43,10 +43,10 @@ void CapsuleCollider::DrawDebugPrimitive(DirectX::XMFLOAT4 color)
 
 /**************************************************************************//**
 		@brief		マップとの当たり判定
-		@param[in]	bool wallcheck : trueなら壁に当たっているかのみ判定、falseなら押し返し処理も行う
-		@return		なし
+		@param[in]	なし
+		@return		衝突判定
 *//***************************************************************************/
-bool CapsuleCollider::CollisionVsMap(bool wallCheck)
+bool CapsuleCollider::CollisionVsMap()
 {
 	Capsule capsule;
 	capsule.position = position;
@@ -54,7 +54,7 @@ bool CapsuleCollider::CollisionVsMap(bool wallCheck)
 	capsule.radius = radius;
 	capsule.length = length;
 
-	if (MAPTILES.IntersectCapsuleVsMap(capsule, wallCheck))
+	if (MAPTILES.IntersectCapsuleVsMap(capsule))
 	{
 		position = capsule.position;
 		return true;
