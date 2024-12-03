@@ -11,12 +11,24 @@
 
 WidgetSettingWindow::WidgetSettingWindow()
 {
-	background = RESOURCE.LoadSpriteResource("Data/Sprites/bar_ready.png");
-	m_size = background->GetTextureSize() * 0.2f;
-	m_position = {
-		(SCREEN_W - m_size.x) / 2.0f,
-		(SCREEN_H - m_size.y) / 2.0f
-	};
+	if (T_GRAPHICS.isDX11Active)
+	{
+		background = RESOURCE.LoadSpriteResource("Data/Sprites/bar_ready.png");
+		m_size = background->GetTextureSize() * 0.2f;
+		m_position = {
+			(SCREEN_W - m_size.x) / 2.0f,
+			(SCREEN_H - m_size.y) / 2.0f
+		};
+	}
+	else
+	{
+		backgroundDX12 = RESOURCE.LoadSpriteResourceDX12("Data/Sprites/bar_ready.png");
+		m_size = { static_cast<float>(backgroundDX12->GetTextureWidth() * 0.2f), static_cast<float>(backgroundDX12->GetTextureHeight() * 0.2f) };
+		m_position = {
+			(SCREEN_W - m_size.x) / 2.0f,
+			(SCREEN_H - m_size.y) / 2.0f
+		};
+	}
 
 	// 閉じ
 	closeBtn = new WidgetButtonImage("", "Data/Sprites/button_cancel.png", [&](Widget*)
@@ -98,4 +110,18 @@ void WidgetSettingWindow::Render(const RenderContext& rc)
 
 void WidgetSettingWindow::RenderDX12(const RenderContextDX12& rc)
 {
+	backgroundDX12->Begin(rc);
+	backgroundDX12->Draw(
+		m_position.x, m_position.y,
+		m_size.x, m_size.y,
+		0,
+		1, 1, 1, 1);
+	backgroundDX12->End(rc.d3d_command_list);
+
+	closeBtn->RenderDX12(rc);
+	saveBtn->RenderDX12(rc);
+	for (Widget*& option : OptionsList)
+	{
+		option->RenderDX12(rc);
+	}
 }

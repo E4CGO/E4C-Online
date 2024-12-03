@@ -3,7 +3,6 @@
 #include "TAKOEngine/GUI/Widget.h"
 
 #include <string>
-
 #include "GameObject/Character/Enemy/Enemy.h"
 
 class WidgetBossHp : public Widget
@@ -20,6 +19,9 @@ private:
 	std::string name;
 	std::shared_ptr<Sprite> gauge;
 	std::shared_ptr<Sprite> gaugeFrame;
+
+	std::shared_ptr<SpriteDX12> gaugeDX12;
+	std::shared_ptr<SpriteDX12> gaugeFrameDX12;
 
 	// 描画用
 	float tempHp = 0;

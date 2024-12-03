@@ -1,8 +1,8 @@
-#include "CollisionManager.h"
+ï»¿#include "CollisionManager.h"
 
 #include "TAKOEngine/Physics/CollisionDataManager.h"
 
-#include "GameObject/Character/Player/PlayerManager.h"
+#include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Projectile/ProjectileManager.h"
 
@@ -17,25 +17,25 @@ void CollisionManager::Update(float elapsedTime)
 }
 
 /**
-* “G“¯mÕ“Ë”»’è
+* æ•µåŒå£«è¡çªåˆ¤å®š
 **/
 void CollisionManager::EnemiesVsEnemiesCollsiion()
 {
 }
 
 /**
-* ©‹@ˆÊ’u’²®
-* “GÕ“Ë”»’è
+* è‡ªæ©Ÿä½ç½®èª¿æ•´
+* æ•µè¡çªåˆ¤å®š
 **/
 void CollisionManager::PlayerPositionAdjustment()
 {
-	// ©‹@ŒÀ’è
-	Player* player = PLAYERS.GetPlayerById(GAME_DATA.GetClientId());
+	// è‡ªæ©Ÿé™å®š
+	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
 	if (!player) return;
 	DirectX::XMFLOAT3 position = player->GetPosition();
 	Collider* playerCollider = player->GetCollider();
 
-	// “GÕ“Ë
+	// æ•µè¡çª
 	for (Enemy*& enemy : ENEMIES.GetAll())
 	{
 		for (const std::pair<int, Collider*>& collider : enemy->GetColliders())
@@ -53,7 +53,7 @@ void CollisionManager::PlayerPositionAdjustment()
 		}
 	}
 
-	// ƒ}ƒbƒv“à‚Ì’²®‚·‚é
+	// ãƒãƒƒãƒ—å†…ã®èª¿æ•´ã™ã‚‹ï¿¥
 	// Y
 	if (position.y < -15.0f)
 	{
@@ -73,21 +73,21 @@ void CollisionManager::ProjectileCollision()
 
 void CollisionManager::PlayerAttackToEnemyCollision()
 {
-	Player* player = PLAYERS.GetPlayerById(GAME_DATA.GetClientId());
-	if (!player) return;	// ©‹@‚¾‚¯
+	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
+	if (!player) return;	// è‡ªæ©Ÿã ã‘
 
 	player->AttackCollision();
 }
 
 /**
-* “GUŒ‚
-* ©‹@‚¾‚¯”»’f
-* Œ‹‰Ê‚ÍƒzƒXƒg‚É‘—‚ç‚È‚¢
-* HPAƒXƒe[ƒg‚Í“¯Šú
+* æ•µæ”»æ’ƒ
+* è‡ªæ©Ÿã ã‘åˆ¤æ–­
+* çµæœã¯ãƒ›ã‚¹ãƒˆã«é€ã‚‰ãªã„
+* HPã€ã‚¹ãƒ†ãƒ¼ãƒˆã¯åŒæœŸ
 **/
 void CollisionManager::EnemyAttackToPlayerCollision()
 {
-	Player* player = PLAYERS.GetPlayerById(GAME_DATA.GetClientId());
+	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
 	if (!player) return;
 	Collider* playerCollider = player->GetCollider();
 	if (!playerCollider->IsEnable()) return;

@@ -550,8 +550,7 @@ void SpriteDX12::Draw(
 		dx, dy, dw, dh,
 		0, 0, static_cast<float>(m_texture_width), static_cast<float>(m_texture_height),
 		angle,
-		r, g, b, a,
-		graphics.GetViwePort());
+		r, g, b, a);
 }
 
 /**************************************************************************//**
@@ -577,12 +576,13 @@ void SpriteDX12::Draw(
 	float sx, float sy,
 	float sw, float sh,
 	float angle,
-	float r, float g, float b, float a,
-	D3D12_VIEWPORT viewport)
+	float r, float g, float b, float a)
 {
 	if (m_sprite_index >= m_sprite_count) return;
 
 	Graphics& graphics = Graphics::Instance();
+
+	m_viewport = graphics.GetFrameBufferManager()->GetViewport();
 
 	// スプライトを構成する４頂点のスクリーン座標を計算する
 	DirectX::XMFLOAT2 positions[] = {
@@ -629,8 +629,8 @@ void SpriteDX12::Draw(
 	}
 
 	// 現在設定されているビューポートからスクリーンサイズを取得する
-	float screen_width = viewport.Width;
-	float screen_height = viewport.Height;
+	float screen_width = m_viewport.Width;
+	float screen_height = m_viewport.Height;
 
 	// スクリーン座標系からNDC座標系へ変換する。
 	for (auto& p : positions)

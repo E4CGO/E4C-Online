@@ -73,14 +73,28 @@ protected:
 
 /**************************************************************************//**
 	@class	PlayerCharacterPatternSword
-	@brief	斧モデル実装
+	@brief	剣モデル実装
 	@par	[説明]
-		斧モーション付きで斧を登録する(未実装)
+		剣モーション付きで剣を登録する
 *//***************************************************************************/
 class PlayerCharacterPatternSword : public PlayerCharacterPatternSingleModel
 {
 public:
 	PlayerCharacterPatternSword(const char* filename) : PlayerCharacterPatternSingleModel(filename) {}
+
+	void Execute(PlayerCharacter* chara) override;
+};
+
+/**************************************************************************//**
+	@class	PlayerCharacterPatternShield
+	@brief	盾モデル実装
+	@par	[説明]
+		盾モーション付きで盾を登録する
+*//***************************************************************************/
+class PlayerCharacterPatternShield : public PlayerCharacterPatternSingleModel
+{
+public:
+	PlayerCharacterPatternShield(const char* filename) : PlayerCharacterPatternSingleModel(filename) {}
 
 	void Execute(PlayerCharacter* chara) override;
 };

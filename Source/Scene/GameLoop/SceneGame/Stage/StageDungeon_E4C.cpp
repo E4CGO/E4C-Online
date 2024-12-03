@@ -19,9 +19,6 @@
 
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 
-#include "Scene/Stage/StageManager.h"
-
-#include "Scene/Stage/TestingStage.h"
 #include "GameObject/Props/Teleporter.h"
 
 #include "Network/OnlineController.h"
@@ -184,8 +181,11 @@ void StageDungeon_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
 
+	// フレームバッファマネージャー
+	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
+
 	// 光
-	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
+	LightManager::Instance().SetAmbientColor({ 0.3f, 0.3f, 0.3f, 0.0f });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
@@ -233,12 +233,6 @@ void StageDungeon_E4C::Initialize()
 	}
 	// 部屋の当たり判定を設定
 	MAPTILES.CreateSpatialIndex(5, 7);
-
-	// Sprite Resource Preload
-	for (auto& filename : spriteList)
-	{
-		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
-	}
 }
 
 void StageDungeon_E4C::Finalize()
@@ -263,8 +257,8 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	// 部屋を全てアップデート
 	rootRoom->Update(elapsedTime);
 
+	PlayerCharacterManager::Instance().Update(elapsedTime);
 	GameObjectManager::Instance().Update(elapsedTime);
-
 	MAPTILES.Update(elapsedTime);
 
 	if (T_INPUT.KeyDown(VK_MENU))
@@ -289,81 +283,8 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	{
 		T_INPUT.KeepCursorCenter();
 	}
-	PlayerCharacterManager::Instance().Update(elapsedTime);
 
 	timer += elapsedTime;
-
-	// 展示会だけ
-	if (T_INPUT.KeyDown(VK_ESCAPE))
-	{
-		isPause = !isPause;
-	}
-
-	if (isPause)
-	{
-		if (btnExit == nullptr)
-		{
-			auto widgets = UI.GetAll();
-			for (auto it : widgets)
-			{
-				if (it == btnExit)
-				{
-					return;
-				}
-			}
-			btnExit = new WidgetButtonImage("", "Data/Sprites/UI/exit.png", [&](WidgetButton*) {
-				m_pScene->GetStateMachine()->ChangeState(SceneGame_E4C::GAME_STATE::EXIT);
-				});
-			btnExit->SetPosition({ SCREEN_W * 0.5f - 163.0f * 0.5f * 1.5f, SCREEN_H * 0.8f });
-			btnExit->SetSize({ 163.0f * 1.5f, 128.0f });
-			UI.Register(btnExit);
-		}
-		if (background == nullptr)
-		{
-			auto widgets = UI.GetAll();
-			for (auto it : widgets)
-			{
-				if (it == background)
-				{
-					return;
-				}
-			}
-			background = new WidgetImage("Data/Sprites/big_background.t.png");
-			background->SetPosition({ 0, 0 });
-			background->SetSize({ SCREEN_W, SCREEN_H });
-			background->SetColor(DirectX::XMFLOAT4{ 1.0f, 1.0f, 1.0f, 0.5f });
-			UI.Register(background);
-		}
-	}
-	else
-	{
-		if (background != nullptr)
-		{
-			auto widgets = UI.GetAll();
-			for (auto it : widgets)
-			{
-				if (it == background)
-				{
-					UI.Remove(background);
-					background = nullptr;
-				}
-			}
-		}
-		if (btnExit != nullptr)
-		{
-			auto widgets = UI.GetAll();
-			for (auto it : widgets)
-			{
-				if (it == btnExit)
-				{
-					UI.Remove(btnExit);
-					btnExit = nullptr;
-				}
-			}
-		}
-	}
-
-	UI.Update(elapsedTime);
 }
 
 void StageDungeon_E4C::Render()
@@ -390,13 +311,53 @@ void StageDungeon_E4C::Render()
 
 	MAPTILES.Render(rc);
 
-	UI.Render(rc);
-
 #ifdef _DEBUG
 	// デバッグレンダラ描画実行
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
 	rootRoom->DrawDebugGUI();
 #endif // _DEBUG
+}
+
+void StageDungeon_E4C::RenderDX12()
+{
+	T_GRAPHICS.BeginRender();
+
+	// シーン用定数バッファ更新
+	const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
+		CameraManager::Instance().GetCamera());
+
+	// レンダーコンテキスト設定
+	RenderContextDX12 rc;
+	rc.d3d_command_list = m_frameBuffer->GetCommandList();
+	rc.scene_cbv_descriptor = scene_cbv_descriptor;
+
+	// 3Dモデル描画
+	{
+		m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+
+		// モデル描画
+		PlayerCharacterManager::Instance().RenderDX12(rc);
+
+		GameObjectManager::Instance().RenderDX12(rc);
+
+		MAPTILES.RenderDX12(rc);
+
+		// レンダーターゲットへの書き込み終了待ち
+		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+	}
+
+	// ポストエフェクト描画
+	{
+		postprocessingRenderer->Render(m_frameBuffer);
+	}
+
+	// 2D描画
+	{
+	}
+
+	T_GRAPHICS.End();
 }
 
 void StageDungeon_E4C::OnPhase()

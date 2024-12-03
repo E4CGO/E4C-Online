@@ -5,7 +5,7 @@
 #define __INCLUDED_UI_WIDGET__
 
 #include <DirectXMath.h>
-
+#include "TAKOEngine/Rendering/SpriteDX12.h"
 #include "TAKOEngine/Rendering/RenderContext.h"
 /**************************************************************************//**
 	@class

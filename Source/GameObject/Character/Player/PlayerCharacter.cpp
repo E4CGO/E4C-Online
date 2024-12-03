@@ -79,16 +79,13 @@ PlayerCharacter::PlayerCharacter(uint64_t id, const char* name, const uint8_t ap
 	LoadAppearance(appearance);
 }
 
-PlayerCharacter::PlayerCharacter(PlayerCharacterData::CharacterInfo dataInfo) : Character()
+PlayerCharacter::PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataInfo) : Character()
 {
 	scale = { 0.5f, 0.5f, 0.5f };
 	moveSpeed = 10.0f;
 	turnSpeed = DirectX::XMConvertToRadians(720);
 	jumpSpeed = 20.0f;
 	dodgeSpeed = 20.0f;
-
-	m_menuVisible = dataInfo.visible;
-	std::string m_SaveFile = dataInfo.save;
 
 	stateMachine = new StateMachine<PlayerCharacter>;
 	RegisterCommonState();
@@ -105,7 +102,7 @@ PlayerCharacter::PlayerCharacter(PlayerCharacterData::CharacterInfo dataInfo) : 
 	capsule.length = height - capsule.radius * 2;
 	collider->SetParam(capsule);
 
-	LoadAppearance(dataInfo.Character.pattern);
+	LoadAppearance(dataInfo.pattern);
 }
 
 /**************************************************************************//**
@@ -579,6 +576,17 @@ void PlayerCharacter::Render(const RenderContext& rc)
 
 	if (IsPlayer()) T_GRAPHICS.GetDebugRenderer()->DrawSphere(target, 0.1f, { 0, 1, 0, 1 });
 #endif // _DEBUG
+}
+
+void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
+{
+	Character::RenderDX12(rc);
+
+	DirectX::XMFLOAT3 front = CameraManager::Instance().GetCamera()->GetFront();
+	DirectX::XMFLOAT3 eye = CameraManager::Instance().GetCamera()->GetEye();
+	DirectX::XMFLOAT3 namePos = this->position + DirectX::XMFLOAT3{ 0, 2.2f, 0 };
+	float dot = XMFLOAT3Dot(front, namePos - eye);
+	if (dot < 0.0f) return;
 }
 
 void PlayerCharacter::OnDamage(const HitResult& hit, int damage)

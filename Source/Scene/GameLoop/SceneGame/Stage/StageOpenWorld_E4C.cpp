@@ -27,6 +27,9 @@ void StageOpenWorld_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
 
+	// フレームバッファマネージャー
+	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
+
 	// Sprite Resource Preload
 	for (auto& filename : spriteList)
 	{
@@ -35,25 +38,45 @@ void StageOpenWorld_E4C::Initialize()
 
 	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
 	stage_collision->Update(0);
+	stage_collision->SetCollider(Collider::COLLIDER_TYPE::MAP);
+
 	MAPTILES.Register(stage_collision);
 	MAPTILES.CreateSpatialIndex(5, 7);
 
-	map = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX11GLTF);
-	tower = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f);
+	if (T_GRAPHICS.isDX11Active)
+	{
+		models.emplace("map", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX11GLTF, ModelObject::MODEL_TYPE::RHS_PBR));
+		models.emplace("tower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_TOON));
+
+		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 70.0f, ModelObject::RENDER_MODE::DX11);
+		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
+	}
+
+	if (T_GRAPHICS.isDX12Active)
+	{
+		models.emplace("map", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		models.emplace("tower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		models.emplace("boss", std::make_unique<ModelObject>("Data/Model/Enemy/MDL_ENMboss_1129.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON));
+		models["boss"]->SetPosition({ 10.0, 0.0f, 10.0f });
+
+		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 50.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
+		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
+		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/pinkSky.dds");
+	}
 
 	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
 	teleporter->SetPosition({ 16, 8.5, -46 });
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
 
 	// 光
-	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
+	LightManager::Instance().SetAmbientColor({ 0.3f, 0.3f, 0.3f, 0.0f });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
 
 	// プレイヤー
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
-	player->SetPosition({ 15.0f, 15.0f, 5.0f });
+	player->SetPosition({ 5.0f, 10.0f, 5.0f });
 
 	// カメラ設定
 	Camera* mainCamera = CameraManager::Instance().GetCamera();
@@ -89,12 +112,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	cameraController->SyncContrllerToCamera(camera);
 	cameraController->Update(elapsedTime);
 
-	// 展示会だけ
-	if (T_INPUT.KeyDown(VK_ESCAPE))
-	{
-		isPause = !isPause;
-	}
-
 	if (T_INPUT.KeyDown(VK_MENU))
 	{
 		if (TentacleLib::isShowCursor())
@@ -118,78 +135,17 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 		T_INPUT.KeepCursorCenter();
 	}
 	PlayerCharacterManager::Instance().Update(elapsedTime);
-	map->Update(elapsedTime);
-	tower->Update(elapsedTime);
+
+	for (auto& it : models)
+	{
+		it.second->Update(elapsedTime);
+	}
+
+	sky->Update(elapsedTime);
 
 	teleporter->Update(elapsedTime);
 
 	timer += elapsedTime;
-
-	if (isPause)
-	{
-		if (btnExit == nullptr)
-		{
-			auto widgets = UI.GetAll();
-			for (auto it : widgets)
-			{
-				if (it == btnExit)
-				{
-					return;
-				}
-			}
-			btnExit = new WidgetButtonImage("", "Data/Sprites/UI/exit.png", [&](WidgetButton*) {
-				m_pScene->GetStateMachine()->ChangeState(SceneGame_E4C::GAME_STATE::EXIT);
-				});
-			btnExit->SetPosition({ SCREEN_W * 0.5f - 163.0f * 0.5f * 1.5f, SCREEN_H * 0.8f });
-			btnExit->SetSize({ 163.0f * 1.5f, 128.0f });
-			UI.Register(btnExit);
-		}
-		if (background == nullptr)
-		{
-			auto widgets = UI.GetAll();
-			for (auto it : widgets)
-			{
-				if (it == background)
-				{
-					return;
-				}
-			}
-			background = new WidgetImage("Data/Sprites/big_background.t.png");
-			background->SetPosition({ 0, 0 });
-			background->SetSize({ SCREEN_W, SCREEN_H });
-			background->SetColor(DirectX::XMFLOAT4{ 1.0f, 1.0f, 1.0f, 0.5f });
-			UI.Register(background);
-		}
-	}
-	else
-	{
-		if (background != nullptr)
-		{
-			auto widgets = UI.GetAll();
-			for (auto it : widgets)
-			{
-				if (it == background)
-				{
-					UI.Remove(background);
-					background = nullptr;
-				}
-			}
-		}
-		if (btnExit != nullptr)
-		{
-			auto widgets = UI.GetAll();
-			for (auto it : widgets)
-			{
-				if (it == btnExit)
-				{
-					UI.Remove(btnExit);
-					btnExit = nullptr;
-				}
-			}
-		}
-	}
-
-	UI.Update(elapsedTime);
 }
 
 void StageOpenWorld_E4C::Render()
@@ -212,8 +168,10 @@ void StageOpenWorld_E4C::Render()
 	// 描画
 	PlayerCharacterManager::Instance().Render(rc);
 
-	map->Render(rc);
-	tower->Render(rc);
+	for (auto& it : models)
+	{
+		it.second->Render(rc);
+	}
 
 	teleporter->Render(rc);
 
@@ -233,6 +191,57 @@ void StageOpenWorld_E4C::Render()
 	// デバッグレンダラ描画実行
 
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
+}
+
+void StageOpenWorld_E4C::RenderDX12()
+{
+	T_GRAPHICS.BeginRender();
+
+	// シーン用定数バッファ更新
+	const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
+		CameraManager::Instance().GetCamera());
+
+	// レンダーコンテキスト設定
+	RenderContextDX12 rc;
+	rc.d3d_command_list = m_frameBuffer->GetCommandList();
+	rc.scene_cbv_descriptor = scene_cbv_descriptor;
+
+	// 3Dモデル描画
+	{
+		m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+
+		// プレイヤー
+		PlayerCharacterManager::Instance().RenderDX12(rc);
+
+		// ステージ
+		for (auto& it : models)
+		{
+			it.second->RenderDX12(rc);
+		}
+
+		// skyBox
+		{
+			rc.skydomeData.skyTexture = m_sprites[1]->GetDescriptor();
+			sky->RenderDX12(rc);
+		}
+
+		// レンダーターゲットへの書き込み終了待ち
+		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+	}
+
+	// ポストエフェクト描画
+	{
+		postprocessingRenderer->Render(m_frameBuffer);
+	}
+
+	// 2D描画
+	{
+		UI.RenderDX12(rc);
+	}
+
+	T_GRAPHICS.End();
 }
 
 void StageOpenWorld_E4C::OnPhase()

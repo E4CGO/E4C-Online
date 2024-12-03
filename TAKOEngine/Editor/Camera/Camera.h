@@ -54,13 +54,13 @@ public:
 	int& GetSegment() { return currentSegment; }
 
 	//動くカメラ
-	void MoveToCamera(const DirectX::XMFLOAT3& eye, const DirectX::XMFLOAT3& focus, float transitiontime, float transitionDuration, float elapsedTime);
+	void MoveTo(const DirectX::XMFLOAT3& eye, const DirectX::XMFLOAT3& focus, float transitiontime, float transitionDuration);
 	//回転するカメラ
-	void RotateToCamera(const DirectX::XMFLOAT3& target, float& angle, float radius, float speed, float elapsedTime);
+	void RotateTo(const DirectX::XMFLOAT3& target, float& angle, float radius, float speed, float elapsedTime);
 	//始点、中点、終点のポイントを経由して移動するカメラ
-	void MovePointToCamera(const std::vector<DirectX::XMFLOAT3>& positions, const std::vector<DirectX::XMFLOAT3>& focusPoints,float& transitionTime, float transitionDuration, float elapsedTime);
+	void MoveByPoints(const std::vector<DirectX::XMFLOAT3>& positions, const std::vector<DirectX::XMFLOAT3>& focusPoints,float transitionTime, float transitionDuration);
 	//始点、終点のポイントを経由して移動するカメラ
-	void Move2PointToCamera(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const DirectX::XMFLOAT3& startFocus, const DirectX::XMFLOAT3& endFocus, float& transitionTime, float transitionDuration, float elapsedTime);
+	void Move2PointToCamera(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const DirectX::XMFLOAT3& startFocus, const DirectX::XMFLOAT3& endFocus, float transitionTime, float transitionDuration);
 private:
 	DirectX::XMFLOAT4X4 view;
 	DirectX::XMFLOAT4X4 projection;
