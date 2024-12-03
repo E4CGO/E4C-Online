@@ -1228,12 +1228,9 @@ if(MSVC)
 endif()
 
 if(MSVC)
-    foreach(CurrentShaderFile IN LISTS SHADER_NAMES)
-        add_custom_command(
-            TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/Data/Shader/${CurrentShaderFile} ${CMAKE_BINARY_DIR}/Data/Shader
-            COMMENT "Copying shaders ${CurrentShaderFile}")
-    endforeach()
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/Data/Shader ${CMAKE_BINARY_DIR}/Data/Shader
+            COMMENT "Copying shaders")
 endif()
 
 
