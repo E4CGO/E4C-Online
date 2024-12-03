@@ -5,6 +5,7 @@
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "TAKOEngine/Tool/XMFLOAT.h"
+#include "TAKOEngine/Tool/Mathf.h"
 #include "Source/GameObject/Character/Enemy/SkeletonMinion.h"
 /**************************************************************************//**
      @brief  コンストラクタ  
@@ -21,6 +22,7 @@ Spawner::Spawner(uint8_t enemyType, int maxExistedEnemiesNum, int maxSpawnEnemie
 void Spawner::Update(float elapsedTime)
 {
 	if (m_maxSpawnedEnemiesNum > 0 && m_maxSpawnedEnemiesNum <= m_spawnedCountTotal) return; // 生成終了
+	if (m_maxExistedEnemiesNum <= m_pSpawnedEnemies.size()) return;
 	if (SearchPlayer())
 	{
 		m_spawnTimer += elapsedTime;
@@ -59,7 +61,16 @@ void Spawner::Spawn()
 	// TODO NETWORK
 	m_spawnedCountTotal++;
 
-	m_pSpawnedEnemies.insert(ENEMIES.Register(Enemy::EnemyFactory(m_enemyType)));
+	Enemy* enemy = Enemy::EnemyFactory(m_enemyType);
+
+	// ランダムポイント
+	float angle = Mathf::RandomRange(0.0f, DirectX::XM_2PI);
+	float distance = Mathf::RandomRange(0.0f, m_spawnRadius);
+	DirectX::XMFLOAT3 offset = { cosf(angle) * distance, 0.0f, sinf(angle) * distance };
+
+	enemy->SetPosition(position + offset);
+	enemy->SetSpawner(this);
+	m_pSpawnedEnemies.insert(ENEMIES.Register(enemy));
 }
 
 /**************************************************************************//**

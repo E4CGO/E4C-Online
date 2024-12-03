@@ -221,7 +221,7 @@ protected:
 
 	float currentAnimationBlendSeconds = 0.0f;
 	float animationBlendSecondsLength = -1.0f;
-	bool animationBlending = false;
+	bool m_animationBlending = false;
 
 	float scaling = 1.0f;
 
@@ -242,6 +242,5 @@ protected:
 
 	float m_animationBlendSecondsLength = -1.0f;
 	float m_currentAnimationBlendSeconds = 0.0f;
-	bool  m_animationBlending = false;
 	std::string name = ""; // モデルの名前
 };

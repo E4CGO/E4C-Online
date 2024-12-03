@@ -14,10 +14,6 @@
 
 #include "GameData.h"
 
-// ディフォルト値
-float SceneCharacter_E4C::m_time{ 0 };
-const int SceneCharacter_E4C::m_maxCharacters{ 3 };
-
 /**************************************************************************//**
 	@brief	初期化
 *//***************************************************************************/
@@ -42,8 +38,6 @@ void SceneCharacter_E4C::Initialize()
 
 	// フレームバッファマネージャー
 	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
-
-	m_previewCharacters.resize(m_maxCharacters);
 
 	// 光
 	LightManager::Instance().SetAmbientColor({ 0.3f, 0.3f, 0.3f, 0.0f });
@@ -73,13 +67,16 @@ void SceneCharacter_E4C::Initialize()
 	cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
 	cameraController->SetEnable(false);
 
+	m_previewCharacters.clear();
+
 	// ステート
 	stateMachine = std::make_unique<StateMachine<SceneCharacter_E4C>>();
 	stateMachine->RegisterState(STATE::INIT, new SceneCharacter_E4CState::InitState(this));
-	stateMachine->RegisterState(STATE::CHARACTERSELECTION, new SceneCharacter_E4CState::CharacterSelectionState(this));
-	stateMachine->RegisterState(STATE::CHARACTERCREATION, new SceneCharacter_E4CState::CharacterCreationState(this));
+	stateMachine->RegisterState(STATE::CHARACTER_SELECTION, new SceneCharacter_E4CState::CharacterSelectionState(this));
+	stateMachine->RegisterState(STATE::CHARACTER_CREATION, new SceneCharacter_E4CState::CharacterCreationState(this));
 	stateMachine->RegisterState(STATE::START, new SceneCharacter_E4CState::StartState(this));
 	stateMachine->SetState(STATE::INIT);
+
 }
 
 /**************************************************************************//**
@@ -87,6 +84,12 @@ void SceneCharacter_E4C::Initialize()
 *//***************************************************************************/
 void SceneCharacter_E4C::Finalize()
 {
+	for (const PlayerCharacter* character : m_previewCharacters)
+	{
+		delete character;
+	}
+	m_previewCharacters.clear();
+
 	spritePreLoad.clear();
 	UI.Clear();
 	shadowMapRenderer->Clear();
@@ -99,15 +102,14 @@ void SceneCharacter_E4C::Finalize()
 *//***************************************************************************/
 void SceneCharacter_E4C::Update(float elapsedTime)
 {
-	m_time += elapsedTime;
-
-	for (auto& it : m_previewCharacters)
-	{
-		if (it != nullptr)
-			it->Update(elapsedTime);
-	}
-
 	stateMachine->Update(elapsedTime);
+
+	cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
+
+	for (PlayerCharacter* character : m_previewCharacters)
+	{
+		character->Update(elapsedTime);
+	}
 
 #ifdef _DEBUG
 	// カメラ更新
@@ -144,12 +146,9 @@ void SceneCharacter_E4C::Render()
 	shadowMapRenderer->Render();
 	rc.shadowMapData = shadowMapRenderer->GetShadowMapData();
 
-	for (auto& it : m_previewCharacters)
+	for (PlayerCharacter* character : m_previewCharacters)
 	{
-		if (it != nullptr) {
-			if (it->GetMenuVisibility())
-				it->Render(rc);
-		}
+		character->Render(rc);
 	}
 
 	UI.Render(rc);
@@ -188,7 +187,6 @@ void SceneCharacter_E4C::RenderDX12()
 			for (auto& it : m_previewCharacters)
 			{
 				if (it != nullptr) {
-					if (it->GetMenuVisibility())
 						it->RenderDX12(rc);
 				}
 			}

@@ -3,7 +3,7 @@
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Character/Enemy/Enemy.h"
 #include "GameObject/Character/Enemy/SkeletonMinion.h"
-
+#include "GameObject/Props/Spawner.h"
 
 Enemy::Enemy(const char* filename, float scaling) : Character(filename, scaling)
 {
@@ -28,6 +28,11 @@ Enemy::~Enemy()
 	}
 	colliders.clear();
 	attackColliders.clear();
+
+	if (m_pSpawner != nullptr)
+	{
+		m_pSpawner->EnemyDestoryCallBack(this);
+	}
 }
 
 bool Enemy::MoveTo(float elapsedTime, const DirectX::XMFLOAT3& target)
@@ -128,7 +133,10 @@ void Enemy::OnDamage(const ENEMY_COLLISION& hit)
 		stateMachine->ChangeState(EnemyState::ID::Death);
 	}
 }
-void Enemy::OnDeath() { ENEMIES.Remove(this); }
+void Enemy::OnDeath()
+{
+	ENEMIES.Remove(this);
+}
 
 Enemy* Enemy::EnemyFactory(int enemyType)
 {

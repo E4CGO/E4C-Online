@@ -12,7 +12,8 @@ float4 degamma(float4 color)
 float4 main(VS_OUT pin) : SV_TARGET
 {
     float3 adjustedPosition = float3(pin.position.x, pin.position.z, -pin.position.y);
-    float4 diffuseColor = degamma(skymap.Sample(sampler0, adjustedPosition));
+    //float4 diffuseColor = degamma(skymap.Sample(sampler0, adjustedPosition));
+    float4 diffuseColor = (skymap.Sample(sampler0, adjustedPosition));
         
     float3 reflection = diffuseColor.rgb * materialColor.rgb;
     float alpha = diffuseColor.a * materialColor.a;

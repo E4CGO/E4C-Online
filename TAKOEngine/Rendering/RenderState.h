@@ -44,6 +44,7 @@ enum class BlendState
 	OIT,
 	Additive,
 	Subtraction,
+	Screen,
 	Multiply,
 
 	EnumCount
@@ -54,6 +55,7 @@ enum class RasterizerState
 {
 	SolidCullNone,
 	SolidCullBack,
+	SolidCullBackCCW,
 	SolidCullFront,
 	WireCullnone,
 	WireCullBack,

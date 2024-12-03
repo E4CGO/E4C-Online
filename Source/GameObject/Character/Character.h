@@ -35,6 +35,12 @@ public:
 	// 攻撃コリジョン
 	virtual void AttackCollision() {}
 
+	void FaceTo(const DirectX::XMFLOAT3 point)
+	{
+		angle.y = atan2(point.x - position.x, point.z - position.z);
+		while (angle.y > DirectX::XM_PI) angle.y -= DirectX::XM_2PI;
+		while (angle.y < -DirectX::XM_PI) angle.y += DirectX::XM_2PI;
+	}
 protected:
 	// 移動
 	void Move(float vx, float vz, float speed);

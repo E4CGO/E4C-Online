@@ -33,7 +33,6 @@ void ModelObject::LoadModel(const char* filename, float scaling, ModelObject::RE
 
 	m_renderMode = renderMode;
 
-
 	switch (modelType)
 	{
 	case ModelObject::RHS_PBR:
@@ -107,7 +106,7 @@ void ModelObject::SetShader(const char* modelName, const ModelShaderDX12Id id, c
 	for (const ModelResource::Material& material : resource->GetMaterials())
 	{
 		ModelResource::Material& mat = const_cast<ModelResource::Material&>(material);
-		
+
 		// マテリアル名が指定されていない場合、または一致する場合にシェーダーを設定
 		if (materialNames.empty() || std::find(materialNames.begin(), materialNames.end(), mat.name) != materialNames.end())
 		{
@@ -241,11 +240,6 @@ void ModelObject::Render(const RenderContext& rc)
 		if (model == nullptr) return;
 
 		ModelShader* shader = T_GRAPHICS.GetModelShader(m_shaderId);
-
-		if (m_renderMode == DX11GLTF)
-		{
-			shader = T_GRAPHICS.GetModelShader(ModelShaderId::Lambert);
-		}
 
 		// 描画
 		shader->Begin(rc);
