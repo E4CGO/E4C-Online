@@ -3,6 +3,8 @@
 #include "Map/DungeonData.h"
 #include <vector>
 
+using namespace ns_RoomData;
+
 // 部屋ベース
 class RoomBase
 {
@@ -22,39 +24,6 @@ public:
 			if (room != nullptr) delete room;
 		}
 	}
-
-	enum TileType
-	{
-		FLOOR = 0,
-		WALL,
-		PILLAR,
-		STAIR,
-		SPAWNER,
-	};
-
-	// 配置するタイルデータ
-	struct TILE_DATA
-	{
-		TileType type;
-
-		DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
-		DirectX::XMFLOAT3 angle = { 0.0f, 0.0f, 0.0f };
-		DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f };
-		DirectX::XMFLOAT4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	};
-
-	// 接続点データ
-	struct CONNECTPOINT_DATA
-	{
-		DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
-		DirectX::XMFLOAT3 angle = { 0.0f, 0.0f, 0.0f };
-		DirectX::XMFLOAT4X4 transform = {
-			1, 0, 0, 0,
-			0, 1, 0, 0,
-			0, 0, 1, 0,
-			0, 0, 0, 1
-		};
-	};
 
 	virtual void Initialize() {}
 
@@ -92,7 +61,7 @@ public:
 	}
 
 	// 自分の部屋タイプを取得する
-	DungeonData::RoomType GetRoomType() { return roomType; }
+	RoomType GetRoomType() { return roomType; }
 
 	// 自分を含め全ての部屋を取得する
 	std::vector<RoomBase*> GetAll(std::vector<RoomBase*> rooms = {})
@@ -129,7 +98,7 @@ public:
 		if (this->childs.size() == 0)
 		{
 			// DEAD_END（行き止まり）なら親を登録
-			if (this->roomType == DungeonData::DEAD_END)
+			if (this->roomType == RoomType::DEAD_END)
 			{
 				childs.emplace_back(this->parent);
 			}
@@ -218,7 +187,9 @@ protected:
 		0, 0, 0, 1
 	};
 
-	std::vector<TILE_DATA> m_tileDatas;
+	std::vector<std::vector<TILE_DATA>> m_tileDatas;
+
+	//std::vector<TILE_DATA> m_tileDatas;
 	std::vector<CONNECTPOINT_DATA> m_connectPointDatas;
 
 	float tileScale = 4.0f;
@@ -227,7 +198,7 @@ protected:
 	int depth = 0;
 	AABB m_aabb = {};		// 当たり判定
 
-	DungeonData::RoomType roomType = DungeonData::RoomType::END_ROOM;
+	RoomType roomType = RoomType::END_ROOM;
 
 	RoomBase* parent = nullptr;		// 親
 	std::vector<RoomBase*> childs;	// 子

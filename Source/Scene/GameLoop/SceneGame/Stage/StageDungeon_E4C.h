@@ -9,6 +9,8 @@
 #include "GameObject/Character/Player/PlayerCharacter.h"
 #include "TAKOEngine/Rendering/Shaders/PlaneShader.h"
 
+#include "Map/DungeonData.h"
+
 #include "Scene/Scene.h"
 #include "Scene/Stage/Stage.h"
 
@@ -24,6 +26,8 @@
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
 #include "TAKOEngine/Tool/GLTFImporter.h"
+
+using namespace ns_RoomData;
 
 class SceneGame_E4C;
 

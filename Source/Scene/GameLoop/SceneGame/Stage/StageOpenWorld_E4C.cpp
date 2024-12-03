@@ -27,16 +27,15 @@ void StageOpenWorld_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
 
-<<<<<<< HEAD
-	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.025f);
+	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
 	stage_collision->SetCollider(Collider::COLLIDER_TYPE::MAP);
-=======
+
 	// Sprite Resource Preload
 	for (auto& filename : spriteList)
 	{
 		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
 	}
->>>>>>> main
+
 	stage_collision->Update(0);
 	MAPTILES.Register(stage_collision);
 	MAPTILES.CreateSpatialIndex(5, 7);

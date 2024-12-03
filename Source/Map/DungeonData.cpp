@@ -3,7 +3,7 @@
 DungeonData::DungeonData()
 {
 	// 部屋タイプの数で配列をリサイズする
-	m_roomGenerateSettings.resize(ENUM_COUNT);
+	m_roomGenerateSettings.resize(6);
 
 	// SIMPLE_ROOM_1
 	{

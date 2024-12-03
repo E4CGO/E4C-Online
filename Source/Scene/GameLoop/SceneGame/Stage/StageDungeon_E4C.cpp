@@ -40,19 +40,19 @@ void StageDungeon_E4C::GenerateDungeon()
 		isLeader = true;
 
 		// ダンジョンの自動生成を行う
-		std::vector<DungeonData::RoomType> placeableRooms;
+		std::vector<RoomType> placeableRooms;
 		//placeableRooms.emplace_back(DungeonData::SIMPLE_ROOM_1);
-		placeableRooms.emplace_back(DungeonData::CROSS_ROOM_1);
+		placeableRooms.emplace_back(RoomType::CROSS_ROOM_1);
 
 		// 生成可能な部屋の重みの合計
 		int totalWeight = 0;
-		for (DungeonData::RoomType type : placeableRooms)
+		for (RoomType type : placeableRooms)
 		{
 			totalWeight += dungeonData.GetRoomGenerateSetting(type).weight;
 		}
 
 		int randomValue = std::rand() % totalWeight;
-		for (DungeonData::RoomType type : placeableRooms)
+		for (RoomType type : placeableRooms)
 		{
 			randomValue -= dungeonData.GetRoomGenerateSetting(type).weight;
 
@@ -62,7 +62,7 @@ void StageDungeon_E4C::GenerateDungeon()
 
 				switch (type)
 				{
-				case DungeonData::SIMPLE_ROOM_1:
+				case RoomType::SIMPLE_ROOM_1:
 					rootRoom = std::make_unique<SimpleRoom1>(
 						nullptr, -1,
 						m_roomAABBs,
@@ -70,7 +70,7 @@ void StageDungeon_E4C::GenerateDungeon()
 						m_roomOrder, orderIndex);
 					break;
 
-				case DungeonData::END_ROOM:
+				case RoomType::END_ROOM:
 					rootRoom = std::make_unique<EndRoom1>(
 						nullptr, -1,
 						m_roomAABBs,
@@ -78,7 +78,7 @@ void StageDungeon_E4C::GenerateDungeon()
 						m_roomOrder, orderIndex);
 					break;
 
-				case DungeonData::CROSS_ROOM_1:
+				case RoomType::CROSS_ROOM_1:
 					rootRoom = std::make_unique<CrossRoom1>(
 						nullptr, -1,
 						m_roomAABBs,
@@ -86,7 +86,7 @@ void StageDungeon_E4C::GenerateDungeon()
 						m_roomOrder, orderIndex);
 					break;
 
-				case DungeonData::CROSS_ROOM_2:
+				case RoomType::CROSS_ROOM_2:
 					rootRoom = std::make_unique<CrossRoom2>(
 						nullptr, -1,
 						m_roomAABBs,
@@ -94,7 +94,7 @@ void StageDungeon_E4C::GenerateDungeon()
 						m_roomOrder, orderIndex);
 					break;
 
-				case DungeonData::PASSAGE_1:
+				case RoomType::PASSAGE_1:
 					rootRoom = std::make_unique<Passage1>(
 						nullptr, -1,
 						m_roomAABBs,
@@ -102,7 +102,7 @@ void StageDungeon_E4C::GenerateDungeon()
 						m_roomOrder, orderIndex);
 					break;
 
-				case DungeonData::DEAD_END:
+				case RoomType::DEAD_END:
 					rootRoom = std::make_unique<DeadEndRoom>(
 						nullptr, -1,
 						m_roomAABBs,
@@ -128,7 +128,7 @@ void StageDungeon_E4C::GenerateDungeon()
 
 		switch (m_roomOrder.front())
 		{
-		case DungeonData::SIMPLE_ROOM_1:
+		case RoomType::SIMPLE_ROOM_1:
 			rootRoom = std::make_unique<SimpleRoom1>(
 				nullptr, -1,
 				m_roomAABBs,
@@ -136,7 +136,7 @@ void StageDungeon_E4C::GenerateDungeon()
 				m_roomOrder, orderIndex);
 			break;
 
-		case DungeonData::END_ROOM:
+		case RoomType::END_ROOM:
 			rootRoom = std::make_unique<EndRoom1>(
 				nullptr, -1,
 				m_roomAABBs,
@@ -144,7 +144,7 @@ void StageDungeon_E4C::GenerateDungeon()
 				m_roomOrder, orderIndex);
 			break;
 
-		case DungeonData::CROSS_ROOM_1:
+		case RoomType::CROSS_ROOM_1:
 			rootRoom = std::make_unique<CrossRoom1>(
 				nullptr, -1,
 				m_roomAABBs,
@@ -152,7 +152,7 @@ void StageDungeon_E4C::GenerateDungeon()
 				m_roomOrder, orderIndex);
 			break;
 
-		case DungeonData::CROSS_ROOM_2:
+		case RoomType::CROSS_ROOM_2:
 			rootRoom = std::make_unique<CrossRoom2>(
 				nullptr, -1,
 				m_roomAABBs,
@@ -160,7 +160,7 @@ void StageDungeon_E4C::GenerateDungeon()
 				m_roomOrder, orderIndex);
 			break;
 
-		case DungeonData::PASSAGE_1:
+		case RoomType::PASSAGE_1:
 			rootRoom = std::make_unique<Passage1>(
 				nullptr, -1,
 				m_roomAABBs,
@@ -168,7 +168,7 @@ void StageDungeon_E4C::GenerateDungeon()
 				m_roomOrder, orderIndex);
 			break;
 
-		case DungeonData::DEAD_END:
+		case RoomType::DEAD_END:
 			rootRoom = std::make_unique<DeadEndRoom>(
 				nullptr, -1,
 				m_roomAABBs,

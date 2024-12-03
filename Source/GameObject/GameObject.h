@@ -58,6 +58,8 @@ public:
 	const DirectX::XMFLOAT3& GetScale() const { return scale; }
 	// スケール設定
 	void SetScale(const DirectX::XMFLOAT3& scale) { this->scale = scale; }
+	// 行列取得
+	const DirectX::XMFLOAT4X4 GetTransform() const { return transform; }
 
 	const DirectX::XMFLOAT3 GetFront() const { return { transform._31, transform._32, transform._33 }; }
 	const DirectX::XMFLOAT3 GetRight() const { return { transform._11, transform._12, transform._13 }; }

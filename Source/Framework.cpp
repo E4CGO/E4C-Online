@@ -13,6 +13,7 @@
 #include "Scene/SceneManager.h"
 #include "Scene/SceneTest.h"
 #include "Scene/GameLoop/SceneTitle/SceneTitle_E4C.h"
+#include "Scene/GameLoop/SceneRoomTest/SceneRoomTest_E4C.h"
 
 #include "GameData.h"
 
@@ -52,8 +53,8 @@ Framework::Framework(HWND hWnd)
 	}
 
 	// シーン初期化
+	//SceneManager::Instance().ChangeScene(new SceneLoading(new SceneRoomTest_E4C));
 	SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTitle_E4C));
-	//SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTitle));
 }
 
 // デストラクタ

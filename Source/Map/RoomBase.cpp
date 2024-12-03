@@ -19,6 +19,9 @@ RoomBase::RoomBase(
 	bool isAutoGeneration,
 	std::vector<uint8_t>& roomOrder, int& orderIndex)
 {
+	// タイルデータのリサイズ
+	m_tileDatas.resize(TileType::TILETYPE_COUNT);
+
 	// 親と接続点番号を代入
 	this->parent = parent;
 	this->parentConnectPointIndex = pointIndex;
@@ -123,27 +126,28 @@ void RoomBase::GenerateNextRoom(
 	// 親がない＝最初の部屋ならば入口を塞いでおく
 	if (parent == nullptr)
 	{
-		m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+		m_tileDatas.at(TileType::WALL).emplace_back(TILE_DATA(
 			{ -2.0f, 0.0f, -2.0f },
 			{ 0.0f, DirectX::XMConvertToRadians(270.0f), 0.0f },
 			{ 1.0f, 1.0f, 1.0f }));
-		m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+		m_tileDatas.at(TileType::WALL).emplace_back(TILE_DATA(
 			{ -2.0f, 3.0f, -2.0f },
 			{ 0.0f, DirectX::XMConvertToRadians(270.0f), 0.0f },
 			{ 1.0f, 1.0f, 1.0f }));
-		m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+
+		m_tileDatas.at(TileType::PILLAR).emplace_back(TILE_DATA(
 			{ -2.0f, 0.0f, -2.0f },
 			{ 0.0f, 0.0f, 0.0f },
 			{ 1.0f, 1.0f, 1.0f }));
-		m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		m_tileDatas.at(TileType::PILLAR).emplace_back(TILE_DATA(
 			{ -2.0f, 3.0f, -2.0f },
 			{ 0.0f, 0.0f, 0.0f },
 			{ 1.0f, 1.0f, 1.0f }));
-		m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		m_tileDatas.at(TileType::PILLAR).emplace_back(TILE_DATA(
 			{ 2.0f, 0.0f, -2.0f },
 			{ 0.0f, 0.0f, 0.0f },
 			{ 1.0f, 1.0f, 1.0f }));
-		m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
+		m_tileDatas.at(TileType::PILLAR).emplace_back(TILE_DATA(
 			{ 2.0f, 3.0f, -2.0f },
 			{ 0.0f, 0.0f, 0.0f },
 			{ 1.0f, 1.0f, 1.0f }));
@@ -165,13 +169,13 @@ void RoomBase::GenerateNextRoom(
 		if (depth < dungeonData.GetDungeonGenerateSetting().maxDepth)
 		{
 			// 配置時に他の部屋と重ならない部屋のみを配列に保存する
-			std::vector<std::vector<DungeonData::RoomType>> placeableRooms;
+			std::vector<std::vector<RoomType>> placeableRooms;
 			placeableRooms.resize(m_connectPointDatas.size());
 
 			// 接続点の数だけ当たり判定を行い、生成を行う
 			for (int i = 0; i < m_connectPointDatas.size(); i++)
 			{
-				for (DungeonData::RoomType type : dungeonData.GetRoomGenerateSetting(roomType).placementCandidates)
+				for (RoomType type : dungeonData.GetRoomGenerateSetting(roomType).placementCandidates)
 				{
 					AABB nextRoomAABB = CalcAABB(dungeonData.GetRoomGenerateSetting(type).aabb,
 						m_connectPointDatas.at(i).position, DirectX::XMConvertToDegrees(m_connectPointDatas.at(i).angle.y));
@@ -223,13 +227,13 @@ void RoomBase::GenerateNextRoom(
 				{
 					// 生成可能な部屋の重みの合計
 					int totalWeight = 0;
-					for (DungeonData::RoomType type : placeableRooms.at(i))
+					for (RoomType type : placeableRooms.at(i))
 					{
 						totalWeight += dungeonData.GetRoomGenerateSetting(type).weight;
 					}
 
 					int randomValue = std::rand() % totalWeight;
-					for (DungeonData::RoomType type : placeableRooms.at(i))
+					for (RoomType type : placeableRooms.at(i))
 					{
 						randomValue -= dungeonData.GetRoomGenerateSetting(type).weight;
 
@@ -239,23 +243,23 @@ void RoomBase::GenerateNextRoom(
 
 							switch (type)
 							{
-							case DungeonData::SIMPLE_ROOM_1:
+							case RoomType::SIMPLE_ROOM_1:
 								nextRoom = new SimpleRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
 								break;
 
-							case DungeonData::END_ROOM:
+							case RoomType::END_ROOM:
 								nextRoom = new EndRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
 								break;
 
-							case DungeonData::CROSS_ROOM_1:
+							case RoomType::CROSS_ROOM_1:
 								nextRoom = new CrossRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
 								break;
 
-							case DungeonData::CROSS_ROOM_2:
+							case RoomType::CROSS_ROOM_2:
 								nextRoom = new CrossRoom2(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
 								break;
 
-							case DungeonData::PASSAGE_1:
+							case RoomType::PASSAGE_1:
 								nextRoom = new Passage1(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
 								break;
 
@@ -303,27 +307,27 @@ void RoomBase::GenerateNextRoom(
 
 			switch (nextRoomType)
 			{
-			case DungeonData::SIMPLE_ROOM_1:
+			case RoomType::SIMPLE_ROOM_1:
 				nextRoom = new SimpleRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
 				break;
 
-			case DungeonData::END_ROOM:
+			case RoomType::END_ROOM:
 				nextRoom = new EndRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
 				break;
 
-			case DungeonData::CROSS_ROOM_1:
+			case RoomType::CROSS_ROOM_1:
 				nextRoom = new CrossRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
 				break;
 
-			case DungeonData::CROSS_ROOM_2:
+			case RoomType::CROSS_ROOM_2:
 				nextRoom = new CrossRoom2(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
 				break;
 
-			case DungeonData::PASSAGE_1:
+			case RoomType::PASSAGE_1:
 				nextRoom = new Passage1(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
 				break;
 
-			case DungeonData::DEAD_END:
+			case RoomType::DEAD_END:
 				nextRoom = new DeadEndRoom(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
 				break;
 			}
@@ -384,67 +388,125 @@ AABB RoomBase::CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const
 
 void RoomBase::PlaceMapTile(bool isLeader)
 {
-	int count = 0;
-
-	for (const TILE_DATA& tileData : m_tileDatas)
+	struct ModelFileData
 	{
-		std::vector<std::string> colliderFileNames;
-		std::vector<std::string> modelFileNames;
+		std::string fileName;
+		float scale = 1.0;
+	};
 
-		switch (tileData.type)
+	for (int tileType = TileType::FLOOR; tileType < TileType::TILETYPE_COUNT; tileType++)
+	{
+		std::vector<ModelFileData> colliderFileNames;	// 当たり判定用モデル
+		std::vector<ModelFileData> modelFileNames;		// 描画用モデル
+
+		switch (tileType)
 		{
 		case TileType::FLOOR:
-			colliderFileNames.emplace_back("Data/Model/DungeonAssets/FLOOR.glb");
+			colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/FloorCollision_01a.glb", 4.0f);
+			modelFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Floor_01a.glb", 4.0f);
 			break;
 		case TileType::WALL:
-			colliderFileNames.emplace_back("Data/Model/DungeonAssets/WALL.glb");
-			//switch (count)
-			//{
-			//case 0:	colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_01a.glb");
-			//case 1:	colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_01b.glb");
-			//case 2:	colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_02a.glb");
-			//case 3:	colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_02b.glb");
-			//case 4:	colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_03a.glb");
-			//case 5:	colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_04a.glb");
-			//}
-			//break;
-		case TileType::PILLAR:
-			modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_01a.glb");
-			modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_Base_01a.glb");
-			modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_Top_01a.glb");
+			colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/WallCollision_01a.glb", 4.0f);
+			modelFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_01a.glb", 4.0f);
 			break;
+		case TileType::PILLAR:
+			continue;
 		case TileType::STAIR:
 			colliderFileNames.emplace_back("Data/Model/DungeonAssets/SLOPE.glb");
 			break;
 		case TileType::SPAWNER:
-			modelFileNames.emplace_back("Data/Model/Cube/testCubes.glb");
-			break;
+			continue;
 		}
 
-		count++;
-		if (count > 5) count = 0;
-
-		MapTile* newTile = new MapTile("", 1.0f, this);
-
-		// 当たり判定モデルだけ先に読み込み、当たり判定を設定する
-		for (std::string fileName : colliderFileNames)
+		for (const TILE_DATA& tileData : m_tileDatas.at(tileType))
 		{
-			newTile->LoadModel(fileName.c_str(), 1.0f);
-		}
-		if (colliderFileNames.size() != 0) newTile->SetCollider(Collider::COLLIDER_TYPE::MAP);
+			MapTile* newTile = new MapTile("", 1.0f, this);
 
-		// 表示用モデルは後に読み込む
-		for (std::string fileName : modelFileNames)
-		{
-			newTile->LoadModel(fileName.c_str(), 1.0f);
+			// 当たり判定モデルだけ先に読み込み、当たり判定を設定する
+			for (const ModelFileData& data : colliderFileNames)
+			{
+				newTile->LoadModel(data.fileName.c_str(), data.scale);
+			}
+			if (colliderFileNames.size() != 0) newTile->SetCollider(Collider::COLLIDER_TYPE::MAP);
+
+			// 表示用モデルは後に読み込む
+			for (const ModelFileData& data : modelFileNames)
+			{
+				newTile->LoadModel(data.fileName.c_str(), data.scale);
+			}
+			newTile->SetPosition(tileData.position);
+			newTile->SetAngle(tileData.angle);
+			newTile->SetScale(tileData.scale);
+			newTile->SetColor(tileData.color);
+			newTile->Update(0);
+			MAPTILES.Register(newTile);
 		}
-		newTile->SetPosition(tileData.position);
-		newTile->SetAngle(tileData.angle);
-		newTile->SetScale(tileData.scale);
-		newTile->SetColor(tileData.color);
-		newTile->Update(0);
-		MAPTILES.Register(newTile);
 	}
+
+	//for (const TILE_DATA& tileData : m_tileDatas)
+	//{
+	//	std::vector<ModelFileData> colliderFileNames;	// 当たり判定用モデル
+	//	std::vector<ModelFileData> modelFileNames;		// 描画用モデル
+
+	//	switch (tileData.type)
+	//	{
+	//	case TileType::FLOOR:
+	//		//colliderFileNames.emplace_back("Data/Model/DungeonAssets/FLOOR.glb");
+	//		colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/FloorCollision_01a.glb", 4.0f);
+	//		modelFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Floor_01a.glb", 4.0f);
+	//		break;
+	//	case TileType::WALL:
+	//		//colliderFileNames.emplace_back("Data/Model/DungeonAssets/WALL.glb");
+	//		colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/WallCollision_01a.glb", 4.0f);
+	//		modelFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_01a.glb", 4.0f);
+	//		//switch (count)
+	//		//{
+	//		//case 0:	colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_01a.glb");
+	//		//case 1:	colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_01b.glb");
+	//		//case 2:	colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_02a.glb");
+	//		//case 3:	colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_02b.glb");
+	//		//case 4:	colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_03a.glb");
+	//		//case 5:	colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_04a.glb");
+	//		//}
+	//		break;
+	//	case TileType::PILLAR:
+	//		continue;
+	//		//modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_01a.glb");
+	//		//modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_Base_01a.glb");
+	//		//modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_Top_01a.glb");
+	//		break;
+	//	case TileType::STAIR:
+	//		colliderFileNames.emplace_back("Data/Model/DungeonAssets/SLOPE.glb");
+	//		break;
+	//	case TileType::SPAWNER:
+	//		modelFileNames.emplace_back("Data/Model/Cube/testCubes.glb");
+	//		break;
+	//	}
+
+	//	count++;
+	//	if (count > 5) count = 0;
+
+	//	MapTile* newTile = new MapTile("", 1.0f, this);
+
+	//	// 当たり判定モデルだけ先に読み込み、当たり判定を設定する
+	//	for (const ModelFileData& data : colliderFileNames)
+	//	{
+	//		newTile->LoadModel(data.fileName.c_str(), data.scale);
+	//	}
+	//	if (colliderFileNames.size() != 0) newTile->SetCollider(Collider::COLLIDER_TYPE::MAP);
+
+	//	// 表示用モデルは後に読み込む
+	//	for (const ModelFileData& data : modelFileNames)
+	//	{
+	//		newTile->LoadModel(data.fileName.c_str(), data.scale);
+	//	}
+	//	newTile->SetPosition(tileData.position);
+	//	newTile->SetAngle(tileData.angle);
+	//	newTile->SetScale(tileData.scale);
+	//	newTile->SetColor(tileData.color);
+	//	newTile->Update(0);
+	//	MAPTILES.Register(newTile);
+	//}
 }
 
 int RoomBase::DrawDebugGUI(int i)
@@ -453,11 +515,11 @@ int RoomBase::DrawDebugGUI(int i)
 
 	switch (roomType)
 	{
-	case DungeonData::SIMPLE_ROOM_1: nameStr = "SimpleRoom1";	break;
-	case DungeonData::END_ROOM:		 nameStr = "EndRoom";		break;
-	case DungeonData::CROSS_ROOM_1:	 nameStr = "CrossRoom1";	break;
-	case DungeonData::PASSAGE_1:	 nameStr = "Passage1";		break;
-	case DungeonData::DEAD_END:		 nameStr = "DeadEnd";		break;
+	case RoomType::SIMPLE_ROOM_1:	nameStr = "SimpleRoom1";	break;
+	case RoomType::END_ROOM:		nameStr = "EndRoom";		break;
+	case RoomType::CROSS_ROOM_1:	nameStr = "CrossRoom1";		break;
+	case RoomType::PASSAGE_1:		nameStr = "Passage1";		break;
+	case RoomType::DEAD_END:		nameStr = "DeadEnd";		break;
 	}
 
 	if (ImGui::TreeNode((nameStr + "(" + std::to_string(i) + ")").c_str()))
