@@ -425,23 +425,35 @@ void RoomBase::PlaceMapTile(bool isLeader)
 			// 当たり判定モデルだけ先に読み込み、当たり判定を設定する
 			for (const ModelFileData& data : colliderFileNames)
 			{
-				newTile->LoadModel(data.fileName.c_str(), data.scale);
+				newTile->LoadModel(fileName.c_str(), 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::LHS_TOON);
 			}
-			if (colliderFileNames.size() != 0) newTile->SetCollider(Collider::COLLIDER_TYPE::MAP);
-
-			// 表示用モデルは後に読み込む
-			for (const ModelFileData& data : modelFileNames)
+			if (T_GRAPHICS.isDX12Active)
 			{
-				newTile->LoadModel(data.fileName.c_str(), data.scale);
+				newTile->LoadModel(fileName.c_str(), 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::LHS_PBR);
 			}
-			newTile->SetPosition(tileData.position);
-			newTile->SetAngle(tileData.angle);
-			newTile->SetScale(tileData.scale);
-			newTile->SetColor(tileData.color);
-			newTile->Update(0);
-			MAPTILES.Register(newTile);
 		}
+		if (colliderFileNames.size() != 0) newTile->SetCollider(Collider::COLLIDER_TYPE::MAP);
+
+		// 表示用モデルは後に読み込む
+		for (std::string fileName : modelFileNames)
+		{
+			if (T_GRAPHICS.isDX11Active)
+			{
+				newTile->LoadModel(fileName.c_str(), 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::LHS_TOON);
+			}
+			if (T_GRAPHICS.isDX12Active)
+			{
+				newTile->LoadModel(fileName.c_str(), 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::LHS_PBR);
+			}
+		}
+		newTile->SetPosition(tileData.position);
+		newTile->SetAngle(tileData.angle);
+		newTile->SetScale(tileData.scale);
+		newTile->SetColor(tileData.color);
+		newTile->Update(0);
+		MAPTILES.Register(newTile);
 	}
+}
 
 	//for (const TILE_DATA& tileData : m_tileDatas)
 	//{
