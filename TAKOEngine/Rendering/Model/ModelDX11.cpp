@@ -62,7 +62,7 @@ void ModelDX11::PlayAnimation(int index, bool loop, float blendSeconds)
 	animationPlaying = true;
 
 	// ブレンドパラメータ
-	m_animationBlending = blendSeconds > 0.0f;
+	animationBlending = blendSeconds > 0.0f;
 	currentAnimationBlendSeconds = 0.0f;
 	animationBlendSecondsLength = blendSeconds;
 
@@ -186,7 +186,7 @@ void ModelDX11::ComputeAnimation(float elapsedTime)
 // ブレンディング計算処理
 void ModelDX11::ComputeBlending(float elapsedTime)
 {
-	if (!m_animationBlending) return;
+	if (!animationBlending) return;
 
 	// ブレンド率の計算
 	float rate = currentAnimationBlendSeconds / animationBlendSecondsLength;
@@ -218,7 +218,7 @@ void ModelDX11::ComputeBlending(float elapsedTime)
 	if (currentAnimationBlendSeconds >= animationBlendSecondsLength)
 	{
 		currentAnimationBlendSeconds = animationBlendSecondsLength;
-		m_animationBlending = false;
+		animationBlending = false;
 	}
 }
 

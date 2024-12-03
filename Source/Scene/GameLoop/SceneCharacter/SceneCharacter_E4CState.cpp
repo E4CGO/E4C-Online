@@ -1,6 +1,5 @@
 #include "SceneCharacter_E4CState.h"
 
-
 #include "TAKOEngine/GUI/UIManager.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
 
@@ -8,7 +7,6 @@
 
 #include "Scene/SceneManager.h"
 #include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
-
 
 using namespace SceneCharacter_E4CState;
 
@@ -36,7 +34,6 @@ void SceneCharacter_E4CState::InitState::Enter()
 
 	owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::CHARACTER_SELECTION);
 }
-
 
 /**************************************************************************//**
 	@brief
@@ -131,9 +128,10 @@ void SceneCharacter_E4CState::CharacterCreationState::Enter()
 	UI.Register(m_pBackBtn);
 
 	m_pStartBtn = new WidgetButtonText("Start", [&](WidgetButton*) {
+		PLAYER_CHARACTER_DATA.SetCurrentCharacter(owner->GetSelectedCharacterIdx());
 		owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::START);
 		});
-	m_pStartBtn->SetPosition({ SCREEN_W * 0.5f - (m_pStartBtn->GetSize().x * 0.5f), SCREEN_H * 0.8f});
+	m_pStartBtn->SetPosition({ SCREEN_W * 0.5f - (m_pStartBtn->GetSize().x * 0.5f), SCREEN_H * 0.8f });
 	UI.Register(m_pStartBtn);
 
 	m_pWidgetCharacterModify = new WidgetCharacterModify(owner);
@@ -147,7 +145,6 @@ void SceneCharacter_E4CState::CharacterCreationState::Enter()
 void SceneCharacter_E4CState::CharacterCreationState::Execute(float elapsedTime)
 {
 	Camera* camera = CameraManager::Instance().GetCamera();
-
 
 	if (m_cameraTimer < m_cameraTime)
 	{
@@ -182,7 +179,6 @@ void SceneCharacter_E4CState::CharacterCreationState::Exit()
 
 	PLAYER_CHARACTER_DATA.SaveData();
 	SetCursor(::LoadCursor(NULL, IDC_HAND));
-
 }
 
 /**************************************************************************//**

@@ -387,12 +387,10 @@ void RoomBase::PlaceMapTile(bool isLeader)
 		switch (tileData.type)
 		{
 		case TileType::FLOOR:
-			colliderFileNames.emplace_back("Data/Model/DungeonAssets/FLOOR_COLLISION.glb");
-			modelFileNames.emplace_back("Data/Model/DungeonAssets/FLOOR.glb");
+			colliderFileNames.emplace_back("Data/Model/DungeonAssets/FLOOR.glb");
 			break;
 		case TileType::WALL:
-			colliderFileNames.emplace_back("Data/Model/DungeonAssets/WALL_COLLISION.glb");
-			modelFileNames.emplace_back("Data/Model/DungeonAssets/WALL.glb");
+			colliderFileNames.emplace_back("Data/Model/DungeonAssets/WALL.glb");
 			break;
 		case TileType::PILLAR:
 			modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_01a.glb");
@@ -400,8 +398,7 @@ void RoomBase::PlaceMapTile(bool isLeader)
 			modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_Top_01a.glb");
 			break;
 		case TileType::STAIR:
-			colliderFileNames.emplace_back("Data/Model/DungeonAssets/SLOPE_COLLISION.glb");
-			modelFileNames.emplace_back("Data/Model/DungeonAssets/SLOPE.glb");
+			colliderFileNames.emplace_back("Data/Model/DungeonAssets/SLOPE.glb");
 			break;
 		case TileType::SPAWNER:
 			modelFileNames.emplace_back("Data/Model/Cube/testCubes.glb");
@@ -415,11 +412,11 @@ void RoomBase::PlaceMapTile(bool isLeader)
 		{
 			if (T_GRAPHICS.isDX11Active)
 			{
-				newTile->LoadModel(fileName.c_str(), 1.0f, ModelObject::RENDER_MODE::DX11);
+				newTile->LoadModel(fileName.c_str(), 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::LHS_TOON);
 			}
 			if (T_GRAPHICS.isDX12Active)
 			{
-				newTile->LoadModel(fileName.c_str(), 1.0f, ModelObject::RENDER_MODE::DX11);
+				newTile->LoadModel(fileName.c_str(), 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::LHS_PBR);
 			}
 		}
 		if (colliderFileNames.size() != 0) newTile->SetCollider(Collider::COLLIDER_TYPE::MAP);
@@ -429,11 +426,11 @@ void RoomBase::PlaceMapTile(bool isLeader)
 		{
 			if (T_GRAPHICS.isDX11Active)
 			{
-				newTile->LoadModel(fileName.c_str(), 1.0f, ModelObject::RENDER_MODE::DX11);
+				newTile->LoadModel(fileName.c_str(), 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::LHS_TOON);
 			}
 			if (T_GRAPHICS.isDX12Active)
 			{
-				newTile->LoadModel(fileName.c_str(), 1.0f, ModelObject::RENDER_MODE::DX12);
+				newTile->LoadModel(fileName.c_str(), 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::LHS_PBR);
 			}
 		}
 		newTile->SetPosition(tileData.position);

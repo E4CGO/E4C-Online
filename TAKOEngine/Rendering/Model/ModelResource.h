@@ -116,9 +116,7 @@ public:
 		std::vector<Bone> bones;
 
 		DirectX::BoundingBox	localBounds;
-		DirectX::XMFLOAT3		boundsMin;
-		DirectX::XMFLOAT3		boundsMax;
-
+		
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_vb_resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_ib_resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cb_resource;
