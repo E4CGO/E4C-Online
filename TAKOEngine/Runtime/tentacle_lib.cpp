@@ -57,8 +57,8 @@ namespace TentacleLib
 
 		setting.title = APPLICATION_NAME;
 
-		graphics.SetDX12Render(true);
-		graphics.SetDX11Render(false);
+		graphics.SetDX12Render(false);
+		graphics.SetDX11Render(true);
 
 		input.Init(hWnd);
 		timer.Init();
