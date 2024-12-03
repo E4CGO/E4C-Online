@@ -317,7 +317,7 @@ void ModelDX12::ComputeWorldBounds()
 	{
 		DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&m_nodes.at(mesh.mesh->nodeIndex).worldTransform);
 		mesh.mesh->localBounds.Transform(mesh.worldBounds, WorldTransform);
-		DirectX::BoundingBox::CreateMerged(bounds, bounds, mesh.worldBounds);
+		DirectX::BoundingBox::CreateMerged(m_bounds, m_bounds, mesh.worldBounds);
 	}
 }
 
@@ -375,12 +375,6 @@ void ModelDX12::PlayAnimation(int animationIndex, bool loop, float blendSeconds)
 		dst.rotation = src.rotation;
 		dst.scale = src.scale;
 	}
-}
-
-// アニメーション再生中か
-bool ModelDX12::IsPlayAnimation() const
-{
-	currentAnimationIndex = -1;
 }
 
 // アニメーション計算
@@ -530,169 +524,16 @@ void ModelDX12::ComputeBlending(float elapsedTime)
 	}
 }
 
-// 変換行列計算
-void ModelDX12::UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform)
-{
-	const DirectX::XMFLOAT4X4 coordinate_system_transforms[]
-	{
-		{-1, 0, 0, 0,
-		  0, 1, 0, 0,
-		  0, 0, 1, 0,
-		  0, 0, 0, 1}, // 0:RHS Y-UP
-
-		{ 1, 0, 0, 0,
-		  0, 1, 0, 0,
-		  0, 0, 1, 0,
-		  0, 0, 0, 1}, // 1:LHS Y-UP
-
-		{-1, 0, 0, 0,
-		  0, 0,-1, 0,
-		  0, 1, 0, 0,
-		  0, 0, 0, 1}, // 2:RHS Z-UP
-
-		{ 1, 0, 0, 0,
-		  0, 0, 1, 0,
-		  0, 1, 0, 0,
-		  0, 0, 0, 1}, //3:LHS Z - UP
-	};
-
-	for (Node& node : m_nodes)
-	{
-		DirectX::XMMATRIX C{ DirectX::XMLoadFloat4x4(&coordinate_system_transforms[1]) * DirectX::XMMatrixScaling(scaling, scaling, scaling) };
-		// ローカル行列算出
-		if (modelType == 0 || modelType == 2)
-		{
-			C = { DirectX::XMLoadFloat4x4(&coordinate_system_transforms[0]) * DirectX::XMMatrixScaling(scaling, scaling, scaling) };
-		}
-
-		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(node.scale.x, node.scale.y, node.scale.z);
-		DirectX::XMMATRIX R = DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&node.rotation));
-		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(node.position.x, node.position.y, node.position.z);
-		DirectX::XMMATRIX LocalTransform = C * S * R * T;
-		DirectX::XMStoreFloat4x4(&node.localTransform, LocalTransform);
-
-		// ワールド行列算出
-		if (node.parent != nullptr)
-		{
-			DirectX::XMMATRIX ParentTransform = DirectX::XMLoadFloat4x4(&node.parent->globalTransform);
-			DirectX::XMMATRIX GlobalTransform = LocalTransform * ParentTransform;
-			DirectX::XMStoreFloat4x4(&node.globalTransform, GlobalTransform);
-		}
-		else
-		{
-			DirectX::XMStoreFloat4x4(&node.globalTransform, LocalTransform);
-		}
-	}
-
-	// フレームリソース更新処理
-	UpdateFrameResource(worldTransform);
-
-	// バウンディングボックス計算
-	ComputeWorldBounds();
-}
-
-// フレームリソース更新処理
-void ModelDX12::UpdateFrameResource(const DirectX::XMFLOAT4X4 transform)
-{
-	Graphics& graphics = Graphics::Instance();
-	DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&transform);
-
-	//メッシュの更新
-	for (Mesh& mesh : m_meshes)
-	{
-		Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
-
-		if (mesh.bones.size() > 0)
-		{
-			for (size_t bone_index = 0; bone_index < mesh.bones.size(); ++bone_index)
-			{
-				const Bone& bone = mesh.bones.at(bone_index);
-				DirectX::XMMATRIX GlobalTransform = DirectX::XMLoadFloat4x4(&bone.node->globalTransform);
-				DirectX::XMMATRIX OffsetTransform = DirectX::XMLoadFloat4x4(&bone.offset_transform);
-				DirectX::XMMATRIX BoneTransform = OffsetTransform * GlobalTransform;
-				DirectX::XMStoreFloat4x4(&frame_resource.cbv_data->bone_transforms[bone_index], BoneTransform);
-			}
-			frame_resource.cbv_data->world_transform = transform;
-		}
-		else
-		{
-			DirectX::XMMATRIX GlobalTransform = DirectX::XMLoadFloat4x4(&mesh.node->globalTransform);
-			DirectX::XMStoreFloat4x4(&frame_resource.cbv_data->world_transform, GlobalTransform * WorldTransform);
-		}
-
-		bool updateBuffers = true;
-		for (const ModelResource::Subset& subset : mesh.mesh->subsets)
-		{
-			if (updateBuffers)
-			{
-				frame_resource.instancingCount = 0;
-				for (int i = 0; i < InstancingMax; ++i)
-				{
-					if (!exist[i])  continue;
-
-					frame_resource.cbv_data->transform[frame_resource.instancingCount++] = m_transform[i];
-				}
-				updateBuffers = false;
-			}
-		}
-	}
-}
-
-// バウンディングボックス計算
-void ModelDX12::ComputeWorldBounds()
-{
-	Graphics& graphics = Graphics::Instance();
-
-	// バウンディングボックス
-	m_bounds.Center = m_bounds.Extents = { 0, 0, 0 };
-	for (Mesh& mesh : m_meshes)
-	{
-		const Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
-
-		DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&frame_resource.cbv_data->world_transform);
-		mesh.mesh->localBounds.Transform(mesh.worldBounds, WorldTransform);
-		DirectX::BoundingBox::CreateMerged(m_bounds, m_bounds, mesh.worldBounds);
-	}
-}
-
-// ノード検索
-ModelDX12::Node* ModelDX12::FindNode(const char* name)
-{
-	// 全てのノードを総当たりで名前比較する
-	int nodeCount = static_cast<int>(m_nodes.size());
-	for (Node& node : m_nodes)
-	{
-		if (node.name == name)
-		{
-			return &node;
-		}
-	}
-
-	// 見つからなかった
-	return nullptr;
-}
-
 // アニメーションコピー
 void ModelDX12::CopyAnimations(iModel* model)
 {
 	m_resource->SetAnimations(model->GetResource()->GetAnimations());
 }
 
-// ノードコピー
-void ModelDX12::CopyNodes(iModel* model)
-{
-	m_resource->SetNodes(model->GetResource()->GetNodes());
-}
-
-// デバック
-void ModelDX12::DrawDebugGUI()
-{
-}
-
 // アニメーション停止
 void ModelDX12::StopAnimation()
 {
-	m_current_animation_Index = -1;
+	currentAnimationIndex = -1;
 }
 
 //割り当てられた番号を返す

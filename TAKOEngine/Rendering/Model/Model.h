@@ -220,7 +220,7 @@ protected:
 
 	float currentAnimationBlendSeconds = 0.0f;
 	float animationBlendSecondsLength = -1.0f;
-	bool m_animationBlending = false;
+	bool  animationBlending = false;
 
 	float scaling = 1.0f;
 
