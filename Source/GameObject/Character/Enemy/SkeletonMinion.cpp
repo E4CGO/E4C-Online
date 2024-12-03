@@ -80,6 +80,8 @@ void SkeletonMinionBoss::Update(float elaspedTime)
 	}
 
 	Enemy::Update(elaspedTime);
+
+	
 }
 void SkeletonMinionBoss::OnDamage(const ENEMY_COLLISION& hit)
 {

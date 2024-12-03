@@ -12,6 +12,7 @@ void Stage::Initialize()
 	MAPTILES.Clear();
 	ENEMIES.Clear();
 	enemyList.clear();
+	
 }
 
 void Stage::Finalize()
@@ -26,6 +27,11 @@ void Stage::Update(float elapsedTime)
 {
 	timer += elapsedTime;
 
+	Spawne();
+}
+
+void Stage::Spawne()
+{
 	// スポナー
 	for (int i = pointer; i < enemyList.size(); i++) {
 		ENEMY_LIST_DATA& enemyData = enemyList.at(i);
@@ -36,9 +42,11 @@ void Stage::Update(float elapsedTime)
 			enemy->SetPosition(enemyData.position);
 			enemy->SetAngle(enemyData.rotation);
 			pointer++;
+
 		}
 	}
 }
+
 
 void Stage::SetPhase(int phase)
 {

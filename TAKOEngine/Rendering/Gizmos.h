@@ -28,6 +28,12 @@ public:
 		const DirectX::XMFLOAT4& color
 	);
 
+	void DrawCylinder(
+		const DirectX::XMFLOAT3& position,
+		float radius,
+		float height,
+		const DirectX::XMFLOAT4& color);
+
 	void Render(const RenderContext& rc);
 private:
 	struct Mesh
@@ -56,6 +62,9 @@ private:
 
 	// 球メッシュ作成
 	void CreateSphereMesh(ID3D11Device* device, float raduis, int subdivisions);
+
+	//円柱メッシュ生成
+	void CreateCylinderMesh(ID3D11Device* device, float radius, float height, int subdivision);
 private:
 	Mesh boxMesh;
 	std::vector<Instance> instances;
@@ -66,4 +75,5 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffer;
 
 	Mesh sphereMesh;
+	Mesh   cylinderMesh;
 };
