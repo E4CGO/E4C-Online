@@ -12,16 +12,19 @@
 
 #include "SceneGame_E4CState.h"
 #include "Scene/GameLoop/SceneGame/Stage/StageOpenWorld_E4C.h"
+#include "Scene/GameLoop/SceneGame/Stage/StageDungeon_E4C.h"
 
-#include "Scene/Stage/StageManager.h"
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "TAKOEngine/Tool/Console.h"
 
 #include "UI/Widget/WidgetCrosshair.h"
 #include "TAKOEngine/GUI/UIManager.h"
+#include "Source\PlayerCharacterData.h"
 
 void SceneGame_E4C::Initialize()
 {
+
+
 	stateMachine = std::make_unique<StateMachine<SceneGame_E4C>>();
 	stateMachine->RegisterState(GAME_STATE::INIT, new SceneGame_E4CState::InitState(this));
 	stateMachine->RegisterState(GAME_STATE::EXIT, new SceneGame_E4CState::ExitState(this));
@@ -36,7 +39,7 @@ void SceneGame_E4C::Initialize()
 
 	// 選択した自機
 	const PlayerCharacterData::CharacterInfo info = PlayerCharacterData::Instance().GetCurrentCharacter();
-	PlayerCharacter* player = PlayerCharacterManager::Instance().UpdatePlayerData(0, "", info.Character.pattern);
+	PlayerCharacter* player = PlayerCharacterManager::Instance().UpdatePlayerData(0, "", info.pattern);
 	player->Show();
 	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 
@@ -88,4 +91,9 @@ void SceneGame_E4C::Render()
 	T_TEXT.End();
 	// デバッグレンダラ描画実行
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
+}
+
+void SceneGame_E4C::RenderDX12()
+{
+	STAGES.RenderDX12();
 }

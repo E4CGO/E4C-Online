@@ -71,11 +71,11 @@ void GLTFModelDX11::cumulate_transforms(std::vector<ModelResource::node>& nodes)
 	std::function<void(int)> traverse{ [&](int node_index)->void
 	{
 			ModelResource::node& node{nodes.at(node_index)};
-			DirectX::XMMATRIX C{ DirectX::XMLoadFloat4x4(&coordinate_system_transforms[modelType]) * DirectX::XMMatrixScaling(scaling, scaling, scaling) };
+			DirectX::XMMATRIX C{ DirectX::XMLoadFloat4x4(&coordinate_system_transforms[modelType])};
 			DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(node.scale.x, node.scale.y, node.scale.z) };
 			DirectX::XMMATRIX R{ DirectX::XMMatrixRotationQuaternion(DirectX::XMVectorSet(node.rotation.x, node.rotation.y, node.rotation.z, node.rotation.w)) };
 			DirectX::XMMATRIX T{ DirectX::XMMatrixTranslation(node.translation.x, node.translation.y, node.translation.z) };
-			DirectX::XMStoreFloat4x4(&node.global_transform , C * S * R * T * DirectX::XMLoadFloat4x4(&parent_global_transforms.top()));
+			DirectX::XMStoreFloat4x4(&node.global_transform, C * S * R * T * DirectX::XMLoadFloat4x4(&parent_global_transforms.top()));
 			for (int child_index : node.children)
 			{
 				parent_global_transforms.push(node.global_transform);
@@ -85,7 +85,7 @@ void GLTFModelDX11::cumulate_transforms(std::vector<ModelResource::node>& nodes)
 	} };
 	for (std::vector<int>::value_type node_index : scenes.at(0).nodes)
 	{
-		parent_global_transforms.push({ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 });
+		parent_global_transforms.push({ scaling, 0, 0, 0, 0, scaling, 0, 0, 0, 0, scaling, 0, 0, 0, 0, 1 });
 		traverse(node_index);
 		parent_global_transforms.pop();
 	}

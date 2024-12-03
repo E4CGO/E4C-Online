@@ -13,7 +13,12 @@
 #include "PlayerCharacterPattern.h"
 
 class PlayerCharacter;
-
+/**************************************************************************//**
+	@class	PlayerCharacterData
+	@brief	プレイヤー保存されているデータクラス
+	@par	[説明]
+		単一クラス
+*//***************************************************************************/
 class PlayerCharacterData : public Singleton<PlayerCharacterData>
 {
 	friend class Singleton <PlayerCharacterData>;
@@ -24,7 +29,7 @@ private:
 	~PlayerCharacterData();
 public:
 	// 外見パータン
-	enum APPEARANCE_PATTERN
+	enum APPEARANCE_PATTERN : uint8_t
 	{
 		GENDER = 0,				// 性別
 		HAIR,					// 髪
@@ -43,164 +48,133 @@ public:
 		NUM						// カウント
 	};
 
+	// キャラクター情報
 	struct CharacterInfo
 	{
-		bool visible = false;
-
-		std::string save = "";
-
-		int GetGender() { return this->Character.pattern[APPEARANCE_PATTERN::GENDER]; }
-
-		struct Character
-		{
-			uint8_t pattern[APPEARANCE_PATTERN::NUM] = {};
-
-			Character& operator=(const Character& other)
-			{
-				if (this != &other)
-				{
-					for (int i = 0; i < APPEARANCE_PATTERN::NUM; i++)
-					{
-						this->pattern[i] = other.pattern[i];
-					}
-				}
-				return *this;
-			}
-		} Character;
+		std::string name;
+		uint8_t pattern[APPEARANCE_PATTERN::NUM] = {};
 
 		CharacterInfo& operator=(const CharacterInfo& other)
 		{
 			if (this != &other)
 			{
-				this->visible = other.visible;
-				this->save = other.save;
-				this->Character = other.Character;
+				this->name = other.name;
+				for (int i = 0; i < APPEARANCE_PATTERN::NUM; i++)
+				{
+					this->pattern[i] = other.pattern[i];
+				}
 			}
 			return *this;
 		}
 	};
 
+	// 現在キャラクターを取得
 	const CharacterInfo& GetCurrentCharacter() const
 	{
 		return m_CharaterInfosData[m_CurrentSaveState];
 	}
+	// 現在キャラクターを設定
 	void SetCurrentCharacter(int index)
 	{
 		m_CurrentSaveState = index;
 	}
+	// 外見情報をキャラクターに登録
 	void LoadAppearance(PlayerCharacter* chara, uint8_t appearance_idx, uint8_t pattern_idx);
-	nlohmann::json GetCharacterInfos() const { return m_CharacterInfos; }
-	void SetCharacterInfos(nlohmann::json savedData) { m_CharacterInfos = savedData; }
 
-	std::vector<CharacterInfo> GetCharacterInfosData() const { return m_CharaterInfosData; }
+	const CharacterInfo& GetCharacterInfo(int idx) const { return m_CharaterInfosData[idx]; }
+	void SetCharacterInfo(int idx, const CharacterInfo info) {
+		if (idx >= m_CharaterInfosData.size())
+		{
+			m_CharaterInfosData.push_back(info);
+		}
+		else
+		{
+			m_CharaterInfosData[idx] = info;
+		}
+	}
+	const std::vector<CharacterInfo>& GetCharacterInfosData() const { return m_CharaterInfosData; }
 	void SetCharacterInfosData(std::vector<CharacterInfo> savedData) { m_CharaterInfosData = savedData; }
 
-	void ParseData()
+	bool LoadData()
 	{
-		nlohmann::json json_array = nlohmann::json::array();
-
-		json_array = m_CharacterInfos["Characters"];
-
-		m_CharaterInfosData.resize(json_array.size());
-
-		for (size_t i = 0; i < json_array.size(); i++)
+		m_CharaterInfosData.clear();
+		nlohmann::json j;
+		std::ifstream file("CharacterInfos.json");
+		if (file.is_open())
 		{
-			m_CharaterInfosData[i] = {
-				json_array[i]["Visible"],
-				json_array[i]["Save"],
-				{
-					json_array[i]["Character"]["GENDER"],
-					json_array[i]["Character"]["HAIR"],
-					json_array[i]["Character"]["HAIR_COLOR"],
-					json_array[i]["Character"]["EYE_COLOR"],
-					json_array[i]["Character"]["SKIN_COLOR"],
-					json_array[i]["Character"]["TOP"],
-					json_array[i]["Character"]["TOP_COLOR"],
-					json_array[i]["Character"]["BOTTOM"],
-					json_array[i]["Character"]["BOTTOM_COLOR"],
-					json_array[i]["Character"]["ARM_GEAR"],
-					json_array[i]["Character"]["ARM_GEAR_COLOR"],
-					json_array[i]["Character"]["LEFT_HAND_EQUIPMENT"],
-					json_array[i]["Character"]["RIGHT_HAND_EQUIPMENT"],
-				}
-			};
+			file >> j;
+
+			for (const auto& jCharacter : j["Characters"]) {
+				m_CharaterInfosData.push_back({
+						jCharacter["NAME"],						// 名前
+						{										// 外見
+							jCharacter["GENDER"],				// 性別
+							jCharacter["HAIR"],					// 髪
+							jCharacter["HAIR_COLOR"],			// 髪の色パターン
+							jCharacter["EYE_COLOR"],			// 目の色パターン
+							jCharacter["SKIN_COLOR"],			// 肌の色パターン
+							jCharacter["TOP"],					// 上半身服パターン
+							jCharacter["TOP_COLOR"],			// 上半身服色パターン
+							jCharacter["BOTTOM"],				// 下半身服パターン
+							jCharacter["BOTTOM_COLOR"],			// 下半身服色パターン
+							jCharacter["ARM_GEAR"],				// 腕装備
+							jCharacter["ARM_GEAR_COLOR"],		// 腕装備色パターン
+							jCharacter["LEFT_HAND_EQUIPMENT"],	// 左手装備
+							jCharacter["RIGHT_HAND_EQUIPMENT"],	// 右手装備
+						}
+					});
+			}
+			file.close();
+			return true;
 		}
+		return false;
 	}
 
-	void ToJson(nlohmann::json& j, CharacterInfo charInfo)
+	bool SaveData()
 	{
-		j = nlohmann::json{
-		{"Character", {
-			{"GENDER",					charInfo.Character.pattern[GENDER]},
-			{"HAIR",					charInfo.Character.pattern[HAIR]},
-			{"HAIR_COLOR",				charInfo.Character.pattern[HAIR_COLOR]},
-			{"EYE_COLOR",				charInfo.Character.pattern[EYE_COLOR]},
-			{"SKIN_COLOR",				charInfo.Character.pattern[SKIN_COLOR]},
-			{"TOP",						charInfo.Character.pattern[TOP]},
-			{"TOP_COLOR",				charInfo.Character.pattern[TOP_COLOR]},
-			{"BOTTOM",					charInfo.Character.pattern[BOTTOM]},
-			{"BOTTOM_COLOR",			charInfo.Character.pattern[BOTTOM_COLOR]},
-			{"ARM_GEAR",				charInfo.Character.pattern[ARM_GEAR]},
-			{"ARM_GEAR_COLOR",			charInfo.Character.pattern[ARM_GEAR_COLOR]},
-			{"LEFT_HAND_EQUIPMENT",		charInfo.Character.pattern[LEFT_HAND_EQUIPMENT]},
-			{"RIGHT_HAND_EQUIPMENT",	charInfo.Character.pattern[RIGHT_HAND_EQUIPMENT]}
-		}},
-		{"Save", charInfo.save},
-		{"Visible", charInfo.visible}
-		};
-	}
-
-	void SaveData()
-	{
-		nlohmann::json newSave;
-		newSave[0]["Characters"];
-
-		for (auto& it : m_CharaterInfosData)
+		nlohmann::json j;
+		j["Characters"] = nlohmann::json::array();
+		for (const CharacterInfo& characterInfo : m_CharaterInfosData)
 		{
-			nlohmann::json newChara;
-
-			if (it.save == "")
-			{
-				CharacterInfo charInfo = {
-				false,			// visible
-				"",				// save
-				{				//Character
-					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-				}
-				};
-
-				ToJson(newChara, charInfo);
-
-				newSave[0]["Characters"].push_back(newChara);
-			}
-			else
-			{
-				CharacterInfo charInfo = it;
-
-				ToJson(newChara, charInfo);
-
-				newSave[0]["Characters"].push_back(newChara);
-			}
+			j["Characters"].push_back({
+				{ "NAME", characterInfo.name },
+				{ "GENDER", characterInfo.pattern[APPEARANCE_PATTERN::GENDER] },				// 性別
+				{ "HAIR", characterInfo.pattern[APPEARANCE_PATTERN::HAIR] },					// 髪
+				{ "HAIR_COLOR", characterInfo.pattern[APPEARANCE_PATTERN::HAIR_COLOR] },			// 髪の色パターン
+				{ "EYE_COLOR", characterInfo.pattern[APPEARANCE_PATTERN::EYE_COLOR] },			// 目の色パターン
+				{ "SKIN_COLOR", characterInfo.pattern[APPEARANCE_PATTERN::SKIN_COLOR] },			// 肌の色パターン
+				{ "TOP", characterInfo.pattern[APPEARANCE_PATTERN::TOP] },					// 上半身服パターン
+				{ "TOP_COLOR", characterInfo.pattern[APPEARANCE_PATTERN::TOP_COLOR] },			// 上半身服色パターン
+				{ "BOTTOM", characterInfo.pattern[APPEARANCE_PATTERN::BOTTOM] },				// 下半身服パターン
+				{ "BOTTOM_COLOR", characterInfo.pattern[APPEARANCE_PATTERN::BOTTOM_COLOR] },			// 下半身服色パターン
+				{ "ARM_GEAR", characterInfo.pattern[APPEARANCE_PATTERN::ARM_GEAR] },				// 腕装備
+				{ "ARM_GEAR_COLOR", characterInfo.pattern[APPEARANCE_PATTERN::ARM_GEAR_COLOR] },		// 腕装備色パターン
+				{ "LEFT_HAND_EQUIPMENT", characterInfo.pattern[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT] },	// 左手装備
+				{ "RIGHT_HAND_EQUIPMENT", characterInfo.pattern[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT] },	// 右手装備
+				});
 		}
 
-		std::ofstream file_out("CharacterInfos.json");
-		if (file_out.is_open()) {
-			file_out.clear();
-			file_out << newSave[0].dump(4); //スペース
-			file_out.close();
+		std::ofstream output_file("CharacterInfos.json");
+		if (output_file.is_open()) {
+			output_file << j.dump(4);  // インデント付きで書き込む
+			output_file.close();
+			return true;
 		}
+		return false;
 	}
 
+
+	const size_t GetAppearancePatternSize(uint8_t idx) { return m_pAppearancePatterns[idx].size(); }
+private:
 	// 外見パターンをクリア
 	void ClearAppearancePatterns();
 
 private:
-	std::unordered_map<uint8_t, std::vector<PlayerCharacterPattern*>> m_pAppearancePatterns;
+	int m_CurrentSaveState = 0;
 
-	nlohmann::json m_CharacterInfos;
+	std::unordered_map<uint8_t, std::vector<PlayerCharacterPattern*>> m_pAppearancePatterns;
 	std::vector<CharacterInfo> m_CharaterInfosData;
 
-	int m_CurrentSaveState = 0;
 };
 
 #define PLAYER_CHARACTER_DATA PlayerCharacterData::Instance()

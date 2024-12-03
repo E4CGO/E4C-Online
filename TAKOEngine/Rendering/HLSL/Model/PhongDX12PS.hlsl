@@ -15,59 +15,59 @@ float4 main(VS_OUT pin) : SV_TARGET
     float3 L = normalize(directionalLightData.direction.xyz);
     float3 E = normalize(cameraPosition.xyz - pin.position.xyz);
     
-    // ƒ}ƒeƒŠƒAƒ‹’è”
+    // ãƒãƒ†ãƒªã‚¢ãƒ«å®šæ•°
     float3 ka = float3(1, 1, 1);
     float3 kd = float3(1, 1, 1);
     float3 ks = float3(1, 1, 1);
     float shiness = 128;
    
-    // ŠÂ‹«Œõ‚ÌŒvZ
+    // ç’°å¢ƒå…‰ã®è¨ˆç®—
     float3 ambient = ka * ambientLightColor.xyz;
     
     float3 directionalDiffuse  = ClacHalfLambert(N, L, directionalLightData.color.rgb, kd);
     float3 directionalSpecular = CalcPhongSpecular(N, L, directionalLightData.color.rgb, E, shiness, ks);
     
-    // “_ŒõŒ¹‚Ìˆ—
+    // ç‚¹å…‰æºã®å‡¦ç†
     float3 pointDiffuse = (float3) 0;
     float3 pointSpecular = (float3) 0;
     int i;
     for (i = 0; i < pointLightCount; ++i)
     {
-		// ƒ‰ƒCƒgƒxƒNƒgƒ‹‚ğZo
+		// ãƒ©ã‚¤ãƒˆãƒ™ã‚¯ãƒˆãƒ«ã‚’ç®—å‡º
         float3 lightVector = pin.position.xyz - pointLightData[i].position.xyz;
 
-		// ƒ‰ƒCƒgƒxƒNƒgƒ‹‚Ì’·‚³‚ğZo
+		// ãƒ©ã‚¤ãƒˆãƒ™ã‚¯ãƒˆãƒ«ã®é•·ã•ã‚’ç®—å‡º
         float lightLength = length(lightVector);
 
-		// ƒ‰ƒCƒg‚Ì‰e‹¿”ÍˆÍŠO‚È‚çŒã‚ÌŒvZ‚ğ‚µ‚È‚¢B
+		// ãƒ©ã‚¤ãƒˆã®å½±éŸ¿ç¯„å›²å¤–ãªã‚‰å¾Œã®è¨ˆç®—ã‚’ã—ãªã„ã€‚
         if (lightLength > pointLightData[i].range) continue;
 
-		// ‹——£Œ¸Š‚ğZo‚·‚é
+		// è·é›¢æ¸›è¡°ã‚’ç®—å‡ºã™ã‚‹
         float attenuate = clamp(1.0f - lightLength / pointLightData[i].range, 0.0, 1.0);
         lightVector = lightVector / lightLength;
         pointDiffuse += CalcLambertDiffuse(N, lightVector, pointLightData[i].color.rgb, kd.rgb) * attenuate;
         pointSpecular += CalcPhongSpecular(N, lightVector, pointLightData[i].color.rgb, E, shiness, ks.rgb) * attenuate;
     }
 
-	// ƒXƒ|ƒbƒgƒ‰ƒCƒg‚Ìˆ—
+	// ã‚¹ãƒãƒƒãƒˆãƒ©ã‚¤ãƒˆã®å‡¦ç†
     float3 spotDiffuse = (float3) 0;
     float3 spotSpecular = (float3) 0;
     for (i = 0; i < spotLightCount; ++i)
     {
-		// ƒ‰ƒCƒgƒxƒNƒgƒ‹‚ğZo
+		// ãƒ©ã‚¤ãƒˆãƒ™ã‚¯ãƒˆãƒ«ã‚’ç®—å‡º
         float3 lightVector = pin.position.xyz - spotLightData[i].position.xyz;
 
-		// ƒ‰ƒCƒgƒxƒNƒgƒ‹‚Ì’·‚³‚ğZo
+		// ãƒ©ã‚¤ãƒˆãƒ™ã‚¯ãƒˆãƒ«ã®é•·ã•ã‚’ç®—å‡º
         float lightLength = length(lightVector);
 
         if (lightLength > spotLightData[i].range) continue;
 
-		// ‹——£Œ¸Š‚ğZo‚·‚é
+		// è·é›¢æ¸›è¡°ã‚’ç®—å‡ºã™ã‚‹
         float attenuate = clamp(1.0f - lightLength / spotLightData[i].range, 0.0, 1.0);
 
         lightVector = normalize(lightVector);
 
-		// Šp“xŒ¸Š‚ğZo‚µ‚Äattenuate‚ÉæZ‚·‚é
+		// è§’åº¦æ¸›è¡°ã‚’ç®—å‡ºã—ã¦attenuateã«ä¹—ç®—ã™ã‚‹
         float3 spotDirection = spotLightData[i].direction;;
         float angle = dot(lightVector, spotDirection);
         float area = spotLightData[i].innerCorn - spotLightData[i].outerCorn;
@@ -77,12 +77,11 @@ float4 main(VS_OUT pin) : SV_TARGET
         spotSpecular += CalcPhongSpecular(N, lightVector, spotLightData[i].color.rgb, E, shiness, ks.rgb) * attenuate;
     }
     
-
-    float4 color = float4(ambient, diffuseColor.a);
-    color.rgb += diffuseColor.rgb * (directionalDiffuse + pointDiffuse + spotDiffuse);
+    float4 color = diffuseColor;
+    color.rgb *= ambient + (directionalDiffuse + pointDiffuse + spotDiffuse);
     color.rgb += directionalSpecular + pointSpecular + spotSpecular;
 
-	//	ƒŠƒ€ƒ‰ƒCƒeƒBƒ“ƒO
+	//	ãƒªãƒ ãƒ©ã‚¤ãƒ†ã‚£ãƒ³ã‚°
     //color.rgb += CalcRimLight(N, E, L, directionalLightData.color.rgb);
 
     return color;

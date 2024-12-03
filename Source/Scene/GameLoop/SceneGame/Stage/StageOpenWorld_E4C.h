@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unordered_set>
 #include <memory>
 #include <array>
 
@@ -17,11 +18,6 @@
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
 
-#include "Source/UI/Widget/WidgetButtonImage.h"
-#include "Source/UI/Widget/WidgetImage.h"
-
-#include <unordered_set>
-
 class SceneGame_E4C;
 
 class StageOpenWorld_E4C : public Stage
@@ -35,6 +31,8 @@ public:
 	void Update(float elapsedTime) override;
 
 	void Render() override;
+
+	void RenderDX12() override;
 protected:
 	void OnPhase() override;
 public:
@@ -51,23 +49,21 @@ private:
 	MapTile* stage_collision = nullptr;
 
 	std::unique_ptr <Teleporter> teleporter;
-	std::unique_ptr <Plane> plane;
 
-	std::unique_ptr <Billboard> billboard;
+	std::unordered_map<std::string, std::unique_ptr<ModelObject>> models;
 
-	std::unique_ptr<ModelObject> map;
-	std::unique_ptr<ModelObject> tower;
-	std::unique_ptr<ModelObject> houses;
+	std::unique_ptr<ModelObject> sky;
+	DirectX::XMFLOAT4X4 test_transform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+	DirectX::XMFLOAT3 test_position = { 0, 0, 0 };
+	DirectX::XMFLOAT4 test_rotation = { 0, 0, 0, 0 };
+	DirectX::XMFLOAT3 test_scale = { 1, 1, 1 };
 
-	WidgetButtonImage* btnExit;
-	WidgetImage* background;
+	std::unique_ptr<SpriteDX12>			m_sprites[8];
 
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {
 		"",											// マスク
 		// Setting UI
-		"Data/Sprites/UI/start.png",
-		"Data/Sprites/big_background.t.png"
 	};
 
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
@@ -76,12 +72,16 @@ private:
 	float transitionDuration = 2.f;  // 5秒かけて移動
 	int currentSegment = 0;
 
-	bool isPause = false;
-
 	std::vector<DirectX::XMFLOAT3> cameraPositions = {
 		{0,3,0},
 		{10,3,0},
 		{5,3,4},
 		{8,3,8}
 	};
+
+	// フレームバッファマネージャー
+	FrameBufferManager* m_frameBuffer = nullptr;
+
+	// ポストエフェクト
+	std::unique_ptr<PostprocessingRendererDX12>	postprocessingRenderer = std::make_unique<PostprocessingRendererDX12>();
 };

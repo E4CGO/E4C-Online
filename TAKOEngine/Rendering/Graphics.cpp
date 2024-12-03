@@ -294,9 +294,9 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 		}
 
 		m_rtv_descriptor_heap = std::make_unique<DescriptorHeap>(m_d3d_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 10);
-		m_dsv_descriptor_heap = std::make_unique<DescriptorHeap>(m_d3d_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1000);
-		m_shader_resource_descriptor_heap = std::make_unique<DescriptorHeap>(m_d3d_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1000);
-		m_sampler_descriptor_heap = std::make_unique<DescriptorHeap>(m_d3d_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, 1000);
+		m_dsv_descriptor_heap = std::make_unique<DescriptorHeap>(m_d3d_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 10);
+		m_shader_resource_descriptor_heap = std::make_unique<DescriptorHeap>(m_d3d_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 50000);
+		m_sampler_descriptor_heap = std::make_unique<DescriptorHeap>(m_d3d_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, 10);
 
 		m_viewport.TopLeftX = 0;
 		m_viewport.TopLeftY = 0;
@@ -497,6 +497,7 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	m_sampler[static_cast<int>(SamplerState::LinearWrap)] = std::make_unique<SamplerManager>(SamplerState::LinearWrap);
 	m_sampler[static_cast<int>(SamplerState::LinearClamp)] = std::make_unique<SamplerManager>(SamplerState::LinearClamp);
 	m_sampler[static_cast<int>(SamplerState::LinearBorder)] = std::make_unique<SamplerManager>(SamplerState::LinearBorder);
+	m_sampler[static_cast<int>(SamplerState::LinearMirror)] = std::make_unique<SamplerManager>(SamplerState::LinearMirror);
 	m_sampler[static_cast<int>(SamplerState::AnisotropicWrap)] = std::make_unique<SamplerManager>(SamplerState::AnisotropicWrap);
 	m_sampler[static_cast<int>(SamplerState::ShadowMap)] = std::make_unique<SamplerManager>(SamplerState::ShadowMap);
 
@@ -598,6 +599,34 @@ DirectX::XMFLOAT3 Graphics::GetScreenPosition(
 //******************************************************************
 // @brief     スクリーン作成取得
 // @param[in] worldPosition　  ワールド座標系での位置
+// @param[in] viewport         ビューポート情報
+// @param[in] View             ビュー行列
+// @param[in] Projection       射影行列
+// @param[in] World            ワールド行列
+// @return    DirectX::XMFLOAT3
+//******************************************************************
+DirectX::XMFLOAT3 Graphics::GetScreenPosition(const DirectX::XMFLOAT3 worldPosition, const D3D12_VIEWPORT& viewport, const DirectX::XMMATRIX& View, const DirectX::XMMATRIX& Projection, const DirectX::XMMATRIX World)
+{
+	DirectX::XMVECTOR ScreenPosition = DirectX::XMVector3Project(
+		DirectX::XMVectorSet(worldPosition.x, worldPosition.y, worldPosition.z, 0),
+		viewport.TopLeftX,
+		viewport.TopLeftY,
+		viewport.Width,
+		viewport.Height,
+		viewport.MinDepth,
+		viewport.MaxDepth,
+		Projection,
+		View,
+		World
+	);
+	DirectX::XMFLOAT3 screenPosition;
+	DirectX::XMStoreFloat3(&screenPosition, ScreenPosition);
+	return screenPosition;
+}
+
+//******************************************************************
+// @brief     スクリーン作成取得
+// @param[in] worldPosition　  ワールド座標系での位置
 // @return    DirectX::XMFLOAT3
 //******************************************************************
 DirectX::XMFLOAT3 Graphics::GetScreenPosition(const DirectX::XMFLOAT3 worldPosition)
@@ -647,7 +676,7 @@ void Graphics::BeginRender()
 	// レンダーターゲットを設定
 	m_framebufferManager->SetRenderTarget(rtv_descriptor[frame_buffer_index]->GetCpuHandle(), dsv_descriptor->GetCpuHandle());
 
-	const float clearColor[] = { 0.6f, 0.6f, 0.6f, 1.0f };
+	const float clearColor[] = { 0.2f, 0.2f, 0.2f, 1.0f };
 	m_framebufferManager->ClearRenderTargetView(rtv_descriptor[frame_buffer_index]->GetCpuHandle(), clearColor);
 	m_framebufferManager->ClearDepthStencilView(dsv_descriptor->GetCpuHandle(), 1.0f);
 }

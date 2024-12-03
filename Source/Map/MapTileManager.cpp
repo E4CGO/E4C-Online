@@ -123,7 +123,7 @@ void MapTileManager::CreateSpatialIndex(uint32_t quadDepth, uint32_t octDepth, D
 int MapTileManager::InsertMapMesh()
 {
 	int count = 0;
-	
+
 	for (ModelObject*& item : items)
 	{
 		int nowMeshNum = 0;

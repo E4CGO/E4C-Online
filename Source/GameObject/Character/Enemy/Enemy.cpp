@@ -1,9 +1,8 @@
 #include "TAKOEngine/Tool/Mathf.h"
 
-#include "GameObject/Character/Player/PlayerManager.h"
+#include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Character/Enemy/Enemy.h"
-#include "GameObject/Character/Enemy/Chest.h"
 #include "GameObject/Character/Enemy/SkeletonMinion.h"
 
 Enemy::Enemy(const char* filename, float scaling) : Character(filename, scaling)
@@ -41,12 +40,12 @@ void Enemy::TurnTo(float elapsedTime, const DirectX::XMFLOAT3& target)
 	Turn(elapsedTime, d.x, d.z, turnSpeed);
 }
 
-Player* Enemy::GetClosestPlayer(float limit)
+PlayerCharacter* Enemy::GetClosestPlayer(float limit)
 {
-	Player* result = nullptr;
+	PlayerCharacter* result = nullptr;
 	limit *= limit;
 
-	for (Player*& player : PLAYERS.GetAll())
+	for (PlayerCharacter*& player : PlayerCharacterManager::Instance().GetAll())
 	{
 		float d = XMFLOAT3LengthSq(player->GetPosition() - position);
 		if (d < limit)
@@ -75,7 +74,7 @@ void Enemy::Render(const RenderContext& rc)
 		collider.second->DrawDebugPrimitive({ 1, 1, 1, 1 });
 	}
 
-	Collider* playerCollider = PLAYERS.GetPlayerById(GAME_DATA.GetClientId())->GetCollider();
+	Collider* playerCollider = PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetCollider();
 	for (const std::pair<int, Collider*>& collider : attackColliders)
 	{
 		DirectX::XMFLOAT4 color = { 1, 0, 0, 1 };
@@ -88,9 +87,9 @@ void Enemy::Render(const RenderContext& rc)
 }
 void Enemy::AttackCollision()
 {
-	Player* player = PLAYERS.GetPlayerById(GAME_DATA.GetClientId());
+	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
 	if (!player) return;
-	Collider* playerCollider = PLAYERS.GetPlayerById(GAME_DATA.GetClientId())->GetCollider();
+	Collider* playerCollider = player->GetCollider();
 	if (!playerCollider->IsEnable()) return;
 
 	for (const std::pair<int, Collider*>& collider : attackColliders)
@@ -122,7 +121,7 @@ void Enemy::ImportData(ENEMY_DATA data)
 {
 	position = data.position;
 	velocity = data.velocity;
-	target = PLAYERS.GetPlayerById(data.target);
+	target = PlayerCharacterManager::Instance().GetPlayerCharacterById(data.target);
 	angle = data.angle;
 	if (stateMachine->GetStateIndex() != data.state)
 	{
@@ -150,19 +149,6 @@ Enemy* Enemy::EnemyFactory(int enemyType)
 {
 	switch (enemyType)
 	{
-	case ENEMY_TYPE::CHEST_COIN: return new VictoryChest; break;
-	case ENEMY_TYPE::CHEST_EMPTY: return new EmptyChest; break;
-	case ENEMY_TYPE::CHEST_EMPTY_SKELETON_MINION:
-	{
-		EmptyChest* enemy = new EmptyChest;
-		enemy->SetOnOpen([chest = enemy](Enemy*) mutable {
-			Enemy* sketelon = ENEMIES.Register(new SkeletonMinion);
-			sketelon->SetPosition(chest->GetPosition());
-			sketelon->SetAngle(chest->GetAngle());
-			});
-		return enemy;
-		break;
-	}
 	case ENEMY_TYPE::SKELETON_MINION: return new SkeletonMinion; break;
 	case ENEMY_TYPE::SKELETON_MINION_BOSS: return new SkeletonMinionBoss; break;
 	}

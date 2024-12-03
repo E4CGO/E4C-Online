@@ -28,6 +28,32 @@ std::shared_ptr<ModelResource> ResourceManager::LoadModelResource(const char* fi
 	return model;
 }
 
+std::shared_ptr<ModelResource> ResourceManager::LoadModelDX12Resource(const char* filename)
+{
+	if (strlen(filename) == 0) return nullptr;
+
+	// モデル検索
+	ModelMap::iterator it = models.find(filename);
+	if (it != models.end())
+	{
+		// リンク(寿命)が切れていないか確認
+		if (!it->second.expired())
+		{
+			// 読み込み済みモデルのリソースを返す
+			return it->second.lock();
+		}
+	}
+
+	// 新規モデルリソース作成&読み込み
+	std::shared_ptr<ModelResource> model = std::make_shared<ModelResource>();
+	model->Load(filename);
+
+	// マップに登録
+	models[filename] = model;
+
+	return model;
+}
+
 std::shared_ptr<ModelResource> ResourceManager::LoadModelResourceGLTF(std::string filename)
 {
 	if (filename.size() == 0) return nullptr;
