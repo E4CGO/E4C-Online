@@ -412,7 +412,7 @@ void RoomBase::PlaceMapTile(bool isLeader)
 		{
 			if (T_GRAPHICS.isDX11Active)
 			{
-				newTile->LoadModel(fileName.c_str(), 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::LHS_PBR);
+				newTile->LoadModel(fileName.c_str(), 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::LHS_TOON);
 			}
 			if (T_GRAPHICS.isDX12Active)
 			{
@@ -426,7 +426,7 @@ void RoomBase::PlaceMapTile(bool isLeader)
 		{
 			if (T_GRAPHICS.isDX11Active)
 			{
-				newTile->LoadModel(fileName.c_str(), 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::LHS_PBR);
+				newTile->LoadModel(fileName.c_str(), 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::LHS_TOON);
 			}
 			if (T_GRAPHICS.isDX12Active)
 			{
