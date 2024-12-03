@@ -13,40 +13,23 @@
 
 struct ENEMY_COLLISION
 {
-	int enemy_id = -1;
-	int player_id = -1;
-	int colider_id = -1;
+	uint64_t enemy_id = -1;
+	uint64_t player_id = -1;
+	uint64_t colider_id = -1;
 	int count = -1;
 	int damage = 10;
 	DirectX::XMFLOAT3 force = {};
 	bool power = false;
 };
 
-struct ENEMY_DATA
+enum ENEMY_TYPE : uint8_t
 {
-	int enemy_id = -1;
-	int enemyType = -1;
-	DirectX::XMFLOAT3 position = {};
-	DirectX::XMFLOAT3 velocity = {};
-	int target = -1;
-	DirectX::XMFLOAT3 angle = {};
-	int state = -1;
-	int subState = -1;
-	int hp = 1;
-	int maxHp = 1;
-};
-
-enum ENEMY_TYPE
-{
-	CHEST_COIN = 0,							// 宝箱
-	CHEST_EMPTY = 1,						// 宝箱(空)
-
-	CHEST_EMPTY_SKELETON_MINION,			// 宝箱(空) スケルトン生成
-
 	SKELETON_MINION,						// デフォルト骨
 	SKELETON_MINION_BOSS,					// デフォルト骨ボス
 	END,
 };
+
+class Spawner;
 
 class Enemy : public Character
 {
@@ -64,11 +47,8 @@ public:
 
 	int GetAttack() { return atk; }
 
-	void ImportData(ENEMY_DATA data);
-	void ExportData(ENEMY_DATA& data);
-
-	void SetEnemyId(int id) { enemy_id = id; }
-	int GetEnemyId() { return enemy_id; }
+	void SetEnemyId(const uint64_t& id) { enemy_id = id; }
+	uint64_t GetEnemyId() { return enemy_id; }
 
 	bool IsAlive();
 
@@ -125,8 +105,8 @@ public:
 		Wave
 	};
 protected:
-	int enemy_id = -1;
-	int enemyType = -1;
+	uint64_t enemy_id = -1;
+	uint8_t enemyType = -1;
 
 	int atk = 10; // 攻撃力
 
@@ -144,5 +124,7 @@ protected:
 	std::unordered_map<int, Collider*> attackColliders;	// 攻撃判定
 
 	bool showHp = true;	// HP表示
+
+	Spawner* m_pSpawner = nullptr; // スポナー
 };
 #endif

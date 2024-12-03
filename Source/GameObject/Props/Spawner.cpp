@@ -1,13 +1,15 @@
-﻿#include "Spawner.h"
-#include "Scene/Stage/StageManager.h"
-#include "TAKOEngine/Tool/Mathf.h"
-#include <GameObject/Character/Enemy/EnemyManager.h>
+﻿//! @file Spawner.cpp
+//! @note 
+
+#include "Spawner.h"
+#include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "TAKOEngine/Tool/XMFLOAT.h"
+#include "Source/GameObject/Character/Enemy/SkeletonMinion.h"
 /**************************************************************************//**
      @brief  コンストラクタ  
 *//***************************************************************************/
-Spawner::Spawner()
+Spawner::Spawner(uint8_t enemyType, int maxExistedEnemiesNum, int maxSpawnEnemiesNum) : m_enemyType(enemyType), m_maxExistedEnemiesNum(maxExistedEnemiesNum), m_maxSpawnedEnemiesNum(maxSpawnEnemiesNum), GameObject()
 {
 	
 }
@@ -18,125 +20,57 @@ Spawner::Spawner()
 *//***************************************************************************/
 void Spawner::Update(float elapsedTime)
 {
-	
-	
-	
-	
+	if (m_maxSpawnedEnemiesNum > 0 && m_maxSpawnedEnemiesNum <= m_spawnedCountTotal) return; // 生成終了
+	if (SearchPlayer())
+	{
+		m_spawnTimer += elapsedTime;
+		while (m_spawnTimer > m_spawnTime)
+		{
+			m_spawnTimer -= m_spawnTime;
+			Spawn();
+		}
+	}
+	else
+	{
+		m_spawnTimer = 0.0f;
+	}
 }
+
 /**************************************************************************//**
-     @brief    テリトリー配置
-    @param[in]    origin
-    @param[in]    range
-*//***************************************************************************/
-void Spawner::SetTerritory(const DirectX::XMFLOAT3& origin, float range)
-{
-	territoryOrigin = origin;
-	territoryRange = range;
-}
-/**************************************************************************//**
-     @brief    プレイヤー発見
-    @return    
+    @brief		プレイヤー検索
+	@return		判定
 *//***************************************************************************/
 bool Spawner::SearchPlayer()
 {
-	for (auto& player : PlayerCharacterManager::Instance().GetAll())
-	{
-		// プレイヤーの位置を取得
-		playerPosition = player->GetPosition();
+	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
+	if (player == nullptr) return false;
 
-		// 自身とプレイヤーの間の距離を計算
-		DirectX::XMFLOAT3 v = playerPosition - position;
-		float dist = sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
+	DirectX::XMFLOAT3 d = player->GetPosition() - position;
+	d.y = 0.0f; // 高さ無視
 
-		// 検知範囲内か確認
-		if (dist < serchRange)
-		{
-			return true;
-			
-		}
-		return false;
-	}
+	return (XMFLOAT3LengthSq(d) < m_searchRadius * m_searchRadius);
 }
+
 /**************************************************************************//**
-     @brief    エネミー生成
-    @param[in]    elapsedTime
-    @param[in]    enemyType
-    @param[in]    maxEnemies
-    @param[in]    activeEnemies
+ 	@brief	エネミー生成
 *//***************************************************************************/
-void Spawner::SpawnEnemy(float elapsedTime, const std::string& enemyType, int maxEnemies, int activeEnemies)
+void Spawner::Spawn()
 {
-spawntimer += elapsedTime;
+	// TODO NETWORK
+	m_spawnedCountTotal++;
 
-// 不要な敵を整理
-CleanupEnemies();
-
-// 現在の生存している敵の数を確認
-currentAliveCount = spawnedEnemies.size();
-
-// 敵が3匹未満かつ合計生成数がmaxEnemiesを超えない場合にのみスポーン処理を実行
-if (spawntimer > spawntime && currentAliveCount < activeEnemies && spawnedEnemyCount < maxEnemies) {
-	// 生成可能な数を計算
-	int spawnCount = min( activeEnemies - currentAliveCount, maxEnemies - spawnedEnemyCount );
-
-	for (int i = 0; i < spawnCount; ++i) {
-		// スポーン位置の計算
-		float theta = Mathf::RandomRange(0, DirectX::XM_2PI);
-		float range = Mathf::RandomRange(0, territoryRange);
-		float offsetX = static_cast<float>(i) * 2.0f - 2.0f; // スポーン位置を調整
-		float offsetZ = static_cast<float>(i) * 1.0f - 1.0f;
-
-		DirectX::XMFLOAT3 spawnPos;
-		spawnPos.x = position.x + territoryOrigin.x + range * sinf(theta) + offsetX;
-		spawnPos.y = 10.0f;
-		spawnPos.z = position.z + territoryOrigin.z + range * cosf(theta) + offsetZ;
-
-		// 敵を生成
-		Enemy* enemy = SetEnemy(enemyType);
-		if (enemy) {
-			enemy->SetPosition(spawnPos);
-
-			// 管理リストに追加
-			spawnedEnemies.push_back(enemy);
-			ENEMIES.Register(enemy);
-
-			// カウンターを更新
-			spawnedEnemyCount++;
-            
-			currentAliveCount++;
-		}
-	}
-	spawntimer = 0; // タイマーをリセット
+	m_pSpawnedEnemies.insert(ENEMIES.Register(Enemy::EnemyFactory(m_enemyType)));
 }
-}
+
 /**************************************************************************//**
-     @brief   リスト削除
+ 	@brief		生成した敵が消滅時コールバック
+	@param[in]	enemy エネミー参照ポインタ
 *//***************************************************************************/
-void Spawner::CleanupEnemies() {
-	spawnedEnemies.erase(
-		std::remove_if(spawnedEnemies.begin(), spawnedEnemies.end(),
-			[this](Enemy* enemy) {
-				if (!enemy->IsAlive()) {
-					currentAliveCount--; // カウンターを更新
-					return true;  // リストから削除
-				}
-				return false;
-			}),
-		spawnedEnemies.end());
-}
-/**************************************************************************//**
-     @brief    エネミーの種類をセット
-    @param[in]    enemyType
-    @return    
-*//***************************************************************************/
-Enemy* Spawner::SetEnemy(const std::string& enemyType)
+void Spawner::EnemyDestoryCallBack(Enemy* enemy)
 {
-	if (enemyType == "Skeleton") {
-		return new SkeletonMinion();
-	}
-	else if (enemyType == "SkeletonBoss")
+	if (m_pSpawnedEnemies.find(enemy) != m_pSpawnedEnemies.end())
 	{
-		return new SkeletonMinionBoss();
+		m_pSpawnedEnemies.erase(enemy);
 	}
 }
 
@@ -146,9 +80,9 @@ Enemy* Spawner::SetEnemy(const std::string& enemyType)
 *//***************************************************************************/
 void Spawner::Render(const RenderContext& rc)
 {
-#ifdef DEBUG
-	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, territoryRange, 1.5f, { 1,0,0,1 });
-	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, serchRange, 1.5f, { 1,0,1,1 });
+#ifdef _DEBUG
+	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, m_spawnRadius, 1.5f, { 1,0,0,1 });
+	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, m_searchRadius, 1.5f, { 1,0,1,1 });
 #endif // DEBUG
 
 	
@@ -157,8 +91,8 @@ void Spawner::Render(const RenderContext& rc)
 void Spawner::RenderDX12(const RenderContextDX12& rc)
 {
 
-#ifdef DEBUG
-	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, territoryRange, 1.5f, { 1,0,0,1 });
-	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, serchRange, 1.5f, { 1,0,1,1 });
+#ifdef _DEBUG
+	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, m_spawnRadius, 1.5f, { 1,0,0,1 });
+	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, m_searchRadius, 1.5f, { 1,0,1,1 });
 #endif // DEBUG
 }

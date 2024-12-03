@@ -90,8 +90,7 @@ void StageOpenWorld_E4C::Initialize()
 		player->GetPosition(),			// 注視点
 		{ 0, 0.969f, -0.248f }	// 上ベクトル
 	);
-	spawner = std::make_unique<Spawner>();
-	spawner->SetPosition({ player->GetPosition().x,2,player->GetPosition().z});
+	spawner = std::make_unique<Spawner>(0, 10, -1);
 
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(mainCamera);
@@ -112,8 +111,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	// ゲームループ内で
 	cameraController->SyncContrllerToCamera(camera);
 	cameraController->Update(elapsedTime);
-
-	spawner->SpawnEnemy(elapsedTime, "Skeleton",10,3);
 
 	ENEMIES.Update(elapsedTime);
 

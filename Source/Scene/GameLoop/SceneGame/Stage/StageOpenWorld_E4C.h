@@ -51,8 +51,8 @@ private:
 
 	std::unique_ptr <Teleporter> teleporter;
 
-	std::unique_ptr<Spawner>spawner;
-	
+	std::unique_ptr<Spawner> spawner;
+
 	std::unique_ptr<ModelObject> map;
 	std::unique_ptr<ModelObject> tower;
 

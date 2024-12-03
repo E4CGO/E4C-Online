@@ -130,36 +130,6 @@ void Enemy::OnDamage(const ENEMY_COLLISION& hit)
 }
 void Enemy::OnDeath() { ENEMIES.Remove(this); }
 
-void Enemy::ImportData(ENEMY_DATA data)
-{
-	PlayerCharacterManager& pMnager = PlayerCharacterManager::Instance();
-
-	position = data.position;
-	velocity = data.velocity;
-	target = pMnager.GetPlayerCharacterById(data.target);
-	angle = data.angle;
-	if (stateMachine->GetStateIndex() != data.state)
-	{
-		stateMachine->ChangeState(data.state);
-	}
-	subState = data.subState;
-	hp = data.hp;
-	maxHp = data.maxHp;
-}
-void Enemy::ExportData(ENEMY_DATA& data)
-{
- 	data.enemy_id = enemy_id;
-	data.enemyType = enemyType;
-	data.position = position;
-	data.velocity = velocity;
-	data.target = (target) ? target->GetClientId() : -1;
-	data.angle = angle;
-	data.state = stateMachine->GetStateIndex();
-	data.subState = subState;
-	data.hp = hp;
-	data.maxHp = maxHp;
-}
-
 Enemy* Enemy::EnemyFactory(int enemyType)
 {
 	switch (enemyType)
