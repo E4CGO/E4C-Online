@@ -30,21 +30,18 @@ void SceneTitle_E4C::Initialize()
 	//シャドウマップレンダラ
 	shadowMapRenderer->Initialize();
 
-	// モデル
-	{
-		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/UI/start.png");
-		m_sprites[0] = std::make_unique<SpriteDX12>(1, "Data/Sprites/UI/exit.png");
-	}
+	// フレームバッファマネージャー
+	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
 
 	// 光
-	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
+	LightManager::Instance().SetAmbientColor({ 0.3f, 0.3f, 0.3f, 0.0f });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
 	shadowMapRenderer->SetShadowLight(dl);
 
 	CameraManager& cameramanager = CameraManager::Instance();
-	Camera*mainCamera = new Camera();
+	Camera* mainCamera = new Camera();
 	cameramanager.Register(mainCamera);
 	cameramanager.SetCamera(0);
 
@@ -83,6 +80,7 @@ void SceneTitle_E4C::Finalize()
 	shadowMapRenderer->Clear();
 	Sound::Instance().StopAudio(0);
 	CameraManager::Instance().Clear();
+	LightManager::Instance().Clear();
 }
 
 // 更新処理
@@ -135,29 +133,20 @@ void SceneTitle_E4C::Render()
 
 void SceneTitle_E4C::RenderDX12()
 {
-	ID3D12GraphicsCommandList* d3d_command_list = TentacleLib::graphics.Begin();
+	T_GRAPHICS.BeginRender();
 	{
-		
 		// シーン用定数バッファ更新
-		const Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
-			CameraManager::Instance().GetCamera(),
-			DirectX::XMFLOAT3(0, -1, 0));
+		const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
+			CameraManager::Instance().GetCamera());
 
 		// レンダーコンテキスト設定
 		RenderContextDX12 rc;
-		rc.d3d_command_list = d3d_command_list;
+		rc.d3d_command_list = m_frameBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
-		// スプライト描画
-		if (m_sprites[0] != nullptr)
-		{
-			m_sprites[0]->Begin(d3d_command_list);
-			m_sprites[0]->Draw(0, 0, 100, 100, 0, 1, 1, 1, 1);
-			m_sprites[0]->End(d3d_command_list);
-		}
-
-		TentacleLib::graphics.End();
+		UI.RenderDX12(rc);
 	}
+	T_GRAPHICS.End();
 }
 
 void SceneTitle_E4C::DrawSceneGUI()

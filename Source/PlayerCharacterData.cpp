@@ -12,42 +12,52 @@
 PlayerCharacterData::PlayerCharacterData()
 {
 	ClearAppearancePatterns();
+	m_pAppearancePatterns[APPEARANCE_PATTERN::GENDER].push_back(new PlayerCharacterPatternGender(true));
+	//m_pAppearancePatterns[APPEARANCE_PATTERN::GENDER].push_back(new PlayerCharacterPatternGender(false));
 
-	m_pappearancePatterns[APPEARANCE_PATTERN::GENDER].push_back(new PlayerCharacterPatternGender(true));
-	m_pappearancePatterns[APPEARANCE_PATTERN::GENDER].push_back(new PlayerCharacterPatternGender(false));
-	m_pappearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/WEAPON_BARB.glb"));
-	m_pappearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/WEAPON_MAGE.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternNone);
+	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSword("Data/Model/Character/PlayerModels/MDL_PLAYER_SWORD_ANIMATION.glb"));
+
+	m_pAppearancePatterns[APPEARANCE_PATTERN::BOTTOM].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/MDL_PLAYER_BOTTOM_ANIMATION.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::TOP].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/MDL_PLAYER_TOP_ANIMATION.glb"));
+
+	m_pAppearancePatterns[APPEARANCE_PATTERN::HAIR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/MDL_PLAYER_HAIR_ANIMATION.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::HAIR].push_back(new PlayerCharacterPatternNone);
+
+	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternNone);
+	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternShield("Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD1_ANIMATION.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternShield("Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD2_ANIMATION.glb"));
 }
 
 /**************************************************************************//**
 	@brief		プレイヤーキャラクターに外見設定を実装する
-	@param[in]	player			プレイヤー参照ポインタ
+	@param[in]	chara			プレイヤー参照ポインタ
 	@param[in]	appearance_idx	外見インデックス
 	@param[in]	pattern_idx		外見パターン
-	@retrun		なし
+	@return		なし
 *//***************************************************************************/
-void PlayerCharacterData::LoadAppearance(Player* player, uint8_t appearance_idx, uint8_t pattern_idx)
+void PlayerCharacterData::LoadAppearance(PlayerCharacter* chara, uint8_t appearance_idx, uint8_t pattern_idx)
 {
-	if (m_pappearancePatterns.find(appearance_idx) == m_pappearancePatterns.end()) return;
-	if (m_pappearancePatterns[appearance_idx].size() <= pattern_idx) return;
-	m_pappearancePatterns[appearance_idx][pattern_idx]->Execute(player);
+	if (m_pAppearancePatterns.find(appearance_idx) == m_pAppearancePatterns.end()) return;
+	if (m_pAppearancePatterns[appearance_idx].size() <= pattern_idx) return;
+	m_pAppearancePatterns[appearance_idx][pattern_idx]->Execute(chara);
 }
 
 /**************************************************************************//**
-	@brief		// 外見パターンをクリア
+	@brief		外見パターンをクリア
 	@param[in]	なし
-	@retrun		なし
+	@return		なし
 *//***************************************************************************/
 void PlayerCharacterData::ClearAppearancePatterns()
 {
-	for (auto& pair : m_pappearancePatterns)
+	for (auto& pair : m_pAppearancePatterns)
 	{
 		for (PlayerCharacterPattern* ptr : pair.second) {
 			delete ptr;			// vector 内のポインタを削除
 		}
 		pair.second.clear();	// vector のポインタをクリア
 	}
-	m_pappearancePatterns.clear();
+	m_pAppearancePatterns.clear();
 }
 
 /**************************************************************************//**

@@ -13,8 +13,9 @@ struct VS_OUT
 };
 
 cbuffer CbScene : register(b0)
-{
-    row_major float4x4 viewProjection;
+{    
+    row_major float4x4 view;
+    row_major float4x4 Projection;   
     float4             cameraPosition;
     
     //ライト情報
@@ -40,7 +41,7 @@ cbuffer CbMaterial : register(b2)
 
 #define ROOT_SIG "RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT), \
                   DescriptorTable(CBV(b0), visibility=SHADER_VISIBILITY_ALL), \
-                  DescriptorTable(CBV(b1), visibility=SHADER_VISIBILITY_VERTEX), \
+                  DescriptorTable(CBV(b1), visibility=SHADER_VISIBILITY_ALL), \
                   DescriptorTable(CBV(b2), visibility=SHADER_VISIBILITY_ALL), \
                   DescriptorTable(SRV(t0), visibility=SHADER_VISIBILITY_PIXEL), \
                   DescriptorTable(SRV(t1), visibility=SHADER_VISIBILITY_PIXEL), \

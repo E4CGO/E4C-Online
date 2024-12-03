@@ -1,16 +1,25 @@
+ï»¿//! @file FrameBuffer.cpp
+//! @note
+
 #include "Misc.h"
 #include "FrameBuffer.h"
 
-// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+//******************************************************************
+// @brief       ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+// @param[in]   device     ID3D11Device*
+// @param[in]   swapchain  IDXGISwapChain*
+// @param[in]   format     æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒ“ãƒ¥ãƒ¼ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ
+// @return      ãªã—
+//******************************************************************
 FrameBuffer::FrameBuffer(ID3D11Device* device, IDXGISwapChain* swapchain, DXGI_FORMAT format)
 {
 	HRESULT hr = S_OK;
 	UINT width, height;
 
-	// ƒŒƒ“ƒ_[ƒe[ƒQƒbƒgƒrƒ…[‚Ì¶¬
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ãƒ†ãƒ¼ã‚²ãƒƒãƒˆãƒ“ãƒ¥ãƒ¼ã®ç”Ÿæˆ
 	{
-		// ƒXƒƒbƒvƒ`ƒF[ƒ“‚©‚çƒoƒbƒNƒoƒbƒtƒ@ƒeƒNƒXƒ`ƒƒ‚ğæ“¾‚·‚éB
-		// ¦ƒXƒƒbƒvƒ`ƒF[ƒ“‚É“à•ï‚³‚ê‚Ä‚¢‚éƒoƒbƒNƒoƒbƒtƒ@ƒeƒNƒXƒ`ƒƒ‚Í'F'‚ğ‘‚«‚ŞƒeƒNƒXƒ`ƒƒ
+		// ã‚¹ãƒ¯ãƒƒãƒ—ãƒã‚§ãƒ¼ãƒ³ã‹ã‚‰ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’å–å¾—ã™ã‚‹ã€‚
+		// â€»ã‚¹ãƒ¯ãƒƒãƒ—ãƒã‚§ãƒ¼ãƒ³ã«å†…åŒ…ã•ã‚Œã¦ã„ã‚‹ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¯'è‰²'ã‚’æ›¸ãè¾¼ã‚€ãƒ†ã‚¯ã‚¹ãƒãƒ£
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> texture2d;
 		hr = swapchain->GetBuffer(
 			0,
@@ -19,11 +28,11 @@ FrameBuffer::FrameBuffer(ID3D11Device* device, IDXGISwapChain* swapchain, DXGI_F
 		);
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
-		// ƒoƒbƒNƒoƒbƒtƒ@ƒeƒNƒXƒ`ƒƒ‚Ö‚Ì‘‚«‚İ‚Ì‘‹Œû‚Æ‚È‚éƒŒƒ“ƒ_[ƒ^[ƒQƒbƒgƒrƒ…[‚ğ¶¬‚·‚éB
+		// ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¸ã®æ›¸ãè¾¼ã¿ã®çª“å£ã¨ãªã‚‹ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆãƒ“ãƒ¥ãƒ¼ã‚’ç”Ÿæˆã™ã‚‹ã€‚
 		hr = device->CreateRenderTargetView(texture2d.Get(), nullptr, renderTargetView.GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
-		// ƒoƒbƒNƒoƒbƒtƒ@ƒeƒNƒXƒ`ƒƒ‚©‚çƒTƒCƒYî•ñ‚ğæ“¾
+		// ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‹ã‚‰ã‚µã‚¤ã‚ºæƒ…å ±ã‚’å–å¾—
 		D3D11_TEXTURE2D_DESC texture2dDesc;
 		texture2d->GetDesc(&texture2dDesc);
 
@@ -31,9 +40,9 @@ FrameBuffer::FrameBuffer(ID3D11Device* device, IDXGISwapChain* swapchain, DXGI_F
 		height = texture2dDesc.Height;
 	}
 
-	// [“xƒXƒeƒ“ƒVƒ‹ƒrƒ…[‚Ìì¬
+	// æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒ“ãƒ¥ãƒ¼ã®ä½œæˆ
 	{
-		// [“xƒXƒeƒ“ƒVƒ‹î•ñ‚ğ‘‚«‚Ş‚½‚ß‚ÌƒeƒNƒXƒ`ƒƒ‚ğì¬‚·‚é
+		// æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«æƒ…å ±ã‚’æ›¸ãè¾¼ã‚€ãŸã‚ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã™ã‚‹
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> texture2d;
 		texture2dDesc = {};
 		texture2dDesc.Width = width;
@@ -50,12 +59,12 @@ FrameBuffer::FrameBuffer(ID3D11Device* device, IDXGISwapChain* swapchain, DXGI_F
 		hr = device->CreateTexture2D(&texture2dDesc, nullptr, texture2d.GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
-		// [“xƒXƒeƒ“ƒVƒ‹ƒeƒNƒXƒ`ƒƒ‚Ö‚Ì‘‚«‚Ş‚É‘‹Œû‚É‚È‚é[“xƒXƒeƒ“ƒVƒ‹ƒrƒ…[‚ğì¬‚·‚é
+		// æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¸ã®æ›¸ãè¾¼ã‚€ã«çª“å£ã«ãªã‚‹æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒ“ãƒ¥ãƒ¼ã‚’ä½œæˆã™ã‚‹
 		hr = device->CreateDepthStencilView(texture2d.Get(), nullptr, depthStencilView.GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 
-	// ƒrƒ…[ƒ|[ƒg
+	// ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆ
 	{
 		viewport.Width = static_cast<float>(width);
 		viewport.Height = static_cast<float>(height);
@@ -66,13 +75,20 @@ FrameBuffer::FrameBuffer(ID3D11Device* device, IDXGISwapChain* swapchain, DXGI_F
 	}
 }
 
-// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+//******************************************************************
+// @brief       ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+// @param[in]   device  ID3D11Device*
+// @param[in]   width   ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®å¹…
+// @param[in]   height  ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®é«˜ã•
+// @param[in]   format  ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ
+// @return      ãªã—
+//******************************************************************
 FrameBuffer::FrameBuffer(ID3D11Device* device, UINT width, UINT height, DXGI_FORMAT format)
 {
 	HRESULT hr = S_OK;
-	// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ
 	{
-		// ƒeƒNƒXƒ`ƒƒ¶¬
+		// ãƒ†ã‚¯ã‚¹ãƒãƒ£ç”Ÿæˆ
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> renderTargetBuffer;
 		texture2dDesc = {};
 		texture2dDesc.Width              = width;
@@ -90,14 +106,14 @@ FrameBuffer::FrameBuffer(ID3D11Device* device, UINT width, UINT height, DXGI_FOR
 		hr = device->CreateTexture2D(&texture2dDesc, 0, renderTargetBuffer.GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
-		// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒgƒrƒ…[¶¬
+		// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆãƒ“ãƒ¥ãƒ¼ç”Ÿæˆ
 		D3D11_RENDER_TARGET_VIEW_DESC renderTargetviewDesc{};
 		renderTargetviewDesc.Format        = texture2dDesc.Format;
 		renderTargetviewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 		hr = device->CreateRenderTargetView(renderTargetBuffer.Get(), &renderTargetviewDesc, renderTargetView.GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
-		// ƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[¶¬
+		// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼ç”Ÿæˆ
 		D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc{};
 		shaderResourceViewDesc.Format              = texture2dDesc.Format;
 		shaderResourceViewDesc.ViewDimension       = D3D11_SRV_DIMENSION_TEXTURE2D;
@@ -106,9 +122,9 @@ FrameBuffer::FrameBuffer(ID3D11Device* device, UINT width, UINT height, DXGI_FOR
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 
-	// ƒfƒvƒXƒXƒeƒ“ƒVƒ‹
+	// ãƒ‡ãƒ—ã‚¹ã‚¹ãƒ†ãƒ³ã‚·ãƒ«
 	{
-		// ƒeƒNƒXƒ`ƒƒ¶¬
+		// ãƒ†ã‚¯ã‚¹ãƒãƒ£ç”Ÿæˆ
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> depthStencilBuffer;
 		texture2dDesc = {};
 		texture2dDesc.Width              = width;
@@ -125,7 +141,7 @@ FrameBuffer::FrameBuffer(ID3D11Device* device, UINT width, UINT height, DXGI_FOR
 		hr = device->CreateTexture2D(&texture2dDesc, 0, depthStencilBuffer.GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
-		// ƒfƒvƒXƒXƒeƒ“ƒVƒ‹ƒrƒ…[¶¬
+		// ãƒ‡ãƒ—ã‚¹ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒ“ãƒ¥ãƒ¼ç”Ÿæˆ
 		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc{ };
 		depthStencilViewDesc.Format        = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
@@ -134,7 +150,7 @@ FrameBuffer::FrameBuffer(ID3D11Device* device, UINT width, UINT height, DXGI_FOR
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 
-	// ƒrƒ…[ƒ|[ƒg
+	// ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆ
 	{
 		viewport.Width    = static_cast<float>(width);
 		viewport.Height   = static_cast<float>(height);
@@ -145,7 +161,15 @@ FrameBuffer::FrameBuffer(ID3D11Device* device, UINT width, UINT height, DXGI_FOR
 	}
 }
 
-//ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg&ƒfƒvƒXƒXƒeƒ“ƒVƒ‹ƒrƒ…[ƒNƒŠƒA
+//******************************************************************
+// @brief       ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ&ãƒ‡ãƒ—ã‚¹ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒ“ãƒ¥ãƒ¼ã‚¯ãƒªã‚¢
+// @param[in]   dc  ID3D11DeviceContext*
+// @param[in]   r   color(èµ¤)
+// @param[in]   g   color(ç·‘)
+// @param[in]   b   color(é’)
+// @param[in]   a   color(é€æ˜åº¦)
+// @return      ãªã—
+//******************************************************************
 void FrameBuffer::Clear(ID3D11DeviceContext* dc, float r, float g, float b, float a)
 {
 	float color[4]{ r,g,b,a };
@@ -153,14 +177,24 @@ void FrameBuffer::Clear(ID3D11DeviceContext* dc, float r, float g, float b, floa
 	dc->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
-//ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg&ƒrƒ…[ƒ|[ƒgİ’è
+//******************************************************************
+// @brief       ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ&ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆè¨­å®š
+// @param[in]   dc  ID3D11DeviceContext*
+// @return      ãªã—
+//******************************************************************
 void FrameBuffer::SetRenderTarget(ID3D11DeviceContext* dc)
 {
 	dc->RSSetViewports(1, &viewport);
 	dc->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 }
 
-//G-Buffer—p
+//******************************************************************
+// @brief       ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ&ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆè¨­å®š(G-Bufferç”¨)
+// @param[in]   dc  ID3D11DeviceContext*
+// @param[in]   number  ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®æ•°
+// @param[in]   rtv[]   ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®é…åˆ—
+// @return      ãªã—
+//******************************************************************
 void FrameBuffer::SetRenderTargets(ID3D11DeviceContext* dc, int number, ID3D11RenderTargetView* rtv[])
 {
 	ID3D11RenderTargetView* m_rtv[] =
@@ -174,6 +208,13 @@ void FrameBuffer::SetRenderTargets(ID3D11DeviceContext* dc, int number, ID3D11Re
 	dc->OMSetRenderTargets(number, m_rtv, depthStencilView.Get());
 }
 
+//******************************************************************
+// @brief       ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆè¨­å®š
+// @param[in]   dc       ID3D11DeviceContext*
+// @param[in]   width  ã€€ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆã®å¹…
+// @param[in]   height   ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆã®é«˜ã•
+// @return      ãªã—
+//******************************************************************
 void FrameBuffer::SetViewport(ID3D11DeviceContext* dc, UINT width, UINT height)
 {
 	viewport.Width    = static_cast<float>(width);

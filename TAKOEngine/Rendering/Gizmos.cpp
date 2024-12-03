@@ -38,6 +38,8 @@ Gizmos::Gizmos(ID3D11Device* device)
 	// 箱メッシュ生成
 	CreateBoxMesh(device, 0.5f, 0.5f, 0.5f);
 	CreateSphereMesh(device, 1.0f, 32);
+	//円柱メッシュ生成
+	CreateCylinderMesh(device, 1.0f, 0.0f, 16);
 }
 
 // 箱描画
@@ -72,7 +74,20 @@ void Gizmos::DrawShpere(
 	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 	DirectX::XMStoreFloat4x4(&instance.worldTransform, S * T);
 }
+void Gizmos::DrawCylinder(
+	const DirectX::XMFLOAT3& position,
+	float radius,
+	float height,
+	const DirectX::XMFLOAT4& color)
+{
+	Instance& instance = instances.emplace_back();
+	instance.mesh = &cylinderMesh;
+	instance.color = color;
 
+	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(radius, height, radius);
+	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
+	DirectX::XMStoreFloat4x4(&instance.worldTransform, S * T);
+}
 // メッシュ生成
 void Gizmos::CreateMesh(ID3D11Device* device, const std::vector<DirectX::XMFLOAT3>& vertices, Mesh& mesh)
 {
@@ -195,7 +210,36 @@ void Gizmos::CreateSphereMesh(ID3D11Device* device, float radius, int subdivisio
 	// メッシュ生成
 	CreateMesh(device, vertices, sphereMesh);
 }
+//円柱メッシュ作成
+void  Gizmos::CreateCylinderMesh(ID3D11Device* device, float radius, float height, int subdivision)
+{
+	float step = DirectX::XM_2PI / subdivision;
 
+	std::vector<DirectX::XMFLOAT3> vertices;
+	//XZ平面
+	for (int i = 0; i < subdivision; ++i)
+	{
+		constexpr int circleNum = 100;
+		for (int j = 0; j < circleNum; ++j)
+		{
+			float interval = 1.0f / circleNum;
+			float height = interval * j;
+
+			for (int k = 0; k < 2; ++k)
+			{
+				float theta = step * ((i + k) % subdivision);
+
+				DirectX::XMFLOAT3& p = vertices.emplace_back();
+				p.x = sinf(theta) * radius;
+				p.y = height * 2;
+				p.z = cosf(theta) * radius;
+			}
+		}
+	}
+
+	//メッシュ生成
+	CreateMesh(device, vertices, cylinderMesh);
+}
 // 描画実行
 void Gizmos::Render(const RenderContext& rc)
 {

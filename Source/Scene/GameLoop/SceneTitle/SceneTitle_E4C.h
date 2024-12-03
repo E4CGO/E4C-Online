@@ -46,8 +46,10 @@ private:
 
 	std::unique_ptr<myRenderer::shadow::ShadowMapRender> shadowMapRenderer = std::make_unique<myRenderer::shadow::ShadowMapRender>();
 
-	std::unique_ptr<FreeCameraController> cameraController;
+	// フレームバッファマネージャー
+	FrameBufferManager* m_frameBuffer;
 
+	std::unique_ptr<FreeCameraController> cameraController;
 
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {
@@ -58,7 +60,6 @@ private:
 	};
 
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
-	std::unique_ptr<SpriteDX12>			m_sprites[8];
 
 	static float time;
 };

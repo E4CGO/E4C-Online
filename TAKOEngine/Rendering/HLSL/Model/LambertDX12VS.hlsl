@@ -20,19 +20,18 @@ VS_OUT main(
     }
 #else
 	float3 p = position.xyz;
-	float3 n = normal;
 #endif
     
     VS_OUT vout;
-    vout.vertex = mul(float4(p, 1.0f), mul(world_transform, viewProjection));
-
-    float3 N = normalize(n);
-    float3 L = normalize(-lightDirection.xyz);
-    float d  = dot(L, N);
-    float power    = max(0, d) * 0.5f + 0.5f;
-    vout.color.rgb = color.rgb * power;
-    vout.color.a   = color.a;
+    float4x4 viewProjection = mul(view, Projection);
+    vout.vertex    = mul(float4(p, 1.0f), mul(world_transform, viewProjection));
     vout.texcoord  = texcoord;
+    vout.normal    = normal;
+    vout.position  = position.xyz;
+    vout.tangent   = tangent;
+    vout.binormal  = normalize(cross(vout.normal, vout.tangent));
+    vout.color.rgb = color.rgb * materialColor.rgb;
+    vout.color.a   = color.a;
 
     return vout;
 }

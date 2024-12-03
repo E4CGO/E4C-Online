@@ -13,12 +13,12 @@
 //******************************************************************
 //  @class  ModelShader
 //  @brief  Shaderの派生クラス
-//  @par    [説明]
-//			他のシェーダーの基底クラス
+//  @par    他のシェーダーの基底クラス
 //******************************************************************
 class ModelShader : public Shader
 {
 public:
+	ModelShader() {};
 	ModelShader(ID3D11Device* device, const char* vs, const char* ps);
 
 	virtual ~ModelShader() override = default;

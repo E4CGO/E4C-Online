@@ -25,7 +25,7 @@ void CameraManager::Update()
 }
 /**************************************************************************//**
 		@brief		削除
-		@param[in]	なし
+		@param[in]	camera	カメラ参照ポインタ
 		@return		なし
 *//***************************************************************************/
 void CameraManager::Remove(Camera* camera)
@@ -35,7 +35,7 @@ void CameraManager::Remove(Camera* camera)
 }
 /**************************************************************************//**
 		@brief		登録
-		@param[in]	なし
+		@param[in]	camera	カメラ参照ポインタ
 		@return		なし
 *//***************************************************************************/
 void CameraManager::Register(Camera* camera)

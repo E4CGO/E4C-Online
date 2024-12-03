@@ -104,7 +104,10 @@ public:
 		// Level回分割（0基点）の配列作成
 		m_iCellNum = (m_iPow[Level] * 8 - 1) / 7;
 		ppCellAry = new Cell<T>*[m_iCellNum];
-		ZeroMemory(ppCellAry, sizeof(Cell<T>*) * m_iCellNum);
+		// 各要素をnullptrで初期化（ZeroMemoryを使わない場合もありますが、こちらで代替）
+		for (int i = 0; i < m_iCellNum; i++) {
+			ppCellAry[i] = new Cell<T>();
+		}
 
 		// 有効領域を登録
 		m_fLeft = minX;
@@ -123,7 +126,8 @@ public:
 
 	//終了化
 	void Finalize()
-	{		
+	{
+		if (m_iCellNum == 0) return;
 		for (int i = 0; i < m_iCellNum; i++)
 		{
 			if (ppCellAry[i] != nullptr)
@@ -142,6 +146,8 @@ public:
 		}
 
 		delete[] ppCellAry;	// 線形空間配列削除
+		ppCellAry = nullptr;
+		m_iCellNum = 0;
 	}
 
 	//オブジェクト登録
@@ -205,7 +211,7 @@ public:
 		if (x < 0 || m_fW < x)	return -1;
 		//if (y < 0 || m_fH < y)	return -1;
 		if (z < 0 || m_fD < z)	return -1;
-		
+
 		// yは空間内に
 		if (y < 0)	y = 0;
 		if (y > m_fH) y = m_fH;
@@ -240,7 +246,7 @@ public:
 			shift += 3; // 3bit分増やす
 			XOR >>= 3;	// 3bitシフトさせて再チェック
 		}
-		
+
 		// 分割レベル = level でのモートン番号
 		int mortonNomber = minMortonNomber >> shift;
 

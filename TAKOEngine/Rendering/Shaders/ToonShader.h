@@ -46,13 +46,13 @@ public:
 	ToonShaderDX12(ID3D12Device* device, bool instancing = false); 
 	~ToonShaderDX12() override;
 
-	void Render(const RenderContextDX12& rc, ModelDX12* model) override;
+	void Render(const RenderContextDX12& rc, const ModelDX12::Mesh& mesh) override;
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12PipelineState>		m_d3d_pipeline_state;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature>		m_d3d_root_signature;
 
-	SamplerManager* m_sampler;
+	SamplerManager* m_sampler = nullptr;
 };
 
 #endif // !__GRAHICS_TOON_SHADER_H__

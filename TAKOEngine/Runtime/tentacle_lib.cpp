@@ -5,6 +5,8 @@
 #include <assert.h>
 #include <tchar.h>
 
+#define FULLSCREEN
+
 namespace TentacleLib
 {
 	HWND Init(LPCWSTR APPLICATION_NAME, HINSTANCE instance, LONG width, LONG height, LPWSTR cmd_line, INT cmd_show, WNDPROC callback)
@@ -33,8 +35,19 @@ namespace TentacleLib
 
 		SetProcessDPIAware();
 		RECT rc = { 0, 0, width, height };
+
+#ifdef FULLSCREEN
+
+		width = GetSystemMetrics(SM_CXSCREEN);
+		height = GetSystemMetrics(SM_CYSCREEN);
+
+		hWnd = CreateWindow(APPLICATION_NAME, _T(""), WS_POPUP, 0, 0, width, height, NULL, NULL, instance, NULL);
+#else
 		AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
 		hWnd = CreateWindow(APPLICATION_NAME, _T(""), WS_OVERLAPPEDWINDOW ^ WS_MAXIMIZEBOX ^ WS_THICKFRAME | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, NULL, NULL, instance, NULL);
+
+#endif // FULLSCREEN
+
 		ShowWindow(hWnd, cmd_show);
 
 		std::wostringstream outs;
@@ -44,10 +57,11 @@ namespace TentacleLib
 
 		setting.title = APPLICATION_NAME;
 
-		//SDL_Init(SDL_INIT_AUDIO);
+		graphics.SetDX12Render(false);
+		graphics.SetDX11Render(true);
+
 		input.Init(hWnd);
 		timer.Init();
-		//audio.Init();
 		graphics.Initalize(hWnd, 2);
 
 		textSprite.Init(graphics.GetDevice());

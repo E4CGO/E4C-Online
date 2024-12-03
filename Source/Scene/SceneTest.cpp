@@ -9,32 +9,18 @@ void SceneTest::Initialize()
 	MAPTILES.Register(stage);
 
 	PlayerCharacterData::CharacterInfo charInfo = {
-		true,			// visible
-		"",				// save
-		{				//Character
+		"",				// NAME
+		{				// APPEARANCE
 			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 		}
 	};
 
 	newPlayer = std::make_unique<PlayerCharacter>(charInfo);
 	newPlayer->SetPosition({ 5,	100, 5 });
-	newPlayer->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::State::Idle));
-
-	//player = std::make_unique<Player>("Data/Model/Character/Barbarian.glb", 1.0f);
-	//player->SetPosition({ 5, 50, 5 });
-	//player->GetStateMachine()->ChangeState(static_cast<int>(Player::State::Idle));
-	//knight = std::make_unique<ModelObject>("Data/Model/Character/Knight.glb");
-	//knight->SetAnimation(22, true, 0.0f);
-	//knight->SetPosition({ 1.08f, 0.0f, 2.12f });
-	//knight->SetAngle({ 0.0f, -1.22f, 0.0f });
-	//knight->GetModel()->FindNode("1H_Sword_Offhand")->visible = false;
-	//knight->GetModel()->FindNode("2H_Sword")->visible = false;
-	//knight->GetModel()->FindNode("Badge_Shield")->visible = false;
-	//knight->GetModel()->FindNode("Round_Shield")->visible = false;
-	//knight->GetModel()->FindNode("Spike_Shield")->visible = false;
+	newPlayer->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 
 	// 光
-	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
+	LightManager::Instance().SetAmbientColor({ 0.3f, 0.3f, 0.3f, 0.0f });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
@@ -79,7 +65,6 @@ void SceneTest::Update(float elapsedTime)
 
 	MAPTILES.Update(elapsedTime);
 
-	//player->Update(elapsedTime);
 	newPlayer->Update(elapsedTime);
 }
 
@@ -100,7 +85,6 @@ void SceneTest::Render()
 
 	// 描画
 	//knight->Render(rc);
-	//player->Render(rc);
 	MAPTILES.Render(rc);
 	newPlayer->Render(rc);
 

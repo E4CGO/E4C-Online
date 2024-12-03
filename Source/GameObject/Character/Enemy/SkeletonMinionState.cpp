@@ -20,7 +20,7 @@ void SkeletonMinionState::AttackState::Execute(float elapsedTime)
 
 	if (!owner->GetModel()->IsPlayAnimation())
 	{
-		owner->GetStateMachine()->ChangeState(EnemyState::ID::Idle);
+		owner->GetStateMachine()->ChangeState(EnemyState::ID::Death);
 	}
 }
 void SkeletonMinionState::AttackState::Exit()

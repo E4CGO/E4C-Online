@@ -6,7 +6,7 @@
 
 #include "GameObject.h"
 #include "TAKOEngine/Rendering/Model/ModelDX11.h"
-#include "TAKOEngine/Rendering/Model/NewModelDX11.h"
+#include "TAKOEngine/Rendering/Model/GLTFModelDX11.h"
 #include "TAKOEngine/Rendering/Model/ModelDX12.h"
 
 /**************************************************************************//**
@@ -17,6 +17,7 @@
 class ModelObject : public GameObject
 {
 public:
+	// TODO: iModelに移動
 	enum RENDER_MODE
 	{
 		DX11 = 0,
@@ -25,15 +26,25 @@ public:
 		DX12GLTF,
 		NOMODEL,
 	};
+	// TODO: iModelに移動
+	enum MODEL_TYPE
+	{
+		RHS_PBR,
+		RHS_TOON,
+		LHS_PBR,
+		LHS_TOON,
+	};
+
+	RENDER_MODE m_renderMode = DX11;
 
 	// コンストラクタ
 	ModelObject(void) {};
 	// コンストラクタ（引数付き）
-	ModelObject(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::DX11);
+	ModelObject(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::DX11, ModelObject::MODEL_TYPE modelType = ModelObject::MODEL_TYPE::LHS_TOON);
 	virtual ~ModelObject() = default;
 
 	// モデルを読み取り
-	void LoadModel(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX11);
+	void LoadModel(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE modelType = ModelObject::MODEL_TYPE::LHS_TOON);
 
 	void CleanModels();
 
@@ -41,6 +52,7 @@ public:
 	virtual void Update(float elapsedTime) override;
 	// 描画処理
 	virtual void Render(const RenderContext& rc) override;
+	virtual void RenderDX12(const RenderContextDX12& rc) override;
 
 	// モデルを取得
 	std::unique_ptr<iModel>& GetModel(int idx = 0) { return m_pmodels[idx]; }
@@ -54,15 +66,19 @@ public:
 
 	// シェーダー設定
 	void SetShader(const ModelShaderId id) { m_shaderId = id; };
+	void SetShader(const char* modelName, const ModelShaderDX12Id id, const std::vector<const char*>& materialNames = {});
+
+	// モデルの名前検索
+	iModel* FindModelName(const char* name);
 
 	// アニメーション設定
 	void SetAnimation(const int index, const bool loop, const float blendSeconds = 0.2f);
 	// 個別モデルアニメーション設定
 	void SetModelAnimation(const int model_idx, const int animation_index, const bool loop, const float blendSeconds = 0.2f);
 	// アニメーション判定
-	bool IsPlayAnimaition(void);
+	bool IsPlayAnimation(void);
 	// 個別モデルアニメーション判定
-	bool IsPlayAnimaition(const int model_idx);
+	bool IsPlayAnimation(const int model_idx);
 
 	// カラー設定
 	void SetColor(const DirectX::XMFLOAT4 color) { this->m_color = color; }
@@ -99,8 +115,10 @@ protected:
 
 	// シェーダーID
 	ModelShaderId m_shaderId = ModelShaderId::Toon;
+	ModelShaderDX12Id m_dx12_ShaderId = ModelShaderDX12Id::Toon;
 
 	// モデルリスト
+	int modelIndex = 0;
 	std::vector<std::unique_ptr<iModel>> m_pmodels;
 
 	// 可視化
@@ -108,6 +126,9 @@ protected:
 
 	// アニメーションスピード
 	float m_animationSpeed = 1.0f;
+
+	//スキニング
+	SkinningPipeline* m_skinning_pipeline = nullptr;
 };
 
 #endif //__INCLUDED_MODEL_OBJECT_H__

@@ -11,8 +11,8 @@ VS_OUT main(
 	float3 tangent : TANGENT)
 {
 	VS_OUT vout;
-
-    vout.position = mul(position, viewProjection);
+	
+    vout.position = mul(position, ViewProjection);
 	vout.color = color;
 	vout.texcoord = texcoord;
 

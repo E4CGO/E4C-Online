@@ -1,10 +1,9 @@
 #include "StageOpenWorld_E4C.h"
 
-#include "GameObject/ModelObject.h"
-#include "GameObject/Character/Player/Barbarian.h"
-#include "GameObject/Props/Teleporter.h"
+#include "TAKOEngine/GUI/UIManager.h"
 
-#include "Scene/Scene.h"
+#include "GameObject/ModelObject.h"
+#include "GameObject/Props/Teleporter.h"
 #include "Scene/Stage/StageManager.h"
 #include "Scene/Stage/Stage.h"
 
@@ -12,8 +11,16 @@
 #include "Map/MapTile.h"
 
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
-#include "TAKOEngine/Tool/GLTFImporter.h"
 #include "TAKOEngine/Tool/Timer.h"
+
+#include "GameObject/Character/Player/PlayerCharacterManager.h"
+#include "GameObject/Character/Enemy/EnemyManager.h"
+
+#include "Scene/GameLoop/SceneGame/Stage/StageDungeon_E4C.h"
+
+#include "Network/OnlineController.h"
+
+#include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
 
 static float timer = 0;
 
@@ -21,143 +28,129 @@ void StageOpenWorld_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
 
+	// フレームバッファマネージャー
+	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
+
+	// Sprite Resource Preload
+	for (auto& filename : spriteList)
+	{
+		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
+	}
+
 	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
 	stage_collision->Update(0);
+	stage_collision->SetCollider(Collider::COLLIDER_TYPE::MAP);
+
 	MAPTILES.Register(stage_collision);
+	MAPTILES.CreateSpatialIndex(5, 7);
 
-	map = std::make_unique<gltf_model>(T_GRAPHICS.GetDevice(), "Data/Model/Stage/Terrain_Map.glb");
+	if (T_GRAPHICS.isDX11Active)
+	{
+		models.emplace("map", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX11GLTF, ModelObject::MODEL_TYPE::RHS_PBR));
+		models.emplace("tower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_TOON));
 
-	PlayerCharacterData::CharacterInfo charInfo = {
-		true,			// visible
-		"",				// save
-		{				//Character
-			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-		}
-	};
+		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 70.0f, ModelObject::RENDER_MODE::DX11);
+		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
+	}
 
-	player = std::make_unique<PlayerCharacter>(charInfo);
-	player->SetPosition({ 5,	10, 5 });
-	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::State::Idle));
+	if (T_GRAPHICS.isDX12Active)
+	{
+		models.emplace("map", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		models.emplace("tower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		models.emplace("boss", std::make_unique<ModelObject>("Data/Model/Enemy/MDL_ENMboss_1129.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON));
+		models["boss"]->SetPosition({ 10.0, 0.0f, 10.0f });
 
-	//teleporter = std::make_unique<Teleporter>("Data/Model/Cube/testCubes.glb", 1.0);
-	//teleporter->SetPosition({ 50, 0, 60 });
+		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 50.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
+		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
+		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/pinkSky.dds");
+	}
 
-	std::array<DirectX::XMFLOAT3, 4 > positions = {
-	DirectX::XMFLOAT3{ 10.0f, 10.0f, 5.0f},
-	DirectX::XMFLOAT3{ 10.0f, 20.0f, 5.0f },
-	DirectX::XMFLOAT3{ 5.0f, 10.0f, 5.0f },
-	DirectX::XMFLOAT3{ 5.0f, 20.0f, 5.0f }
-	};
-
-	plane = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "Data/Sprites/gem.png", 1.0f, positions);
-
-	positions = {
-		DirectX::XMFLOAT3{ 15.0f, 15.0f, 5.0f},
-		DirectX::XMFLOAT3{ 15.0f, 25.0f, 5.0f },
-		DirectX::XMFLOAT3{ 25.0f, 15.0f, 5.0f },
-		DirectX::XMFLOAT3{ 25.0f, 25.0f, 5.0f }
-	};
-
-	//portal = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, positions);
-	//portal.get()->SetShader(ModelShaderId::Portal);
+	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
+	teleporter->SetPosition({ 16, 8.5, -46 });
+	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
 
 	// 光
-	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
+	LightManager::Instance().SetAmbientColor({ 0.3f, 0.3f, 0.3f, 0.0f });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
-	
-	
-	// カメラ設定
-	for (int i = 0; i < CameraManager::Instance().GetCameraCount(); i++)
-	{
-		CameraManager::Instance().GetCamera(i)->SetPerspectiveFov(
-			DirectX::XMConvertToRadians(45),							// 画角
-			T_GRAPHICS.GetScreenWidth() / T_GRAPHICS.GetScreenHeight(),	// 画面アスペクト比
-			0.1f,														// ニアクリップ
-			10000.0f													// ファークリップ
-		);
-		CameraManager::Instance().GetCamera(i)->SetLookAt(
-			{ 0, 5.0f, 10.0f },	// 視点
-			{ 0, 0, 0 },	// 注視点
-			{ 0, 0.969f, -0.248f } // 上ベクトル
-		);
-	}
 
-	DebugcameraController = std::make_unique<FreeCameraController>();
-	DebugcameraController->SyncCameraToController(CameraManager::Instance().GetCamera(0));
-	DebugcameraController->SetEnable(true);
+	// プレイヤー
+	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
+	player->SetPosition({ 5.0f, 10.0f, 5.0f });
+
+	// カメラ設定
+	Camera* mainCamera = CameraManager::Instance().GetCamera();
+	mainCamera->SetPerspectiveFov(
+		DirectX::XMConvertToRadians(45),							// 画角
+		T_GRAPHICS.GetScreenWidth() / T_GRAPHICS.GetScreenHeight(),	// 画面アスペクト比
+		0.1f,														// ニアクリップ
+		10000.0f													// ファークリップ
+	);
+	mainCamera->SetLookAt(
+		{ 0, 5.0f, 5.0f },		// 視点
+		player->GetPosition(),			// 注視点
+		{ 0, 0.969f, -0.248f }	// 上ベクトル
+	);
+	spawner = std::make_unique<Spawner>(0, 1, -1);
+	spawner->SetPosition({ 0.0f, 2.0f, 0.0f });
 
 	cameraController = std::make_unique<ThridPersonCameraController>();
-	cameraController->SyncCameraToController(CameraManager::Instance().GetCamera(1));
+	cameraController->SyncCameraToController(mainCamera);
 	cameraController->SetEnable(true);
-	cameraController->SetPlayer(player.get());
-
-	{
-		HRESULT hr;
-
-		D3D11_BUFFER_DESC buffer_desc{};
-		buffer_desc.ByteWidth = (sizeof(CbScene) + 15) / 16 * 16;
-		buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-		buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		buffer_desc.CPUAccessFlags = 0;
-		buffer_desc.MiscFlags = 0;
-		buffer_desc.StructureByteStride = 0;
-		hr = T_GRAPHICS.GetDevice()->CreateBuffer(&buffer_desc, nullptr, constant_buffers[1].GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-	}
+	cameraController->SetPlayer(player);
+	CURSOR_OFF;
 }
 
 void StageOpenWorld_E4C::Update(float elapsedTime)
 {
-	std::vector<DirectX::XMFLOAT3> cameraFocusPoints = {
-		{CameraManager::Instance().GetCamera(1)->GetFocus().x, CameraManager::Instance().GetCamera(1)->GetFocus().y, CameraManager::Instance().GetCamera(1)->GetFocus().z},
-		{CameraManager::Instance().GetCamera(1)->GetFocus().x, CameraManager::Instance().GetCamera(1)->GetFocus().y, CameraManager::Instance().GetCamera(1)->GetFocus().z},
-		{CameraManager::Instance().GetCamera(1)->GetFocus().x, CameraManager::Instance().GetCamera(1)->GetFocus().y, CameraManager::Instance().GetCamera(1)->GetFocus().z},
-		{CameraManager::Instance().GetCamera(1)->GetFocus().x, CameraManager::Instance().GetCamera(1)->GetFocus().y, CameraManager::Instance().GetCamera(1)->GetFocus().z}
-		//{CameraManager::Instance().GetCamera()->GetFocus().x, CameraManager::Instance().GetCamera()->GetFocus().y, CameraManager::Instance().GetCamera()->GetFocus().z}
-	};
+	Camera* camera = CameraManager::Instance().GetCamera();
+	Online::OnlineController* onlineController = m_pScene->GetOnlineController();
+	if (onlineController->GetState() == Online::OnlineController::STATE::LOGINED)
+	{
+		onlineController->BeginSync();
+	}
+
 	// ゲームループ内で
+	cameraController->SyncContrllerToCamera(camera);
+	cameraController->Update(elapsedTime);
 
-	if (T_INPUT.KeyPress(VK_SHIFT))
+	ENEMIES.Update(elapsedTime);
+
+	if (T_INPUT.KeyDown(VK_MENU))
 	{
-		CameraManager::Instance().GetCamera(1)->MovePointToCamera(cameraPositions, cameraFocusPoints, transitionTime, transitionDuration, elapsedTime);
+		if (TentacleLib::isShowCursor())
+		{
+			cameraController->SetEnable(true);
+			CURSOR_OFF;
+		}
+		else
+		{
+			cameraController->SetEnable(false);
+			CURSOR_ON;
+		}
 	}
-	else
+	if (!TentacleLib::isFocus())
 	{
-		cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera(1));
-		cameraController->Update(elapsedTime);
-		CameraManager::Instance().GetCamera(1)->GetSegment() = 0;
-		transitionTime = 0;
-
-		DebugcameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera(0));
-		DebugcameraController->Update(elapsedTime);
-		
+		cameraController->SetEnable(false);
+		CURSOR_ON;
 	}
-	
-
-
-	player->Update(elapsedTime);
-	//teleporter->Update(elapsedTime);
-	plane->Update(elapsedTime);
-	//portal->Update(elapsedTime);
-
-	//teleporter->CheckPlayer(player->GetPosition(), elapsedTime);
-
-	//if (teleporter->GetPortalReady()) STAGES.stageNumber = 1;
-
-	if (T_INPUT.KeyDown(VK_F2))
+	if (cameraController->isEnable())
 	{
-		PlayerCharacterData::CharacterInfo charInfo = {
-			true,			// visible
-			"",				// save
-			{				//Character
-				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
-			}
-		};
-		//player->
-		player->LoadAppearance(charInfo.Character.pattern);
+		T_INPUT.KeepCursorCenter();
 	}
+	PlayerCharacterManager::Instance().Update(elapsedTime);
+
+	for (auto& it : models)
+	{
+		it.second->Update(elapsedTime);
+	}
+
+	sky->Update(elapsedTime);
+
+	spawner->Update(elapsedTime);
+
+	teleporter->Update(elapsedTime);
 
 	timer += elapsedTime;
 }
@@ -166,25 +159,10 @@ void StageOpenWorld_E4C::Render()
 {
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->Clear(T_GRAPHICS.GetDeviceContext(), 0.2f, 0.2f, 0.2f, 1);
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->SetRenderTarget(T_GRAPHICS.GetDeviceContext());
-#ifdef _DEBUG
-	{
-		T_GRAPHICS.GetDebugRenderer()->DrawSphere(cameraPositions, 2, { 1,0,0,1 });
-		T_GRAPHICS.GetDebugRenderer()->DrawSphere(CameraManager::Instance().GetCamera(1)->GetEye(), 2, {1,1,0,1});
-	}
-#endif // _DEBUG
 
 	// 描画コンテキスト設定
 	RenderContext rc;
-	if (DebugCameraMode == true)
-	{
-		rc.camera = CameraManager::Instance().GetCamera(0);
-		T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera(0)->GetView(), CameraManager::Instance().GetCamera(0)->GetProjection());
-	}
-	else
-	{
-		rc.camera = CameraManager::Instance().GetCamera(1);
-		T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera(1)->GetView(), CameraManager::Instance().GetCamera(1)->GetProjection());
-	}
+	rc.camera = CameraManager::Instance().GetCamera();
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
@@ -195,93 +173,89 @@ void StageOpenWorld_E4C::Render()
 	LightManager::Instance().PushRenderContext(rc);
 
 	// 描画
-	player->Render(rc);
+	PlayerCharacterManager::Instance().Render(rc);
 
-	float time = 0;
-
+	for (auto& it : models)
 	{
-		static std::vector<gltf_model::node> animated_nodes{ map->nodes };
-
-		//map->animate(0/*animation index*/, time, animated_nodes);
-
-		const DirectX::XMFLOAT4X4 coordinate_system_transforms[]
-		{
-			{-1, 0, 0, 0,
-			  0, 1, 0, 0,
-			  0, 0, 1, 0,
-			  0, 0, 0, 1}, // 0:RHS Y-UP
-
-			{ 1, 0, 0, 0,
-			  0, 1, 0, 0,
-			  0, 0, 1, 0,
-			  0, 0, 0, 1}, // 1:LHS Y-UP
-
-			{-1, 0, 0, 0,
-			  0, 0,-1, 0,
-			  0, 1, 0, 0,
-			  0, 0, 0, 1}, // 2:RHS Z-UP
-
-			{ 1, 0, 0, 0,
-			  0, 0, 1, 0,
-			  0, 1, 0, 0,
-			  0, 0, 0, 1}, //3:LHS Z - UP
-		};
-
-		float scale_factor = 1.0f;
-
-		DirectX::XMMATRIX C{ DirectX::XMLoadFloat4x4(&coordinate_system_transforms[0]) * DirectX::XMMatrixScaling(scale_factor, scale_factor, scale_factor) };
-		DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(1.0, 1.0f, 1.0f) };
-		DirectX::XMMATRIX R{ DirectX::XMMatrixRotationRollPitchYaw(0.0f, 0.0f, 0.0f) };
-		DirectX::XMMATRIX T{ DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f) };
-
-		DirectX::XMFLOAT4X4 world;
-		DirectX::XMStoreFloat4x4(&world, C * S * R * T);
-
-		// シーン用定数バッファ更新
-		CbScene cbScene{};
-		DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&rc.camera->GetView());
-		DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&rc.camera->GetProjection());
-		DirectX::XMStoreFloat4x4(&cbScene.view_projection, V * P);
-
-		const DirectX::XMFLOAT3& eye = rc.camera->GetEye();
-		cbScene.camera_position.x = eye.x;
-		cbScene.camera_position.y = eye.y;
-		cbScene.camera_position.z = eye.z;
-
-		// レンダーステート設定
-		const float blend_factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		rc.deviceContext->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Opaque), blend_factor, 0xFFFFFFFF);
-		rc.deviceContext->OMSetDepthStencilState(rc.renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
-		rc.deviceContext->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullNone));
-
-		rc.deviceContext->UpdateSubresource(constant_buffers[1].Get(), 0, 0, &cbScene, 0, 0);
-		rc.deviceContext->VSSetConstantBuffers(1, 1, constant_buffers[1].GetAddressOf());
-		rc.deviceContext->PSSetConstantBuffers(1, 1, constant_buffers[1].GetAddressOf());
-
-		map->render(rc, world, animated_nodes);
+		it.second->Render(rc);
 	}
 
-	//teleporter->Render(rc);
-	plane->Render(rc);
-	//portal->Render(rc);
-	if (ImGui::TreeNode("Camera Positions"))
-	{
-		for (size_t i = 0; i < cameraPositions.size(); ++i)
-		{
-			std::string label = "Position " + std::to_string(i);  // 各カメラポジションのラベル
-			ImGui::DragFloat3(label.c_str(), &cameraPositions[i].x, 1.0f, -FLT_MAX, FLT_MAX);  // カメラポジションの設定
-		}
-		ImGui::TreePop();
+	teleporter->Render(rc);
 
-		ImGui::Checkbox("📷", &DebugCameraMode);
+	spawner->Render(rc);
 
+	ENEMIES.Render(rc);
 
-	}
+	UI.Render(rc);
+
+	//MAPTILES.Render(rc);
+
+	//if (ImGui::TreeNode("Camera Positions"))
+	//{
+	//	for (size_t i = 0; i < cameraPositions.size(); ++i)
+	//	{
+	//		std::string label = "Position " + std::to_string(i);  // 各カメラポジションのラベル
+	//		ImGui::DragFloat3(label.c_str(), &cameraPositions[i].x, 1.0f, -FLT_MAX, FLT_MAX);  // カメラポジションの設定
+	//	}
+	//	ImGui::TreePop();
+	//}
 	// デバッグレンダラ描画実行
-	
-	
-	
 
+	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
+}
+
+void StageOpenWorld_E4C::RenderDX12()
+{
+	T_GRAPHICS.BeginRender();
+
+	// シーン用定数バッファ更新
+	const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
+		CameraManager::Instance().GetCamera());
+
+	// レンダーコンテキスト設定
+	RenderContextDX12 rc;
+	rc.d3d_command_list = m_frameBuffer->GetCommandList();
+	rc.scene_cbv_descriptor = scene_cbv_descriptor;
+
+	// 3Dモデル描画
+	{
+		m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+
+		// プレイヤー
+		PlayerCharacterManager::Instance().RenderDX12(rc);
+
+		ENEMIES.RenderDX12(rc);
+
+		// ステージ
+		for (auto& it : models)
+		{
+			it.second->RenderDX12(rc);
+		}
+
+		spawner->RenderDX12(rc);
+		// skyBox
+		{
+			rc.skydomeData.skyTexture = m_sprites[1]->GetDescriptor();
+			sky->RenderDX12(rc);
+		}
+
+		// レンダーターゲットへの書き込み終了待ち
+		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+	}
+
+	// ポストエフェクト描画
+	{
+		postprocessingRenderer->Render(m_frameBuffer);
+	}
+
+	// 2D描画
+	{
+		UI.RenderDX12(rc);
+	}
+
+	T_GRAPHICS.End();
 }
 
 void StageOpenWorld_E4C::OnPhase()

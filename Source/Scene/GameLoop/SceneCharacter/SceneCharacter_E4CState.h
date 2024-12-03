@@ -1,14 +1,28 @@
 #pragma once
 
+#include <vector>
+#include <array>
+#include <DirectXMath.h>
+
 #include "TAKOEngine/Network/HttpRequest.h"
 #include "TAKOEngine/AI/BaseState.h"
 #include "Source/UI/Widget/WidgetButtonImage.h"
+#include "UI/Widget/WidgetButtonText.h"
 
 #include "Scene/GameLoop/SceneCharacter/SceneCharacter_E4C.h"
 
+#include "UI/Widget/WidgetCharacterSelect.h"
+#include "UI/Widget/WidgetCharacterModify.h"
+
+
 namespace SceneCharacter_E4CState
 {
-	// タイトルステート
+
+	/**************************************************************************//**
+		@class	InitState
+		@brief	初期化とJSONからデーターを読み込み
+		@par    [説明]
+	*//***************************************************************************/
 	class InitState : public HierarchicalState<SceneCharacter_E4C>
 	{
 	public:
@@ -27,12 +41,16 @@ namespace SceneCharacter_E4CState
 
 	};
 
-	// タイトルステート
+	/**************************************************************************//**
+		@class	CharacterSelectionState
+		@brief	キャラセレクト
+		@par    [説明]
+	*//***************************************************************************/
 	class CharacterSelectionState : public HierarchicalState<SceneCharacter_E4C>
 	{
 	public:
 		// コンストラクタ
-		CharacterSelectionState(SceneCharacter_E4C* scene) : HierarchicalState<SceneCharacter_E4C>(scene) {};
+		CharacterSelectionState(SceneCharacter_E4C* scene) : m_pWidgetCharacterSelect(nullptr), HierarchicalState<SceneCharacter_E4C>(scene) {};
 		// デストラクタ
 		~CharacterSelectionState() {}
 		// ステートに入った時のメソッド
@@ -42,59 +60,50 @@ namespace SceneCharacter_E4CState
 		// ステートから出ていくときのメソッド
 		void Exit() override;
 	private:
-		float timer = 0.0f;
-	
+		DirectX::XMFLOAT3 m_cameraOriginPos = {};
+		DirectX::XMFLOAT3 m_cameraOriginFocus = {};
+		float m_cameraTimer = 0.0f;
+		const float m_cameraTime = 0.5f;
+		WidgetCharacterSelect* m_pWidgetCharacterSelect;
 	};
 
-	// ログインステート
-	class CharacterCreationStateLeft : public HierarchicalState<SceneCharacter_E4C>
+	/**************************************************************************//**
+		@class	CharacterCreationState
+		@brief	キャラクリ
+		@par    [説明]
+	*//***************************************************************************/
+	class CharacterCreationState : public HierarchicalState<SceneCharacter_E4C>
 	{
 	public:
 		// コンストラクタ
-		CharacterCreationStateLeft(SceneCharacter_E4C* scene) : HierarchicalState<SceneCharacter_E4C>(scene) {};
+		CharacterCreationState(SceneCharacter_E4C* scene) : HierarchicalState<SceneCharacter_E4C>(scene) {};
 		// デストラクタ
-		~CharacterCreationStateLeft() {}
+		~CharacterCreationState() {}
 		// ステートに入った時のメソッド
 		virtual void Enter() override;
 		// ステートで実行するメソッド
 		void Execute(float elapsedTime) override;
 		// ステートから出ていくときのメソッド
 		void Exit() override;
+	private:
+		DirectX::XMFLOAT3 m_cameraOriginPos = {};
+		DirectX::XMFLOAT3 m_cameraOriginFocus = {};
+		float m_cameraTimer = 0.0f;
+		const float m_cameraTime = 0.5f;
+
+		PlayerCharacter* m_pCharacter = nullptr;
+
+		WidgetButtonText* m_pBackBtn = nullptr;
+		WidgetButtonText* m_pStartBtn = nullptr;
+
+		WidgetCharacterModify* m_pWidgetCharacterModify = nullptr;
 	};
 
-	// ログインステート
-	class CharacterCreationStateCenter : public HierarchicalState<SceneCharacter_E4C>
-	{
-	public:
-		// コンストラクタ
-		CharacterCreationStateCenter(SceneCharacter_E4C* scene) : HierarchicalState<SceneCharacter_E4C>(scene) {};
-		// デストラクタ
-		~CharacterCreationStateCenter() {}
-		// ステートに入った時のメソッド
-		virtual void Enter() override;
-		// ステートで実行するメソッド
-		void Execute(float elapsedTime) override;
-		// ステートから出ていくときのメソッド
-		void Exit() override;
-	};
-
-	// ログインステート
-	class CharacterCreationStateRight : public HierarchicalState<SceneCharacter_E4C>
-	{
-	public:
-		// コンストラクタ
-		CharacterCreationStateRight(SceneCharacter_E4C* scene) : HierarchicalState<SceneCharacter_E4C>(scene) {};
-		// デストラクタ
-		~CharacterCreationStateRight() {}
-		// ステートに入った時のメソッド
-		virtual void Enter() override;
-		// ステートで実行するメソッド
-		void Execute(float elapsedTime) override;
-		// ステートから出ていくときのメソッド
-		void Exit() override;
-	};
-
-	// タイトルステート
+	/**************************************************************************//**
+		@class	StartState
+		@brief	ゲームを始める
+		@par    [説明]
+	*//***************************************************************************/
 	class StartState : public HierarchicalState<SceneCharacter_E4C>
 	{
 	public:

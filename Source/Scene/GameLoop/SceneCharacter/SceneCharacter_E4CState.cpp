@@ -1,5 +1,6 @@
 #include "SceneCharacter_E4CState.h"
 
+
 #include "TAKOEngine/GUI/UIManager.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
 
@@ -8,230 +9,202 @@
 #include "Scene/SceneManager.h"
 #include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
 
-#include "fstream"
 
-WidgetButtonImage* btnCharacterLeft = nullptr;
-WidgetButtonImage* btnCharacterCenter = nullptr;
-WidgetButtonImage* btnCharacterRight = nullptr;
+using namespace SceneCharacter_E4CState;
 
-WidgetButtonImage* btnStartCharacter = nullptr;
-
-inline bool FileExist(const std::string& name) {
-	std::ifstream f(name.c_str());
-	return f.good();
-}
-
+/**************************************************************************//**
+	@brief    データーを読み込みまたはデーターを初期化
+*//***************************************************************************/
 void SceneCharacter_E4CState::InitState::Enter()
 {
-	if (!FileExist("CharacterInfos.json"))
+	PLAYER_CHARACTER_DATA.LoadData();
+
+	CameraManager::Instance().GetCamera()->SetLookAt(
+		{ 0.0f, 1.5f, 12.4f }, { 0.0f, 1.5f, 0.73f }, { 0.0f, 1.0f, 0.0f }
+	);
+
+	DirectX::XMFLOAT3 pos = { 3.5f, 0.0f, 5.0f };
+	const std::vector<PlayerCharacterData::CharacterInfo>& infos = PLAYER_CHARACTER_DATA.GetCharacterInfosData();
+	for (const PlayerCharacterData::CharacterInfo& info : infos)
 	{
-		nlohmann::json newSave = PLAYER_CHARACTER_DATA.GetCharacterInfos();
-
-		newSave[0]["Characters"] = {
-			{
-				{"Save", "CharacterLeft"},
-				{"Visible", true},
-				{"Character", {
-					{"GenderType", 0},
-					{ "HeadType", 0 },
-					{"BodyType", 0},
-					{"WeaponType", 0},
-				}}
-			},
-			{
-				{"Save", "CharacterCenter"},
-				{"Visible", true},
-				{"Character", {
-					{"GenderType", 0},
-					{"HeadType", 0},
-					{"BodyType", 0},
-					{"WeaponType", 0},
-				}}
-			},
-			{
-				{"Save", "CharacterRight"},
-				{"Visible", true},
-				{"Character", {
-					{"GenderType", 0},
-					{"HeadType", 0},
-					{"BodyType", 0},
-					{"WeaponType", 0},
-				}}
-			}
-		};
-
-		std::ofstream file_out("CharacterInfos.json");
-		if (file_out.is_open()) {
-			file_out << newSave[0].dump(4); //スペース
-			file_out.close();
-		}
+		PlayerCharacter* character = new PlayerCharacter(info);
+		character->SetPosition(pos);
+		character->SetKinematic(true);
+		pos.x -= 3.5f;
+		owner->RegisterCharacter(character);
 	}
 
-	if (FileExist("CharacterInfos.json"))
-	{
-		std::ifstream file_in("CharacterInfos.json");
-
-		nlohmann::json savedData;
-
-		file_in >> savedData;
-
-		file_in.close();
-
-		PLAYER_CHARACTER_DATA.SetCharacterInfos(savedData);
-	}
+	owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::CHARACTER_SELECTION);
 }
 
+
+/**************************************************************************//**
+	@brief
+	@param[in]    elapsedTime
+*//***************************************************************************/
 void SceneCharacter_E4CState::InitState::Execute(float elapsedTime)
 {
-	owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::CHARACTERSELECTION);
 }
 
+/**************************************************************************//**
+	@brief	終わり
+*//***************************************************************************/
 void SceneCharacter_E4CState::InitState::Exit()
 {
+
 }
 
-// タイトルステート
+/**************************************************************************//**
+	@brief	全てキャラを描画と選択
+*//***************************************************************************/
 void SceneCharacter_E4CState::CharacterSelectionState::Enter()
 {
-	PLAYER_CHARACTER_DATA.ParseData();
+	m_pWidgetCharacterSelect = new WidgetCharacterSelect(owner);
+	UI.Register(m_pWidgetCharacterSelect);
+	for (PlayerCharacter* character : owner->GetCharacters())
+	{
+		character->Show();
+	}
 
-	btnCharacterLeft = new WidgetButtonImage("", "Data/Sprites/big_background.t.png", [&](WidgetButton*) {
-		owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::CHARACTERCREATIONLEFT);
-		});
-	btnCharacterLeft->SetPosition({ SCREEN_W * 0.1f, SCREEN_H * 0.1f });
-	btnCharacterLeft->SetSize({ SCREEN_W * 0.25f, SCREEN_H * 0.8f });
-	btnCharacterLeft->SetColor(DirectX::XMFLOAT4{ 1.0f, 1.0f, 1.0f, 0.5f });
-	UIManager::Instance().Register(btnCharacterLeft);
-
-	btnCharacterCenter = new WidgetButtonImage("", "Data/Sprites/big_background.t.png", [&](WidgetButton*) {
-		owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::CHARACTERCREATIONCENTER);
-		});
-	btnCharacterCenter->SetPosition({ SCREEN_W * 0.4f, SCREEN_H * 0.1f });
-	btnCharacterCenter->SetSize({ SCREEN_W * 0.25f, SCREEN_H * 0.8f });
-	btnCharacterCenter->SetColor(DirectX::XMFLOAT4{ 1.0f, 1.0f, 1.0f, 0.5f });
-	UIManager::Instance().Register(btnCharacterCenter);
-
-	btnCharacterRight = new WidgetButtonImage("", "Data/Sprites/big_background.t.png", [&](WidgetButton*) {
-		owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::CHARACTERCREATIONRIGHT);
-		});
-	btnCharacterRight->SetPosition({ SCREEN_W * 0.7f, SCREEN_H * 0.1f });
-	btnCharacterRight->SetSize({ SCREEN_W * 0.25f, SCREEN_H * 0.8f });
-	btnCharacterRight->SetColor(DirectX::XMFLOAT4{ 1.0f, 1.0f, 1.0f, 0.5f });
-	UIManager::Instance().Register(btnCharacterRight);
+	m_cameraOriginPos = CameraManager::Instance().GetCamera()->GetEye();
+	m_cameraOriginFocus = CameraManager::Instance().GetCamera()->GetFocus();
+	m_cameraTimer = 0.0f;
 }
+/**************************************************************************//**
+	@brief		実行
+	@param[in]    elapsedTime
+*//***************************************************************************/
+
 void SceneCharacter_E4CState::CharacterSelectionState::Execute(float elapsedTime)
 {
+	Camera* camera = CameraManager::Instance().GetCamera();
+
+	if (m_cameraTimer < m_cameraTime)
+	{
+		m_cameraTimer += elapsedTime;
+		if (m_cameraTimer > m_cameraTime) m_cameraTimer = m_cameraTime;
+		camera->Move2PointToCamera(
+			m_cameraOriginPos,
+			{ 0.0f, 1.5f, 12.4f },
+			m_cameraOriginFocus,
+			{ 0.0f, 1.5f, 0.73f },
+			m_cameraTimer,
+			m_cameraTime
+		);
+	}
+
+	for (PlayerCharacter* character : owner->GetCharacters())
+	{
+		character->FaceTo(camera->GetEye());
+	}
 }
+/**************************************************************************//**
+	@brief	終わり
+*//***************************************************************************/
+
 void SceneCharacter_E4CState::CharacterSelectionState::Exit()
 {
-	UI.Clear();
+	UI.Remove(m_pWidgetCharacterSelect);
 	SetCursor(::LoadCursor(NULL, IDC_HAND));
 }
 
-// タイトルステート
-void SceneCharacter_E4CState::CharacterCreationStateLeft::Enter()
+/**************************************************************************//**
+	@brief	キャラクリ
+*//***************************************************************************/
+void SceneCharacter_E4CState::CharacterCreationState::Enter()
 {
-	btnStartCharacter = new WidgetButtonImage("", "Data/Sprites/UI/start.png", [&](WidgetButton*) {
+	m_pCharacter = owner->GetSelectedCharacter();
+	std::vector<PlayerCharacter*> characters = owner->GetCharacters();
+	for (PlayerCharacter* character : characters)
+	{
+		character->Hide();
+	}
+	m_pCharacter->Show();
+
+	m_cameraOriginPos = CameraManager::Instance().GetCamera()->GetEye();
+	m_cameraOriginFocus = CameraManager::Instance().GetCamera()->GetFocus();
+	m_cameraTimer = 0.0f;
+
+	m_pBackBtn = new WidgetButtonText("Back", [&](WidgetButton*) {
+		owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::CHARACTER_SELECTION);
+		});
+	m_pBackBtn->SetPosition({ SCREEN_H * 0.1f, SCREEN_H * 0.1f });
+	UI.Register(m_pBackBtn);
+
+	m_pStartBtn = new WidgetButtonText("Start", [&](WidgetButton*) {
 		owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::START);
 		});
-	btnStartCharacter->SetPosition({ SCREEN_W * 0.5f - 163.0f * 0.5f * 1.5f, SCREEN_H * 0.8f });
-	btnStartCharacter->SetSize({ 196.0f * 1.5f, 92.0f * 1.5f });
-	UIManager::Instance().Register(btnStartCharacter);
+	m_pStartBtn->SetPosition({ SCREEN_W * 0.5f - (m_pStartBtn->GetSize().x * 0.5f), SCREEN_H * 0.8f});
+	UI.Register(m_pStartBtn);
 
-	CameraManager& cameraManager = CameraManager::Instance();
-	
-	CameraManager::Instance().GetCamera()->SetLookAt(
-		{ 6.0, 2.0f, 9.0f },			// 視点
-		{ -3.0f, 0.0, 0.0f },					// 注視点
-		{ 0.036f, 0.999f, -0.035f }				// 上ベクトル
-	);
-
-	owner->cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
-
-	owner->m_previewCharacters[1]->SetMenuVisibility(false);
-	owner->m_previewCharacters[2]->SetMenuVisibility(false);
+	m_pWidgetCharacterModify = new WidgetCharacterModify(owner);
+	UI.Register(m_pWidgetCharacterModify);
 }
-void SceneCharacter_E4CState::CharacterCreationStateLeft::Execute(float elapsedTime)
+
+/**************************************************************************//**
+	@brief		キャラ設定を変わる
+	@param[in]    elapsedTime
+*//***************************************************************************/
+void SceneCharacter_E4CState::CharacterCreationState::Execute(float elapsedTime)
 {
+	Camera* camera = CameraManager::Instance().GetCamera();
+
+
+	if (m_cameraTimer < m_cameraTime)
+	{
+		m_cameraTimer += elapsedTime;
+		if (m_cameraTimer > m_cameraTime) m_cameraTimer = m_cameraTime;
+		camera->Move2PointToCamera(
+			m_cameraOriginPos,
+			m_pCharacter->GetPosition() + DirectX::XMFLOAT3{ -0.5f, 2.5f, 5.5f },
+			m_cameraOriginFocus,
+			m_pCharacter->GetPosition() + DirectX::XMFLOAT3{ -0.5f, 1.2f, 0.0f },
+			m_cameraTimer,
+			m_cameraTime
+		);
+	}
+
+	m_pCharacter->FaceTo(camera->GetEye());
 }
-void SceneCharacter_E4CState::CharacterCreationStateLeft::Exit()
+/**************************************************************************//**
+	@brief	終わり、データーをPLAYER_CHARACTER_DATAとJSONにセーブ
+*//***************************************************************************/
+void SceneCharacter_E4CState::CharacterCreationState::Exit()
 {
-	UI.Clear();
+	UI.Remove(m_pBackBtn);
+	m_pBackBtn = nullptr;
+
+	UI.Remove(m_pStartBtn);
+	m_pStartBtn = nullptr;
+
+	m_pWidgetCharacterModify->SaveData();
+	UI.Remove(m_pWidgetCharacterModify);
+	m_pWidgetCharacterModify = nullptr;
+
+	PLAYER_CHARACTER_DATA.SaveData();
 	SetCursor(::LoadCursor(NULL, IDC_HAND));
+
 }
 
-// タイトルステート
-void SceneCharacter_E4CState::CharacterCreationStateCenter::Enter()
-{
-	btnStartCharacter = new WidgetButtonImage("", "Data/Sprites/UI/start.png", [&](WidgetButton*) {
-		owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::START);
-		});
-	btnStartCharacter->SetPosition({ SCREEN_W * 0.5f - 163.0f * 0.5f * 1.5f, SCREEN_H * 0.8f });
-	btnStartCharacter->SetSize({ 196.0f * 1.5f, 92.0f * 1.5f });
-	UIManager::Instance().Register(btnStartCharacter);
-
-	CameraManager& cameraManager = CameraManager::Instance();
-	
-	CameraManager::Instance().GetCamera()->SetLookAt(
-		{ 6.0, 2.0f, 9.0f },			// 視点
-		{ -3.0f, 0.0, 0.0f },					// 注視点
-		{ 0.036f, 0.999f, -0.035f }				// 上ベクトル
-	);
-
-	owner->cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
-
-	owner->m_previewCharacters[0]->SetMenuVisibility(false);
-	owner->m_previewCharacters[2]->SetMenuVisibility(false);
-}
-void SceneCharacter_E4CState::CharacterCreationStateCenter::Execute(float elapsedTime)
-{
-}
-void SceneCharacter_E4CState::CharacterCreationStateCenter::Exit()
-{
-	UI.Clear();
-	SetCursor(::LoadCursor(NULL, IDC_HAND));
-}
-
-// タイトルステート
-void SceneCharacter_E4CState::CharacterCreationStateRight::Enter()
-{
-	btnStartCharacter = new WidgetButtonImage("", "Data/Sprites/UI/start.png", [&](WidgetButton*) {
-		owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::START);
-		});
-	btnStartCharacter->SetPosition({ SCREEN_W * 0.5f - 163.0f * 0.5f * 1.5f, SCREEN_H * 0.8f });
-	btnStartCharacter->SetSize({ 196.0f * 1.5f, 92.0f * 1.5f });
-	UIManager::Instance().Register(btnStartCharacter);
-
-	CameraManager& cameraManager = CameraManager::Instance();
-	
-	CameraManager::Instance().GetCamera()->SetLookAt(
-		{ 6.0, 2.0f, 9.0f },			// 視点
-		{ -3.0f, 0.0, 0.0f },					// 注視点
-		{ 0.036f, 0.999f, -0.035f }				// 上ベクトル
-	);
-
-	owner->cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
-
-	owner->m_previewCharacters[0]->SetMenuVisibility(false);
-	owner->m_previewCharacters[1]->SetMenuVisibility(false);
-}
-void SceneCharacter_E4CState::CharacterCreationStateRight::Execute(float elapsedTime)
-{
-}
-void SceneCharacter_E4CState::CharacterCreationStateRight::Exit()
-{
-	UI.Clear();
-	SetCursor(::LoadCursor(NULL, IDC_HAND));
-}
-
-// タイトルステート
+/**************************************************************************//**
+	@brief	ゲームを始まり
+*//***************************************************************************/
 void SceneCharacter_E4CState::StartState::Enter()
 {
 }
+
+/**************************************************************************//**
+	@brief		シーンゲームに移動
+	@param[in]    elapsedTime
+*//***************************************************************************/
 void SceneCharacter_E4CState::StartState::Execute(float elapsedTime)
 {
 	SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame_E4C));
 }
+
+/**************************************************************************//*
+	@brief	終わり
+*//***************************************************************************/
 void SceneCharacter_E4CState::StartState::Exit()
 {
 	UI.Clear();

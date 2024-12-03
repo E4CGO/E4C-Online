@@ -47,12 +47,12 @@ void Camera::SetPerspectiveFov(float fovY, float aspect, float nearZ, float farZ
 	this->farZ   = farZ;
 }
 
-void Camera::MoveToCamera(const DirectX::XMFLOAT3& eye, const DirectX::XMFLOAT3& focus, float transitiontime, float transitionDuration, float elapsedTime)
+void Camera::MoveTo(const DirectX::XMFLOAT3& eye, const DirectX::XMFLOAT3& focus, float transitiontime, float transitionDuration)
 {
 	// 遷移時間を増加
-	if (transitiontime < transitionDuration)
+	if (transitiontime > transitionDuration)
 	{
-		transitiontime += elapsedTime;
+		transitiontime = transitionDuration;
 	}
 
 	// 補間係数を計算（0.0〜1.0の範囲）
@@ -75,7 +75,7 @@ void Camera::MoveToCamera(const DirectX::XMFLOAT3& eye, const DirectX::XMFLOAT3&
 	this->SetLookAt(interpolatedEye, interpolatedFocus, { 0.0f, 1.0f, 0.0f });
 }
 
-void Camera::RotateToCamera(const DirectX::XMFLOAT3& target, float& angle, float radius, float speed, float elapsedTime)
+void Camera::RotateTo(const DirectX::XMFLOAT3& target, float& angle, float radius, float speed, float elapsedTime)
 {
 
 	// 回転の進行
@@ -101,12 +101,12 @@ void Camera::RotateToCamera(const DirectX::XMFLOAT3& target, float& angle, float
 		angle = 0.0f;
 	}
 }
-void Camera::Move2PointToCamera(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const DirectX::XMFLOAT3& startFocus, const DirectX::XMFLOAT3& endFocus, float& transitionTime, float transitionDuration, float elapsedTime)
+void Camera::Move2PointToCamera(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const DirectX::XMFLOAT3& startFocus, const DirectX::XMFLOAT3& endFocus, float transitionTime, float transitionDuration)
 {
 	// 遷移時間の更新
-	if (transitionTime < transitionDuration)
+	if (transitionTime > transitionDuration)
 	{
-		transitionTime += elapsedTime;
+		transitionTime = transitionDuration;
 	}
 
 	// 補間係数を計算（0.0〜1.0の範囲でクランプ）
@@ -137,20 +137,19 @@ void Camera::Move2PointToCamera(const DirectX::XMFLOAT3& start, const DirectX::X
 
 }
 
-void Camera::MovePointToCamera(const std::vector<DirectX::XMFLOAT3>& positions, const std::vector<DirectX::XMFLOAT3>& focusPoints,  float& transitionTime, float transitionDuration, float elapsedTime)
+void Camera::MoveByPoints(const std::vector<DirectX::XMFLOAT3>& positions, const std::vector<DirectX::XMFLOAT3>& focusPoints, float transitionTime, float transitionDuration)
 {
-	if (positions.size() < 2 || focusPoints.size() < 2)
+	if (positions.size() < 2 || focusPoints.size() < 2 || positions.size() != focusPoints.size())
 	{
 		// 少なくとも2つのポイントが必要
 		return;
 	}
 
 	// 遷移時間の更新
-	if (transitionTime < transitionDuration)
+	if (transitionTime > transitionDuration)
 	{
-		transitionTime += elapsedTime;
+		transitionTime = transitionDuration;
 	}
-
 	// 現在のセグメントのスタートとエンドのポイントを取得
 	int nextSegment = (currentSegment + 1) % positions.size();
 

@@ -1,8 +1,10 @@
-#pragma once
+//! @file RenderContext.h
+//! @note
+
+#ifndef __INCLUDE_RENDER_CONTEXT_H__
+#define __INCLUDE_RENDER_CONTEXT_H__
 
 #include <d3d12.h>
-
-#include "TAKOEngine/Rendering/Descriptor.h"
 
 #include "TAKOEngine/Editor/Camera/Camera.h"
 #include "TAKOEngine/Rendering/RenderState.h"
@@ -115,7 +117,7 @@ struct GaussianFilterData
 {
 	int					kernelSize = 8;		// カーネルサイズ
 	float				deviation = 10.0f;	// 標準偏差
-	DirectX::XMFLOAT2	textureSize;			// 暈すテクスチャのサイズ
+	DirectX::XMFLOAT2	textureSize = {};	// 暈すテクスチャのサイズ
 };
 
 // ガウスフィルターの最大カーネルサイズ
@@ -156,6 +158,43 @@ struct ShadowMapData
 	DirectX::XMFLOAT3 shadowColor = { 0.5f,0.5f,0.5f };
 };
 #pragma endregion
+
+// ポストエフェクトの最終パス用情報
+struct FinalpassDataDX12
+{
+	//ブルームテクスチャ
+	const Descriptor* bloomTexture = nullptr;
+};
+
+// スカイボックス情報
+struct SkydomeData
+{
+	//ブルームテクスチャ
+	const Descriptor* skyTexture = nullptr;
+};
+
+// パーティクル情報
+struct ParticleData
+{
+	// コンスタントバッファ
+	const Descriptor* cbv_descriptor = nullptr;
+
+	// パーティクル情報
+	float elapsedTime = 0; //経過時間
+	float deltaTime = 0;   //フレーム経過時間
+	int emitCount = 0;     //出現させる個数
+	int emitIndex = 0;     //現在の出現待ち
+
+	DirectX::XMFLOAT4 startColor = { 1.0f, 0.0f, 0.0f, 1.0f };
+	DirectX::XMFLOAT4 endColor = { 0.0f, 1.0f, 0.0f, 1.0f };
+
+	float scale = 0.3f;
+	float lifetime = 1.0f;
+
+	//ノイズ
+	float noiseSpeed = 0.4f;
+	float noisePower = 100.0f;
+};
 
 struct RenderContext
 {
@@ -199,7 +238,21 @@ struct RenderContextDX12
 	ID3D12GraphicsCommandList* d3d_command_list = nullptr;
 	const Descriptor* scene_cbv_descriptor = nullptr;
 
-	DirectX::XMFLOAT4X4			view;
-	DirectX::XMFLOAT4X4			projection;
-	DirectX::XMFLOAT4			light_direction;
+	DirectX::XMFLOAT4X4	view;
+	DirectX::XMFLOAT4X4	projection;
+	DirectX::XMFLOAT4	light_direction;
+
+	// スプライトシェーダー情報
+	LuminanceExtractionData	luminanceExtractionData; //	高輝度抽出用情報 
+	GaussianFilterData		gaussianFilterData;		 //	ガウスフィルター情報
+	ColorGradingData		colorGradingData;		 //	色調補正情報
+	FinalpassDataDX12		finalpassnData;			 //	最終パス情報
+
+	// スカイボックス情報
+	SkydomeData             skydomeData;
+
+	// パーティクル情報
+	ParticleData            particleData;
 };
+
+#endif // !__INCLUDE_RENDER_CONTEXT_H__

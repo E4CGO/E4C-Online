@@ -1,128 +1,102 @@
-#pragma once
+//! @file PlayerCharacter.h
+//! @note
+
+#ifndef __INCLUDED_PLAYER_CHARACTER_H__
+#define __INCLUDED_PLAYER_CHARACTER_H__
+
+#include <unordered_map>
+#include <mutex>
 
 #include "TAKOEngine/AI/StateMachine.h"
-
-#include <memory>
-#include <unordered_map>
-
 #include "GameObject/Character/Character.h"
-#include "GameObject/Character/Player/Player.h"
 #include "GameData.h"
 #include "PlayerCharacterData.h"
 
 class Enemy;
 
+static const uint32_t Input_Up = (1 << 0);			// 上
+static const uint32_t Input_Down = (1 << 1);		// 下
+static const uint32_t Input_Left = (1 << 2);		// 左
+static const uint32_t Input_Right = (1 << 3);		// 右
+static const uint32_t Input_Jump = (1 << 4);		// ジャンプ
+static const uint32_t Input_Dodge = (1 << 5);		// 回避
+static const uint32_t Input_Attack_N = (1 << 6);	// 一般攻撃
+static const uint32_t Input_Attack_S = (1 << 7);	// 特殊攻撃
+static const uint32_t Input_Skill_1 = (1 << 8);		// スキル1
+static const uint32_t Input_Skill_2 = (1 << 9);		// スキル2
+static const uint32_t Input_Skill_3 = (1 << 10);	// スキル3
+static const uint32_t Input_Skill_4 = (1 << 11);	// スキル4
+static const uint32_t Input_Menu = (1 << 12);		// メニュー
+
+static const uint32_t Input_R_Attack_N = (1 << 13);	// 一般攻撃リリース
+static const uint32_t Input_R_Attack_S = (1 << 14);	// 特殊攻撃リリース
+static const uint32_t Input_R_Skill_1 = (1 << 15);	// スキル1リリース
+static const uint32_t Input_R_Skill_2 = (1 << 16);	// スキル2リリース
+static const uint32_t Input_R_Skill_3 = (1 << 17);	// スキル3リリース
+static const uint32_t Input_R_Skill_4 = (1 << 18);	// スキル4リリース
+
 class PlayerCharacter : public Character
 {
 public:
 	// コンストラクタ(引数付き)
-	PlayerCharacter(uint64_t id, const char* name, uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
+	PlayerCharacter(uint64_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
 	// コンストラクタ(引数付き)
-	PlayerCharacter(PlayerCharacterData::CharacterInfo dataInfo);
+	PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataInfo);
 	// デストラクタ
 	~PlayerCharacter();
+
+#pragma pack(push, 1)
+	// 同期用
+	struct SYNC_DATA
+	{
+		uint64_t client_id;
+		uint64_t sync_count_id;
+		float position[3];
+		float velocity[3];
+		float rotate;
+		uint8_t state;
+		uint8_t sub_state;
+	};
+#pragma pack(pop)
 
 	// KayKit Adventurers
 	enum Animation
 	{
-		OneHanded_Melee_Attack_Chop,
-		OneHanded_Melee_Attack_Slice_Diagonal,
-		OneHanded_Melee_Attack_Slice_Horizontal,
-		OneHanded_Melee_Attack_Stab,
-		OneHanded_Ranged_Aiming,
-		OneHanded_Ranged_Reload,
-		OneHanded_Ranged_Shoot,
-		OneHanded_Ranged_Shooting,
-		TwoHanded_Melee_Attack_Chop,
-		TwoHanded_Melee_Attack_Slice,
-		TwoHanded_Melee_Attack_Spin,
-		TwoHanded_Melee_Attack_Spinning,
-		TwoHanded_Melee_Attack_Stab,
-		TwoHanded_Melee_Idle,
-		TwoHanded_Ranged_Aiming,
-		TwoHanded_Ranged_Reload,
-		TwoHanded_Ranged_Shoot,
-		TwoHanded_Ranged_Shooting,
-		Block,
-		Block_Attack,
-		Block_Hit,
-		Blocking,
-		Cheer,
-		Death_A,
-		Death_A_Pose,
-		Death_B,
-		Death_B_Pose,
-		Dodge_Backward,
-		Dodge_Forward,
-		Dodge_Left,
-		Dodge_Right,
-		Dualwield_Melee_Attack_Chop,
-		Dualwield_Melee_Attack_Slice,
-		Dualwield_Melee_Attack_Stab,
-		Hit_A,
-		Hit_B,
-		Idle,
-		Interact,
-		Jump_Full_Long,
-		Jump_Full_Short,
-		Jump_Idle,
-		Jump_Land,
-		Jump_Start,
-		Lie_Down,
-		Lie_Idle,
-		Lie_Pose,
-		Lie_StandUp,
-		Pickup,
-		Running_A,
-		Running_B,
-		Running_Strafe_Left,
-		Running_Strafe_Right,
-		Sit_Chair_Down,
-		Sit_Chair_Idle,
-		Sit_Chair_Pose,
-		Sit_Chair_StandUp,
-		Sit_Floor_Down,
-		Sit_Floor_Idle,
-		Sit_Floor_Pose,
-		Sit_Floor_StandUp,
-		Spellcast_Charge,
-		Spellcast_Long,
-		Spellcast_Raise,
-		Spellcast_Shoot,
-		T_POSE,
-		Throw,
-		Unarmed_Idle,
-		Unarmed_Melee_Attack_Kick,
-		Unarmed_Melee_Attack_Punch_A,
-		Unarmed_Melee_Attack_Punch_B,
-		Unarmed_Pose,
-		Use_Item,
-		Walking_A,
-		Walking_B,
-		Walking_Backward,
-		Walking_C
+		ANIM_IDLE,
+		ANIM_MOVE_START,
+		ANIM_MOVE_CONTINUE,
+		ANIM_ATTACK_SWORD_COMBO_FIRST,
+		ANIM_ATTACK_SWORD_COMBO_SECOND,
+		ANIM_ATTACK_SWORD_COMBO_THIRD,
+		ANIM_ATTACK_SWORD_SPECIAL_FIRST,
+		ANIM_ATTACK_SWORD_SPECIAL_SECOND,
+		ANIM_GUARD_SHIELD_START,
+		ANIM_GUARD_SHIELD_CONTINUE,
+		ANIM_GUARD_SHIELD_FINISH,
+		ANIM_HURT,
+		ANIM_DEATH
 	};
 
-	enum class State
+	enum STATE : uint8_t
 	{
-		Idle,
-		Move,
-		Jump,
-		Fall,
-		Land,
-		Dodge,
-		Hurt,
-		Death,
+		IDLE,
+		MOVE,
+		JUMP,
+		FALL,
+		LAND,
+		DODGE,
+		HURT,
+		DEATH,
 
-		AttackNormal,
-		AttackSpecial,
-		Skill_1,
-		Skill_2,
-		Skill_4,
-		Skill_3,
+		ATTACK_NORMAL,
+		ATTACK_SPECIAL,
+		SKILL_1,
+		SKILL_2,
+		SKILL_3,
+		SKILL_4,
 
-		Waiting = 998,	// 待機
-		Ready = 999,	// 待機 (準備完了)
+		WAITING = 254,	// 待機
+		READY = 255,	// 待機 (準備完了)
 	};
 
 	enum COLOR_PATTERN {
@@ -136,9 +110,10 @@ public:
 	virtual void Update(float elapsedTime) override;
 	// 描画処理
 	void Render(const RenderContext& rc) override;
+	void RenderDX12(const RenderContextDX12& rc) override;
 
 	// 外見パターンを読み取る
-	void LoadAppearance(uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
+	void LoadAppearance(const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
 
 	void Jump();
 	void InputMove(float elapsedTime);
@@ -162,22 +137,19 @@ public:
 	bool ReleaseSkill4() { return (input & Input_R_Skill_4) > 0; }
 
 	bool IsMove() { return velocity.x != 0.0f || velocity.z != 0.0f; }
-	bool IsFall() { return velocity.y < -2.0f; }
+	bool IsFall() { return velocity.y < -10.0f; }
 
 	void FaceToCamera();
 	void TurnByInput();
 
 	uint64_t GetClientId() { return m_client_id; }
-	void SetClientId(int id) { m_client_id = id; }
-	int GetClassType() { return type; }
+	void SetClientId(const uint64_t id) { m_client_id = id; }
 
 	float GetTurnSpeed() { return turnSpeed; }
 	void SetTurnSpeed(float turnSpeed) { this->turnSpeed = turnSpeed; }
 
-	void SetName(const char* name) { this->name = name; }
-
-	void SetMenuVisibility(bool value) { this->m_menuVisible = value; }
-	bool GetMenuVisibility() { return this->m_menuVisible; }
+	const std::string& GetName() { return m_name; }
+	void SetName(const char* name) { this->m_name = name; }
 
 	void SetSaveFileName(std::string value) { this->m_SaveFile = value; }
 	std::string GetCharacterSaveFileName() { return this->m_SaveFile; }
@@ -221,10 +193,16 @@ public:
 	std::unordered_map<int, Collider*> GetAttackColliders() { return m_pattackColliders; }
 	void EnableAttackColliders(bool enable = true) { for (const std::pair<int, Collider*>& collider : m_pattackColliders) collider.second->SetEnable(enable); }
 
+	// 同期用データを取得
+	void GetSyncData(SYNC_DATA& data);
+	// 同期用データを計算
+	void ImportSyncData(const SYNC_DATA& data);
+
 	static DirectX::XMFLOAT4 GetColorSet(int idx) { return PlayerCharacter::colorSet[idx]; }
 protected:
 	void RegisterCommonState();
 	void UpdateTarget();													// 自機用アイム目標更新
+	void UpdateHorizontalMove(float elapsedTime) override;					// 水平移動更新処理
 	virtual void UpdateColliders() override;								// 衝突判定の更新
 
 	void UpdateSkillTimers(float elapsedTime);								// スキルタイマー
@@ -251,9 +229,8 @@ private:
 	float mp = 100.0f;
 	float maxMp = 100.0f;
 	float mpRecoverRate = 8.0f; // 毎秒回復量
-	PLAYER_CLASS type = PLAYER_CLASS::Null;
 	int atk = 10;
-	std::string name;
+	std::string m_name;
 
 	float moveSpeed = 0.0f;
 	float turnSpeed = 0.0f;
@@ -286,4 +263,18 @@ protected:
 	StateMachine<PlayerCharacter>* stateMachine;
 
 	std::unordered_map<int, Collider*> m_pattackColliders; // 攻撃判定
+
+	// 同期用
+	std::mutex m_mut;
+	// 同期補間
+	struct TEMP_DATA {
+		float timer = 0.0f;
+		float time = 0.0f;
+		DirectX::XMFLOAT3 position = {};
+		float angle = 0.0f;
+		uint64_t old_sync_count = 0;
+		SYNC_DATA sync_data = {};
+	} m_tempData;
 };
+
+#endif // __INCLUDED_PLAYER_CHARACTER_H__

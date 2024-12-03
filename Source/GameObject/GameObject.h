@@ -25,11 +25,12 @@ public:
 	// デストラクタ
 	virtual ~GameObject() = default;
 	// トランスフォーム更新
-	void UpdateTransform();
+	virtual void UpdateTransform();
 	// 更新処理
 	virtual void Update(float elapsedTime) = 0;
 	// 描画処理
 	virtual void Render(const RenderContext& rc) = 0;
+	virtual void RenderDX12(const RenderContextDX12& rc) = 0;
 
 	DirectX::XMFLOAT3 LocalPositiontoWorld(DirectX::XMFLOAT3 v);
 	DirectX::XMFLOAT3 GetScreenPosition(
@@ -64,7 +65,6 @@ public:
 	const DirectX::XMFLOAT3 GetUp() const { return { transform._21, transform._22, transform._23 }; }
 
 protected:
-
 	DirectX::XMFLOAT3 position = { 0, 0, 0 };
 	DirectX::XMFLOAT3 angle = { 0, 0, 0 };
 	DirectX::XMFLOAT3 scale = { 1, 1, 1 };

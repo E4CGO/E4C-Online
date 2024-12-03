@@ -12,7 +12,6 @@
 #include "TAKOEngine/Rendering/ResourceManager.h"
 #include "TAKOEngine/Rendering/Sprite.h"
 #include "TAKOEngine/Rendering/TextSprite.h"
-#include "TAKOEngine/Sound/Audio.h"
 #include "TAKOEngine/Editor/Input/Input.h"
 #include "TAKOEngine/Tool/Timer.h"
 #include "TAKOEngine/Tool/Console.h"
@@ -45,7 +44,6 @@ namespace TentacleLib
 
 	static Graphics& graphics = Graphics::Instance();
 	static TentacleLib::Timer& timer = TentacleLib::Timer::Instance();
-	static Audio& audio = Audio::Instance();
 	static Input& input = Input::Instance();
 	static Console& console = Console::Instance();
 	static ResourceManager& resource = ResourceManager::Instance();
@@ -53,7 +51,6 @@ namespace TentacleLib
 }
 #define T_GRAPHICS TentacleLib::graphics
 #define T_TIMER TentacleLib::timer
-#define T_AUDIO TentacleLib::audio
 #define T_INPUT TentacleLib::input
 #define T_RESOURCE TentacleLib::resource
 #define T_TEXT TentacleLib::textSprite

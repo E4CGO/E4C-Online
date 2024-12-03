@@ -1,5 +1,17 @@
-#pragma once
+ï»¿//! @file ColorGradingShader
+//! @note
+
+#ifndef __GRAHICS_COLOR_GRADING_SHADER_H__
+#define __GRAHICS_COLOR_GRADING_SHADER_H__
+
 #include "SpriteShader.h"
+#include "SpriteShaderDX12.h"
+
+//***************************************************
+// @class ColorGradingShader
+// @brief è‰²èª¿è£œæ­£
+// @par   DX11
+//***************************************************
 class ColorGradingShader : public SpriteShader
 {
 public:
@@ -9,9 +21,29 @@ private:
 private:
 	struct CBColorGrading
 	{
-		float	hueShift;	// F‘Š’²®
-		float	saturation;	// Ê“x’²®
-		float	brightness;	// –¾“x’²®
+		float	hueShift;	// è‰²ç›¸èª¿æ•´
+		float	saturation;	// å½©åº¦èª¿æ•´
+		float	brightness;	// æ˜åº¦èª¿æ•´
 		float	dummy;
 	};
 };
+
+//***************************************************
+// @class ColorGradingShaderDX12
+// @brief è‰²èª¿è£œæ­£
+// @par   DX12
+//***************************************************
+class ColorGradingShaderDX12 : public SpriteShaderDX12
+{
+public:
+	ColorGradingShaderDX12(ID3D12Device* device);
+	~ColorGradingShaderDX12() override {};
+
+	void Render(const RenderContextDX12& rc, SpriteDX12* sprite) override;
+
+private:
+	Microsoft::WRL::ComPtr<ID3D12PipelineState>		m_d3d_pipeline_state;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature>		m_d3d_root_signature;
+};
+
+#endif // !__GRAHICS_COLOR_GRADING_SHADER_H__

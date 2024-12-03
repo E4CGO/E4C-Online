@@ -1,4 +1,8 @@
-#pragma once
+//! @file ObjectManager.h
+//! @note
+
+#ifndef __INCLUDED_OBJECT_MANAGER__
+#define __INCLUDED_OBJECT_MANAGER__
 
 #include <set>
 #include "Manager.h"
@@ -29,11 +33,19 @@ public:
 			this->items.at(i)->Update(elapsedTime);
 		}
 	}
-	void Render(const RenderContext& rc)
+	virtual void Render(const RenderContext& rc)
 	{
 		for (T* item : this->items)
 		{
 			item->Render(rc);
+		}
+	}
+
+	virtual void RenderDX12(const RenderContextDX12& rc)
+	{
+		for (T* item : this->items)
+		{
+			item->RenderDX12(rc);
 		}
 	}
 
@@ -81,3 +93,5 @@ public:
 protected:
 	std::set<T*> removes;
 };
+
+#endif // !__INCLUDED_OBJECT_MANAGER__

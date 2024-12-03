@@ -25,7 +25,7 @@ struct occlusion_texture_info
 {
     int index;
     int texcoord;
-    float stregth;
+    float strength;
 };
 
 struct pbr_metallic_roughness
@@ -52,11 +52,9 @@ struct material_constants
 };
 StructuredBuffer<material_constants> materials : register(t0);
 
-
 float4 main(VS_OUT pin) : SV_TARGET
 {
-    const float GAMMA = 2.2;
-    float4 light_direction = float4(0.0f, -1.0f, 0.0f, 1.0f);
+    const float GAMMA = 1.0f;
 
     material_constants m = materials[material];
         
@@ -96,17 +94,8 @@ float4 main(VS_OUT pin) : SV_TARGET
         occlusion_factor *= sampled.r;
     }
     
-    const float occlusion_strength = m.occlusion_texture.stregth;
-    
-    
-    const float3 f0 = lerp(0.04, basecolor_factor.rgb, metallic_factor);
-    const float3 f90 = 1.0;
-    const float alpha_roughness = roughness_factor * roughness_factor;
-    const float3 c_diff = lerp(basecolor_factor.rgb, 0.0, metallic_factor);
-    
-    const float3 P = pin.w_position.xyz;
-    const float3 V = normalize(camera_position.xyz - pin.w_position.xyz);
-    
+    const float occlusion_strength = m.occlusion_texture.strength;
+   
     float3 N = normalize(pin.w_normal.xyz);
     float3 T = has_tangent ? normalize(pin.w_tangent.xyz) : float3(1, 0, 0);
     float sigma = has_tangent ? pin.w_tangent.w : 1.0;
@@ -123,10 +112,18 @@ float4 main(VS_OUT pin) : SV_TARGET
         N = normalize((normal_factor.x * T) + (normal_factor.y * B) + (normal_factor.z * N));
     }
     
+    const float3 f0 = lerp(0.04, basecolor_factor.rgb, metallic_factor);
+    const float3 f90 = 1.0;
+    const float alpha_roughness = roughness_factor * roughness_factor;
+    const float3 c_diff = lerp(basecolor_factor.rgb, 0.0, metallic_factor);
+    
+    const float3 P = pin.w_position.xyz;
+    const float3 V = normalize(cameraPosition.xyz - pin.w_position.xyz);
+    
     float3 diffuse = 0;
     float3 specular = 0;
     
-    float3 L = normalize(-light_direction.xyz);
+    float3 L = normalize(-directionalLightData.direction);
     float3 Li = float3(1.0, 1.0, 1.0);
     const float NoL = max(0.0, dot(N, L));
     const float NoV = max(0.0, dot(N, V));
@@ -149,11 +146,9 @@ float4 main(VS_OUT pin) : SV_TARGET
     float3 emmisive = emmisive_factor;
     diffuse = lerp(diffuse, diffuse * occlusion_factor, occlusion_strength);
     specular = lerp(specular, specular * occlusion_factor, occlusion_strength);
-    
-    float3 Lo = diffuse + specular + emmisive;
-    
-    Lo *= 5.0;
-    
+        
+    float3 Lo = diffuse * 3.0f + specular + emmisive;
+        
     return float4(Lo, basecolor_factor.a);
 }
 
