@@ -131,7 +131,7 @@ namespace Online
 	*//***************************************************************************/
 	void OnlineController::UDPRecvThread()
 	{
-		const size_t buffer_size = 1024;
+		const size_t buffer_size = 5120;
 		uint8_t buffer[buffer_size];
 		DATA_HEADER header;
 		int header_size = sizeof(DATA_HEADER);

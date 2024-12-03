@@ -184,7 +184,6 @@ void SceneCharacter_E4C::RenderDX12()
 			for (auto& it : m_previewCharacters)
 			{
 				if (it != nullptr) {
-					if (it->GetMenuVisibility())
 						it->RenderDX12(rc);
 				}
 			}
