@@ -70,7 +70,7 @@ public:
 		return false;
 	};
 
-	virtual bool CollisionVsMap(bool wallCheck = false) 
+	virtual bool CollisionVsMap() 
 	{
 		return false;
 	};
