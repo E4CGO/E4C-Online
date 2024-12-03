@@ -13,6 +13,7 @@
 #include "TAKOEngine/Physics/Collider.h"
 #include "TAKOEngine/Rendering/Sprite.h"
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
+#include "GameObject/Character/Player/PlayerCharacterManager.h"
 
 #include "GameObject/ModelObject.h"
 
@@ -25,13 +26,19 @@
 class Plane : public ModelObject
 {
 public:
-	Plane(ID3D11Device* device, const char* filename, float scaling = 1.0f, std::array<DirectX::XMFLOAT3, 4> positions =
+	Plane(ID3D11Device* device, const char* filename, float scaling, XMFLOAT3 positions, float positionZ, float plane_width);
+
+#if 0
+	Plane(ID3D11Device* device, const char* filename, float scaling = 1.0f,
+		std::array<DirectX::XMFLOAT3, 4> position =
 		{
 			DirectX::XMFLOAT3{1.0f, 1.0f, 0.0f},
 			DirectX::XMFLOAT3{-1.0f, 1.0f, 0.0f},
 			DirectX::XMFLOAT3{1.0f, -1.0f, 0.0f},
 			DirectX::XMFLOAT3{-1.0f, -1.0f, 0.0f},
 		});
+#endif // 0
+
 	virtual ~Plane()
 	{
 		if (mesh.material != nullptr)
@@ -141,6 +148,35 @@ public:
 			mesh.material = nullptr;
 		}
 	}
+};
+/**************************************************************************//**
+	@class	Fireball
+	@brief	魔法使い火球を作るクラス
+	@par    [説明]
+		魔法使い攻撃
+*//***************************************************************************/
+class RunningDust : public Billboard
+{
+public:
+	RunningDust(ID3D11Device* device, const char* filename, float scaling = 1.0f,
+		DirectX::XMFLOAT3 position = { 0.f, 0.f, 0.f },
+		float alpha = 1.0f,
+		int model_id = 0, int age = 0);
+	virtual ~RunningDust()
+	{
+		if (mesh.material != nullptr)
+		{
+			delete mesh.material;
+			mesh.material = nullptr;
+		}
+	}
+
+	virtual void Update(float elapsedTime) override;
+
+public:
+	float alpha = 1.0f;
+	int model_id = 0;
+	int age = 0;
 };
 
 #endif //!__INCLUDED_PLANE_H__

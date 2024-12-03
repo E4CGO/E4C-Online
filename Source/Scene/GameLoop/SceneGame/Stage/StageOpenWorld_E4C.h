@@ -3,10 +3,12 @@
 #include <unordered_set>
 #include <memory>
 #include <array>
+#include <deque>
 
 #include "GameObject/ModelObject.h"
 #include "GameObject/GameObject.h"
 #include "GameObject/Character/Player/PlayerCharacter.h"
+#include "TAKOEngine/Rendering/Plane.h"
 #include "GameObject/Props/Teleporter.h"
 #include "TAKOEngine/Rendering/Shaders/PlaneShader.h"
 
@@ -17,6 +19,8 @@
 
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
+
+using namespace DirectX;
 
 class SceneGame_E4C;
 
@@ -50,6 +54,17 @@ private:
 
 	std::unique_ptr<ModelObject> map;
 	std::unique_ptr<ModelObject> tower;
+
+	std::unique_ptr<Plane> portalSquare;
+
+	std::unique_ptr<RunningDust> runningDust1;
+	std::deque<RunningDust> runningDust;
+	bool running = true;
+	float f_timer;
+	int f_count = 0.0f;// 何個目のモデルか数える
+	float f_INTERVAL = 0.1f;// push の間隔
+	float f_popINTERVAL = 0.3f;// pop の間隔
+	float f_alpha = 0.2f;// 透明度
 
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {

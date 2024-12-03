@@ -49,6 +49,18 @@ public:
 	PortalShader(ID3D11Device* device) : PlaneShader(device, "Data/Shader/PortalVS.cso", "Data/Shader/PortalPS.cso") {}
 	virtual ~PortalShader() override = default;
 };
+/**************************************************************************//**
+	@class	PortalShader
+	@brief	テレポートシェーダークラス
+	@par    [説明]
+		四角く区切って描画するバージョン
+*//***************************************************************************/
+class PortalSquareShader : public PlaneShader
+{
+public:
+	PortalSquareShader(ID3D11Device* device) : PlaneShader(device, "Data/Shader/PortalVS.cso", "Data/Shader/PortalSquarePS.cso") {}
+	virtual ~PortalSquareShader() override = default;
+};
 
 /**************************************************************************//**
 	@class	BillboardShader

@@ -37,6 +37,7 @@ enum class ModelShaderId
 	ShadowMap,
 	Plane,
 	Portal,
+	PortalSquare,
 	Billboard,
 	Fireball,
 	Lambert,

@@ -511,6 +511,7 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 	modelShaders[static_cast<int>(ModelShaderId::ShadowMap)] = std::make_unique<ShadowMapShader>(device.Get());
 	modelShaders[static_cast<int>(ModelShaderId::Plane)] = std::make_unique<PlaneShader>(device.Get());
 	modelShaders[static_cast<int>(ModelShaderId::Portal)] = std::make_unique<PortalShader>(device.Get());
+	modelShaders[static_cast<int>(ModelShaderId::PortalSquare)] = std::make_unique<PortalSquareShader>(device.Get());
 	modelShaders[static_cast<int>(ModelShaderId::Billboard)] = std::make_unique<BillboardShader>(device.Get());
 	modelShaders[static_cast<int>(ModelShaderId::Fireball)] = std::make_unique<FireballShader>(device.Get());
 	modelShaders[static_cast<int>(ModelShaderId::Lambert)] = std::make_unique<LambertShader>(device.Get());

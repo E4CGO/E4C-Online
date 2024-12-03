@@ -718,7 +718,9 @@ set(TAKOEngine__Rendering__HLSL__Primitives
     "TAKOEngine/Rendering/HLSL/Primitives/PlaneVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/Portal.hlsli"
     "TAKOEngine/Rendering/HLSL/Primitives/PortalPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/PortalSquarePS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/PortalVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/RunningDustPS.hlsl"
 )
 source_group("TAKOEngine\\Rendering\\HLSL\\Primitives" FILES ${TAKOEngine__Rendering__HLSL__Primitives})
 
@@ -756,6 +758,7 @@ set(ALL_FILES
     ${Source__Network}
     ${Source__Scene}
     ${Source__UI}
+    ${Source__VFX}
     ${Source__GameObject__Character}
     ${Source__GameObject__Projectile}
     ${Source__GameObject__Props}
@@ -878,7 +881,9 @@ set(SHADER_NAMES
     "PlanePS.cso"
     "PlaneVS.cso"
     "PortalPS.cso"
+    "PortalSquarePS.cso"
     "PortalVS.cso"
+    "RunningDustPS.cso"
     "SkyBoxDX12PS.cso"
     "SkyBoxDX12VS.cso"
     "SkydomePS.cso"
@@ -945,7 +950,9 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlanePS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlaneVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PortalPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PortalSquarePS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PortalVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/RunningDustPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Skydome/SkyBoxDX12PS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Skydome/SkyBoxDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Skydome/SkydomePS.hlsl,5.0,Pixel,main"
