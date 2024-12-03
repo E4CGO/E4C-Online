@@ -88,6 +88,10 @@ void WidgetArrowRight::Render(const RenderContext& rc)
 	);
 }
 
+/**************************************************************************//**
+	 @brief		レンダリング関数
+	@param[in]    rc	RenderContext
+*//***************************************************************************/
 void WidgetArrowRight::RenderDX12(const RenderContextDX12& rc)
 {
 	btnDX12->Begin(rc);
@@ -181,6 +185,10 @@ void WidgetUpDown::Render(const RenderContext& rc)
 	m_ArrowRight->Render(rc);
 }
 
+/**************************************************************************//**
+	@brief		レンダリング関数
+	@param[in]    rc
+*//***************************************************************************/
 void WidgetUpDown::RenderDX12(const RenderContextDX12& rc)
 {
 	m_ArrowLeft->RenderDX12(rc);

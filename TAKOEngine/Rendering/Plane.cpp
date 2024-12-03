@@ -91,7 +91,7 @@ Plane::Plane(ID3D11Device* device, const char* filename, float scaling, std::arr
 	mesh.material = new ModelResource::Material;
 
 	// テクスチャ生成
-	if (filename != "")
+	if (*filename != 0)
 	{
 		// テクスチャファイル読み込み
 		D3D11_TEXTURE2D_DESC desc;

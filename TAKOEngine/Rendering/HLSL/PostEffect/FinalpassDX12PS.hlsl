@@ -13,7 +13,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     float4 color = sceneTexture.Sample(sceneSampler, pin.texcoord) * pin.color;
 
 	// ブルームテクスチャを加算する
-    color.rgb += bloomTexture.Sample(sceneSampler, pin.texcoord).rgb;
+    //color.rgb += bloomTexture.Sample(sceneSampler, pin.texcoord).rgb;
     
     // 色調補正処理
 	{

@@ -31,6 +31,8 @@ public:
 	void Update(float elapsedTime) override;
 
 	void Render() override;
+
+	void RenderDX12() override;
 protected:
 	void OnPhase() override;
 public:
@@ -48,15 +50,20 @@ private:
 
 	std::unique_ptr <Teleporter> teleporter;
 
-	std::unique_ptr<ModelObject> map;
-	std::unique_ptr<ModelObject> tower;
+	std::unordered_map<std::string, std::unique_ptr<ModelObject>> models;
+
+	std::unique_ptr<ModelObject> sky;
+	DirectX::XMFLOAT4X4 test_transform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+	DirectX::XMFLOAT3 test_position = { 0, 0, 0 };
+	DirectX::XMFLOAT4 test_rotation = { 0, 0, 0, 0 };
+	DirectX::XMFLOAT3 test_scale = { 1, 1, 1 };
+
+	std::unique_ptr<SpriteDX12>			m_sprites[8];
 
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {
 		"",											// マスク
 		// Setting UI
-		"Data/Sprites/UI/start.png",
-		"Data/Sprites/big_background.t.png"
 	};
 
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
@@ -71,4 +78,10 @@ private:
 		{5,3,4},
 		{8,3,8}
 	};
+
+	// フレームバッファマネージャー
+	FrameBufferManager* m_frameBuffer = nullptr;
+
+	// ポストエフェクト
+	std::unique_ptr<PostprocessingRendererDX12>	postprocessingRenderer = std::make_unique<PostprocessingRendererDX12>();
 };

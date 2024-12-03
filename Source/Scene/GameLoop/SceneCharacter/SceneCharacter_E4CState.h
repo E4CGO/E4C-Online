@@ -7,52 +7,16 @@
 #include "TAKOEngine/Network/HttpRequest.h"
 #include "TAKOEngine/AI/BaseState.h"
 #include "Source/UI/Widget/WidgetButtonImage.h"
+#include "UI/Widget/WidgetButtonText.h"
 
 #include "Scene/GameLoop/SceneCharacter/SceneCharacter_E4C.h"
 
+#include "UI/Widget/WidgetCharacterSelect.h"
+#include "UI/Widget/WidgetCharacterModify.h"
+
+
 namespace SceneCharacter_E4CState
 {
-	// UIとプレイヤーデーター変数
-	static WidgetButtonImage* btnCharacterLeft = nullptr;
-	static WidgetButtonImage* btnCharacterCenter = nullptr;
-	static WidgetButtonImage* btnCharacterRight = nullptr;
-
-	static WidgetButtonImage* btnStartCharacter = nullptr;
-	static std::shared_ptr<Sprite> background;
-
-	static int currentState = 0;
-
-	static PlayerCharacterData::CharacterInfo currentCharacterInfo = {
-			true,			// visible
-			"",				// save
-			{				//Character
-				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-			}
-	};
-
-	static PlayerCharacterData::CharacterInfo previousCharacterInfo = {
-			true,			// visible
-			"",				// save
-			{				//Character
-				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-			}
-	};
-
-	static std::vector < std::string> saveNames{
-		"Left",
-		"Center",
-		"Right"
-	};
-
-	static std::vector<std::array<DirectX::XMFLOAT3, 4>> cameraSettings{
-		{{{ 3.7f, 2.1f, 10.5f}, { 3.5f,-2.3f,-15.0f}, {0.0f, 1.0f, 0.0f}}},
-		{{{ 0.0f, 2.1f, 10.5f}, { 0.0f, 0.0f, 0.0f }, {0.0f, 1.0f, 0.0f}}},
-		{{{-3.7f, 2.1f, 10.5f}, {-3.5f,-2.3f,-15.0f}, {0.0f, 1.0f, 0.0f}}},
-		{{{ 0.0f, 3.3f, 12.4f},	{0.06f,0.65f, 0.73f}, {0.0f, 0.1f, 0.0f}}}
-	};
-	static std::array<DirectX::XMFLOAT3, 3> characterPositions{
-		{{3.5f, 0.0f, 5.0f}, {0.0f, 0.0f, 5.0f}, {-3.5f, 0.0f, 5.0f},}
-	};
 
 	/**************************************************************************//**
 		@class	InitState
@@ -86,7 +50,7 @@ namespace SceneCharacter_E4CState
 	{
 	public:
 		// コンストラクタ
-		CharacterSelectionState(SceneCharacter_E4C* scene) : HierarchicalState<SceneCharacter_E4C>(scene) {};
+		CharacterSelectionState(SceneCharacter_E4C* scene) : m_pWidgetCharacterSelect(nullptr), HierarchicalState<SceneCharacter_E4C>(scene) {};
 		// デストラクタ
 		~CharacterSelectionState() {}
 		// ステートに入った時のメソッド
@@ -96,10 +60,11 @@ namespace SceneCharacter_E4CState
 		// ステートから出ていくときのメソッド
 		void Exit() override;
 	private:
-		float timer = 0.0f;
-		void setCurrentStateLeft();
-		void setCurrentStateCenter();
-		void setCurrentStateRight();
+		DirectX::XMFLOAT3 m_cameraOriginPos = {};
+		DirectX::XMFLOAT3 m_cameraOriginFocus = {};
+		float m_cameraTimer = 0.0f;
+		const float m_cameraTime = 0.5f;
+		WidgetCharacterSelect* m_pWidgetCharacterSelect;
 	};
 
 	/**************************************************************************//**
@@ -120,8 +85,18 @@ namespace SceneCharacter_E4CState
 		void Execute(float elapsedTime) override;
 		// ステートから出ていくときのメソッド
 		void Exit() override;
+	private:
+		DirectX::XMFLOAT3 m_cameraOriginPos = {};
+		DirectX::XMFLOAT3 m_cameraOriginFocus = {};
+		float m_cameraTimer = 0.0f;
+		const float m_cameraTime = 0.5f;
 
-		bool clicked = false;
+		PlayerCharacter* m_pCharacter = nullptr;
+
+		WidgetButtonText* m_pBackBtn = nullptr;
+		WidgetButtonText* m_pStartBtn = nullptr;
+
+		WidgetCharacterModify* m_pWidgetCharacterModify = nullptr;
 	};
 
 	/**************************************************************************//**

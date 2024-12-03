@@ -1,15 +1,13 @@
 ﻿#include "MapTile.h"
 
 MapTile::MapTile(const char* filename, float scaling, RoomBase* parent) :
-	ModelObject(filename, scaling)
+	ModelObject(filename, scaling, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_TOON)
 {
 	this->parent = parent;
 
 	Update(0);// モデル更新
 
 	if (strlen(filename) == 0) return;
-	//SetCollider(Collider::COLLIDER_TYPE::MAP);
-	//SetCollider(Collider::COLLIDER_TYPE::MODEL);
 }
 
 void MapTile::UpdateTransform()

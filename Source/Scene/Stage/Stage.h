@@ -37,6 +37,8 @@ public:
 
 	virtual void Render() = 0;
 
+	virtual void RenderDX12() = 0;
+
 	void SetPhase(int phase);
 	void NextPhase();
 	int GetPhase() { return phase; }

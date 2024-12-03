@@ -43,17 +43,17 @@ bool SphereCollider::CollisionVsShpere(
 	return false;
 }
 
-bool SphereCollider::CollisionVsMap(bool wallCheck)
+bool SphereCollider::CollisionVsMap()
 {
 	Sphere sphere;
 	sphere.position = position;
 	sphere.radius = radius;
 
-	//if (MAPTILES.IntersectSphereVsMap(sphere, wallCheck))
-	//{
-	//	position = sphere.position;
-	//	return true;
-	//}
+	if (MAPTILES.IntersectSphereVsMap(sphere))
+	{
+		position = sphere.position;
+		return true;
+	}
 	return false;
 };
 

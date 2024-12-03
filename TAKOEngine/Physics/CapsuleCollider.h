@@ -20,7 +20,7 @@ public:
 		return false;
 	}
 
-	bool CollisionVsMap(bool wallCheck = false) override;
+	bool CollisionVsMap() override;
 
 	bool RayCast(
 		const DirectX::XMFLOAT3& start,

@@ -9,7 +9,12 @@
 	@param[in]	text	UI文字
 	@param[in]	scale	UIの大きさ
 *//***************************************************************************/
-WidgetText::WidgetText(const char* text, float scale) : m_str(text), m_scale(scale) {}
+WidgetText::WidgetText(const char* text, float scale) : m_str(text), m_scale(scale) {
+	m_size = T_TEXT.TextSize(
+		m_font,
+		m_str.c_str()
+	) * m_scale;
+}
 
 /**************************************************************************//**
 	@brief		描画処理
@@ -32,6 +37,11 @@ void WidgetText::Render(const RenderContext& rc)
 	);
 }
 
+/**************************************************************************//**
+	@brief		描画処理
+	@param[in]	rc	レンダーコンテンツ参照
+*//***************************************************************************/
 void WidgetText::RenderDX12(const RenderContextDX12& rc)
 {
+	if (!m_enable) return;
 }

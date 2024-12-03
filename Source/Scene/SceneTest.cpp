@@ -9,9 +9,8 @@ void SceneTest::Initialize()
 	MAPTILES.Register(stage);
 
 	PlayerCharacterData::CharacterInfo charInfo = {
-		true,			// visible
-		"",				// save
-		{				//Character
+		"",				// NAME
+		{				// APPEARANCE
 			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 		}
 	};
@@ -21,7 +20,7 @@ void SceneTest::Initialize()
 	newPlayer->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 
 	// 光
-	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
+	LightManager::Instance().SetAmbientColor({ 0.3f, 0.3f, 0.3f, 0.0f });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);

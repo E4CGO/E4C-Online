@@ -68,6 +68,12 @@ namespace PlayerCharacterState
 			owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::SKILL_1));
 			return;
 		}
+
+		if (flags & flag_Skill_2 && owner->InputSkill2())
+		{
+			owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::SKILL_2));
+			return;
+		}
 	}
 	// 待機ステート
 	void IdleState::Enter()
@@ -83,7 +89,7 @@ namespace PlayerCharacterState
 
 		PlayerTransition(
 			owner,
-			flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1
+			flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2
 		);
 	}
 	void IdleState::Exit()
@@ -93,7 +99,7 @@ namespace PlayerCharacterState
 	// 移動ステート
 	void MoveState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::ANIM_MOVE, true, 0.1f);
+		owner->SetAnimation(PlayerCharacter::Animation::ANIM_MOVE_CONTINUE, true, 0.1f);
 	}
 	void MoveState::Execute(float elapsedTime)
 	{
@@ -104,7 +110,7 @@ namespace PlayerCharacterState
 
 		PlayerTransition(
 			owner,
-			flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1
+			flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2
 		);
 	}
 	void MoveState::Exit()
@@ -114,7 +120,7 @@ namespace PlayerCharacterState
 	// ジャンプステート
 	void JumpState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::ANIM_MOVE, false, 0.1f);
+		owner->SetAnimation(PlayerCharacter::Animation::ANIM_MOVE_CONTINUE, false, 0.1f);
 	}
 	void JumpState::Execute(float elapsedTime)
 	{
@@ -122,7 +128,7 @@ namespace PlayerCharacterState
 
 		PlayerTransition(
 			owner,
-			flag_Fall | flag_Dodge | flag_Ground | flag_AttackN | flag_AttackS | flag_Skill_1
+			flag_Fall | flag_Dodge | flag_Ground | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2
 		);
 	}
 	void JumpState::Exit()
@@ -132,7 +138,7 @@ namespace PlayerCharacterState
 	// 落下ステート
 	void FallState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::ANIM_MOVE, true, 0.1f);
+		owner->SetAnimation(PlayerCharacter::Animation::ANIM_MOVE_CONTINUE, true, 0.1f);
 	}
 	void FallState::Execute(float elapsedTime)
 	{
@@ -140,7 +146,7 @@ namespace PlayerCharacterState
 
 		PlayerTransition(
 			owner,
-			flag_Fall | flag_Dodge | flag_Ground | flag_AttackN | flag_AttackS | flag_Skill_1
+			flag_Fall | flag_Dodge | flag_Ground | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2
 		);
 	}
 	void FallState::Exit()
@@ -159,7 +165,7 @@ namespace PlayerCharacterState
 
 		PlayerTransition(
 			owner,
-			flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1
+			flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2
 		);
 
 		if (!owner->IsPlayAnimation()) owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE)); return;
@@ -171,7 +177,7 @@ namespace PlayerCharacterState
 	// 回避ステート
 	void DodgeState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::ANIM_MOVE, false, 0.0f);
+		owner->SetAnimation(PlayerCharacter::Animation::ANIM_MOVE_CONTINUE, false, 0.0f);
 		owner->SetHurtCoolTime(0.2f);
 
 		// MP消費
@@ -193,7 +199,7 @@ namespace PlayerCharacterState
 	// 怪我
 	void HurtState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::ANIM_IDLE, false, 0.1f);
+		owner->SetAnimation(PlayerCharacter::Animation::ANIM_HURT, false, 0.1f);
 	}
 	void HurtState::Execute(float elapsedTime)
 	{
@@ -208,7 +214,7 @@ namespace PlayerCharacterState
 	// 死亡
 	void DeathState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::ANIM_IDLE, false, 0.1f);
+		owner->SetAnimation(PlayerCharacter::Animation::ANIM_DEATH, false, 0.1f);
 		owner->GetCollider()->SetEnable(false);
 	}
 	void DeathState::Execute(float elapsedTime)

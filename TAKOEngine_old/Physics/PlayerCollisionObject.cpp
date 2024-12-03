@@ -35,3 +35,7 @@ void PlayerCollisionObject::Render(const RenderContext& rc)
 	collider->DrawDebugPrimitive({ 1, 1, 1, 1 });
 #endif
 }
+
+void PlayerCollisionObject::RenderDX12(const RenderContextDX12& rc)
+{
+}

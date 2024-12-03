@@ -24,13 +24,14 @@ VS_OUT main(
     
     VS_OUT vout;
     float4x4 viewProjection = mul(view, Projection);
-    vout.vertex   = mul(float4(p, 1.0f), mul(world_transform, viewProjection));
-    vout.texcoord = texcoord;
-    vout.normal   = normal;
-    vout.position = position.xyz;
-    vout.tangent  = tangent;
-    vout.binormal = normalize(cross(vout.normal, vout.tangent));
-    vout.color    = materialColor;
+    vout.vertex    = mul(float4(p, 1.0f), mul(world_transform, viewProjection));
+    vout.texcoord  = texcoord;
+    vout.normal    = normal;
+    vout.position  = position.xyz;
+    vout.tangent   = tangent;
+    vout.binormal  = normalize(cross(vout.normal, vout.tangent));
+    vout.color.rgb = color.rgb * materialColor.rgb;
+    vout.color.a   = color.a;
 
     return vout;
 }

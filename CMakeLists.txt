@@ -242,6 +242,8 @@ source_group("Source\\GameObject\\Character\\Player" FILES ${Source__GameObject_
 set(Source__GameObject__Character__Player__State
     "Source/GameObject/Character/Player/State/NonPlayerCharacterState.cpp"
     "Source/GameObject/Character/Player/State/NonPlayerCharacterState.h"
+    "Source/GameObject/Character/Player/State/PlayerCharacterShieldState.cpp"
+    "Source/GameObject/Character/Player/State/PlayerCharacterShieldState.h"
     "Source/GameObject/Character/Player/State/PlayerCharacterState.cpp"
     "Source/GameObject/Character/Player/State/PlayerCharacterState.h"
     "Source/GameObject/Character/Player/State/PlayerCharacterSwordState.cpp"
@@ -324,6 +326,10 @@ set(Source__UI__Widget
     "Source/UI/Widget/WidgetButtonImage.h"
     "Source/UI/Widget/WidgetButtonText.cpp"
     "Source/UI/Widget/WidgetButtonText.h"
+    "Source/UI/Widget/WidgetCharacterModify.cpp"
+    "Source/UI/Widget/WidgetCharacterModify.h"
+    "Source/UI/Widget/WidgetCharacterSelect.cpp"
+    "Source/UI/Widget/WidgetCharacterSelect.h"
     "Source/UI/Widget/WidgetCrosshair.cpp"
     "Source/UI/Widget/WidgetCrosshair.h"
     "Source/UI/Widget/WidgetDragFloat.cpp"
@@ -334,6 +340,8 @@ set(Source__UI__Widget
     "Source/UI/Widget/WidgetImage.h"
     "Source/UI/Widget/WidgetInputBool.cpp"
     "Source/UI/Widget/WidgetInputBool.h"
+    "Source/UI/Widget/WidgetInputInt.cpp"
+    "Source/UI/Widget/WidgetInputInt.h"
     "Source/UI/Widget/WidgetMatching.cpp"
     "Source/UI/Widget/WidgetMatching.h"
     "Source/UI/Widget/WidgetSettingWindow.cpp"
@@ -456,8 +464,6 @@ set(TAKOEngine__Rendering
     "TAKOEngine/Rendering/MyRender.h"
     "TAKOEngine/Rendering/ParticleRenderer.cpp"
     "TAKOEngine/Rendering/ParticleRenderer.h"
-    "TAKOEngine/Rendering/PipelineState.cpp"
-    "TAKOEngine/Rendering/PipelineState.h"
     "TAKOEngine/Rendering/Plane.cpp"
     "TAKOEngine/Rendering/Plane.h"
     "TAKOEngine/Rendering/PostEffect.cpp"
@@ -1222,12 +1228,9 @@ if(MSVC)
 endif()
 
 if(MSVC)
-    foreach(CurrentShaderFile IN LISTS SHADER_NAMES)
-        add_custom_command(
-            TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/Data/Shader/${CurrentShaderFile} ${CMAKE_BINARY_DIR}/Data/Shader
-            COMMENT "Copying shaders ${CurrentShaderFile}")
-    endforeach()
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/Data/Shader ${CMAKE_BINARY_DIR}/Data/Shader
+            COMMENT "Copying shaders")
 endif()
 
 

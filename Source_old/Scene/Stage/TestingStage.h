@@ -15,6 +15,8 @@ public:
 	void Update(float elapsedTime) override;
 
 	void Render() override;
+
+	void RenderDX12() override;
 protected:
 	void OnPhase() override;
 public:

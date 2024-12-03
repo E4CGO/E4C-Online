@@ -13,7 +13,7 @@
 #include "Scene/SceneManager.h"
 #include "Scene/SceneTest.h"
 #include "Scene/GameLoop/SceneTitle/SceneTitle_E4C.h"
-#include "Scene/GameLoop/SceneRoomTest/SceneRoomTest_E4C.h"
+#include "Scene\GameLoop\SceneGame\SceneGame_E4C.h"
 
 #include "GameData.h"
 

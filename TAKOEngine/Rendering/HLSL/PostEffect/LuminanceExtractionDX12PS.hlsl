@@ -8,17 +8,14 @@ float4 main(VS_OUT pin) : SV_TARGET
 {
     float4 color = texture0.Sample(sampler0, pin.texcoord) * pin.color;
 
-	// RGB > 輝度値に変換
+	// RGB > 霈晏ｺｦ蛟､縺ｫ螟画鋤
     float luminance = RGB2Luminance(color.rgb);
     
-	// 閾値との差を算出
+	// 髢ｾ蛟､縺ｨ縺ｮ蟾ｮ繧堤ｮ怜�ｺ
     float contribution = max(0, luminance - threshold);
 
-	// 出力する色を補正する
-    if (luminance > 0)
-    {
-        contribution /= luminance;
-    }
+	// 蜃ｺ蜉帙☆繧玖牡繧定｣懈ｭ｣縺吶ｋ
+    contribution /= luminance;
     color.rgb *= contribution * intensity;
     
     clip(color.a - 0.2);

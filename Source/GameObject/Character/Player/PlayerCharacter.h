@@ -1,5 +1,5 @@
 //! @file PlayerCharacter.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDED_PLAYER_CHARACTER_H__
 #define __INCLUDED_PLAYER_CHARACTER_H__
@@ -41,10 +41,9 @@ public:
 	// コンストラクタ(引数付き)
 	PlayerCharacter(uint64_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
 	// コンストラクタ(引数付き)
-	PlayerCharacter(PlayerCharacterData::CharacterInfo dataInfo);
+	PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataInfo);
 	// デストラクタ
 	~PlayerCharacter();
-
 
 #pragma pack(push, 1)
 	// 同期用
@@ -60,14 +59,22 @@ public:
 	};
 #pragma pack(pop)
 
-
 	// KayKit Adventurers
 	enum Animation
 	{
 		ANIM_IDLE,
 		ANIM_MOVE_START,
-		ANIM_MOVE,
-		ANIM_ATTACK_SIMPLE,
+		ANIM_MOVE_CONTINUE,
+		ANIM_ATTACK_SWORD_COMBO_FIRST,
+		ANIM_ATTACK_SWORD_COMBO_SECOND,
+		ANIM_ATTACK_SWORD_COMBO_THIRD,
+		ANIM_ATTACK_SWORD_SPECIAL_FIRST,
+		ANIM_ATTACK_SWORD_SPECIAL_SECOND,
+		ANIM_GUARD_SHIELD_START,
+		ANIM_GUARD_SHIELD_CONTINUE,
+		ANIM_GUARD_SHIELD_FINISH,
+		ANIM_HURT,
+		ANIM_DEATH
 	};
 
 	enum STATE : uint8_t
@@ -103,6 +110,7 @@ public:
 	virtual void Update(float elapsedTime) override;
 	// 描画処理
 	void Render(const RenderContext& rc) override;
+	void RenderDX12(const RenderContextDX12& rc) override;
 
 	// 外見パターンを読み取る
 	void LoadAppearance(const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
@@ -142,9 +150,6 @@ public:
 
 	const std::string& GetName() { return m_name; }
 	void SetName(const char* name) { this->m_name = name; }
-
-	void SetMenuVisibility(bool value) { this->m_menuVisible = value; }
-	bool GetMenuVisibility() { return this->m_menuVisible; }
 
 	void SetSaveFileName(std::string value) { this->m_SaveFile = value; }
 	std::string GetCharacterSaveFileName() { return this->m_SaveFile; }
@@ -188,7 +193,6 @@ public:
 	std::unordered_map<int, Collider*> GetAttackColliders() { return m_pattackColliders; }
 	void EnableAttackColliders(bool enable = true) { for (const std::pair<int, Collider*>& collider : m_pattackColliders) collider.second->SetEnable(enable); }
 
-
 	// 同期用データを取得
 	void GetSyncData(SYNC_DATA& data);
 	// 同期用データを計算
@@ -198,6 +202,7 @@ public:
 protected:
 	void RegisterCommonState();
 	void UpdateTarget();													// 自機用アイム目標更新
+	void UpdateHorizontalMove(float elapsedTime) override;					// 水平移動更新処理
 	virtual void UpdateColliders() override;								// 衝突判定の更新
 
 	void UpdateSkillTimers(float elapsedTime);								// スキルタイマー
