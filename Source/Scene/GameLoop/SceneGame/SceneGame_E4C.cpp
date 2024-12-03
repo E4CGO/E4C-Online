@@ -23,12 +23,7 @@
 
 void SceneGame_E4C::Initialize()
 {
-	std::ifstream file_in("CharacterInfos.json");
-	nlohmann::json savedData;
-	file_in >> savedData;
-	file_in.close();
-	PLAYER_CHARACTER_DATA.SetCharacterInfos(savedData);
-	PLAYER_CHARACTER_DATA.ParseData();
+
 
 	stateMachine = std::make_unique<StateMachine<SceneGame_E4C>>();
 	stateMachine->RegisterState(GAME_STATE::INIT, new SceneGame_E4CState::InitState(this));
