@@ -58,8 +58,11 @@ bool Spawner::SearchPlayer()
 	}
 }
 /**************************************************************************//**
-     @brief    エネミースポーン
+     @brief    エネミー生成
     @param[in]    elapsedTime
+    @param[in]    enemyType
+    @param[in]    maxEnemies
+    @param[in]    activeEnemies
 *//***************************************************************************/
 void Spawner::SpawnEnemy(float elapsedTime, const std::string& enemyType, int maxEnemies, int activeEnemies)
 {
@@ -106,18 +109,26 @@ if (spawntimer > spawntime && currentAliveCount < activeEnemies && spawnedEnemyC
 	spawntimer = 0; // タイマーをリセット
 }
 }
+/**************************************************************************//**
+     @brief   リスト削除
+*//***************************************************************************/
 void Spawner::CleanupEnemies() {
 	spawnedEnemies.erase(
 		std::remove_if(spawnedEnemies.begin(), spawnedEnemies.end(),
 			[this](Enemy* enemy) {
 				if (!enemy->IsAlive()) {
-					currentAliveCount--;
-					return true;
+					currentAliveCount--; // カウンターを更新
+					return true;  // リストから削除
 				}
 				return false;
 			}),
 		spawnedEnemies.end());
 }
+/**************************************************************************//**
+     @brief    エネミーの種類をセット
+    @param[in]    enemyType
+    @return    
+*//***************************************************************************/
 Enemy* Spawner::SetEnemy(const std::string& enemyType)
 {
 	if (enemyType == "Skeleton") {
@@ -135,14 +146,19 @@ Enemy* Spawner::SetEnemy(const std::string& enemyType)
 *//***************************************************************************/
 void Spawner::Render(const RenderContext& rc)
 {
-	
+#ifdef DEBUG
 	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, territoryRange, 1.5f, { 1,0,0,1 });
 	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, serchRange, 1.5f, { 1,0,1,1 });
+#endif // DEBUG
+
+	
 }
 
 void Spawner::RenderDX12(const RenderContextDX12& rc)
 {
 
+#ifdef DEBUG
 	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, territoryRange, 1.5f, { 1,0,0,1 });
 	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, serchRange, 1.5f, { 1,0,1,1 });
+#endif // DEBUG
 }
