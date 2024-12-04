@@ -36,6 +36,7 @@ void StageOpenWorld_E4C::Initialize()
 		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
 	}
 
+	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
 	stage_collision->Update(0);
 	stage_collision->SetCollider(Collider::COLLIDER_TYPE::MAP);
 

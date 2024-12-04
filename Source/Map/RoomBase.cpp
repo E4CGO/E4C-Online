@@ -425,100 +425,38 @@ void RoomBase::PlaceMapTile(bool isLeader)
 			// 当たり判定モデルだけ先に読み込み、当たり判定を設定する
 			for (const ModelFileData& data : colliderFileNames)
 			{
-				newTile->LoadModel(fileName.c_str(), 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::LHS_TOON);
+				if (T_GRAPHICS.isDX11Active)
+				{
+					newTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX11, ModelObject::LHS_TOON);
+				}
+				if (T_GRAPHICS.isDX12Active)
+				{
+					newTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX12, ModelObject::LHS_PBR);
+				}
 			}
-			if (T_GRAPHICS.isDX12Active)
-			{
-				newTile->LoadModel(fileName.c_str(), 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::LHS_PBR);
-			}
-		}
-		if (colliderFileNames.size() != 0) newTile->SetCollider(Collider::COLLIDER_TYPE::MAP);
 
-		// 表示用モデルは後に読み込む
-		for (std::string fileName : modelFileNames)
-		{
-			if (T_GRAPHICS.isDX11Active)
+			if (colliderFileNames.size() != 0) newTile->SetCollider(Collider::COLLIDER_TYPE::MAP);
+
+			// 表示用モデルは後に読み込む
+			for (const ModelFileData& data : modelFileNames)
 			{
-				newTile->LoadModel(fileName.c_str(), 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::LHS_TOON);
+				if (T_GRAPHICS.isDX11Active)
+				{
+					newTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX11, ModelObject::LHS_TOON);
+				}
+				if (T_GRAPHICS.isDX12Active)
+				{
+					newTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX12, ModelObject::LHS_PBR);
+				}
 			}
-			if (T_GRAPHICS.isDX12Active)
-			{
-				newTile->LoadModel(fileName.c_str(), 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::LHS_PBR);
-			}
+			newTile->SetPosition(tileData.position);
+			newTile->SetAngle(tileData.angle);
+			newTile->SetScale(tileData.scale);
+			newTile->SetColor(tileData.color);
+			newTile->Update(0);
+			MAPTILES.Register(newTile);
 		}
-		newTile->SetPosition(tileData.position);
-		newTile->SetAngle(tileData.angle);
-		newTile->SetScale(tileData.scale);
-		newTile->SetColor(tileData.color);
-		newTile->Update(0);
-		MAPTILES.Register(newTile);
 	}
-}
-
-	//for (const TILE_DATA& tileData : m_tileDatas)
-	//{
-	//	std::vector<ModelFileData> colliderFileNames;	// 当たり判定用モデル
-	//	std::vector<ModelFileData> modelFileNames;		// 描画用モデル
-
-	//	switch (tileData.type)
-	//	{
-	//	case TileType::FLOOR:
-	//		//colliderFileNames.emplace_back("Data/Model/DungeonAssets/FLOOR.glb");
-	//		colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/FloorCollision_01a.glb", 4.0f);
-	//		modelFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Floor_01a.glb", 4.0f);
-	//		break;
-	//	case TileType::WALL:
-	//		//colliderFileNames.emplace_back("Data/Model/DungeonAssets/WALL.glb");
-	//		colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/WallCollision_01a.glb", 4.0f);
-	//		modelFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_01a.glb", 4.0f);
-	//		//switch (count)
-	//		//{
-	//		//case 0:	colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_01a.glb");
-	//		//case 1:	colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_01b.glb");
-	//		//case 2:	colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_02a.glb");
-	//		//case 3:	colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_02b.glb");
-	//		//case 4:	colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_03a.glb");
-	//		//case 5:	colliderFileNames.emplace_back("Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_04a.glb");
-	//		//}
-	//		break;
-	//	case TileType::PILLAR:
-	//		continue;
-	//		//modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_01a.glb");
-	//		//modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_Base_01a.glb");
-	//		//modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_Top_01a.glb");
-	//		break;
-	//	case TileType::STAIR:
-	//		colliderFileNames.emplace_back("Data/Model/DungeonAssets/SLOPE.glb");
-	//		break;
-	//	case TileType::SPAWNER:
-	//		modelFileNames.emplace_back("Data/Model/Cube/testCubes.glb");
-	//		break;
-	//	}
-
-	//	count++;
-	//	if (count > 5) count = 0;
-
-	//	MapTile* newTile = new MapTile("", 1.0f, this);
-
-	//	// 当たり判定モデルだけ先に読み込み、当たり判定を設定する
-	//	for (const ModelFileData& data : colliderFileNames)
-	//	{
-	//		newTile->LoadModel(data.fileName.c_str(), data.scale);
-	//	}
-	//	if (colliderFileNames.size() != 0) newTile->SetCollider(Collider::COLLIDER_TYPE::MAP);
-
-	//	// 表示用モデルは後に読み込む
-	//	for (const ModelFileData& data : modelFileNames)
-	//	{
-	//		newTile->LoadModel(data.fileName.c_str(), data.scale);
-	//	}
-	//	newTile->SetPosition(tileData.position);
-	//	newTile->SetAngle(tileData.angle);
-	//	newTile->SetScale(tileData.scale);
-	//	newTile->SetColor(tileData.color);
-	//	newTile->Update(0);
-	//	MAPTILES.Register(newTile);
-	//}
 }
 
 int RoomBase::DrawDebugGUI(int i)
