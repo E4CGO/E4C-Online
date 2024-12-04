@@ -8,6 +8,7 @@
 
 #include "Map/MapTileManager.h"
 #include "TAKOEngine/Physics/CollisionDataManager.h"
+#include "TAKOEngine/Physics/SphereCollider.h"
 #include "TAKOEngine/Effects/EffectManager.h"
 #include "TAKOEngine/Editor/Camera/Camera.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
@@ -35,7 +36,42 @@ PlayerCharacter::PlayerCharacter(uint64_t id, const char* name, const uint8_t ap
 	mpCost[static_cast<int>(STATE::DODGE)] = 0.0f;
 
 	// 衝突判定
-	SetCollider(Collider::COLLIDER_TYPE::CAPSULE);
+	SetCollider(Collider::COLLIDER_TYPE::CAPSULE, Collider::COLLIDER_OBJ::PLAYER);
+	Capsule capsule{};
+	capsule.radius = 0.4f;
+	capsule.position = { 0, capsule.radius / scale.y, 0 };
+	capsule.direction = { 0, 1.0f, 0 };
+	capsule.length = height - capsule.radius * 2;
+	collider->SetParam(capsule);
+
+	// 攻撃判定
+	Sphere sphere{};
+	sphere.radius = 0.6f;
+	sphere.position = { 0, 0.5f / scale.y, 0.8f / scale.z };
+	m_pattackColliders[0] = new SphereCollider(Collider::COLLIDER_OBJ::PLAYER_ATTACK, &transform);
+	m_pattackColliders[0]->SetParam(sphere);
+	m_pattackColliders[0]->SetHittableOBJ(Collider::ENEMY);
+	m_pattackColliders[0]->SetHitStartRate(0.25f);
+	m_pattackColliders[0]->SetHitEndRate(0.7f);
+	m_pattackColliders[0]->SetEnable(false);
+
+	sphere.radius = 0.8f;
+	sphere.position = { 0, 0.5f / scale.y, 0.8f / scale.z };
+	m_pattackColliders[1] = new SphereCollider(Collider::COLLIDER_OBJ::PLAYER_ATTACK, &transform);
+	m_pattackColliders[1]->SetParam(sphere);
+	m_pattackColliders[1]->SetHittableOBJ(Collider::ENEMY);
+	m_pattackColliders[1]->SetHitStartRate(0.25f);
+	m_pattackColliders[1]->SetHitEndRate(0.7f);
+	m_pattackColliders[1]->SetEnable(false);
+
+	sphere.radius = 1.2f;
+	sphere.position = { 0, 0.5f / scale.y, 0.8f / scale.z };
+	m_pattackColliders[2] = new SphereCollider(Collider::COLLIDER_OBJ::PLAYER_ATTACK, &transform);
+	m_pattackColliders[2]->SetParam(sphere);
+	m_pattackColliders[2]->SetHittableOBJ(Collider::ENEMY);
+	m_pattackColliders[2]->SetHitStartRate(0.25f);
+	m_pattackColliders[2]->SetHitEndRate(0.7f);
+	m_pattackColliders[2]->SetEnable(false);
 
 	m_client_id = id;
 	this->m_name = name;
@@ -58,7 +94,7 @@ PlayerCharacter::PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataI
 	mpCost[static_cast<int>(STATE::DODGE)] = 00.0f;
 
 	// 衝突判定
-	SetCollider(Collider::COLLIDER_TYPE::CAPSULE);
+	SetCollider(Collider::COLLIDER_TYPE::CAPSULE, Collider::COLLIDER_OBJ::PLAYER);
 
 	LoadAppearance(dataInfo.pattern);
 }
@@ -129,29 +165,55 @@ void PlayerCharacter::UpdateHorizontalMove(float elapsedTime)
 	float velocityLengthXZ = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);
 	if (velocityLengthXZ > 0.0f)
 	{
-		// 水平移動地
-		float mx = velocity.x * elapsedTime;
-		float mz = velocity.z * elapsedTime;
+		{
+			ProfileScopedSection_2("UpdateHorizontalMove", ImGuiControl::Profiler::Purple);
+			// 水平移動地
+			float mx = velocity.x * elapsedTime;
+			float mz = velocity.z * elapsedTime;
 
-		// マップ
-		if (collider != nullptr) {
-			if (IsPlayer())
-			{
-				XMFLOAT3 pos = position + XMFLOAT3{ 0, height * 0.5f, 0 };
-				XMFLOAT3 dir = { mx, 0.0f, mz };
-				float dist = XMFLOAT3Length(dir);
-				dir = XMFLOAT3Normalize(dir);
-				float radius = 0.4f;
-
-				Capsule sphereCast;
-				sphereCast.position = pos;
-				sphereCast.direction = dir;
-				sphereCast.length = dist;
-				sphereCast.radius = radius;
-
-				if (MAPTILES.IntersectCapsuleVsMap(sphereCast))
+			// マップ
+			if (collider != nullptr) {
+				if (IsPlayer())
 				{
-					pos = sphereCast.position + sphereCast.direction * sphereCast.length;
+					// 重いときにスフィアキャストを分割して行う
+					int solver = 1;
+					float t = elapsedTime;
+					while (t > 0.02f)
+					{
+						t -= 0.02f;
+						solver++;
+					}
+					mx /= solver;
+					mz /= solver;
+					XMFLOAT3 pos = position + XMFLOAT3{ 0, height * 0.5f, 0 };
+					XMFLOAT3 dir = { mx, 0.0f, mz };
+					float dist = XMFLOAT3Length(dir);
+					dir = XMFLOAT3Normalize(dir);
+					float radius = 0.4f;
+
+					Capsule sphereCast;
+					sphereCast.position = pos;
+					sphereCast.direction = dir;
+					sphereCast.length = dist;
+					sphereCast.radius = radius;
+
+					for (int i = 0; i < solver; i++)
+					{
+						if (MAPTILES.IntersectCapsuleVsMap(sphereCast))
+						{
+							pos = sphereCast.position + sphereCast.direction * sphereCast.length;
+							sphereCast.position = pos;
+							//position = pos - XMFLOAT3{ 0, height * 0.5f, 0 };
+						}
+						else
+						{
+							pos.x += mx;
+							pos.z += mz;
+							sphereCast.position = pos;
+							//position.x += mx;
+							//position.z += mz;
+						}
+					}
 					position = pos - XMFLOAT3{ 0, height * 0.5f, 0 };
 				}
 				else
@@ -164,12 +226,7 @@ void PlayerCharacter::UpdateHorizontalMove(float elapsedTime)
 			{
 				position.x += mx;
 				position.z += mz;
-			}		
-		}
-		else
-		{
-			position.x += mx;
-			position.z += mz;
+			}
 		}
 	}
 }
@@ -178,18 +235,22 @@ void PlayerCharacter::UpdateColliders()
 {
 	if(IsPlayer())
 	{
-		Capsule capsule{};
-		capsule.position = position + DirectX::XMFLOAT3{ 0, 0.4f, 0 };
-		capsule.direction = { 0, 1, 0 };
-		capsule.radius = 0.4f;
-		capsule.length = height - capsule.radius * 2;
-		collider->SetParam(capsule);
-		if (XMFLOAT3LengthSq(velocity) > 0.0f)
+		if (collider)
 		{
-			if (collider->CollisionVsMap())
+			UpdateTransform();
+			collider->Update();
+			for (const std::pair<int, Collider*>& attackCollider : m_pattackColliders)
 			{
-				position = collider->GetPosition();
-				position.y -= 0.4f;
+				attackCollider.second->Update();
+			}
+
+			if (XMFLOAT3LengthSq(velocity) > 0.0f)
+			{
+				if (collider->CollisionVsMap())
+				{
+					position = collider->GetPosition();
+					position.y -= 0.4f;
+				}
 			}
 		}
 	}
@@ -443,7 +504,7 @@ void PlayerCharacter::Update(float elapsedTime)
 		UpdateSkillTimers(elapsedTime);
 	}
 	{
-		ProfileScopedSection_2("character", ImGuiControl::Profiler::Purple);
+		//ProfileScopedSection_2("character", ImGuiControl::Profiler::Purple);
 
 		Character::Update(elapsedTime);
 	}
@@ -476,6 +537,42 @@ void PlayerCharacter::Render(const RenderContext& rc)
 	collider->DrawDebugPrimitive({ 1, 1, 1, 1 });
 	if (IsPlayer())
 	{
+		ImVec2 pos = ImGui::GetMainViewport()->Pos;
+		ImGui::SetNextWindowPos(ImVec2(pos.x + 10, pos.y + 10), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(300, 450), ImGuiCond_FirstUseEver);
+
+		if (ImGui::Begin("AttackCollider", nullptr, ImGuiWindowFlags_None))
+		{
+			for (const std::pair<int, Collider*>& attackCollider : m_pattackColliders)
+			{
+				std::string name = "Attack" + std::to_string(attackCollider.first + 1);
+				if (ImGui::TreeNode(name.c_str()))
+				{
+					float radius = attackCollider.second->GetSphere().radius;
+					XMFLOAT3 offset = attackCollider.second->GetSphere().position * scale;
+					float hitStartRate = attackCollider.second->GetHitStartRate() * 100.0f;	// %表示に
+					float hitEndRate = attackCollider.second->GetHitEndRate() * 100.0f;		// %表示に
+
+					ImGui::InputFloat("radius", &radius);
+					ImGui::InputFloat3("offset", &offset.x);
+					ImGui::InputFloat("hitStartRate(%)", &hitStartRate);
+					if (hitStartRate < 0.0f)	hitStartRate = 0.0f;
+					if (hitStartRate > hitEndRate)	hitStartRate = hitEndRate;
+					ImGui::InputFloat("hitEndRate(%)", &hitEndRate);
+					if (hitEndRate < hitStartRate)	hitEndRate = hitStartRate;
+					if (hitEndRate > 100.0f)	hitEndRate = 100.0f;
+
+					Sphere sphere(offset / scale, radius);
+					attackCollider.second->SetParam(sphere);
+					attackCollider.second->SetHitStartRate(hitStartRate * 0.01f);
+					attackCollider.second->SetHitEndRate(hitEndRate * 0.01f);
+
+					ImGui::TreePop();
+				}
+			}
+		}
+		ImGui::End();
+
 		for (const std::pair<int, Collider*>& attackCollider : m_pattackColliders)
 		{
 			DirectX::XMFLOAT4 color = { 1, 0, 0, 1 };

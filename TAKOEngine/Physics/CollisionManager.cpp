@@ -44,10 +44,10 @@ void CollisionManager::PlayerPositionAdjustment()
 			if (collider.second->Collision(playerCollider, {}, hit))
 			{
 				DirectX::XMFLOAT3 diff = hit.normal * -1.0f;
-				diff *= (collider.second->GetScale().x + playerCollider->GetScale().x - hit.distance);
+				//diff *= (collider.second->GetScale().x + playerCollider->GetScale().x - hit.distance);
 				diff.y = 0.0f;
 				position += diff;
-				playerCollider->SetPosition(playerCollider->GetPosition() + diff);
+				//playerCollider->SetPosition(playerCollider->GetPosition() + diff);
 			}
 		}
 	}
