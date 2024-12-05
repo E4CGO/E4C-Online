@@ -163,6 +163,9 @@ public:
 	bool IsEnable() const { return m_enable; }
 	void SetEnable(bool e) { m_enable = e; }
 
+	virtual void OnCollision(Collider* other) { if (collisionFanction) collisionFanction(other); }
+	void SetCollisionFunction(std::function<void(Collider*)> f) { collisionFanction = f; }
+
 protected:
 	uint32_t m_ownerID = 0;
 	COLLIDER_TYPE m_shapeType = COLLIDER_TYPE::DEFAULT;
@@ -177,6 +180,8 @@ protected:
 	DirectX::XMFLOAT3 m_position = { 0.0f, 0.0f, 0.0f };	// ワールド位置
 	DirectX::XMFLOAT3 m_prePosition = { 0.0f, 0.0f, 0.0f };	// 前フレームのワールド位置
 	DirectX::XMFLOAT3 m_offset = { 0.0f, 0.0f, 0.0f };		// ローカル空間での補正位置
+
+	std::function<void(Collider*)> collisionFanction = nullptr;
 };
 
 #endif // !__COLLIDER_H__

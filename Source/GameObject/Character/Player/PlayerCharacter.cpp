@@ -8,6 +8,7 @@
 
 #include "Map/MapTileManager.h"
 #include "TAKOEngine/Physics/CollisionDataManager.h"
+#include "TAKOEngine/Physics/CollisionManager.h"
 #include "TAKOEngine/Physics/SphereCollider.h"
 #include "TAKOEngine/Effects/EffectManager.h"
 #include "TAKOEngine/Editor/Camera/Camera.h"
@@ -57,6 +58,7 @@ PlayerCharacter::PlayerCharacter(uint32_t id, const char* name, const uint8_t ap
 	m_pattackColliders[0]->SetHitStartRate(0.25f);
 	m_pattackColliders[0]->SetHitEndRate(0.7f);
 	m_pattackColliders[0]->SetEnable(false);
+	COLLISIONS.Register(m_pattackColliders[0]);
 
 	sphere.radius = 0.8f;
 	sphere.position = { 0, 0.5f / scale.y, 0.8f / scale.z };
@@ -67,6 +69,7 @@ PlayerCharacter::PlayerCharacter(uint32_t id, const char* name, const uint8_t ap
 	m_pattackColliders[1]->SetHitStartRate(0.25f);
 	m_pattackColliders[1]->SetHitEndRate(0.7f);
 	m_pattackColliders[1]->SetEnable(false);
+	COLLISIONS.Register(m_pattackColliders[1]);
 
 	sphere.radius = 1.2f;
 	sphere.position = { 0, 0.5f / scale.y, 0.8f / scale.z };
@@ -77,6 +80,7 @@ PlayerCharacter::PlayerCharacter(uint32_t id, const char* name, const uint8_t ap
 	m_pattackColliders[2]->SetHitStartRate(0.25f);
 	m_pattackColliders[2]->SetHitEndRate(0.7f);
 	m_pattackColliders[2]->SetEnable(false);
+	COLLISIONS.Register(m_pattackColliders[2]);
 
 	m_client_id = id;
 	this->m_name = name;
