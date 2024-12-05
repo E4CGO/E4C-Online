@@ -24,7 +24,7 @@ void SimpleRoom1::LoadMapData()
 {
 	// 接続点データを設定
 	{
-		CONNECTPOINT_DATA newPoint;
+		TILE_DATA newPoint;
 		newPoint.position = DirectX::XMFLOAT3(12.0f, 0.0f, 8.0f);
 		newPoint.angle = m_angle + DirectX::XMFLOAT3(0.0f, DirectX::XMConvertToRadians(90.0f), 0.0f);
 
@@ -36,7 +36,7 @@ void SimpleRoom1::LoadMapData()
 	}
 
 	{
-		CONNECTPOINT_DATA newPoint;
+		TILE_DATA newPoint;
 		newPoint.position = DirectX::XMFLOAT3(-12.0f, 0.0f, 8.0f);
 		newPoint.angle = m_angle + DirectX::XMFLOAT3(0.0f, DirectX::XMConvertToRadians(-90.0f), 0.0f);
 

@@ -34,6 +34,7 @@ namespace ns_RoomData
 		STAIR,
 		SPAWNER,
 		PORTAL,
+		CONNECTPOINT,
 		TILETYPE_COUNT,
 	};
 
@@ -44,19 +45,6 @@ namespace ns_RoomData
 		DirectX::XMFLOAT3 angle = { 0.0f, 0.0f, 0.0f };
 		DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f };
 		DirectX::XMFLOAT4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	};
-
-	// 接続点データ
-	struct CONNECTPOINT_DATA
-	{
-		DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
-		DirectX::XMFLOAT3 angle = { 0.0f, 0.0f, 0.0f };
-		DirectX::XMFLOAT4X4 transform = {
-			1, 0, 0, 0,
-			0, 1, 0, 0,
-			0, 0, 1, 0,
-			0, 0, 0, 1
-		};
 	};
 }
 

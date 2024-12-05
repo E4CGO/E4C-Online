@@ -20,34 +20,57 @@
 
 using namespace ns_RoomData;
 
-// 部屋テストシーンでのみ使う
-class TileNode : public MapTile
+// ノード基底クラス
+class Node : public ModelObject
 {
 public:
-	TileNode(const char* filename, float scaling = 1.0f) :
-		MapTile(filename, scaling, nullptr) {}
+	Node(std::string name, const char* fileName = "", float scaling = 1.0f) :
+		ModelObject(fileName, scaling), name(name) {}
+	~Node() = default;
+
+	void SetName(const std::string newName) { this->name = newName; }
+	const std::string GetName() const { return this->name; }
+
+	// 自身を複製する
+	virtual Node* Duplicate() { return nullptr; }
+
+protected:
+	std::string name;
+};
+
+
+// ノード管理クラス
+class NodeManager : public ObjectManager<Node>, public Singleton<NodeManager>
+{
+	friend class Singleton<NodeManager>;
+
+public:
+	// 正規表現を用いて重複しない名前を探す
+	std::string GetUniqueName(std::string name);
+};
+#define NODES NodeManager::Instance()
+
+
+// MapTileノード
+class TileNode : public Node
+{
+public:
+	TileNode(std::string name, TileType type = TileType::FLOOR, const char* fileName = "", float scaling = 1.0f) :
+		Node(name, fileName, scaling), type(type) {};
 	~TileNode() = default;
 
-	void SetName(std::string newName) { this->name = newName; }
-	std::string GetName() { return name; }
+	void SetType(const TileType newType) { this->type = newType; }
+	const TileType GetType() const { return this->type; }
 
-	void SetType(TileType newType) { this->type = newType; }
-	TileType GetType() { return type; }
+	Node* Duplicate() override;
+
+	// デバッグGUI描画
+	void DrawDebugGUI() override;
 
 private:
-	std::string name = "";
-	TileType type = TileType::FLOOR;
+	TileType type;
 };
 
-class TileNodeManager : public ObjectManager<TileNode>, public Singleton<TileNodeManager>
-{
-	friend class Singleton<TileNodeManager>;
-//private:
-//	TileNodeManager() = default;
-//	~TileNodeManager() {}
-};
-
-#define TILENODES TileNodeManager::Instance()
 
 class SceneRoomTest_E4C : public Scene
 {
@@ -65,16 +88,10 @@ public:
 	// 描画処理
 	void Render() override;
 
-	// 部屋データをjsonからロードする
-	void LoadRoomData();
+	// 部屋データを指定したjsonからロードする
+	void OpenRoomData();
 	// 部屋データをjsonにセーブする
 	void SaveRoomData();
-
-	// 次ノードの重複しない名前を探す
-	std::string GetUniqueName(std::string name);
-
-	// 正規表現された文字列から元の文字列に変換する
-	std::string GetNameByRegEx(std::string regName);
 
 	// デバッグ描画
 	void DebugRender();
@@ -84,9 +101,10 @@ private:
 	FrameBufferManager* m_frameBuffer;
 	std::unique_ptr<FreeCameraController> m_cameraController;
 
-	//ModelObject* selectionObject = nullptr;
-	TileNode* selectionNode = nullptr;
-	TileType selectionTileType = TileType::FLOOR;
+	Node* selectionNode = nullptr;					// 現在選択しているノード
+	TileType selectionTileType = TileType::FLOOR;	// 次に新規作成するタイルのタイプ
+
+	//std::vector<TILE_DATA> connectPointDatas;	// 接続点データ
 
 	// Sprite Preload
 	std::unordered_set<const char*> m_spriteList = {
@@ -96,6 +114,4 @@ private:
 		"Data/Sprites/UI/exit.png"
 	};
 	std::unordered_set<std::shared_ptr<Sprite>> m_spritePreLoad;
-
-	//std::regex pattern;
 };

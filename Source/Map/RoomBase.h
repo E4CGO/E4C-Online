@@ -147,20 +147,18 @@ public:
 
 	// 親を設定
 	void SetParent(RoomBase* parent) { this->parent = parent; }
-
 	// 子を追加する
 	void AddRoom(RoomBase* room) { this->childs.emplace_back(room); }
 
 	// 部屋の接続点データを取得
-	std::vector<CONNECTPOINT_DATA> GetConnectPointData() const { return m_connectPointDatas; }
-	CONNECTPOINT_DATA GetConnectPointData(int index) const { return m_connectPointDatas.at(index); }
+	std::vector<TILE_DATA> GetConnectPointData() const { return m_connectPointDatas; }
+	const TILE_DATA GetConnectPointData(int index) const { return m_connectPointDatas.at(index); }
 
 	// 行列取得
 	DirectX::XMFLOAT4X4 GetTransform() { return m_transform; }
 
 	// AABB取得
 	AABB GetAABB() const { return m_aabb; }
-
 	// AABB算出
 	AABB CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const;
 
@@ -190,7 +188,7 @@ protected:
 	std::vector<std::vector<TILE_DATA>> m_tileDatas;
 
 	//std::vector<TILE_DATA> m_tileDatas;
-	std::vector<CONNECTPOINT_DATA> m_connectPointDatas;
+	std::vector<TILE_DATA> m_connectPointDatas;
 
 	float tileScale = 4.0f;
 

@@ -8,6 +8,7 @@
 
 #include <imgui.h>
 #include <string>
+#include <algorithm>
 #include <fstream>
 #include <commdlg.h>
 
@@ -61,32 +62,13 @@ void SceneRoomTest_E4C::Initialize()
 	m_cameraController = std::make_unique<FreeCameraController>();
 	m_cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
 	m_cameraController->SetEnable(true);
-
-	TileNode* testNode1 = new TileNode("");
-	testNode1->SetName(GetUniqueName("node"));
-	TILENODES.Register(testNode1);
-
-	TileNode* testNode2 = new TileNode("");
-	testNode2->SetName(GetUniqueName("node"));
-	TILENODES.Register(testNode2);
-
-	//std::string testStr1 = "node";
-	//std::string testStr2 = "node(1)";
-	//std::string testStr3 = "node(2)";
-	//std::string testStr4 = "floor(1)";
-	//std::string testStr5 = "floor";
-
-	//testStr1 = GetUniqueName(testStr1);
-	//testStr2 = GetUniqueName(testStr2);
-
-	//int a = 0;
 }
 
 void SceneRoomTest_E4C::Finalize()
 {
 	m_spritePreLoad.clear();
 	UI.Clear();
-	TILENODES.Clear();
+	NODES.Clear();
 	m_shadowMapRenderer->Clear();
 	CameraManager::Instance().Clear();
 	LightManager::Instance().Clear();
@@ -97,7 +79,7 @@ void SceneRoomTest_E4C::Update(float elapsedTime)
 	m_cameraController->Update();
 	m_cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
 
-	TILENODES.Update(elapsedTime);
+	NODES.Update(elapsedTime);
 }
 
 void SceneRoomTest_E4C::Render()
@@ -114,7 +96,7 @@ void SceneRoomTest_E4C::Render()
 	// ライトの情報を詰め込む
 	LightManager::Instance().PushRenderContext(rc);
 
-	TILENODES.Render(rc);
+	NODES.Render(rc);
 
 	//	シャドウマップ描画
 	m_shadowMapRenderer->Render();
@@ -125,16 +107,14 @@ void SceneRoomTest_E4C::Render()
 	// デバッグレンダラ描画実行
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
 	DebugRender();
-
-	//T_TEXT.End();
 }
 
 /**************************************************************************//**
-	@brief		部屋データをjsonからロードする
+	@brief		部屋データを指定したjsonからロードする
 	@param[in]	なし
 	@return		なし
 *//***************************************************************************/
-void SceneRoomTest_E4C::LoadRoomData()
+void SceneRoomTest_E4C::OpenRoomData()
 {
 	// 構造体セット
 	//OPENFILENAMEA	ofn;
@@ -190,102 +170,8 @@ void SceneRoomTest_E4C::SaveRoomData()
 	file.close();
 }
 
-/**************************************************************************//**
-	@brief		正規表現を用いた重複しない名前を返す
-	@param[in]	元の名前
-	@return		重複しない名前
-*//***************************************************************************/
-std::string SceneRoomTest_E4C::GetUniqueName(std::string name)
-{
-	// ノード番号を格納するためのベクター
-	std::vector<int> nodeNumbers;
-
-	int nextNumber = -1;
-
-	// 既存のノード番号をセットに追加する
-	for (TileNode* node : TILENODES.GetAll())
-	{
-		// 同じ名前のノードがあれば0番をノード番号ベクターに保存
-		if (name == node->GetName())
-		{
-			nodeNumbers.emplace_back(0);
-		}
-
-		std::string nodeName = node->GetName();
-		std::smatch match;
-		if (std::regex_search(nodeName, match, std::regex("\\((\\d+)\\)")))
-		{
-			// match[1]が空でない
-			// ちゃんと正規表現になっている
-			if (!match[1].str().empty())
-			{
-				// ノード番号ベクターに保存
-				nodeNumbers.emplace_back(std::stoi(match[1].str()));
-			}
-		}
-	}
-
-	// ノード番号ベクターに中身があるなら
-	if (nodeNumbers.size() != 0)
-	{
-		// 空いている番号を探す
-		for (int searchNum = 1; int number : nodeNumbers)
-		{
-			// nodeNumbersと一致しないなら
-			// numberが空いている番号となる
-			if (searchNum != number)
-			{
-				nextNumber = number;
-				break;
-			}
-			searchNum++;
-		}
-
-		// 空いている番号がなかった場合
-		if (nextNumber == -1)
-		{
-			// 最後のnumber+1したものが次の番号
-			nextNumber = (nodeNumbers.back() + 1);
-		}
-	}
-	// 中身がないなら重複なしなのでそのまま返す
-	else
-	{
-		return name;
-	}
-
-	return (name + "(" + std::to_string(nextNumber) + ")");
-}
-
-/**************************************************************************//**
-	@brief		正規表現が用いられた名前から元の名前に変換し返す
-	@param[in]	正規表現が用いられた名前
-	@return		元の名前
-*//***************************************************************************/
-std::string SceneRoomTest_E4C::GetNameByRegEx(std::string regName)
-{
-	std::string replaceStr = "";
-	return std::regex_replace(regName, std::regex(R"(\w+)\((\d+)\)"), replaceStr.c_str());
-}
-
 void SceneRoomTest_E4C::DebugRender()
 {
-	//if (ImGui::TreeNode("SceneRoomTest_E4C"))
-	//{
-	//	if (ImGui::Button("Save"))
-	//	{
-	//		nlohmann::json jsonFile;
-
-	//		jsonFile["yeah"] = 1;
-
-	//		std::ofstream file("testRoom.json");
-	//		file << jsonFile;
-	//		file.close();
-	//	}
-
-	//	ImGui::TreePop();
-	//}
-
 	ImVec2 screenSize = { TentacleLib::graphics.GetScreenWidth(), TentacleLib::graphics.GetScreenHeight() };
 	ImVec2 windowSize = { 256.0f, 512.0f };
 
@@ -300,19 +186,12 @@ void SceneRoomTest_E4C::DebugRender()
 		{
 			if (ImGui::BeginMenu("File"))
 			{
-				if (ImGui::MenuItem("Open File"))
-				{
-					LoadRoomData();
-				}
-				if (ImGui::MenuItem("Save File"))
-				{
-					SaveRoomData();
-				}
+				if (ImGui::MenuItem("Open File")) OpenRoomData();
+				if (ImGui::MenuItem("Save File")) SaveRoomData();
 
 				ImGui::EndMenu();
 			}
 
-			//ImGui::EndMainMenuBar();
 			ImGui::EndMenuBar();
 		}
 	}
@@ -324,13 +203,40 @@ void SceneRoomTest_E4C::DebugRender()
 	// ひえらるき～
 	if (ImGui::Begin("Hierarchy", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
 	{
+		if (ImGui::Button("Add"))
+		{
+			std::string nodeName = "NewNode";
+			std::string fileName = "";
+
+			switch (selectionTileType)
+			{
+			case TileType::FLOOR:	fileName = "Data/Model/DungeonAssets/NewAssets/SM_Floor_01a.glb";			nodeName = "Floor";			break;
+			case TileType::WALL:	fileName = "Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_01a.glb";	nodeName = "Wall";			break;
+			case TileType::PILLAR:																				nodeName = "Pillar";		break;
+			case TileType::STAIR:	fileName = "Data/Model/DungeonAssets/SLOPE.glb";							nodeName = "Stair";			break;
+			case TileType::SPAWNER:																				nodeName = "Spawner";		break;
+			case TileType::PORTAL:																				nodeName = "Portal";		break;
+			case TileType::CONNECTPOINT:																		nodeName = "ConnectPoint";	break;
+			}
+
+			TileNode* newNode = new TileNode(NODES.GetUniqueName(nodeName), selectionTileType, fileName.c_str());
+			NODES.Register(newNode);
+
+			// 追加したノードを選択させる
+			selectionNode = newNode;
+		}
+
 		std::vector<std::string> typeNames;
 		typeNames.emplace_back("FLOOR");
 		typeNames.emplace_back("WALL");
 		typeNames.emplace_back("PILLAR");
 		typeNames.emplace_back("STAIR");
 		typeNames.emplace_back("SPAWNER");
+		typeNames.emplace_back("PORTAL");
+		typeNames.emplace_back("CONNECTPOINT");
 
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.4f);
 		if (ImGui::BeginCombo("NextTileType", typeNames.at(selectionTileType).c_str()))
 		{
 			for (int i = 0; i < typeNames.size(); i++)
@@ -344,33 +250,9 @@ void SceneRoomTest_E4C::DebugRender()
 			ImGui::EndCombo();
 		}
 
-		if (ImGui::Button("Add"))
-		{
-			std::string fileName;
-
-			switch (selectionTileType)
-			{
-			case TileType::FLOOR:	fileName = "Data/Model/DungeonAssets/NewAssets/SM_Floor_01a.glb";			break;
-			case TileType::WALL:	fileName = "Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_01a.glb";	break;
-			case TileType::PILLAR:	break;
-			case TileType::STAIR:	fileName = "Data/Model/DungeonAssets/SLOPE.glb";	break;
-			case TileType::SPAWNER:	break;
-			}
-
-			TileNode* newNode = new TileNode(fileName.c_str(), 1.0f);
-			newNode->SetName("TileNode");
-			newNode->SetType(selectionTileType);
-
-			TILENODES.Register(newNode);
-
-			// 追加したノードを選択させる
-			selectionNode = newNode;
-		}
-
-		ImGui::SameLine();
 		if (ImGui::Button("Remove"))
 		{
-			TILENODES.Remove(selectionNode);
+			NODES.Remove(selectionNode);
 			selectionNode = nullptr;
 		}
 
@@ -379,44 +261,34 @@ void SceneRoomTest_E4C::DebugRender()
 		{
 			if (selectionNode != nullptr)
 			{
-				std::string fileName;
+				Node* newNode = selectionNode->Duplicate();
 
-				switch (selectionNode->GetType())
-				{
-				case TileType::FLOOR:	fileName = "Data/Model/DungeonAssets/NewAssets/SM_Floor_01a.glb";			break;
-				case TileType::WALL:	fileName = "Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_01a.glb";	break;
-				case TileType::PILLAR:	break;
-				case TileType::STAIR:	fileName = "Data/Model/DungeonAssets/SLOPE.glb";	break;
-				case TileType::SPAWNER:	break;
-				}
+				// 正規表現が用いられた名前に変換する
+				newNode->SetName(NODES.GetUniqueName(newNode->GetName()));
+				NODES.Register(newNode);
 
-				TileNode* newNode = new TileNode(fileName.c_str(), 1.0f);
-				newNode->SetName(GetUniqueName(selectionNode->GetName()));
-				newNode->SetType(selectionNode->GetType());
-				newNode->SetPosition(selectionNode->GetPosition());
-				newNode->SetAngle(selectionNode->GetAngle());
-				newNode->SetScale(selectionNode->GetScale());
-				TILENODES.Register(newNode);
-
-				// 複製したノードを選択させる
+				// 複製したノードを選択する
 				selectionNode = newNode;
 			}
 		}
 
+		ImGui::SameLine();
 		if (ImGui::Button("Clear All"))
 		{
-			for (TileNode* node : TILENODES.GetAll())
+			for (Node* node : NODES.GetAll())
 			{
-				TILENODES.Remove(node);
+				NODES.Remove(node);
 				selectionNode = nullptr;
 			}
 		}
+
+		ImGui::Separator();
 
 		if (ImGui::TreeNodeEx("Nodes", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			int index = 0;
 
-			for (TileNode* node : TILENODES.GetAll())
+			for (Node* node : NODES.GetAll())
 			{
 				ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_Leaf;
 
@@ -425,12 +297,15 @@ void SceneRoomTest_E4C::DebugRender()
 					nodeFlags |= ImGuiTreeNodeFlags_Selected;
 				}
 
-				ImGui::PushID(index);
-				if (ImGui::TreeNodeEx(node->GetName().c_str(), nodeFlags))
+				if (node)
 				{
-					if (ImGui::IsItemFocused()) selectionNode = node;
+					ImGui::PushID(index);
+					if (ImGui::TreeNodeEx(node->GetName().c_str(), nodeFlags))
+					{
+						if (ImGui::IsItemFocused()) selectionNode = node;
+					}
+					ImGui::PopID();
 				}
-				ImGui::PopID();
 				index++;
 				ImGui::TreePop();
 			}
@@ -449,31 +324,164 @@ void SceneRoomTest_E4C::DebugRender()
 
 		if (ImGui::Begin("SelectedNode", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			std::string debugName = selectionNode->GetName();
-			if (ImGui::InputText("Name", debugName.data(), 32))
-			{
-				selectionNode->SetName(debugName);
-			}
-		
-			// pos
-			DirectX::XMFLOAT3 debugTilePos = selectionNode->GetPosition();
-			ImGui::DragFloat3("Position", &debugTilePos.x, 0.1f);
-			selectionNode->SetPosition(debugTilePos);
-			// angle
-			DirectX::XMFLOAT3 debugTileAngle = selectionNode->GetAngle();
-			debugTileAngle.x = DirectX::XMConvertToDegrees(debugTileAngle.x);
-			debugTileAngle.y = DirectX::XMConvertToDegrees(debugTileAngle.y);
-			debugTileAngle.z = DirectX::XMConvertToDegrees(debugTileAngle.z);
-			ImGui::DragFloat3("Angle", &debugTileAngle.x);
-			debugTileAngle.x = DirectX::XMConvertToRadians(debugTileAngle.x);
-			debugTileAngle.y = DirectX::XMConvertToRadians(debugTileAngle.y);
-			debugTileAngle.z = DirectX::XMConvertToRadians(debugTileAngle.z);
-			selectionNode->SetAngle(debugTileAngle);
-			// scale
-			DirectX::XMFLOAT3 debugTileScale = selectionNode->GetScale();
-			ImGui::DragFloat3("Scale", &debugTileScale.x, 0.1f);
-			selectionNode->SetScale(debugTileScale);
+			selectionNode->DrawDebugGUI();
 		}
 		ImGui::End();
 	}
+}
+
+Node* TileNode::Duplicate()
+{
+	std::string fileName;
+
+	switch (type)
+	{
+	case TileType::FLOOR:	fileName = "Data/Model/DungeonAssets/NewAssets/SM_Floor_01a.glb";			break;
+	case TileType::WALL:	fileName = "Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_01a.glb";	break;
+	case TileType::PILLAR:	break;
+	case TileType::STAIR:	fileName = "Data/Model/DungeonAssets/SLOPE.glb";	break;
+	case TileType::SPAWNER:	break;
+	case TileType::PORTAL:	break;
+	case TileType::CONNECTPOINT:	break;
+	}
+
+	TileNode* newNode = new TileNode(name, type, fileName.c_str());
+	newNode->SetPosition(this->position);
+	newNode->SetAngle(this->angle);
+	newNode->SetScale(this->scale);
+
+	return newNode;
+}
+
+void TileNode::DrawDebugGUI()
+{
+	// type
+	{
+		std::string typeText = "Type: ";
+
+		switch (type)
+		{
+		case TileType::FLOOR:	typeText += "FLOOR";	break;
+		case TileType::WALL:	typeText += "WALL";		break;
+		case TileType::PILLAR:	typeText += "PILLAR";	break;
+		case TileType::STAIR:	typeText += "STAIR";	break;
+		case TileType::SPAWNER:	typeText += "SPAWNER";	break;
+		case TileType::PORTAL:	typeText += "PORTAL";	break;
+		case TileType::CONNECTPOINT:	typeText += "CONNECTPOINT";	break;
+		}
+
+		ImGui::Text(typeText.c_str());
+	}
+
+	// name
+	{
+		std::string inputName = name;
+		if (ImGui::InputText("Name", inputName.data(), 256))
+		{
+			std::string newName = inputName.c_str();
+
+			// 正規表現も行ってからセットする
+			name = NODES.GetUniqueName(newName);
+		}
+	}
+	
+	// pos
+	ImGui::DragFloat3("Position", &position.x, 0.1f);
+	// angle
+	DirectX::XMFLOAT3 debugAngle = angle;
+	debugAngle.x = DirectX::XMConvertToDegrees(debugAngle.x);
+	debugAngle.y = DirectX::XMConvertToDegrees(debugAngle.y);
+	debugAngle.z = DirectX::XMConvertToDegrees(debugAngle.z);
+	if (ImGui::DragFloat3("Angle", &debugAngle.x, 1.0f))
+	{
+		angle.x = DirectX::XMConvertToRadians(debugAngle.x);
+		angle.y = DirectX::XMConvertToRadians(debugAngle.y);
+		angle.z = DirectX::XMConvertToRadians(debugAngle.z);
+	}
+	// scale
+	ImGui::DragFloat3("Scale", &scale.x, 0.1f);
+}
+
+std::string NodeManager::GetUniqueName(std::string name)
+{
+	// 使用されている番号を保存する配列
+	std::vector<int> duplicateNumbers;
+
+	int nextNumber = -1;
+
+	// 正規表現が用いられていない名前にする
+	{
+		std::smatch match;
+		if (std::regex_search(name, match, std::regex("\\((\\d+)\\)")))
+		{
+			name = match.prefix();
+		}
+	}
+
+	// 既存のノード番号をセットに追加する
+	for (Node* node : this->items)
+	{
+		// 同じ名前のノードがあれば0番も使用されているとして保存
+		if (name == node->GetName())
+		{
+			duplicateNumbers.push_back(0);
+		}
+
+		std::string nodeName = node->GetName();
+		std::smatch match;
+		if (std::regex_search(nodeName, match, std::regex("\\((\\d+)\\)")))
+		{
+			// 正規表現が行われていない名前と同じ名前なら
+			if (name == match.prefix())
+			{
+				// 使用されているとして番号を保存
+				duplicateNumbers.emplace_back(std::stoi(match[1].str()));
+			}
+		}
+	}
+
+	// 配列を昇順に並べ替える
+	std::sort(duplicateNumbers.begin(), duplicateNumbers.end());
+	// 重複した番号を削除する
+	duplicateNumbers.erase(std::unique(duplicateNumbers.begin(), duplicateNumbers.end()), duplicateNumbers.end());
+
+	// 使用されている番号があるならば
+	if (duplicateNumbers.size() != 0)
+	{
+		// 空いている番号を探す
+		for (int searchNum = 0; int number : duplicateNumbers)
+		{
+			// searchNumとnumberが同じでないなら
+			// 空いている番号
+			if (searchNum != number)
+			{
+				nextNumber = searchNum;
+				break;
+			}
+			searchNum++;
+		}
+
+		// 空いている番号がなかった場合
+		if (nextNumber == -1)
+		{
+			// 最後のnumber+1したものが次の番号
+			nextNumber = (duplicateNumbers.back() + 1);
+		}
+	}
+	// 中身がないなら重複なしなのでそのまま返す
+	else
+	{
+		return name;
+	}
+
+	// バグ修正用
+	if (name.back() == '\0') {
+		name.pop_back();
+	}
+
+	// 0番が空いている＝オリジナルが空いているのでそのまま返す
+	if (nextNumber == 0) return name;
+
+	// 数字をカッコで囲んで返す
+	return name + "(" + std::to_string(nextNumber) + ")";
 }

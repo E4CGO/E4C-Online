@@ -52,18 +52,18 @@ void RoomBase::UpdateTransform()
 		DirectX::XMStoreFloat4x4(&m_transform, LocalTransform);
 	}
 
-	// 接続点データも更新
-	for (CONNECTPOINT_DATA& data : m_connectPointDatas)
-	{
-		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(m_scale.x, m_scale.y, m_scale.z);
-		DirectX::XMMATRIX R = AnglesToMatrix(data.angle);
-		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(data.position.x, data.position.y, data.position.z);
+	//// 接続点データも更新
+	//for (CONNECTPOINT_DATA& data : m_connectPointDatas)
+	//{
+	//	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(m_scale.x, m_scale.y, m_scale.z);
+	//	DirectX::XMMATRIX R = AnglesToMatrix(data.angle);
+	//	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(data.position.x, data.position.y, data.position.z);
 
-		DirectX::XMMATRIX LocalTransform = S * R * T;
-		DirectX::XMMATRIX ParentTransform = DirectX::XMLoadFloat4x4(&m_transform);
-		DirectX::XMMATRIX GlobalTransform = LocalTransform * ParentTransform;
-		DirectX::XMStoreFloat4x4(&data.transform, GlobalTransform);
-	}
+	//	DirectX::XMMATRIX LocalTransform = S * R * T;
+	//	DirectX::XMMATRIX ParentTransform = DirectX::XMLoadFloat4x4(&m_transform);
+	//	DirectX::XMMATRIX GlobalTransform = LocalTransform * ParentTransform;
+	//	DirectX::XMStoreFloat4x4(&data.transform, GlobalTransform);
+	//}
 }
 
 DirectX::XMFLOAT3 RoomBase::GetCenterPos()
