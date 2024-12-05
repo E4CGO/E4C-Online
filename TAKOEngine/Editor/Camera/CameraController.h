@@ -16,6 +16,7 @@ public:
 	float GetDistance() { return distance; }
 	virtual void SetDistance(float d) { distance = d; };
 
+
 	bool isEnable() { return enable; }
 	void SetEnable(bool enable) { this->enable = enable; }
 protected:

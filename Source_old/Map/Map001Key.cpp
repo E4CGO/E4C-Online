@@ -37,6 +37,7 @@ void Map001Key::Render(const RenderContext& rc)
 #ifdef _DEBUG
 	{
 		collider->DrawDebugPrimitive({ 1.0f, 1.0f, 1.0f, 1.0f });
+
 	}
 #endif // DEBUG
 }

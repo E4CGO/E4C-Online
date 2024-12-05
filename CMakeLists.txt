@@ -210,6 +210,8 @@ set(Source__GameObject__Projectile
 source_group("Source\\GameObject\\Projectile" FILES ${Source__GameObject__Projectile})
 
 set(Source__GameObject__Props
+    "Source/GameObject/Props/Spawner.cpp"
+    "Source/GameObject/Props/Spawner.h"
     "Source/GameObject/Props/Teleporter.cpp"
     "Source/GameObject/Props/Teleporter.h"
 )
@@ -476,6 +478,8 @@ set(TAKOEngine__Rendering
     "TAKOEngine/Rendering/PostEffect.h"
     "TAKOEngine/Rendering/PostprocessingRenderer.cpp"
     "TAKOEngine/Rendering/PostprocessingRenderer.h"
+    "TAKOEngine/Rendering/PrimitiveRenderer.cpp"
+    "TAKOEngine/Rendering/PrimitiveRenderer.h"
     "TAKOEngine/Rendering/RenderContext.h"
     "TAKOEngine/Rendering/RenderState.cpp"
     "TAKOEngine/Rendering/RenderState.h"
@@ -731,6 +735,9 @@ set(TAKOEngine__Rendering__HLSL__Primitives
     "TAKOEngine/Rendering/HLSL/Primitives/Portal.hlsli"
     "TAKOEngine/Rendering/HLSL/Primitives/PortalPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/PortalVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/PrimitiveRenderer.hlsli"
+    "TAKOEngine/Rendering/HLSL/Primitives/PrimitiveRendererPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/PrimitiveRendererVS.hlsl"
 )
 source_group("TAKOEngine\\Rendering\\HLSL\\Primitives" FILES ${TAKOEngine__Rendering__HLSL__Primitives})
 
@@ -892,6 +899,8 @@ set(SHADER_NAMES
     "PlaneVS.cso"
     "PortalPS.cso"
     "PortalVS.cso"
+    "PrimitiveRendererPS.cso"
+    "PrimitiveRendererVS.cso"
     "SkyBoxDX12PS.cso"
     "SkyBoxDX12VS.cso"
     "SkydomePS.cso"
@@ -959,6 +968,8 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlaneVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PortalPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PortalVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PrimitiveRendererPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PrimitiveRendererVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Skydome/SkyBoxDX12PS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Skydome/SkyBoxDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Skydome/SkydomePS.hlsl,5.0,Pixel,main"

@@ -11,11 +11,11 @@
 #include "TAKOEngine/GUI/UIManager.h"
 #include "TAKOEngine/GUI/Dialog.h"
 #include "TAKOEngine/Physics/Collision.h"
-#include "TAKOEngine/Physics/CollisionManager.h"
 #include "TAKOEngine/Physics/CollisionDataManager.h"
 #include "TAKOEngine/Effects/EffectManager.h"
 #include "TAKOEngine/Tool/Encode.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
+
 
 #include "Scene/SceneManager.h"
 #include "Scene/SceneGameState.h"
@@ -79,6 +79,7 @@ void SceneGame::Initialize()
 	mainCamera = new Camera();
 	cameraManger.Register(mainCamera);
 	cameraManger.SetCamera(0);
+	
 
 	CameraManager::Instance().GetCamera()->SetPerspectiveFov(
 		DirectX::XMConvertToRadians(45),							// 画角
@@ -209,9 +210,9 @@ void SceneGame::Update(float elapsedTime)
 	}
 
 	{
-		ProfileScopedSection_2("Collision", ImGuiControl::Profiler::Yellow);
-		// オブジェクト間衝突判定
-		COLLISION.Update(elapsedTime);
+		//ProfileScopedSection_2("Collision", ImGuiControl::Profiler::Yellow);
+		//// オブジェクト間衝突判定
+		//COLLISION.Update(elapsedTime);
 	}
 
 	{
@@ -226,6 +227,7 @@ void SceneGame::Update(float elapsedTime)
 		EFFECTS.Update(elapsedTime);
 	}
 
+
 	CameraManager::Instance().Update();
 	std::vector<DirectX::XMFLOAT3> cameraFocusPoints = {
 		{CameraManager::Instance().GetCamera()->GetFocus().x, CameraManager::Instance().GetCamera()->GetFocus().y, CameraManager::Instance().GetCamera()->GetFocus().z},
@@ -235,10 +237,12 @@ void SceneGame::Update(float elapsedTime)
 		{ 5,6,4}
 	};
 	// ゲームループ内で
-
+	
 	if (T_INPUT.KeyPress(VK_SHIFT))
 	{
-		CameraManager::Instance().GetCamera()->MovePointToCamera(cameraPositions, cameraFocusPoints, transitionTime, transitionDuration, elapsedTime);
+		CameraManager::Instance().GetCamera()->MovePointToCamera(cameraPositions, cameraFocusPoints,transitionTime,transitionDuration,elapsedTime);
+
+		
 	}
 	else
 	{
@@ -351,7 +355,7 @@ void SceneGame::Render()
 
 	// 描画コンテキスト設定
 	RenderContext rc;
-
+	
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 	rc.camera = CameraManager::Instance().GetCamera();
@@ -366,7 +370,7 @@ void SceneGame::Render()
 	{
 		//Deferred Rendering
 		deferredRendering->SetDeferredRTV();
-
+		
 		//オブジェクト描画
 		MAPTILES.Render(rc);						// マップ
 		PLAYERS.Render(rc);						// プレイヤー
@@ -379,7 +383,8 @@ void SceneGame::Render()
 #ifdef _DEBUG
 	{
 		PROJECTILES.DrawDebugPrimitive();
-		T_GRAPHICS.GetDebugRenderer()->DrawSphere(cameraPositions, 2, { 1,0,0,1 });
+		T_GRAPHICS.GetDebugRenderer()->DrawSphere(cameraPositions,2,{1,0,0,1});
+		
 	}
 #endif // _DEBUG
 
@@ -410,9 +415,10 @@ void SceneGame::Render()
 }
 void SceneGame::CameraGUI()
 {
+
 	if (ImGui::TreeNode("CameraMovePar"))
 	{
-		ImGui::DragFloat("MoveEyeX", &MovePar[CameraMovePar::MoveEyeX], 1.0f, 0.f, FLT_MAX);
+		ImGui::DragFloat("MoveEyeX", &MovePar[CameraMovePar::MoveEyeX], 1.0f, 0.f,FLT_MAX);
 		ImGui::DragFloat("MoveEyeY", &MovePar[CameraMovePar::MoveEyeY], 1.0f, 0.f, FLT_MAX);
 		ImGui::DragFloat("MoveEyeZ", &MovePar[CameraMovePar::MoveEyeZ], 1.0f, 0.f, FLT_MAX);
 		ImGui::DragFloat("MoveDuration", &MovePar[CameraMovePar::MoveDuration], 1.0f, 0.f, FLT_MAX);

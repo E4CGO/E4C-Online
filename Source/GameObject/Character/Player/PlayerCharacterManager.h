@@ -31,18 +31,17 @@ public:
 	void RenderDX12(const RenderContextDX12& rc) override;
 	// プレイヤーキャラクターを取得
 	PlayerCharacter* GetPlayerCharacterById(void);
-	PlayerCharacter* GetPlayerCharacterById(uint64_t client_id);
+	PlayerCharacter* GetPlayerCharacterById(uint32_t client_id);
 	// プレイヤーキャラクターを追加
-	PlayerCharacter* UpdatePlayerData(const uint64_t client_id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
+	PlayerCharacter* UpdatePlayerData(const uint32_t client_id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
 	// プレイヤーキャラクターを同期
-	void SyncPlayer(const uint64_t client_id, const PlayerCharacter::SYNC_DATA& data);
+	void SyncPlayer(const uint32_t client_id, const PlayerCharacter::SYNC_DATA& data);
 	// プレイヤーキャラクターを削除
-	void Remove(const uint64_t client_id);
+	void Remove(const uint32_t client_id);
 
 	// 自分以外全てのプレイヤーを削除
 	void ClearOtherPlayers();
 private:
-	//uint64_t m_local_client_id = 0; //ローカルプレイヤーID offline = 0;
 	std::mutex m_mut;				// ロック
 };
 

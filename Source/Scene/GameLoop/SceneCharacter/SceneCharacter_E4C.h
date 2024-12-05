@@ -117,6 +117,8 @@ private:
 	std::unordered_set<std::shared_ptr<ModelResource>> modelPreLoad;
 
 	static float m_time;
+
+	float transitiontime = 0.f;
 };
 
 #endif // __SCENE_CHARACTER_E4C_H__

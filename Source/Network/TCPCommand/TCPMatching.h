@@ -39,7 +39,7 @@ namespace Online
 		bool Receive(size_t size) override;
 	private:
 		struct MATCHING_DATA {
-			uint64_t owner_id;
+			uint32_t owner_id;
 			uint8_t client_num;
 			uint8_t max_client_num;
 		};

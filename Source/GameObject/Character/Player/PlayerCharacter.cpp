@@ -20,7 +20,7 @@
 
 #include "TAKOEngine/Tool/Mathf.h"
 
-PlayerCharacter::PlayerCharacter(uint64_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]) : Character()
+PlayerCharacter::PlayerCharacter(uint32_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]) : Character()
 {
 	scale = { 0.5f, 0.5f, 0.5f };
 	moveSpeed = 10.0f;
@@ -447,11 +447,14 @@ void PlayerCharacter::Update(float elapsedTime)
 
 		Character::Update(elapsedTime);
 	}
+	iModel::Node* node = this->GetModel()->FindNode("Mesh_0");
 }
 
 void PlayerCharacter::Render(const RenderContext& rc)
 {
 	Character::Render(rc);
+
+	
 
 	DirectX::XMFLOAT3 front = CameraManager::Instance().GetCamera()->GetFront();
 	DirectX::XMFLOAT3 eye = CameraManager::Instance().GetCamera()->GetEye();
