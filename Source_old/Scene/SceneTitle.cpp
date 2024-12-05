@@ -36,7 +36,7 @@ void SceneTitle::Initialize()
 	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
 
 	// パーティクル
-	m_particle = std::make_unique<ParticleRenderer>();
+	//m_particle = std::make_unique<ParticleRenderer>();
 
 	// モデル
 	{

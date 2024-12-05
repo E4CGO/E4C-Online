@@ -142,8 +142,8 @@ public:
 	// Capsule用パラメータゲット
 	virtual Capsule GetCapsule() { return Capsule{}; }
 
-	void SetID(const uint64_t id) { m_ownerID = id; }
-	const uint64_t GetID() const { return m_ownerID; }
+	void SetID(const uint32_t id) { m_ownerID = id; }
+	const uint32_t GetID() const { return m_ownerID; }
 
 	const COLLIDER_TYPE GetType() const { return m_shapeType; };
 
@@ -164,7 +164,7 @@ public:
 	void SetEnable(bool e) { m_enable = e; }
 
 protected:
-	uint64_t m_ownerID = 0;
+	uint32_t m_ownerID = 0;
 	COLLIDER_TYPE m_shapeType = COLLIDER_TYPE::DEFAULT;
 	uint16_t m_OBJType = 0;
 	uint16_t m_hittableOBJType = 0;

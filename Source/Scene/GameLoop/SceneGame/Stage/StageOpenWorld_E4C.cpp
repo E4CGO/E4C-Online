@@ -14,6 +14,7 @@
 #include "TAKOEngine/Tool/Timer.h"
 
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
+#include "GameObject/Character/Enemy/EnemyManager.h"
 
 #include "Scene/GameLoop/SceneGame/Stage/StageDungeon_E4C.h"
 
@@ -91,6 +92,8 @@ void StageOpenWorld_E4C::Initialize()
 		player->GetPosition(),	// 注視点
 		{ 0, 0.969f, -0.248f }	// 上ベクトル
 	);
+	spawner = std::make_unique<Spawner>(0, 1, -1);
+	spawner->SetPosition({ 0.0f, 2.0f, 0.0f });
 
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(mainCamera);
@@ -111,6 +114,8 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	// ゲームループ内で
 	cameraController->SyncContrllerToCamera(camera);
 	cameraController->Update(elapsedTime);
+
+	ENEMIES.Update(elapsedTime);
 
 	if (T_INPUT.KeyDown(VK_MENU))
 	{
@@ -143,6 +148,8 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 
 	sky->Update(elapsedTime);
 
+	spawner->Update(elapsedTime);
+
 	teleporter->Update(elapsedTime);
 
 	timer += elapsedTime;
@@ -174,6 +181,10 @@ void StageOpenWorld_E4C::Render()
 	}
 
 	teleporter->Render(rc);
+
+	spawner->Render(rc);
+
+	ENEMIES.Render(rc);
 
 	UI.Render(rc);
 
@@ -215,12 +226,15 @@ void StageOpenWorld_E4C::RenderDX12()
 		// プレイヤー
 		PlayerCharacterManager::Instance().RenderDX12(rc);
 
+		ENEMIES.RenderDX12(rc);
+
 		// ステージ
 		for (auto& it : models)
 		{
 			it.second->RenderDX12(rc);
 		}
 
+		spawner->RenderDX12(rc);
 		// skyBox
 		{
 			rc.skydomeData.skyTexture = m_sprites[1]->GetDescriptor();

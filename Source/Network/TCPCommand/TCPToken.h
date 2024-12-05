@@ -23,12 +23,14 @@ namespace Online
 		// データ受信
 		bool Receive(size_t size) override;
 	private:
+#pragma pack(push, 1)
 		struct DATA_SET
 		{
-			uint64_t id = -1;
+			uint32_t id = -1;
 			uint64_t token_size = 0;
 			char* token = nullptr;
 		};
+#pragma pack(pop)
 	};
 }
 
