@@ -31,17 +31,26 @@ BoundingBoxCollider::BoundingBoxCollider(iModel* model)
 		center,			// Center
 		extends
 	);
+
+	// DebugPrimitive用
+	m_cube = std::make_unique<CubeRenderer>(T_GRAPHICS.GetDeviceDX12());
 }
 
 void BoundingBoxCollider::DrawDebugPrimitive(DirectX::XMFLOAT4 color)
 {
 	if (!enable) return;
 
-	T_GRAPHICS.GetDebugRenderer()->DrawCube(
-		center,
-		extends,
-		color
-	);
+	if (T_GRAPHICS.isDX11Active) T_GRAPHICS.GetDebugRenderer()->DrawCube(center, extends, color);
+	else
+	{
+		// レンダーコンテキスト設定
+		RenderContextDX12 rc;
+		rc.d3d_command_list = T_GRAPHICS.GetFrameBufferManager()->GetCommandList();
+
+		// 描画
+		m_cube->SetCube(center, extends, color);
+		m_cube->Render(rc);
+	}
 }
 
 bool BoundingBoxCollider::RayCast(

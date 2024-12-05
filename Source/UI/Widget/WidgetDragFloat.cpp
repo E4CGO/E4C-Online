@@ -12,10 +12,16 @@
 *//***************************************************************************/
 WidgetDragBar::WidgetDragBar(float rate) : m_rate(rate)
 {
-	m_scrollBar = RESOURCE.LoadSpriteResource("Data/Sprites/button_frame.png");
-	m_scrollBarDX12 = RESOURCE.LoadSpriteResourceDX12("Data/Sprites/button_frame.png");
-	m_scrollBtn = RESOURCE.LoadSpriteResource("Data/Sprites/button2_ready_on.png");
-	m_scrollBtnDX12 = RESOURCE.LoadSpriteResourceDX12("Data/Sprites/button2_ready_on.png");
+	if (T_GRAPHICS.isDX11Active)
+	{
+		m_scrollBar = RESOURCE.LoadSpriteResource("Data/Sprites/button_frame.png");
+		m_scrollBtn = RESOURCE.LoadSpriteResource("Data/Sprites/button2_ready_on.png");
+	}
+	else
+	{
+		m_scrollBarDX12 = RESOURCE.LoadSpriteResourceDX12("Data/Sprites/button_frame.png");
+		m_scrollBtnDX12 = RESOURCE.LoadSpriteResourceDX12("Data/Sprites/button2_ready_on.png");
+	}
 }
 
 /**************************************************************************//**

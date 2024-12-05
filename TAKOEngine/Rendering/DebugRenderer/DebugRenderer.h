@@ -1,10 +1,23 @@
-﻿#pragma once
+﻿//! @file DebugRenderer.h
+//! @note 
+
+#ifndef __GRAHICS_DEBUG_RENDERER_H__
+#define __GRAHICS_DEBUG_RENDERER_H__
 
 #include <vector>
 #include <wrl.h>
 #include <d3d11.h>
+#include <d3d12.h>
 #include <DirectXMath.h>
 
+#include "TAKOEngine\Rendering\RenderContext.h"
+#include "TAKOEngine\Rendering\Descriptor.h"
+
+//*********************************************************
+// @file   DebugRenderer
+// @brief  デバック描画
+// @par    
+//*********************************************************
 class DebugRenderer
 {
 public:
@@ -16,8 +29,8 @@ public:
 	void Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
 	// 球描画
-	void DrawSphere(const DirectX::XMFLOAT3& center, float radius, const DirectX::XMFLOAT4& color);
-	void DrawSphere(const std::vector<DirectX::XMFLOAT3>& centers, float radius, const DirectX::XMFLOAT4& color);
+	void SetSphere(const DirectX::XMFLOAT3& center, float radius, const DirectX::XMFLOAT4& color);
+	void SetSphere(const std::vector<DirectX::XMFLOAT3>& centers, float radius, const DirectX::XMFLOAT4& color);
 
 	// 円柱描画
 	void DrawCylinder(const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color);
@@ -87,3 +100,5 @@ private:
 	UINT	cylinderVertexCount = 0;
 	UINT	cubeVertexCount = 0;
 };
+
+#endif // !__GRAHICS_DEBUG_RENDERER_H__

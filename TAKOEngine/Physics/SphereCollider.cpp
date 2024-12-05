@@ -8,6 +8,9 @@ SphereCollider::SphereCollider(float _radius)
 {
 	radius = _radius;
 	type = COLLIDER_TYPE::SPHERE;
+
+	// DebugPrimitive用
+	m_sphere = std::make_unique<SphereRenderer>(T_GRAPHICS.GetDeviceDX12());
 }
 
 // Sphere用パラメータセット
@@ -20,7 +23,21 @@ void SphereCollider::SetParam(Sphere sphere)
 void SphereCollider::DrawDebugPrimitive(DirectX::XMFLOAT4 color)
 {
 	if (!enable) return;
-	T_GRAPHICS.GetDebugRenderer()->DrawSphere(position, radius, color);
+
+	if (T_GRAPHICS.isDX11Active)
+	{
+		T_GRAPHICS.GetDebugRenderer()->SetSphere(position, radius, color);
+	}
+	else
+	{
+		// レンダーコンテキスト設定
+		RenderContextDX12 rc;
+		rc.d3d_command_list = T_GRAPHICS.GetFrameBufferManager()->GetCommandList();
+
+		// 描画
+		m_sphere->SetSphere(position, radius, color);
+		m_sphere->Render(rc);
+	}
 }
 
 bool SphereCollider::CollisionVsShpere(
