@@ -40,7 +40,7 @@ class PlayerCharacter : public Character
 {
 public:
 	// コンストラクタ(引数付き)
-	PlayerCharacter(uint64_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
+	PlayerCharacter(uint32_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
 	// コンストラクタ(引数付き)
 	PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataInfo);
 	// デストラクタ
@@ -50,8 +50,8 @@ public:
 	// 同期用
 	struct SYNC_DATA
 	{
-		uint64_t client_id;
-		uint64_t sync_count_id;
+		uint32_t client_id;
+		uint32_t sync_count_id;
 		float position[3];
 		float velocity[3];
 		float rotate;
@@ -143,8 +143,8 @@ public:
 	void FaceToCamera();
 	void TurnByInput();
 
-	uint64_t GetClientId() { return m_client_id; }
-	void SetClientId(const uint64_t id) { m_client_id = id; }
+	uint32_t GetClientId() { return m_client_id; }
+	void SetClientId(const uint32_t id) { m_client_id = id; }
 
 	float GetTurnSpeed() { return turnSpeed; }
 	void SetTurnSpeed(float turnSpeed) { this->turnSpeed = turnSpeed; }
@@ -218,7 +218,7 @@ protected:
 	); // 汎用 敵との判定
 
 private:
-	uint64_t m_client_id = 0;
+	uint32_t m_client_id = 0;
 
 	uint32_t input = 0;						// キー入力
 	DirectX::XMFLOAT2 inputDirection = {};	// 移動方向
@@ -275,7 +275,7 @@ protected:
 		float time = 0.0f;
 		DirectX::XMFLOAT3 position = {};
 		float angle = 0.0f;
-		uint64_t old_sync_count = 0;
+		uint32_t old_sync_count = 0;
 		SYNC_DATA sync_data = {};
 	} m_tempData;
 };

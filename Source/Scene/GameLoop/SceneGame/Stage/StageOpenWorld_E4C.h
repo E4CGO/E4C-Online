@@ -8,6 +8,7 @@
 #include "GameObject/GameObject.h"
 #include "GameObject/Character/Player/PlayerCharacter.h"
 #include "GameObject/Props/Teleporter.h"
+#include "GameObject/Props/Spawner.h"
 #include "TAKOEngine/Rendering/Shaders/PlaneShader.h"
 
 #include "Scene/Scene.h"
@@ -51,6 +52,7 @@ private:
 	std::unique_ptr <Teleporter> teleporter;
 
 	std::unordered_map<std::string, std::unique_ptr<ModelObject>> models;
+	std::unique_ptr<Spawner> spawner;
 
 	std::unique_ptr<ModelObject> sky;
 	DirectX::XMFLOAT4X4 test_transform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };

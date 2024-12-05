@@ -1,4 +1,7 @@
-ï»¿#pragma once
+//! @file Enemy.h
+//! @note 
+#ifndef __INCLUDED_ENEMY_H__
+#define __INCLUDED_ENEMY_H__
 
 #include "TAKOEngine/AI/StateMachine.h"
 
@@ -9,40 +12,23 @@
 
 struct ENEMY_COLLISION
 {
-	int enemy_id = -1;
-	int player_id = -1;
-	int colider_id = -1;
+	uint32_t enemy_id = -1;
+	uint32_t player_id = -1;
+	uint32_t colider_id = -1;
 	int count = -1;
-	int damage = 0;
+	int damage = 10;
 	DirectX::XMFLOAT3 force = {};
 	bool power = false;
 };
 
-struct ENEMY_DATA
+enum ENEMY_TYPE : uint8_t
 {
-	int enemy_id = -1;
-	int enemyType = -1;
-	DirectX::XMFLOAT3 position = {};
-	DirectX::XMFLOAT3 velocity = {};
-	int target = -1;
-	DirectX::XMFLOAT3 angle = {};
-	int state = -1;
-	int subState = -1;
-	int hp = 1;
-	int maxHp = 1;
-};
-
-enum ENEMY_TYPE
-{
-	CHEST_COIN = 0,							// å®ç®±
-	CHEST_EMPTY = 1,						// å®ç®±(ç©º)
-
-	CHEST_EMPTY_SKELETON_MINION,			// å®ç®±(ç©º) ã‚¹ã‚±ãƒ«ãƒˆãƒ³ç”Ÿæˆ
-
-	SKELETON_MINION,						// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆéª¨
-	SKELETON_MINION_BOSS,					// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆéª¨ãƒœã‚¹
+	SKELETON_MINION,						// ƒfƒtƒHƒ‹ƒgœ
+	SKELETON_MINION_BOSS,					// ƒfƒtƒHƒ‹ƒgœƒ{ƒX
 	END,
 };
+
+class Spawner;
 
 class Enemy : public Character
 {
@@ -60,11 +46,10 @@ public:
 
 	int GetAttack() { return atk; }
 
-	void ImportData(ENEMY_DATA data);
-	void ExportData(ENEMY_DATA& data);
+	void SetEnemyId(const uint32_t& id) { enemy_id = id; }
+	uint32_t GetEnemyId() { return enemy_id; }
 
-	void SetEnemyId(int id) { enemy_id = id; }
-	int GetEnemyId() { return enemy_id; }
+	bool IsAlive();
 
 	bool MoveTo(float elapsedTime, const DirectX::XMFLOAT3& target);
 	void TurnTo(float elapsedTime, const DirectX::XMFLOAT3& target);
@@ -84,6 +69,7 @@ public:
 
 	static Enemy* EnemyFactory(int enemyType);
 
+	void SetSpawner(Spawner* spawner) { m_pSpawner = spawner; }
 public:
 	enum Animation
 	{
@@ -119,10 +105,10 @@ public:
 		Wave
 	};
 protected:
-	int enemy_id = -1;
-	int enemyType = -1;
+	uint32_t enemy_id = 0;
+	uint8_t enemyType = -1;
 
-	int atk = 10; // æ”»æ’ƒåŠ›
+	int atk = 10; // UŒ‚—Í
 
 	PlayerCharacter* target = nullptr;
 
@@ -134,8 +120,11 @@ protected:
 
 	int subState = -1;
 
-	std::unordered_map<int, Collider*> colliders;		// å½“ãŸã‚Šåˆ¤å®š
-	std::unordered_map<int, Collider*> attackColliders;	// æ”»æ’ƒåˆ¤å®š
+	std::unordered_map<int, Collider*> colliders;		// “–‚½‚è”»’è
+	std::unordered_map<int, Collider*> attackColliders;	// UŒ‚”»’è
 
-	bool showHp = true;	// HPè¡¨ç¤º
+	bool showHp = true;	// HP•\¦
+
+	Spawner* m_pSpawner = nullptr; // ƒXƒ|ƒi[
 };
+#endif

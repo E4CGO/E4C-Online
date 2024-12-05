@@ -28,7 +28,7 @@ namespace Online
 		// チャート用受信データ
 		struct CHAT_DATA
 		{
-			uint64_t client_id = 0;
+			uint32_t client_id = 0;
 			std::string message;
 		};
 	};

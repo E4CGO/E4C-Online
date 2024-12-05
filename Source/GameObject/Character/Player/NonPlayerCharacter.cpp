@@ -14,7 +14,7 @@
 
 #include "GameData.h"
 
-NonPlayerCharacter::NonPlayerCharacter(uint64_t id, const char* name, uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]) : PlayerCharacter(id, name, appearance)
+NonPlayerCharacter::NonPlayerCharacter(uint32_t id, const char* name, uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]) : PlayerCharacter(id, name, appearance)
 {
 }
 
