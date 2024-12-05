@@ -20,7 +20,7 @@
 
 #include "TAKOEngine/Tool/Mathf.h"
 
-PlayerCharacter::PlayerCharacter(uint64_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]) : Character()
+PlayerCharacter::PlayerCharacter(uint32_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]) : Character()
 {
 	scale = { 0.5f, 0.5f, 0.5f };
 	moveSpeed = 10.0f;

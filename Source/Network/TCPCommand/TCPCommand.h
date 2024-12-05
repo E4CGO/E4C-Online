@@ -56,8 +56,8 @@ namespace Online
 
 		PlayerCharacter* ReceiveClient()
 		{
-			uint64_t client_id = 0;
-			if (m_pcontroller->GetTcpSocket()->Receive(&client_id, sizeof(uint64_t)) > 0)
+			uint32_t client_id = 0;
+			if (m_pcontroller->GetTcpSocket()->Receive(&client_id, sizeof(uint32_t)) > 0)
 			{
 				// 外見パーツ
 				uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM] = {};

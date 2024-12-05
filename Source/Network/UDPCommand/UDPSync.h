@@ -21,7 +21,7 @@ namespace Online
 		// データ送信
 		void Send(void* data) override;
 	private:
-		uint64_t m_sync_count_id = 1;
+		uint32_t m_sync_count_id = 1;
 	};
 }
 

@@ -11,7 +11,7 @@ namespace Online
 {
     struct RoomData
     {
-        uint64_t owner_id;
+        uint32_t owner_id;
         uint8_t& tree;
     };
 

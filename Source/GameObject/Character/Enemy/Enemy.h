@@ -12,9 +12,9 @@
 
 struct ENEMY_COLLISION
 {
-	uint64_t enemy_id = -1;
-	uint64_t player_id = -1;
-	uint64_t colider_id = -1;
+	uint32_t enemy_id = -1;
+	uint32_t player_id = -1;
+	uint32_t colider_id = -1;
 	int count = -1;
 	int damage = 10;
 	DirectX::XMFLOAT3 force = {};
@@ -46,8 +46,8 @@ public:
 
 	int GetAttack() { return atk; }
 
-	void SetEnemyId(const uint64_t& id) { enemy_id = id; }
-	uint64_t GetEnemyId() { return enemy_id; }
+	void SetEnemyId(const uint32_t& id) { enemy_id = id; }
+	uint32_t GetEnemyId() { return enemy_id; }
 
 	bool IsAlive();
 
@@ -105,7 +105,7 @@ public:
 		Wave
 	};
 protected:
-	uint64_t enemy_id = -1;
+	uint32_t enemy_id = 0;
 	uint8_t enemyType = -1;
 
 	int atk = 10; // UŒ‚—Í
