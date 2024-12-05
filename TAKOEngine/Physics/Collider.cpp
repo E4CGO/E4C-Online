@@ -24,6 +24,20 @@ void Collider::Update()
 	}
 }
 
+void Collider::SetPosition(const DirectX::XMFLOAT3 pos)
+{
+	//DirectX::XMFLOAT3 v = m_position - pos;
+
+	m_position = pos;
+
+	//if (m_pTransform)
+	//{
+	//	m_pTransform->_41 += v.x;
+	//	m_pTransform->_42 += v.y;
+	//	m_pTransform->_43 += v.z;
+	//}
+}
+
 bool Collider::Collision(
 	Collider* other,
 	DirectX::XMFLOAT3 direction,

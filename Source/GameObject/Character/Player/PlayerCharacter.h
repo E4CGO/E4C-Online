@@ -35,6 +35,13 @@ static const uint32_t Input_R_Skill_2 = (1 << 16);	// スキル2リリース
 static const uint32_t Input_R_Skill_3 = (1 << 17);	// スキル3リリース
 static const uint32_t Input_R_Skill_4 = (1 << 18);	// スキル4リリース
 
+struct ATTACK_DATA
+{
+	int damage = 0;
+	DirectX::XMFLOAT3 force = {};
+	bool power = false;
+};
+
 class PlayerCharacter : public Character
 {
 public:
@@ -203,11 +210,14 @@ protected:
 	void RegisterCommonState();
 	void UpdateTarget();													// 自機用アイム目標更新
 	void UpdateHorizontalMove(float elapsedTime) override;					// 水平移動更新処理
+	void PositionAdjustment() override;										// 位置補正処理
 	virtual void UpdateColliders() override;								// 衝突判定の更新
 
 	void UpdateSkillTimers(float elapsedTime);								// スキルタイマー
 
-	bool CollisionVsEnemies(
+	bool CollisionVsEnemies();
+
+	bool CollisionVsEnemyAttack(
 		Collider* collider,
 		int damage,
 		bool power = false,
@@ -217,6 +227,8 @@ protected:
 	); // 汎用 敵との判定
 
 private:
+	float radius = 0;	// 当たり判定半径
+
 	uint64_t m_client_id = 0;
 
 	uint32_t input = 0;						// キー入力

@@ -57,6 +57,8 @@ protected:
 	void UpdateHorizontalVelocity(float elapsedFrame);
 	// 水平移動更新処理
 	virtual void UpdateHorizontalMove(float elapsedTime);
+	// 位置補正処理
+	virtual void PositionAdjustment() {}
 
 	// 着地コールバック
 	virtual void OnLanding() {};

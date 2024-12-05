@@ -115,6 +115,19 @@ void Enemy::OnDamage(const ENEMY_COLLISION& hit)
 		stateMachine->ChangeState(EnemyState::ID::Death);
 	}
 }
+void Enemy::OnDamage(const ATTACK_DATA& hit)
+{
+	hp -= hit.damage;
+	if (hp > 0)
+	{
+		if (hit.power) stateMachine->ChangeState(EnemyState::ID::Hurt);
+		velocity += hit.force;
+	}
+	else
+	{
+		stateMachine->ChangeState(EnemyState::ID::Death);
+	}
+}
 void Enemy::OnDeath() { ENEMIES.Remove(this); }
 
 void Enemy::ImportData(ENEMY_DATA data)

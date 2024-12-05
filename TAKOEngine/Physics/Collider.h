@@ -142,11 +142,14 @@ public:
 	// Capsule用パラメータゲット
 	virtual Capsule GetCapsule() { return Capsule{}; }
 
+	void SetID(const uint64_t id) { m_ownerID = id; }
+	const uint64_t GetID() const { return m_ownerID; }
+
 	const COLLIDER_TYPE GetType() const { return m_shapeType; };
 
 	const uint16_t GetOBJType() const { return m_OBJType; }
 
-	//void SetPosition(const DirectX::XMFLOAT3 pos) { m_position = pos; }
+	void SetPosition(const DirectX::XMFLOAT3 pos);
 	const DirectX::XMFLOAT3 GetPosition() const { return m_position; }
 
 	void SetHittableOBJ(uint16_t hit) { m_hittableOBJType = hit; }
@@ -161,12 +164,14 @@ public:
 	void SetEnable(bool e) { m_enable = e; }
 
 protected:
+	uint64_t m_ownerID = 0;
 	COLLIDER_TYPE m_shapeType = COLLIDER_TYPE::DEFAULT;
 	uint16_t m_OBJType = 0;
 	uint16_t m_hittableOBJType = 0;
 	float m_hitStartRate = 0.0f;	// 攻撃判定が発生するタイミングのアニメーションレート(min0%)
 	float m_hitEndRate = 1.0f;	// 攻撃判定が消滅するタイミングのアニメーションレート(max100%)
 	bool m_enable = true;
+	
 
 	DirectX::XMFLOAT4X4* m_pTransform = nullptr;			// ワールド行列
 	DirectX::XMFLOAT3 m_position = { 0.0f, 0.0f, 0.0f };	// ワールド位置
