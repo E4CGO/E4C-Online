@@ -71,7 +71,6 @@ namespace TentacleLib
 
 	void Finalize()
 	{
-		//SDL_Quit();
 	}
 
 	void SetSyncInterval(UINT syncInterval)

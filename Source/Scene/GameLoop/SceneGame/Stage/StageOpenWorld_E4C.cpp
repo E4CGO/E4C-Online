@@ -45,8 +45,12 @@ void StageOpenWorld_E4C::Initialize()
 
 	if (T_GRAPHICS.isDX11Active)
 	{
-		models.emplace("map", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX11GLTF, ModelObject::MODEL_TYPE::RHS_PBR));
+		models.emplace("map", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_TOON));
 		models.emplace("tower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_TOON));
+
+		mouse = std::make_unique<MouseMob>(.5f);
+		mouse->SetPosition({ 20.0, 0.0f, 10.0f });
+		mouse->SetSpawnPosition({ 20.0, 0.0f, 10.0f });
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 70.0f, ModelObject::RENDER_MODE::DX11);
 		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
@@ -56,8 +60,12 @@ void StageOpenWorld_E4C::Initialize()
 	{
 		models.emplace("map", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models.emplace("tower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
-		//models.emplace("boss", std::make_unique<ModelObject>("Data/Model/Enemy/MDL_ENMboss_1129.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON));
-		//models["boss"]->SetPosition({ 10.0, 0.0f, 10.0f });
+		models.emplace("boss", std::make_unique<ModelObject>("Data/Model/Enemy/MDL_ENMboss_1129.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON));
+		models["boss"]->SetPosition({ 10.0, 0.0f, 10.0f });
+
+		mouse = std::make_unique<MouseMob>(.5f, ModelObject::RENDER_MODE::DX12);
+		mouse->SetPosition({ 20.0, 0.0f, 10.0f });
+		mouse->SetSpawnPosition({ 20.0, 0.0f, 10.0f });
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 70.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
 		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
@@ -145,6 +153,8 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 
 	teleporter->Update(elapsedTime);
 
+	mouse->Update(elapsedTime);
+
 	timer += elapsedTime;
 }
 
@@ -174,6 +184,8 @@ void StageOpenWorld_E4C::Render()
 	}
 
 	teleporter->Render(rc);
+
+	mouse->Render(rc);
 
 	UI.Render(rc);
 
@@ -211,6 +223,8 @@ void StageOpenWorld_E4C::RenderDX12()
 		m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 		m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 		m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+
+		mouse->RenderDX12(rc);
 
 		// プレイヤー
 		PlayerCharacterManager::Instance().RenderDX12(rc);

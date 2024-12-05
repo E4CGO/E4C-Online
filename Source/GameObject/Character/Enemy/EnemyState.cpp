@@ -1,9 +1,10 @@
-#include "EnemyState.h"
+ï»¿#include "EnemyState.h"
 
-// ‘Ò‹@ƒXƒe[ƒg
+// å¾…æ©Ÿã‚¹ãƒ†ãƒ¼ãƒˆ
 void EnemyState::IdleState::Enter()
 {
-	owner->GetModel()->PlayAnimation(Enemy::Animation::Idle, true);
+	if (owner->GetModel()->GetCurrentAnimationIndex() >= 0)
+		owner->GetModel()->PlayAnimation(Enemy::Animation::Idle, true);
 	waitTimer = waitTime;
 }
 void EnemyState::IdleState::Execute(float elapsedTime)
@@ -24,10 +25,11 @@ void EnemyState::IdleState::Exit()
 {
 }
 
-// ˆÚ“®ƒXƒe[ƒg
+// ç§»å‹•ã‚¹ãƒ†ãƒ¼ãƒˆ
 void EnemyState::MoveState::Enter()
 {
-	owner->GetModel()->PlayAnimation(Enemy::Animation::Walk, true);
+	if (owner->GetModel()->GetCurrentAnimationIndex() >= 0)
+		owner->GetModel()->PlayAnimation(Enemy::Animation::Walk, true);
 }
 void EnemyState::MoveState::Execute(float elapsedTime)
 {
@@ -40,10 +42,11 @@ void EnemyState::MoveState::Exit()
 {
 }
 
-// ’ÇÕƒXƒe[ƒg
+// è¿½è·¡ã‚¹ãƒ†ãƒ¼ãƒˆ
 void EnemyState::FollowState::Enter()
 {
-	owner->GetModel()->PlayAnimation(Enemy::Animation::Walk, true);
+	if (owner->GetModel()->GetCurrentAnimationIndex() >= 0)
+		owner->GetModel()->PlayAnimation(Enemy::Animation::Walk, true);
 }
 void EnemyState::FollowState::Execute(float elapsedTime)
 {
@@ -57,7 +60,7 @@ void EnemyState::FollowState::Execute(float elapsedTime)
 	owner->MoveTo(elapsedTime, owner->GetTarget()->GetPosition());
 
 	DirectX::XMFLOAT3 diff = owner->GetTarget()->GetPosition() - owner->GetPosition();
-	diff.y = 0; // YŽ²–³Ž‹
+	diff.y = 0; // Yè»¸ç„¡è¦–
 	if (XMFLOAT3LengthSq(diff) < distance * distance)
 	{
 		owner->GetStateMachine()->ChangeState(nextState);
@@ -67,11 +70,12 @@ void EnemyState::FollowState::Exit()
 {
 }
 
-// ‰ö‰äƒXƒe[ƒg
+// æ€ªæˆ‘ã‚¹ãƒ†ãƒ¼ãƒˆ
 void EnemyState::HurtState::Enter()
 {
 	owner->SetAnimationSpeed(3.0f);
-	owner->GetModel()->PlayAnimation(Enemy::Animation::Dash_Back, false);
+	if (owner->GetModel()->GetCurrentAnimationIndex() >= 0)
+		owner->GetModel()->PlayAnimation(Enemy::Animation::Dash_Back, false);
 }
 void EnemyState::HurtState::Execute(float elapsedTime)
 {
@@ -85,10 +89,11 @@ void EnemyState::HurtState::Exit()
 	owner->SetAnimationSpeed(1.0f);
 }
 
-// Ž€–SƒXƒe[ƒg
+// æ­»äº¡ã‚¹ãƒ†ãƒ¼ãƒˆ
 void EnemyState::DeathState::Enter()
 {
-	owner->GetModel()->PlayAnimation(Enemy::Animation::Defeat, false);
+	if (owner->GetModel()->GetCurrentAnimationIndex() >= 0)
+		owner->GetModel()->PlayAnimation(Enemy::Animation::Defeat, false);
 	for (std::pair<int, Collider*> collider : owner->GetColliders()) collider.second->SetEnable(false);
 }
 void EnemyState::DeathState::Execute(float elapsedTime)

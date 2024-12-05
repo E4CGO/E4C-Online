@@ -1,9 +1,15 @@
-﻿#pragma once
+﻿//! @file Enemy.h
+//! @note
+
+#ifndef __INCLUDED_ENEMY_H__
+#define __INCLUDED_ENEMY_H__
 
 #include "TAKOEngine/AI/StateMachine.h"
 
 #include <memory>
 #include <unordered_map>
+
+#include "TAKOEngine/Tool/Mathf.h"
 
 #include "GameObject/Character/Player/PlayerCharacter.h"
 
@@ -41,17 +47,21 @@ enum ENEMY_TYPE
 
 	SKELETON_MINION,						// デフォルト骨
 	SKELETON_MINION_BOSS,					// デフォルト骨ボス
+
+	MOUSE,									//　ネズミ
 	END,
 };
 
 class Enemy : public Character
 {
 public:
-	Enemy(const char* filename, float scaling = 1.0f);
+	Enemy(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX11);
 	~Enemy();
 
 	virtual void Update(float elapsedTime) override;
 	void Render(const RenderContext& rc) override;
+
+	void SetSpawnPosition(const DirectX::XMFLOAT3& position) { this->m_SpawnPosition = position; }
 
 	virtual void OnDamage(const ENEMY_COLLISION& hit);
 	virtual void OnDeath();
@@ -83,6 +93,12 @@ public:
 	virtual void AttackCollision() override;
 
 	static Enemy* EnemyFactory(int enemyType);
+
+	void SetRandomMoveTargetPosition();
+	bool SearchPlayer();
+
+	float GetSearchRange() { return m_SearchRange; }
+	DirectX::XMFLOAT3 GetMoveTargetPosition() { return m_MoveTargetPosition; }
 
 public:
 	enum Animation
@@ -130,6 +146,11 @@ protected:
 	float turnSpeed = 0.0f;
 	float jumpSpeed = 0.0f;
 
+	DirectX::XMFLOAT3 m_SpawnPosition;
+	float m_SearchRange;
+	float m_AttackRange;
+	DirectX::XMFLOAT3 m_MoveTargetPosition;
+
 	StateMachine<Enemy>* stateMachine;
 
 	int subState = -1;
@@ -139,3 +160,5 @@ protected:
 
 	bool showHp = true;	// HP表示
 };
+
+#endif //!__INCLUDED_ENEMY_H__

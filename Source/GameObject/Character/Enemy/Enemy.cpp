@@ -1,11 +1,11 @@
-#include "TAKOEngine/Tool/Mathf.h"
+﻿#include "TAKOEngine/Tool/Mathf.h"
 
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Character/Enemy/Enemy.h"
 #include "GameObject/Character/Enemy/SkeletonMinion.h"
 
-Enemy::Enemy(const char* filename, float scaling) : Character(filename, scaling)
+Enemy::Enemy(const char* filename, float scaling, ModelObject::RENDER_MODE renderMode) : Character(filename, scaling, renderMode)
 {
 	//SetCollider(Collider::COLLIDER_TYPE::MODEL);
 
@@ -153,4 +153,43 @@ Enemy* Enemy::EnemyFactory(int enemyType)
 	case ENEMY_TYPE::SKELETON_MINION_BOSS: return new SkeletonMinionBoss; break;
 	}
 	return nullptr;
+}
+
+void Enemy::SetRandomMoveTargetPosition()
+{
+	float theta = Mathf::RandomRange(-DirectX::XM_PI, DirectX::XM_PI);
+	float range = Mathf::RandomRange(0.0f, m_SearchRange);
+	m_MoveTargetPosition.x = this->m_SpawnPosition.x + sinf(theta) * range;
+	m_MoveTargetPosition.z = this->m_SpawnPosition.z + cosf(theta) * range;
+}
+
+bool Enemy::SearchPlayer()
+{
+	if (!target) return false;
+
+	const DirectX::XMFLOAT3& closestPlayerPosition = target->GetPosition();
+
+	float vx = closestPlayerPosition.x - position.x;
+	float vy = closestPlayerPosition.y - position.y;
+	float vz = closestPlayerPosition.z - position.z;
+	float closestDist = sqrtf(vx * vx + vy * vy + vz * vz);
+
+	if (closestDist < m_SearchRange)
+	{
+		float distXZ = sqrtf(vx * vx + vz * vz);
+		// 単位ベクトル化
+		vx /= distXZ;
+		vz /= distXZ;
+
+		// 方向ベクトル化
+		float frontX = sinf(angle.y);
+		float frontZ = cosf(angle.y);
+		// 2つのベクトルの内積値で前後判定
+		float dot = (frontX * vx) + (frontZ * vz);
+		if (dot > 0.0f)
+		{
+			return true;
+		}
+	}
+	return false;
 }

@@ -8,6 +8,8 @@
 #include "GameObject/GameObject.h"
 #include "GameObject/Character/Player/PlayerCharacter.h"
 #include "GameObject/Props/Teleporter.h"
+#include "GameObject/Character/Enemy/MouseMob.h"
+
 #include "TAKOEngine/Rendering/Shaders/PlaneShader.h"
 
 #include "Scene/Scene.h"
@@ -57,6 +59,8 @@ private:
 	DirectX::XMFLOAT3 test_position = { 0, 0, 0 };
 	DirectX::XMFLOAT4 test_rotation = { 0, 0, 0, 0 };
 	DirectX::XMFLOAT3 test_scale = { 1, 1, 1 };
+
+	std::unique_ptr<MouseMob> mouse;
 
 	std::unique_ptr<SpriteDX12>			m_sprites[8];
 
