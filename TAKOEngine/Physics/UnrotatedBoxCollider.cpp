@@ -8,6 +8,9 @@ UnrotatedBoxCollider::UnrotatedBoxCollider(DirectX::XMFLOAT3 position, DirectX::
 	type = COLLIDER_TYPE::UNROTATED_BOX;
 	this->position = position;
 	this->scale = scale;
+
+	// DebugPrimitive用
+	m_cube = std::make_unique<CubeRenderer>(T_GRAPHICS.GetDeviceDX12());
 }
 
 UnrotatedBoxCollider::UnrotatedBoxCollider() : UnrotatedBoxCollider({ 0, 0, 0 }, { 1, 1, 1 }) {}
@@ -114,5 +117,15 @@ void UnrotatedBoxCollider::DrawDebugGUI()
 
 void UnrotatedBoxCollider::DrawDebugPrimitive(DirectX::XMFLOAT4 color)
 {
-	T_GRAPHICS.GetDebugRenderer()->DrawCube(position, scale, color);
+	if (T_GRAPHICS.isDX11Active) T_GRAPHICS.GetDebugRenderer()->DrawCube(position, scale, color);
+	else
+	{
+		// レンダーコンテキスト設定
+		RenderContextDX12 rc;
+		rc.d3d_command_list = T_GRAPHICS.GetFrameBufferManager()->GetCommandList();
+
+		// 描画
+		m_cube->SetCube(position, scale, color);
+		m_cube->Render(rc);
+	}
 }

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Collider.h"
+#include "TAKOEngine\Rendering\DebugRenderer\SphereRenderer.h"
 
 class SphereCollider : public Collider
 {
@@ -37,4 +38,6 @@ public:
 
 private:
 	float radius;
+
+	std::unique_ptr<SphereRenderer> m_sphere;
 };

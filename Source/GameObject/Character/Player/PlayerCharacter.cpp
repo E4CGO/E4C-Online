@@ -41,6 +41,9 @@ PlayerCharacter::PlayerCharacter(uint32_t id, const char* name, const uint8_t ap
 	this->m_name = name;
 
 	LoadAppearance(appearance);
+
+	// DebugPrimitive用
+	m_sphere = std::make_unique<SphereRenderer>(T_GRAPHICS.GetDeviceDX12());
 }
 
 PlayerCharacter::PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataInfo) : Character()
@@ -61,6 +64,9 @@ PlayerCharacter::PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataI
 	SetCollider(Collider::COLLIDER_TYPE::CAPSULE);
 
 	LoadAppearance(dataInfo.pattern);
+
+	// DebugPrimitive用
+	m_sphere = std::make_unique<SphereRenderer>(T_GRAPHICS.GetDeviceDX12());
 }
 
 /**************************************************************************//**
@@ -499,7 +505,7 @@ void PlayerCharacter::Render(const RenderContext& rc)
 		}
 	}
 
-	if (IsPlayer()) T_GRAPHICS.GetDebugRenderer()->DrawSphere(target, 0.1f, { 0, 1, 0, 1 });
+	if (IsPlayer()) T_GRAPHICS.GetDebugRenderer()->SetSphere(target, 0.1f, { 0, 1, 0, 1 });
 #endif // _DEBUG
 }
 
@@ -512,6 +518,42 @@ void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
 	DirectX::XMFLOAT3 namePos = this->position + DirectX::XMFLOAT3{ 0, 2.2f, 0 };
 	float dot = XMFLOAT3Dot(front, namePos - eye);
 	if (dot < 0.0f) return;
+
+#ifdef _DEBUG
+	collider->DrawDebugPrimitive({ 1, 1, 1, 1 });
+	if (IsPlayer())
+	{
+		for (const std::pair<int, Collider*>& attackCollider : m_pattackColliders)
+		{
+			DirectX::XMFLOAT4 color = { 1, 0, 0, 1 };
+			HitResult hit;
+			for (Enemy*& enemy : ENEMIES.GetAll())
+			{
+				for (std::pair<int, Collider*> enemyCollider : enemy->GetColliders())
+				{
+					if (attackCollider.second->Collision(enemyCollider.second, {}, hit))
+					{
+						color = { 0, 0, 1, 1 };
+						break;
+					}
+				}
+				if (hit.distance > 0) break;
+			}
+			attackCollider.second->DrawDebugPrimitive(color);
+		}
+	}
+
+	if (IsPlayer())
+	{
+		// レンダーコンテキスト設定
+		RenderContextDX12 rc;
+		rc.d3d_command_list = T_GRAPHICS.GetFrameBufferManager()->GetCommandList();
+
+		// 描画
+		m_sphere->SetSphere(target, 0.1f, { 0, 1, 0, 1 });
+		m_sphere->Render(rc);
+	}
+#endif // _DEBUG
 }
 
 void PlayerCharacter::OnDamage(const HitResult& hit, int damage)

@@ -19,7 +19,7 @@
 #include "TAKOEngine/Rendering/Shaders/ModelShaderDX12.h"
 #include "TAKOEngine/Rendering/Shaders/SpriteShader.h"
 #include "TAKOEngine/Rendering/Shaders/SpriteShaderDX12.h"
-#include "TAKOEngine/Rendering/DebugRenderer.h"
+#include "TAKOEngine/Rendering/DebugRenderer/DebugRenderer.h"
 #include "TAKOEngine/Rendering/LineRenderer.h"
 #include "TAKOEngine/Rendering/Descriptor.h"
 #include "TAKOEngine/Rendering/ConstantBuffer.h"

@@ -23,7 +23,7 @@ WidgetSettingWindow::WidgetSettingWindow()
 	else
 	{
 		backgroundDX12 = RESOURCE.LoadSpriteResourceDX12("Data/Sprites/bar_ready.png");
-		m_size = { static_cast<float>(backgroundDX12->GetTextureWidth() * 0.2f), static_cast<float>(backgroundDX12->GetTextureHeight() * 0.2f) };
+		m_size = backgroundDX12->GetTextureSize();
 		m_position = {
 			(SCREEN_W - m_size.x) / 2.0f,
 			(SCREEN_H - m_size.y) / 2.0f

@@ -4,6 +4,7 @@
 
 #include "TAKOEngine/Physics/Collider.h"
 #include "TAKOEngine/Rendering/Model/Model.h"
+#include "TAKOEngine/Rendering/DebugRenderer/CubeRenderer.h"
 
 class BoundingBoxCollider : public Collider
 {
@@ -27,4 +28,6 @@ protected:
 	DirectX::BoundingBox boundingBox;
 	DirectX::XMFLOAT3 center = {};
 	DirectX::XMFLOAT3 extends = {};
+
+	std::unique_ptr<CubeRenderer> m_cube;
 };

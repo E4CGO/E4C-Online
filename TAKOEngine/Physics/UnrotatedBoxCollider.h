@@ -1,5 +1,7 @@
 #pragma once
 #include "Collider.h"
+#include "TAKOEngine/Rendering/DebugRenderer/CubeRenderer.h"
+
 class UnrotatedBoxCollider : public Collider
 {
 public:
@@ -22,4 +24,6 @@ private:
 
 	void DrawDebugGUI() override;
 	void DrawDebugPrimitive(DirectX::XMFLOAT4 color = { 1, 1, 1, 1 }) override;
+
+	std::unique_ptr<CubeRenderer> m_cube;
 };

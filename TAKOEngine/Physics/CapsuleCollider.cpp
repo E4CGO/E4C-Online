@@ -15,6 +15,11 @@
 CapsuleCollider::CapsuleCollider()
 {
 	type = COLLIDER_TYPE::CAPSULE;
+
+	m_sphere[0] = std::make_unique<SphereRenderer>(T_GRAPHICS.GetDeviceDX12());
+	m_sphere[1] = std::make_unique<SphereRenderer>(T_GRAPHICS.GetDeviceDX12());
+
+	m_cylinder = std::make_unique<CylinderRenderer>(T_GRAPHICS.GetDeviceDX12());
 }
 
 /**************************************************************************//**
@@ -38,7 +43,29 @@ void CapsuleCollider::SetParam(Capsule capsule)
 void CapsuleCollider::DrawDebugPrimitive(DirectX::XMFLOAT4 color)
 {
 	if (!enable) return;
-	T_GRAPHICS.GetDebugRenderer()->DrawCapsule(position, radius, length, color);
+
+	if (T_GRAPHICS.isDX11Active) T_GRAPHICS.GetDebugRenderer()->DrawCapsule(position, radius, length, color);
+	else
+	{
+		// レンダーコンテキスト設定
+		RenderContextDX12 rc;
+		rc.d3d_command_list = T_GRAPHICS.GetFrameBufferManager()->GetCommandList();
+
+		// 円柱描画
+		m_cylinder->SetCylinder(position, radius, length, color);
+		m_cylinder->Render(rc);
+
+		// 下の球描画
+		m_sphere[0]->SetSphere(position, radius, color);
+		m_sphere[0]->Render(rc);
+
+		DirectX::XMFLOAT3 upPos = position;
+		upPos.y += length;
+
+		// 上の球描画
+		m_sphere[1]->SetSphere(upPos, radius, color);
+		m_sphere[1]->Render(rc);
+	}
 }
 
 /**************************************************************************//**
