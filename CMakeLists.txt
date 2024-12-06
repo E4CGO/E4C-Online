@@ -396,8 +396,8 @@ set(TAKOEngine__Network
 source_group("TAKOEngine\\Network" FILES ${TAKOEngine__Network})
 
 set(TAKOEngine__Physics
-    "TAKOEngine/Physics/BoundingBoxCollider.cpp"
-    "TAKOEngine/Physics/BoundingBoxCollider.h"
+    "TAKOEngine/Physics/AABBCollider.cpp"
+    "TAKOEngine/Physics/AABBCollider.h"
     "TAKOEngine/Physics/CapsuleCollider.cpp"
     "TAKOEngine/Physics/CapsuleCollider.h"
     "TAKOEngine/Physics/Collider.cpp"
@@ -417,6 +417,8 @@ set(TAKOEngine__Physics
     "TAKOEngine/Physics/MapQuadtree.h"
     "TAKOEngine/Physics/ModelCollider.cpp"
     "TAKOEngine/Physics/ModelCollider.h"
+    "TAKOEngine/Physics/OBBCollider.cpp"
+    "TAKOEngine/Physics/OBBCollider.h"
     "TAKOEngine/Physics/OctreeNode.cpp"
     "TAKOEngine/Physics/OctreeNode.h"
     "TAKOEngine/Physics/QuadtreeNode.cpp"
@@ -424,8 +426,6 @@ set(TAKOEngine__Physics
     "TAKOEngine/Physics/RigidBody.h"
     "TAKOEngine/Physics/SphereCollider.cpp"
     "TAKOEngine/Physics/SphereCollider.h"
-    "TAKOEngine/Physics/UnrotatedBoxCollider.cpp"
-    "TAKOEngine/Physics/UnrotatedBoxCollider.h"
 )
 source_group("TAKOEngine\\Physics" FILES ${TAKOEngine__Physics})
 

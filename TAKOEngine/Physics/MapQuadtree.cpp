@@ -378,7 +378,7 @@ bool MapQuadtree::IntersectVsRay(const DirectX::XMFLOAT3& rayStart, const Direct
 
 				// 既に見つかっている最短交差距離よりも探索する空間までの距離が長くなっていれば、
 				// これ以上進む必要はないため現在の階層の処理を終了させる
-				if (result.distance < horizontalRayDist * tx)	break;
+				if (result.distance < rayDist * tx)	break;
 
 				// 移動するのでtxとnowXを更新する
 				tx += dx;
@@ -401,7 +401,7 @@ bool MapQuadtree::IntersectVsRay(const DirectX::XMFLOAT3& rayStart, const Direct
 
 				// 既に見つかっている最短交差距離よりも探索する空間までの距離が長くなっていれば、
 				// これ以上進む必要はないため現在の階層の処理を終了させる
-				if (result.distance < horizontalRayDist * tz)	break;
+				if (result.distance < rayDist * tz)	break;
 
 				// 移動するのでtzとnowZを更新する
 				tz += dz;

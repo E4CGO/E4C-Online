@@ -226,6 +226,8 @@ protected:
 		float effectScale = 1.0f
 	); // 汎用 敵との判定
 
+	void AttackEnemy(Collider* attackCol, Collider* enemyCol);
+
 private:
 	float radius = 0;	// 当たり判定半径
 	
@@ -274,6 +276,7 @@ protected:
 
 	StateMachine<PlayerCharacter>* stateMachine;
 
+	Collider* m_hitCollider;	// ヒット判定
 	std::unordered_map<int, Collider*> m_pattackColliders; // 攻撃判定
 
 	// 同期用

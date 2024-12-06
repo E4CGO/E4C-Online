@@ -229,7 +229,10 @@ void Character::UpdateVerticalMove(float elapsedTime)
 		{
 			// 空中に浮いている
 			position.y += my;
-			collider->SetPosition(collider->GetPosition() + XMFLOAT3{0, my, 0});
+			if (collider)
+			{
+				collider->SetPosition(collider->GetPosition() + XMFLOAT3{0, my, 0});
+			}
 			if (velocity.y < -10.0f)
 			{
 				isGround = false;
@@ -259,7 +262,10 @@ void Character::UpdateVerticalMove(float elapsedTime)
 		}
 		else {
 			position.y += my;
-			collider->SetPosition(collider->GetPosition() + XMFLOAT3{0, my, 0});
+			if (collider)
+			{
+				collider->SetPosition(collider->GetPosition() + XMFLOAT3{0, my, 0});
+			}
 		}
 	}
 
@@ -373,6 +379,26 @@ void Character::UpdateHorizontalMove(float elapsedTime)
 			}
 		}
 	}
+}
+
+/**************************************************************************//**
+	@brief		位置補正処理
+	@param[in]	なし
+	@return		なし
+*//***************************************************************************/
+void Character::PositionAdjustment()
+{
+	//if (collider)
+	//{
+	//	if (XMFLOAT3LengthSq(velocity) > 0.0f)
+	//	{
+	//		if (collider->CollisionVsMap())
+	//		{
+	//			position = collider->GetPosition();
+	//			position.y -= collider->GetSphere().radius;
+	//		}
+	//	}
+	//}
 }
 
 void Character::ModifyHp(int hp)

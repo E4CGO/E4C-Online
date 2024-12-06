@@ -6,7 +6,9 @@
 
 // writer Matsumura
 #include "TAKOEngine/Physics/Collision.h"
+#include <functional>
 
+class GameObject;
 // 継承Collider前方宣言
 class SphereCollider;
 class AABBCollider;
@@ -142,18 +144,24 @@ public:
 	// Capsule用パラメータゲット
 	virtual Capsule GetCapsule() { return Capsule{}; }
 
-	void SetID(const uint32_t id) { m_ownerID = id; }
-	const uint32_t GetID() const { return m_ownerID; }
+	void SetOwner(GameObject* obj) { m_pOwner = obj; }
+	GameObject* GetOwner() const { return m_pOwner; }
 
 	const COLLIDER_TYPE GetType() const { return m_shapeType; };
 
 	const uint16_t GetOBJType() const { return m_OBJType; }
+
+	void setTransform(DirectX::XMFLOAT4X4* transform) { m_pTransform = transform; }
 
 	void SetPosition(const DirectX::XMFLOAT3 pos);
 	const DirectX::XMFLOAT3 GetPosition() const { return m_position; }
 
 	void SetHittableOBJ(uint16_t hit) { m_hittableOBJType = hit; }
 	const uint16_t GetHittableOBJ() const { return m_hittableOBJType; }
+
+	std::vector<GameObject*> GetHitOthers() { return m_hitOthers; }
+	void RegisterHitOthers(GameObject* other) { m_hitOthers.emplace_back(other); }
+	void ClearHitOthers() { m_hitOthers.clear(); }
 
 	void SetHitStartRate(float rate) { m_hitStartRate = rate; }
 	const float GetHitStartRate() const { return m_hitStartRate; }
@@ -163,14 +171,15 @@ public:
 	bool IsEnable() const { return m_enable; }
 	void SetEnable(bool e) { m_enable = e; }
 
-	virtual void OnCollision(Collider* other) { if (collisionFanction) collisionFanction(other); }
-	void SetCollisionFunction(std::function<void(Collider*)> f) { collisionFanction = f; }
+	virtual void OnCollision(Collider* other) { if (collisionFanction) collisionFanction(this, other); }
+	void SetCollisionFunction(std::function<void(Collider*, Collider*)> f) { collisionFanction = f; }
 
 protected:
-	uint32_t m_ownerID = 0;
+	GameObject* m_pOwner = nullptr;
 	COLLIDER_TYPE m_shapeType = COLLIDER_TYPE::DEFAULT;
 	uint16_t m_OBJType = 0;
 	uint16_t m_hittableOBJType = 0;
+	std::vector<GameObject*> m_hitOthers;	// 攻撃が当たった相手を保存して複数回当たらないようにする
 	float m_hitStartRate = 0.0f;	// 攻撃判定が発生するタイミングのアニメーションレート(min0%)
 	float m_hitEndRate = 1.0f;	// 攻撃判定が消滅するタイミングのアニメーションレート(max100%)
 	bool m_enable = true;
@@ -181,7 +190,7 @@ protected:
 	DirectX::XMFLOAT3 m_prePosition = { 0.0f, 0.0f, 0.0f };	// 前フレームのワールド位置
 	DirectX::XMFLOAT3 m_offset = { 0.0f, 0.0f, 0.0f };		// ローカル空間での補正位置
 
-	std::function<void(Collider*)> collisionFanction = nullptr;
+	std::function<void(Collider*, Collider*)> collisionFanction = nullptr;
 };
 
 #endif // !__COLLIDER_H__

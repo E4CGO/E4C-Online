@@ -10,6 +10,7 @@
 #include "TAKOEngine/Physics/CollisionDataManager.h"
 #include "TAKOEngine/Physics/CollisionManager.h"
 #include "TAKOEngine/Physics/SphereCollider.h"
+#include "TAKOEngine/Physics/CapsuleCollider.h"
 #include "TAKOEngine/Effects/EffectManager.h"
 #include "TAKOEngine/Editor/Camera/Camera.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
@@ -27,7 +28,7 @@ PlayerCharacter::PlayerCharacter(uint32_t id, const char* name, const uint8_t ap
 	scale = { 0.5f, 0.5f, 0.5f };
 	radius = 0.4f;
 	moveSpeed = 10.0f;
-	turnSpeed = DirectX::XMConvertToRadians(720);
+	turnSpeed = DirectX::XMConvertToRadians(1440);
 	jumpSpeed = 20.0f;
 	dodgeSpeed = 20.0f;
 
@@ -38,14 +39,28 @@ PlayerCharacter::PlayerCharacter(uint32_t id, const char* name, const uint8_t ap
 	mpCost[static_cast<int>(STATE::DODGE)] = 0.0f;
 
 	// 衝突判定
-	SetCollider(Collider::COLLIDER_TYPE::CAPSULE, Collider::COLLIDER_OBJ::PLAYER);
+	SetCollider(Collider::COLLIDER_TYPE::SPHERE, Collider::COLLIDER_OBJ::PLAYER);
+	Sphere colSphere({ 0, radius / scale.y, 0 }, radius);
+	collider->SetParam(colSphere);
+	//SetCollider(Collider::COLLIDER_TYPE::CAPSULE, Collider::COLLIDER_OBJ::PLAYER);
+	//Capsule capsule{};
+	//capsule.radius = radius;
+	//capsule.position = { 0, capsule.radius / scale.y, 0 };
+	//capsule.direction = { 0, 1.0f, 0 };
+	//capsule.length = height - capsule.radius * 2;
+	//collider->SetParam(capsule);
+	collider->SetOwner(this);
+
+	// ヒット判定
 	Capsule capsule{};
 	capsule.radius = radius;
 	capsule.position = { 0, capsule.radius / scale.y, 0 };
 	capsule.direction = { 0, 1.0f, 0 };
 	capsule.length = height - capsule.radius * 2;
-	collider->SetParam(capsule);
-	collider->SetID(m_client_id);
+	m_hitCollider = new CapsuleCollider(Collider::COLLIDER_OBJ::PLAYER, &transform);
+	m_hitCollider->SetParam(capsule);
+	m_hitCollider->SetOwner(this);
+	COLLISIONS.Register(m_hitCollider);
 
 	// 攻撃判定
 	Sphere sphere{};
@@ -53,18 +68,19 @@ PlayerCharacter::PlayerCharacter(uint32_t id, const char* name, const uint8_t ap
 	sphere.position = { 0, 0.5f / scale.y, 0.8f / scale.z };
 	m_pattackColliders[0] = new SphereCollider(Collider::COLLIDER_OBJ::PLAYER_ATTACK, &transform);
 	m_pattackColliders[0]->SetParam(sphere);
-	m_pattackColliders[0]->SetID(m_client_id);
+	m_pattackColliders[0]->SetOwner(this);
 	m_pattackColliders[0]->SetHittableOBJ(Collider::ENEMY);
 	m_pattackColliders[0]->SetHitStartRate(0.25f);
 	m_pattackColliders[0]->SetHitEndRate(0.7f);
 	m_pattackColliders[0]->SetEnable(false);
+	m_pattackColliders[0]->SetCollisionFunction([&](Collider* attackCol, Collider* enemyCol) { AttackEnemy(attackCol, enemyCol); });
 	COLLISIONS.Register(m_pattackColliders[0]);
 
 	sphere.radius = 0.8f;
 	sphere.position = { 0, 0.5f / scale.y, 0.8f / scale.z };
 	m_pattackColliders[1] = new SphereCollider(Collider::COLLIDER_OBJ::PLAYER_ATTACK, &transform);
 	m_pattackColliders[1]->SetParam(sphere);
-	m_pattackColliders[1]->SetID(m_client_id);
+	m_pattackColliders[1]->SetOwner(this);
 	m_pattackColliders[1]->SetHittableOBJ(Collider::ENEMY);
 	m_pattackColliders[1]->SetHitStartRate(0.25f);
 	m_pattackColliders[1]->SetHitEndRate(0.7f);
@@ -75,7 +91,7 @@ PlayerCharacter::PlayerCharacter(uint32_t id, const char* name, const uint8_t ap
 	sphere.position = { 0, 0.5f / scale.y, 0.8f / scale.z };
 	m_pattackColliders[2] = new SphereCollider(Collider::COLLIDER_OBJ::PLAYER_ATTACK, &transform);
 	m_pattackColliders[2]->SetParam(sphere);
-	m_pattackColliders[2]->SetID(m_client_id);
+	m_pattackColliders[2]->SetOwner(this);
 	m_pattackColliders[2]->SetHittableOBJ(Collider::ENEMY);
 	m_pattackColliders[2]->SetHitStartRate(0.25f);
 	m_pattackColliders[2]->SetHitEndRate(0.7f);
@@ -104,6 +120,8 @@ PlayerCharacter::PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataI
 
 	// 衝突判定
 	SetCollider(Collider::COLLIDER_TYPE::CAPSULE, Collider::COLLIDER_OBJ::PLAYER);
+	m_hitCollider = new CapsuleCollider(Collider::COLLIDER_OBJ::PLAYER, &transform);
+	COLLISIONS.Register(m_hitCollider);
 
 	LoadAppearance(dataInfo.pattern);
 }
@@ -129,9 +147,13 @@ PlayerCharacter::~PlayerCharacter()
 {
 	delete stateMachine;
 
+	COLLISIONS.Remove(m_hitCollider);
+	//delete m_hitCollider;
+
 	for (const std::pair<int, Collider*>& collider : m_pattackColliders)
 	{
-		delete collider.second;
+		COLLISIONS.Remove(collider.second);
+		//delete collider.second;
 	}
 	m_pattackColliders.clear();
 }
@@ -246,9 +268,7 @@ void PlayerCharacter::PositionAdjustment()
 	{
 		if (collider)
 		{
-			CollisionVsEnemies();
-
-			if (XMFLOAT3LengthSq(velocity) > 0.0f)
+			if (CollisionVsEnemies() || (XMFLOAT3LengthSq(velocity) > 0.0f))
 			{
 				if (collider->CollisionVsMap())
 				{
@@ -256,6 +276,15 @@ void PlayerCharacter::PositionAdjustment()
 					position.y -= radius;
 				}
 			}
+
+			//if (XMFLOAT3LengthSq(velocity) > 0.0f)
+			//{
+			//	if (collider->CollisionVsMap())
+			//	{
+			//		position = collider->GetPosition();
+			//		position.y -= radius;
+			//	}
+			//}
 		}
 	}
 }
@@ -267,6 +296,7 @@ void PlayerCharacter::UpdateColliders()
 		if (collider)
 		{
 			collider->Update();
+			m_hitCollider->Update();
 			for (const std::pair<int, Collider*>& attackCollider : m_pattackColliders)
 			{
 				attackCollider.second->Update();
@@ -281,9 +311,11 @@ bool  PlayerCharacter::CollisionVsEnemies()
 	HitResult hit; 
 	for (Enemy*& enemy : ENEMIES.GetAll())
 	{
+		if (!enemy->GetCollider()) continue;
+
 		if (collider->Collision(enemy->GetCollider(), {}, hit))
 		{
-			position = hit.position + hit.normal * hit.distance;
+			position = hit.position + hit.normal * radius;
 			collider->SetPosition(position);
 
 			position.y -= radius;
@@ -318,6 +350,19 @@ bool  PlayerCharacter::CollisionVsEnemyAttack(Collider* collider, int damage, bo
 		}
 	}
 	return isHit;
+}
+
+void PlayerCharacter::AttackEnemy(Collider* attackCol, Collider* enemyCol)
+{
+	for (GameObject* enemy : attackCol->GetHitOthers())
+	{
+		if (enemy == enemyCol->GetOwner()) return;
+	}
+
+	Enemy* enemy = static_cast<Enemy*>(enemyCol->GetOwner());
+	attackCol->RegisterHitOthers(enemy);
+	ATTACK_DATA attack(10, {}, false);
+	enemy->OnDamage(attack);
 }
 
 void PlayerCharacter::UpdateInput()
