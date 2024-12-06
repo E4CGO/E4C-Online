@@ -32,10 +32,10 @@ void StageOpenWorld_E4C::Initialize()
 	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
 
 	// Sprite Resource Preload
-	for (auto& filename : spriteList)
+	/*for (auto& filename : spriteList)
 	{
 		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
-	}
+	}*/
 
 	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
 	stage_collision->Update(0);
@@ -92,8 +92,8 @@ void StageOpenWorld_E4C::Initialize()
 		player->GetPosition(),	// 注視点
 		{ 0, 0.969f, -0.248f }	// 上ベクトル
 	);
-	spawner = std::make_unique<Spawner>(0, 1, -1);
-	spawner->SetPosition({ 0.0f, 2.0f, 0.0f });
+	/*spawner = std::make_unique<Spawner>();
+	spawner->SetPosition({ player->GetPosition().x,2,player->GetPosition().z});*/
 
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(mainCamera);
@@ -114,6 +114,8 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	// ゲームループ内で
 	cameraController->SyncContrllerToCamera(camera);
 	cameraController->Update(elapsedTime);
+
+	//spawner->SpawnEnemy(elapsedTime, "Skeleton",10,3);
 
 	ENEMIES.Update(elapsedTime);
 
@@ -148,8 +150,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 
 	sky->Update(elapsedTime);
 
-	spawner->Update(elapsedTime);
-
 	teleporter->Update(elapsedTime);
 
 	timer += elapsedTime;
@@ -182,7 +182,7 @@ void StageOpenWorld_E4C::Render()
 
 	teleporter->Render(rc);
 
-	spawner->Render(rc);
+	//spawner->Render(rc);
 
 	ENEMIES.Render(rc);
 
@@ -234,7 +234,7 @@ void StageOpenWorld_E4C::RenderDX12()
 			it.second->RenderDX12(rc);
 		}
 
-		spawner->RenderDX12(rc);
+		//spawner->RenderDX12(rc);
 		// skyBox
 		{
 			rc.skydomeData.skyTexture = m_sprites[1]->GetDescriptor();

@@ -58,9 +58,9 @@ namespace PlayerCharacterState
 			owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::ATTACK_NORMAL));
 			return;
 		}
-		if (flags & flag_AttackS && owner->InputAttackSpecial())
+		if (flags & flag_AttackS && owner->InputGuard())
 		{
-			owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::ATTACK_SPECIAL));
+			owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::GUARD));
 			return;
 		}
 		if (flags & flag_Skill_1 && owner->InputSkill1())
@@ -99,7 +99,7 @@ namespace PlayerCharacterState
 	// 移動ステート
 	void MoveState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::ANIM_MOVE_CONTINUE, true, 0.1f);
+		owner->SetAnimation(PlayerCharacter::Animation::ANIM_MOVE_CONTINUE, true, 0.2f);
 	}
 	void MoveState::Execute(float elapsedTime)
 	{

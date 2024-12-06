@@ -10,7 +10,7 @@ namespace PlayerCharacterState
 		// 一般攻撃ステート
 		void AttackNormalState::Enter()
 		{
-			owner->SetAnimationSpeed(1.5f);
+			owner->SetAnimationSpeed(1.f);
 
 			SetSubState(NORMAL_ATTACK_STATE::ATTACK_1);
 		}
@@ -34,19 +34,46 @@ namespace PlayerCharacterState
 		//  一般攻撃1
 		void AttackNormalState_1::Enter()
 		{
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ATTACK_SWORD_COMBO_FIRST, false, 0.05f);
+			owner->SetAnimationSpeed(0.5f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ATTACK_SWORD_COMBO_FIRST, false, 0.1f);
 		}
 		void AttackNormalState_1::Execute(float elapsedTime)
 		{
+			
 			if (owner->IsPlayer())
 			{
-				float time = owner->GetModel()->GetAnimationRate();
-				if (owner->GetModel()->GetAnimationRate() > 0.75f)
+				float time = owner->GetModel()->GetCurrentAnimationSeconds();
+				if (0.184f<=time&&time<=0.368f)
 				{
-					if (owner->InputAttackNormal()) // アニメーション75%完成
+					if (owner->InputAttackNormal()) 
 					{
 						owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_2);
 					}
+				}
+				else if (0.435f <= time)
+				{
+					if (owner->InputMove(elapsedTime))
+					{
+						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::MOVE);
+					}
+					else if(owner->InputDodge())
+					{
+						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
+					}
+					else if (owner->InputGuard())
+					{
+						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::GUARD);
+
+					}
+					else if (owner->InputSkill1())
+					{
+						owner->GetStateMachine()->ChangeState(SKILL_1_STATE::ATTACK_START);
+					}
+					else if (owner->InputSkill2())
+					{
+						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
+					}
+					
 				}
 			}
 			else
@@ -58,19 +85,46 @@ namespace PlayerCharacterState
 		//  一般攻撃2
 		void AttackNormalState_2::Enter()
 		{
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ATTACK_SWORD_COMBO_SECOND, false, 0.05f);
+			owner->SetAnimationSpeed(0.5f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ATTACK_SWORD_COMBO_SECOND, false, 0.2f);
 		}
 		void AttackNormalState_2::Execute(float elapsedTime)
 		{
+			float time = owner->GetModel()->GetCurrentAnimationSeconds();
 			if (owner->IsPlayer())
 			{
-				if (owner->GetModel()->GetAnimationRate() > 0.75f)
+				if (0.185f<=time&&time<=0.418f)
 				{
-					if (owner->InputAttackNormal()) // アニメーション75%完成
+					if (owner->InputAttackNormal()) 
 					{
 						owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_3);
 					}
 				}
+				else if (0.835f <= time)
+				{
+					if (owner->InputMove(elapsedTime))
+					{
+						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::MOVE);
+					}
+					else if (owner->InputDodge())
+					{
+						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
+					}
+					else if (owner->InputGuard())
+					{
+						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::GUARD);
+					}
+					else if (owner->InputSkill1())
+					{
+						owner->GetStateMachine()->ChangeState(SKILL_1_STATE::ATTACK_START);
+					}
+					else if (owner->InputSkill2())
+					{
+						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
+					}
+					
+				}
+
 			}
 			else
 			{
@@ -81,11 +135,50 @@ namespace PlayerCharacterState
 		//  一般攻撃3
 		void AttackNormalState_3::Enter()
 		{
-			owner->SetAnimationSpeed(1.2f);
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ATTACK_SWORD_COMBO_THIRD, false, 0.05f);
+			owner->SetAnimationSpeed(0.7f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ATTACK_SWORD_COMBO_THIRD, false, 0.2f);
 		}
 		void AttackNormalState_3::Execute(float elapsedTime)
 		{
+			float time = owner->GetModel()->GetCurrentAnimationSeconds();
+			if (owner->IsPlayer())
+			{
+				if (0.5f <= time && time <= 0.753f)
+				{
+					if (owner->InputAttackNormal()) 
+					{
+						owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_1);
+					}
+				}
+				else if (0.95f <= time)
+				{
+					if (owner->InputMove(elapsedTime))
+					{
+						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::MOVE);
+					}
+					else if (owner->InputDodge())
+					{
+						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
+					}
+					else if (owner->InputGuard())
+					{
+						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::GUARD);
+					}
+					else if (owner->InputSkill1())
+					{
+						owner->GetStateMachine()->ChangeState(SKILL_1_STATE::ATTACK_START);
+					}
+					else if (owner->InputSkill2())
+					{
+						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
+					}
+				}
+			}
+			else
+			{
+				if (!owner->IsPlayAnimation())
+					owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_1);
+			}
 			if (!owner->IsPlayer()) return;
 		}
 
@@ -96,7 +189,7 @@ namespace PlayerCharacterState
 		}
 		void Skill1State::Execute(float elapsedTime)
 		{
-			subState->Execute(elapsedTime);
+			subState->Execute(elapsedTime);	
 		}
 		void Skill1State::Exit()
 		{
@@ -105,17 +198,23 @@ namespace PlayerCharacterState
 
 		void Skill1StateStart::Enter()
 		{
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ATTACK_SWORD_SPECIAL_FIRST, false, 0.05f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ATTACK_SWORD_SPECIAL_FIRST, false, 0.1f);
 		}
 
 		void Skill1StateStart::Execute(float elapsedTime)
 		{
+			
+
+
 			if (owner->IsPlayer())
 			{
 				if (owner->GetModel()->GetAnimationRate() > 0.25f)
 				{
 					owner->GetStateMachine()->ChangeSubState(SKILL_1_STATE::ATTACK_CONTINUE);
 				}
+				
+				
+				
 			}
 		}
 
@@ -128,19 +227,55 @@ namespace PlayerCharacterState
 		}
 		void Skill1ContinueStart::Execute(float elapsedTime)
 		{
+			float time = owner->GetModel()->GetCurrentAnimationSeconds();
+			if (2.6f <= time)
+			{
+				if (owner->InputMove(elapsedTime))
+				{
+					owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::MOVE);
+				}
+				else if (owner->InputDodge())
+				{
+					owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
+				}
+				else if (owner->InputGuard())
+				{
+					owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::GUARD);
+				}
+			}
+
+
 			if (!owner->IsPlayAnimation())
 				owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::IDLE);
 		}
 
 		void Skill2State::Enter()
 		{
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ATTACK_SWORD_SPECIAL_SECOND, false, 0.05f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ATTACK_SWORD_SPECIAL_SECOND, false, 0.1f);
 		}
 		void Skill2State::Execute(float elapsedTime)
 		{
+			float time = owner->GetModel()->GetCurrentAnimationSeconds();
 			// 反重力
 			owner->StopFall();
 			owner->StopMove();
+
+			if (1.215f <= time)
+			{
+				if (owner->InputMove(elapsedTime))
+				{
+					owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::MOVE);
+				}
+				else if (owner->InputDodge())
+				{
+					owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
+				}
+				else if (owner->InputGuard())
+				{
+					owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::GUARD);
+				}
+			}
+
 
 			if (!owner->IsPlayAnimation()) // 攻撃モーション終わり
 			{

@@ -89,7 +89,7 @@ public:
 		DEATH,
 
 		ATTACK_NORMAL,
-		ATTACK_SPECIAL,
+		GUARD,
 		SKILL_1,
 		SKILL_2,
 		SKILL_3,
@@ -116,7 +116,7 @@ public:
 	void LoadAppearance(const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
 
 	void Jump();
-	void InputMove(float elapsedTime);
+	bool InputMove(float elapsedTime);
 
 	DirectX::XMFLOAT2 GetInputDirection();
 	// 入力管理
@@ -124,7 +124,7 @@ public:
 	bool InputJump() { return (input & Input_Jump); }
 	bool InputDodge();
 	bool InputAttackNormal() { return (input & Input_Attack_N) > 0; }
-	bool InputAttackSpecial() { return (input & Input_Attack_S) > 0; }
+	bool InputGuard() { return (input & Input_Attack_S) > 0; }
 	bool InputSkill1() { return (input & Input_Skill_1) > 0; }
 	bool InputSkill2() { return (input & Input_Skill_2) > 0; }
 	bool InputSkill3() { return (input & Input_Skill_3) > 0; }
