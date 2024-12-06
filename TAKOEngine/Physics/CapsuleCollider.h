@@ -5,6 +5,8 @@
 #define __CAPSULE_COLLIDER_H__
 
 #include "Collider.h"
+#include "TAKOEngine\Rendering\DebugRenderer\CylinderRenderer.h"
+#include "TAKOEngine\Rendering\DebugRenderer\SphereRenderer.h"
 
 class CapsuleCollider : public Collider
 {
@@ -43,6 +45,9 @@ private:
 	float m_radius = 0.0f;
 	float m_length = 0.0f;
 	DirectX::XMFLOAT3 m_direction = { 0.0f, 0.0f, 0.0f };	// 向き（正規化）
+
+	std::unique_ptr<SphereRenderer> m_sphere[2];
+	std::unique_ptr<CylinderRenderer> m_cylinder;
 };
 
 #endif // !__CAPSULE_COLLIDER_H__

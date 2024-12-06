@@ -7,20 +7,24 @@
 #include "TAKOEngine/Rendering/Light.h"
 
 //***********************************************************
-// @brief       ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-// @param[in]   ‚È‚µ
-// @return      ‚È‚µ
+// @brief       ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+// @param[in]   ãªã—
+// @return      ãªã—
 //***********************************************************
-Light::Light(LightType lightType) : lightType(lightType) {}
+Light::Light(LightType lightType) : lightType(lightType) 
+{
+	// DebugPrimitiveç”¨
+	m_sphere = std::make_unique<SphereRenderer>(Graphics::Instance().GetDeviceDX12());
+}
 
 //***********************************************************
-// @brief      ƒ‰ƒCƒgî•ñ‚ğRenderContext‚ÉÏ‚Ş
-// @param[in]  rc  ƒŒƒ“ƒ_[ƒRƒ“ƒeƒLƒXƒg
-// @return     ‚È‚µ
+// @brief      ãƒ©ã‚¤ãƒˆæƒ…å ±ã‚’RenderContextã«ç©ã‚€
+// @param[in]  rc  ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆ
+// @return     ãªã—
 //***********************************************************
 void Light::PushRenderContext(RenderContext& rc) const
 {
-	// “o˜^‚³‚ê‚Ä‚¢‚éŒõŒ¹‚Ìî•ñ‚ğİ’è
+	// ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹å…‰æºã®æƒ…å ±ã‚’è¨­å®š
 	switch (lightType)
 	{
 	case	LightType::Directional:
@@ -69,9 +73,9 @@ void Light::PushRenderContext(RenderContext& rc) const
 }
 
 //***********************************************************
-// @brief      ƒfƒoƒbƒOî•ñ‚Ì•\¦
-// @param[in]  ‚È‚µ
-// @return     ‚È‚µ
+// @brief      ãƒ‡ãƒãƒƒã‚°æƒ…å ±ã®è¡¨ç¤º
+// @param[in]  ãªã—
+// @return     ãªã—
 //***********************************************************
 void Light::DrawDebugGUI()
 {
@@ -123,9 +127,9 @@ void Light::DrawDebugGUI()
 }
 
 //***********************************************************
-// @brief      ƒfƒoƒbƒO}Œ`‚Ì•\¦
-// @param[in]  ‚È‚µ
-// @return     ‚È‚µ
+// @brief      ãƒ‡ãƒãƒƒã‚°å›³å½¢ã®è¡¨ç¤º
+// @param[in]  ãªã—
+// @return     ãªã—
 //***********************************************************
 void Light::DrawDebugPrimitive()
 {
@@ -136,13 +140,24 @@ void Light::DrawDebugPrimitive()
 	{
 	case LightType::Directional:
 	{
-		//	•½sŒõŒ¹‚Í•\¦‚µ‚È‚¢B
+		//	å¹³è¡Œå…‰æºã¯è¡¨ç¤ºã—ãªã„ã€‚
 		break;
 	}
 	case LightType::Point:
 	{
-		//	“_ŒõŒ¹‚Í‘S•ûˆÊ‚ÉŒõ‚ğ•úË‚·‚éŒõŒ¹‚È‚Ì‚Å‹…‘Ì‚ğ•`‰æ‚·‚éB
-		debugRenderer->DrawSphere(position, range, color);
+		//	ç‚¹å…‰æºã¯å…¨æ–¹ä½ã«å…‰ã‚’æ”¾å°„ã™ã‚‹å…‰æºãªã®ã§çƒä½“ã‚’æç”»ã™ã‚‹ã€‚
+		if (Graphics::Instance().isDX11Active) debugRenderer->SetSphere(position, range, color);
+		else
+		{
+			// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆè¨­å®š
+			RenderContextDX12 rc;
+			rc.d3d_command_list = Graphics::Instance().GetFrameBufferManager()->GetCommandList();
+
+			// æç”»
+			m_sphere->SetSphere(position, range, color);
+			m_sphere->Render(rc);
+		}
+
 		break;
 	}
 	case LightType::Spot:
@@ -153,7 +168,7 @@ void Light::DrawDebugPrimitive()
 		if (len <= 0.00001f)
 			break;
 		Direction = DirectX::XMVector3Normalize(Direction);
-		//	²Zo
+		//	è»¸ç®—å‡º
 		DirectX::XMFLOAT3 dir;
 		DirectX::XMStoreFloat3(&dir, Direction);
 		DirectX::XMVECTOR Work = fabs(dir.y) == 1 ? DirectX::XMVectorSet(1, 0, 0, 0)
@@ -167,9 +182,9 @@ void Light::DrawDebugPrimitive()
 		{
 			float s = static_cast<float>(u) / static_cast<float>(SplitCount);
 			float r = -DirectX::XM_PI + DirectX::XM_2PI * s;
-			// ‰ñ“]s—ñZo
+			// å›è»¢è¡Œåˆ—ç®—å‡º
 			DirectX::XMMATRIX	RotationZ = DirectX::XMMatrixRotationAxis(Direction, r);
-			// ü‚ğZo
+			// ç·šã‚’ç®—å‡º
 			DirectX::XMFLOAT3	OldPoint;
 			{
 				DirectX::XMVECTOR	Point = Direction;
@@ -184,7 +199,7 @@ void Light::DrawDebugPrimitive()
 				lineRenderer->AddVertex(pos, color);
 				OldPoint = pos;
 			}
-			// ‹…–Ê‚ğZo
+			// çƒé¢ã‚’ç®—å‡º
 			for (int v = 0; v <= SplitCount; ++v)
 			{
 				float s = static_cast<float>(v) / static_cast<float>(SplitCount);

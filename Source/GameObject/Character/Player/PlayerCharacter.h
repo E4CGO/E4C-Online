@@ -11,6 +11,7 @@
 #include "GameObject/Character/Character.h"
 #include "GameData.h"
 #include "PlayerCharacterData.h"
+#include "TAKOEngine/Rendering/DebugRenderer/SphereRenderer.h"
 
 class Enemy;
 
@@ -265,6 +266,8 @@ private:
 		}
 	};
 	std::unordered_map<int, SkillTimer> skillTimer;
+
+	std::unique_ptr<SphereRenderer> m_sphere;
 protected:
 
 	static inline DirectX::XMFLOAT4 colorSet[COLOR_PATTERN::END] = {

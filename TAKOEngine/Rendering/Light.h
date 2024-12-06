@@ -7,69 +7,72 @@
 #include <DirectXMath.h>
 
 #include "TAKOEngine/Rendering/RenderContext.h"
+#include "TAKOEngine\Rendering\DebugRenderer\SphereRenderer.h"
 
-// ŒõŒ¹ƒ^ƒCƒv
+// å…‰æºã‚¿ã‚¤ãƒ—
 enum class LightType
 {
-	Directional,	// •½sŒõŒ¹
-	Point,			// “_ŒõŒ¹
-	Spot,			// ƒXƒ|ƒbƒgƒ‰ƒCƒg
+	Directional,	// å¹³è¡Œå…‰æº
+	Point,			// ç‚¹å…‰æº
+	Spot,			// ã‚¹ãƒãƒƒãƒˆãƒ©ã‚¤ãƒˆ
 };
 
-// ŒõŒ¹ƒNƒ‰ƒX
+// å…‰æºã‚¯ãƒ©ã‚¹
 //*********************************************************************
 // @class Light
-// @brief ƒ‰ƒCƒgƒNƒ‰ƒX
-// @par   [à–¾]
+// @brief ãƒ©ã‚¤ãƒˆã‚¯ãƒ©ã‚¹
+// @par   [èª¬æ˜]
 //*********************************************************************
 class Light
 {
 public:
 	Light(LightType lightType = LightType::Directional);
 
-	// ƒ‰ƒCƒgî•ñ‚ğRenderContext‚ÉÏ‚Ş
+	// ãƒ©ã‚¤ãƒˆæƒ…å ±ã‚’RenderContextã«ç©ã‚€
 	void PushRenderContext(RenderContext& rc) const;
 
-	// ƒfƒoƒbƒOî•ñ‚Ì•\¦
+	// ãƒ‡ãƒãƒƒã‚°æƒ…å ±ã®è¡¨ç¤º
 	void DrawDebugGUI();
 
-	// ƒfƒoƒbƒO}Œ`‚Ì•\¦
+	// ãƒ‡ãƒãƒƒã‚°å›³å½¢ã®è¡¨ç¤º
 	void DrawDebugPrimitive();
 
-	// ƒ‰ƒCƒgƒ^ƒCƒv
+	// ãƒ©ã‚¤ãƒˆã‚¿ã‚¤ãƒ—
 	LightType GetLightType() { return lightType; }
 
-	// ƒ‰ƒCƒg‚ÌÀ•W
+	// ãƒ©ã‚¤ãƒˆã®åº§æ¨™
 	DirectX::XMFLOAT3 GetPosition() { return position; }
 	void SetPosition(DirectX::XMFLOAT3 position) { this->position = position; }
 
-	// ƒ‰ƒCƒg‚ÌŒü‚«
+	// ãƒ©ã‚¤ãƒˆã®å‘ã
 	DirectX::XMFLOAT3 GetDirection() { return direction; }
 	void SetDirection(DirectX::XMFLOAT3 direction) { this->direction = direction; }
-	// F
+	// è‰²
 	DirectX::XMFLOAT4 GetColor() { return color; }
 	void SetColor(DirectX::XMFLOAT4 color) { this->color = color; }
 
-	// ƒ‰ƒCƒg‚Ì”ÍˆÍ
+	// ãƒ©ã‚¤ãƒˆã®ç¯„å›²
 	float GetRange() { return range; }
 	void SetRange(float range) { this->range = range; }
 
-	// ƒCƒ“ƒi[
+	// ã‚¤ãƒ³ãƒŠãƒ¼
 	float GetInnerCorn() { return innerCorn; }
 	void SetInnerCorn(float innerCorn) { this->innerCorn = innerCorn; }
 
-	// ƒAƒEƒ^[
+	// ã‚¢ã‚¦ã‚¿ãƒ¼
 	float GetOuterCorn() { return outerCorn; }
 	void SetOuterCorn(float outerCorn) { this->outerCorn = outerCorn; }
 
 private:
-	LightType lightType = LightType::Directional;				// ƒ‰ƒCƒg‚Ìƒ^ƒCƒv
-	DirectX::XMFLOAT3 position = DirectX::XMFLOAT3(0, -1, -1); // ƒ‰ƒCƒg‚ÌÀ•W
-	DirectX::XMFLOAT3 direction = DirectX::XMFLOAT3(0, -1, -1); // ƒ‰ƒCƒg‚ÌŒü‚«
-	DirectX::XMFLOAT4 color = DirectX::XMFLOAT4(1, 1, 1, 1);	// ƒ‰ƒCƒg‚ÌF
-	float	range = 20.0f;		// ”ÍˆÍ
-	float	innerCorn = 0.99f;	// ƒCƒ“ƒi[
-	float	outerCorn = 0.9f;	// ƒAƒEƒ^[
+	LightType lightType = LightType::Directional;				// ãƒ©ã‚¤ãƒˆã®ã‚¿ã‚¤ãƒ—
+	DirectX::XMFLOAT3 position = DirectX::XMFLOAT3(0, -1, -1); // ãƒ©ã‚¤ãƒˆã®åº§æ¨™
+	DirectX::XMFLOAT3 direction = DirectX::XMFLOAT3(0, -1, -1); // ãƒ©ã‚¤ãƒˆã®å‘ã
+	DirectX::XMFLOAT4 color = DirectX::XMFLOAT4(1, 1, 1, 1);	// ãƒ©ã‚¤ãƒˆã®è‰²
+	float	range = 20.0f;		// ç¯„å›²
+	float	innerCorn = 0.99f;	// ã‚¤ãƒ³ãƒŠãƒ¼
+	float	outerCorn = 0.9f;	// ã‚¢ã‚¦ã‚¿ãƒ¼
+
+	std::unique_ptr<SphereRenderer> m_sphere;
 };
 
 #endif // !__LIGHT_LIGHT_H__

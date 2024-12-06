@@ -245,7 +245,6 @@ bool MapQuadtree::IntersectVsRay(const DirectX::XMFLOAT3& rayStart, const Direct
 
 	// レイの水平方向の成分のベクトル
 	XMFLOAT3 horizontalRayDirection = { rayDirection.x * rayDist , 0.0f, rayDirection.z * rayDist };
-	float horizontalRayDist = XMFLOAT3Length(horizontalRayDirection);
 
 	// xz軸それぞれのレイの向きをプラス→１、ゼロ→０、マイナス→－１で記録
 	int directionX = rayDirection.x > 0.0f ? 1 : (rayDirection.x < 0.0f ? -1 : 0);

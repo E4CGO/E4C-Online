@@ -5,6 +5,7 @@
 #define __SPHERE_COLLIDER_H__
 
 #include "Collider.h"
+#include "TAKOEngine\Rendering\DebugRenderer\SphereRenderer.h"
 
 class SphereCollider : public Collider
 {
@@ -49,6 +50,8 @@ public:
 
 private:
 	float m_radius = 0.0f;
+
+	std::unique_ptr<SphereRenderer> m_sphere;
 };
 
 #endif // !__SPHERE_COLLIDER_H__
