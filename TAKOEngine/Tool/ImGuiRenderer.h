@@ -33,7 +33,7 @@ public:
 		ID3D12Device* d3d_device,
 		DXGI_FORMAT dxgi_format,
 		int buffer_count,
-		std::shared_ptr<DescriptorHeap> descriptor_heap);
+		std::shared_ptr<TakoEngine::DescriptorHeap> descriptor_heap);
 
 	// 終了化
 	static void Finalize();
@@ -71,8 +71,8 @@ private:
 	static void CacheFonts(int idx);
 	static bool LoadFontsCache(int idx);
 
-	std::shared_ptr<DescriptorHeap>	m_descriptor_heap;
-	const Descriptor* m_pFont_srv_descriptor = nullptr;
+	std::shared_ptr<TakoEngine::DescriptorHeap>	m_descriptor_heap;
+	const TakoEngine::Descriptor* m_pFont_srv_descriptor = nullptr;
 	ImGuiContext* m_pImgui_context = nullptr;
 };
 

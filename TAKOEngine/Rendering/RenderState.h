@@ -115,10 +115,10 @@ public:
 	SamplerManager(SamplerState state);
 	~SamplerManager();
 
-	const Descriptor* GetDescriptor() { return m_sampler_descriptor; }
+	const TakoEngine::Descriptor* GetDescriptor() { return m_sampler_descriptor; }
 
 private:
-	const Descriptor* m_sampler_descriptor = nullptr;
+	const TakoEngine::Descriptor* m_sampler_descriptor = nullptr;
 
 	// ƒTƒ“ƒvƒ‰[‚ğì¬‚·‚é“à•”ŠÖ”
 	void CreateSampler(ID3D12Device* device, SamplerState type, D3D12_SAMPLER_DESC& samplerDesc);

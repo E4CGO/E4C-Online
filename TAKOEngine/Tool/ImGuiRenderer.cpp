@@ -81,7 +81,7 @@ ImGuiRenderer::ImGuiRenderer(HWND hwnd,
 	ID3D12Device* d3d_device,
 	DXGI_FORMAT dxgi_format,
 	int buffer_count,
-	std::shared_ptr<DescriptorHeap> descriptor_heap)
+	std::shared_ptr<TakoEngine::DescriptorHeap> descriptor_heap)
 	: m_descriptor_heap(descriptor_heap)
 {
 	// Setup Dear ImGui context

@@ -188,7 +188,7 @@ ModelDX12::ModelDX12(ID3D12Device* device, const char* filename, float scaling, 
 ModelDX12::~ModelDX12()
 {
 	Graphics& graphics = Graphics::Instance();
-	DescriptorHeap* descriptor_heap = graphics.GetShaderResourceDescriptorHeap();
+	TakoEngine::DescriptorHeap* descriptor_heap = graphics.GetShaderResourceDescriptorHeap();
 
 	for (Mesh& mesh : m_meshes)
 	{
@@ -263,7 +263,7 @@ void ModelDX12::UpdateFrameResource(const DirectX::XMFLOAT4X4 transform)
 
 	// 左手系変換のためのスケーリング行列を作成
 	DirectX::XMMATRIX LeftHandScaling = DirectX::XMMatrixScaling(-scaling, scaling, scaling);
-	
+
 	//メッシュの更新
 	for (Mesh& mesh : m_meshes)
 	{
@@ -415,12 +415,12 @@ void ModelDX12::ComputeAnimation(float elapsedTime)
 			{
 				// 再生時間とキーフレームの時間から補完率を算出する
 				float rate = (currentAnimationSeconds - keyframe0.seconds) / (keyframe1.seconds - keyframe0.seconds);
-				
+
 				// 前のキーフレームと次のキーフレームの姿勢を補完
 				DirectX::XMVECTOR V0 = DirectX::XMLoadFloat3(&keyframe0.value);
 				DirectX::XMVECTOR V1 = DirectX::XMLoadFloat3(&keyframe1.value);
 				DirectX::XMVECTOR V = DirectX::XMVectorLerp(V0, V1, rate);
-				
+
 				// 計算結果をノードに格納
 				DirectX::XMStoreFloat3(&node.position, V);
 			}
@@ -435,12 +435,12 @@ void ModelDX12::ComputeAnimation(float elapsedTime)
 			{
 				// 再生時間とキーフレームの時間から補完率を算出する
 				float rate = (currentAnimationSeconds - keyframe0.seconds) / (keyframe1.seconds - keyframe0.seconds);
-				
+
 				// 前のキーフレームと次のキーフレームの姿勢を補完
 				DirectX::XMVECTOR Q0 = DirectX::XMLoadFloat4(&keyframe0.value);
 				DirectX::XMVECTOR Q1 = DirectX::XMLoadFloat4(&keyframe1.value);
 				DirectX::XMVECTOR Q = DirectX::XMQuaternionSlerp(Q0, Q1, rate);
-				
+
 				// 計算結果をノードに格納
 				DirectX::XMStoreFloat4(&node.rotation, Q);
 			}
@@ -455,12 +455,12 @@ void ModelDX12::ComputeAnimation(float elapsedTime)
 			{
 				// 再生時間とキーフレームの時間から補完率を算出する
 				float rate = (currentAnimationSeconds - keyframe0.seconds) / (keyframe1.seconds - keyframe0.seconds);
-				
+
 				// 前のキーフレームと次のキーフレームの姿勢を補完
 				DirectX::XMVECTOR V0 = DirectX::XMLoadFloat3(&keyframe0.value);
 				DirectX::XMVECTOR V1 = DirectX::XMLoadFloat3(&keyframe1.value);
 				DirectX::XMVECTOR V = DirectX::XMVectorLerp(V0, V1, rate);
-				
+
 				// 計算結果をノードに格納
 				DirectX::XMStoreFloat3(&node.scale, V);
 			}
@@ -494,7 +494,7 @@ void ModelDX12::ComputeBlending(float elapsedTime)
 
 	// ブレンド率の計算
 	float rate = currentAnimationBlendSeconds / animationBlendSecondsLength;
-	
+
 	// ブレンド計算
 	int count = static_cast<int>(m_nodes.size());
 	for (int i = 0; i < count; i++)

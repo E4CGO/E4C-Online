@@ -214,7 +214,7 @@ void StageOpenWorld_E4C::RenderDX12()
 	T_GRAPHICS.BeginRender();
 
 	// シーン用定数バッファ更新
-	const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
+	const TakoEngine::Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
 		CameraManager::Instance().GetCamera());
 
 	// レンダーコンテキスト設定

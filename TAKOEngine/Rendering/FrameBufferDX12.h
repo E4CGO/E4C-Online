@@ -11,7 +11,7 @@
 //*******************************************************
 // @class FrameBufferDX12
 // @brief レンダータゲット作成
-// @par   
+// @par
 //*******************************************************
 class FrameBufferDX12
 {
@@ -30,7 +30,7 @@ public:
 	{
 		return m_rtvClearColor;
 	}
-	
+
 	// 深度ステンシルのクリアカラー
 	float GetDSVClearValue() const
 	{
@@ -53,10 +53,10 @@ public:
 	inline float GetHeight() const { return m_height; }
 
 	// レンダーターゲットのディスクリプタ取得
-	const Descriptor* GetRTVDescriptor() { return rtv_descriptor; }
+	const TakoEngine::Descriptor* GetRTVDescriptor() { return rtv_descriptor; }
 
 	// 深度ステンシルバッファのディスクリプタ取得
-	const Descriptor* GetDSVDescriptor() { return dsv_descriptor; }
+	const TakoEngine::Descriptor* GetDSVDescriptor() { return dsv_descriptor; }
 
 private:
 	// レンダーターゲットとなるテクスチャを作成する
@@ -76,10 +76,10 @@ private:
 	std::unique_ptr<FrameBufferTexture> m_depthStencilTexture;
 	Microsoft::WRL::ComPtr<ID3D12Resource> d3d_rtv_resource;
 	Microsoft::WRL::ComPtr<ID3D12Resource> d3d_dsv_resource;
-	const Descriptor* rtv_descriptor = nullptr;
-	const Descriptor* dsv_descriptor = nullptr;
+	const TakoEngine::Descriptor* rtv_descriptor = nullptr;
+	const TakoEngine::Descriptor* dsv_descriptor = nullptr;
 
-	float m_width  = 0;	//レンダリングターゲットの幅
+	float m_width = 0;	//レンダリングターゲットの幅
 	float m_height = 0;	//レンダリングターゲットの高さ
 	float m_rtvClearColor[4] = { 0.2f, 0.2f, 0.2f, 1.0f };	//レンダリングターゲットビューのクリアカラー
 	float m_dsvClearValue = 1.0f;							//DSVのクリアカラー

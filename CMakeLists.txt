@@ -1267,6 +1267,10 @@ endif()
 # Dependencies
 # ###############################################################################
 # Link with other targets.
+
+add_subdirectory(${CMAKE_SOURCE_DIR}/External/DirectXTK12 ${CMAKE_BINARY_DIR}/bin/CMake/DirectXTK12)
+target_link_libraries(${PROJECT_NAME} PRIVATE DirectXTK12)
+
 set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "$<$<CONFIG:Debug>:"
     "DirectXTK"

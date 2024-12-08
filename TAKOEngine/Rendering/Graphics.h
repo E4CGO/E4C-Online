@@ -29,6 +29,8 @@
 
 #define MAX_BUFFER_COUNT (2)
 
+using namespace TakoEngine;
+
 enum class ModelShaderId
 {
 	Phong,
@@ -206,10 +208,10 @@ public:
 	CommandQueue GetCommandQueue() const { return m_graphics_queue; }
 
 	// ディスクリプタヒープ取得
-	DescriptorHeap* GetShaderResourceDescriptorHeap() const { return m_shader_resource_descriptor_heap.get(); }
-	DescriptorHeap* GetSamplerDescriptorHeap() const { return m_sampler_descriptor_heap.get(); }
-	DescriptorHeap* GetRenderTargetDescriptorHeap() const { return m_rtv_descriptor_heap.get(); }
-	DescriptorHeap* GetDepthStencilDescriptorHeap() const { return m_dsv_descriptor_heap.get(); }
+	TakoEngine::DescriptorHeap* GetShaderResourceDescriptorHeap() const { return m_shader_resource_descriptor_heap.get(); }
+	TakoEngine::DescriptorHeap* GetSamplerDescriptorHeap() const { return m_sampler_descriptor_heap.get(); }
+	TakoEngine::DescriptorHeap* GetRenderTargetDescriptorHeap() const { return m_rtv_descriptor_heap.get(); }
+	TakoEngine::DescriptorHeap* GetDepthStencilDescriptorHeap() const { return m_dsv_descriptor_heap.get(); }
 
 	DirectX::XMFLOAT3 GetScreenPosition(
 		const DirectX::XMFLOAT3 worldPosition,
@@ -241,7 +243,7 @@ public:
 
 	void FinishDX12();
 
-	const Descriptor* UpdateSceneConstantBuffer(const Camera* camera);
+	const TakoEngine::Descriptor* UpdateSceneConstantBuffer(const Camera* camera);
 
 	// テクスチャ読み込み
 	HRESULT LoadTexture(const char* filename, ID3D12Resource** d3d_resource);
@@ -272,7 +274,7 @@ public:
 	}
 
 	// ビューポートを取得
-	D3D12_VIEWPORT GetViwePort()
+	D3D12_VIEWPORT GetViewport()
 	{
 		return m_viewport;
 	}
@@ -337,9 +339,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource>				d3d_rtv_resource[MAX_BUFFER_COUNT];
 	Microsoft::WRL::ComPtr<ID3D12Resource>				d3d_dsv_resource;
 	Microsoft::WRL::ComPtr<ID3D12Resource>				d3d_cbv_resource;
-	const Descriptor* rtv_descriptor[MAX_BUFFER_COUNT] = { nullptr, nullptr };
-	const Descriptor* dsv_descriptor = nullptr;
-	const Descriptor* cbv_descriptor = nullptr;
+	const TakoEngine::Descriptor* rtv_descriptor[MAX_BUFFER_COUNT] = { nullptr, nullptr };
+	const TakoEngine::Descriptor* dsv_descriptor = nullptr;
+	const TakoEngine::Descriptor* cbv_descriptor = nullptr;
 	CbScene* cb_scene_data = nullptr;
 
 	D3D12_VIEWPORT m_viewport;	//ビューポート
@@ -353,10 +355,10 @@ private:
 	CommandQueue										m_resource_queue;
 	CommandQueue										m_graphics_queue;
 
-	std::unique_ptr<DescriptorHeap>						m_rtv_descriptor_heap;
-	std::unique_ptr<DescriptorHeap>						m_dsv_descriptor_heap;
-	std::shared_ptr<DescriptorHeap>						m_shader_resource_descriptor_heap;
-	std::unique_ptr<DescriptorHeap>						m_sampler_descriptor_heap;
+	std::unique_ptr<TakoEngine::DescriptorHeap>						m_rtv_descriptor_heap;
+	std::unique_ptr<TakoEngine::DescriptorHeap>						m_dsv_descriptor_heap;
+	std::shared_ptr<TakoEngine::DescriptorHeap>						m_shader_resource_descriptor_heap;
+	std::unique_ptr<TakoEngine::DescriptorHeap>						m_sampler_descriptor_heap;
 
 	std::unique_ptr<SamplerManager> m_sampler[static_cast<int>(SamplerState::EnumCount)];
 

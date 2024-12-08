@@ -1,9 +1,8 @@
 //! @file CylinderRenderer.h
 //! @note
- 
+
 #ifndef __GRAHICS_CYLINDER_RENDERER_H__
 #define __GRAHICS_CYLINDER_RENDERER_H__
-
 
 #include <vector>
 #include <wrl.h>
@@ -16,7 +15,7 @@
 //*********************************************************
 // @file   CylinderRenderer
 // @brief  円柱デバック描画(DX12)
-// @par    
+// @par
 //*********************************************************
 class CylinderRenderer
 {
@@ -67,7 +66,7 @@ private:
 		Vertex* vertex_data = nullptr;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cbv_resource;
-		const Descriptor* cbv_descriptor = nullptr;
+		const TakoEngine::Descriptor* cbv_descriptor = nullptr;
 		CbMesh* cb_mesh_data = nullptr;
 	};
 	std::vector<FrameResource>	m_frame_resources;

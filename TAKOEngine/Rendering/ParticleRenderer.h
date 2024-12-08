@@ -22,7 +22,7 @@ public:
 private:
 	void CreateConstantBuffer();
 
-	const Descriptor* UpdateSceneConstantBuffer(const RenderContextDX12& rc);
+	const TakoEngine::Descriptor* UpdateSceneConstantBuffer(const RenderContextDX12& rc);
 
 private:
 	enum class ParticleSprite
@@ -56,7 +56,7 @@ private:
 	};
 
 	Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cbv_resource;
-	const Descriptor* cbv_descriptor = nullptr;
+	const TakoEngine::Descriptor* cbv_descriptor = nullptr;
 	CBScene* cbv_data = nullptr;
 
 	// 描画用スプライト

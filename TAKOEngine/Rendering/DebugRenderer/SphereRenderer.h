@@ -1,5 +1,5 @@
 //! @flie SphereRenderer.h
-//! @note 
+//! @note
 
 #ifndef __GRAHICS_SPHERE_RENDERER_H__
 #define __GRAHICS_SPHERE_RENDERER_H__
@@ -15,7 +15,7 @@
 //*********************************************************
 // @file   SphereRenderer
 // @brief  球デバック描画(DX12)
-// @par    
+// @par
 //*********************************************************
 class SphereRenderer
 {
@@ -67,7 +67,7 @@ private:
 		Vertex* vertex_data = nullptr;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cbv_resource;
-		const Descriptor* cbv_descriptor = nullptr;
+		const TakoEngine::Descriptor* cbv_descriptor = nullptr;
 		CbMesh* cb_mesh_data = nullptr;
 	};
 	std::vector<FrameResource>	m_frame_resources;

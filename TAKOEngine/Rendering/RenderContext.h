@@ -163,21 +163,21 @@ struct ShadowMapData
 struct FinalpassDataDX12
 {
 	//ブルームテクスチャ
-	const Descriptor* bloomTexture = nullptr;
+	const TakoEngine::Descriptor* bloomTexture = nullptr;
 };
 
 // スカイボックス情報
 struct SkydomeData
 {
 	//ブルームテクスチャ
-	const Descriptor* skyTexture = nullptr;
+	const TakoEngine::Descriptor* skyTexture = nullptr;
 };
 
 // パーティクル情報
 struct ParticleData
 {
 	// コンスタントバッファ
-	const Descriptor* cbv_descriptor = nullptr;
+	const TakoEngine::Descriptor* cbv_descriptor = nullptr;
 
 	// パーティクル情報
 	float elapsedTime = 0; //経過時間
@@ -236,14 +236,14 @@ struct RenderContext
 struct RenderContextDX12
 {
 	ID3D12GraphicsCommandList* d3d_command_list = nullptr;
-	const Descriptor* scene_cbv_descriptor = nullptr;
+	const TakoEngine::Descriptor* scene_cbv_descriptor = nullptr;
 
 	DirectX::XMFLOAT4X4	view;
 	DirectX::XMFLOAT4X4	projection;
 	DirectX::XMFLOAT4	light_direction;
 
 	// スプライトシェーダー情報
-	LuminanceExtractionData	luminanceExtractionData; //	高輝度抽出用情報 
+	LuminanceExtractionData	luminanceExtractionData; //	高輝度抽出用情報
 	GaussianFilterData		gaussianFilterData;		 //	ガウスフィルター情報
 	ColorGradingData		colorGradingData;		 //	色調補正情報
 	FinalpassDataDX12		finalpassnData;			 //	最終パス情報

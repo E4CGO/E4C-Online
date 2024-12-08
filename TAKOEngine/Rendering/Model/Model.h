@@ -57,10 +57,10 @@ public:
 		{
 			Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_vbv_uav_resource;
 			D3D12_VERTEX_BUFFER_VIEW				d3d_vbv;
-			const Descriptor* uav_descriptor = nullptr;
+			const TakoEngine::Descriptor* uav_descriptor = nullptr;
 
 			Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cbv_resource;
-			const Descriptor* cbv_descriptor = nullptr;
+			const TakoEngine::Descriptor* cbv_descriptor = nullptr;
 			Constants* cbv_data = nullptr;
 
 			int instancingCount = 0;	  //インスタンシング描画数

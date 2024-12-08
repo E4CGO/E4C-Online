@@ -58,7 +58,7 @@ public:
 		Vertex* vertex_data = nullptr;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource>			d3d_cbv_resource;
-		const Descriptor* cbv_descriptor = nullptr;
+		const TakoEngine::Descriptor* cbv_descriptor = nullptr;
 		CbSpriteData* cb_scene_data = nullptr;
 	};
 	std::vector<FrameResource>	m_frame_resources;
@@ -99,13 +99,13 @@ public:
 	// テクスチャ高さ取得
 	int GetTextureHeight() const { return m_texture_height; }
 
-	const DirectX::XMFLOAT2 GetTextureSize() const 
+	const DirectX::XMFLOAT2 GetTextureSize() const
 	{
 		return DirectX::XMFLOAT2(static_cast<float>(m_texture_width), static_cast<float>(m_texture_height));
 	}
 
 	// ディスクリプタ取得
-	const Descriptor* GetDescriptor() { return m_srv_descriptor; }
+	const TakoEngine::Descriptor* GetDescriptor() { return m_srv_descriptor; }
 
 	// スプライトカウント取得
 	const int GetSpriteCount() { return m_sprite_count; }
@@ -121,7 +121,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource>				m_d3d_texture;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState>			m_d3d_pipeline_state;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature>			m_d3d_root_signature;
-	const Descriptor* m_srv_descriptor = nullptr;
+	const TakoEngine::Descriptor* m_srv_descriptor = nullptr;
 	int													m_texture_width = 0;
 	int													m_texture_height = 0;
 	int													m_sprite_index = 0;

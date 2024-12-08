@@ -760,7 +760,7 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 ModelResource::~ModelResource()
 {
 	Graphics& graphics = Graphics::Instance();
-	DescriptorHeap* descriptor_pool = graphics.GetShaderResourceDescriptorHeap();
+	TakoEngine::DescriptorHeap* descriptor_pool = graphics.GetShaderResourceDescriptorHeap();
 
 	for (Material& material : materials)
 	{
