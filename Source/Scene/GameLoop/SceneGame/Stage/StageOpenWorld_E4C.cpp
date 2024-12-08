@@ -12,6 +12,7 @@
 
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Tool/Timer.h"
+#include "TAKOEngine/Physics/CollisionManager.h"
 
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
@@ -39,7 +40,7 @@ void StageOpenWorld_E4C::Initialize()
 
 	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
 	stage_collision->Update(0);
-	stage_collision->SetCollider(Collider::COLLIDER_TYPE::MAP);
+	stage_collision->SetCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
 
 	MAPTILES.Register(stage_collision);
 	MAPTILES.CreateSpatialIndex(5, 7);
@@ -93,8 +94,9 @@ void StageOpenWorld_E4C::Initialize()
 		player->GetPosition(),	// 注視点
 		{ 0, 0.969f, -0.248f }	// 上ベクトル
 	);
-	spawner = std::make_unique<Spawner>(0, 1, -1);
-	spawner->SetPosition({ 0.0f, 2.0f, 0.0f });
+	spawner = std::make_unique<Spawner>(0, 2, -1);
+	spawner->SetPosition({ 0.0f, 5.0f, -5.0f });
+	spawner->SetSpawnRadius(0.0f);
 
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(mainCamera);
@@ -141,6 +143,8 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 		T_INPUT.KeepCursorCenter();
 	}
 	PlayerCharacterManager::Instance().Update(elapsedTime);
+
+	COLLISIONS.Contacts();
 
 	for (auto& it : models)
 	{

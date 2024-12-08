@@ -1,4 +1,5 @@
 #include "TAKOEngine/Tool/Mathf.h"
+#include "TAKOEngine/Physics/CollisionManager.h"
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Character/Enemy/Enemy.h"
@@ -20,11 +21,13 @@ Enemy::~Enemy()
 	delete stateMachine;
 	for (const std::pair<int, Collider*>& collider : colliders)
 	{
-		delete collider.second;
+		COLLISIONS.Remove(collider.second);
+		//delete collider.second;
 	}
 	for (const std::pair<int, Collider*>& collider : attackColliders)
 	{
-		delete collider.second;
+		COLLISIONS.Remove(collider.second);
+		//delete collider.second;
 	}
 	colliders.clear();
 	attackColliders.clear();
@@ -90,15 +93,15 @@ void Enemy::Render(const RenderContext& rc)
 		collider.second->DrawDebugPrimitive({ 1, 1, 1, 1 });
 	}
 
-	/*Collider* playerCollider = PLAYERS.GetPlayerById(GAME_DATA.GetClientId())->GetCollider();
+	//Collider* playerCollider = PLAYERS.GetPlayerById(GAME_DATA.GetClientId())->GetCollider();
 	for (const std::pair<int, Collider*>& collider : attackColliders)
 	{
 		DirectX::XMFLOAT4 color = { 1, 0, 0, 1 };
-		HitResult hit;
-		if (collider.second->Collision(playerCollider, {}, hit)) color = { 0, 0, 1, 1 };
+		//HitResult hit;
+		//if (collider.second->Collision(playerCollider, {}, hit)) color = { 0, 0, 1, 1 };
 
 		collider.second->DrawDebugPrimitive(color);
-	}*/
+	}
 #endif // DEBUG
 }
 void Enemy::AttackCollision()
@@ -121,6 +124,19 @@ void Enemy::AttackCollision()
 }
 
 void Enemy::OnDamage(const ENEMY_COLLISION& hit)
+{
+	hp -= hit.damage;
+	if (hp > 0)
+	{
+		if (hit.power) stateMachine->ChangeState(EnemyState::ID::Hurt);
+		velocity += hit.force;
+	}
+	else
+	{
+		stateMachine->ChangeState(EnemyState::ID::Death);
+	}
+}
+void Enemy::OnDamage(const ATTACK_DATA& hit)
 {
 	hp -= hit.damage;
 	if (hp > 0)

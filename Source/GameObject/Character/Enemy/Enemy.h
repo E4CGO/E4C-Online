@@ -40,6 +40,7 @@ public:
 	void Render(const RenderContext& rc) override;
 
 	virtual void OnDamage(const ENEMY_COLLISION& hit);
+	virtual void OnDamage(const ATTACK_DATA& hit);
 	virtual void OnDeath();
 
 	bool IsShowHp() { return showHp; }

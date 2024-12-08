@@ -32,8 +32,7 @@ bool MapTileManager::SphereCast(const DirectX::XMFLOAT3& start, const DirectX::X
 // 球の押し戻し
 bool MapTileManager::IntersectSphereVsMap(Sphere& sphere)
 {
-	bool ret = false;
-	return ret;
+	return mapQuadtree.IntersectVsSphere(sphere);
 }
 
 // カプセルの押し戻し
