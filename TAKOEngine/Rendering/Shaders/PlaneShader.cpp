@@ -148,6 +148,7 @@ void BillboardShader::Begin(const RenderContext& rc)
 	ID3D11Buffer* constantBuffers[] =
 	{
 		sceneConstantBuffer.Get(),
+		m_WorldMatrixBuffer.Get(),
 	};
 	rc.deviceContext->VSSetConstantBuffers(0, _countof(constantBuffers), constantBuffers);
 	rc.deviceContext->GSSetConstantBuffers(0, _countof(constantBuffers), constantBuffers);
@@ -240,6 +241,8 @@ void BillboardShader::Draw(const RenderContext& rc, const ModelResource::Mesh& m
 	UINT offset = 0;
 
 	ID3D11DeviceContext* dc = rc.deviceContext;
+
+	dc->UpdateSubresource(m_WorldMatrixBuffer.Get(), 0, 0, &mesh.offsetTransforms[0], 0, 0);
 
 	dc->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
 	dc->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);

@@ -47,7 +47,7 @@ void StageOpenWorld_E4C::Initialize()
 
 	portalSquare = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, XMFLOAT3{ 10.0f,10.0f,5.0f }, 5.0f, 5.0f);
 	portalSquare->SetShader(ModelShaderId::PortalSquare);
-	
+
 	// 光
 	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
 	Light* dl = new Light(LightType::Directional);
@@ -58,11 +58,11 @@ void StageOpenWorld_E4C::Initialize()
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
 	player->SetPosition({ 15.0f, 15.0f, 5.0f });
 	// プレイヤーが走るときの土埃
-	runningDust1 = std::make_unique<RunningDust>( T_GRAPHICS.GetDevice(), "Data/Sprites/smoke.png", 100.0f,
-										player->GetPosition(),	// position
-										1.0f,			// alpha
-										f_count,	// model_id
-										0 );		// age
+	runningDust1 = std::make_unique<RunningDust>(T_GRAPHICS.GetDevice(), "Data/Sprites/smoke.png", 100.0f,
+		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),	// position
+		1.0f,			// alpha
+		f_count,	// model_id
+		0);		// age
 	//runningDust.push_back(Fireball{ T_GRAPHICS.GetDevice(), "Data/Sprites/smoke.png", 100.0f,
 	//									player->GetPosition(),	// position
 	//									1.0f,			// alpha

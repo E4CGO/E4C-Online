@@ -333,6 +333,8 @@ Billboard::Billboard(ID3D11Device* device, const char* filename, float scaling, 
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 
+	mesh.offsetTransforms.resize(1);
+
 	mesh.material = new ModelResource::Material;
 
 	// テクスチャ生成
@@ -392,6 +394,21 @@ void Billboard::Update(float elapsedTime)
 *//***************************************************************************/
 void Billboard::Render(const RenderContext& rc)
 {
+	//D3D11_MAPPED_SUBRESOURCE mappedSubresource;
+	//HRESULT hr = rc.deviceContext->Map(mesh.vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubresource);
+	//_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+	//ModelResource::Vertex* v = static_cast<ModelResource::Vertex*>(mappedSubresource.pData);
+	//for (int i = 0; i < mesh.vertices.size(); i++)
+	//{
+	//	v[i].position = mesh.vertices[i].position;
+	//}
+
+	//// 頂点バッファの内容の編集を終了する
+	//rc.deviceContext->Unmap(mesh.vertexBuffer.Get(), 0);
+
+	mesh.offsetTransforms[0] = transform;
+
 	ModelShader* shader = T_GRAPHICS.GetModelShader(m_shaderId);
 	shader->Begin(rc);
 	shader->Draw(rc, mesh);
@@ -426,13 +443,17 @@ RunningDust::RunningDust(ID3D11Device* device, const char* filename, float scali
 void RunningDust::Update(float elapsedTime)
 {
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
-	position += player->GetPosition();
 
+	//mesh.vertices[0].position = player->GetPosition();
+
+	// スケール行列生成
 	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
+	// 回転行列生成
 	DirectX::XMMATRIX R = AnglesToMatrix(angle);
-	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
+	// 位置行列生成
+	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z);
+
 	DirectX::XMMATRIX W = S * R * T;
+
 	DirectX::XMStoreFloat4x4(&transform, W);
-
 }
-

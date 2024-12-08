@@ -73,6 +73,11 @@ class BillboardShader : public ModelShader
 public:
 	BillboardShader(ID3D11Device* device) : ModelShader(device, "Data/Shader/BillBoardVS.cso", "Data/Shader/BillBoardPS.cso")
 	{
+		GpuResourceUtils::CreateConstantBuffer(
+			device,
+			sizeof(DirectX::XMFLOAT4X4),
+			m_WorldMatrixBuffer.GetAddressOf());
+
 		GpuResourceUtils::LoadGeometryShader(
 			device,
 			GeometryShaderName,
@@ -81,6 +86,11 @@ public:
 
 	BillboardShader(ID3D11Device* device, const char* vs, const char* ps) : ModelShader(device, vs, ps)
 	{
+		GpuResourceUtils::CreateConstantBuffer(
+			device,
+			sizeof(DirectX::XMFLOAT4X4),
+			m_WorldMatrixBuffer.GetAddressOf());
+
 		GpuResourceUtils::LoadGeometryShader(
 			device,
 			GeometryShaderName,
@@ -107,6 +117,8 @@ protected:
 	void SetShaderResourceView(const ModelResource::Mesh& mesh, ID3D11DeviceContext*& dc) override;
 
 	Microsoft::WRL::ComPtr<ID3D11GeometryShader>		geometryShader;
+
+	Microsoft::WRL::ComPtr<ID3D11Buffer> m_WorldMatrixBuffer;
 };
 
 /**************************************************************************//**
