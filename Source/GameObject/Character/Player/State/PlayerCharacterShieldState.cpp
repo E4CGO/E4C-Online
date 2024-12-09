@@ -19,7 +19,7 @@ namespace PlayerCharacterState
 		{
 			owner->StopMove();
 
-			if (!owner->InputAttackSpecial())
+			if (!owner->InputGuard())
 			{
 				owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 			}

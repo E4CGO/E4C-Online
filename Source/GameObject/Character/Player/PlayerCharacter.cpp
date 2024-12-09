@@ -19,20 +19,11 @@
 #include "GameData.h"
 
 #include "TAKOEngine/Tool/Mathf.h"
+#include <TAKOEngine/Rendering/DebugRenderer/SphereRenderer.h>
+#include <TAKOEngine/Physics/SphereCollider.h>
 
-PlayerCharacter::PlayerCharacter(uint32_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]) : Character()
+PlayerCharacter::PlayerCharacter(uint64_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]):Character()
 {
-	scale = { 0.5f, 0.5f, 0.5f };
-	moveSpeed = 10.0f;
-	turnSpeed = DirectX::XMConvertToRadians(720);
-	jumpSpeed = 20.0f;
-	dodgeSpeed = 20.0f;
-
-	stateMachine = new StateMachine<PlayerCharacter>;
-	RegisterCommonState();
-	stateMachine->SetState(static_cast<int>(STATE::WAITING));
-
-	mpCost[static_cast<int>(STATE::DODGE)] = 0.0f;
 
 	// 衝突判定
 	SetCollider(Collider::COLLIDER_TYPE::CAPSULE);
@@ -43,7 +34,7 @@ PlayerCharacter::PlayerCharacter(uint32_t id, const char* name, const uint8_t ap
 	LoadAppearance(appearance);
 
 	// DebugPrimitive用
-	m_sphere = std::make_unique<SphereRenderer>(T_GRAPHICS.GetDeviceDX12());
+	//m_sphere = std::make_unique<SphereRenderer>(T_GRAPHICS.GetDeviceDX12());
 }
 
 PlayerCharacter::PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataInfo) : Character()
@@ -66,7 +57,7 @@ PlayerCharacter::PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataI
 	LoadAppearance(dataInfo.pattern);
 
 	// DebugPrimitive用
-	m_sphere = std::make_unique<SphereRenderer>(T_GRAPHICS.GetDeviceDX12());
+	//m_sphere = std::make_unique<SphereRenderer>(T_GRAPHICS.GetDeviceDX12());
 }
 
 /**************************************************************************//**
@@ -99,7 +90,7 @@ PlayerCharacter::~PlayerCharacter()
 
 void PlayerCharacter::RegisterCommonState()
 {
-	//stateMachine->RegisterState(static_cast<int>(PlayerCharacter::State::Idle), new PlayerCharacterState::IdleState(this));
+	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::IDLE), new PlayerCharacterState::IdleState(this));
 	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::MOVE), new PlayerCharacterState::MoveState(this));
 	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::JUMP), new PlayerCharacterState::JumpState(this));
 	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::FALL), new PlayerCharacterState::FallState(this));
@@ -550,8 +541,8 @@ void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
 		rc.d3d_command_list = T_GRAPHICS.GetFrameBufferManager()->GetCommandList();
 
 		// 描画
-		m_sphere->SetSphere(target, 0.1f, { 0, 1, 0, 1 });
-		m_sphere->Render(rc);
+		//m_sphere->SetSphere(target, 0.1f, { 0, 1, 0, 1 });
+		//m_sphere->Render(rc);
 	}
 #endif // _DEBUG
 }
@@ -578,8 +569,8 @@ void PlayerCharacter::OnDamage(const HitResult& hit, int damage)
 	}
 }
 
-void PlayerCharacter::InputMove(float elapsedTime) {
-	if (inputDirection.x == 0 && inputDirection.y == 0) return; // 方向入力なし
+bool PlayerCharacter::InputMove(float elapsedTime) {
+	return inputDirection.x == 0 && inputDirection.y == 0 ; // 方向入力なし
 
 	// 移動処理
 	Move(inputDirection.x, inputDirection.y, this->moveSpeed);

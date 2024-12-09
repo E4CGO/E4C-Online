@@ -42,7 +42,7 @@ void PlayerCharacterPatternGender::Execute(PlayerCharacter* chara)
 	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::WAITING), new PlayerCharacterState::WaitState(chara));
 
 	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::ATTACK_NORMAL), nullptr);
-	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::ATTACK_SPECIAL), nullptr);
+	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::GUARD), nullptr);
 	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::SKILL_1), nullptr);
 	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::SKILL_2), nullptr);
 	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::SKILL_4), nullptr);
@@ -108,6 +108,6 @@ void PlayerCharacterPatternShield::Execute(PlayerCharacter * chara)
 
 	{
 		using namespace PlayerCharacterState::Shield;
-		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::ATTACK_SPECIAL), new AttackSpecialState(chara));
+		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::GUARD), new AttackSpecialState(chara));
 	}
 }

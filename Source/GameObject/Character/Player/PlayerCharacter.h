@@ -11,7 +11,6 @@
 #include "GameObject/Character/Character.h"
 #include "GameData.h"
 #include "PlayerCharacterData.h"
-#include "TAKOEngine/Rendering/DebugRenderer/SphereRenderer.h"
 
 class Enemy;
 
@@ -40,7 +39,7 @@ class PlayerCharacter : public Character
 {
 public:
 	// コンストラクタ(引数付き)
-	PlayerCharacter(uint32_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
+	PlayerCharacter(uint64_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
 	// コンストラクタ(引数付き)
 	PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataInfo);
 	// デストラクタ
@@ -50,8 +49,8 @@ public:
 	// 同期用
 	struct SYNC_DATA
 	{
-		uint32_t client_id;
-		uint32_t sync_count_id;
+		uint64_t client_id;
+		uint64_t sync_count_id;
 		float position[3];
 		float velocity[3];
 		float rotate;
@@ -90,7 +89,7 @@ public:
 		DEATH,
 
 		ATTACK_NORMAL,
-		ATTACK_SPECIAL,
+		GUARD,
 		SKILL_1,
 		SKILL_2,
 		SKILL_3,
@@ -117,7 +116,7 @@ public:
 	void LoadAppearance(const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
 
 	void Jump();
-	void InputMove(float elapsedTime);
+	bool InputMove(float elapsedTime);
 
 	DirectX::XMFLOAT2 GetInputDirection();
 	// 入力管理
@@ -125,7 +124,7 @@ public:
 	bool InputJump() { return (input & Input_Jump); }
 	bool InputDodge();
 	bool InputAttackNormal() { return (input & Input_Attack_N) > 0; }
-	bool InputAttackSpecial() { return (input & Input_Attack_S) > 0; }
+	bool InputGuard() { return (input & Input_Attack_S) > 0; }
 	bool InputSkill1() { return (input & Input_Skill_1) > 0; }
 	bool InputSkill2() { return (input & Input_Skill_2) > 0; }
 	bool InputSkill3() { return (input & Input_Skill_3) > 0; }
@@ -143,8 +142,8 @@ public:
 	void FaceToCamera();
 	void TurnByInput();
 
-	uint32_t GetClientId() { return m_client_id; }
-	void SetClientId(const uint32_t id) { m_client_id = id; }
+	uint64_t GetClientId() { return m_client_id; }
+	void SetClientId(const uint64_t id) { m_client_id = id; }
 
 	float GetTurnSpeed() { return turnSpeed; }
 	void SetTurnSpeed(float turnSpeed) { this->turnSpeed = turnSpeed; }
@@ -218,7 +217,7 @@ protected:
 	); // 汎用 敵との判定
 
 private:
-	uint32_t m_client_id = 0;
+	uint64_t m_client_id = 0;
 
 	uint32_t input = 0;						// キー入力
 	DirectX::XMFLOAT2 inputDirection = {};	// 移動方向
@@ -252,8 +251,6 @@ private:
 		}
 	};
 	std::unordered_map<int, SkillTimer> skillTimer;
-
-	std::unique_ptr<SphereRenderer> m_sphere;
 protected:
 
 	static inline DirectX::XMFLOAT4 colorSet[COLOR_PATTERN::END] = {
@@ -275,7 +272,7 @@ protected:
 		float time = 0.0f;
 		DirectX::XMFLOAT3 position = {};
 		float angle = 0.0f;
-		uint32_t old_sync_count = 0;
+		uint64_t old_sync_count = 0;
 		SYNC_DATA sync_data = {};
 	} m_tempData;
 };
