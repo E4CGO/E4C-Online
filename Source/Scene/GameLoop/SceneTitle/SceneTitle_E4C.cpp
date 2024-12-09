@@ -71,36 +71,6 @@ void SceneTitle_E4C::Initialize()
 	Sound::Instance().InitAudio();
 	Sound::Instance().LoadAudio("Data/Sound/TitleTheme.mp3");
 	Sound::Instance().PlayAudio(0);
-
-	graphicsMemory = std::make_unique<GraphicsMemory>(T_GRAPHICS.GetDeviceDX12());
-
-	m_resourceDescriptors = std::make_unique<DirectX::DescriptorHeap>(T_GRAPHICS.GetDeviceDX12(),
-		Descriptors::Count);
-
-	ResourceUploadBatch resourceUpload(T_GRAPHICS.GetDeviceDX12());
-
-	resourceUpload.Begin();
-
-	RenderTargetState rtState(RenderTargetFormat, DepthStencilFormat);
-
-	SpriteBatchPipelineStateDescription pd(rtState);
-	m_spriteBatch = std::make_unique<DirectX::DX12::SpriteBatch>(T_GRAPHICS.GetDeviceDX12(), resourceUpload, pd);
-
-	m_font = std::make_unique <DirectX::DX12::SpriteFont>(T_GRAPHICS.GetDeviceDX12(), resourceUpload,
-		L"Data/Font/SegoeUI_48.spritefont",
-		m_resourceDescriptors->GetCpuHandle(Descriptors::MyFont),
-		m_resourceDescriptors->GetGpuHandle(Descriptors::MyFont));
-
-	auto viewport = T_GRAPHICS.GetViewport();
-	m_spriteBatch->SetViewport(viewport);
-
-	m_fontPos.x = float(T_GRAPHICS.GetScreenWidth()) / 2.f;
-	m_fontPos.y = float(T_GRAPHICS.GetScreenHeight()) / 2.f;
-
-	auto uploadResourcesFinished = resourceUpload.End(
-		T_GRAPHICS.GetCommandQueue().d3d_command_queue.Get());
-
-	uploadResourcesFinished.wait();
 }
 
 void SceneTitle_E4C::Finalize()
@@ -174,18 +144,11 @@ void SceneTitle_E4C::RenderDX12()
 		rc.d3d_command_list = m_frameBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
-		m_spriteBatch->Begin(m_frameBuffer->GetCommandList());
-
-		const wchar_t* output = L"MOJI BYOGA WA MUZUKASHII";
-
-		DirectX::SimpleMath::Vector2 origin = m_font->MeasureString(output) / 2.f;
-
-		m_font->DrawString(m_spriteBatch.get(), output,
-			m_fontPos, Colors::White, 0.f, origin);
-
-		m_spriteBatch->End();
+		T_TEXT.BeginDX12(rc);
 
 		UI.RenderDX12(rc);
+
+		T_TEXT.EndDX12();
 	}
 	T_GRAPHICS.End();
 }

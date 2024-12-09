@@ -176,6 +176,8 @@ void SceneCharacter_E4C::RenderDX12()
 		rc.d3d_command_list = m_frameBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
+		T_TEXT.BeginDX12(rc);
+
 		// 3Dモデル描画
 		{
 			m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
@@ -200,6 +202,8 @@ void SceneCharacter_E4C::RenderDX12()
 		// 2D描画
 		{
 			UI.RenderDX12(rc);
+
+			T_TEXT.EndDX12();
 		}
 	}
 	TentacleLib::graphics.End();

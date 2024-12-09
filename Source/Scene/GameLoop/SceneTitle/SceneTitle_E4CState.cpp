@@ -7,9 +7,9 @@
 #include "Source/UI/Widget/WidgetText.h"
 #include "Source/UI/Widget/WidgetButtonImage.h"
 
-WidgetText* title = nullptr;;
-WidgetButtonImage* btnStart = nullptr;;
-WidgetButtonImage* btnExit = nullptr;;
+WidgetText* title = nullptr;
+WidgetButtonImage* btnStart = nullptr;
+WidgetButtonImage* btnExit = nullptr;
 
 void SceneTitle_E4CState::InitState::Enter()
 {

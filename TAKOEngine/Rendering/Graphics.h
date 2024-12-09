@@ -11,6 +11,8 @@
 #include <d3d12.h>
 #include <dxgi1_6.h>
 
+#include "External/DirectXTK12/Inc/GraphicsMemory.h"
+
 #include "TAKOEngine/Rendering/FrameBuffer.h"
 #include "TAKOEngine/Rendering/FrameBufferManager.h"
 #include "TAKOEngine/Rendering/RenderState.h"
@@ -206,6 +208,7 @@ public:
 	// デバイス取得
 	ID3D12Device* GetDeviceDX12() const { return m_d3d_device.Get(); }
 	CommandQueue GetCommandQueue() const { return m_graphics_queue; }
+	DirectX::DX12::GraphicsMemory* GetGraphicsMemory() const { return m_graphicsMemory.get(); }
 
 	// ディスクリプタヒープ取得
 	TakoEngine::DescriptorHeap* GetShaderResourceDescriptorHeap() const { return m_shader_resource_descriptor_heap.get(); }
@@ -368,6 +371,8 @@ private:
 	float m_screen_height;
 
 	std::unique_ptr<ImGuiRenderer>						m_imgui_renderer;
+
+	std::unique_ptr<DirectX::DX12::GraphicsMemory> m_graphicsMemory;
 };
 
 #endif // !__GRAHICS_GRAHICS_H__

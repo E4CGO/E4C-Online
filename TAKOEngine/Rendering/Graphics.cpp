@@ -103,6 +103,10 @@ void Graphics::FinishDX12()
 			m_sampler_descriptor_heap->PushDescriptor(m_sampler[i]->GetDescriptor());
 		}
 	}
+
+	m_graphicsMemory->GarbageCollect();
+	//m_graphicsMemory.reset();
+	m_graphicsMemory.release();
 }
 
 //******************************************************************
@@ -139,10 +143,10 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 		{
 			if (SUCCEEDED(d3d_debug->QueryInterface(IID_PPV_ARGS(&d3d_debug1))))
 			{
-				//d3d_debug->EnableDebugLayer();
+				d3d_debug->EnableDebugLayer();
 				d3d_debug1->SetEnableGPUBasedValidation(true);
 			}
-			//dxgi_factory_flags |= DXGI_CREATE_FACTORY_DEBUG;
+			dxgi_factory_flags |= DXGI_CREATE_FACTORY_DEBUG;
 		}
 	}
 
@@ -378,6 +382,8 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 			}
 		}
 	}
+
+	m_graphicsMemory = std::make_unique<DirectX::DX12::GraphicsMemory>(T_GRAPHICS.GetDeviceDX12());
 
 #endif // USEDX12
 
@@ -741,6 +747,8 @@ void Graphics::Execute()
 
 	// 画面表示
 	m_dxgi_swap_chain->Present(SyncInterval, SyncInterval == 0 ? DXGI_PRESENT_ALLOW_TEARING : 0);
+
+	m_graphicsMemory->Commit(m_graphics_queue.d3d_command_queue.Get());
 
 	// コマンド終了まで待つ
 	WaitIdle(m_graphics_queue);

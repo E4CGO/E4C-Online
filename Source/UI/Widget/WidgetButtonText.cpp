@@ -38,4 +38,14 @@ void WidgetButtonText::Render(const RenderContext& rc)
 
 void WidgetButtonText::RenderDX12(const RenderContextDX12& rc)
 {
+	T_TEXT.RenderDX12(
+		FONT_ID::HGpop,
+		m_text.c_str(),
+		m_position.x, m_position.y,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		0.0f,
+		FONT_ALIGN::TOP_LEFT,
+		m_scale,
+		0
+	);
 }

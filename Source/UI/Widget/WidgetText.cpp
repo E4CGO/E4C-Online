@@ -44,4 +44,16 @@ void WidgetText::Render(const RenderContext& rc)
 void WidgetText::RenderDX12(const RenderContextDX12& rc)
 {
 	if (!m_enable) return;
+
+	T_TEXT.RenderDX12(
+		m_font,
+		m_str.c_str(),
+		m_position.x, m_position.y,
+		m_color.x, m_color.y, m_color.z, m_color.w,
+		m_angle,
+		m_align,
+		m_scale,
+		m_border,
+		m_borderColor
+	);
 }

@@ -6,18 +6,13 @@
 #include "TAKOEngine/Editor/Camera/FreeCameraController.h"
 #include "TAKOEngine/AI/StateMachine.h"
 
+#include "Source/UI/Widget/WidgetText.h"
+
 #include <unordered_set>
 
 // テスト用
 #include "GameObject/ModelObject.h"
 #include "Scene/Scene.h"
-
-#include "External/DirectXTK12/Inc/SpriteFont.h"
-#include "External/DirectXTK12/Inc/SpriteBatch.h"
-#include "DescriptorHeap.h"
-#include "ResourceUploadBatch.h"
-
-using namespace DX12;
 
 class SceneTitle_E4C : public Scene
 {
@@ -69,20 +64,4 @@ private:
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
 
 	static float time;
-
-	//DX12FONT
-
-	std::unique_ptr<DirectX::DescriptorHeap> m_resourceDescriptors;
-	std::unique_ptr <DirectX::DX12::SpriteFont> m_font;
-
-	enum Descriptors
-	{
-		MyFont,
-		Count
-	};
-
-	std::unique_ptr<DirectX::DX12::SpriteBatch> m_spriteBatch;
-	DirectX::SimpleMath::Vector2 m_fontPos;
-
-	std::unique_ptr<GraphicsMemory> graphicsMemory;
 };

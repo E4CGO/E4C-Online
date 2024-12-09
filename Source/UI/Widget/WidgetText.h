@@ -1,4 +1,4 @@
-﻿//! @file WidgetText.h
+//! @file WidgetText.h
 //! @note
 
 #ifndef __INCLUDED_UI_WIDGET_TEXT__
