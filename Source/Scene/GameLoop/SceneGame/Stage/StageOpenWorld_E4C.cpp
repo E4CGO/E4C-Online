@@ -1,3 +1,6 @@
+//! @file StageOpenWorld_E4C.cpp
+//! @note 
+
 #include "StageOpenWorld_E4C.h"
 
 #include "TAKOEngine/GUI/UIManager.h"
@@ -48,8 +51,9 @@ void StageOpenWorld_E4C::Initialize()
 
 	if (T_GRAPHICS.isDX11Active)
 	{
-		models.emplace("map", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX11GLTF, ModelObject::MODEL_TYPE::RHS_PBR));
+		models.emplace("map", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_TOON));
 		models.emplace("tower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_TOON));
+
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 70.0f, ModelObject::RENDER_MODE::DX11);
 		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
@@ -59,8 +63,8 @@ void StageOpenWorld_E4C::Initialize()
 	{
 		models.emplace("map", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models.emplace("tower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
-		//models.emplace("boss", std::make_unique<ModelObject>("Data/Model/Enemy/MDL_ENMboss_1129.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON));
-		//models["boss"]->SetPosition({ 10.0, 0.0f, 10.0f });
+		models.emplace("boss", std::make_unique<ModelObject>("Data/Model/Enemy/MDL_ENMboss_1129.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON));
+		models["boss"]->SetPosition({ 10.0, 0.0f, 10.0f });
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 70.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
 		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
@@ -94,7 +98,7 @@ void StageOpenWorld_E4C::Initialize()
 		player->GetPosition(),	// 注視点
 		{ 0, 0.969f, -0.248f }	// 上ベクトル
 	);
-	Spawner* spawner = new Spawner(0, 1, -1);
+	Spawner* spawner = new Spawner(ENEMY_TYPE::MOUSE, 3, -1);
 	spawner->SetPosition({ 0.0f, 2.0f, 0.0f });
 	SpawnerManager::Instance().Register(spawner);
 
@@ -155,7 +159,7 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 
 	teleporter->Update(elapsedTime);
 
-	timer += elapsedTime;
+	m_timer += elapsedTime;
 }
 
 void StageOpenWorld_E4C::Render()
@@ -169,7 +173,7 @@ void StageOpenWorld_E4C::Render()
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
-	rc.timerGlobal = timer;
+	rc.timerGlobal = m_timer;
 	rc.timerTick = TentacleLib::Timer::Instance().Delta();
 
 	// ライトの情報を詰め込む
@@ -259,8 +263,4 @@ void StageOpenWorld_E4C::RenderDX12()
 	}
 
 	T_GRAPHICS.End();
-}
-
-void StageOpenWorld_E4C::OnPhase()
-{
 }

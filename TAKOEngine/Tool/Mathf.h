@@ -1,5 +1,5 @@
 ﻿//! @file Mathf.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDED_TOOL_MATH__
 #define __INCLUDED_TOOL_MATH__
@@ -20,6 +20,8 @@ public:
 	static float LerpRadian(float a, float b, float t);
 	// 指定範囲のランダム値を計算する
 	static float RandomRange(float min, float max);
+	static float CalcDistFloat3XZ(DirectX::XMFLOAT3 originPosition, DirectX::XMFLOAT3 targetPosition);
+	static float CalcDistFloat3(DirectX::XMFLOAT3 originPosition, DirectX::XMFLOAT3 targetPosition);
 	// 誤差比較
 	static bool cmpf(float a, float b, float epsilon = 0.005f);
 	static bool cmpfloat3(DirectX::XMFLOAT3 a, DirectX::XMFLOAT3 b, float epsilon = 0.005f);

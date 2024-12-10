@@ -1,5 +1,6 @@
 ﻿//! @file Enemy.h
-//! @note 
+//! @note
+
 #ifndef __INCLUDED_ENEMY_H__
 #define __INCLUDED_ENEMY_H__
 
@@ -25,6 +26,8 @@ enum ENEMY_TYPE : uint8_t
 {
 	SKELETON_MINION,						// デフォルト骨
 	SKELETON_MINION_BOSS,					// デフォルト骨ボス
+
+	MOUSE,									//　ネズミ
 	END,
 };
 
@@ -33,11 +36,13 @@ class Spawner;
 class Enemy : public Character
 {
 public:
-	Enemy(const char* filename, float scaling = 1.0f);
+	Enemy(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX11);
 	~Enemy();
 
 	virtual void Update(float elapsedTime) override;
 	void Render(const RenderContext& rc) override;
+
+	void SetSpawnPosition(const DirectX::XMFLOAT3& position) { this->m_SpawnPosition = position; }
 
 	virtual void OnDamage(const ENEMY_COLLISION& hit);
 	virtual void OnDeath();
@@ -49,7 +54,6 @@ public:
 	void SetEnemyId(const uint32_t& id) { enemy_id = id; }
 	uint32_t GetEnemyId() { return enemy_id; }
 
-	bool IsAlive();
 
 	bool MoveTo(float elapsedTime, const DirectX::XMFLOAT3& target);
 	void TurnTo(float elapsedTime, const DirectX::XMFLOAT3& target);
@@ -67,12 +71,19 @@ public:
 	void EnableAttackColliders(bool enable = true) { for (const std::pair<int, Collider*>& collider : attackColliders) collider.second->SetEnable(enable); }
 	virtual void AttackCollision() override;
 
-	static Enemy* EnemyFactory(int enemyType);
+	static Enemy* EnemyFactory(uint8_t enemyType);
 
 	void SetSpawner(Spawner* spawner) { m_pSpawner = spawner; }
 
 	const bool IsMine() const { return m_isMine; }
 	void SetMine(bool flag = true) { m_isMine = flag; }
+
+	void SetRandomMoveTargetPosition();
+	bool SearchPlayer();
+
+	float GetSearchRange() { return m_SearchRange; }
+	DirectX::XMFLOAT3 GetMoveTargetPosition() { return m_MoveTargetPosition; }
+
 public:
 	enum Animation
 	{
@@ -119,6 +130,11 @@ protected:
 	float turnSpeed = 0.0f;
 	float jumpSpeed = 0.0f;
 
+	DirectX::XMFLOAT3 m_SpawnPosition;
+	float m_SearchRange;
+	float m_AttackRange;
+	DirectX::XMFLOAT3 m_MoveTargetPosition;
+
 	StateMachine<Enemy>* stateMachine;
 
 	int subState = -1;
@@ -132,4 +148,5 @@ protected:
 
 	bool m_isMine = false; // ローカル
 };
-#endif
+
+#endif //!__INCLUDED_ENEMY_H__

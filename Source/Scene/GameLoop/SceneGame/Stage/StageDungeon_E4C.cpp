@@ -1,4 +1,7 @@
-﻿#include "StageDungeon_E4C.h"
+﻿//! @file StageDungeon_E4C.cpp
+//! @note 
+
+#include "StageDungeon_E4C.h"
 #include "StageOpenWorld_E4C.h"
 
 #include "TAKOEngine/GUI/UIManager.h"
@@ -284,7 +287,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 		T_INPUT.KeepCursorCenter();
 	}
 
-	timer += elapsedTime;
+	m_timer += elapsedTime;
 }
 
 void StageDungeon_E4C::Render()
@@ -298,7 +301,7 @@ void StageDungeon_E4C::Render()
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
-	rc.timerGlobal = timer;
+	rc.timerGlobal = m_timer;
 	rc.timerTick = TentacleLib::Timer::Instance().Delta();
 
 	// ライトの情報を詰め込む
@@ -358,8 +361,4 @@ void StageDungeon_E4C::RenderDX12()
 	}
 
 	T_GRAPHICS.End();
-}
-
-void StageDungeon_E4C::OnPhase()
-{
 }

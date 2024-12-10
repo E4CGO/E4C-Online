@@ -1,4 +1,8 @@
-#pragma once
+//! @file StageOpenWorld_E4C.h
+//! @note 
+
+#ifndef __INCLUDED_STAGE_OPEN_WORLD_E4C_H__
+#define __INCLUDED_STAGE_OPEN_WORLD_E4C_H__
 
 #include <unordered_set>
 #include <memory>
@@ -8,6 +12,7 @@
 #include "GameObject/GameObject.h"
 #include "GameObject/Character/Player/PlayerCharacter.h"
 #include "GameObject/Props/Teleporter.h"
+
 #include "TAKOEngine/Rendering/Shaders/PlaneShader.h"
 
 #include "Scene/Scene.h"
@@ -33,8 +38,6 @@ public:
 	void Render() override;
 
 	void RenderDX12() override;
-protected:
-	void OnPhase() override;
 public:
 	enum PHASE
 	{
@@ -85,3 +88,5 @@ private:
 	// ポストエフェクト
 	std::unique_ptr<PostprocessingRendererDX12>	postprocessingRenderer = std::make_unique<PostprocessingRendererDX12>();
 };
+
+#endif // !__INCLUDED_STAGE_OPEN_WORLD_E4C_H__
