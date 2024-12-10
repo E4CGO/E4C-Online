@@ -200,6 +200,19 @@ public:
 	// バウンディングボックス計算
 	virtual void ComputeWorldBounds() = 0;
 
+	// インスタンシング用関数----------------------------------
+	//割り当てられた番号を返す
+	virtual int AllocateInstancingIndex() = 0;
+
+	//割り当てられた番号を解放する
+	virtual void FreeInstancingIndex(int instancingIndex) = 0;
+
+	//行列計算
+	virtual void UpdateTransform(int instancingIndex, const DirectX::XMFLOAT4X4& transform) = 0;
+
+	//現在の姿勢行列を取得
+	virtual const DirectX::XMFLOAT4X4& GetTransform(int instancingIndex) const = 0;
+
 protected:
 	std::shared_ptr<ModelResource>	resource;
 	std::vector<Node>				nodes;
@@ -234,4 +247,8 @@ protected:
 	std::vector<Mesh>						m_meshes;
 	DirectX::BoundingBox	                m_bounds;
 	std::string name = ""; // モデルの名前
+
+	// インスタンシング用
+	bool exist[InstancingMax] = {};
+	DirectX::XMFLOAT4X4 m_transform[InstancingMax];
 };
