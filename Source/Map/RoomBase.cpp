@@ -422,61 +422,38 @@ void RoomBase::PlaceMapTile(bool isLeader)
 		if (T_GRAPHICS.isDX12Active)
 		{
 			ModelObject* model = new ModelObject(modelFileNames.at(0).fileName.c_str(), modelFileNames.at(0).scale, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON);
-
-			//ID3D12Device* device = Graphics::Instance().GetDeviceDX12();
-
-			//// インスタンシング用モデルを生成
-			//ModelDX12* instancingModel = new ModelDX12(device, modelFileNames.at(0).fileName.c_str(), modelFileNames.at(0).scale);
+			model->SetShader(modelFileNames.at(0).fileName.c_str(), ModelShaderDX12Id::ToonInstancing);
 
 			for (int i = 0; i < m_tileDatas.at(tileType).size(); i++)
 			{
 				// 使われていないIDを取得して利用
-				
-				//if (id < 0) continue;
+				int id = model->GetModel()->AllocateInstancingIndex();
+				if (id < 0) continue;
 
 				DirectX::XMFLOAT3 position = m_tileDatas.at(tileType).at(i).position;
 				DirectX::XMFLOAT3 angle = m_tileDatas.at(tileType).at(i).angle;
 				DirectX::XMFLOAT3 scale = m_tileDatas.at(tileType).at(i).scale;
 
-				DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
-				DirectX::XMMATRIX R = AnglesToMatrix(angle);
-				DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
+				DirectX::XMMATRIX m;
+				m = DirectX::XMMatrixScaling(1, 1, 1);
+				m *= DirectX::XMMatrixRotationY(DirectX::XMConvertToRadians(angle.y));
+				m *= DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 
-				DirectX::XMMATRIX LocalTransform = S * R * T;
-				DirectX::XMFLOAT4X4 localTransform;
-				DirectX::XMStoreFloat4x4(&localTransform, LocalTransform);
-
-				//instancingModel->UpdateTransform(id, localTransform);
-
-
-				//DirectX::XMMATRIX m;
-				//m = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
-				//m *= DirectX::XMMatrixRotationY(angle.y);
-				//m *= DirectX::XMMatrixTranslation(position.x, position.y, position.z);
-
-				//DirectX::XMFLOAT4X4 tm;
-				//DirectX::XMStoreFloat4x4(&tm, m);
-				//instancingModel->UpdateTransform(id, tm);
+				DirectX::XMFLOAT4X4 tm;
+				DirectX::XMStoreFloat4x4(&tm, m);
+				model->GetModel()->UpdateTransform(id, tm);
 			}
 
-			//// 右手座標系から左手座標系へ変換する行列
-			//DirectX::XMMATRIX CoordinateSystemTransform = DirectX::XMMatrixScaling(-1.0f, 1.0f, 1.0f);
+			DirectX::XMFLOAT4X4 worldTransform = {
+				1, 0, 0, 0,
+				0, 1, 0, 0,
+				0, 0, 1, 0,
+				0, 0, 0, 1
+			};
+			model->GetModel()->UpdateTransform(worldTransform);
 
-			//DirectX::XMFLOAT4X4 worldTransform;
-			//worldTransform = {
-			//	1, 0, 0, 0,
-			//	0, 1, 0, 0,
-			//	0, 0, 1, 0,
-			//	0, 0, 0, 1
-			//};
-
-			//DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&worldTransform) * CoordinateSystemTransform;
-			//DirectX::XMStoreFloat4x4(&worldTransform, WorldTransform);
-
-			//instancingModel->UpdateTransform(worldTransform);
-
-			//// 登録
-			//InstancingModelManager::Instance().Register(instancingModel);
+			model->Update(0);
+			MAPTILES.Register(model);
 		}
 
 		for (const TILE_DATA& tileData : m_tileDatas.at(tileType))
@@ -495,6 +472,8 @@ void RoomBase::PlaceMapTile(bool isLeader)
 				}
 			}
 
+			continue;
+
 			//if (colliderFileNames.size() != 0) continue;
 
 			newTile->SetPosition(tileData.position);
@@ -502,7 +481,7 @@ void RoomBase::PlaceMapTile(bool isLeader)
 			newTile->SetScale(tileData.scale);
 			//newTile->SetColor(tileData.color);
 			//newTile->Update(0);
-			//newTile->Hide();
+			newTile->Hide();
 			MAPTILES.Register(newTile);
 		}
 	}
