@@ -402,8 +402,8 @@ set(TAKOEngine__Network
 source_group("TAKOEngine\\Network" FILES ${TAKOEngine__Network})
 
 set(TAKOEngine__Physics
-    "TAKOEngine/Physics/BoundingBoxCollider.cpp"
-    "TAKOEngine/Physics/BoundingBoxCollider.h"
+    "TAKOEngine/Physics/AABBCollider.cpp"
+    "TAKOEngine/Physics/AABBCollider.h"
     "TAKOEngine/Physics/CapsuleCollider.cpp"
     "TAKOEngine/Physics/CapsuleCollider.h"
     "TAKOEngine/Physics/Collider.cpp"
@@ -423,6 +423,8 @@ set(TAKOEngine__Physics
     "TAKOEngine/Physics/MapQuadtree.h"
     "TAKOEngine/Physics/ModelCollider.cpp"
     "TAKOEngine/Physics/ModelCollider.h"
+    "TAKOEngine/Physics/OBBCollider.cpp"
+    "TAKOEngine/Physics/OBBCollider.h"
     "TAKOEngine/Physics/OctreeNode.cpp"
     "TAKOEngine/Physics/OctreeNode.h"
     "TAKOEngine/Physics/QuadtreeNode.cpp"
@@ -430,8 +432,6 @@ set(TAKOEngine__Physics
     "TAKOEngine/Physics/RigidBody.h"
     "TAKOEngine/Physics/SphereCollider.cpp"
     "TAKOEngine/Physics/SphereCollider.h"
-    "TAKOEngine/Physics/UnrotatedBoxCollider.cpp"
-    "TAKOEngine/Physics/UnrotatedBoxCollider.h"
 )
 source_group("TAKOEngine\\Physics" FILES ${TAKOEngine__Physics})
 
@@ -440,8 +440,6 @@ set(TAKOEngine__Rendering
     "TAKOEngine/Rendering/ConstantBuffer.h"
     "TAKOEngine/Rendering/Cylinder.cpp"
     "TAKOEngine/Rendering/Cylinder.h"
-    "TAKOEngine/Rendering/DebugRenderer.cpp"
-    "TAKOEngine/Rendering/DebugRenderer.h"
     "TAKOEngine/Rendering/DeferredRendering.cpp"
     "TAKOEngine/Rendering/DeferredRendering.h"
     "TAKOEngine/Rendering/Descriptor.cpp"
@@ -555,6 +553,18 @@ set(TAKOEngine__Editor__Input
 )
 source_group("TAKOEngine\\Editor\\Input" FILES ${TAKOEngine__Editor__Input})
 
+set(TAKOEngine__Rendering__DebugRenderer
+    "TAKOEngine/Rendering/DebugRenderer/CubeRenderer.cpp"
+    "TAKOEngine/Rendering/DebugRenderer/CubeRenderer.h"
+    "TAKOEngine/Rendering/DebugRenderer/CylinderRenderer.cpp"
+    "TAKOEngine/Rendering/DebugRenderer/CylinderRenderer.h"
+    "TAKOEngine/Rendering/DebugRenderer/DebugRenderer.cpp"
+    "TAKOEngine/Rendering/DebugRenderer/DebugRenderer.h"
+    "TAKOEngine/Rendering/DebugRenderer/SphereRenderer.cpp"
+    "TAKOEngine/Rendering/DebugRenderer/SphereRenderer.h"
+)
+source_group("TAKOEngine\\Rendering\\DebugRenderer" FILES ${TAKOEngine__Rendering__DebugRenderer})
+
 set(TAKOEngine__Rendering__Model
     "TAKOEngine/Rendering/Model/GLTFModelDX11.cpp"
     "TAKOEngine/Rendering/Model/GLTFModelDX11.h"
@@ -626,6 +636,9 @@ source_group("TAKOEngine\\Rendering\\HLSL\\Common" FILES ${TAKOEngine__Rendering
 
 set(TAKOEngine__Rendering__HLSL__Debug
     "TAKOEngine/Rendering/HLSL/Debug/Debug.hlsli"
+    "TAKOEngine/Rendering/HLSL/Debug/DebugDX12.hlsli"
+    "TAKOEngine/Rendering/HLSL/Debug/DebugDX12PS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Debug/DebugDX12VS.hlsl"
     "TAKOEngine/Rendering/HLSL/Debug/DebugPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Debug/DebugVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Debug/Gizmos.hlsli"
@@ -803,6 +816,7 @@ set(ALL_FILES
     ${TAKOEngine__Tool}
     ${TAKOEngine__Editor__Camera}
     ${TAKOEngine__Editor__Input}
+    ${TAKOEngine__Rendering__DebugRenderer}
     ${TAKOEngine__Rendering__HLSL}
     ${TAKOEngine__Rendering__Model}
     ${TAKOEngine__Rendering__Shaders}
@@ -843,6 +857,8 @@ endfunction()
 
 #List of HLSL shaders
 set(SHADER_NAMES
+    "DebugDX12PS.cso"
+    "DebugDX12VS.cso"
     "DebugPS.cso"
     "DebugVS.cso"
     "GizmosPS.cso"
@@ -912,6 +928,8 @@ set(SHADER_NAMES
 
 # List of shader settings
 set(HLSL_SHADERS
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/DebugDX12PS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/DebugDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/DebugPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/DebugVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/GizmosPS.hlsl,5.0,Pixel,main"
