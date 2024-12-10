@@ -23,9 +23,11 @@ inline void operator/=(XMFLOAT3& v, const float& num) { v.x /= num; v.y /= num; 
 inline bool operator==(const XMFLOAT3& v1, const XMFLOAT3& v2) { return v1.x == v2.x && v1.y == v2.y && v1.z == v2.z; }
 inline bool operator!=(const XMFLOAT3& v1, const XMFLOAT3& v2) { return !(v1 == v2); }
 
-inline float XMFLOAT3Length(const XMFLOAT3 v) { return XMVectorGetX(XMVector3Length(XMLoadFloat3(&v))); }
-inline float XMFLOAT3LengthSq(const XMFLOAT3 v) { return XMVectorGetX(XMVector3LengthSq(XMLoadFloat3(&v))); }
-inline XMFLOAT3 XMFLOAT3Normalize(const XMFLOAT3 v)
+inline float XMFLOAT3Length(const XMFLOAT3& v) { return XMVectorGetX(XMVector3Length(XMLoadFloat3(&v))); }
+inline float XMFLOAT3LengthSq(const XMFLOAT3& v) { return XMVectorGetX(XMVector3LengthSq(XMLoadFloat3(&v))); }
+inline float XMFLOAT3HorizontalLength(XMFLOAT3 v) { v.y = 0.0f; return XMFLOAT3Length(v); }
+inline float XMFLOAT3HorizontalLengthSq(XMFLOAT3 v) { v.y = 0.0f; return XMFLOAT3HorizontalLengthSq(v); }
+inline XMFLOAT3 XMFLOAT3Normalize(const XMFLOAT3& v)
 {
 	XMFLOAT3 n;
 	XMStoreFloat3(&n, XMVector3Normalize(XMLoadFloat3(&v)));

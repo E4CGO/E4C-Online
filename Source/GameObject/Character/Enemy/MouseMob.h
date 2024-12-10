@@ -21,16 +21,9 @@ public:
 private:
 	void UpdateColliders() override;
 public:
-	enum AttackCollider
+	enum ATTACK_COLLIDER
 	{
 		BodyAtc
-	};
-
-	enum State
-	{
-		Search = EnemyState::ID::End,
-		Battle,
-		Recieve,
 	};
 
 protected:

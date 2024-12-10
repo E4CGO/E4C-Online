@@ -11,9 +11,9 @@ Enemy::Enemy(const char* filename, float scaling, ModelObject::RENDER_MODE rende
 	//SetCollider(Collider::COLLIDER_TYPE::MODEL);
 
 	stateMachine = new StateMachine<Enemy>;
-	stateMachine->RegisterState(EnemyState::ID::Idle, new EnemyState::IdleState(this, 2.0f));
-	stateMachine->RegisterState(EnemyState::ID::Hurt, new EnemyState::HurtState(this));
-	stateMachine->RegisterState(EnemyState::ID::Death, new EnemyState::DeathState(this));
+	stateMachine->RegisterState(enemy::STATE::IDLE, new enemy::IdleState(this, 2.0f));
+	stateMachine->RegisterState(enemy::STATE::HURT, new enemy::HurtState(this));
+	stateMachine->RegisterState(enemy::STATE::DEATH, new enemy::DeathState(this));
 }
 
 Enemy::~Enemy()
@@ -113,12 +113,12 @@ void Enemy::OnDamage(const ENEMY_COLLISION& hit)
 	hp -= hit.damage;
 	if (hp > 0)
 	{
-		if (hit.power) stateMachine->ChangeState(EnemyState::ID::Hurt);
+		if (hit.power) stateMachine->ChangeState(enemy::STATE::HURT);
 		velocity += hit.force;
 	}
 	else
 	{
-		stateMachine->ChangeState(EnemyState::ID::Death);
+		stateMachine->ChangeState(enemy::STATE::DEATH);
 	}
 }
 void Enemy::OnDeath()

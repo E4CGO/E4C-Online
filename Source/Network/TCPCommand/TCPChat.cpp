@@ -45,13 +45,10 @@ namespace Online
 		std::string* message = static_cast<std::string*>(data);
 
 		std::vector<uint8_t> buffer;
-
-		std::string utfmessage = Encode::shift_jis_to_utf8(*message);
-
-		CreateHeaderBuffer(buffer, m_cmd, static_cast<uint32_t>(utfmessage.size() - 1));
+		CreateHeaderBuffer(buffer, m_cmd, static_cast<uint32_t>(message->size()));
 
 		// チャット内容
-		U8Buffer::InsertU8(buffer, utfmessage);
+		U8Buffer::InsertU8(buffer, *message);
 
 		return m_pcontroller->GetTcpSocket()->Send(buffer.data(), buffer.size()) >= 0;
 	}

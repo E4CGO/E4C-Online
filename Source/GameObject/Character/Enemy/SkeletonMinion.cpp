@@ -23,9 +23,9 @@ SkeletonMinion::SkeletonMinion(float scaling) : Enemy("Data/Model/Enemy/characte
 	attackColliders[AttackCollider::RightHand] = new SphereCollider(scaling * 0.2f);
 	EnableAttackColliders(false);
 
-	stateMachine->RegisterState(EnemyState::ID::TargetFound, new EnemyState::FollowState(this, 2.0f, SkeletonMinion::State::Attack));
-	stateMachine->RegisterState(SkeletonMinion::State::Attack, new SkeletonMinionState::AttackState(this));
-	stateMachine->SetState(EnemyState::Idle);
+	stateMachine->RegisterState(enemy::STATE::TARGET_FOUND, new enemy::FollowState(this, 2.0f, SkeletonMinion::STATE::ATTACK));
+	stateMachine->RegisterState(SkeletonMinion::STATE::ATTACK, new SkeletonMinionState::AttackState(this));
+	stateMachine->SetState(enemy::STATE::IDLE);
 }
 
 // 一番近いプレイヤーをターゲット
@@ -60,9 +60,9 @@ SkeletonMinionBoss::SkeletonMinionBoss() : SkeletonMinion(3.0f)
 	// スーパーアーマー
 	armorMaxHp = armorHp = 50;
 
-	stateMachine->RegisterState(EnemyState::ID::Idle, new EnemyState::IdleState(this, 1.0f));
-	stateMachine->RegisterState(EnemyState::ID::TargetFound, new EnemyState::FollowState(this, 3.0f, SkeletonMinion::State::Attack));
-	stateMachine->SetState(EnemyState::ID::Idle);
+	stateMachine->RegisterState(enemy::STATE::IDLE, new enemy::IdleState(this, 1.0f));
+	stateMachine->RegisterState(enemy::STATE::TARGET_FOUND, new enemy::FollowState(this, 3.0f, SkeletonMinion::STATE::ATTACK));
+	stateMachine->SetState(enemy::STATE::IDLE);
 
 	// HPゲージ
 	UI.Register(new WidgetBossHp("スケルドン", this));
@@ -90,7 +90,7 @@ void SkeletonMinionBoss::OnDamage(const ENEMY_COLLISION& hit)
 	if (hp > 0)
 	{
 		if (armorHp <= 0) { // アーマーなし
-			stateMachine->ChangeState(EnemyState::ID::Hurt);
+			stateMachine->ChangeState(enemy::STATE::HURT);
 			hp -= hit.damage / 10 * 2;		// ダウン追加ダメージ
 		}
 		else if (hit.colider_id == HitCollider::Head)	// ヘッドショット アーマーあり
@@ -106,6 +106,6 @@ void SkeletonMinionBoss::OnDamage(const ENEMY_COLLISION& hit)
 
 	if (hp <= 0)
 	{
-		stateMachine->ChangeState(EnemyState::ID::Death);
+		stateMachine->ChangeState(enemy::STATE::DEATH);
 	}
 }

@@ -1,4 +1,4 @@
-﻿//! @file RenderState.cpp
+//! @file RenderState.cpp
 //! @note
 
 #include "Misc.h"

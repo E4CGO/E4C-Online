@@ -22,9 +22,9 @@ protected:
 		Body,
 		Head
 	};
-	enum State
+	enum STATE
 	{
-		Attack = EnemyState::ID::End,
+		ATTACK = enemy::STATE::END,
 	};
 
 	void UpdateTarget();

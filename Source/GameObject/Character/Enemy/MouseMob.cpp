@@ -24,28 +24,26 @@ MouseMob::MouseMob(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("
 	// 当たり判定
 	colliders[HitCollider::BodyHit] = new SphereCollider(scaling * 1.2f);
 	// 攻撃判定
-	attackColliders[AttackCollider::BodyAtc] = new SphereCollider(scaling * 0.6f);
+	attackColliders[ATTACK_COLLIDER::BodyAtc] = new SphereCollider(scaling * 0.6f);
 	EnableAttackColliders(false);
 
-	using namespace MouseMobState;
-	// 基本ステート
-	stateMachine->RegisterState(MouseMob::State::Search, new MouseMobState::SearchState(this));
-	stateMachine->RegisterState(MouseMob::State::Battle, new MouseMobState::BattleState(this));
-	stateMachine->RegisterState(MouseMob::State::Recieve, new MouseMobState::RecievedState(this));
+	{
+		using namespace enemy::mouseMob;
+		// 基本ステート
+		stateMachine->RegisterState(STATE::SEARCH, new SearchState(this));
+		stateMachine->RegisterState(STATE::BATTLE, new BattleState(this));
 
-	// 移動サブステート
-	stateMachine->RegisterSubState(MouseMob::State::Search, Search::Wander, new MouseMobState::WanderState(this, 1.0f));
-	stateMachine->RegisterSubState(MouseMob::State::Search, Search::Idle, new MouseMobState::IdleState(this, 3.0f, 5.0f));
+		// 移動サブステート
+		stateMachine->RegisterSubState(STATE::SEARCH, SEARCH_STATE::WANDER, new WanderState(this, 1.0f));
+		stateMachine->RegisterSubState(STATE::SEARCH, SEARCH_STATE::IDLE, new IdleState(this, 3.0f, 5.0f));
 
-	// 攻撃ステート
-	stateMachine->RegisterSubState(MouseMob::State::Battle, Battle::Pursuit, new MouseMobState::PursuitState(this, 2.0f, m_AttackRange, 3.0f, 5.0f));
-	stateMachine->RegisterSubState(MouseMob::State::Battle, Battle::Attack, new MouseMobState::AttackState(this, 0.5f));
-	stateMachine->RegisterSubState(MouseMob::State::Battle, Battle::Standby, new MouseMobState::StandbyState(this));
+		// 攻撃ステート
+		stateMachine->RegisterSubState(STATE::BATTLE, BATTLE_STATE::PURSUIT, new PursuitState(this, 2.0f, m_AttackRange, 3.0f, 5.0f));
+		stateMachine->RegisterSubState(STATE::BATTLE, BATTLE_STATE::ATTACK, new AttackState(this, 0.5f));
+		stateMachine->RegisterSubState(STATE::BATTLE, BATTLE_STATE::STANDBY, new StandbyState(this));
 
-	// MetaAIのためステート
-	stateMachine->RegisterSubState(MouseMob::State::Recieve, Recieve::Called, new MouseMobState::CalledState(this));
-
-	stateMachine->SetState(MouseMob::State::Search);
+		stateMachine->SetState(STATE::SEARCH);
+	}
 }
 
 // 一番近いプレイヤーをターゲット
@@ -61,5 +59,5 @@ void MouseMob::UpdateColliders()
 	colliders[HitCollider::BodyHit]->SetPosition(GetNodePosition("JOT_C_Body", DirectX::XMFLOAT3{ 0.0f, 50.0f, 0.0f } *scale));
 
 	// 攻撃判定
-	attackColliders[AttackCollider::BodyAtc]->SetPosition(GetNodePosition("JOT_C_Head", DirectX::XMFLOAT3{ 20.0f, 70.0f, 0.0f } *scale));
+	attackColliders[ATTACK_COLLIDER::BodyAtc]->SetPosition(GetNodePosition("JOT_C_Head", DirectX::XMFLOAT3{ 20.0f, 70.0f, 0.0f } *scale));
 }

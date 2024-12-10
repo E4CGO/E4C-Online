@@ -3,69 +3,69 @@
 #include "TAKOEngine/AI/BaseState.h"
 #include "GameObject/Character/Enemy/Enemy.h"
 
-namespace EnemyState
+namespace enemy
 {
-	enum ID {
-		Idle,
-		TargetFound,
+	enum STATE {			
+		IDLE,
+		TARGET_FOUND,
 
-		Hurt,
-		Death,
+		HURT,
+		DEATH,
 
-		End,
+		END,
 	};
 
-	// ‘Ò‹@ƒXƒe[ƒgƒIƒuƒWƒFƒNƒg
+	// å¾…æ©Ÿã‚¹ãƒ†ãƒ¼ãƒˆã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 	class IdleState : public HierarchicalState<Enemy>
 	{
 	public:
-		// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+		// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		IdleState(Enemy* enemy, float waitTime = 2.0f) : HierarchicalState<Enemy>(enemy), waitTime(waitTime) {};
-		// ƒfƒXƒgƒ‰ƒNƒ^
+		// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		~IdleState() {}
-		// ƒXƒe[ƒg‚É“ü‚Á‚½‚Ìƒƒ\ƒbƒh
+		// ã‚¹ãƒ†ãƒ¼ãƒˆã«å…¥ã£ãŸæ™‚ã®ãƒ¡ã‚½ãƒƒãƒ‰
 		virtual void Enter() override;
-		// ƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+		// ã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 		void Execute(float elapsedTime) override;
-		// ƒXƒe[ƒg‚©‚ço‚Ä‚¢‚­‚Æ‚«‚Ìƒƒ\ƒbƒh
+		// ã‚¹ãƒ†ãƒ¼ãƒˆã‹ã‚‰å‡ºã¦ã„ãã¨ãã®ãƒ¡ã‚½ãƒƒãƒ‰
 		void Exit() override;
 	private:
 		float waitTime;
 		float waitTimer = 0.0f;
 	};
 
-	// ˆÚ“®ƒXƒe[ƒg
+	// ç§»å‹•ã‚¹ãƒ†ãƒ¼ãƒˆ
 	class MoveState : public HierarchicalState<Enemy>
 	{
 	public:
-		// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-		MoveState(Enemy* enemy, DirectX::XMFLOAT3 position, int nextState = EnemyState::ID::Idle) : HierarchicalState<Enemy>(enemy), position(position), nextState(nextState) {};
-		// ƒfƒXƒgƒ‰ƒNƒ^
+		// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+		MoveState(Enemy* enemy, DirectX::XMFLOAT3 position, int nextState = STATE::IDLE) : HierarchicalState<Enemy>(enemy), position(position), nextState(nextState) {};
+		// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		~MoveState() {}
-		// ƒXƒe[ƒg‚É“ü‚Á‚½‚Ìƒƒ\ƒbƒh
+		// ã‚¹ãƒ†ãƒ¼ãƒˆã«å…¥ã£ãŸæ™‚ã®ãƒ¡ã‚½ãƒƒãƒ‰
 		virtual void Enter() override;
-		// ƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+		// ã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 		void Execute(float elapsedTime) override;
-		// ƒXƒe[ƒg‚©‚ço‚Ä‚¢‚­‚Æ‚«‚Ìƒƒ\ƒbƒh
+		// ã‚¹ãƒ†ãƒ¼ãƒˆã‹ã‚‰å‡ºã¦ã„ãã¨ãã®ãƒ¡ã‚½ãƒƒãƒ‰
 		void Exit() override;
 	private:
 		DirectX::XMFLOAT3 position;
 		int nextState;
 	};
 
-	// ’ÇÕƒXƒe[ƒg
+	// è¿½è·¡ã‚¹ãƒ†ãƒ¼ãƒˆ
 	class FollowState : public HierarchicalState<Enemy>
 	{
 	public:
-		// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-		FollowState(Enemy* enemy, float distance, int nextState = EnemyState::ID::Idle) : HierarchicalState<Enemy>(enemy), distance(distance), nextState(nextState) {};
-		// ƒfƒXƒgƒ‰ƒNƒ^
+		// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+		FollowState(Enemy* enemy, float distance, int nextState = STATE::IDLE) : HierarchicalState<Enemy>(enemy), distance(distance), nextState(nextState) {};
+		// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		~FollowState() {}
-		// ƒXƒe[ƒg‚É“ü‚Á‚½‚Ìƒƒ\ƒbƒh
+		// ã‚¹ãƒ†ãƒ¼ãƒˆã«å…¥ã£ãŸæ™‚ã®ãƒ¡ã‚½ãƒƒãƒ‰
 		virtual void Enter() override;
-		// ƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+		// ã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 		void Execute(float elapsedTime) override;
-		// ƒXƒe[ƒg‚©‚ço‚Ä‚¢‚­‚Æ‚«‚Ìƒƒ\ƒbƒh
+		// ã‚¹ãƒ†ãƒ¼ãƒˆã‹ã‚‰å‡ºã¦ã„ãã¨ãã®ãƒ¡ã‚½ãƒƒãƒ‰
 		void Exit() override;
 	private:
 		float distance;
@@ -75,30 +75,30 @@ namespace EnemyState
 	class HurtState : public HierarchicalState<Enemy>
 	{
 	public:
-		// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+		// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		HurtState(Enemy* enemy) : HierarchicalState<Enemy>(enemy) {};
-		// ƒfƒXƒgƒ‰ƒNƒ^
+		// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		~HurtState() {}
-		// ƒXƒe[ƒg‚É“ü‚Á‚½‚Ìƒƒ\ƒbƒh
+		// ã‚¹ãƒ†ãƒ¼ãƒˆã«å…¥ã£ãŸæ™‚ã®ãƒ¡ã‚½ãƒƒãƒ‰
 		virtual void Enter() override;
-		// ƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+		// ã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 		void Execute(float elapsedTime) override;
-		// ƒXƒe[ƒg‚©‚ço‚Ä‚¢‚­‚Æ‚«‚Ìƒƒ\ƒbƒh
+		// ã‚¹ãƒ†ãƒ¼ãƒˆã‹ã‚‰å‡ºã¦ã„ãã¨ãã®ãƒ¡ã‚½ãƒƒãƒ‰
 		void Exit() override;
 	};
 
 	class DeathState : public HierarchicalState<Enemy>
 	{
 	public:
-		// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+		// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		DeathState(Enemy* enemy) : HierarchicalState<Enemy>(enemy) {};
-		// ƒfƒXƒgƒ‰ƒNƒ^
+		// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		~DeathState() {}
-		// ƒXƒe[ƒg‚É“ü‚Á‚½‚Ìƒƒ\ƒbƒh
+		// ã‚¹ãƒ†ãƒ¼ãƒˆã«å…¥ã£ãŸæ™‚ã®ãƒ¡ã‚½ãƒƒãƒ‰
 		virtual void Enter() override;
-		// ƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+		// ã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 		void Execute(float elapsedTime) override;
-		// ƒXƒe[ƒg‚©‚ço‚Ä‚¢‚­‚Æ‚«‚Ìƒƒ\ƒbƒh
+		// ã‚¹ãƒ†ãƒ¼ãƒˆã‹ã‚‰å‡ºã¦ã„ãã¨ãã®ãƒ¡ã‚½ãƒƒãƒ‰
 		void Exit() override;
 	};
 }
