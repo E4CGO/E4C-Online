@@ -22,6 +22,8 @@
 
 #include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
 
+#include "GameObject/Props/SpawnerManager.h"
+
 static float timer = 0;
 
 void StageOpenWorld_E4C::Initialize()
@@ -92,8 +94,9 @@ void StageOpenWorld_E4C::Initialize()
 		player->GetPosition(),	// 注視点
 		{ 0, 0.969f, -0.248f }	// 上ベクトル
 	);
-	spawner = std::make_unique<Spawner>(0, 1, -1);
+	Spawner* spawner = new Spawner(0, 1, -1);
 	spawner->SetPosition({ 0.0f, 2.0f, 0.0f });
+	SpawnerManager::Instance().Register(spawner);
 
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(mainCamera);
@@ -148,7 +151,7 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 
 	sky->Update(elapsedTime);
 
-	spawner->Update(elapsedTime);
+	SpawnerManager::Instance().Update(elapsedTime);
 
 	teleporter->Update(elapsedTime);
 
@@ -182,7 +185,7 @@ void StageOpenWorld_E4C::Render()
 
 	teleporter->Render(rc);
 
-	spawner->Render(rc);
+	SpawnerManager::Instance().Render(rc);
 
 	ENEMIES.Render(rc);
 
@@ -234,7 +237,7 @@ void StageOpenWorld_E4C::RenderDX12()
 			it.second->RenderDX12(rc);
 		}
 
-		spawner->RenderDX12(rc);
+		SpawnerManager::Instance().RenderDX12(rc);
 		// skyBox
 		{
 			rc.skydomeData.skyTexture = m_sprites[1]->GetDescriptor();

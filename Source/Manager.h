@@ -41,7 +41,7 @@ public:
 		return item;
 	}
 
-	T* get(int index) { return items.at(index); }
+	T* Get(int index) { return items.at(index); }
 
 	int Count() { return static_cast<int>(items.size()); }
 

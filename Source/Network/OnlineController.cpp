@@ -7,6 +7,7 @@
 #include "TCPCommand/TCPToken.h"
 #include "TCPCommand/TCPLogin.h"
 #include "TCPCommand/TCPClientData.h"
+#include "TCPCommand/TCPEnemy.h"
 #include "TCPCommand/TCPRoom.h"
 #include "TCPCommand/TCPChat.h"
 #include "TCPCommand/TCPMatching.h"
@@ -19,6 +20,8 @@
 
 namespace Online
 {
+	static OnlineController* instance = nullptr;
+
 	/**************************************************************************//**
 		@brief		コンストラクタ
 		@param[in]	なし
@@ -26,6 +29,8 @@ namespace Online
 	*//***************************************************************************/
 	OnlineController::OnlineController() : m_id(NULL), m_state(NULL)
 	{
+		instance = this;
+
 		// TCP処理を実装
 		m_tcpCommands[TCP_CMD::TOKEN] = new TCPToken(this, TCP_CMD::TOKEN);
 		m_tcpCommands[TCP_CMD::LOGIN] = new TCPLogin(this, TCP_CMD::LOGIN);
@@ -36,14 +41,32 @@ namespace Online
 		m_tcpCommands[TCP_CMD::MATCHING_END] = new TCPMatchingEnd(this, TCP_CMD::MATCHING_END);
 		m_tcpCommands[TCP_CMD::MATCHING_READY] = new TCPMatchingReady(this, TCP_CMD::MATCHING_READY);
 
+		m_tcpCommands[TCP_CMD::ROOM_NEW] = new TCPRoomNew(this, TCP_CMD::ROOM_NEW);
 		m_tcpCommands[TCP_CMD::ROOM_IN] = new TCPRoomIn(this, TCP_CMD::ROOM_IN);
 		m_tcpCommands[TCP_CMD::ROOM_OUT] = new TCPRoomOut(this, TCP_CMD::ROOM_OUT);
-		m_tcpCommands[TCP_CMD::ROOM_NEW] = new TCPRoomNew(this, TCP_CMD::ROOM_NEW);
+
+		m_tcpCommands[TCP_CMD::ENEMY_NEW] = new TCPEnemyNew(this, TCP_CMD::ENEMY_NEW);
+		//m_tcpCommands[TCP_CMD::ENEMY_SYNC] = new (this, TCP_CMD::ENEMY_SYNC);
+		//m_tcpCommands[TCP_CMD::ENEMY_OWNER] = new (this, TCP_CMD::ENEMY_OWNER);
+		//m_tcpCommands[TCP_CMD::ENEMY_DESTROY] = new (this, TCP_CMD::ENEMY_DESTROY);
+
+
 		m_tcpCommands[TCP_CMD::CHAT] = new TCPChat(this, TCP_CMD::CHAT);
 		m_tcpCommands[TCP_CMD::PING] = new TCPNone(this, TCP_CMD::PING);
 
+
+
 		// UDP処理
 		m_udpCommands[UDP_CMD::SYNC] = new UDPSync(this, UDP_CMD::SYNC);
+	}
+
+	/**************************************************************************//**
+		@brief	インスタンス取得
+		@return	オンラインコントローラーインスタンス参照
+	*//***************************************************************************/
+	OnlineController* OnlineController::Instance()
+	{
+		return instance;
 	}
 
 	/**************************************************************************//**
@@ -254,6 +277,11 @@ namespace Online
 			}
 		}
 	}
+	/**************************************************************************//**
+		@brief		ダンジョンを生成する
+		@param[in]	roomOrder 部屋シード参照
+		@return		なし
+	*//***************************************************************************/
 	void OnlineController::NewRoom(const std::vector<uint8_t>& roomOrder)
 	{
 		if (m_pMatchingUI)
@@ -271,10 +299,28 @@ namespace Online
 			}
 		}
 	}
-
+	/**************************************************************************//**
+		@brief	入室送信
+	*//***************************************************************************/
 	void OnlineController::RoomIn()
 	{
 		m_tcpCommands[TCP_CMD::ROOM_IN]->Send(nullptr);
+	}
+
+	/**************************************************************************//**
+		@brief		エネミーの生成送信処理
+		@param[in]	enemyType	エネミータイプ
+		@param[in]	spawnerId	スポナーID
+		@param[in]	count		敵の数
+	*//***************************************************************************/
+	void OnlineController::NewEnemy(const uint8_t enemyType, uint8_t spawnerId, uint8_t count)
+	{
+		TCPEnemyNew::SEND_DATA data {
+			spawnerId,
+			enemyType,
+			count,
+		};
+		m_tcpCommands[TCP_CMD::ENEMY_NEW]->Send(&data);
 	}
 
 	/**************************************************************************//**
@@ -306,6 +352,8 @@ namespace Online
 	*//***************************************************************************/
 	OnlineController::~OnlineController()
 	{
+		instance = nullptr;
+
 		if (m_ptcpSocket != nullptr)
 		{
 			if (m_ptcpSocket->IsConnecting()) m_ptcpSocket->Disconnect();

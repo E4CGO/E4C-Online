@@ -2,6 +2,7 @@
 #include "Scene/Stage/Stage.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "TAKOEngine/Rendering/LightManager.h"
+#include "GameObject/Props/SpawnerManager.h"
 
 void Stage::Initialize()
 {
@@ -11,6 +12,7 @@ void Stage::Initialize()
 
 	MAPTILES.Clear();
 	ENEMIES.Clear();
+	SpawnerManager::Instance().Clear();
 	enemyList.clear();
 	
 }
@@ -19,6 +21,7 @@ void Stage::Finalize()
 {
 	MAPTILES.Clear();
 	ENEMIES.Clear();
+	SpawnerManager::Instance().Clear();
 	LightManager::Instance().Clear();
 	enemyList.clear();
 }

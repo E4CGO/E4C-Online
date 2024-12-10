@@ -212,6 +212,8 @@ source_group("Source\\GameObject\\Projectile" FILES ${Source__GameObject__Projec
 set(Source__GameObject__Props
     "Source/GameObject/Props/Spawner.cpp"
     "Source/GameObject/Props/Spawner.h"
+    "Source/GameObject/Props/SpawnerManager.cpp"
+    "Source/GameObject/Props/SpawnerManager.h"
     "Source/GameObject/Props/Teleporter.cpp"
     "Source/GameObject/Props/Teleporter.h"
 )
@@ -260,6 +262,8 @@ set(Source__Network__TCPCommand
     "Source/Network/TCPCommand/TCPClientData.h"
     "Source/Network/TCPCommand/TCPCommand.cpp"
     "Source/Network/TCPCommand/TCPCommand.h"
+    "Source/Network/TCPCommand/TCPEnemy.cpp"
+    "Source/Network/TCPCommand/TCPEnemy.h"
     "Source/Network/TCPCommand/TCPLogin.cpp"
     "Source/Network/TCPCommand/TCPLogin.h"
     "Source/Network/TCPCommand/TCPMatching.cpp"

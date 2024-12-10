@@ -40,7 +40,7 @@ namespace Online
 	bool TCPRoomIn::Send(void* data)
 	{
 		std::vector<uint8_t> buffer;
-		CreateHeaderBuffer(buffer, m_cmd, 0);
+		CreateHeaderBuffer(buffer, m_cmd);
 		return m_pcontroller->GetTcpSocket()->Send(buffer.data(), buffer.size()) >= 0;
 	}
 

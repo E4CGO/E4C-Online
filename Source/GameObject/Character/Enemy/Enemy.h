@@ -1,4 +1,4 @@
-//! @file Enemy.h
+ï»¿//! @file Enemy.h
 //! @note 
 #ifndef __INCLUDED_ENEMY_H__
 #define __INCLUDED_ENEMY_H__
@@ -23,8 +23,8 @@ struct ENEMY_COLLISION
 
 enum ENEMY_TYPE : uint8_t
 {
-	SKELETON_MINION,						// ƒfƒtƒHƒ‹ƒgœ
-	SKELETON_MINION_BOSS,					// ƒfƒtƒHƒ‹ƒgœƒ{ƒX
+	SKELETON_MINION,						// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆéª¨
+	SKELETON_MINION_BOSS,					// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆéª¨ãƒœã‚¹
 	END,
 };
 
@@ -70,6 +70,9 @@ public:
 	static Enemy* EnemyFactory(int enemyType);
 
 	void SetSpawner(Spawner* spawner) { m_pSpawner = spawner; }
+
+	const bool IsMine() const { return m_isMine; }
+	void SetMine(bool flag = true) { m_isMine = flag; }
 public:
 	enum Animation
 	{
@@ -108,7 +111,7 @@ protected:
 	uint32_t enemy_id = 0;
 	uint8_t enemyType = -1;
 
-	int atk = 10; // UŒ‚—Í
+	int atk = 10; // æ”»æ’ƒåŠ›
 
 	PlayerCharacter* target = nullptr;
 
@@ -120,11 +123,13 @@ protected:
 
 	int subState = -1;
 
-	std::unordered_map<int, Collider*> colliders;		// “–‚½‚è”»’è
-	std::unordered_map<int, Collider*> attackColliders;	// UŒ‚”»’è
+	std::unordered_map<int, Collider*> colliders;		// å½“ãŸã‚Šåˆ¤å®š
+	std::unordered_map<int, Collider*> attackColliders;	// æ”»æ’ƒåˆ¤å®š
 
-	bool showHp = true;	// HP•\¦
+	bool showHp = true;	// HPè¡¨ç¤º
 
-	Spawner* m_pSpawner = nullptr; // ƒXƒ|ƒi[
+	Spawner* m_pSpawner = nullptr; // ã‚¹ãƒãƒŠãƒ¼
+
+	bool m_isMine = false; // ãƒ­ãƒ¼ã‚«ãƒ«
 };
 #endif

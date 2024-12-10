@@ -48,9 +48,14 @@ namespace Online
 		ROOM_IN,			/*!< 入室命令処理 */
 		ROOM_OUT,			/*!< クライアント退室処理 */
 
+		ENEMY_NEW,			/*!< エネミー生成処理 */
+		ENEMY_SYNC,			/*!< エネミー同期処理 */
+		ENEMY_OWNER,		/*!< エネミー所有者更新処理 */
+		ENEMY_DESTROY,		/*!< エネミー削除処理 */
+
 		CHAT,				/*!< チャット */
 
-		PING = 255,			/*!< 接続チェック */
+		PING = UINT8_MAX,	/*!< 接続チェック */
 	};
 	/**************************************************************************//**
 		@enum	UDP_CMD
@@ -104,6 +109,9 @@ namespace Online
 			uint32_t size;
 		};
 #pragma pack(pop)
+		// インスタンス取得
+		static OnlineController* Instance();
+
 		// 接続開始
 		bool Initialize();
 		// 接続終了
@@ -144,9 +152,16 @@ namespace Online
 		void EndMatching();
 		// マッチング準備完了
 		void ReadyMatching();
-		void NewRoom();
+		// ダンジョンを生成する(ホスト)
+		void NewRoom(); 
+		// ダンジョンを生成する
 		void NewRoom(const std::vector<uint8_t>& roomOrder);
+		// 入室送信
 		void RoomIn();
+
+		// エネミーの生成送信
+		void NewEnemy(const uint8_t enemyType, uint8_t spawnerId, uint8_t count = 1);
+
 
 		// 同期開始
 		void BeginSync()
@@ -207,7 +222,10 @@ namespace Online
 
 		WidgetMatching* m_pMatchingUI = nullptr;
 	};
-}
 
+	typedef OnlineController Controller;
+	typedef OnlineController::STATE State;
+}
+#define ONLINE_CONTROLLER Online::Controller::Instance()
 #endif
 

@@ -33,11 +33,12 @@ public:
 
 	void SetId(const uint8_t id) { m_id = id; }
 	uint8_t GetId() { return m_id; };
+public:
+	// エネミー生成
+	Enemy* Spawn();
 private:
 	// プレイヤー検索
 	bool SearchPlayer();
-	// エネミー生成
-	void Spawn();
 
 private:
 	uint8_t m_id = 0;
