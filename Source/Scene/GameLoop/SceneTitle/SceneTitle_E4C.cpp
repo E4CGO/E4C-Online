@@ -6,6 +6,8 @@
 #include "TAKOEngine/Sound/Sound.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
 
+#include "TAKOEngine/Tool/Encode.h"
+
 #include <imgui.h>
 #include <string>
 #include <fstream>
@@ -144,8 +146,39 @@ void SceneTitle_E4C::RenderDX12()
 		rc.d3d_command_list = m_frameBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
+		D2D1_SIZE_F rtSize = T_GRAPHICS.GetD2D1RenderTargets(T_GRAPHICS.GetCurrentBufferIndex())->GetSize();
+		D2D1_RECT_F textRect = D2D1::RectF(0, 0, rtSize.width, rtSize.height);
+
+		std::string test = std::to_string(time);
+		std::wstring testString = Encode::utf8_to_wstring(test);
+
+		// Acquire our wrapped render target resource for the current back buffer.
+		T_GRAPHICS.GetD3D11On12Device()->AcquireWrappedResources(T_GRAPHICS.GetD3D11BackBuffer(T_GRAPHICS.GetCurrentBufferIndex()).GetAddressOf(), 1);
+
+		// Render text directly to the back buffer.
+		T_GRAPHICS.GetD2D1DeviceContext()->SetTarget(T_GRAPHICS.GetD2D1RenderTargets(T_GRAPHICS.GetCurrentBufferIndex()));
+
+		T_GRAPHICS.GetD2D1DeviceContext()->BeginDraw();
+		T_GRAPHICS.GetD2D1DeviceContext()->SetTransform(D2D1::Matrix3x2F::Identity());
+
+		T_GRAPHICS.GetD2D1DeviceContext()->DrawText(
+			testString.c_str(),
+			testString.length(),
+			T_GRAPHICS.GetD2D1TextFormat(),
+			&textRect,
+			T_GRAPHICS.GetD2D1TextBrush()
+		);
+
+		T_GRAPHICS.GetD2D1DeviceContext()->EndDraw();
+
+		// Release our wrapped render target resource. Releasing
+		// transitions the back buffer resource to the state specified
+		// as the OutState when the wrapped resource was created.
+		T_GRAPHICS.GetD3D11On12Device()->ReleaseWrappedResources(T_GRAPHICS.GetD3D11BackBuffer(T_GRAPHICS.GetCurrentBufferIndex()).GetAddressOf(), 1);
+
 		UI.RenderDX12(rc);
 	}
+
 	T_GRAPHICS.End();
 }
 

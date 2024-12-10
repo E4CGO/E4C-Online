@@ -1117,8 +1117,7 @@ if(MSVC)
         /Zi
         ${DEFAULT_CXX_EXCEPTION_HANDLING}
         /Y-
-        /wd4819
-        /wd4099
+        /utf-8
     )
     target_link_options(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:
@@ -1131,8 +1130,6 @@ if(MSVC)
         /MANIFEST
         /DEBUG
         /SUBSYSTEM:WINDOWS
-        /wd4819
-        /wd4099
     )
 endif()
 
