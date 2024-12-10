@@ -38,6 +38,8 @@ namespace PlayerCharacterState
 		}
 		void AttackNormalState_1::Execute(float elapsedTime)
 		{
+			float time = owner->GetModel()->GetCurrentAnimationSeconds();
+
 			if (owner->IsPlayer())
 			{
 				if (!owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_1)->IsEnable())
@@ -52,7 +54,38 @@ namespace PlayerCharacterState
 					owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_1)->SetEnable(false);
 					owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_1)->ClearHitOthers();
 				}
+				if (0.184f <= time && time <= 0.368f)
+				{
+					if (owner->InputAttackNormal())
+					{
+						owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_2);
+					}
+				}
+				else if (0.435f <= time)
+				{
+					if (owner->InputMove(elapsedTime))
+					{
+						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::MOVE);
+					}
+					else if (owner->InputDodge())
+					{
+						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
+					}
+					else if (owner->InputAttackSpecial())
+					{
+						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
 
+					}
+					else if (owner->InputSkill1())
+					{
+						owner->GetStateMachine()->ChangeState(SKILL_1_STATE::ATTACK_START);
+					}
+					else if (owner->InputSkill2())
+					{
+						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
+					}
+
+				}
 				
 			}
 			else
