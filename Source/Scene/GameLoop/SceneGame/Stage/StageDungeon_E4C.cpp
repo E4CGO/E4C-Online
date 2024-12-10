@@ -12,6 +12,7 @@
 #include "Map/MapTileManager.h"
 #include "Map/MapTile.h"
 #include "Map/DungeonData.h"
+#include "Map/InstancingModelManager.h"
 
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Tool/GLTFImporter.h"
@@ -339,8 +340,12 @@ void StageDungeon_E4C::RenderDX12()
 
 		// モデル描画
 		PlayerCharacterManager::Instance().RenderDX12(rc);
+		PlayerCharacterManager::Instance().GetPlayerCharacterById()->SetKinematic(true);
 
 		GameObjectManager::Instance().RenderDX12(rc);
+
+		// 見た目用モデル描画
+		InstancingModelManager::Instance().RenderDX12(rc);
 
 		MAPTILES.RenderDX12(rc);
 

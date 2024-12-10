@@ -5,7 +5,10 @@
 
 #include "TAKOEngine/Sound/Sound.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
+#include "TAKOEngine/Network/WinSock2Wrapper.h"
+#include "TAKOEngine/Tool/Console.h"
 
+#include <commdlg.h>
 #include <imgui.h>
 #include <string>
 #include <algorithm>
@@ -62,10 +65,14 @@ void SceneRoomTest_E4C::Initialize()
 	m_cameraController = std::make_unique<FreeCameraController>();
 	m_cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
 	m_cameraController->SetEnable(true);
+
+	Console::Instance().Open();
 }
 
 void SceneRoomTest_E4C::Finalize()
 {
+	Console::Instance().Close();
+
 	m_spritePreLoad.clear();
 	UI.Clear();
 	NODES.Clear();
@@ -106,7 +113,7 @@ void SceneRoomTest_E4C::Render()
 
 	// デバッグレンダラ描画実行
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
-	DebugRender();
+	DrawDebugGUI();
 }
 
 /**************************************************************************//**
@@ -116,16 +123,46 @@ void SceneRoomTest_E4C::Render()
 *//***************************************************************************/
 void SceneRoomTest_E4C::OpenRoomData()
 {
-	// 構造体セット
-	//OPENFILENAMEA	ofn;
-	//memset(&ofn, 0, sizeof(OPENFILENAMEA));
-	//ofn.lStructSize = sizeof(ofn);
-	//ofn.hwndOwner = NULL;
-	//ofn.lpstrTitle = "a";
-	////ofn.lStructSize = sizeof(OPENFILENAMEA);
-	////ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	
-	//::GetOpenFileNameA(&ofn);
+	// ダイアログボックスの設定
+	OPENFILENAMEA ofn;
+	char filePath[260]{};
+
+	// OPENFILENAMEA構造体の初期化
+	ZeroMemory(&ofn, sizeof(OPENFILENAMEA));
+	ofn.lStructSize = sizeof(OPENFILENAMEA);
+	ofn.hwndOwner = NULL;
+	ofn.lpstrFilter = "JSONファイル(*.json)\0*.JSON\0";
+	ofn.nFilterIndex = 1;
+	ofn.lpstrFile = filePath;
+	ofn.nMaxFile = sizeof(filePath);
+	ofn.lpstrFileTitle = NULL;
+	ofn.lpstrTitle = "ファイルを開く";
+	ofn.lpstrInitialDir = NULL;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_OVERWRITEPROMPT;
+
+	int testInt;
+
+	// オープン
+	if (GetOpenFileNameA(&ofn) == TRUE)
+	{
+		Console::Instance().Log(filePath);
+
+		nlohmann::json loadFile;
+		std::ifstream ifs(filePath);
+
+		if (ifs.is_open())
+		{
+			ifs >> loadFile;
+
+			// 部屋の生成設定
+			//roomSetting.weight = loadFile["RoomSetting"]["Weight"];
+			//roomSetting.aabb = loadFile["RoomSetting"]["AABB"]
+
+			//Console::Instance().Log(std::to_string(testInt).c_str());
+
+			ifs.close();
+		}
+	}
 }
 
 /**************************************************************************//**
@@ -135,17 +172,67 @@ void SceneRoomTest_E4C::OpenRoomData()
 *//***************************************************************************/
 void SceneRoomTest_E4C::SaveRoomData()
 {
-	nlohmann::json saveFile;
+	// ダイアログボックスの設定
+	OPENFILENAMEA ofn;
+	char filePath[260]{};
 
-	nlohmann::json testJson;
-	testJson["TestData"] = {
+	// OPENFILENAMEA構造体の初期化
+	ZeroMemory(&ofn, sizeof(OPENFILENAMEA));
+	ofn.lStructSize = sizeof(OPENFILENAMEA);
+	ofn.hwndOwner = NULL;
+	ofn.lpstrFilter = "JSONファイル(*.json)\0*.JSON\0";
+	ofn.nFilterIndex = 1;
+	ofn.lpstrFile = filePath;
+	ofn.nMaxFile = sizeof(filePath);
+	ofn.lpstrFileTitle = NULL;
+	ofn.lpstrTitle = "ファイルを保存する";
+	ofn.lpstrInitialDir = NULL;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_CREATEPROMPT;
+	ofn.lpstrDefExt = "json";
+
+	// セーブ
+	if (GetSaveFileNameA(&ofn) == TRUE)
+	{
+		Console::Instance().Log(filePath);
+
+		nlohmann::json saveFile;
+
+		// 部屋の生成設定
+		saveFile["RoomSetting"].push_back({
+			{ "Weight", roomSetting.weight },
+			{ "AABB", { "Position", roomSetting.aabb.position.x }},
+			});
+		//saveFile["RoomSetting"].push_back({ "AABB",
+		//	{ "Position", { roomSetting.aabb.position.x, roomSetting.aabb.position.y, roomSetting.aabb.position.z }},
+		//	{ "Radii", { roomSetting.aabb.radii.x, roomSetting.aabb.radii.y, roomSetting.aabb.radii.z }},
+		//	});
+		//saveFile["RoomSetting"]["AABB"].emplace_back(roomSetting.aabb);
+
+		std::ofstream ofs(filePath);
+		if (ofs.is_open())
 		{
-			{"Yeah", 315},
-			{"Salmon", true}
+			ofs << saveFile.dump(4);
+			ofs.close();
 		}
-	};
+	}
 
-	saveFile.emplace_back(testJson);
+	//nlohmann::json saveFile;
+
+	//saveFile["RoomSetting"].push_back({
+	//	{ "Weight", roomSetting.weight }
+	//	});
+
+	//nlohmann::json testJson;
+	//testJson["TestData"] = {
+	//	{
+	//		{"Yeah", 315},
+	//		{"Salmon", true}
+	//	}
+	//};
+
+	//saveFile.emplace_back(testJson);
+
+
 
 	////saveFile["RoomData"]["RoomType"] = RoomType::SIMPLE_ROOM_1;
 	////saveFile["RoomData"]["Weight"] = 0;
@@ -165,12 +252,12 @@ void SceneRoomTest_E4C::SaveRoomData()
 	//	//saveFile["RoomData"]["ConnectPointDatas"].emplace_back(data);
 	//}
 
-	std::ofstream file("debug_TestRoom.json");
-	file << saveFile;
-	file.close();
+	//std::ofstream file("debug_TestRoom.json");
+	//file << saveFile;
+	//file.close();
 }
 
-void SceneRoomTest_E4C::DebugRender()
+void SceneRoomTest_E4C::DrawDebugGUI()
 {
 	ImVec2 screenSize = { TentacleLib::graphics.GetScreenWidth(), TentacleLib::graphics.GetScreenHeight() };
 	ImVec2 windowSize = { 256.0f, 512.0f };
@@ -201,107 +288,51 @@ void SceneRoomTest_E4C::DebugRender()
 	ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
 
 	// ひえらるき～
-	if (ImGui::Begin("Hierarchy", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::Begin("Hierarchy", nullptr, ImGuiWindowFlags_MenuBar))
 	{
-		if (ImGui::Button("Add"))
-		{
-			std::string nodeName = "NewNode";
-			std::string fileName = "";
-
-			switch (selectionTileType)
-			{
-			case TileType::FLOOR:	fileName = "Data/Model/DungeonAssets/NewAssets/SM_Floor_01a.glb";			nodeName = "Floor";			break;
-			case TileType::WALL:	fileName = "Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_01a.glb";	nodeName = "Wall";			break;
-			case TileType::PILLAR:																				nodeName = "Pillar";		break;
-			case TileType::STAIR:	fileName = "Data/Model/DungeonAssets/SLOPE.glb";							nodeName = "Stair";			break;
-			case TileType::SPAWNER:																				nodeName = "Spawner";		break;
-			case TileType::PORTAL:																				nodeName = "Portal";		break;
-			case TileType::CONNECTPOINT:																		nodeName = "ConnectPoint";	break;
-			}
-
-			TileNode* newNode = new TileNode(NODES.GetUniqueName(nodeName), selectionTileType, fileName.c_str());
-			NODES.Register(newNode);
-
-			// 追加したノードを選択させる
-			selectionNode = newNode;
-		}
-
-		std::vector<std::string> typeNames;
-		typeNames.emplace_back("FLOOR");
-		typeNames.emplace_back("WALL");
-		typeNames.emplace_back("PILLAR");
-		typeNames.emplace_back("STAIR");
-		typeNames.emplace_back("SPAWNER");
-		typeNames.emplace_back("PORTAL");
-		typeNames.emplace_back("CONNECTPOINT");
-
-		ImGui::SameLine();
-		ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.4f);
-		if (ImGui::BeginCombo("NextTileType", typeNames.at(selectionTileType).c_str()))
-		{
-			for (int i = 0; i < typeNames.size(); i++)
-			{
-				if (ImGui::Selectable(typeNames.at(i).c_str()))
-				{
-					selectionTileType = static_cast<TileType>(i);
+		// メニュー
+		if (ImGui::BeginMenuBar()) {
+			if (ImGui::BeginMenu("New")) {
+				if (ImGui::BeginMenu("TileNode")) {
+					if (ImGui::MenuItem("Floor01a"))		AddTileNode(TileType::FLOOR_01A);
+					if (ImGui::MenuItem("Wall01a"))			AddTileNode(TileType::WALL_01A);
+					if (ImGui::MenuItem("StairStep01a"))	AddTileNode(TileType::STAIR_STEP_01A);
+					if (ImGui::MenuItem("Portal"))			AddTileNode(TileType::PORTAL);
+					if (ImGui::MenuItem("ConnectPoint"))	AddTileNode(TileType::CONNECTPOINT);
+					ImGui::EndMenu();
 				}
+				if (ImGui::BeginMenu("ObjectNode")) {
+					if (ImGui::MenuItem("Spawner"))	AddSpawner();
+					ImGui::EndMenu();
+				}
+				if (ImGui::BeginMenu("Template")) {
+					if (ImGui::MenuItem("3x3 Floor")) AddTemplate3x3Floor();
+					ImGui::EndMenu();
+				}
+				ImGui::EndMenu();
 			}
-
-			ImGui::EndCombo();
-		}
-
-		if (ImGui::Button("Remove"))
-		{
-			NODES.Remove(selectionNode);
-			selectionNode = nullptr;
-		}
-
-		ImGui::SameLine();
-		if (ImGui::Button("Duplicate"))
-		{
-			if (selectionNode != nullptr)
-			{
-				Node* newNode = selectionNode->Duplicate();
-
-				// 正規表現が用いられた名前に変換する
-				newNode->SetName(NODES.GetUniqueName(newNode->GetName()));
-				NODES.Register(newNode);
-
-				// 複製したノードを選択する
-				selectionNode = newNode;
+			if (ImGui::MenuItem("Duplicate")) DuplicateNode();
+			if (ImGui::BeginMenu("Remove")) {
+				if (ImGui::MenuItem("Clear All")) ClearNodes();
+				ImGui::EndMenu();
 			}
+			ImGui::EndMenuBar();
 		}
 
-		ImGui::SameLine();
-		if (ImGui::Button("Clear All"))
-		{
-			for (Node* node : NODES.GetAll())
-			{
-				NODES.Remove(node);
-				selectionNode = nullptr;
-			}
-		}
+		// 部屋の生成設定
+		ImGui::InputInt("Weight", &roomSetting.weight);
 
 		ImGui::Separator();
 
-		if (ImGui::TreeNodeEx("Nodes", ImGuiTreeNodeFlags_DefaultOpen))
-		{
+		// ノード
+		if (ImGui::TreeNodeEx("Nodes", ImGuiTreeNodeFlags_DefaultOpen)) {
 			int index = 0;
-
-			for (Node* node : NODES.GetAll())
-			{
+			for (Node* node : NODES.GetAll()) {
 				ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_Leaf;
-
-				if (selectionNode == node)
-				{
-					nodeFlags |= ImGuiTreeNodeFlags_Selected;
-				}
-
-				if (node)
-				{
+				if (selectionNode == node) nodeFlags |= ImGuiTreeNodeFlags_Selected;
+				if (node) {
 					ImGui::PushID(index);
-					if (ImGui::TreeNodeEx(node->GetName().c_str(), nodeFlags))
-					{
+					if (ImGui::TreeNodeEx(node->GetName().c_str(), nodeFlags)) {
 						if (ImGui::IsItemFocused()) selectionNode = node;
 					}
 					ImGui::PopID();
@@ -330,19 +361,79 @@ void SceneRoomTest_E4C::DebugRender()
 	}
 }
 
+void SceneRoomTest_E4C::AddTileNode(TileType type)
+{
+	std::string nodeName = "NewNode";
+	std::string fileName = "";
+
+	switch (type)
+	{
+	case TileType::FLOOR_01A:		fileName = "Data/Model/DungeonAssets/SM_Floor_02a.glb";			nodeName = "Floor";			break;
+	case TileType::WALL_01A:		fileName = "Data/Model/DungeonAssets/SM_Wall_Pattern_01a.glb";	nodeName = "Wall";			break;
+	case TileType::STAIR_STEP_01A:	fileName = "Data/Model/DungeonAssets/SM_Stairs_Steps_01a.glb";	nodeName = "Stair";			break;
+	case TileType::PORTAL:																			nodeName = "Portal";		break;
+	case TileType::CONNECTPOINT:																	nodeName = "ConnectPoint";	break;
+	}
+
+	TileNode* newNode = new TileNode(NODES.GetUniqueName(nodeName), type, fileName.c_str());
+	NODES.Register(newNode);
+
+	// 追加したノードを選択させる
+	selectionNode = newNode;
+}
+
+void SceneRoomTest_E4C::AddSpawner()
+{
+	SpawnerNode* newNode = new SpawnerNode(NODES.GetUniqueName("Spawner"));
+	NODES.Register(newNode);
+
+	// 追加したノードを選択させる
+	selectionNode = newNode;
+}
+
+void SceneRoomTest_E4C::DuplicateNode()
+{
+	if (selectionNode != nullptr)
+	{
+		Node* newNode = selectionNode->Duplicate();
+
+		// 正規表現が用いられた名前に変換する
+		newNode->SetName(NODES.GetUniqueName(newNode->GetName()));
+		NODES.Register(newNode);
+
+		// 複製したノードを選択する
+		selectionNode = newNode;
+	}
+}
+
+void SceneRoomTest_E4C::ClearNodes()
+{
+	NODES.Clear();
+	selectionNode = nullptr;
+}
+
+void SceneRoomTest_E4C::AddTemplate3x3Floor()
+{
+	for (int x = -1; x < 2; x++) {
+		for (int z = -1; z < 2; z++) {
+			TileNode* newNode = new TileNode(NODES.GetUniqueName("Floor01a"), TileType::FLOOR_01A, "Data/Model/DungeonAssets/SM_Floor_02a.glb");
+			newNode->SetPosition(DirectX::XMFLOAT3((x), 0.0f, (z)));
+			NODES.Register(newNode);
+		}
+	}
+}
+
 Node* TileNode::Duplicate()
 {
 	std::string fileName;
 
 	switch (type)
 	{
-	case TileType::FLOOR:	fileName = "Data/Model/DungeonAssets/NewAssets/SM_Floor_01a.glb";			break;
-	case TileType::WALL:	fileName = "Data/Model/DungeonAssets/NewAssets/SM_Wall_Pattern_01a.glb";	break;
-	case TileType::PILLAR:	break;
-	case TileType::STAIR:	fileName = "Data/Model/DungeonAssets/SLOPE.glb";	break;
-	case TileType::SPAWNER:	break;
-	case TileType::PORTAL:	break;
-	case TileType::CONNECTPOINT:	break;
+	case TileType::FLOOR_01A:		fileName = "Data/Model/DungeonAssets/SM_Floor_02a.glb";			break;
+	case TileType::WALL_01A:		fileName = "Data/Model/DungeonAssets/SM_Wall_Pattern_01a.glb";	break;
+	case TileType::STAIR_STEP_01A:	fileName = "Data/Model/DungeonAssets/SM_Stairs_Steps_01a.glb";	break;
+	case TileType::PORTAL:																			break;
+	case TileType::CONNECTPOINT:																	break;
 	}
 
 	TileNode* newNode = new TileNode(name, type, fileName.c_str());
@@ -361,13 +452,11 @@ void TileNode::DrawDebugGUI()
 
 		switch (type)
 		{
-		case TileType::FLOOR:	typeText += "FLOOR";	break;
-		case TileType::WALL:	typeText += "WALL";		break;
-		case TileType::PILLAR:	typeText += "PILLAR";	break;
-		case TileType::STAIR:	typeText += "STAIR";	break;
-		case TileType::SPAWNER:	typeText += "SPAWNER";	break;
-		case TileType::PORTAL:	typeText += "PORTAL";	break;
-		case TileType::CONNECTPOINT:	typeText += "CONNECTPOINT";	break;
+		case TileType::FLOOR_01A:		typeText += "FLOOR_01A";		break;
+		case TileType::WALL_01A:		typeText += "WALL_01A";			break;
+		case TileType::STAIR_STEP_01A:	typeText += "STAIR_STEP_01A";	break;
+		case TileType::PORTAL:			typeText += "PORTAL";			break;
+		case TileType::CONNECTPOINT:	typeText += "CONNECTPOINT";		break;
 		}
 
 		ImGui::Text(typeText.c_str());
@@ -400,6 +489,30 @@ void TileNode::DrawDebugGUI()
 	}
 	// scale
 	ImGui::DragFloat3("Scale", &scale.x, 0.1f);
+}
+
+void SpawnerNode::Render(const RenderContext& rc)
+{
+	// 継承元のRender呼び出し
+	ModelObject::Render(rc);
+
+	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, spawnerData.spawnRadius, 1.5f, { 1,0,0,1 });
+	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, spawnerData.searchRadius, 1.5f, { 1,0,1,1 });
+}
+
+Node* SpawnerNode::Duplicate()
+{
+	SpawnerNode* newNode = new SpawnerNode(name);
+	newNode->SetPosition(this->position);
+	newNode->SetAngle(this->angle);
+	newNode->SetScale(this->scale);
+
+	return newNode;
+}
+
+void SpawnerNode::DrawDebugGUI()
+{
+
 }
 
 std::string NodeManager::GetUniqueName(std::string name)

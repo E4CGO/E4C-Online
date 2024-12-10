@@ -55,7 +55,7 @@ public:
 class TileNode : public Node
 {
 public:
-	TileNode(std::string name, TileType type = TileType::FLOOR, const char* fileName = "", float scaling = 1.0f) :
+	TileNode(std::string name, TileType type = TileType::FLOOR_01A, const char* fileName = "", float scaling = 1.0f) :
 		Node(name, fileName, scaling), type(type) {};
 	~TileNode() = default;
 
@@ -67,8 +67,26 @@ public:
 	// デバッグGUI描画
 	void DrawDebugGUI() override;
 
-private:
+protected:
 	TileType type;
+};
+
+// Spawnerノード
+class SpawnerNode : public Node
+{
+public:
+	SpawnerNode(std::string name) :
+		Node(name) {}
+
+	void Render(const RenderContext& rc) override;
+
+	Node* Duplicate() override;
+
+	// デバッグGUI描画
+	void DrawDebugGUI() override;
+
+protected:
+	SPAWNER_DATA spawnerData;
 };
 
 
@@ -94,17 +112,28 @@ public:
 	void SaveRoomData();
 
 	// デバッグ描画
-	void DebugRender();
+	void DrawDebugGUI();
+
+	// TileNode追加
+	void AddTileNode(TileType tileType);
+	// Spawner追加
+	void AddSpawner();
+	// ノード複製
+	void DuplicateNode();
+	// ノード全削除
+	void ClearNodes();
+
+	// テンプレート
+	// 3x3 Floor
+	void AddTemplate3x3Floor();
 
 private:
 	std::unique_ptr<myRenderer::shadow::ShadowMapRender> m_shadowMapRenderer = std::make_unique<myRenderer::shadow::ShadowMapRender>();
 	FrameBufferManager* m_frameBuffer;
 	std::unique_ptr<FreeCameraController> m_cameraController;
 
+	DungeonData::RoomGenerateSetting roomSetting;	// 部屋の生成設定
 	Node* selectionNode = nullptr;					// 現在選択しているノード
-	TileType selectionTileType = TileType::FLOOR;	// 次に新規作成するタイルのタイプ
-
-	//std::vector<TILE_DATA> connectPointDatas;	// 接続点データ
 
 	// Sprite Preload
 	std::unordered_set<const char*> m_spriteList = {

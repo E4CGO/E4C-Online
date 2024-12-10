@@ -14,7 +14,7 @@
 namespace ns_RoomData
 {
 	// 部屋タイプ
-	enum RoomType
+	enum RoomType : uint8_t
 	{
 		SIMPLE_ROOM_1 = 0,
 		END_ROOM,
@@ -26,16 +26,44 @@ namespace ns_RoomData
 	};
 
 	// タイルタイプ
-	enum TileType
+	enum TileType : uint8_t
 	{
-		FLOOR = 0,
-		WALL,
-		PILLAR,
-		STAIR,
-		SPAWNER,
+		FLOOR_01A = 0,
+		FLOOR_01B,
+		FLOOR_02A,
+		FLOOR_03A,
+
+		WALL_01A,
+		WALL_01B,
+		WALL_02A,
+		WALL_02B,
+		WALL_03A,
+		WALL_04A,
+
+		ARCH_01A,
+		ARCH_ENTRANCE_01A,
+		ARCH_FLOOR_01A,
+
+		STAIR_STEP_01A,
+		STAIR_RAILING_01A,
+
 		PORTAL,
 		CONNECTPOINT,
 		TILETYPE_COUNT,
+	};
+
+	// スポナーデータ
+	struct SPAWNER_DATA
+	{
+		uint8_t enemyType = 0;
+
+		float searchRadius = 5.0f;
+		float spawnRadius = 3.0f;
+
+		int maxExistedEnemiesNum = 1;
+		int maxSpawnedEnemiesNum = -1;
+
+		float spawnTime = 2.0f;
 	};
 
 	// 配置するタイルデータ
@@ -67,9 +95,9 @@ public:
 	// 部屋の生成設定
 	struct RoomGenerateSetting
 	{
-		int weight;	// 重み、値が大きいほど生成確率が高くなる
-		AABB aabb;	// AABB、部屋同士の当たり判定などに使用
-		DirectX::XMFLOAT3 portalPosition;			// ポータル配置座標
+		int weight = 0;	// 重み、値が大きいほど生成確率が高くなる
+		AABB aabb {};	// AABB、部屋同士の当たり判定などに使用
+		DirectX::XMFLOAT3 portalPosition {};		// ポータル配置座標
 		std::vector<RoomType> placementCandidates;	// 配置候補の部屋タイプを保存する配列
 	};
 
