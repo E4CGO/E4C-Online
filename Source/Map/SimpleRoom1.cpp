@@ -57,6 +57,7 @@ void SimpleRoom1::LoadMapData()
 		{ 1.0f, 1.0f, 1.0f },
 		floorColor));
 
+	/*
 	m_tileDatas.at(TileType::WALL_01A).emplace_back(TILE_DATA(
 		{ -2.0f, 0.0f, -2.0f },
 		{ 0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f },
@@ -298,4 +299,5 @@ void SimpleRoom1::LoadMapData()
 		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
 		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
 		floorColor));
+		*/
 }
