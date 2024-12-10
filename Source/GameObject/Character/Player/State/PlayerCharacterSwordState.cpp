@@ -53,14 +53,7 @@ namespace PlayerCharacterState
 					owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_1)->ClearHitOthers();
 				}
 
-				float time = owner->GetModel()->GetAnimationRate();
-				if (owner->GetModel()->GetAnimationRate() > 0.75f)
-				{
-					if (owner->InputAttackNormal()) // アニメーション75%完成
-					{
-						owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_2);
-					}
-				}
+				
 			}
 			else
 			{
