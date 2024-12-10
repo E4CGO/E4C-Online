@@ -92,8 +92,7 @@ void StageOpenWorld_E4C::Initialize()
 		player->GetPosition(),	// 注視点
 		{ 0, 0.969f, -0.248f }	// 上ベクトル
 	);
-	/*spawner = std::make_unique<Spawner>();
-	spawner->SetPosition({ player->GetPosition().x,2,player->GetPosition().z});*/
+
 
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(mainCamera);
@@ -115,7 +114,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	cameraController->SyncContrllerToCamera(camera);
 	cameraController->Update(elapsedTime);
 
-	//spawner->SpawnEnemy(elapsedTime, "Skeleton",10,3);
 
 	ENEMIES.Update(elapsedTime);
 
@@ -182,23 +180,11 @@ void StageOpenWorld_E4C::Render()
 
 	teleporter->Render(rc);
 
-	//spawner->Render(rc);
 
 	ENEMIES.Render(rc);
 
 	UI.Render(rc);
 
-	//MAPTILES.Render(rc);
-
-	//if (ImGui::TreeNode("Camera Positions"))
-	//{
-	//	for (size_t i = 0; i < cameraPositions.size(); ++i)
-	//	{
-	//		std::string label = "Position " + std::to_string(i);  // 各カメラポジションのラベル
-	//		ImGui::DragFloat3(label.c_str(), &cameraPositions[i].x, 1.0f, -FLT_MAX, FLT_MAX);  // カメラポジションの設定
-	//	}
-	//	ImGui::TreePop();
-	//}
 	// デバッグレンダラ描画実行
 
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
@@ -234,7 +220,7 @@ void StageOpenWorld_E4C::RenderDX12()
 			it.second->RenderDX12(rc);
 		}
 
-		//spawner->RenderDX12(rc);
+		
 		// skyBox
 		{
 			rc.skydomeData.skyTexture = m_sprites[1]->GetDescriptor();

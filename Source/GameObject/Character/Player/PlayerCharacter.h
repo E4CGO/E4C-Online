@@ -89,6 +89,7 @@ public:
 		DEATH,
 
 		ATTACK_NORMAL,
+		ATTACK_SPECIAL,
 		GUARD,
 		SKILL_1,
 		SKILL_2,
