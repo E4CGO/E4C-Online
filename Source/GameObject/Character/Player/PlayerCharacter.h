@@ -107,7 +107,6 @@ public:
 
 		ATTACK_NORMAL,
 		ATTACK_SPECIAL,
-		GUARD,
 		SKILL_1,
 		SKILL_2,
 		SKILL_3,
@@ -143,7 +142,6 @@ public:
 	bool InputDodge();
 	bool InputAttackNormal() { return (input & Input_Attack_N) > 0; }
 	bool InputSpecial() { return (input & Input_Attack_S) > 0; }
-	bool InputGuard() { return (input & Input_Attack_S) > 0; }
 	bool InputSkill1() { return (input & Input_Skill_1) > 0; }
 	bool InputSkill2() { return (input & Input_Skill_2) > 0; }
 	bool InputSkill3() { return (input & Input_Skill_3) > 0; }
@@ -242,9 +240,9 @@ protected:
 
 private:
 	float radius = 0;	// 当たり判定半径
-	
+
 	uint32_t m_client_id = 0;
-	
+
 	uint32_t input = 0;						// キー入力
 	DirectX::XMFLOAT2 inputDirection = {};	// 移動方向
 	DirectX::XMFLOAT3 target = {};			// アイム目標

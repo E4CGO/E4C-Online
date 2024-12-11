@@ -45,21 +45,11 @@ namespace PlayerCharacterState
 			owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::ATTACK_NORMAL));
 			return;
 		}
-		if (owner->GetStateMachine()->m_StateMachineName == "Sword")
+
+		if (flags & flag_AttackS && owner->InputSpecial())
 		{
-			if (flags & flag_AttackS && owner->InputGuard())
-			{
-				owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::GUARD));
-				return;
-			}
-		}
-		if (owner->GetStateMachine()->m_StateMachineName == "Rod")
-		{
-			if (flags & flag_AttackS && owner->InputSpecial())
-			{
-				owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::ATTACK_SPECIAL));
-				return;
-			}
+			owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::ATTACK_SPECIAL));
+			return;
 		}
 
 		if (flags & flag_Skill_1 && owner->InputSkill1())

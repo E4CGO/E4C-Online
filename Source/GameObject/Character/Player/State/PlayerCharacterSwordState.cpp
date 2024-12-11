@@ -131,9 +131,9 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
 					}
-					else if (owner->InputGuard())
+					else if (owner->InputSpecial())
 					{
-						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::GUARD);
+						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
 					}
 					else if (owner->InputSkill1())
 					{
@@ -194,9 +194,9 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
 					}
-					else if (owner->InputGuard())
+					else if (owner->InputSpecial())
 					{
-						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::GUARD);
+						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
 					}
 					else if (owner->InputSkill1())
 					{
@@ -257,9 +257,9 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
 					}
-					else if (owner->InputGuard())
+					else if (owner->InputSpecial())
 					{
-						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::GUARD);
+						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
 					}
 					else if (owner->InputSkill1())
 					{
@@ -334,9 +334,9 @@ namespace PlayerCharacterState
 				{
 					owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
 				}
-				else if (owner->InputGuard())
+				else if (owner->InputSpecial())
 				{
-					owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::GUARD);
+					owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
 				}
 			}
 
@@ -365,9 +365,9 @@ namespace PlayerCharacterState
 				{
 					owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
 				}
-				else if (owner->InputGuard())
+				else if (owner->InputSpecial())
 				{
-					owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::GUARD);
+					owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
 				}
 			}
 

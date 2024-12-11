@@ -41,7 +41,7 @@ void PlayerCharacterPatternGender::Execute(PlayerCharacter* chara)
 	StateMachine<PlayerCharacter>* stateMachine = chara->GetStateMachine();
 
 	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::ATTACK_NORMAL), nullptr);
-	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::GUARD), nullptr);
+	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::ATTACK_SPECIAL), nullptr);
 	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::SKILL_1), nullptr);
 	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::SKILL_2), nullptr);
 	stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::SKILL_4), nullptr);
@@ -94,7 +94,6 @@ void PlayerCharacterPatternSword::Execute(PlayerCharacter* chara)
 		stateMachine->RegisterSubState(static_cast<int>(PlayerCharacter::STATE::SKILL_1), ATTACK_START, new Skill1StateStart(chara));
 		stateMachine->RegisterSubState(static_cast<int>(PlayerCharacter::STATE::SKILL_1), ATTACK_CONTINUE, new Skill1ContinueStart(chara));
 		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::SKILL_2), new Skill2State(chara));
-		stateMachine->m_StateMachineName = "Sword";
 	}
 }
 
@@ -111,8 +110,7 @@ void PlayerCharacterPatternShield::Execute(PlayerCharacter* chara)
 
 	{
 		using namespace PlayerCharacterState::Shield;
-		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::GUARD), new AttackSpecialState(chara));
-		stateMachine->m_StateMachineName = "Shield";
+		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::ATTACK_SPECIAL), new AttackSpecialState(chara));
 	}
 }
 
@@ -134,6 +132,5 @@ void PlayerCharacterPatternRod::Execute(PlayerCharacter* chara)
 		stateMachine->RegisterSubState(static_cast<int>(PlayerCharacter::STATE::ATTACK_NORMAL), ATTACK_3, new AttackNormalState_3(chara));
 
 		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::ATTACK_SPECIAL), new AttackSpecialState(chara));
-		stateMachine->m_StateMachineName = "Rod";
 	}
 }
