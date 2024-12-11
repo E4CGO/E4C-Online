@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "TAKOEngine/Editor/Camera/CameraController.h"
 
@@ -9,7 +9,7 @@ class ThridPersonCameraController : public CameraController
 public:
 	ThridPersonCameraController();
 
-	// XVˆ—
+	// æ›´æ–°å‡¦ç†
 	void Update(float elapsedTime = 0.0f) override;
 
 	void SetPlayer(Character* player) { this->player = player; }
@@ -20,7 +20,7 @@ public:
 
 	DirectX::XMFLOAT3 GetTargetPt(float distance);
 
-	// ƒCƒ“ƒXƒ^ƒ“ƒXæ“¾
+	// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹å–å¾—
 	static ThridPersonCameraController& Instance();
 
 	void AimMode(bool enable = true);
@@ -40,12 +40,12 @@ private:
 
 	DirectX::XMFLOAT2 offset = { 0, 0 };
 
-	//  ƒJƒƒ‰ƒVƒF[ƒN
+	//  ã‚«ãƒ¡ãƒ©ã‚·ã‚§ãƒ¼ã‚¯
 	float shakeModify = 1.0f;
 	float shakeTimer = 0.0;
 	float shakeRange = 0.0f;
 
-	// ƒXƒ€[ƒYƒJƒƒ‰
+	// ã‚¹ãƒ ãƒ¼ã‚ºã‚«ãƒ¡ãƒ©
 	float angleXLerp = 0;
 	float angleYLerp = 0;
 	float distanceLerp;

@@ -1,4 +1,4 @@
-#include "SkeletonMinion.h"
+ï»¿#include "SkeletonMinion.h"
 
 #include "TAKOEngine/Physics/SphereCollider.h"
 #include "TAKOEngine/Physics/CollisionManager.h"
@@ -16,14 +16,14 @@ SkeletonMinion::SkeletonMinion(float scaling) : Enemy("Data/Model/Enemy/characte
 	moveSpeed = 2.0f;
 	turnSpeed = DirectX::XMConvertToRadians(180);
 
-	// ˆÚ“®—pCollider
+	// ç§»å‹•ç”¨Collider
 	SetCollider(Collider::COLLIDER_TYPE::SPHERE, Collider::COLLIDER_OBJ::ENEMY);
 	Sphere sphere({ 0, 0.6f / scaling, 0 }, 0.6f);
 	collider->SetParam(sphere);
 	//collider->setTransform(&m_pmodels[0]->FindNode("character_skeleton_minion_body")->worldTransform);
 	collider->SetOwner(this);
 
-	// “–‚½‚è”»’è
+	// å½“ãŸã‚Šåˆ¤å®š
 	colliders[HitCollider::Body] = new SphereCollider(Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("character_skeleton_minion_body")->worldTransform);
 	colliders[HitCollider::Body]->SetParam(sphere);
 	colliders[HitCollider::Body]->SetOwner(this);
@@ -37,7 +37,7 @@ SkeletonMinion::SkeletonMinion(float scaling) : Enemy("Data/Model/Enemy/characte
 	colliders[HitCollider::Head]->SetHittableOBJ(Collider::COLLIDER_OBJ::PLAYER_ATTACK | Collider::COLLIDER_OBJ::PLAYER_PROJECTILE);
 	COLLISIONS.Register(colliders[HitCollider::Head]);
 	
-	// UŒ‚”»’è
+	// æ”»æ’ƒåˆ¤å®š
 	attackColliders[AttackCollider::LeftHand] = new SphereCollider(Collider::COLLIDER_OBJ::ENEMY_ATTACK, &m_pmodels[0]->FindNode("character_skeleton_minion_armLeft")->worldTransform);
 	sphere.radius = 0.3f;
 	sphere.position = { 0.25f, -0.45f, 0.0f };
@@ -60,13 +60,13 @@ SkeletonMinion::SkeletonMinion(float scaling) : Enemy("Data/Model/Enemy/characte
 	stateMachine->SetState(EnemyState::Idle);
 }
 
-// ˆê”Ô‹ß‚¢ƒvƒŒƒCƒ„[‚ğƒ^[ƒQƒbƒg
+// ä¸€ç•ªè¿‘ã„ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ
 void SkeletonMinion::UpdateTarget()
 {
 	target = GetClosestPlayer(24.0f);
 }
 
-// Õ“Ë”»’èXV
+// è¡çªåˆ¤å®šæ›´æ–°
 void SkeletonMinion::UpdateColliders()
 {
 	if (collider)
@@ -94,25 +94,25 @@ SkeletonMinionBoss::SkeletonMinionBoss() : SkeletonMinion(3.0f)
 
 	showHp = true;
 
-	// ƒX[ƒp[ƒA[ƒ}[
+	// ã‚¹ãƒ¼ãƒ‘ãƒ¼ã‚¢ãƒ¼ãƒãƒ¼
 	armorMaxHp = armorHp = 50;
 
 	stateMachine->RegisterState(EnemyState::ID::Idle, new EnemyState::IdleState(this, 1.0f));
 	stateMachine->RegisterState(EnemyState::ID::TargetFound, new EnemyState::FollowState(this, 3.0f, SkeletonMinion::State::Attack));
 	stateMachine->SetState(EnemyState::ID::Idle);
 
-	// HPƒQ[ƒW
-	UI.Register(new WidgetBossHp("ƒXƒPƒ‹ƒhƒ“", this));
+	// HPã‚²ãƒ¼ã‚¸
+	UI.Register(new WidgetBossHp("ã‚¹ã‚±ãƒ«ãƒ‰ãƒ³", this));
 }
 void SkeletonMinionBoss::Update(float elaspedTime)
 {
-	if (armorHp <= 0) // ƒA[ƒ}[ƒuƒŒƒCƒN
+	if (armorHp <= 0) // ã‚¢ãƒ¼ãƒãƒ¼ãƒ–ãƒ¬ã‚¤ã‚¯
 	{
 		recoverArmorTimer -= elaspedTime;
 		if (recoverArmorTimer <= 0.0f)
 		{
 			recoverArmorTimer = 0.0f;
-			armorHp = armorMaxHp;		// ƒA[ƒ}[‰ñ•œ
+			armorHp = armorMaxHp;		// ã‚¢ãƒ¼ãƒãƒ¼å›å¾©
 		}
 	}
 
@@ -126,16 +126,16 @@ void SkeletonMinionBoss::OnDamage(const ENEMY_COLLISION& hit)
 
 	if (hp > 0)
 	{
-		if (armorHp <= 0) { // ƒA[ƒ}[‚È‚µ
+		if (armorHp <= 0) { // ã‚¢ãƒ¼ãƒãƒ¼ãªã—
 			stateMachine->ChangeState(EnemyState::ID::Hurt);
-			hp -= hit.damage / 10 * 2;		// ƒ_ƒEƒ“’Ç‰Áƒ_ƒ[ƒW
+			hp -= hit.damage / 10 * 2;		// ãƒ€ã‚¦ãƒ³è¿½åŠ ãƒ€ãƒ¡ãƒ¼ã‚¸
 		}
-		else if (hit.colider_id == HitCollider::Head)	// ƒwƒbƒhƒVƒ‡ƒbƒg ƒA[ƒ}[‚ ‚è
+		else if (hit.colider_id == HitCollider::Head)	// ãƒ˜ãƒƒãƒ‰ã‚·ãƒ§ãƒƒãƒˆ ã‚¢ãƒ¼ãƒãƒ¼ã‚ã‚Š
 		{
 			armorHp -= hit.damage;
-			if (armorHp <= 0) {		// ƒA[ƒ}[‰ğœ
+			if (armorHp <= 0) {		// ã‚¢ãƒ¼ãƒãƒ¼è§£é™¤
 				armorHp = 0;
-				recoverArmorTimer = recoverArmorTime;	// ƒA[ƒ}[‰ñ•œƒ^ƒCƒ}[
+				recoverArmorTimer = recoverArmorTime;	// ã‚¢ãƒ¼ãƒãƒ¼å›å¾©ã‚¿ã‚¤ãƒãƒ¼
 			}
 		}
 		velocity += hit.force * 0.1f;

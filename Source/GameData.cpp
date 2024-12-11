@@ -1,4 +1,4 @@
-#include "GameData.h"
+ï»¿#include "GameData.h"
 
 #include <fstream>
 
@@ -6,7 +6,7 @@
 
 GameData::GameData()
 {
-	if (!LoadGameSetting()) // ƒ[ƒh¸”sEV‚µ‚¢ƒtƒ@ƒCƒ‹
+	if (!LoadGameSetting()) // ãƒ­ãƒ¼ãƒ‰å¤±æ•—ãƒ»æ–°ã—ã„ãƒ•ã‚¡ã‚¤ãƒ«
 	{
 		SaveGameSetting();
 	}
@@ -16,7 +16,7 @@ bool GameData::SaveGameSetting()
 {
 	std::ofstream ofs;
 	ofs.open("setting.bin", std::ios::binary);
-	if (!ofs)	// ƒtƒ@ƒCƒ‹¸”s
+	if (!ofs)	// ãƒ•ã‚¡ã‚¤ãƒ«å¤±æ•—
 	{
 		return false;
 	}
@@ -29,8 +29,8 @@ bool GameData::LoadGameSetting()
 {
 	std::ifstream ifs;
 	ifs.open("setting.bin", std::ios::binary);
-	if (!ifs) { // ƒI[ƒvƒ“¸”s
-		gameSetting = {}; // ƒfƒtƒHƒ‹ƒgƒf[ƒ^
+	if (!ifs) { // ã‚ªãƒ¼ãƒ—ãƒ³å¤±æ•—æ™‚
+		gameSetting = {}; // ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆãƒ‡ãƒ¼ã‚¿
 		return false;
 	}
 

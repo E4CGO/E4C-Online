@@ -1,4 +1,4 @@
-//! @file OBBCollider.h
+ï»¿//! @file OBBCollider.h
 //! @note 
 
 #ifndef __OBB_COLLIDER_H__
@@ -20,7 +20,7 @@ public:
 		HitResult& result
 	) override;
 
-	// OBB—pƒpƒ‰ƒ[ƒ^ƒZƒbƒg
+	// OBBç”¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚»ãƒƒãƒˆ
 	void SetParam(OBB obb) override;
 
 	const DirectX::XMFLOAT3 GetRadii() const { return m_radii; }

@@ -1,31 +1,31 @@
-//! @file QuadtreeNode.cpp
-//! @note l•ª–Ø‹óŠÔ
+ï»¿//! @file QuadtreeNode.cpp
+//! @note å››åˆ†æœ¨ç©ºé–“
 #include "TAKOEngine/Physics/QuadtreeNode.h"
 #include <profiler.h>
 
 /**************************************************************************//**
-	@brief		l•ª–Ø‹óŠÔ‚Ì¶¬ ƒCƒ“ƒfƒbƒNƒX‚Ì‘‰Á•ûŒü‚Í‚˜¨‚š‚Ì‡”Ô
-	@param[in]	XMFLOAT3 center : ƒ‹[ƒg‹óŠÔ‚Ì’†SÀ•W
-				float halfSize : ƒ‹[ƒg‹óŠÔ‚Ì”¼•Ó’·
-				uint32_t depth : ‹óŠÔ•ªŠ„”
-	@return		‚È‚µ
+	@brief		å››åˆ†æœ¨ç©ºé–“ã®ç”Ÿæˆ ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã®å¢—åŠ æ–¹å‘ã¯ï½˜â†’ï½šã®é †ç•ª
+	@param[in]	XMFLOAT3 center : ãƒ«ãƒ¼ãƒˆç©ºé–“ã®ä¸­å¿ƒåº§æ¨™
+				float halfSize : ãƒ«ãƒ¼ãƒˆç©ºé–“ã®åŠè¾ºé•·
+				uint32_t depth : ç©ºé–“åˆ†å‰²æ•°
+	@return		ãªã—
 *//***************************************************************************/
 void QuadtreeNodeManager::CreateQuadtree(DirectX::XMFLOAT3 center, float halfSize, uint32_t depth)
 {
-	// Å‘åŠK‘w”ƒ`ƒFƒbƒN
+	// æœ€å¤§éšå±¤æ•°ãƒã‚§ãƒƒã‚¯
 	if (depth > MAX_DEPTH)
 	{
 		depth = MAX_DEPTH;
 	}
 
-	// ŠK‘w”•Û‘¶
+	// éšå±¤æ•°ä¿å­˜
 	this->m_depth = depth;
 
-	// ƒ‹[ƒg‹óŠÔ‚ğ“o˜^
+	// ãƒ«ãƒ¼ãƒˆç©ºé–“ã‚’ç™»éŒ²
 	QuadtreeNode tmp(center, halfSize);
 	m_quadtreeNodes.push_back(tmp);
 
-	// ƒ‹[ƒgˆÈ‰º‚Ì‘S‚Ä‚Ìƒm[ƒh‚ğì¬
+	// ãƒ«ãƒ¼ãƒˆä»¥ä¸‹ã®å…¨ã¦ã®ãƒãƒ¼ãƒ‰ã‚’ä½œæˆ
 	for (uint32_t level = 1; level <= depth; level++)
 	{
 		float nodeHalfSize = halfSize / (1 << level);
@@ -49,10 +49,10 @@ void QuadtreeNodeManager::CreateQuadtree(DirectX::XMFLOAT3 center, float halfSiz
 }
 
 /**************************************************************************//**
-	@brief		ƒ‚[ƒgƒ“ƒR[ƒh(‚ ‚é‚ÌŠK‘w‚Ì‹óŠÔ”Ô†)‚Ì¶¬
-	@param[in]	XMFLOAT3 point : ƒ‚[ƒgƒ“ƒR[ƒh‚ğ‹‚ß‚½‚¢À•W
-				QuadtreeNode route : ƒ‹[ƒg‹óŠÔ
-				float halfSize : ‚»‚ÌŠK‘w‚Ì”¼•Ó’·
+	@brief		ãƒ¢ãƒ¼ãƒˆãƒ³ã‚³ãƒ¼ãƒ‰(ã‚ã‚‹ã®éšå±¤ã®ç©ºé–“ç•ªå·)ã®ç”Ÿæˆ
+	@param[in]	XMFLOAT3 point : ãƒ¢ãƒ¼ãƒˆãƒ³ã‚³ãƒ¼ãƒ‰ã‚’æ±‚ã‚ãŸã„åº§æ¨™
+				QuadtreeNode route : ãƒ«ãƒ¼ãƒˆç©ºé–“
+				float halfSize : ãã®éšå±¤ã®åŠè¾ºé•·
 	@return		uint32_t
 *//***************************************************************************/
 uint32_t QuadtreeNodeManager::GetMortonCode(const DirectX::XMFLOAT3& point, const QuadtreeNode& route, float halfSize)
@@ -71,10 +71,10 @@ uint32_t QuadtreeNodeManager::bitSeparete(uint32_t n)
 }
 
 /**************************************************************************//**
-	@brief		“¯ŠK‘w‚Ì—×‚Ìƒ‚[ƒgƒ“ƒR[ƒh‚ğæ“¾
-	@param[in]	uint32_t before : Œ³‚Ìƒ‚[ƒgƒ“ƒR[ƒhi”ñüŒ`‰»‚ÌŠeŠK‘w‚Ìƒ‚[ƒgƒ“ƒR[ƒhj
-				uint32_t shiftXZ : ‚Ç‚Ì²‚Ì—×‚Ìƒ‚[ƒgƒ“ƒR[ƒh‚ª—~‚µ‚¢‚©w’è@x=0, z=1
-				bool minus : ƒ}ƒCƒiƒX•ûŒü‚Éi‚Şê‡‚Éture
+	@brief		åŒéšå±¤ã®éš£ã®ãƒ¢ãƒ¼ãƒˆãƒ³ã‚³ãƒ¼ãƒ‰ã‚’å–å¾—
+	@param[in]	uint32_t before : å…ƒã®ãƒ¢ãƒ¼ãƒˆãƒ³ã‚³ãƒ¼ãƒ‰ï¼ˆéç·šå½¢åŒ–ã®å„éšå±¤ã®ãƒ¢ãƒ¼ãƒˆãƒ³ã‚³ãƒ¼ãƒ‰ï¼‰
+				uint32_t shiftXZ : ã©ã®è»¸ã®éš£ã®ãƒ¢ãƒ¼ãƒˆãƒ³ã‚³ãƒ¼ãƒ‰ãŒæ¬²ã—ã„ã‹æŒ‡å®šã€€x=0, z=1
+				bool minus : ãƒã‚¤ãƒŠã‚¹æ–¹å‘ã«é€²ã‚€å ´åˆã«ture
 	@return		int
 *//***************************************************************************/
 int QuadtreeNodeManager::GetNextMortonCode(uint32_t before, uint32_t shiftXZ, bool minus)
@@ -84,13 +84,13 @@ int QuadtreeNodeManager::GetNextMortonCode(uint32_t before, uint32_t shiftXZ, bo
 	uint32_t filter = 0x01 << shiftXZ;
 	uint32_t value = 1 << shiftXZ;
 
-	// before‚ªfilter‚æ‚è‘å‚«‚¢ŠÔƒ‹[ƒv‚·‚é
+	// beforeãŒfilterã‚ˆã‚Šå¤§ãã„é–“ãƒ«ãƒ¼ãƒ—ã™ã‚‹
 	while (before >= filter)
 	{
-		// ƒtƒBƒ‹ƒ^[‚ğ‚©‚¯‚Ä’l‚ğƒ`ƒFƒbƒN‚µAbreak‚·‚é
+		// ãƒ•ã‚£ãƒ«ã‚¿ãƒ¼ã‚’ã‹ã‘ã¦å€¤ã‚’ãƒã‚§ãƒƒã‚¯ã—ã€breakã™ã‚‹
 		if ((!(before & filter) && (!minus)) || ((before & filter) && minus))	break;
 
-		// before‚ğ2bit‰EƒVƒtƒg‚³‚¹‚ÄÄƒ`ƒFƒbƒNB•¹‚¹‚Äƒ‚[ƒgƒ“ƒR[ƒh‚ÌXV—p‚Ì·•ª’l‚Ìvalue‚àXV‚·‚é
+		// beforeã‚’2bitå³ã‚·ãƒ•ãƒˆã•ã›ã¦å†ãƒã‚§ãƒƒã‚¯ã€‚ä½µã›ã¦ãƒ¢ãƒ¼ãƒˆãƒ³ã‚³ãƒ¼ãƒ‰ã®æ›´æ–°ç”¨ã®å·®åˆ†å€¤ã®valueã‚‚æ›´æ–°ã™ã‚‹
 		before >>= 2;
 		value = value * 4 - filter;
 	}
@@ -108,50 +108,50 @@ int QuadtreeNodeManager::GetNextMortonCode(uint32_t before, uint32_t shiftXZ, bo
 }
 
 /**************************************************************************//**
-	@brief		l•ª–Ø‹óŠÔ‚ÖƒIƒuƒWƒFƒNƒg‚ğ“o˜^‚·‚éÛ‚ÌüŒ`ƒCƒ“ƒfƒbƒNƒX‚ğæ“¾
-	@param[in]	XMFLOAT3 minPoint : AABB‚ÌÅ¬“_
-				XMFLOAT3 maxPoint : AABB‚ÌÅ‘å“_
+	@brief		å››åˆ†æœ¨ç©ºé–“ã¸ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç™»éŒ²ã™ã‚‹éš›ã®ç·šå½¢ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’å–å¾—
+	@param[in]	XMFLOAT3 minPoint : AABBã®æœ€å°ç‚¹
+				XMFLOAT3 maxPoint : AABBã®æœ€å¤§ç‚¹
 	@return		uint32_t
 *//***************************************************************************/
 uint32_t QuadtreeNodeManager::GetLinerIndexInsertObject(DirectX::XMFLOAT3 minPoint, DirectX::XMFLOAT3 maxPoint)
 {
-	// AABB‚ÌÅ¬“_‚Ìƒ‚[ƒgƒ“ƒR[ƒh
+	// AABBã®æœ€å°ç‚¹ã®ãƒ¢ãƒ¼ãƒˆãƒ³ã‚³ãƒ¼ãƒ‰
 	uint32_t mortonCodeMin = GetMortonCode(minPoint, m_quadtreeNodes.front(), m_quadtreeNodes.back().GetHalfSize());
-	// AABB‚ÌÅ‘å“_‚Ìƒ‚[ƒgƒ“ƒR[ƒh
+	// AABBã®æœ€å¤§ç‚¹ã®ãƒ¢ãƒ¼ãƒˆãƒ³ã‚³ãƒ¼ãƒ‰
 	uint32_t mortonCodeMax = GetMortonCode(maxPoint, m_quadtreeNodes.front(), m_quadtreeNodes.back().GetHalfSize());
-	// ã‹L“ñ‚Â‚Ìƒ‚[ƒgƒ“ƒR[ƒh‚Ì”r‘¼“I˜_—˜a
+	// ä¸Šè¨˜äºŒã¤ã®ãƒ¢ãƒ¼ãƒˆãƒ³ã‚³ãƒ¼ãƒ‰ã®æ’ä»–çš„è«–ç†å’Œ
 	uint32_t mortonCodeXOR = mortonCodeMin ^ mortonCodeMax;
 
-	// ƒ‚[ƒgƒ“ƒR[ƒh‚Ì”r‘¼“I˜_—˜a‚ğg‚¢AãˆÊ‹óŠÔ‚É“o˜^‚·‚é‚©‚Ìƒ`ƒFƒbƒN
+	// ãƒ¢ãƒ¼ãƒˆãƒ³ã‚³ãƒ¼ãƒ‰ã®æ’ä»–çš„è«–ç†å’Œã‚’ä½¿ã„ã€ä¸Šä½ç©ºé–“ã«ç™»éŒ²ã™ã‚‹ã‹ã®ãƒã‚§ãƒƒã‚¯
 	uint32_t count = 1;
 	uint32_t shift = 0;
 
 	while (mortonCodeXOR != 0)
 	{
-		// ‰ºˆÊ2bit‚¸‚Âƒ}ƒXƒN‚µ‚Ä’l‚ğƒ`ƒFƒbƒN‚·‚é
+		// ä¸‹ä½2bitãšã¤ãƒã‚¹ã‚¯ã—ã¦å€¤ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹
 		if (mortonCodeXOR & 0x03)
 		{
-			// ƒVƒtƒg”‚ğã‘‚«•Û‘¶
+			// ã‚·ãƒ•ãƒˆæ•°ã‚’ä¸Šæ›¸ãä¿å­˜
 			shift = count;
 		}
-		// ”r‘¼“I˜_—˜a‚ğ2bitƒVƒtƒg‚³‚¹‚ÄÄƒ`ƒFƒbƒN
+		// æ’ä»–çš„è«–ç†å’Œã‚’2bitã‚·ãƒ•ãƒˆã•ã›ã¦å†ãƒã‚§ãƒƒã‚¯
 		mortonCodeXOR >>= 2;
 
 		count++;
 	}
 
-	// üŒ`i”z—ñj‚ÌƒCƒ“ƒfƒbƒNƒX‚Ö•ÏŠ·
+	// ç·šå½¢ï¼ˆé…åˆ—ï¼‰ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã¸å¤‰æ›
 	return  (mortonCodeMin >> (shift * 2)) + GetLevelStart(m_depth - shift);
 }
 
 /**************************************************************************//**
-	@brief		l•ª–Ø‹óŠÔ‚ÖOŠpŒ`ƒIƒuƒWƒFƒNƒg‚ğ“o˜^
-	@param[in]	Triangle triangle : “o˜^‚·‚éOŠpŒ`
-	@return		bool : “o˜^¬Œ÷true
+	@brief		å››åˆ†æœ¨ç©ºé–“ã¸ä¸‰è§’å½¢ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç™»éŒ²
+	@param[in]	Triangle triangle : ç™»éŒ²ã™ã‚‹ä¸‰è§’å½¢
+	@return		bool : ç™»éŒ²æˆåŠŸæ™‚true
 *//***************************************************************************/
 bool QuadtreeNodeManager::InsertTriangleObject(Triangle& triangle)
 {
-	// OŠpŒ`‚ğŠÜ‚ŞAABB‚ğ\¬‚·‚éÅ¬“_‚ÆÅ‘å“_‚ğì¬iyÀ•W‚ğœ‚­j
+	// ä¸‰è§’å½¢ã‚’å«ã‚€AABBã‚’æ§‹æˆã™ã‚‹æœ€å°ç‚¹ã¨æœ€å¤§ç‚¹ã‚’ä½œæˆï¼ˆyåº§æ¨™ã‚’é™¤ãï¼‰
 	DirectX::XMFLOAT3 minPoint = triangle.position[0];
 	DirectX::XMFLOAT3 maxPoint = triangle.position[0];
 
@@ -191,7 +191,7 @@ bool QuadtreeNodeManager::InsertTriangleObject(Triangle& triangle)
 		maxPoint.z = triangle.position[2].z;
 	}
 
-	// Å¬“_EÅ‘å“_‚ªl•ª–Ø‚Ìƒ‹[ƒg‹óŠÔ‚ÌŠO‚É‚ ‚éê‡A“o˜^¸”s
+	// æœ€å°ç‚¹ãƒ»æœ€å¤§ç‚¹ãŒå››åˆ†æœ¨ã®ãƒ«ãƒ¼ãƒˆç©ºé–“ã®å¤–ã«ã‚ã‚‹å ´åˆã€ç™»éŒ²å¤±æ•—
 	DirectX::XMFLOAT3 routeMinPoint = m_quadtreeNodes.front().GetCenter();
 	routeMinPoint.x -= m_quadtreeNodes.front().GetHalfSize();
 	routeMinPoint.z -= m_quadtreeNodes.front().GetHalfSize();
@@ -205,29 +205,29 @@ bool QuadtreeNodeManager::InsertTriangleObject(Triangle& triangle)
 	if (maxPoint.x > routeMaxPoint.x)	return false;
 	if (maxPoint.z > routeMaxPoint.z)	return false;
 
-	// üŒ`i”z—ñj‚ÌƒCƒ“ƒfƒbƒNƒX‚Ö•ÏŠ·
+	// ç·šå½¢ï¼ˆé…åˆ—ï¼‰ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã¸å¤‰æ›
 	int linerIndex = GetLinerIndexInsertObject(minPoint, maxPoint);
 	if (linerIndex >= m_quadtreeNodes.size()) return false;
 
-	// “o˜^
+	// ç™»éŒ²
 	m_quadtreeNodes[linerIndex].InsertTriangleObject(triangle);
 
 	return true;
 }
 
 /**************************************************************************//**
-	@brief		l•ª–Ø‹óŠÔ‚Ö‹…‘ÌƒIƒuƒWƒFƒNƒg‚ğ“o˜^
-	@param[in]	Sphere sphere : “o˜^‚·‚é‹…‘Ì
-	@return		bool : “o˜^¬Œ÷true
+	@brief		å››åˆ†æœ¨ç©ºé–“ã¸çƒä½“ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç™»éŒ²
+	@param[in]	Sphere sphere : ç™»éŒ²ã™ã‚‹çƒä½“
+	@return		bool : ç™»éŒ²æˆåŠŸæ™‚true
 *//***************************************************************************/
 bool QuadtreeNodeManager::InsertSphereObject(Sphere& sphere)
 {
-	// ‹…‚ğŠÜ‚ŞAABB‚ğ\¬‚·‚éÅ¬“_‚ÆÅ‘å“_‚ğì¬
+	// çƒã‚’å«ã‚€AABBã‚’æ§‹æˆã™ã‚‹æœ€å°ç‚¹ã¨æœ€å¤§ç‚¹ã‚’ä½œæˆ
 	DirectX::XMFLOAT3 minPoint = {};
 	DirectX::XMFLOAT3 maxPoint = {};
 	sphere.GetBoundPoints(&minPoint, &maxPoint);
 
-	// Å¬“_EÅ‘å“_‚ªl•ª–Ø‚Ìƒ‹[ƒg‹óŠÔ‚ÌŠO‚É‚ ‚éê‡A“o˜^¸”s
+	// æœ€å°ç‚¹ãƒ»æœ€å¤§ç‚¹ãŒå››åˆ†æœ¨ã®ãƒ«ãƒ¼ãƒˆç©ºé–“ã®å¤–ã«ã‚ã‚‹å ´åˆã€ç™»éŒ²å¤±æ•—
 	DirectX::XMFLOAT3 routeMinPoint = m_quadtreeNodes.front().GetCenter();
 	routeMinPoint.x -= m_quadtreeNodes.front().GetHalfSize();
 	routeMinPoint.z -= m_quadtreeNodes.front().GetHalfSize();
@@ -241,28 +241,28 @@ bool QuadtreeNodeManager::InsertSphereObject(Sphere& sphere)
 	if (maxPoint.x > routeMaxPoint.x)	return false;
 	if (maxPoint.z > routeMaxPoint.z)	return false;
 
-	// üŒ`i”z—ñj‚ÌƒCƒ“ƒfƒbƒNƒX‚Ö•ÏŠ·
+	// ç·šå½¢ï¼ˆé…åˆ—ï¼‰ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã¸å¤‰æ›
 	int linerIndex = GetLinerIndexInsertObject(minPoint, maxPoint);
 	if (linerIndex >= m_quadtreeNodes.size()) return false;
 
-	// “o˜^
+	// ç™»éŒ²
 	m_quadtreeNodes[linerIndex].InsertSphereObject(sphere);
 
 	return true;
 }
 
 /**************************************************************************//**
-	@brief		l•ª–Ø‹óŠÔ‚ÖAABBƒIƒuƒWƒFƒNƒg‚ğ“o˜^
-	@param[in]	AABB aabb : “o˜^‚·‚éAABB
-	@return		bool : “o˜^¬Œ÷true
+	@brief		å››åˆ†æœ¨ç©ºé–“ã¸AABBã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç™»éŒ²
+	@param[in]	AABB aabb : ç™»éŒ²ã™ã‚‹AABB
+	@return		bool : ç™»éŒ²æˆåŠŸæ™‚true
 *//***************************************************************************/
 bool QuadtreeNodeManager::InsertAABBObject(AABB& aabb)
 {
-	// AABB‚ğ\¬‚·‚éÅ¬“_‚ÆÅ‘å“_‚ğì¬iyÀ•W‚ğœ‚­j
+	// AABBã‚’æ§‹æˆã™ã‚‹æœ€å°ç‚¹ã¨æœ€å¤§ç‚¹ã‚’ä½œæˆï¼ˆyåº§æ¨™ã‚’é™¤ãï¼‰
 	DirectX::XMFLOAT3 minPoint = { aabb.position.x - aabb.radii.x, 0.0f, aabb.position.z - aabb.radii.z };
 	DirectX::XMFLOAT3 maxPoint = { aabb.position.x + aabb.radii.x, 0.0f, aabb.position.z + aabb.radii.z };
 
-	// Å¬“_EÅ‘å“_‚ªl•ª–Ø‚Ìƒ‹[ƒg‹óŠÔ‚ÌŠO‚É‚ ‚éê‡A“o˜^¸”s
+	// æœ€å°ç‚¹ãƒ»æœ€å¤§ç‚¹ãŒå››åˆ†æœ¨ã®ãƒ«ãƒ¼ãƒˆç©ºé–“ã®å¤–ã«ã‚ã‚‹å ´åˆã€ç™»éŒ²å¤±æ•—
 	DirectX::XMFLOAT3 routeMinPoint = m_quadtreeNodes.front().GetCenter();
 	routeMinPoint.x -= m_quadtreeNodes.front().GetHalfSize();
 	routeMinPoint.z -= m_quadtreeNodes.front().GetHalfSize();
@@ -276,29 +276,29 @@ bool QuadtreeNodeManager::InsertAABBObject(AABB& aabb)
 	if (maxPoint.x > routeMaxPoint.x)	return false;
 	if (maxPoint.z > routeMaxPoint.z)	return false;
 
-	// üŒ`i”z—ñj‚ÌƒCƒ“ƒfƒbƒNƒX‚Ö•ÏŠ·
+	// ç·šå½¢ï¼ˆé…åˆ—ï¼‰ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã¸å¤‰æ›
 	int linerIndex = GetLinerIndexInsertObject(minPoint, maxPoint);
 	if (linerIndex >= m_quadtreeNodes.size()) return false;
 
-	// “o˜^
+	// ç™»éŒ²
 	m_quadtreeNodes[linerIndex].InsertAABBObject(aabb);
 
 	return true;
 }
 
 /**************************************************************************//**
-	@brief		l•ª–Ø‹óŠÔ‚ÖƒJƒvƒZƒ‹ƒIƒuƒWƒFƒNƒg‚ğ“o˜^
-	@param[in]	Capsule capsule : “o˜^‚·‚éƒJƒvƒZƒ‹
-	@return		bool : “o˜^¬Œ÷true
+	@brief		å››åˆ†æœ¨ç©ºé–“ã¸ã‚«ãƒ—ã‚»ãƒ«ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç™»éŒ²
+	@param[in]	Capsule capsule : ç™»éŒ²ã™ã‚‹ã‚«ãƒ—ã‚»ãƒ«
+	@return		bool : ç™»éŒ²æˆåŠŸæ™‚true
 *//***************************************************************************/
 bool QuadtreeNodeManager::InsertCapsuleObject(Capsule& capsule)
 {
-	// ƒJƒvƒZƒ‹‚ğŠÜ‚ŞAABB‚ğ\¬‚·‚éÅ¬“_‚ÆÅ‘å“_‚ğì¬iyÀ•W‚ğœ‚­j
+	// ã‚«ãƒ—ã‚»ãƒ«ã‚’å«ã‚€AABBã‚’æ§‹æˆã™ã‚‹æœ€å°ç‚¹ã¨æœ€å¤§ç‚¹ã‚’ä½œæˆï¼ˆyåº§æ¨™ã‚’é™¤ãï¼‰
 	DirectX::XMFLOAT3 minPoint = {};
 	DirectX::XMFLOAT3 maxPoint = {};
 	capsule.GetBoundPoints(&minPoint, &maxPoint);
 
-	// Å¬“_EÅ‘å“_‚ªl•ª–Ø‚Ìƒ‹[ƒg‹óŠÔ‚ÌŠO‚É‚ ‚éê‡A“o˜^¸”s
+	// æœ€å°ç‚¹ãƒ»æœ€å¤§ç‚¹ãŒå››åˆ†æœ¨ã®ãƒ«ãƒ¼ãƒˆç©ºé–“ã®å¤–ã«ã‚ã‚‹å ´åˆã€ç™»éŒ²å¤±æ•—
 	DirectX::XMFLOAT3 routeMinPoint = m_quadtreeNodes.front().GetCenter();
 	routeMinPoint.x -= m_quadtreeNodes.front().GetHalfSize();
 	routeMinPoint.z -= m_quadtreeNodes.front().GetHalfSize();
@@ -312,22 +312,22 @@ bool QuadtreeNodeManager::InsertCapsuleObject(Capsule& capsule)
 	if (maxPoint.x > routeMaxPoint.x)	return false;
 	if (maxPoint.z > routeMaxPoint.z)	return false;
 
-	// üŒ`i”z—ñj‚ÌƒCƒ“ƒfƒbƒNƒX‚Ö•ÏŠ·
+	// ç·šå½¢ï¼ˆé…åˆ—ï¼‰ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã¸å¤‰æ›
 	int linerIndex = GetLinerIndexInsertObject(minPoint, maxPoint);
 	if (linerIndex >= m_quadtreeNodes.size()) return false;
 
-	// “o˜^
+	// ç™»éŒ²
 	m_quadtreeNodes[linerIndex].InsertCapsuleObject(capsule);
 
 	return true;
 }
 
 /**************************************************************************//**
-	@brief		ƒIƒuƒWƒFƒNƒg‚ğl•ª–Ø‹óŠÔ‚©‚çíœ
-	@param[in]	‚È‚µ
-	@return		‚È‚µ
+	@brief		ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å››åˆ†æœ¨ç©ºé–“ã‹ã‚‰å‰Šé™¤
+	@param[in]	ãªã—
+	@return		ãªã—
 *//***************************************************************************/
-// ‘S‚Ä‚ÌOŠpŒ`ƒIƒuƒWƒFƒNƒg‚ğl•ª–Ø‹óŠÔ‚©‚çíœ
+// å…¨ã¦ã®ä¸‰è§’å½¢ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å››åˆ†æœ¨ç©ºé–“ã‹ã‚‰å‰Šé™¤
 void QuadtreeNodeManager::ClearAllTriangleObject()
 {
 	for (auto it = m_quadtreeNodes.begin(); it != m_quadtreeNodes.end(); it++)
@@ -335,7 +335,7 @@ void QuadtreeNodeManager::ClearAllTriangleObject()
 		it->ClearTriangleObject();
 	}
 }
-// ‘S‚Ä‚Ì‹…‘ÌƒIƒuƒWƒFƒNƒg‚ğl•ª–Ø‹óŠÔ‚©‚çíœ
+// å…¨ã¦ã®çƒä½“ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å››åˆ†æœ¨ç©ºé–“ã‹ã‚‰å‰Šé™¤
 void QuadtreeNodeManager::ClearAllSphereObject()
 {
 	for (auto it = m_quadtreeNodes.begin(); it != m_quadtreeNodes.end(); it++)
@@ -343,7 +343,7 @@ void QuadtreeNodeManager::ClearAllSphereObject()
 		it->ClearSphereObject();
 	}
 }
-// ‘S‚Ä‚ÌAABBƒIƒuƒWƒFƒNƒg‚ğl•ª–Ø‹óŠÔ‚©‚çíœ
+// å…¨ã¦ã®AABBã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å››åˆ†æœ¨ç©ºé–“ã‹ã‚‰å‰Šé™¤
 void QuadtreeNodeManager::ClearAllAABBObject()
 {
 	for (auto it = m_quadtreeNodes.begin(); it != m_quadtreeNodes.end(); it++)
@@ -351,7 +351,7 @@ void QuadtreeNodeManager::ClearAllAABBObject()
 		it->ClearAABBObject();
 	}
 }
-// ‘S‚Ä‚ÌƒJƒvƒZƒ‹ƒIƒuƒWƒFƒNƒg‚ğl•ª–Ø‹óŠÔ‚©‚çíœ
+// å…¨ã¦ã®ã‚«ãƒ—ã‚»ãƒ«ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å››åˆ†æœ¨ç©ºé–“ã‹ã‚‰å‰Šé™¤
 void QuadtreeNodeManager::ClearAllCapsuleObject()
 {
 	for (auto it = m_quadtreeNodes.begin(); it != m_quadtreeNodes.end(); it++)
@@ -361,22 +361,22 @@ void QuadtreeNodeManager::ClearAllCapsuleObject()
 }
 
 /**************************************************************************//**
-	@brief		‘S‚Ä‚Ìƒm[ƒh‚ÅOŠpŒ`‚Æ‚’¼ƒŒƒC‚ÌŒğ·”»’è‚ğs‚¤iÅ‰‚ÉŒğ·‚·‚éOŠpŒ`‚Ì‚İ‚ğ•Ô‚·•û®j
-	@param[in]	XMFLOAT3 rayStart : ƒŒƒC‚Ìn“_
-				XMFLOAT3 rayEnd : ƒŒƒC‚ÌI“_
-				HitResultVector result : ƒqƒbƒgŒ‹‰Ê‹L˜^—p•Ï”
-	@return		bool : Œğ·‚·‚é‚Æ‚«true
+	@brief		å…¨ã¦ã®ãƒãƒ¼ãƒ‰ã§ä¸‰è§’å½¢ã¨å‚ç›´ãƒ¬ã‚¤ã®äº¤å·®åˆ¤å®šã‚’è¡Œã†ï¼ˆæœ€åˆã«äº¤å·®ã™ã‚‹ä¸‰è§’å½¢ã®ã¿ã‚’è¿”ã™æ–¹å¼ï¼‰
+	@param[in]	XMFLOAT3 rayStart : ãƒ¬ã‚¤ã®å§‹ç‚¹
+				XMFLOAT3 rayEnd : ãƒ¬ã‚¤ã®çµ‚ç‚¹
+				HitResultVector result : ãƒ’ãƒƒãƒˆçµæœè¨˜éŒ²ç”¨å¤‰æ•°
+	@return		bool : äº¤å·®ã™ã‚‹ã¨ãtrue
 *//***************************************************************************/
 bool QuadtreeNodeManager::IntersectVerticalRayVsTriangle(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayEnd, HitResultVector& result)
 {
 	bool ret = false;
 	int count = 0;
 
-	// ƒŒƒC‚ÌŒü‚«‚ğ—pˆÓ‚µA•¹‚¹‚ÄƒŒƒC‚Ì’·‚³‚Åƒqƒbƒgî•ñ‚Ì‹——£‚ğ‰Šú‰»
+	// ãƒ¬ã‚¤ã®å‘ãã‚’ç”¨æ„ã—ã€ä½µã›ã¦ãƒ¬ã‚¤ã®é•·ã•ã§ãƒ’ãƒƒãƒˆæƒ…å ±ã®è·é›¢ã‚’åˆæœŸåŒ–
 	DirectX::XMFLOAT3 rayDirection = { 0.0f, rayEnd.y - rayStart.y , 0.0f };
 	result.distance = fabsf(rayDirection.y);
 
-	// ƒŒƒC‚Ìn“_‚Ìƒ‚[ƒgƒ“ƒR[ƒh‚ÆüŒ`ƒCƒ“ƒfƒbƒNƒX‚ğZo
+	// ãƒ¬ã‚¤ã®å§‹ç‚¹ã®ãƒ¢ãƒ¼ãƒˆãƒ³ã‚³ãƒ¼ãƒ‰ã¨ç·šå½¢ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’ç®—å‡º
 	uint32_t mortonCode = GetMortonCode(rayStart, m_quadtreeNodes.front(), m_quadtreeNodes[GetLevelStart(m_depth)].GetHalfSize());
 	int linerIndex = GetLevelStart(m_depth) + mortonCode;
 
@@ -384,13 +384,13 @@ bool QuadtreeNodeManager::IntersectVerticalRayVsTriangle(const DirectX::XMFLOAT3
 		ProfileScopedSection_2("ray", ImGuiControl::Profiler::Green);
 		int level = m_depth;
 
-		// l•ª–Ø‚ÌŠK‘w”•ªƒ‹[ƒvˆ—
+		// å››åˆ†æœ¨ã®éšå±¤æ•°åˆ†ãƒ«ãƒ¼ãƒ—å‡¦ç†
 		//for (int level = m_depth; level >= 0; level--)
 		while(1)
 		{
 			QuadtreeNode targetNode = m_quadtreeNodes.at(linerIndex);
 
-			// Šeƒm[ƒh‚ª‚ÂOŠpŒ`‘S‚Ä‚ÆƒŒƒC‚Ì“–‚½‚è”»’è‚ğs‚¤
+			// å„ãƒãƒ¼ãƒ‰ãŒæŒã¤ä¸‰è§’å½¢å…¨ã¦ã¨ãƒ¬ã‚¤ã®å½“ãŸã‚Šåˆ¤å®šã‚’è¡Œã†
 			for (int i = 0; i < targetNode.GetTriangles().size(); i++)
 			{
 				//HitResultVector tmpResult;
@@ -418,7 +418,7 @@ bool QuadtreeNodeManager::IntersectVerticalRayVsTriangle(const DirectX::XMFLOAT3
 				count++;
 			}
 
-			// eŠK‘w‚ÉƒCƒ“ƒfƒbƒNƒX‚ğˆÚ“®
+			// è¦ªéšå±¤ã«ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’ç§»å‹•
 			mortonCode >>= 2;
 			if (level > 0)
 				linerIndex = GetLevelStart(level - 1) + mortonCode;
@@ -430,63 +430,63 @@ bool QuadtreeNodeManager::IntersectVerticalRayVsTriangle(const DirectX::XMFLOAT3
 }
 
 /**************************************************************************//**
-	@brief		‘S‚Ä‚Ìƒm[ƒh‚ÅOŠpŒ`‚ÆƒŒƒC‚ÌŒğ·”»’è‚ğs‚¤iÅ‰‚ÉŒğ·‚·‚éOŠpŒ`‚Ì‚İ‚ğ•Ô‚·•û®j
-	@param[in]	XMFLOAT3 rayStart : ƒŒƒC‚Ìn“_
-				XMFLOAT3 rayEnd : ƒŒƒC‚ÌI“_
-				HitResultVector result : ƒqƒbƒgŒ‹‰Ê‹L˜^—p•Ï”
-	@return		bool : Œğ·‚·‚é‚Æ‚«true
+	@brief		å…¨ã¦ã®ãƒãƒ¼ãƒ‰ã§ä¸‰è§’å½¢ã¨ãƒ¬ã‚¤ã®äº¤å·®åˆ¤å®šã‚’è¡Œã†ï¼ˆæœ€åˆã«äº¤å·®ã™ã‚‹ä¸‰è§’å½¢ã®ã¿ã‚’è¿”ã™æ–¹å¼ï¼‰
+	@param[in]	XMFLOAT3 rayStart : ãƒ¬ã‚¤ã®å§‹ç‚¹
+				XMFLOAT3 rayEnd : ãƒ¬ã‚¤ã®çµ‚ç‚¹
+				HitResultVector result : ãƒ’ãƒƒãƒˆçµæœè¨˜éŒ²ç”¨å¤‰æ•°
+	@return		bool : äº¤å·®ã™ã‚‹ã¨ãtrue
 *//***************************************************************************/
 bool QuadtreeNodeManager::IntersectRayVsTriangle(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayEnd, HitResultVector& result)
 {
-	// l•ª–Ø‹óŠÔ‚ÌÅ¬’lix,zÀ•Wj
+	// å››åˆ†æœ¨ç©ºé–“ã®æœ€å°å€¤ï¼ˆx,zåº§æ¨™ï¼‰
 	DirectX::XMFLOAT3 routeMinPoint = m_quadtreeNodes.front().GetCenter();
 	routeMinPoint.x -= m_quadtreeNodes.front().GetHalfSize();
 	routeMinPoint.z -= m_quadtreeNodes.front().GetHalfSize();
-	// §Œä—p•Ï”
-	bool ret = false;	// ‘S‘Ì‚ÌŒğ·Œ‹‰ÊBˆê“x‚Å‚àOŠpŒ`‚Æ‚ÌŒğ·‚ªo‚ê‚Îtrue
-	bool hit = false;	// ŠK‘w‚²‚Æ‚ÌŒğ·Œ‹‰ÊBˆê“x‚Å‚àOŠpŒ`‚ÌŒğ·‚ªo‚ê‚Îtrue
+	// åˆ¶å¾¡ç”¨å¤‰æ•°
+	bool ret = false;	// å…¨ä½“ã®äº¤å·®çµæœã€‚ä¸€åº¦ã§ã‚‚ä¸‰è§’å½¢ã¨ã®äº¤å·®ãŒå‡ºã‚Œã°true
+	bool hit = false;	// éšå±¤ã”ã¨ã®äº¤å·®çµæœã€‚ä¸€åº¦ã§ã‚‚ä¸‰è§’å½¢ã®äº¤å·®ãŒå‡ºã‚Œã°true
 
-	// ƒŒƒC‚ÌŒü‚«‚ğ—pˆÓ‚µA•¹‚¹‚ÄƒŒƒC‚Ì’·‚³‚Åƒqƒbƒgî•ñ‚Ì‹——£‚ğ‰Šú‰»
+	// ãƒ¬ã‚¤ã®å‘ãã‚’ç”¨æ„ã—ã€ä½µã›ã¦ãƒ¬ã‚¤ã®é•·ã•ã§ãƒ’ãƒƒãƒˆæƒ…å ±ã®è·é›¢ã‚’åˆæœŸåŒ–
 	DirectX::XMFLOAT3 rayDirection = { rayEnd.x - rayStart.x, rayEnd.y - rayStart.y, rayEnd.z - rayStart.z };
 	float rayDist = DirectX::XMVectorGetX(DirectX::XMVector3Length(DirectX::XMLoadFloat3(&rayDirection)));
 	result.distance = rayDist;
 
-	// xz²‚»‚ê‚¼‚ê‚ÌƒŒƒC‚ÌŒü‚«‚ğƒvƒ‰ƒX¨‚PAƒ[ƒ¨‚OAƒ}ƒCƒiƒX¨|‚P‚Å‹L˜^
+	// xzè»¸ãã‚Œãã‚Œã®ãƒ¬ã‚¤ã®å‘ãã‚’ãƒ—ãƒ©ã‚¹â†’ï¼‘ã€ã‚¼ãƒ­â†’ï¼ã€ãƒã‚¤ãƒŠã‚¹â†’ï¼ï¼‘ã§è¨˜éŒ²
 	int directionX = rayDirection.x > 0.0f ? 1 : (rayDirection.x < 0.0f ? -1 : 0);
 	int directionZ = rayDirection.z > 0.0f ? 1 : (rayDirection.z < 0.0f ? -1 : 0);
 
 
-	// ŠK‘w”•ª‚Ìƒ‹[ƒvˆ—Bƒ‹[ƒg‹óŠÔ‚©‚çƒXƒ^[ƒg
+	// éšå±¤æ•°åˆ†ã®ãƒ«ãƒ¼ãƒ—å‡¦ç†ã€‚ãƒ«ãƒ¼ãƒˆç©ºé–“ã‹ã‚‰ã‚¹ã‚¿ãƒ¼ãƒˆ
 	for (uint32_t level = 0; level <= m_depth; level++)
 	{
-		// Œ»İ‚ÌŠK‘w‚ÌüŒ`ƒCƒ“ƒfƒbƒNƒX‚ğæ“¾
+		// ç¾åœ¨ã®éšå±¤ã®ç·šå½¢ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’å–å¾—
 		int levelStart = GetLevelStart(level);
 
-		// ƒŒƒC‚Ìn“_‚Ìƒ‚[ƒgƒ“ƒR[ƒh‚ğZo
+		// ãƒ¬ã‚¤ã®å§‹ç‚¹ã®ãƒ¢ãƒ¼ãƒˆãƒ³ã‚³ãƒ¼ãƒ‰ã‚’ç®—å‡º
 		uint32_t mortonCode = GetMortonCode(rayStart, m_quadtreeNodes.front(), m_quadtreeNodes[levelStart].GetHalfSize());
 
-		// DDA‚ğg‚Á‚ÄƒŒƒC‚Å’H‚éƒm[ƒh‚ğZo‚·‚é‚½‚ß‚ÌŠe•Ï”‚Ì€”õ
+		// DDAã‚’ä½¿ã£ã¦ãƒ¬ã‚¤ã§è¾¿ã‚‹ãƒãƒ¼ãƒ‰ã‚’ç®—å‡ºã™ã‚‹ãŸã‚ã®å„å¤‰æ•°ã®æº–å‚™
 
-		// ‹óŠÔ‚Ì’¼•û‘Ì‚Ìxz²‚Ì•Ó‚Ì’·‚³
+		// ç©ºé–“ã®ç›´æ–¹ä½“ã®xzè»¸ã®è¾ºã®é•·ã•
 		float cubeSize = m_quadtreeNodes[levelStart].GetHalfSize() * 2;
 
-		// ƒŒƒC‚ÌŒX‚«‚©‚çˆê‚Âƒm[ƒh‚ği‚ß‚½‚ÌŸ‚Ìƒm[ƒh‚Ü‚Å‚Ì‹——£‚Ì‘‰Á—Ê‚Ì’è”u’¼•û‘Ì‚Ìxz²‚Ì•Ó‚Ì’·‚³/|ƒŒƒC‚Ì¬•ª|v‚ğZo
+		// ãƒ¬ã‚¤ã®å‚¾ãã‹ã‚‰ä¸€ã¤ãƒãƒ¼ãƒ‰ã‚’é€²ã‚ãŸæ™‚ã®æ¬¡ã®ãƒãƒ¼ãƒ‰ã¾ã§ã®è·é›¢ã®å¢—åŠ é‡ã®å®šæ•°ã€Œç›´æ–¹ä½“ã®xzè»¸ã®è¾ºã®é•·ã•/|ãƒ¬ã‚¤ã®æˆåˆ†|ã€ã‚’ç®—å‡º
 		float dx = directionX != 0 ? cubeSize / fabsf(rayDirection.x) : 0.0f;
 		float dz = directionZ != 0 ? cubeSize / fabsf(rayDirection.z) : 0.0f;
 
-		// ƒŒƒC‚Ìn“_‚ªl•ª–Ø‚ÌÅ¬“_‚ğŠÜ‚Şƒm[ƒh‚©‚ç”‚¦‚Ä‰½ŒÂ–Ú‚Ìƒm[ƒh‚É‹‚é‚©Zoi‚OŒÂ–ÚƒXƒ^[ƒgj
+		// ãƒ¬ã‚¤ã®å§‹ç‚¹ãŒå››åˆ†æœ¨ã®æœ€å°ç‚¹ã‚’å«ã‚€ãƒãƒ¼ãƒ‰ã‹ã‚‰æ•°ãˆã¦ä½•å€‹ç›®ã®ãƒãƒ¼ãƒ‰ã«å±…ã‚‹ã‹ç®—å‡ºï¼ˆï¼å€‹ç›®ã‚¹ã‚¿ãƒ¼ãƒˆï¼‰
 		uint32_t nowX = static_cast<uint32_t>((rayStart.x - routeMinPoint.x) / cubeSize);
 		uint32_t nowZ = static_cast<uint32_t>((rayStart.z - routeMinPoint.z) / cubeSize);
 
-		// ƒŒƒC‚ÌI“_‚ªl•ª–Ø‚ÌÅ¬“_‚ğŠÜ‚Şƒm[ƒh‚©‚ç”‚¦‚Ä‰½ŒÂ–Ú‚Ìƒm[ƒh‚É‹‚é‚©Zo
+		// ãƒ¬ã‚¤ã®çµ‚ç‚¹ãŒå››åˆ†æœ¨ã®æœ€å°ç‚¹ã‚’å«ã‚€ãƒãƒ¼ãƒ‰ã‹ã‚‰æ•°ãˆã¦ä½•å€‹ç›®ã®ãƒãƒ¼ãƒ‰ã«å±…ã‚‹ã‹ç®—å‡º
 		uint32_t goalX = static_cast<uint32_t>((rayEnd.x - routeMinPoint.x) / cubeSize);
 		uint32_t goalZ = static_cast<uint32_t>((rayEnd.z - routeMinPoint.z) / cubeSize);
 
-		// ƒŒƒC‚Ìn“_‚Ìƒm[ƒh‚ÌÅ¬EÅ‘åÀ•W‚ÌZo
+		// ãƒ¬ã‚¤ã®å§‹ç‚¹ã®ãƒãƒ¼ãƒ‰ã®æœ€å°ãƒ»æœ€å¤§åº§æ¨™ã®ç®—å‡º
 		float minX = routeMinPoint.x + nowX * cubeSize, maxX = minX + cubeSize;
 		float minZ = routeMinPoint.z + nowZ * cubeSize, maxZ = minZ + cubeSize;
 
-		// ƒŒƒC‚Ìn“_‚É‚¨‚¢‚ÄAƒŒƒC‚ªi‚ŞÛAuŸ‚Ìƒm[ƒh‚É‚Ô‚Â‚©‚é‚Ü‚Å‚Ì‹——£/|ƒŒƒC‚Ì¬•ª|v‚ğZo
+		// ãƒ¬ã‚¤ã®å§‹ç‚¹ã«ãŠã„ã¦ã€ãƒ¬ã‚¤ãŒé€²ã‚€éš›ã€ã€Œæ¬¡ã®ãƒãƒ¼ãƒ‰ã«ã¶ã¤ã‹ã‚‹ã¾ã§ã®è·é›¢/|ãƒ¬ã‚¤ã®æˆåˆ†|ã€ã‚’ç®—å‡º
 		float distX = directionX * (maxX - rayStart.x) + (1 - directionX) * cubeSize / 2;
 		float distZ = directionZ * (maxZ - rayStart.z) + (1 - directionZ) * cubeSize / 2;
 
@@ -494,20 +494,20 @@ bool QuadtreeNodeManager::IntersectRayVsTriangle(const DirectX::XMFLOAT3& raySta
 		float tz = directionZ != 0 ? distZ / fabsf(rayDirection.z) : FLT_MAX;
 
 
-		// ƒ‹[ƒvˆ—‚Ål•ª–Ø‚Ì“¯ˆêŠK‘w“à‚ÌƒŒƒCvsOŠpŒ`‚ÌŒğ·”»’è‚ğs‚¤
+		// ãƒ«ãƒ¼ãƒ—å‡¦ç†ã§å››åˆ†æœ¨ã®åŒä¸€éšå±¤å†…ã®ãƒ¬ã‚¤vsä¸‰è§’å½¢ã®äº¤å·®åˆ¤å®šã‚’è¡Œã†
 		while (1)
 		{
 			hit = false;
 
-			// üŒ`i”z—ñj‚ÌƒCƒ“ƒfƒbƒNƒX‚Ö•ÏŠ·
+			// ç·šå½¢ï¼ˆé…åˆ—ï¼‰ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã¸å¤‰æ›
 			uint32_t linerIndex = mortonCode + levelStart;
 
-			// ŠK‘w“à‚Éû‚Ü‚Á‚Ä‚¢‚é‚©Šm”F
+			// éšå±¤å†…ã«åã¾ã£ã¦ã„ã‚‹ã‹ç¢ºèª
 			if (linerIndex <= GetLevelStart(level + 1) - 1)
 			{
 				QuadtreeNode targetNode = m_quadtreeNodes[linerIndex];
 
-				// Šeƒm[ƒh‚ª‚ÂOŠpŒ`‘S‚Ä‚ÆƒŒƒC‚Ì“–‚½‚è”»’è‚ğs‚¤
+				// å„ãƒãƒ¼ãƒ‰ãŒæŒã¤ä¸‰è§’å½¢å…¨ã¦ã¨ãƒ¬ã‚¤ã®å½“ãŸã‚Šåˆ¤å®šã‚’è¡Œã†
 				for (int i = 0; i < targetNode.GetTriangles().size(); i++)
 				{
 					HitResultVector tmpResult;
@@ -535,46 +535,46 @@ bool QuadtreeNodeManager::IntersectRayVsTriangle(const DirectX::XMFLOAT3& raySta
 			}
 			else
 			{
-				// ŠK‘wŠO‚È‚çI—¹
+				// éšå±¤å¤–ãªã‚‰çµ‚äº†
 				break;
 			}
 
-			// ‚P“x‚Å‚àƒqƒbƒg‚µ‚Ä‚¢‚½‚çA‚±‚ÌŠK‘w‚Ìƒ`ƒFƒbƒN‚ÍI—¹BiƒŒƒC‚ÌŠJn“_‚É‹ß‚¢ƒm[ƒh‡‚Éƒ`ƒFƒbƒN‚µ‚Ä‚¢‚é‚Ì‚Åj
+			// ï¼‘åº¦ã§ã‚‚ãƒ’ãƒƒãƒˆã—ã¦ã„ãŸã‚‰ã€ã“ã®éšå±¤ã®ãƒã‚§ãƒƒã‚¯ã¯çµ‚äº†ã€‚ï¼ˆãƒ¬ã‚¤ã®é–‹å§‹ç‚¹ã«è¿‘ã„ãƒãƒ¼ãƒ‰é †ã«ãƒã‚§ãƒƒã‚¯ã—ã¦ã„ã‚‹ã®ã§ï¼‰
 			if (hit) break;
 
-			// DDA‚ğ—p‚¢‚ÄAŸ‚Éƒ`ƒFƒbƒN‚·‚é—×‚Ì‹æ‰æ‚ğZo‚µA‚»‚Ìƒm[ƒh‚ğ¦‚·ƒ‚[ƒgƒ“ƒR[ƒh‚ğã‘‚«‚·‚é
-			// x•ûŒü
+			// DDAã‚’ç”¨ã„ã¦ã€æ¬¡ã«ãƒã‚§ãƒƒã‚¯ã™ã‚‹éš£ã®åŒºç”»ã‚’ç®—å‡ºã—ã€ãã®ãƒãƒ¼ãƒ‰ã‚’ç¤ºã™ãƒ¢ãƒ¼ãƒˆãƒ³ã‚³ãƒ¼ãƒ‰ã‚’ä¸Šæ›¸ãã™ã‚‹
+			// xæ–¹å‘
 			if (tx <= tz)
 			{
-				// I’[‚Ì‹óŠÔ‚Ü‚Å—ˆ‚Ä‚¢‚½‚çŒ»İ‚ÌŠK‘w‚Ìˆ—‚ğI—¹‚³‚¹‚é
+				// çµ‚ç«¯ã®ç©ºé–“ã¾ã§æ¥ã¦ã„ãŸã‚‰ç¾åœ¨ã®éšå±¤ã®å‡¦ç†ã‚’çµ‚äº†ã•ã›ã‚‹
 				if (nowX == goalX)	break;
 
-				// Šù‚ÉŒ©‚Â‚©‚Á‚Ä‚¢‚éÅ’ZŒğ·‹——£‚æ‚è‚à’Tõ‚·‚é‹óŠÔ‚Ü‚Å‚Ì‹——£‚ª’·‚­‚È‚Á‚Ä‚¢‚ê‚ÎA
-				// ‚±‚êˆÈãi‚Ş•K—v‚Í‚È‚¢‚½‚ßŒ»İ‚ÌŠK‘w‚Ìˆ—‚ğI—¹‚³‚¹‚é
+				// æ—¢ã«è¦‹ã¤ã‹ã£ã¦ã„ã‚‹æœ€çŸ­äº¤å·®è·é›¢ã‚ˆã‚Šã‚‚æ¢ç´¢ã™ã‚‹ç©ºé–“ã¾ã§ã®è·é›¢ãŒé•·ããªã£ã¦ã„ã‚Œã°ã€
+				// ã“ã‚Œä»¥ä¸Šé€²ã‚€å¿…è¦ã¯ãªã„ãŸã‚ç¾åœ¨ã®éšå±¤ã®å‡¦ç†ã‚’çµ‚äº†ã•ã›ã‚‹
 				if (result.distance < rayDist * tx)	break;
 
-				// ˆÚ“®‚·‚é‚Ì‚Åtx‚ÆnowX‚ğXV‚·‚é
+				// ç§»å‹•ã™ã‚‹ã®ã§txã¨nowXã‚’æ›´æ–°ã™ã‚‹
 				tx += dx;
 				nowX += directionX;
 
-				// —×‚Ì‹óŠÔ‚Ìƒ‚[ƒgƒ“ƒR[ƒhi”ñüŒ`j‚ğZo‚µã‘‚«‚·‚é
+				// éš£ã®ç©ºé–“ã®ãƒ¢ãƒ¼ãƒˆãƒ³ã‚³ãƒ¼ãƒ‰ï¼ˆéç·šå½¢ï¼‰ã‚’ç®—å‡ºã—ä¸Šæ›¸ãã™ã‚‹
 				mortonCode = GetNextMortonCode(mortonCode, 0, directionX == -1);
 			}
-			// z•ûŒü
+			// zæ–¹å‘
 			else
 			{
-				// I’[‚Ì‹óŠÔ‚Ü‚Å—ˆ‚Ä‚¢‚½‚çˆ—‚ğI—¹‚³‚¹‚é
+				// çµ‚ç«¯ã®ç©ºé–“ã¾ã§æ¥ã¦ã„ãŸã‚‰å‡¦ç†ã‚’çµ‚äº†ã•ã›ã‚‹
 				if (nowZ == goalZ)	break;
 
-				// Šù‚ÉŒ©‚Â‚©‚Á‚Ä‚¢‚éÅ’ZŒğ·‹——£‚æ‚è‚à’Tõ‚·‚é‹óŠÔ‚Ü‚Å‚Ì‹——£‚ª’·‚­‚È‚Á‚Ä‚¢‚ê‚ÎA
-				// ‚±‚êˆÈãi‚Ş•K—v‚Í‚È‚¢‚½‚ßŒ»İ‚ÌŠK‘w‚Ìˆ—‚ğI—¹‚³‚¹‚é
+				// æ—¢ã«è¦‹ã¤ã‹ã£ã¦ã„ã‚‹æœ€çŸ­äº¤å·®è·é›¢ã‚ˆã‚Šã‚‚æ¢ç´¢ã™ã‚‹ç©ºé–“ã¾ã§ã®è·é›¢ãŒé•·ããªã£ã¦ã„ã‚Œã°ã€
+				// ã“ã‚Œä»¥ä¸Šé€²ã‚€å¿…è¦ã¯ãªã„ãŸã‚ç¾åœ¨ã®éšå±¤ã®å‡¦ç†ã‚’çµ‚äº†ã•ã›ã‚‹
 				if (result.distance < rayDist * tz)	break;
 
-				// ˆÚ“®‚·‚é‚Ì‚Åtz‚ÆnowZ‚ğXV‚·‚é
+				// ç§»å‹•ã™ã‚‹ã®ã§tzã¨nowZã‚’æ›´æ–°ã™ã‚‹
 				tz += dz;
 				nowZ += directionZ;
 
-				// —×‚Ì‹óŠÔ‚Ìƒ‚[ƒgƒ“ƒR[ƒhi”ñüŒ`j‚ğZo‚µã‘‚«‚·‚é
+				// éš£ã®ç©ºé–“ã®ãƒ¢ãƒ¼ãƒˆãƒ³ã‚³ãƒ¼ãƒ‰ï¼ˆéç·šå½¢ï¼‰ã‚’ç®—å‡ºã—ä¸Šæ›¸ãã™ã‚‹
 				mortonCode = GetNextMortonCode(mortonCode, 1, directionZ == -1);
 			}
 		}
@@ -584,22 +584,22 @@ bool QuadtreeNodeManager::IntersectRayVsTriangle(const DirectX::XMFLOAT3& raySta
 }
 
 /**************************************************************************//**
-	@brief		‘S‚Ä‚Ìƒm[ƒh‚ÅOŠpŒ`‚ÆƒXƒtƒBƒAƒLƒƒƒXƒg‚ÌŒğ·”»’è‚ğs‚¤iÅ‰‚ÉŒğ·‚·‚éOŠpŒ`‚Ì‚İ‚ğ•Ô‚·•û®j
-	@param[in]	XMFLOAT3 rayStart : ƒXƒtƒBƒAƒLƒƒƒXƒg‚Ìn“_
-				XMFLOAT3 rayEnd : ƒXƒtƒBƒAƒLƒƒƒXƒg‚ÌI“_
-				float radius : ƒXƒtƒBƒA‚Ì”¼Œa
-				HitResultVector result : ƒqƒbƒgŒ‹‰Ê‹L˜^—p•Ï”
-				vector<CrossedNode>* nodeList : Œğ·‚µ‚½ƒm[ƒhƒŠƒXƒg
-	@return		bool : Œğ·‚·‚é‚Æ‚«true
+	@brief		å…¨ã¦ã®ãƒãƒ¼ãƒ‰ã§ä¸‰è§’å½¢ã¨ã‚¹ãƒ•ã‚£ã‚¢ã‚­ãƒ£ã‚¹ãƒˆã®äº¤å·®åˆ¤å®šã‚’è¡Œã†ï¼ˆæœ€åˆã«äº¤å·®ã™ã‚‹ä¸‰è§’å½¢ã®ã¿ã‚’è¿”ã™æ–¹å¼ï¼‰
+	@param[in]	XMFLOAT3 rayStart : ã‚¹ãƒ•ã‚£ã‚¢ã‚­ãƒ£ã‚¹ãƒˆã®å§‹ç‚¹
+				XMFLOAT3 rayEnd : ã‚¹ãƒ•ã‚£ã‚¢ã‚­ãƒ£ã‚¹ãƒˆã®çµ‚ç‚¹
+				float radius : ã‚¹ãƒ•ã‚£ã‚¢ã®åŠå¾„
+				HitResultVector result : ãƒ’ãƒƒãƒˆçµæœè¨˜éŒ²ç”¨å¤‰æ•°
+				vector<CrossedNode>* nodeList : äº¤å·®ã—ãŸãƒãƒ¼ãƒ‰ãƒªã‚¹ãƒˆ
+	@return		bool : äº¤å·®ã™ã‚‹ã¨ãtrue
 *//***************************************************************************/
 bool QuadtreeNodeManager::IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayEnd, float radius, HitResultVector& result)
 {
-	std::vector<QuadtreeNodeManager::CrossedNode>	mortonList;	// Œğ·‚µ‚½ƒm[ƒh‚ğ‹L˜^‚·‚é
+	std::vector<QuadtreeNodeManager::CrossedNode>	mortonList;	// äº¤å·®ã—ãŸãƒãƒ¼ãƒ‰ã‚’è¨˜éŒ²ã™ã‚‹
 	return IntersectSphereCastVsTriangle(rayStart, rayEnd, radius, result, &mortonList);
 }
 bool QuadtreeNodeManager::IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayEnd, float radius, HitResultVector& result, std::vector<CrossedNode>* nodeList)
 {
-	// l•ª–Ø‚ÌÅ‰º‘w‚Ì•Ó’·‚æ‚è‚àƒXƒtƒBƒAƒLƒƒƒXƒg‚Ì”¼Œa‚ª‘å‚«‚¢ê‡A¡‰ñ‚ÌƒAƒ‹ƒSƒŠƒYƒ€‚Å‚Í”»’èo—ˆ‚È‚¢‚½‚ßAÅ‰º‘w‚ğˆê‚Âã‚ÌŠK‘w‚ÉˆÚ“®‚³‚¹‚é
+	// å››åˆ†æœ¨ã®æœ€ä¸‹å±¤ã®è¾ºé•·ã‚ˆã‚Šã‚‚ã‚¹ãƒ•ã‚£ã‚¢ã‚­ãƒ£ã‚¹ãƒˆã®åŠå¾„ãŒå¤§ãã„å ´åˆã€ä»Šå›ã®ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã§ã¯åˆ¤å®šå‡ºæ¥ãªã„ãŸã‚ã€æœ€ä¸‹å±¤ã‚’ä¸€ã¤ä¸Šã®éšå±¤ã«ç§»å‹•ã•ã›ã‚‹
 	float minSize = m_quadtreeNodes.back().GetHalfSize() * 2.0f;
 	uint32_t targetDepth = m_depth;
 	while (minSize < radius)
@@ -608,14 +608,14 @@ bool QuadtreeNodeManager::IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3&
 		targetDepth--;
 	}
 
-	// §Œä—p•Ï”
-	bool ret = false;			// ‘S‘Ì‚ÌŒğ·Œ‹‰ÊBˆê“x‚Å‚àOŠpŒ`‚Æ‚ÌŒğ·‚ªo‚ê‚Îtrue
-	bool hitNowLevel = false;	// Œ»İ‚ÌŠK‘w‚Å‚ÌŒğ·Œ‹‰ÊBˆê“x‚Å‚àOŠpŒ`‚Æ‚ÌŒğ·‚ªo‚ê‚Îtrue
-	bool hitRayCast = false;	// ’Pˆê‚ÌƒŒƒCƒLƒƒƒXƒg‚Å‚ÌŒğ·Œ‹‰ÊBˆê“x‚Å‚àOŠpŒ`‚Æ‚ÌŒğ·‚ªo‚ê‚Îtrue
+	// åˆ¶å¾¡ç”¨å¤‰æ•°
+	bool ret = false;			// å…¨ä½“ã®äº¤å·®çµæœã€‚ä¸€åº¦ã§ã‚‚ä¸‰è§’å½¢ã¨ã®äº¤å·®ãŒå‡ºã‚Œã°true
+	bool hitNowLevel = false;	// ç¾åœ¨ã®éšå±¤ã§ã®äº¤å·®çµæœã€‚ä¸€åº¦ã§ã‚‚ä¸‰è§’å½¢ã¨ã®äº¤å·®ãŒå‡ºã‚Œã°true
+	bool hitRayCast = false;	// å˜ä¸€ã®ãƒ¬ã‚¤ã‚­ãƒ£ã‚¹ãƒˆã§ã®äº¤å·®çµæœã€‚ä¸€åº¦ã§ã‚‚ä¸‰è§’å½¢ã¨ã®äº¤å·®ãŒå‡ºã‚Œã°true
 
 	uint32_t level = 0;
 
-	// ƒŒƒC‚Ì’·‚³‚Åƒqƒbƒgî•ñ‚Ì‹——£‚ğ‰Šú‰»‚µA³‹K‰»‚à‚µ‚Ä‚¨‚­
+	// ãƒ¬ã‚¤ã®é•·ã•ã§ãƒ’ãƒƒãƒˆæƒ…å ±ã®è·é›¢ã‚’åˆæœŸåŒ–ã—ã€æ­£è¦åŒ–ã‚‚ã—ã¦ãŠã
 	DirectX::XMFLOAT3 rayDirection =
 	{
 		rayEnd.x - rayStart.x,
@@ -627,21 +627,21 @@ bool QuadtreeNodeManager::IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3&
 	rayDirection.z /= rayDist;
 	result.distance = rayDist;
 
-	// l•ª–Ø‹óŠÔ‚ÌÅ¬’lix,zÀ•Wj
+	// å››åˆ†æœ¨ç©ºé–“ã®æœ€å°å€¤ï¼ˆx,zåº§æ¨™ï¼‰
 	DirectX::XMFLOAT3 routeMinPoint = m_quadtreeNodes.front().GetCenter();
 	routeMinPoint.x -= m_quadtreeNodes.front().GetHalfSize();
 	routeMinPoint.z -= m_quadtreeNodes.front().GetHalfSize();
 
-	// ƒŒƒC‚ÌŒü‚«‚ğ‚PE‚OE|‚P‚Å‹L˜^
+	// ãƒ¬ã‚¤ã®å‘ãã‚’ï¼‘ãƒ»ï¼ãƒ»ï¼ï¼‘ã§è¨˜éŒ²
 	int directionX = rayDirection.x > 0.0f ? 1 : (rayDirection.x < 0.0f ? -1 : 0);
 	int directionZ = rayDirection.z > 0.0f ? 1 : (rayDirection.z < 0.0f ? -1 : 0);
 
-	// ƒm[ƒh‚ğw’è‚µA‚»‚Ìƒm[ƒh“à‚Ì‘S‚Ä‚ÌOŠpŒ`‚ÆƒXƒtƒBƒAƒLƒƒƒXƒg‚ğs‚¤ƒ‰ƒ€ƒ_®
+	// ãƒãƒ¼ãƒ‰ã‚’æŒ‡å®šã—ã€ãã®ãƒãƒ¼ãƒ‰å†…ã®å…¨ã¦ã®ä¸‰è§’å½¢ã¨ã‚¹ãƒ•ã‚£ã‚¢ã‚­ãƒ£ã‚¹ãƒˆã‚’è¡Œã†ãƒ©ãƒ ãƒ€å¼
 	auto IntersectShpereCastVsTriangleInTargetNode = [&](int linerIndex)
 	{
 		QuadtreeNode targetNode = m_quadtreeNodes[linerIndex];
 
-		// Šeƒm[ƒh‚ª‚ÂOŠpŒ`‘S‚Ä‚ÆƒŒƒC‚Ì“–‚½‚è”»’è‚ğs‚¤
+		// å„ãƒãƒ¼ãƒ‰ãŒæŒã¤ä¸‰è§’å½¢å…¨ã¦ã¨ãƒ¬ã‚¤ã®å½“ãŸã‚Šåˆ¤å®šã‚’è¡Œã†
 		for (int i = 0; i < targetNode.GetTriangles().size(); i++)
 		{
 			HitResult tmpResult;
@@ -668,7 +668,7 @@ bool QuadtreeNodeManager::IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3&
 			}
 		}
 	};
-	// Šù‚É“o˜^Ï‚İ‚ÌƒCƒ“ƒfƒbƒNƒX‚©Šm”F‚µ‚Ä‚©‚çAã‹Lƒ‰ƒ€ƒ_®‚ğŒÄ‚Ño‚·ƒ‰ƒ€ƒ_®B‚±‚ê‚¾‚¯‚ÅOK
+	// æ—¢ã«ç™»éŒ²æ¸ˆã¿ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹ç¢ºèªã—ã¦ã‹ã‚‰ã€ä¸Šè¨˜ãƒ©ãƒ ãƒ€å¼ã‚’å‘¼ã³å‡ºã™ãƒ©ãƒ ãƒ€å¼ã€‚ã“ã‚Œã ã‘ã§OK
 	auto resisterAndIntersectShpereCastVsTriangleInTargetNode = [&](uint32_t linerIndex)
 	{
 		if (linerIndex <= GetLevelStart(level + 1) - 1)
@@ -691,130 +691,130 @@ bool QuadtreeNodeManager::IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3&
 		return true;
 	};
 
-	// ŠK‘wilevelj•ª‚Ìƒ‹[ƒv
+	// éšå±¤ï¼ˆlevelï¼‰åˆ†ã®ãƒ«ãƒ¼ãƒ—
 	for (level = 0; level <= targetDepth; level++)
 	{
 		hitNowLevel = false;
 
 		uint32_t levelStart = GetLevelStart(level);
 
-		// ƒŒƒC‚Å’H‚éƒm[ƒh‚ğZo‚·‚é‚½‚ß‚ÌŠe•Ï”‚Ì€”õ
+		// ãƒ¬ã‚¤ã§è¾¿ã‚‹ãƒãƒ¼ãƒ‰ã‚’ç®—å‡ºã™ã‚‹ãŸã‚ã®å„å¤‰æ•°ã®æº–å‚™
 		float cubeSize = m_quadtreeNodes[levelStart].GetHalfSize() * 2;
 
-		// ƒŒƒC‚ÌŒX‚«‚©‚çˆê‚Âƒm[ƒh‚ği‚ß‚½‚ÌŸ‚Ìƒm[ƒh‚Ü‚Å‚Ì‹——£‚Ì‘‰Á—Ê‚Ì’è”u’¼•û‘Ì‚Ìxz²‚Ì•Ó‚Ì’·‚³/|ƒŒƒC‚Ì¬•ª|v‚ğZo
+		// ãƒ¬ã‚¤ã®å‚¾ãã‹ã‚‰ä¸€ã¤ãƒãƒ¼ãƒ‰ã‚’é€²ã‚ãŸæ™‚ã®æ¬¡ã®ãƒãƒ¼ãƒ‰ã¾ã§ã®è·é›¢ã®å¢—åŠ é‡ã®å®šæ•°ã€Œç›´æ–¹ä½“ã®xzè»¸ã®è¾ºã®é•·ã•/|ãƒ¬ã‚¤ã®æˆåˆ†|ã€ã‚’ç®—å‡º
 		float dx = directionX != 0 ? cubeSize / fabsf(rayDirection.x * rayDist) : 0.0f;
 		float dz = directionZ != 0 ? cubeSize / fabsf(rayDirection.z * rayDist) : 0.0f;
 
-		// ƒŒƒC‚Ìn“_‚ÌŒğ·”»’è
+		// ãƒ¬ã‚¤ã®å§‹ç‚¹ã®äº¤å·®åˆ¤å®š
 		uint32_t mortonCode = GetMortonCode(rayStart, m_quadtreeNodes.front(), m_quadtreeNodes[levelStart].GetHalfSize());
 		if (!resisterAndIntersectShpereCastVsTriangleInTargetNode(mortonCode + levelStart))
 		{
 			continue;
 		}
 
-		// ƒŒƒC‚ÌÀ•W•â³’l
+		// ãƒ¬ã‚¤ã®åº§æ¨™è£œæ­£å€¤
 		DirectX::XMFLOAT3 fixAddVec = {};
-		// ’†SA¶A‰E‚©‚ç‚ÌƒŒƒC‚Æl•ª–Ø‚ÌŒğ·”»’è
+		// ä¸­å¿ƒã€å·¦ã€å³ã‹ã‚‰ã®ãƒ¬ã‚¤ã¨å››åˆ†æœ¨ã®äº¤å·®åˆ¤å®š
 		for (int i = 0; i < 3; i++)
 		{
-			// ƒŒƒC‚ÌÀ•W•â³’l‚ğZo
-			if (i == 0)	// ’†S
+			// ãƒ¬ã‚¤ã®åº§æ¨™è£œæ­£å€¤ã‚’ç®—å‡º
+			if (i == 0)	// ä¸­å¿ƒ
 			{
 				fixAddVec = { rayDirection.x * radius, 0.0f, rayDirection.z * radius };
 			}
-			else if (i == 1)	// ¶
+			else if (i == 1)	// å·¦
 			{
 				fixAddVec = { rayDirection.z * radius, 0.0f, -rayDirection.x * radius };
 			}
-			else if (i == 2)	// ‰E
+			else if (i == 2)	// å³
 			{
 				fixAddVec = { -rayDirection.z * radius, 0.0f, rayDirection.x * radius };
 			}
 
-			// À•W•â³Œã‚ÌƒŒƒC‚Ìn“_‚Ìƒ‚[ƒgƒ“ƒR[ƒh
+			// åº§æ¨™è£œæ­£å¾Œã®ãƒ¬ã‚¤ã®å§‹ç‚¹ã®ãƒ¢ãƒ¼ãƒˆãƒ³ã‚³ãƒ¼ãƒ‰
 			mortonCode = GetMortonCode(DirectX::XMFLOAT3{ rayStart.x + fixAddVec.x, 0.0f, rayStart.z + fixAddVec.z }, m_quadtreeNodes.front(), m_quadtreeNodes[levelStart].GetHalfSize());
 
-			// ƒŒƒC‚Ìn“_‚ªl•ª–Ø‚ÌÅ¬“_‚ğŠÜ‚Şƒm[ƒh‚©‚ç”‚¦‚Ä‰½ŒÂ–Ú‚Ìƒm[ƒh‚É‹‚é‚©Zoi‚OŒÂ–ÚƒXƒ^[ƒgj
+			// ãƒ¬ã‚¤ã®å§‹ç‚¹ãŒå››åˆ†æœ¨ã®æœ€å°ç‚¹ã‚’å«ã‚€ãƒãƒ¼ãƒ‰ã‹ã‚‰æ•°ãˆã¦ä½•å€‹ç›®ã®ãƒãƒ¼ãƒ‰ã«å±…ã‚‹ã‹ç®—å‡ºï¼ˆï¼å€‹ç›®ã‚¹ã‚¿ãƒ¼ãƒˆï¼‰
 			uint32_t nowX = static_cast<uint32_t>((rayStart.x + fixAddVec.x - routeMinPoint.x) / cubeSize);
 			uint32_t nowZ = static_cast<uint32_t>((rayStart.z + fixAddVec.z - routeMinPoint.z) / cubeSize);
-			// ƒŒƒC‚ÌI“_‚ªl•ª–Ø‚ÌÅ¬“_‚ğŠÜ‚Şƒm[ƒh‚©‚ç”‚¦‚Ä‰½ŒÂ–Ú‚Ìƒm[ƒh‚É‹‚é‚©Zo
+			// ãƒ¬ã‚¤ã®çµ‚ç‚¹ãŒå››åˆ†æœ¨ã®æœ€å°ç‚¹ã‚’å«ã‚€ãƒãƒ¼ãƒ‰ã‹ã‚‰æ•°ãˆã¦ä½•å€‹ç›®ã®ãƒãƒ¼ãƒ‰ã«å±…ã‚‹ã‹ç®—å‡º
 			uint32_t goalX = static_cast<uint32_t>((rayEnd.x + fixAddVec.x - routeMinPoint.x) / cubeSize);
 			uint32_t goalZ = static_cast<uint32_t>((rayEnd.z + fixAddVec.z - routeMinPoint.z) / cubeSize);
-			// ƒŒƒC‚Ìn“_‚Ìƒm[ƒh‚ÌÅ¬EÅ‘åÀ•W‚ÌZo
+			// ãƒ¬ã‚¤ã®å§‹ç‚¹ã®ãƒãƒ¼ãƒ‰ã®æœ€å°ãƒ»æœ€å¤§åº§æ¨™ã®ç®—å‡º
 			float minX = routeMinPoint.x + nowX * cubeSize, maxX = minX + cubeSize;
 			float minZ = routeMinPoint.z + nowZ * cubeSize, maxZ = minZ + cubeSize;
-			// ƒŒƒC‚ªi‚ŞÛAŸ‚Ìƒm[ƒh‚É‚Ô‚Â‚©‚é‚Ü‚Å‚Ì‹——£iƒŒƒC‚Ì”ä—¦j‚ğZo
+			// ãƒ¬ã‚¤ãŒé€²ã‚€éš›ã€æ¬¡ã®ãƒãƒ¼ãƒ‰ã«ã¶ã¤ã‹ã‚‹ã¾ã§ã®è·é›¢ï¼ˆãƒ¬ã‚¤ã®æ¯”ç‡ï¼‰ã‚’ç®—å‡º
 			float distX = directionX * (maxX - (rayStart.x + fixAddVec.x)) + (1 - directionX) * cubeSize / 2;
 			float distZ = directionZ * (maxZ - (rayStart.z + fixAddVec.z)) + (1 - directionZ) * cubeSize / 2;
 
 			float tx = directionX != 0 ? distX / fabsf(rayDirection.x * rayDist) : FLT_MAX;
 			float tz = directionZ != 0 ? distZ / fabsf(rayDirection.z * rayDist) : FLT_MAX;
 
-			// ƒ‹[ƒvˆ—‚Ål•ª–Ø‚Ì“¯ˆêŠK‘w“à‚ÌƒXƒtƒBƒAƒLƒƒƒXƒgvsOŠpŒ`‚ÌŒğ·”»’è‚ğs‚¤
+			// ãƒ«ãƒ¼ãƒ—å‡¦ç†ã§å››åˆ†æœ¨ã®åŒä¸€éšå±¤å†…ã®ã‚¹ãƒ•ã‚£ã‚¢ã‚­ãƒ£ã‚¹ãƒˆvsä¸‰è§’å½¢ã®äº¤å·®åˆ¤å®šã‚’è¡Œã†
 			while (1)
 			{
 				hitRayCast = false;
 
-				// “o˜^‚ÆŒğ·”»’èˆ—
+				// ç™»éŒ²ã¨äº¤å·®åˆ¤å®šå‡¦ç†
 				if (!resisterAndIntersectShpereCastVsTriangleInTargetNode(mortonCode + levelStart))
 				{
 					break;
 				}
 
-				// ‚P“x‚Å‚àƒqƒbƒg‚µ‚Ä‚¢‚½‚çA‚±‚ÌŠK‘w‚Ìƒ`ƒFƒbƒN‚ÍI—¹BiƒŒƒC‚ÌŠJn“_‚É‹ß‚¢ƒm[ƒh‡‚Éƒ`ƒFƒbƒN‚µ‚Ä‚¢‚é‚Ì‚Åj
+				// ï¼‘åº¦ã§ã‚‚ãƒ’ãƒƒãƒˆã—ã¦ã„ãŸã‚‰ã€ã“ã®éšå±¤ã®ãƒã‚§ãƒƒã‚¯ã¯çµ‚äº†ã€‚ï¼ˆãƒ¬ã‚¤ã®é–‹å§‹ç‚¹ã«è¿‘ã„ãƒãƒ¼ãƒ‰é †ã«ãƒã‚§ãƒƒã‚¯ã—ã¦ã„ã‚‹ã®ã§ï¼‰
 				if (hitRayCast) break;
 
-				// DDA‚ğ—p‚¢‚ÄAŸ‚Éƒ`ƒFƒbƒN‚·‚é—×‚Ì‹æ‰æ‚ğZo‚µA‚»‚Ìƒm[ƒh‚ğ¦‚·ƒ‚[ƒgƒ“ƒR[ƒh‚ğã‘‚«‚·‚é
-				// x•ûŒü
+				// DDAã‚’ç”¨ã„ã¦ã€æ¬¡ã«ãƒã‚§ãƒƒã‚¯ã™ã‚‹éš£ã®åŒºç”»ã‚’ç®—å‡ºã—ã€ãã®ãƒãƒ¼ãƒ‰ã‚’ç¤ºã™ãƒ¢ãƒ¼ãƒˆãƒ³ã‚³ãƒ¼ãƒ‰ã‚’ä¸Šæ›¸ãã™ã‚‹
+				// xæ–¹å‘
 				if (tx <= tz)
 				{
-					// I’[‚Ì‹óŠÔ‚Ü‚Å—ˆ‚Ä‚¢‚½‚çŒ»İ‚ÌŠK‘w‚Ìˆ—‚ğI—¹‚³‚¹‚é
+					// çµ‚ç«¯ã®ç©ºé–“ã¾ã§æ¥ã¦ã„ãŸã‚‰ç¾åœ¨ã®éšå±¤ã®å‡¦ç†ã‚’çµ‚äº†ã•ã›ã‚‹
 					if (nowX == goalX)	break;
 
-					// Šù‚ÉŒ©‚Â‚©‚Á‚Ä‚¢‚éÅ’ZŒğ·‹——£‚æ‚è‚à’Tõ‚·‚é‹óŠÔ‚Ü‚Å‚Ì‹——£‚ª’·‚­‚È‚Á‚Ä‚¢‚ê‚ÎA
-					// ‚±‚êˆÈãi‚Ş•K—v‚Í‚È‚¢‚½‚ßŒ»İ‚ÌŠK‘w‚Ìˆ—‚ğI—¹‚³‚¹‚é
+					// æ—¢ã«è¦‹ã¤ã‹ã£ã¦ã„ã‚‹æœ€çŸ­äº¤å·®è·é›¢ã‚ˆã‚Šã‚‚æ¢ç´¢ã™ã‚‹ç©ºé–“ã¾ã§ã®è·é›¢ãŒé•·ããªã£ã¦ã„ã‚Œã°ã€
+					// ã“ã‚Œä»¥ä¸Šé€²ã‚€å¿…è¦ã¯ãªã„ãŸã‚ç¾åœ¨ã®éšå±¤ã®å‡¦ç†ã‚’çµ‚äº†ã•ã›ã‚‹
 					if (result.distance < rayDist * tx)	break;
 
-					// ˆÚ“®‚·‚é‚Ì‚Åtx‚ÆnowX‚ğXV‚·‚é
+					// ç§»å‹•ã™ã‚‹ã®ã§txã¨nowXã‚’æ›´æ–°ã™ã‚‹
 					tx += dx;
 					nowX += directionX;
 
-					// —×‚Ì‹óŠÔ‚Ìƒ‚[ƒgƒ“ƒR[ƒhi”ñüŒ`j‚ğZo‚µã‘‚«‚·‚é
+					// éš£ã®ç©ºé–“ã®ãƒ¢ãƒ¼ãƒˆãƒ³ã‚³ãƒ¼ãƒ‰ï¼ˆéç·šå½¢ï¼‰ã‚’ç®—å‡ºã—ä¸Šæ›¸ãã™ã‚‹
 					mortonCode = GetNextMortonCode(mortonCode, 0, directionX == -1);
 				}
-				// z•ûŒü
+				// zæ–¹å‘
 				else
 				{
-					// I’[‚Ì‹óŠÔ‚Ü‚Å—ˆ‚Ä‚¢‚½‚çˆ—‚ğI—¹‚³‚¹‚é
+					// çµ‚ç«¯ã®ç©ºé–“ã¾ã§æ¥ã¦ã„ãŸã‚‰å‡¦ç†ã‚’çµ‚äº†ã•ã›ã‚‹
 					if (nowZ == goalZ)	break;
 
-					// Šù‚ÉŒ©‚Â‚©‚Á‚Ä‚¢‚éÅ’ZŒğ·‹——£‚æ‚è‚à’Tõ‚·‚é‹óŠÔ‚Ü‚Å‚Ì‹——£‚ª’·‚­‚È‚Á‚Ä‚¢‚ê‚ÎA
-					// ‚±‚êˆÈãi‚Ş•K—v‚Í‚È‚¢‚½‚ßŒ»İ‚ÌŠK‘w‚Ìˆ—‚ğI—¹‚³‚¹‚é
+					// æ—¢ã«è¦‹ã¤ã‹ã£ã¦ã„ã‚‹æœ€çŸ­äº¤å·®è·é›¢ã‚ˆã‚Šã‚‚æ¢ç´¢ã™ã‚‹ç©ºé–“ã¾ã§ã®è·é›¢ãŒé•·ããªã£ã¦ã„ã‚Œã°ã€
+					// ã“ã‚Œä»¥ä¸Šé€²ã‚€å¿…è¦ã¯ãªã„ãŸã‚ç¾åœ¨ã®éšå±¤ã®å‡¦ç†ã‚’çµ‚äº†ã•ã›ã‚‹
 					if (result.distance < rayDist * tz)	break;
 
-					// ˆÚ“®‚·‚é‚Ì‚Åtz‚ÆnowZ‚ğXV‚·‚é
+					// ç§»å‹•ã™ã‚‹ã®ã§tzã¨nowZã‚’æ›´æ–°ã™ã‚‹
 					tz += dz;
 					nowZ += directionZ;
 
-					// —×‚Ì‹óŠÔ‚Ìƒ‚[ƒgƒ“ƒR[ƒhi”ñüŒ`j‚ğZo‚µã‘‚«‚·‚é
+					// éš£ã®ç©ºé–“ã®ãƒ¢ãƒ¼ãƒˆãƒ³ã‚³ãƒ¼ãƒ‰ï¼ˆéç·šå½¢ï¼‰ã‚’ç®—å‡ºã—ä¸Šæ›¸ãã™ã‚‹
 					mortonCode = GetNextMortonCode(mortonCode, 1, directionZ == -1);
 				}
 			}
 		}
 
-		// ‚±‚±‚Ü‚Å‚ÅŒğ·‚ª‚È‚¯‚ê‚ÎAƒXƒtƒBƒAƒLƒƒƒXƒg‚ÌI’[‚Ì‹…‚ÆüˆÍ‚Ì‹óŠÔ‚Ì”»’è‚ğs‚¤
+		// ã“ã“ã¾ã§ã§äº¤å·®ãŒãªã‘ã‚Œã°ã€ã‚¹ãƒ•ã‚£ã‚¢ã‚­ãƒ£ã‚¹ãƒˆã®çµ‚ç«¯ã®çƒã¨å‘¨å›²ã®ç©ºé–“ã®åˆ¤å®šã‚’è¡Œã†
 		if (!hitNowLevel)
 		{
 			uint32_t mortonCode = GetMortonCode(rayEnd, m_quadtreeNodes.front(), m_quadtreeNodes[levelStart].GetHalfSize());
 			uint32_t tmpMortonCode = mortonCode;
-			// ƒŒƒC‚ÌI“_‚ªl•ª–Ø‚ÌÅ¬“_‚ğŠÜ‚Şƒm[ƒh‚©‚ç”‚¦‚Ä‰½ŒÂ–Ú‚Ìƒm[ƒh‚É‹‚é‚©Zo
+			// ãƒ¬ã‚¤ã®çµ‚ç‚¹ãŒå››åˆ†æœ¨ã®æœ€å°ç‚¹ã‚’å«ã‚€ãƒãƒ¼ãƒ‰ã‹ã‚‰æ•°ãˆã¦ä½•å€‹ç›®ã®ãƒãƒ¼ãƒ‰ã«å±…ã‚‹ã‹ç®—å‡º
 			uint32_t endX = static_cast<uint32_t>((rayEnd.x - routeMinPoint.x) / cubeSize);
 			uint32_t endZ = static_cast<uint32_t>((rayEnd.z - routeMinPoint.z) / cubeSize);
-			// ƒŒƒC‚ÌI“_‚Ìƒm[ƒh‚ÌÅ¬EÅ‘åÀ•W‚ÌZo
+			// ãƒ¬ã‚¤ã®çµ‚ç‚¹ã®ãƒãƒ¼ãƒ‰ã®æœ€å°ãƒ»æœ€å¤§åº§æ¨™ã®ç®—å‡º
 			float minX = routeMinPoint.x + endX * cubeSize, maxX = minX + cubeSize;
 			float minZ = routeMinPoint.z + endZ * cubeSize, maxZ = minZ + cubeSize;
 
-			// 8•ûŒü‚Ì—×Ú‚·‚é‹óŠÔ‚ğƒ`ƒFƒbƒN‚·‚é
+			// 8æ–¹å‘ã®éš£æ¥ã™ã‚‹ç©ºé–“ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹
 			float distLeft = rayEnd.x - minX;
 			float distRight = maxX - rayEnd.x;
 			float distDown = rayEnd.z - minZ;
@@ -871,16 +871,16 @@ bool QuadtreeNodeManager::IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3&
 }
 
 /**************************************************************************//**
-	@brief		w’è‚µ‚½ƒm[ƒhˆÈ‰º‘S‚Ä‚Ìƒm[ƒh‚ÅƒIƒuƒWƒFƒNƒg‚ÆƒIƒuƒWƒFƒNƒg‚Ì‰Ÿ‚µ–ß‚µˆ—‚ğÀs
-	@param[in]	uint32_t target : w’èƒm[ƒh
-				bool singleNode : ’Pˆê‹óŠÔw’è
-				vector<Sphere*>* upperListSphere : ãˆÊƒm[ƒh‚Ì‹…‘Ì
-				vector<Capsule*>* upperListCapsule : ãˆÊƒm[ƒh‚ÌƒJƒvƒZƒ‹
-				vector<AABB*>* upperListAABB : ãˆÊƒm[ƒh‚ÌAABB
-				vector<Triangle>* upperListTriangle : ãˆÊƒm[ƒh‚ÌOŠpŒ`
-	@return		bool : Œğ·‚·‚é‚Æ‚«true
+	@brief		æŒ‡å®šã—ãŸãƒãƒ¼ãƒ‰ä»¥ä¸‹å…¨ã¦ã®ãƒãƒ¼ãƒ‰ã§ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¨ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®æŠ¼ã—æˆ»ã—å‡¦ç†ã‚’å®Ÿè¡Œ
+	@param[in]	uint32_t target : æŒ‡å®šãƒãƒ¼ãƒ‰
+				bool singleNode : å˜ä¸€ç©ºé–“æŒ‡å®š
+				vector<Sphere*>* upperListSphere : ä¸Šä½ãƒãƒ¼ãƒ‰ã®çƒä½“
+				vector<Capsule*>* upperListCapsule : ä¸Šä½ãƒãƒ¼ãƒ‰ã®ã‚«ãƒ—ã‚»ãƒ«
+				vector<AABB*>* upperListAABB : ä¸Šä½ãƒãƒ¼ãƒ‰ã®AABB
+				vector<Triangle>* upperListTriangle : ä¸Šä½ãƒãƒ¼ãƒ‰ã®ä¸‰è§’å½¢
+	@return		bool : äº¤å·®ã™ã‚‹ã¨ãtrue
 *//***************************************************************************/
-// ‘S‚Ä‚ÌƒIƒuƒWƒFƒNƒg‚Ì‰Ÿ‚µ–ß‚µˆ—‚ğÀs
+// å…¨ã¦ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®æŠ¼ã—æˆ»ã—å‡¦ç†ã‚’å®Ÿè¡Œ
 void QuadtreeNodeManager::CollisionAllObjects(
 	uint32_t target,
 	bool singleNode,
@@ -899,7 +899,7 @@ void QuadtreeNodeManager::CollisionAllObjects(
 	CollisionCapsuleVsTriangle(target, singleNode, upperListCapsule, upperListTriangle);
 	CollisionAABBVsTriangle(target, singleNode, upperListAABB, upperListTriangle);
 }
-// ‹…‘Ì VS ‹…‘Ì
+// çƒä½“ VS çƒä½“
 void QuadtreeNodeManager::CollisionSphereVsSphere(uint32_t target, bool singleNode, std::vector<Sphere*>* upperListSphere)
 {
 	QuadtreeNode targetNode = m_quadtreeNodes[target];
@@ -907,7 +907,7 @@ void QuadtreeNodeManager::CollisionSphereVsSphere(uint32_t target, bool singleNo
 
 	for (int i = 0; i < targetNode.GetSpheres().size(); i++)
 	{
-		// “¯ˆê‹óŠÔ“à‚ÌÕ“Ëˆ—
+		// åŒä¸€ç©ºé–“å†…ã®è¡çªå‡¦ç†
 		for (int j = i + 1; j < targetNode.GetSpheres().size(); j++)
 		{
 			if (Collision::IntersectSphereVsSphere(
@@ -917,7 +917,7 @@ void QuadtreeNodeManager::CollisionSphereVsSphere(uint32_t target, bool singleNo
 				targetNode.GetSpheres().at(j)->radius, 
 				&result))
 			{
-				// ‰Ÿ‚µ–ß‚µˆ—
+				// æŠ¼ã—æˆ»ã—å‡¦ç†
 				DirectX::XMVECTOR addVec = DirectX::XMVectorScale(result.normal, result.penetration);
 				DirectX::XMFLOAT3 addVecF = {};
 				DirectX::XMStoreFloat3(&addVecF, addVec);
@@ -929,7 +929,7 @@ void QuadtreeNodeManager::CollisionSphereVsSphere(uint32_t target, bool singleNo
 				targetNode.GetSpheres().at(j)->position.z -= addVecF.z * 0.5f;
 			}
 		}
-		// ãˆÊ‹óŠÔ‚Æ‚ÌÕ“Ëˆ—
+		// ä¸Šä½ç©ºé–“ã¨ã®è¡çªå‡¦ç†
 		for (int j = 0; upperListSphere && j < upperListSphere->size(); j++)
 		{
 			if (Collision::IntersectSphereVsSphere(
@@ -938,7 +938,7 @@ void QuadtreeNodeManager::CollisionSphereVsSphere(uint32_t target, bool singleNo
 				DirectX::XMLoadFloat3(&upperListSphere->at(j)->position), 
 				upperListSphere->at(j)->radius, &result))
 			{
-				// ‰Ÿ‚µ–ß‚µˆ—
+				// æŠ¼ã—æˆ»ã—å‡¦ç†
 				DirectX::XMVECTOR addVec = DirectX::XMVectorScale(result.normal, result.penetration);
 				DirectX::XMFLOAT3 addVecF = {};
 				DirectX::XMStoreFloat3(&addVecF, addVec);
@@ -952,14 +952,14 @@ void QuadtreeNodeManager::CollisionSphereVsSphere(uint32_t target, bool singleNo
 		}
 	}
 
-	// ‰ºˆÊ‹óŠÔ‚ª‘¶İ‚µ‚È‚¯‚ê‚Îreturn
+	// ä¸‹ä½ç©ºé–“ãŒå­˜åœ¨ã—ãªã‘ã‚Œã°return
 	if (target >= GetLevelStart(m_depth))	return;
 
-	// ’Pˆê‹óŠÔw’è‚Å‚È‚¯‚ê‚ÎA‰ºˆÊ‹óŠÔ‚ÖˆÚ“®‚µÄ‹NŒÄ‚Ño‚µ
+	// å˜ä¸€ç©ºé–“æŒ‡å®šã§ãªã‘ã‚Œã°ã€ä¸‹ä½ç©ºé–“ã¸ç§»å‹•ã—å†èµ·å‘¼ã³å‡ºã—
 	if (!singleNode)
 	{
-		// Š‚µ‚Ä‚¢‚é‹…‘Ì‚ğUpperList‚É“o˜^‚µ‚Ä‚©‚çAÄ‹Nˆ—‚Åq‹óŠÔ‚ÉˆÚ“®‚·‚é
-		bool addUpperList = false;	// “o˜^‚ª‚ ‚Á‚½‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒOBíœ‚É—˜—p‚·‚é
+		// æ‰€æŒã—ã¦ã„ã‚‹çƒä½“ã‚’UpperListã«ç™»éŒ²ã—ã¦ã‹ã‚‰ã€å†èµ·å‡¦ç†ã§å­ç©ºé–“ã«ç§»å‹•ã™ã‚‹
+		bool addUpperList = false;	// ç™»éŒ²ãŒã‚ã£ãŸã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°ã€‚å‰Šé™¤ã«åˆ©ç”¨ã™ã‚‹
 
 		for (int i = 0; i < targetNode.GetSpheres().size(); i++)
 		{
@@ -973,7 +973,7 @@ void QuadtreeNodeManager::CollisionSphereVsSphere(uint32_t target, bool singleNo
 			CollisionSphereVsSphere(nextTarget, false, upperListSphere);
 		}
 
-		// ‰ºˆÊ‹óŠÔ‚ğ‘S‚Äˆ—‚µI‚í‚Á‚½‚çAUpperList‚©‚çíœ‚·‚é
+		// ä¸‹ä½ç©ºé–“ã‚’å…¨ã¦å‡¦ç†ã—çµ‚ã‚ã£ãŸã‚‰ã€UpperListã‹ã‚‰å‰Šé™¤ã™ã‚‹
 		if (addUpperList)
 		{
 			for (int i = 0; i < targetNode.GetSpheres().size(); i++)
@@ -983,7 +983,7 @@ void QuadtreeNodeManager::CollisionSphereVsSphere(uint32_t target, bool singleNo
 		}
 	}
 }
-// ƒJƒvƒZƒ‹ VS ƒJƒvƒZƒ‹
+// ã‚«ãƒ—ã‚»ãƒ« VS ã‚«ãƒ—ã‚»ãƒ«
 void QuadtreeNodeManager::CollisionCapsuleVsCapsule(uint32_t target, bool singleNode, std::vector<Capsule*>* upperListCapsule)
 {
 	QuadtreeNode targetNode = m_quadtreeNodes[target];
@@ -991,7 +991,7 @@ void QuadtreeNodeManager::CollisionCapsuleVsCapsule(uint32_t target, bool single
 
 	for (int i = 0; i < targetNode.GetCapsules().size(); i++)
 	{
-		// “¯ˆê‹óŠÔ“à‚ÌÕ“Ëˆ—
+		// åŒä¸€ç©ºé–“å†…ã®è¡çªå‡¦ç†
 		for (int j = i + 1; j < targetNode.GetCapsules().size(); j++)
 		{
 			if (Collision::IntersectCapsuleVsCapsule(
@@ -1005,7 +1005,7 @@ void QuadtreeNodeManager::CollisionCapsuleVsCapsule(uint32_t target, bool single
 				targetNode.GetCapsules().at(j)->radius,
 				&result))
 			{
-				// ‰Ÿ‚µ–ß‚µˆ—
+				// æŠ¼ã—æˆ»ã—å‡¦ç†
 				DirectX::XMVECTOR addVec = DirectX::XMVectorScale(result.normal, result.penetration);
 				DirectX::XMFLOAT3 addVecF = {};
 				DirectX::XMStoreFloat3(&addVecF, addVec);
@@ -1017,7 +1017,7 @@ void QuadtreeNodeManager::CollisionCapsuleVsCapsule(uint32_t target, bool single
 				targetNode.GetCapsules().at(j)->position.z -= addVecF.z * 0.5f;
 			}
 		}
-		// ãˆÊ‹óŠÔ‚Æ‚ÌÕ“Ëˆ—
+		// ä¸Šä½ç©ºé–“ã¨ã®è¡çªå‡¦ç†
 		for (int j = 0; upperListCapsule && j < upperListCapsule->size(); j++)
 		{
 			if (Collision::IntersectCapsuleVsCapsule(
@@ -1031,7 +1031,7 @@ void QuadtreeNodeManager::CollisionCapsuleVsCapsule(uint32_t target, bool single
 				upperListCapsule->at(j)->radius,
 				&result))
 			{
-				// ‰Ÿ‚µ–ß‚µˆ—
+				// æŠ¼ã—æˆ»ã—å‡¦ç†
 				DirectX::XMVECTOR addVec = DirectX::XMVectorScale(result.normal, result.penetration);
 				DirectX::XMFLOAT3 addVecF = {};
 				DirectX::XMStoreFloat3(&addVecF, addVec);
@@ -1045,14 +1045,14 @@ void QuadtreeNodeManager::CollisionCapsuleVsCapsule(uint32_t target, bool single
 		}
 	}
 
-	// ‰ºˆÊ‹óŠÔ‚ª‘¶İ‚µ‚È‚¯‚ê‚Îreturn
+	// ä¸‹ä½ç©ºé–“ãŒå­˜åœ¨ã—ãªã‘ã‚Œã°return
 	if (target >= GetLevelStart(m_depth))	return;
 
-	// ’Pˆê‹óŠÔw’è‚Å‚È‚¯‚ê‚ÎA‰ºˆÊ‹óŠÔ‚ÖˆÚ“®‚µÄ‹NŒÄ‚Ño‚µ
+	// å˜ä¸€ç©ºé–“æŒ‡å®šã§ãªã‘ã‚Œã°ã€ä¸‹ä½ç©ºé–“ã¸ç§»å‹•ã—å†èµ·å‘¼ã³å‡ºã—
 	if (!singleNode)
 	{
-		// Š‚µ‚Ä‚¢‚é‹…‘Ì‚ğUpperList‚É“o˜^‚µ‚Ä‚©‚çAÄ‹Nˆ—‚Åq‹óŠÔ‚ÉˆÚ“®‚·‚é
-		bool addUpperList = false;	// “o˜^‚ª‚ ‚Á‚½‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒOBíœ‚É—˜—p‚·‚é
+		// æ‰€æŒã—ã¦ã„ã‚‹çƒä½“ã‚’UpperListã«ç™»éŒ²ã—ã¦ã‹ã‚‰ã€å†èµ·å‡¦ç†ã§å­ç©ºé–“ã«ç§»å‹•ã™ã‚‹
+		bool addUpperList = false;	// ç™»éŒ²ãŒã‚ã£ãŸã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°ã€‚å‰Šé™¤ã«åˆ©ç”¨ã™ã‚‹
 
 		for (int i = 0; i < targetNode.GetCapsules().size(); i++)
 		{
@@ -1066,7 +1066,7 @@ void QuadtreeNodeManager::CollisionCapsuleVsCapsule(uint32_t target, bool single
 			CollisionCapsuleVsCapsule(nextTarget, false, upperListCapsule);
 		}
 
-		// ‰ºˆÊ‹óŠÔ‚ğ‘S‚Äˆ—‚µI‚í‚Á‚½‚çAUpperList‚©‚çíœ‚·‚é
+		// ä¸‹ä½ç©ºé–“ã‚’å…¨ã¦å‡¦ç†ã—çµ‚ã‚ã£ãŸã‚‰ã€UpperListã‹ã‚‰å‰Šé™¤ã™ã‚‹
 		if (addUpperList)
 		{
 			for (int i = 0; i < targetNode.GetCapsules().size(); i++)
@@ -1084,7 +1084,7 @@ void QuadtreeNodeManager::CollisionAABBVsAABB(uint32_t target, bool singleNode, 
 
 	for (int i = 0; i < targetNode.GetAABBs().size(); i++)
 	{
-		// “¯ˆê‹óŠÔ“à‚ÌÕ“Ëˆ—
+		// åŒä¸€ç©ºé–“å†…ã®è¡çªå‡¦ç†
 		for (int j = i + 1; j < targetNode.GetAABBs().size(); j++)
 		{
 			if (Collision::IntersectAABBVsAABB(
@@ -1094,7 +1094,7 @@ void QuadtreeNodeManager::CollisionAABBVsAABB(uint32_t target, bool singleNode, 
 				DirectX::XMLoadFloat3(&targetNode.GetAABBs().at(j)->radii),
 				&result))
 			{
-				// ‰Ÿ‚µ–ß‚µˆ—
+				// æŠ¼ã—æˆ»ã—å‡¦ç†
 				DirectX::XMVECTOR addVec = DirectX::XMVectorScale(result.normal, result.penetration);
 				DirectX::XMFLOAT3 addVecF = {};
 				DirectX::XMStoreFloat3(&addVecF, addVec);
@@ -1106,7 +1106,7 @@ void QuadtreeNodeManager::CollisionAABBVsAABB(uint32_t target, bool singleNode, 
 				targetNode.GetAABBs().at(j)->position.z -= addVecF.z * 0.5f;
 			}
 		}
-		// ãˆÊ‹óŠÔ‚Æ‚ÌÕ“Ëˆ—
+		// ä¸Šä½ç©ºé–“ã¨ã®è¡çªå‡¦ç†
 		for (int j = 0; upperListAABB && j < upperListAABB->size(); j++)
 		{
 			if (Collision::IntersectAABBVsAABB(
@@ -1116,7 +1116,7 @@ void QuadtreeNodeManager::CollisionAABBVsAABB(uint32_t target, bool singleNode, 
 				DirectX::XMLoadFloat3(&upperListAABB->at(j)->radii),
 				&result))
 			{
-				// ‰Ÿ‚µ–ß‚µˆ—
+				// æŠ¼ã—æˆ»ã—å‡¦ç†
 				DirectX::XMVECTOR addVec = DirectX::XMVectorScale(result.normal, result.penetration);
 				DirectX::XMFLOAT3 addVecF = {};
 				DirectX::XMStoreFloat3(&addVecF, addVec);
@@ -1130,14 +1130,14 @@ void QuadtreeNodeManager::CollisionAABBVsAABB(uint32_t target, bool singleNode, 
 		}
 	}
 
-	// ‰ºˆÊ‹óŠÔ‚ª‘¶İ‚µ‚È‚¯‚ê‚Îreturn
+	// ä¸‹ä½ç©ºé–“ãŒå­˜åœ¨ã—ãªã‘ã‚Œã°return
 	if (target >= GetLevelStart(m_depth))	return;
 
-	// ’Pˆê‹óŠÔw’è‚Å‚È‚¯‚ê‚ÎA‰ºˆÊ‹óŠÔ‚ÖˆÚ“®‚µÄ‹NŒÄ‚Ño‚µ
+	// å˜ä¸€ç©ºé–“æŒ‡å®šã§ãªã‘ã‚Œã°ã€ä¸‹ä½ç©ºé–“ã¸ç§»å‹•ã—å†èµ·å‘¼ã³å‡ºã—
 	if (!singleNode)
 	{
-		// Š‚µ‚Ä‚¢‚é‹…‘Ì‚ğUpperList‚É“o˜^‚µ‚Ä‚©‚çAÄ‹Nˆ—‚Åq‹óŠÔ‚ÉˆÚ“®‚·‚é
-		bool addUpperList = false;	// “o˜^‚ª‚ ‚Á‚½‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒOBíœ‚É—˜—p‚·‚é
+		// æ‰€æŒã—ã¦ã„ã‚‹çƒä½“ã‚’UpperListã«ç™»éŒ²ã—ã¦ã‹ã‚‰ã€å†èµ·å‡¦ç†ã§å­ç©ºé–“ã«ç§»å‹•ã™ã‚‹
+		bool addUpperList = false;	// ç™»éŒ²ãŒã‚ã£ãŸã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°ã€‚å‰Šé™¤ã«åˆ©ç”¨ã™ã‚‹
 
 		for (int i = 0; i < targetNode.GetAABBs().size(); i++)
 		{
@@ -1151,7 +1151,7 @@ void QuadtreeNodeManager::CollisionAABBVsAABB(uint32_t target, bool singleNode, 
 			CollisionAABBVsAABB(nextTarget, false, upperListAABB);
 		}
 
-		// ‰ºˆÊ‹óŠÔ‚ğ‘S‚Äˆ—‚µI‚í‚Á‚½‚çAUpperList‚©‚çíœ‚·‚é
+		// ä¸‹ä½ç©ºé–“ã‚’å…¨ã¦å‡¦ç†ã—çµ‚ã‚ã£ãŸã‚‰ã€UpperListã‹ã‚‰å‰Šé™¤ã™ã‚‹
 		if (addUpperList)
 		{
 			for (int i = 0; i < targetNode.GetAABBs().size(); i++)
@@ -1161,16 +1161,16 @@ void QuadtreeNodeManager::CollisionAABBVsAABB(uint32_t target, bool singleNode, 
 		}
 	}
 }
-// ‹…‘Ì VS OŠpŒ`
+// çƒä½“ VS ä¸‰è§’å½¢
 void QuadtreeNodeManager::CollisionSphereVsTriangle(uint32_t target, bool singleNode, std::vector<Sphere*>* upperListSphere, std::vector<Triangle>* upperListTriangle)
 {
 	QuadtreeNode targetNode = m_quadtreeNodes[target];
 	IntersectionResult result;
 
-	// ‹…‘Ì‘¤‚Ìˆ—
+	// çƒä½“å´ã®å‡¦ç†
 	for (int i = 0; i < targetNode.GetSpheres().size(); i++)
 	{
-		// “¯ˆê‹óŠÔ“à‚ÌOŠpŒ`‚Æ‚ÌÕ“Ëˆ—
+		// åŒä¸€ç©ºé–“å†…ã®ä¸‰è§’å½¢ã¨ã®è¡çªå‡¦ç†
 		for (int j = 0; j < targetNode.GetTriangles().size(); j++)
 		{
 			DirectX::XMVECTOR triPos[3] =
@@ -1185,7 +1185,7 @@ void QuadtreeNodeManager::CollisionSphereVsTriangle(uint32_t target, bool single
 				triPos, 
 				&result))
 			{
-				// ‹…‘Ì‚Ì‚İ‰Ÿ‚µ–ß‚µˆ—
+				// çƒä½“ã®ã¿æŠ¼ã—æˆ»ã—å‡¦ç†
 				DirectX::XMVECTOR addVec = DirectX::XMVectorScale(result.normal, result.penetration);
 				DirectX::XMFLOAT3 addVecF = {};
 				DirectX::XMStoreFloat3(&addVecF, addVec);
@@ -1194,7 +1194,7 @@ void QuadtreeNodeManager::CollisionSphereVsTriangle(uint32_t target, bool single
 				targetNode.GetSpheres().at(i)->position.z += addVecF.z;
 			}
 		}
-		// ãˆÊ‹óŠÔ‚ÌOŠpŒ`‚Æ‚ÌÕ“Ëˆ—
+		// ä¸Šä½ç©ºé–“ã®ä¸‰è§’å½¢ã¨ã®è¡çªå‡¦ç†
 		for (int j = 0; upperListTriangle && j < upperListTriangle->size(); j++)
 		{
 			DirectX::XMVECTOR triPos[3] =
@@ -1209,7 +1209,7 @@ void QuadtreeNodeManager::CollisionSphereVsTriangle(uint32_t target, bool single
 				triPos, 
 				&result))
 			{
-				// ‹…‘Ì‚Ì‚İ‰Ÿ‚µ–ß‚µˆ—
+				// çƒä½“ã®ã¿æŠ¼ã—æˆ»ã—å‡¦ç†
 				DirectX::XMVECTOR addVec = DirectX::XMVectorScale(result.normal, result.penetration);
 				DirectX::XMFLOAT3 addVecF = {};
 				DirectX::XMStoreFloat3(&addVecF, addVec);
@@ -1220,10 +1220,10 @@ void QuadtreeNodeManager::CollisionSphereVsTriangle(uint32_t target, bool single
 		}
 	}
 
-	// OŠpŒ`‘¤‚Ìˆ—
+	// ä¸‰è§’å½¢å´ã®å‡¦ç†
 	for (int i = 0; upperListSphere && i < upperListSphere->size(); i++)
 	{
-		// ãˆÊ‹óŠÔ‚Ì‹…‘Ì‚Æ‚ÌÕ“Ëˆ—
+		// ä¸Šä½ç©ºé–“ã®çƒä½“ã¨ã®è¡çªå‡¦ç†
 		for (int j = 0; j < targetNode.GetTriangles().size(); j++)
 		{
 			DirectX::XMVECTOR triPos[3] =
@@ -1238,7 +1238,7 @@ void QuadtreeNodeManager::CollisionSphereVsTriangle(uint32_t target, bool single
 				triPos, 
 				&result))
 			{
-				// ‹…‘Ì‚Ì‚İ‰Ÿ‚µ–ß‚µˆ—
+				// çƒä½“ã®ã¿æŠ¼ã—æˆ»ã—å‡¦ç†
 				DirectX::XMVECTOR addVec = DirectX::XMVectorScale(result.normal, result.penetration);
 				DirectX::XMFLOAT3 addVecF = {};
 				DirectX::XMStoreFloat3(&addVecF, addVec);
@@ -1249,14 +1249,14 @@ void QuadtreeNodeManager::CollisionSphereVsTriangle(uint32_t target, bool single
 		}
 	}
 
-	// ‰ºˆÊ‹óŠÔ‚ª‘¶İ‚µ‚È‚¯‚ê‚Îreturn
+	// ä¸‹ä½ç©ºé–“ãŒå­˜åœ¨ã—ãªã‘ã‚Œã°return
 	if (target >= GetLevelStart(m_depth))	return;
 
-	// ’Pˆê‹óŠÔw’è‚Å‚È‚¯‚ê‚ÎA‰ºˆÊ‹óŠÔ‚ÖˆÚ“®‚µÄ‹NŒÄ‚Ño‚µ
+	// å˜ä¸€ç©ºé–“æŒ‡å®šã§ãªã‘ã‚Œã°ã€ä¸‹ä½ç©ºé–“ã¸ç§»å‹•ã—å†èµ·å‘¼ã³å‡ºã—
 	if (!singleNode)
 	{
-		// Š‚µ‚Ä‚¢‚é‹…‘Ì‚ÆOŠpŒ`‚ğUpperList‚É“o˜^‚µ‚Ä‚©‚çAÄ‹Nˆ—‚Åq‹óŠÔ‚ÉˆÚ“®‚·‚é
-		bool addUpperList = false;	// “o˜^‚ª‚ ‚Á‚½‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒOBíœ‚É—˜—p‚·‚é
+		// æ‰€æŒã—ã¦ã„ã‚‹çƒä½“ã¨ä¸‰è§’å½¢ã‚’UpperListã«ç™»éŒ²ã—ã¦ã‹ã‚‰ã€å†èµ·å‡¦ç†ã§å­ç©ºé–“ã«ç§»å‹•ã™ã‚‹
+		bool addUpperList = false;	// ç™»éŒ²ãŒã‚ã£ãŸã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°ã€‚å‰Šé™¤ã«åˆ©ç”¨ã™ã‚‹
 
 		for (int i = 0; i < targetNode.GetSpheres().size(); i++)
 		{
@@ -1275,7 +1275,7 @@ void QuadtreeNodeManager::CollisionSphereVsTriangle(uint32_t target, bool single
 			CollisionSphereVsTriangle(nextTarget, false, upperListSphere, upperListTriangle);
 		}
 
-		// ‰ºˆÊ‹óŠÔ‚ğ‘S‚Äˆ—‚µI‚í‚Á‚½‚çAUpperList‚©‚çíœ‚·‚é
+		// ä¸‹ä½ç©ºé–“ã‚’å…¨ã¦å‡¦ç†ã—çµ‚ã‚ã£ãŸã‚‰ã€UpperListã‹ã‚‰å‰Šé™¤ã™ã‚‹
 		if (addUpperList)
 		{
 			for (int i = 0; i < targetNode.GetSpheres().size(); i++)
@@ -1289,16 +1289,16 @@ void QuadtreeNodeManager::CollisionSphereVsTriangle(uint32_t target, bool single
 		}
 	}
 }
-// ƒJƒvƒZƒ‹ VS OŠpŒ`
+// ã‚«ãƒ—ã‚»ãƒ« VS ä¸‰è§’å½¢
 void QuadtreeNodeManager::CollisionCapsuleVsTriangle(uint32_t target, bool singleNode, std::vector<Capsule*>* upperListCapsule, std::vector<Triangle>* upperListTriangle)
 {
 	QuadtreeNode targetNode = m_quadtreeNodes[target];
 	IntersectionResult result;
 
-	// ƒJƒvƒZƒ‹‘¤‚Ìˆ—
+	// ã‚«ãƒ—ã‚»ãƒ«å´ã®å‡¦ç†
 	for (int i = 0; i < targetNode.GetCapsules().size(); i++)
 	{
-		// “¯ˆê‹óŠÔ“à‚ÌOŠpŒ`‚Æ‚ÌÕ“Ëˆ—
+		// åŒä¸€ç©ºé–“å†…ã®ä¸‰è§’å½¢ã¨ã®è¡çªå‡¦ç†
 		for (int j = 0; j < targetNode.GetTriangles().size(); j++)
 		{
 			DirectX::XMVECTOR triPos[3] =
@@ -1315,7 +1315,7 @@ void QuadtreeNodeManager::CollisionCapsuleVsTriangle(uint32_t target, bool singl
 				triPos, 
 				&result))
 			{
-				// ƒJƒvƒZƒ‹‚Ì‚İ‰Ÿ‚µ–ß‚µˆ—
+				// ã‚«ãƒ—ã‚»ãƒ«ã®ã¿æŠ¼ã—æˆ»ã—å‡¦ç†
 				DirectX::XMVECTOR addVec = DirectX::XMVectorScale(result.normal, result.penetration);
 				DirectX::XMFLOAT3 addVecF = {};
 				DirectX::XMStoreFloat3(&addVecF, addVec);
@@ -1324,7 +1324,7 @@ void QuadtreeNodeManager::CollisionCapsuleVsTriangle(uint32_t target, bool singl
 				targetNode.GetCapsules().at(i)->position.z += addVecF.z;
 			}
 		}
-		// ãˆÊ‹óŠÔ‚ÌOŠpŒ`‚Æ‚ÌÕ“Ëˆ—
+		// ä¸Šä½ç©ºé–“ã®ä¸‰è§’å½¢ã¨ã®è¡çªå‡¦ç†
 		for (int j = 0; upperListTriangle && j < upperListTriangle->size(); j++)
 		{
 			DirectX::XMVECTOR triPos[3] =
@@ -1341,7 +1341,7 @@ void QuadtreeNodeManager::CollisionCapsuleVsTriangle(uint32_t target, bool singl
 				triPos, 
 				&result))
 			{
-				// ƒJƒvƒZƒ‹‚Ì‚İ‰Ÿ‚µ–ß‚µˆ—
+				// ã‚«ãƒ—ã‚»ãƒ«ã®ã¿æŠ¼ã—æˆ»ã—å‡¦ç†
 				DirectX::XMVECTOR addVec = DirectX::XMVectorScale(result.normal, result.penetration);
 				DirectX::XMFLOAT3 addVecF = {};
 				DirectX::XMStoreFloat3(&addVecF, addVec);
@@ -1352,10 +1352,10 @@ void QuadtreeNodeManager::CollisionCapsuleVsTriangle(uint32_t target, bool singl
 		}
 	}
 
-	// OŠpŒ`‘¤‚Ìˆ—
+	// ä¸‰è§’å½¢å´ã®å‡¦ç†
 	for (int i = 0; upperListCapsule && i < upperListCapsule->size(); i++)
 	{
-		// ãˆÊ‹óŠÔ‚ÌƒJƒvƒZƒ‹‚Æ‚ÌÕ“Ëˆ—
+		// ä¸Šä½ç©ºé–“ã®ã‚«ãƒ—ã‚»ãƒ«ã¨ã®è¡çªå‡¦ç†
 		for (int j = 0; j < targetNode.GetTriangles().size(); j++)
 		{
 			DirectX::XMVECTOR triPos[3] =
@@ -1372,7 +1372,7 @@ void QuadtreeNodeManager::CollisionCapsuleVsTriangle(uint32_t target, bool singl
 				triPos, 
 				&result))
 			{
-				// ƒJƒvƒZƒ‹‚Ì‚İ‰Ÿ‚µ–ß‚µˆ—
+				// ã‚«ãƒ—ã‚»ãƒ«ã®ã¿æŠ¼ã—æˆ»ã—å‡¦ç†
 				DirectX::XMVECTOR addVec = DirectX::XMVectorScale(result.normal, result.penetration);
 				DirectX::XMFLOAT3 addVecF = {};
 				DirectX::XMStoreFloat3(&addVecF, addVec);
@@ -1383,14 +1383,14 @@ void QuadtreeNodeManager::CollisionCapsuleVsTriangle(uint32_t target, bool singl
 		}
 	}
 
-	// ‰ºˆÊ‹óŠÔ‚ª‘¶İ‚µ‚È‚¯‚ê‚Îreturn
+	// ä¸‹ä½ç©ºé–“ãŒå­˜åœ¨ã—ãªã‘ã‚Œã°return
 	if (target >= GetLevelStart(m_depth))	return;
 
-	// ’Pˆê‹óŠÔw’è‚Å‚È‚¯‚ê‚ÎA‰ºˆÊ‹óŠÔ‚ÖˆÚ“®‚µÄ‹NŒÄ‚Ño‚µ
+	// å˜ä¸€ç©ºé–“æŒ‡å®šã§ãªã‘ã‚Œã°ã€ä¸‹ä½ç©ºé–“ã¸ç§»å‹•ã—å†èµ·å‘¼ã³å‡ºã—
 	if (!singleNode)
 	{
-		// Š‚µ‚Ä‚¢‚éƒJƒvƒZƒ‹‚ÆOŠpŒ`‚ğUpperList‚É“o˜^‚µ‚Ä‚©‚çAÄ‹Nˆ—‚Åq‹óŠÔ‚ÉˆÚ“®‚·‚é
-		bool addUpperList = false;	// “o˜^‚ª‚ ‚Á‚½‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒOBíœ‚É—˜—p‚·‚é
+		// æ‰€æŒã—ã¦ã„ã‚‹ã‚«ãƒ—ã‚»ãƒ«ã¨ä¸‰è§’å½¢ã‚’UpperListã«ç™»éŒ²ã—ã¦ã‹ã‚‰ã€å†èµ·å‡¦ç†ã§å­ç©ºé–“ã«ç§»å‹•ã™ã‚‹
+		bool addUpperList = false;	// ç™»éŒ²ãŒã‚ã£ãŸã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°ã€‚å‰Šé™¤ã«åˆ©ç”¨ã™ã‚‹
 
 		for (int i = 0; i < targetNode.GetCapsules().size(); i++)
 		{
@@ -1409,7 +1409,7 @@ void QuadtreeNodeManager::CollisionCapsuleVsTriangle(uint32_t target, bool singl
 			CollisionCapsuleVsTriangle(nextTarget, false, upperListCapsule, upperListTriangle);
 		}
 
-		// ‰ºˆÊ‹óŠÔ‚ğ‘S‚Äˆ—‚µI‚í‚Á‚½‚çAUpperList‚©‚çíœ‚·‚é
+		// ä¸‹ä½ç©ºé–“ã‚’å…¨ã¦å‡¦ç†ã—çµ‚ã‚ã£ãŸã‚‰ã€UpperListã‹ã‚‰å‰Šé™¤ã™ã‚‹
 		if (addUpperList)
 		{
 			for (int i = 0; i < targetNode.GetCapsules().size(); i++)
@@ -1423,16 +1423,16 @@ void QuadtreeNodeManager::CollisionCapsuleVsTriangle(uint32_t target, bool singl
 		}
 	}
 }
-// AABB VS OŠpŒ`
+// AABB VS ä¸‰è§’å½¢
 void QuadtreeNodeManager::CollisionAABBVsTriangle(uint32_t target, bool singleNode, std::vector<AABB*>* upperListAABB, std::vector<Triangle>* upperListTriangle)
 {
 	QuadtreeNode targetNode = m_quadtreeNodes[target];
 	IntersectionResult result;
 
-	// AABB‘¤‚Ìˆ—
+	// AABBå´ã®å‡¦ç†
 	for (int i = 0; i < targetNode.GetAABBs().size(); i++)
 	{
-		// “¯ˆê‹óŠÔ“à‚ÌOŠpŒ`‚Æ‚ÌÕ“Ëˆ—
+		// åŒä¸€ç©ºé–“å†…ã®ä¸‰è§’å½¢ã¨ã®è¡çªå‡¦ç†
 		for (int j = 0; j < targetNode.GetTriangles().size(); j++)
 		{
 			DirectX::XMVECTOR triPos[3] =
@@ -1447,7 +1447,7 @@ void QuadtreeNodeManager::CollisionAABBVsTriangle(uint32_t target, bool singleNo
 				triPos, 
 				&result))
 			{
-				// AABB‚Ì‚İ‰Ÿ‚µ–ß‚µˆ—
+				// AABBã®ã¿æŠ¼ã—æˆ»ã—å‡¦ç†
 				DirectX::XMVECTOR addVec = DirectX::XMVectorScale(result.normal, result.penetration);
 				DirectX::XMFLOAT3 addVecF = {};
 				DirectX::XMStoreFloat3(&addVecF, addVec);
@@ -1456,7 +1456,7 @@ void QuadtreeNodeManager::CollisionAABBVsTriangle(uint32_t target, bool singleNo
 				targetNode.GetAABBs().at(i)->position.z += addVecF.z;
 			}
 		}
-		// ãˆÊ‹óŠÔ‚ÌOŠpŒ`‚Æ‚ÌÕ“Ëˆ—
+		// ä¸Šä½ç©ºé–“ã®ä¸‰è§’å½¢ã¨ã®è¡çªå‡¦ç†
 		for (int j = 0; upperListTriangle && j < upperListTriangle->size(); j++)
 		{
 			DirectX::XMVECTOR triPos[3] =
@@ -1471,7 +1471,7 @@ void QuadtreeNodeManager::CollisionAABBVsTriangle(uint32_t target, bool singleNo
 				triPos, 
 				&result))
 			{
-				// AABB‚Ì‚İ‰Ÿ‚µ–ß‚µˆ—
+				// AABBã®ã¿æŠ¼ã—æˆ»ã—å‡¦ç†
 				DirectX::XMVECTOR addVec = DirectX::XMVectorScale(result.normal, result.penetration);
 				DirectX::XMFLOAT3 addVecF = {};
 				DirectX::XMStoreFloat3(&addVecF, addVec);
@@ -1482,10 +1482,10 @@ void QuadtreeNodeManager::CollisionAABBVsTriangle(uint32_t target, bool singleNo
 		}
 	}
 
-	// OŠpŒ`‘¤‚Ìˆ—
+	// ä¸‰è§’å½¢å´ã®å‡¦ç†
 	for (int i = 0; upperListAABB && i < upperListAABB->size(); i++)
 	{
-		// ãˆÊ‹óŠÔ‚ÌAABB‚Æ‚ÌÕ“Ëˆ—
+		// ä¸Šä½ç©ºé–“ã®AABBã¨ã®è¡çªå‡¦ç†
 		for (int j = 0; j < targetNode.GetTriangles().size(); j++)
 		{
 			DirectX::XMVECTOR triPos[3] =
@@ -1500,7 +1500,7 @@ void QuadtreeNodeManager::CollisionAABBVsTriangle(uint32_t target, bool singleNo
 				triPos, 
 				&result))
 			{
-				// AABB‚Ì‚İ‰Ÿ‚µ–ß‚µˆ—
+				// AABBã®ã¿æŠ¼ã—æˆ»ã—å‡¦ç†
 				DirectX::XMVECTOR addVec = DirectX::XMVectorScale(result.normal, result.penetration);
 				DirectX::XMFLOAT3 addVecF = {};
 				DirectX::XMStoreFloat3(&addVecF, addVec);
@@ -1511,14 +1511,14 @@ void QuadtreeNodeManager::CollisionAABBVsTriangle(uint32_t target, bool singleNo
 		}
 	}
 
-	// ‰ºˆÊ‹óŠÔ‚ª‘¶İ‚µ‚È‚¯‚ê‚Îreturn
+	// ä¸‹ä½ç©ºé–“ãŒå­˜åœ¨ã—ãªã‘ã‚Œã°return
 	if (target >= GetLevelStart(m_depth))	return;
 
-	// ’Pˆê‹óŠÔw’è‚Å‚È‚¯‚ê‚ÎA‰ºˆÊ‹óŠÔ‚ÖˆÚ“®‚µÄ‹NŒÄ‚Ño‚µ
+	// å˜ä¸€ç©ºé–“æŒ‡å®šã§ãªã‘ã‚Œã°ã€ä¸‹ä½ç©ºé–“ã¸ç§»å‹•ã—å†èµ·å‘¼ã³å‡ºã—
 	if (!singleNode)
 	{
-		// Š‚µ‚Ä‚¢‚éAABB‚ÆOŠpŒ`‚ğUpperList‚É“o˜^‚µ‚Ä‚©‚çAÄ‹Nˆ—‚Åq‹óŠÔ‚ÉˆÚ“®‚·‚é
-		bool addUpperList = false;	// “o˜^‚ª‚ ‚Á‚½‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒOBíœ‚É—˜—p‚·‚é
+		// æ‰€æŒã—ã¦ã„ã‚‹AABBã¨ä¸‰è§’å½¢ã‚’UpperListã«ç™»éŒ²ã—ã¦ã‹ã‚‰ã€å†èµ·å‡¦ç†ã§å­ç©ºé–“ã«ç§»å‹•ã™ã‚‹
+		bool addUpperList = false;	// ç™»éŒ²ãŒã‚ã£ãŸã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°ã€‚å‰Šé™¤ã«åˆ©ç”¨ã™ã‚‹
 
 		for (int i = 0; i < targetNode.GetAABBs().size(); i++)
 		{
@@ -1537,7 +1537,7 @@ void QuadtreeNodeManager::CollisionAABBVsTriangle(uint32_t target, bool singleNo
 			CollisionAABBVsTriangle(nextTarget, false, upperListAABB, upperListTriangle);
 		}
 
-		// ‰ºˆÊ‹óŠÔ‚ğ‘S‚Äˆ—‚µI‚í‚Á‚½‚çAUpperList‚©‚çíœ‚·‚é
+		// ä¸‹ä½ç©ºé–“ã‚’å…¨ã¦å‡¦ç†ã—çµ‚ã‚ã£ãŸã‚‰ã€UpperListã‹ã‚‰å‰Šé™¤ã™ã‚‹
 		if (addUpperList)
 		{
 			for (int i = 0; i < targetNode.GetAABBs().size(); i++)
@@ -1551,16 +1551,16 @@ void QuadtreeNodeManager::CollisionAABBVsTriangle(uint32_t target, bool singleNo
 		}
 	}
 }
-// ‹…‘Ì VS ƒJƒvƒZƒ‹
+// çƒä½“ VS ã‚«ãƒ—ã‚»ãƒ«
 void QuadtreeNodeManager::CollisionSphereVsCapsule(uint32_t target, bool singleNode, std::vector<Sphere*>* upperListSphere, std::vector<Capsule*>* upperListCapsule)
 {
 	QuadtreeNode targetNode = m_quadtreeNodes[target];
 	IntersectionResult result;
 
-	// ‹…‘Ì‘¤‚Ìˆ—
+	// çƒä½“å´ã®å‡¦ç†
 	for (int i = 0; i < targetNode.GetSpheres().size(); i++)
 	{
-		// “¯ˆê‹óŠÔ“à‚ÌƒJƒvƒZƒ‹‚Æ‚ÌÕ“Ëˆ—
+		// åŒä¸€ç©ºé–“å†…ã®ã‚«ãƒ—ã‚»ãƒ«ã¨ã®è¡çªå‡¦ç†
 		for (int j = 0; j < targetNode.GetCapsules().size(); j++)
 		{
 			if (Collision::IntersectSphereVsCapsule(
@@ -1572,7 +1572,7 @@ void QuadtreeNodeManager::CollisionSphereVsCapsule(uint32_t target, bool singleN
 				targetNode.GetCapsules().at(j)->radius, 
 				&result))
 			{
-				// ‰Ÿ‚µ–ß‚µˆ—
+				// æŠ¼ã—æˆ»ã—å‡¦ç†
 				DirectX::XMVECTOR addVec = DirectX::XMVectorScale(result.normal, result.penetration);
 				DirectX::XMFLOAT3 addVecF = {};
 				DirectX::XMStoreFloat3(&addVecF, addVec);
@@ -1584,7 +1584,7 @@ void QuadtreeNodeManager::CollisionSphereVsCapsule(uint32_t target, bool singleN
 				targetNode.GetCapsules().at(j)->position.z -= addVecF.z * 0.5f;
 			}
 		}
-		// ãˆÊ‹óŠÔ‚ÌƒJƒvƒZƒ‹‚Æ‚ÌÕ“Ëˆ—
+		// ä¸Šä½ç©ºé–“ã®ã‚«ãƒ—ã‚»ãƒ«ã¨ã®è¡çªå‡¦ç†
 		for (int j = 0; upperListCapsule && j < upperListCapsule->size(); j++)
 		{
 			if (Collision::IntersectSphereVsCapsule(
@@ -1596,7 +1596,7 @@ void QuadtreeNodeManager::CollisionSphereVsCapsule(uint32_t target, bool singleN
 				upperListCapsule->at(j)->radius, 
 				&result))
 			{
-				// ‰Ÿ‚µ–ß‚µˆ—
+				// æŠ¼ã—æˆ»ã—å‡¦ç†
 				DirectX::XMVECTOR addVec = DirectX::XMVectorScale(result.normal, result.penetration);
 				DirectX::XMFLOAT3 addVecF = {};
 				DirectX::XMStoreFloat3(&addVecF, addVec);
@@ -1610,10 +1610,10 @@ void QuadtreeNodeManager::CollisionSphereVsCapsule(uint32_t target, bool singleN
 		}
 	}
 
-	// ƒJƒvƒZƒ‹‘¤‚Ìˆ—
+	// ã‚«ãƒ—ã‚»ãƒ«å´ã®å‡¦ç†
 	for (int i = 0; upperListSphere && i < upperListSphere->size(); i++)
 	{
-		// ãˆÊ‹óŠÔ‚Ì‹…‘Ì‚Æ‚ÌÕ“Ëˆ—
+		// ä¸Šä½ç©ºé–“ã®çƒä½“ã¨ã®è¡çªå‡¦ç†
 		for (int j = 0; j < targetNode.GetCapsules().size(); j++)
 		{
 			if (Collision::IntersectSphereVsCapsule(
@@ -1625,7 +1625,7 @@ void QuadtreeNodeManager::CollisionSphereVsCapsule(uint32_t target, bool singleN
 				targetNode.GetCapsules().at(j)->radius, 
 				&result))
 			{
-				// ‰Ÿ‚µ–ß‚µˆ—
+				// æŠ¼ã—æˆ»ã—å‡¦ç†
 				DirectX::XMVECTOR addVec = DirectX::XMVectorScale(result.normal, result.penetration);
 				DirectX::XMFLOAT3 addVecF = {};
 				DirectX::XMStoreFloat3(&addVecF, addVec);
@@ -1639,14 +1639,14 @@ void QuadtreeNodeManager::CollisionSphereVsCapsule(uint32_t target, bool singleN
 		}
 	}
 
-	// ‰ºˆÊ‹óŠÔ‚ª‘¶İ‚µ‚È‚¯‚ê‚Îreturn
+	// ä¸‹ä½ç©ºé–“ãŒå­˜åœ¨ã—ãªã‘ã‚Œã°return
 	if (target >= GetLevelStart(m_depth))	return;
 
-	// ’Pˆê‹óŠÔw’è‚Å‚È‚¯‚ê‚ÎA‰ºˆÊ‹óŠÔ‚ÖˆÚ“®‚µÄ‹NŒÄ‚Ño‚µ
+	// å˜ä¸€ç©ºé–“æŒ‡å®šã§ãªã‘ã‚Œã°ã€ä¸‹ä½ç©ºé–“ã¸ç§»å‹•ã—å†èµ·å‘¼ã³å‡ºã—
 	if (!singleNode)
 	{
-		// Š‚µ‚Ä‚¢‚é‹…‘Ì‚ÆƒJƒvƒZƒ‹‚ğUpperList‚É“o˜^‚µ‚Ä‚©‚çAÄ‹Nˆ—‚Åq‹óŠÔ‚ÉˆÚ“®‚·‚é
-		bool addUpperList = false;	// “o˜^‚ª‚ ‚Á‚½‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒOBíœ‚É—˜—p‚·‚é
+		// æ‰€æŒã—ã¦ã„ã‚‹çƒä½“ã¨ã‚«ãƒ—ã‚»ãƒ«ã‚’UpperListã«ç™»éŒ²ã—ã¦ã‹ã‚‰ã€å†èµ·å‡¦ç†ã§å­ç©ºé–“ã«ç§»å‹•ã™ã‚‹
+		bool addUpperList = false;	// ç™»éŒ²ãŒã‚ã£ãŸã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°ã€‚å‰Šé™¤ã«åˆ©ç”¨ã™ã‚‹
 
 		for (int i = 0; i < targetNode.GetSpheres().size(); i++)
 		{
@@ -1665,7 +1665,7 @@ void QuadtreeNodeManager::CollisionSphereVsCapsule(uint32_t target, bool singleN
 			CollisionSphereVsCapsule(nextTarget, false, upperListSphere, upperListCapsule);
 		}
 
-		// ‰ºˆÊ‹óŠÔ‚ğ‘S‚Äˆ—‚µI‚í‚Á‚½‚çAUpperList‚©‚çíœ‚·‚é
+		// ä¸‹ä½ç©ºé–“ã‚’å…¨ã¦å‡¦ç†ã—çµ‚ã‚ã£ãŸã‚‰ã€UpperListã‹ã‚‰å‰Šé™¤ã™ã‚‹
 		if (addUpperList)
 		{
 			for (int i = 0; i < targetNode.GetSpheres().size(); i++)
@@ -1679,16 +1679,16 @@ void QuadtreeNodeManager::CollisionSphereVsCapsule(uint32_t target, bool singleN
 		}
 	}
 }
-// ‹…‘Ì VS AABB
+// çƒä½“ VS AABB
 void QuadtreeNodeManager::CollisionSphereVsAABB(uint32_t target, bool singleNode, std::vector<Sphere*>* upperListSphere, std::vector<AABB*>* upperListAABB)
 {
 	QuadtreeNode targetNode = m_quadtreeNodes[target];
 	IntersectionResult result;
 
-	// ‹…‘Ì‘¤‚Ìˆ—
+	// çƒä½“å´ã®å‡¦ç†
 	for (int i = 0; i < targetNode.GetSpheres().size(); i++)
 	{
-		// “¯ˆê‹óŠÔ“à‚ÌAABB‚Æ‚ÌÕ“Ëˆ—
+		// åŒä¸€ç©ºé–“å†…ã®AABBã¨ã®è¡çªå‡¦ç†
 		for (int j = 0; j < targetNode.GetAABBs().size(); j++)
 		{
 			if (Collision::IntersectSphereVsAABB(
@@ -1698,7 +1698,7 @@ void QuadtreeNodeManager::CollisionSphereVsAABB(uint32_t target, bool singleNode
 				DirectX::XMLoadFloat3(&targetNode.GetAABBs().at(j)->radii), 
 				&result))
 			{
-				// ‰Ÿ‚µ–ß‚µˆ—
+				// æŠ¼ã—æˆ»ã—å‡¦ç†
 				DirectX::XMVECTOR addVec = DirectX::XMVectorScale(result.normal, result.penetration);
 				DirectX::XMFLOAT3 addVecF = {};
 				DirectX::XMStoreFloat3(&addVecF, addVec);
@@ -1710,7 +1710,7 @@ void QuadtreeNodeManager::CollisionSphereVsAABB(uint32_t target, bool singleNode
 				targetNode.GetAABBs().at(j)->position.z -= addVecF.z * 0.5f;
 			}
 		}
-		// ãˆÊ‹óŠÔ‚ÌAABB‚Æ‚ÌÕ“Ëˆ—
+		// ä¸Šä½ç©ºé–“ã®AABBã¨ã®è¡çªå‡¦ç†
 		for (int j = 0; upperListAABB && j < upperListAABB->size(); j++)
 		{
 			if (Collision::IntersectSphereVsAABB(
@@ -1720,7 +1720,7 @@ void QuadtreeNodeManager::CollisionSphereVsAABB(uint32_t target, bool singleNode
 				DirectX::XMLoadFloat3(&upperListAABB->at(j)->radii), 
 				&result))
 			{
-				// ‰Ÿ‚µ–ß‚µˆ—
+				// æŠ¼ã—æˆ»ã—å‡¦ç†
 				DirectX::XMVECTOR addVec = DirectX::XMVectorScale(result.normal, result.penetration);
 				DirectX::XMFLOAT3 addVecF = {};
 				DirectX::XMStoreFloat3(&addVecF, addVec);
@@ -1734,10 +1734,10 @@ void QuadtreeNodeManager::CollisionSphereVsAABB(uint32_t target, bool singleNode
 		}
 	}
 
-	// AABB‘¤‚Ìˆ—
+	// AABBå´ã®å‡¦ç†
 	for (int i = 0; upperListSphere && i < upperListSphere->size(); i++)
 	{
-		// ãˆÊ‹óŠÔ‚Ì‹…‘Ì‚Æ‚ÌÕ“Ëˆ—
+		// ä¸Šä½ç©ºé–“ã®çƒä½“ã¨ã®è¡çªå‡¦ç†
 		for (int j = 0; j < targetNode.GetAABBs().size(); j++)
 		{
 			if (Collision::IntersectSphereVsAABB(
@@ -1747,7 +1747,7 @@ void QuadtreeNodeManager::CollisionSphereVsAABB(uint32_t target, bool singleNode
 				DirectX::XMLoadFloat3(&targetNode.GetAABBs().at(j)->radii), 
 				&result))
 			{
-				// ‰Ÿ‚µ–ß‚µˆ—
+				// æŠ¼ã—æˆ»ã—å‡¦ç†
 				DirectX::XMVECTOR addVec = DirectX::XMVectorScale(result.normal, result.penetration);
 				DirectX::XMFLOAT3 addVecF = {};
 				DirectX::XMStoreFloat3(&addVecF, addVec);
@@ -1761,14 +1761,14 @@ void QuadtreeNodeManager::CollisionSphereVsAABB(uint32_t target, bool singleNode
 		}
 	}
 
-	// ‰ºˆÊ‹óŠÔ‚ª‘¶İ‚µ‚È‚¯‚ê‚Îreturn
+	// ä¸‹ä½ç©ºé–“ãŒå­˜åœ¨ã—ãªã‘ã‚Œã°return
 	if (target >= GetLevelStart(m_depth))	return;
 
-	// ’Pˆê‹óŠÔw’è‚Å‚È‚¯‚ê‚ÎA‰ºˆÊ‹óŠÔ‚ÖˆÚ“®‚µÄ‹NŒÄ‚Ño‚µ
+	// å˜ä¸€ç©ºé–“æŒ‡å®šã§ãªã‘ã‚Œã°ã€ä¸‹ä½ç©ºé–“ã¸ç§»å‹•ã—å†èµ·å‘¼ã³å‡ºã—
 	if (!singleNode)
 	{
-		// Š‚µ‚Ä‚¢‚é‹…‘Ì‚ÆAABB‚ğUpperList‚É“o˜^‚µ‚Ä‚©‚çAÄ‹Nˆ—‚Åq‹óŠÔ‚ÉˆÚ“®‚·‚é
-		bool addUpperList = false;	// “o˜^‚ª‚ ‚Á‚½‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒOBíœ‚É—˜—p‚·‚é
+		// æ‰€æŒã—ã¦ã„ã‚‹çƒä½“ã¨AABBã‚’UpperListã«ç™»éŒ²ã—ã¦ã‹ã‚‰ã€å†èµ·å‡¦ç†ã§å­ç©ºé–“ã«ç§»å‹•ã™ã‚‹
+		bool addUpperList = false;	// ç™»éŒ²ãŒã‚ã£ãŸã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°ã€‚å‰Šé™¤ã«åˆ©ç”¨ã™ã‚‹
 
 		for (int i = 0; i < targetNode.GetSpheres().size(); i++)
 		{
@@ -1787,7 +1787,7 @@ void QuadtreeNodeManager::CollisionSphereVsAABB(uint32_t target, bool singleNode
 			CollisionSphereVsAABB(nextTarget, false, upperListSphere, upperListAABB);
 		}
 
-		// ‰ºˆÊ‹óŠÔ‚ğ‘S‚Äˆ—‚µI‚í‚Á‚½‚çAUpperList‚©‚çíœ‚·‚é
+		// ä¸‹ä½ç©ºé–“ã‚’å…¨ã¦å‡¦ç†ã—çµ‚ã‚ã£ãŸã‚‰ã€UpperListã‹ã‚‰å‰Šé™¤ã™ã‚‹
 		if (addUpperList)
 		{
 			for (int i = 0; i < targetNode.GetSpheres().size(); i++)
@@ -1801,16 +1801,16 @@ void QuadtreeNodeManager::CollisionSphereVsAABB(uint32_t target, bool singleNode
 		}
 	}
 }
-// ƒJƒvƒZƒ‹ VS AABB
+// ã‚«ãƒ—ã‚»ãƒ« VS AABB
 void QuadtreeNodeManager::CollisionCapsuleVsAABB(uint32_t target, bool singleNode, std::vector<Capsule*>* upperListCapsule, std::vector<AABB*>* upperListAABB)
 {
 	QuadtreeNode targetNode = m_quadtreeNodes[target];
 	IntersectionResult result;
 
-	// AABB‘¤‚Ìˆ—
+	// AABBå´ã®å‡¦ç†
 	for (int i = 0; i < targetNode.GetCapsules().size(); i++)
 	{
-		// “¯ˆê‹óŠÔ“à‚ÌƒJƒvƒZƒ‹‚Æ‚ÌÕ“Ëˆ—
+		// åŒä¸€ç©ºé–“å†…ã®ã‚«ãƒ—ã‚»ãƒ«ã¨ã®è¡çªå‡¦ç†
 		for (int j = 0; j < targetNode.GetAABBs().size(); j++)
 		{
 			if (Collision::IntersectCapsuleVsAABB(
@@ -1822,7 +1822,7 @@ void QuadtreeNodeManager::CollisionCapsuleVsAABB(uint32_t target, bool singleNod
 				DirectX::XMLoadFloat3(&targetNode.GetAABBs().at(j)->radii),
 				&result))
 			{
-				// ‰Ÿ‚µ–ß‚µˆ—
+				// æŠ¼ã—æˆ»ã—å‡¦ç†
 				DirectX::XMVECTOR addVec = DirectX::XMVectorScale(result.normal, result.penetration);
 				DirectX::XMFLOAT3 addVecF = {};
 				DirectX::XMStoreFloat3(&addVecF, addVec);
@@ -1834,7 +1834,7 @@ void QuadtreeNodeManager::CollisionCapsuleVsAABB(uint32_t target, bool singleNod
 				targetNode.GetAABBs().at(j)->position.z -= addVecF.z * 0.5f;
 			}
 		}
-		// ãˆÊ‹óŠÔ‚ÌƒJƒvƒZƒ‹‚Æ‚ÌÕ“Ëˆ—
+		// ä¸Šä½ç©ºé–“ã®ã‚«ãƒ—ã‚»ãƒ«ã¨ã®è¡çªå‡¦ç†
 		for (int j = 0; upperListAABB && j < upperListAABB->size(); j++)
 		{
 			if (Collision::IntersectCapsuleVsAABB(
@@ -1846,7 +1846,7 @@ void QuadtreeNodeManager::CollisionCapsuleVsAABB(uint32_t target, bool singleNod
 				DirectX::XMLoadFloat3(&upperListAABB->at(j)->radii),
 				&result))
 			{
-				// ‰Ÿ‚µ–ß‚µˆ—
+				// æŠ¼ã—æˆ»ã—å‡¦ç†
 				DirectX::XMVECTOR addVec = DirectX::XMVectorScale(result.normal, result.penetration);
 				DirectX::XMFLOAT3 addVecF = {};
 				DirectX::XMStoreFloat3(&addVecF, addVec);
@@ -1860,10 +1860,10 @@ void QuadtreeNodeManager::CollisionCapsuleVsAABB(uint32_t target, bool singleNod
 		}
 	}
 
-	// ƒJƒvƒZƒ‹‘¤‚Ìˆ—
+	// ã‚«ãƒ—ã‚»ãƒ«å´ã®å‡¦ç†
 	for (int i = 0; upperListCapsule && i < upperListCapsule->size(); i++)
 	{
-		// ãˆÊ‹óŠÔ‚ÌAABB‚Æ‚ÌÕ“Ëˆ—
+		// ä¸Šä½ç©ºé–“ã®AABBã¨ã®è¡çªå‡¦ç†
 		for (int j = 0; j < targetNode.GetAABBs().size(); j++)
 		{
 			if (Collision::IntersectCapsuleVsAABB(
@@ -1875,7 +1875,7 @@ void QuadtreeNodeManager::CollisionCapsuleVsAABB(uint32_t target, bool singleNod
 				DirectX::XMLoadFloat3(&targetNode.GetAABBs().at(j)->radii),
 				&result))
 			{
-				// ‰Ÿ‚µ–ß‚µˆ—
+				// æŠ¼ã—æˆ»ã—å‡¦ç†
 				DirectX::XMVECTOR addVec = DirectX::XMVectorScale(result.normal, result.penetration);
 				DirectX::XMFLOAT3 addVecF = {};
 				DirectX::XMStoreFloat3(&addVecF, addVec);
@@ -1889,14 +1889,14 @@ void QuadtreeNodeManager::CollisionCapsuleVsAABB(uint32_t target, bool singleNod
 		}
 	}
 
-	// ‰ºˆÊ‹óŠÔ‚ª‘¶İ‚µ‚È‚¯‚ê‚Îreturn
+	// ä¸‹ä½ç©ºé–“ãŒå­˜åœ¨ã—ãªã‘ã‚Œã°return
 	if (target >= GetLevelStart(m_depth))	return;
 
-	// ’Pˆê‹óŠÔw’è‚Å‚È‚¯‚ê‚ÎA‰ºˆÊ‹óŠÔ‚ÖˆÚ“®‚µÄ‹NŒÄ‚Ño‚µ
+	// å˜ä¸€ç©ºé–“æŒ‡å®šã§ãªã‘ã‚Œã°ã€ä¸‹ä½ç©ºé–“ã¸ç§»å‹•ã—å†èµ·å‘¼ã³å‡ºã—
 	if (!singleNode)
 	{
-		// Š‚µ‚Ä‚¢‚éAABB‚ÆƒJƒvƒZƒ‹‚ğUpperList‚É“o˜^‚µ‚Ä‚©‚çAÄ‹Nˆ—‚Åq‹óŠÔ‚ÉˆÚ“®‚·‚é
-		bool addUpperList = false;	// “o˜^‚ª‚ ‚Á‚½‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒOBíœ‚É—˜—p‚·‚é
+		// æ‰€æŒã—ã¦ã„ã‚‹AABBã¨ã‚«ãƒ—ã‚»ãƒ«ã‚’UpperListã«ç™»éŒ²ã—ã¦ã‹ã‚‰ã€å†èµ·å‡¦ç†ã§å­ç©ºé–“ã«ç§»å‹•ã™ã‚‹
+		bool addUpperList = false;	// ç™»éŒ²ãŒã‚ã£ãŸã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°ã€‚å‰Šé™¤ã«åˆ©ç”¨ã™ã‚‹
 
 		for (int i = 0; i < targetNode.GetCapsules().size(); i++)
 		{
@@ -1915,7 +1915,7 @@ void QuadtreeNodeManager::CollisionCapsuleVsAABB(uint32_t target, bool singleNod
 			CollisionCapsuleVsAABB(nextTarget, false, upperListCapsule, upperListAABB);
 		}
 
-		// ‰ºˆÊ‹óŠÔ‚ğ‘S‚Äˆ—‚µI‚í‚Á‚½‚çAUpperList‚©‚çíœ‚·‚é
+		// ä¸‹ä½ç©ºé–“ã‚’å…¨ã¦å‡¦ç†ã—çµ‚ã‚ã£ãŸã‚‰ã€UpperListã‹ã‚‰å‰Šé™¤ã™ã‚‹
 		if (addUpperList)
 		{
 			for (int i = 0; i < targetNode.GetCapsules().size(); i++)

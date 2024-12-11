@@ -1,4 +1,4 @@
-#pragma once
+Ôªø#pragma once
 
 #include <memory>
 
@@ -45,14 +45,14 @@ private:
 	FONT_ID font = FONT_ID::HGpop;
 	float scale = 1.0;
 	float timer = 0.0f;
-	float typeSpeed = 0.05f; //  ïb/àÍï∂éö
+	float typeSpeed = 0.05f; //  Áßí/‰∏ÄÊñáÂ≠ó
 
 	bool done = true;
 	bool visible = false;
 
 	GameObject* dialogOwner = nullptr;
 
-	// êF
+	// Ëâ≤
 	DirectX::XMFLOAT4 nameColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 	DirectX::XMFLOAT4 fontColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 
