@@ -1121,6 +1121,7 @@ if(MSVC)
         /Y-
         /wd4819
         /wd4099
+        /utf-8
     )
     target_link_options(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:
