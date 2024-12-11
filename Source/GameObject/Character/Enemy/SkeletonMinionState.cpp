@@ -1,6 +1,6 @@
-#include "SkeletonMinionState.h"
+ï»¿#include "SkeletonMinionState.h"
 
-// UŒ‚ƒXƒe[ƒg
+// æ”»æ’ƒã‚¹ãƒ†ãƒ¼ãƒˆ
 void SkeletonMinionState::AttackState::Enter()
 {
 	owner->GetModel()->PlayAnimation(Enemy::Animation::Attack_Combo, false);

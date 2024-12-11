@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <array>
 #include <wrl.h>
@@ -29,18 +29,18 @@ public:
 	virtual void Render(const RenderContext& rc) override;
 
 public:
-	// ƒAƒNƒZƒT
-	// ˆÊ’uŽæ“¾
+	// ã‚¢ã‚¯ã‚»ã‚µ
+	// ä½ç½®å–å¾—
 	const DirectX::XMFLOAT3& GetPosition() const { return position; }
-	// ˆÊ’uÝ’è
+	// ä½ç½®è¨­å®š
 	void SetPosition(const DirectX::XMFLOAT3& position) { this->position = position; }
-	// ‰ñ“]Žæ“¾
+	// å›žè»¢å–å¾—
 	const DirectX::XMFLOAT3& GetAngle() const { return angle; }
-	// ‰ñ“]Ý’è
+	// å›žè»¢è¨­å®š
 	void SetAngle(const DirectX::XMFLOAT3& angle) { this->angle = angle; }
-	// ƒXƒP[ƒ‹Žæ“¾
+	// ã‚¹ã‚±ãƒ¼ãƒ«å–å¾—
 	const DirectX::XMFLOAT3& GetScale() const { return scale; }
-	// ƒXƒP[ƒ‹Ý’è
+	// ã‚¹ã‚±ãƒ¼ãƒ«è¨­å®š
 	void SetScale(const DirectX::XMFLOAT3& scale) { this->scale = scale; }
 protected:
 

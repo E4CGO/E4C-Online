@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <vector>
 #include <wrl.h>
@@ -12,10 +12,10 @@ public:
 	~LineRenderer() {}
 
 public:
-	// •`‰æÀs
+	// æç”»å®Ÿè¡Œ
 	void Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
-	// ’¸“_’Ç‰Á
+	// é ‚ç‚¹è¿½åŠ 
 	void AddVertex(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT4& color);
 
 private:
