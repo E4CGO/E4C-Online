@@ -12,6 +12,8 @@
 #include "GameData.h"
 #include "PlayerCharacterData.h"
 #include "TAKOEngine/Rendering/DebugRenderer/SphereRenderer.h"
+#include "TAKOEngine/Rendering/Model/Model.h"
+#include "GameObject/Character/Player/State/PlayerCharacterSwordState.h"
 
 class Enemy;
 
@@ -126,6 +128,15 @@ public:
 	void Jump();
 	void InputMove(float elapsedTime);
 
+	void SwordTrail();
+
+	bool IsTrail() { return m_isTrail; }
+
+	void SetTrail(bool trail) { m_isTrail = trail; }
+
+
+	//剣の軌跡ノード取得
+	const iModel::Node* GetSwordTrailNode();
 	DirectX::XMFLOAT2 GetInputDirection();
 	// 入力管理
 	void UpdateInput();						// キー入力
@@ -228,7 +239,6 @@ protected:
 	); // 汎用 敵との判定
 
 	void AttackEnemy(Collider* attackCol, Collider* enemyCol);
-
 private:
 	float radius = 0;	// 当たり判定半径
 	
@@ -252,6 +262,10 @@ private:
 	float jumpSpeed = 0.0f;
 	float dodgeSpeed = 0.0f;
 
+	//ポリゴンの最大数
+	static const int MAX_POLYGON = 12;
+	XMFLOAT3 trailPosition[2][MAX_POLYGON];
+	XMFLOAT4 trailColor{ 1.f,0.f,0.f,0.2f };
 	// MP消費
 	std::unordered_map<int, float> mpCost;
 
@@ -268,6 +282,8 @@ private:
 	std::unordered_map<int, SkillTimer> skillTimer;
 
 	std::unique_ptr<SphereRenderer> m_sphere;
+
+    
 protected:
 
 	static inline DirectX::XMFLOAT4 colorSet[COLOR_PATTERN::END] = {
@@ -282,6 +298,8 @@ protected:
 	Collider* m_hitCollider;	// ヒット判定
 	std::unordered_map<int, Collider*> m_pattackColliders; // 攻撃判定
 
+
+
 	// 同期用
 	std::mutex m_mut;
 	// 同期補間
@@ -293,6 +311,8 @@ protected:
 		uint32_t old_sync_count = 0;
 		SYNC_DATA sync_data = {};
 	} m_tempData;
+
+	bool m_isTrail = false;
 };
 
 #endif // __INCLUDED_PLAYER_CHARACTER_H__

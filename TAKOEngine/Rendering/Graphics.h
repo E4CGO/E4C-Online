@@ -26,6 +26,7 @@
 #include "TAKOEngine/Tool/ImGuiRenderer.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
 #include "TAKOEngine/Rendering/ParticleRenderer.h"
+#include "TAKOEngine/Rendering/PrimitiveRenderer.h"
 
 #define MAX_BUFFER_COUNT (2)
 
@@ -185,7 +186,8 @@ public:
 	DebugRenderer* GetDebugRenderer() const { return debugRenderer.get(); }
 	// ラインレンダラ取得
 	LineRenderer* GetLineRenderer() const { return lineRenderer.get(); }
-
+	//プリミティブレンダラ取得
+	PrimitiveRenderer* GetPrimitiveRenderer()const { return primitiveRenderer.get(); }
 	//スキニング取得
 	SkinningPipeline* GetSkinningPipeline() const { return m_skinning_pipeline.get(); }
 
@@ -322,6 +324,7 @@ private:
 
 	std::unique_ptr<DebugRenderer>					debugRenderer;
 	std::unique_ptr<LineRenderer>					lineRenderer;
+	std::unique_ptr<PrimitiveRenderer>              primitiveRenderer;
 	//スキニング
 	std::unique_ptr<SkinningPipeline>	m_skinning_pipeline;
 
