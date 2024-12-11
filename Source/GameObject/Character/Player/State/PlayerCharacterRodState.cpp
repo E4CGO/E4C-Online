@@ -1,17 +1,17 @@
 ﻿//! @file PlayerCharacterSwordState.cpp
 //! @note
 
-#include "PlayerCharacterSwordState.h"
+#include "PlayerCharacterRodState.h"
 #include "PlayerCharacterState.h"
 
 namespace PlayerCharacterState
 {
-	namespace Sword
+	namespace Rod
 	{
 		// 待機用ステート
 		void WaitState::Enter()
 		{
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_IDLE, true, 0.1f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_IDLE, true, 0.1f);
 		}
 		void WaitState::Execute(float elapsedTime)
 		{
@@ -23,7 +23,7 @@ namespace PlayerCharacterState
 		// 待機ステート
 		void IdleState::Enter()
 		{
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_IDLE, true, 0.1f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_IDLE, true, 0.1f);
 		}
 
 		void IdleState::Execute(float elapsedTime)
@@ -46,7 +46,7 @@ namespace PlayerCharacterState
 		// 移動ステート
 		void MoveState::Enter()
 		{
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_MOVE_CONTINUE, true, 0.2f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_MOVE_CONTINUE, true, 0.2f);
 		}
 
 		void MoveState::Execute(float elapsedTime)
@@ -94,14 +94,14 @@ namespace PlayerCharacterState
 		void AttackNormalState_1::Enter()
 		{
 			owner->SetAnimationSpeed(1.0f);
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_COMBO_FIRST, false, 0.1f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_ATTACK_COMBO_FIRST, false, 0.1f);
 		}
 		void AttackNormalState_1::Execute(float elapsedTime)
 		{
 			if (owner->IsPlayer())
 			{
 				float time = owner->GetModel()->GetCurrentAnimationSeconds();
-				if (0.184f <= time && time <= 0.368f)
+				if (0.95f <= time)
 				{
 					if (owner->InputAttackNormal())
 					{
@@ -118,17 +118,9 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
 					}
-					else if (owner->InputGuard())
+					else if (owner->InputSpecial())
 					{
-						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::GUARD);
-					}
-					else if (owner->InputSkill1())
-					{
-						owner->GetStateMachine()->ChangeState(SKILL_1_STATE::ATTACK_START);
-					}
-					else if (owner->InputSkill2())
-					{
-						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
+						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
 					}
 				}
 			}
@@ -142,14 +134,14 @@ namespace PlayerCharacterState
 		void AttackNormalState_2::Enter()
 		{
 			owner->SetAnimationSpeed(1.0f);
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_COMBO_SECOND, false, 0.2f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_ATTACK_COMBO_SECOND, false, 0.2f);
 		}
 		void AttackNormalState_2::Execute(float elapsedTime)
 		{
 			float time = owner->GetModel()->GetCurrentAnimationSeconds();
 			if (owner->IsPlayer())
 			{
-				if (0.185f <= time && time <= 0.418f)
+				if (0.95f <= time)
 				{
 					if (owner->InputAttackNormal())
 					{
@@ -166,17 +158,9 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
 					}
-					else if (owner->InputGuard())
+					else if (owner->InputSpecial())
 					{
-						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::GUARD);
-					}
-					else if (owner->InputSkill1())
-					{
-						owner->GetStateMachine()->ChangeState(SKILL_1_STATE::ATTACK_START);
-					}
-					else if (owner->InputSkill2())
-					{
-						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
+						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
 					}
 				}
 			}
@@ -190,14 +174,14 @@ namespace PlayerCharacterState
 		void AttackNormalState_3::Enter()
 		{
 			owner->SetAnimationSpeed(0.7f);
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_COMBO_THIRD, false, 0.2f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_ATTACK_COMBO_THIRD, false, 0.2f);
 		}
 		void AttackNormalState_3::Execute(float elapsedTime)
 		{
 			float time = owner->GetModel()->GetCurrentAnimationSeconds();
 			if (owner->IsPlayer())
 			{
-				if (0.5f <= time && time <= 0.753f)
+				if (0.95f <= time)
 				{
 					if (owner->InputAttackNormal())
 					{
@@ -214,17 +198,9 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
 					}
-					else if (owner->InputGuard())
+					else if (owner->InputSpecial())
 					{
-						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::GUARD);
-					}
-					else if (owner->InputSkill1())
-					{
-						owner->GetStateMachine()->ChangeState(SKILL_1_STATE::ATTACK_START);
-					}
-					else if (owner->InputSkill2())
-					{
-						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
+						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
 					}
 				}
 			}
@@ -236,97 +212,26 @@ namespace PlayerCharacterState
 			if (!owner->IsPlayer()) return;
 		}
 
-		// スキル_1ステート
-		void Skill1State::Enter()
-		{
-			SetSubState(SKILL_1_STATE::ATTACK_START);
-		}
-		void Skill1State::Execute(float elapsedTime)
-		{
-			subState->Execute(elapsedTime);
-		}
-		void Skill1State::Exit()
+		// 特殊攻撃ステート
+		void AttackSpecialState::Enter()
 		{
 			owner->SetAnimationSpeed(1.0f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_CHARGE_START, false, 0.05f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_CHARGE_CONTINUE, true);
 		}
-
-		void Skill1StateStart::Enter()
+		void AttackSpecialState::Execute(float elapsedTime)
 		{
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_SPECIAL_FIRST, false, 0.1f);
-		}
-
-		void Skill1StateStart::Execute(float elapsedTime)
-		{
-			if (owner->IsPlayer())
-			{
-				if (owner->GetModel()->GetAnimationRate() > 0.25f)
-				{
-					owner->GetStateMachine()->ChangeSubState(SKILL_1_STATE::ATTACK_CONTINUE);
-				}
-			}
-		}
-
-		void Skill1ContinueStart::Enter()
-		{
-			DirectX::XMFLOAT3 front = owner->GetFront();
-			DirectX::XMFLOAT3 impulse;
-			DirectX::XMStoreFloat3(&impulse, DirectX::XMVectorScale(DirectX::XMLoadFloat3(&front), impulseSpeed));
-			owner->AddImpulse(impulse);
-		}
-		void Skill1ContinueStart::Execute(float elapsedTime)
-		{
-			float time = owner->GetModel()->GetCurrentAnimationSeconds();
-			if (2.6f <= time)
-			{
-				if (owner->InputMove(elapsedTime))
-				{
-					owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::MOVE);
-				}
-				else if (owner->InputDodge())
-				{
-					owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
-				}
-				else if (owner->InputGuard())
-				{
-					owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::GUARD);
-				}
-			}
-
-			if (!owner->IsPlayAnimation())
-				owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::IDLE);
-		}
-
-		void Skill2State::Enter()
-		{
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_SPECIAL_SECOND, false, 0.1f);
-		}
-		void Skill2State::Execute(float elapsedTime)
-		{
-			float time = owner->GetModel()->GetCurrentAnimationSeconds();
-			// 反重力
-			owner->StopFall();
 			owner->StopMove();
 
-			if (1.215f <= time)
-			{
-				if (owner->InputMove(elapsedTime))
-				{
-					owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::MOVE);
-				}
-				else if (owner->InputDodge())
-				{
-					owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
-				}
-				else if (owner->InputGuard())
-				{
-					owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::GUARD);
-				}
-			}
-
-			if (!owner->IsPlayAnimation()) // 攻撃モーション終わり
+			if (!owner->InputSpecial())
 			{
 				owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 			}
+		}
+		void AttackSpecialState::Exit()
+		{
+			owner->SetAnimationSpeed(1.0f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_IDLE, false, 0.05f);
 		}
 	}
 }

@@ -2,6 +2,7 @@
 
 //#include <vector>
 #include <unordered_map>
+#include <string>
 
 #include "TAKOEngine/AI/BaseState.h"
 
@@ -78,6 +79,9 @@ public:
 
 	// ステート取得
 	HierarchicalState<T>* GetState() { return currentState; }
+
+	std::string m_StateMachineName = "";
+
 private:
 	// 現在のステート
 	HierarchicalState<T>* currentState = nullptr;

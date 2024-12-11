@@ -46,7 +46,7 @@ void StageOpenWorld_E4C::Initialize()
 
 	if (T_GRAPHICS.isDX11Active)
 	{
-		models.emplace("map", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX11GLTF, ModelObject::MODEL_TYPE::RHS_PBR));
+		models.emplace("map", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_TOON));
 		models.emplace("tower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_TOON));
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 70.0f, ModelObject::RENDER_MODE::DX11);
@@ -93,7 +93,6 @@ void StageOpenWorld_E4C::Initialize()
 		{ 0, 0.969f, -0.248f }	// 上ベクトル
 	);
 
-
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(mainCamera);
 	cameraController->SetEnable(true);
@@ -113,7 +112,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	// ゲームループ内で
 	cameraController->SyncContrllerToCamera(camera);
 	cameraController->Update(elapsedTime);
-
 
 	ENEMIES.Update(elapsedTime);
 
@@ -180,7 +178,6 @@ void StageOpenWorld_E4C::Render()
 
 	teleporter->Render(rc);
 
-
 	ENEMIES.Render(rc);
 
 	UI.Render(rc);
@@ -220,7 +217,6 @@ void StageOpenWorld_E4C::RenderDX12()
 			it.second->RenderDX12(rc);
 		}
 
-		
 		// skyBox
 		{
 			rc.skydomeData.skyTexture = m_sprites[1]->GetDescriptor();

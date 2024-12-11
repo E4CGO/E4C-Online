@@ -1,8 +1,7 @@
 ﻿//! @file PlayerCharacterShieldState.cpp
-//! @note 
+//! @note
 
 #include "PlayerCharacterShieldState.h"
-
 
 namespace PlayerCharacterState
 {
@@ -12,8 +11,8 @@ namespace PlayerCharacterState
 		void AttackSpecialState::Enter()
 		{
 			owner->SetAnimationSpeed(1.2f);
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_GUARD_SHIELD_START, false, 0.05f);
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_GUARD_SHIELD_CONTINUE, true);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SHIELD_GUARD_START, false, 0.05f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SHIELD_GUARD_CONTINUE, true);
 		}
 		void AttackSpecialState::Execute(float elapsedTime)
 		{
@@ -27,7 +26,7 @@ namespace PlayerCharacterState
 		void AttackSpecialState::Exit()
 		{
 			owner->SetAnimationSpeed(1.0f);
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_GUARD_SHIELD_FINISH, false, 0.05f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SHIELD_GUARD_FINISH, false, 0.05f);
 		}
 	}
 }
