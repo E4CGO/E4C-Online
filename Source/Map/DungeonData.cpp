@@ -131,6 +131,11 @@ void DungeonData::InitModelFileDatas()
 
 	m_modelFileDatas.at(STAIR_RAILING_01A).emplace_back("Data/Model/DungeonAssets/SM_Stairs_Railing_01a.glb", 4.0f);
 	m_modelFileDatas.at(STAIR_STEP_01A).emplace_back("Data/Model/DungeonAssets/SM_Stairs_Steps_01a.glb", 4.0f);
+
+	// モデルない組～
+	m_modelFileDatas.at(PORTAL).emplace_back("", 0.0f);
+	m_modelFileDatas.at(SPAWNER).emplace_back("", 0.0f);
+	m_modelFileDatas.at(CONNECTPOINT).emplace_back("", 0.0f);
 }
 
 void DungeonData::InitCollisionFileDatas()

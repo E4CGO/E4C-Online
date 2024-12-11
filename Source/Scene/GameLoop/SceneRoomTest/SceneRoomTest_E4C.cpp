@@ -161,6 +161,10 @@ void SceneRoomTest_E4C::RenderDX12()
 *//***************************************************************************/
 void SceneRoomTest_E4C::LoadRoomData()
 {
+	// 現在のカレントディレクトリを保存しておく
+	char currentDirectory[260];
+	GetCurrentDirectoryA(260, currentDirectory);
+
 	// ダイアログボックスの設定
 	OPENFILENAMEA ofn;
 	char filePath[260]{};
@@ -169,12 +173,12 @@ void SceneRoomTest_E4C::LoadRoomData()
 	ZeroMemory(&ofn, sizeof(OPENFILENAMEA));
 	ofn.lStructSize = sizeof(OPENFILENAMEA);
 	ofn.hwndOwner = NULL;
-	ofn.lpstrFilter = "JSONファイル(*.json)\0*.json\0";
+	ofn.lpstrFilter = "json File(*.json)\0*.json\0";
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFile = filePath;
 	ofn.nMaxFile = sizeof(filePath);
 	ofn.lpstrFileTitle = NULL;
-	ofn.lpstrTitle = "ファイルを開く";
+	ofn.lpstrTitle = "Open File";
 	ofn.lpstrInitialDir = NULL;
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_OVERWRITEPROMPT;
 
@@ -182,6 +186,7 @@ void SceneRoomTest_E4C::LoadRoomData()
 	if (GetOpenFileNameA(&ofn) == TRUE)
 	{
 		Console::Instance().Log(filePath);
+
 		nlohmann::json loadFile;
 		std::ifstream ifs(filePath);
 
@@ -214,6 +219,9 @@ void SceneRoomTest_E4C::LoadRoomData()
 			ifs.close();
 		}
 	}
+
+	// 元のカレントディレクトリに戻す
+	SetCurrentDirectoryA(currentDirectory);
 }
 
 void SceneRoomTest_E4C::LoadTileNodeData(const auto& nodeData)
@@ -277,6 +285,10 @@ void SceneRoomTest_E4C::LoadSpawnerData(const auto& nodeData)
 *//***************************************************************************/
 void SceneRoomTest_E4C::SaveRoomData()
 {
+	// 現在のカレントディレクトリを保存しておく
+	char currentDirectory[260];
+	GetCurrentDirectoryA(260, currentDirectory);
+
 	// ダイアログボックスの設定
 	OPENFILENAMEA ofn;
 	char filePath[260]{};
@@ -326,6 +338,9 @@ void SceneRoomTest_E4C::SaveRoomData()
 			ofs.close();
 		}
 	}
+
+	// 元のカレントディレクトリに戻す
+	SetCurrentDirectoryA(currentDirectory);
 }
 
 void SceneRoomTest_E4C::DrawDebugGUI()
@@ -478,6 +493,7 @@ void SceneRoomTest_E4C::DuplicateNode()
 void SceneRoomTest_E4C::RemoveSelectedNode()
 {
 	NODES.Remove(selectionNode);
+	selectionNode = nullptr;
 }
 
 void SceneRoomTest_E4C::ClearNodes()
@@ -490,9 +506,7 @@ void SceneRoomTest_E4C::AddTemplate3x3Floor()
 {
 	for (int x = -1; x < 2; x++) {
 		for (int z = -1; z < 2; z++) {
-			TileNode* newNode = new TileNode(NODES.GetUniqueName("Floor01a"), TileType::FLOOR_01A, "Data/Model/DungeonAssets/SM_Floor_02a.glb");
-			newNode->SetPosition(DirectX::XMFLOAT3((x), 0.0f, (z)));
-			NODES.Register(newNode);
+			AddTileNode(NODES.GetUniqueName("Floor01a"), TileType::FLOOR_01A, DirectX::XMFLOAT3((x * 4.0f), 0.0f, (z * 4.0f)));
 		}
 	}
 }
@@ -577,7 +591,52 @@ Node* SpawnerNode::Duplicate()
 
 void SpawnerNode::DrawDebugGUI()
 {
+	ImGui::Text("Type: SPAWNER");
 
+	// name
+	std::string inputName = name;
+	if (ImGui::InputText("Name", inputName.data(), 256)) {
+		// 正規表現も行ってからセットする
+		name = NODES.GetUniqueName(inputName.c_str());
+	}
+
+	// pos
+	ImGui::DragFloat3("Position", &position.x, 0.1f);
+	// angle
+	DirectX::XMFLOAT3 debugAngle = angle;
+	debugAngle.x = DirectX::XMConvertToDegrees(debugAngle.x);
+	debugAngle.y = DirectX::XMConvertToDegrees(debugAngle.y);
+	debugAngle.z = DirectX::XMConvertToDegrees(debugAngle.z);
+	if (ImGui::DragFloat3("Angle", &debugAngle.x, 1.0f)) {
+		angle.x = DirectX::XMConvertToRadians(debugAngle.x);
+		angle.y = DirectX::XMConvertToRadians(debugAngle.y);
+		angle.z = DirectX::XMConvertToRadians(debugAngle.z);
+	}
+	// scale
+	ImGui::DragFloat3("Scale", &scale.x, 0.1f);
+	
+	// スポナーデータ
+	if (ImGui::TreeNodeEx("SpawnerData", ImGuiTreeNodeFlags_DefaultOpen)) {
+		// enemyType
+		int enemyTypeInt = (int)spawnerData.enemyType;
+		if (ImGui::InputInt("EnemyType", &enemyTypeInt)) {
+			// 最大数を超えないように調整
+			if (enemyTypeInt < 0) enemyTypeInt = 0;
+			spawnerData.enemyType = (uint8_t)enemyTypeInt;
+		}
+		// searchRadius
+		ImGui::SliderFloat("SearchRadius", &spawnerData.searchRadius, 0.0f, 30.0f);
+		// spawnRadius
+		ImGui::SliderFloat("SpawnRadius", &spawnerData.spawnRadius, 0.0f, 30.0f);
+		// maxExistedEnemiesNum
+		ImGui::SliderInt("MaxExistedEnemiesNum", &spawnerData.maxExistedEnemiesNum, 0, 30);
+		// maxSpawnedEnemiesNum
+		ImGui::SliderInt("MaxSpawnedEnemiesNum", &spawnerData.maxSpawnedEnemiesNum, -1, 30);
+		// spawnTime
+		ImGui::SliderFloat("SpawnTime", &spawnerData.spawnTime, 1.0f, 30.0f);
+
+		ImGui::TreePop();
+	}
 }
 
 std::string NodeManager::GetUniqueName(std::string name)

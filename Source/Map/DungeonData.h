@@ -137,5 +137,6 @@ private:
 	std::vector<std::vector<FILE_DATA>> m_modelFileDatas;		// 見た目用ファイル読み込み用データ配列
 	std::vector<std::vector<FILE_DATA>> m_collisionFileDatas;	// 当たり判定用ファイル読み込み用データ配列
 };
+#define DUNGEONDATA DungeonData::Instance()
 
 #endif // !__INCLUDED_DUNGEON_DATA_H__
