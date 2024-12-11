@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "TAKOEngine/Tool/Singleton.h"
 
@@ -14,7 +14,7 @@ protected:
 
 public:
 	Enemy* GetEnemyById(int id);
-	// ƒŒƒCƒLƒƒƒXƒg
+	// ãƒ¬ã‚¤ã‚­ãƒ£ã‚¹ãƒˆ
 	bool RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, HitResult& hit, bool camera = false);
 };
 

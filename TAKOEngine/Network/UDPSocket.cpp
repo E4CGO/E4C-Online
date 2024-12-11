@@ -1,10 +1,10 @@
-#include "UDPSocket.h"
+ï»¿#include "UDPSocket.h"
 
 #include "TAKOEngine/Network/Network.h"
 
 bool UDPServerSocket::Connect(const char* address, const char* port)
 {
-	// ƒAƒhƒŒƒXî•ñİ’è
+	// ã‚¢ãƒ‰ãƒ¬ã‚¹æƒ…å ±è¨­å®š
 	struct addrinfo hints;
 	ZeroMemory(&hints, sizeof(hints));
 	hints.ai_family = AF_INET;
@@ -14,13 +14,13 @@ bool UDPServerSocket::Connect(const char* address, const char* port)
 	{
 		return false;
 	}
-	// ƒ\ƒPƒbƒgì¬
+	// ã‚½ã‚±ãƒƒãƒˆä½œæˆ
 	sock = socket(addr->ai_family, addr->ai_socktype, addr->ai_protocol);
 	if (sock == INVALID_SOCKET)
 	{
 		return false;
 	}
-	// ƒ\ƒPƒbƒg‚Ìó‚¯“ü‚êî•ñ‚ğŠÖ˜A•t‚¯
+	// ã‚½ã‚±ãƒƒãƒˆã®å—ã‘å…¥ã‚Œæƒ…å ±ã‚’é–¢é€£ä»˜ã‘
 	iResult = bind(sock, addr->ai_addr, static_cast<int>(addr->ai_addrlen));
 	if (iResult == SOCKET_ERROR)
 	{
@@ -33,7 +33,7 @@ bool UDPServerSocket::Connect(const char* address, const char* port)
 	return true;
 }
 
-// ‘—M
+// é€ä¿¡
 int UDPServerSocket::Send(int id, const void* data, size_t size)
 {
 	int iResult = sendto(sock, reinterpret_cast<const char*>(data), static_cast<int>(size), 0, reinterpret_cast<sockaddr*>(&clients[id]), sizeof(clients[id]));
@@ -56,7 +56,7 @@ int UDPServerSocket::SendAll(const void* data, size_t size)
 	return iResult;
 }
 
-// óM
+// å—ä¿¡
 int UDPServerSocket::Receive(void* buffer, size_t size, struct sockaddr_in& client_addr)
 {
 	struct timeval tv;
@@ -65,12 +65,12 @@ int UDPServerSocket::Receive(void* buffer, size_t size, struct sockaddr_in& clie
 
 	fd_set	fd_work;
 	memcpy(&fd_work, &fds, sizeof(fd_set));
-	// fds‚Éİ’è‚³‚ê‚½ƒ\ƒPƒbƒg‚ª“Ç‚İ‚İ‰Â”\‚É‚È‚é‚Ü‚Å‘Ò‚¿‚Ü‚·
+	// fdsã«è¨­å®šã•ã‚ŒãŸã‚½ã‚±ãƒƒãƒˆãŒèª­ã¿è¾¼ã¿å¯èƒ½ã«ãªã‚‹ã¾ã§å¾…ã¡ã¾ã™
 	int n = select(0, &fd_work, NULL, NULL, &tv);
-	// ƒ^ƒCƒ€ƒAƒEƒg‚Ìê‡‚Éselect‚Í0‚ğ•Ô‚µ‚Ü‚·
+	// ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆã®å ´åˆã«selectã¯0ã‚’è¿”ã—ã¾ã™
 	if (n <= 0) return -1;
 
-	// ƒf[ƒ^óM
+	// ãƒ‡ãƒ¼ã‚¿å—ä¿¡
 	int addr_len = sizeof(struct sockaddr_in);
 	int iResult = recvfrom(sock, reinterpret_cast<char*>(buffer), static_cast<int>(size), 0, reinterpret_cast<struct sockaddr*>(&client_addr), &addr_len);
 
@@ -94,7 +94,7 @@ void UDPServerSocket::Register(int id, struct sockaddr_in addr)
 
 bool UDPClientSocket::Connect(const char* address, const char* port)
 {
-	// ƒAƒhƒŒƒXî•ñİ’è
+	// ã‚¢ãƒ‰ãƒ¬ã‚¹æƒ…å ±è¨­å®š
 	struct addrinfo hints;
 	ZeroMemory(&hints, sizeof(hints));
 	hints.ai_family = AF_INET;
@@ -104,7 +104,7 @@ bool UDPClientSocket::Connect(const char* address, const char* port)
 	{
 		return false;
 	}
-	// ƒ\ƒPƒbƒgì¬
+	// ã‚½ã‚±ãƒƒãƒˆä½œæˆ
 	sock = socket(addr->ai_family, addr->ai_socktype, addr->ai_protocol);
 	if (sock == INVALID_SOCKET)
 	{
@@ -127,7 +127,7 @@ int UDPClientSocket::Send(const void* data, size_t size)
 	return iResult;
 }
 
-// óM
+// å—ä¿¡
 int UDPClientSocket::Receive(void* buffer, size_t size)
 {
 	struct timeval tv;
@@ -136,9 +136,9 @@ int UDPClientSocket::Receive(void* buffer, size_t size)
 
 	fd_set	fd_work;
 	memcpy(&fd_work, &fds, sizeof(fd_set));
-	// fds‚Éİ’è‚³‚ê‚½ƒ\ƒPƒbƒg‚ª“Ç‚İ‚İ‰Â”\‚É‚È‚é‚Ü‚Å‘Ò‚¿‚Ü‚·
+	// fdsã«è¨­å®šã•ã‚ŒãŸã‚½ã‚±ãƒƒãƒˆãŒèª­ã¿è¾¼ã¿å¯èƒ½ã«ãªã‚‹ã¾ã§å¾…ã¡ã¾ã™
 	int n = select(0, &fd_work, NULL, NULL, &tv);
-	// ƒ^ƒCƒ€ƒAƒEƒg‚Ìê‡‚Éselect‚Í0‚ğ•Ô‚µ‚Ü‚·
+	// ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆã®å ´åˆã«selectã¯0ã‚’è¿”ã—ã¾ã™
 	if (n <= 0) return -1;
 
 	struct sockaddr_in sv_addr;

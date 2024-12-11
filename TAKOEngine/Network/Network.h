@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 
 #include "TAKOEngine/Network/WinSock2Wrapper.h"
@@ -9,13 +9,13 @@ public:
 	Network() = default;
 	~Network() = default;
 
-	// ‰Šú‰»
+	// åˆæœŸåŒ–
 	static bool Initialize();
 
-	// I—¹‰»
+	// çµ‚äº†åŒ–
 	static void Finalize();
 
-	// IPƒAƒhƒŒƒXæ“¾
+	// IPã‚¢ãƒ‰ãƒ¬ã‚¹å–å¾—
 	static bool GetIpAddress(char* buffer, size_t size);
 	static void addrToChar(struct addrinfo*& addr, char*& buffer, size_t size);
 };

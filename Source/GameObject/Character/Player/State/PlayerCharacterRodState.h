@@ -1,25 +1,19 @@
-﻿//! @file PlayerCharacterState.h
+﻿//! @file PlayerCharacterRodState.h
 //! @note
 
-#ifndef __INCLUDED_PLAYER_CHARACTER_SWORD_STATE_H__
-#define __INCLUDED_PLAYER_CHARACTER_SWORD_STATE_H__
+#ifndef __INCLUDED_PLAYER_CHARACTER_ROD_STATE_H__
+#define __INCLUDED_PLAYER_CHARACTER_ROD_STATE_H__
 
 #include "GameObject/Character/Player/PlayerCharacter.h"
 
 namespace PlayerCharacterState
 {
-	namespace Sword
+	namespace Rod
 	{
 		enum NORMAL_ATTACK_STATE {
 			ATTACK_1,
 			ATTACK_2,
 			ATTACK_3,
-		};
-
-		enum SKILL_1_STATE
-		{
-			ATTACK_START,
-			ATTACK_CONTINUE,
 		};
 
 		// 待機用ステートオブジェクト
@@ -130,71 +124,20 @@ namespace PlayerCharacterState
 			void Exit() override {};
 		};
 
-		// スキル_1 回レ
-		class Skill1State : public HierarchicalState<PlayerCharacter>
+		class AttackSpecialState : public HierarchicalState<PlayerCharacter>
 		{
 		public:
 			// コンストラクタ
-			Skill1State(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
+			AttackSpecialState(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
 			// デストラクタ
-			~Skill1State() {}
+			~AttackSpecialState() {}
 			// ステートに入った時のメソッド
 			void Enter() override;
 			// ステートで実行するメソッド
 			void Execute(float elapsedTime) override;
 			// ステートから出ていくときのメソッド
 			void Exit() override;
-		private:
-			float cacheTurnSpeed = 0.0f;
-		};
-
-		class Skill1StateStart : public HierarchicalState<PlayerCharacter>
-		{
-		public:
-			// コンストラクタ
-			Skill1StateStart(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
-			// デストラクタ
-			~Skill1StateStart() {}
-			// ステートに入った時のメソッド
-			void Enter() override;
-			// ステートで実行するメソッド
-			void Execute(float elapsedTime) override;
-			// ステートから出ていくときのメソッド
-			void Exit() override {};
-		};
-
-		class Skill1ContinueStart : public HierarchicalState<PlayerCharacter>
-		{
-		public:
-
-			float impulseSpeed = 50.0f;
-
-			// コンストラクタ
-			Skill1ContinueStart(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
-			// デストラクタ
-			~Skill1ContinueStart() {}
-			// ステートに入った時のメソッド
-			void Enter() override;
-			// ステートで実行するメソッド
-			void Execute(float elapsedTime) override;
-			// ステートから出ていくときのメソッド
-			void Exit() override {};
-		};
-
-		class Skill2State : public HierarchicalState<PlayerCharacter>
-		{
-		public:
-			// コンストラクタ
-			Skill2State(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
-			// デストラクタ
-			~Skill2State() {}
-			// ステートに入った時のメソッド
-			void Enter() override;
-			// ステートで実行するメソッド
-			void Execute(float elapsedTime) override;
-			// ステートから出ていくときのメソッド
-			void Exit() override {};
 		};
 	}
 }
-#endif // !__INCLUDED_PLAYER_CHARACTER_SWORD_STATE_H__
+#endif // !__INCLUDED_PLAYER_CHARACTER_ROD_STATE_H__

@@ -1,4 +1,4 @@
-//! @file AABBCollider.cpp
+ï»¿//! @file AABBCollider.cpp
 //! @note 
 
 #include "TAKOEngine/Runtime/tentacle_lib.h"
@@ -12,7 +12,7 @@ AABBCollider::AABBCollider(uint16_t _objType, DirectX::XMFLOAT4X4* _transform) :
 	m_shapeType = COLLIDER_TYPE::AABB;
 }
 
-// AABB—pƒpƒ‰ƒ[ƒ^ƒZƒbƒg
+// AABBç”¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚»ãƒƒãƒˆ
 void AABBCollider::SetParam(AABB aabb)
 {
 	m_offset = aabb.position;

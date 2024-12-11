@@ -1,4 +1,4 @@
-//! @file WidgetMatching.cpp
+ï»¿//! @file WidgetMatching.cpp
 //! @note 
 #include "WidgetMatching.h"
 
@@ -33,7 +33,7 @@ void WidgetMatching::Update(float elapsedTime)
 		m_text = std::to_string(m_playerNum) + "/" + std::to_string(m_maxPlayerNum);
 		break;
 	case STATE::FULL:
-		m_text = "€”õŠ®—¹";
+		m_text = "æº–å‚™å®Œäº†";
 		break;
 	}
 

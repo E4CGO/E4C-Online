@@ -47,7 +47,7 @@ void StageOpenWorld_E4C::Initialize()
 
 	if (T_GRAPHICS.isDX11Active)
 	{
-		models.emplace("map", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX11GLTF, ModelObject::MODEL_TYPE::RHS_PBR));
+		models.emplace("map", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_TOON));
 		models.emplace("tower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_TOON));
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 70.0f, ModelObject::RENDER_MODE::DX11);
@@ -153,8 +153,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 
 	sky->Update(elapsedTime);
 
-	spawner->Update(elapsedTime);
-
 	teleporter->Update(elapsedTime);
 
 	timer += elapsedTime;
@@ -187,23 +185,10 @@ void StageOpenWorld_E4C::Render()
 
 	teleporter->Render(rc);
 
-	spawner->Render(rc);
-
 	ENEMIES.Render(rc);
 
 	UI.Render(rc);
 
-	//MAPTILES.Render(rc);
-
-	//if (ImGui::TreeNode("Camera Positions"))
-	//{
-	//	for (size_t i = 0; i < cameraPositions.size(); ++i)
-	//	{
-	//		std::string label = "Position " + std::to_string(i);  // 各カメラポジションのラベル
-	//		ImGui::DragFloat3(label.c_str(), &cameraPositions[i].x, 1.0f, -FLT_MAX, FLT_MAX);  // カメラポジションの設定
-	//	}
-	//	ImGui::TreePop();
-	//}
 	// デバッグレンダラ描画実行
 
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
@@ -239,7 +224,6 @@ void StageOpenWorld_E4C::RenderDX12()
 			it.second->RenderDX12(rc);
 		}
 
-		spawner->RenderDX12(rc);
 		// skyBox
 		{
 			rc.skydomeData.skyTexture = m_sprites[1]->GetDescriptor();

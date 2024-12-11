@@ -1,17 +1,17 @@
-#include "SceneManager.h"
+ï»¿#include "SceneManager.h"
 
-// XVˆ—
+// æ›´æ–°å‡¦ç†
 void SceneManager::Update(float elapsedTime)
 {
 	if (nextScene != nullptr)
 	{
-		// ŒÃ‚¢ƒV[ƒ“‚ğI—¹ˆ—
+		// å¤ã„ã‚·ãƒ¼ãƒ³ã‚’çµ‚äº†å‡¦ç†
 		Clear();
-		// V‚µ‚¢ƒV[ƒ“‚ğİ’è
+		// æ–°ã—ã„ã‚·ãƒ¼ãƒ³ã‚’è¨­å®š
 		currentScene = nextScene;
 		nextScene = nullptr;
 
-		// ƒV[ƒ“‰Šú‰»ˆ—
+		// ã‚·ãƒ¼ãƒ³åˆæœŸåŒ–å‡¦ç†
 		if (!currentScene->IsReady())
 		{
 			currentScene->Initialize();
@@ -23,7 +23,7 @@ void SceneManager::Update(float elapsedTime)
 		currentScene->Update(elapsedTime);
 	}
 }
-// •`‰æˆ—
+// æç”»å‡¦ç†
 void SceneManager::Render()
 {
 	if (currentScene != nullptr)
@@ -38,7 +38,7 @@ void SceneManager::RenderDX12()
 		currentScene->RenderDX12();
 	}
 }
-// ƒV[ƒ“ƒNƒŠƒA
+// ã‚·ãƒ¼ãƒ³ã‚¯ãƒªã‚¢
 void SceneManager::Clear()
 {
 	if (currentScene != nullptr)
@@ -48,9 +48,9 @@ void SceneManager::Clear()
 		currentScene = nullptr;
 	}
 }
-// ƒV[ƒ“Ø‚è‘Ö‚¦
+// ã‚·ãƒ¼ãƒ³åˆ‡ã‚Šæ›¿ãˆ
 void SceneManager::ChangeScene(Scene* scene)
 {
-	// V‚µ‚¢ƒV[ƒ“‚ğİ’è
+	// æ–°ã—ã„ã‚·ãƒ¼ãƒ³ã‚’è¨­å®š
 	nextScene = scene;
 }

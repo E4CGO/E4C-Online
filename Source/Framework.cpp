@@ -1,4 +1,4 @@
-#include <memory>
+﻿#include <memory>
 #include <sstream>
 
 #include "Framework.h"

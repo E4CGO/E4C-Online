@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <d3d11.h>
 #include <memory>
@@ -34,7 +34,7 @@ private:
 	~TextSprite();
 
 public:
-	// ƒCƒ“ƒXƒ^ƒ“ƒX
+	// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
 	static TextSprite& Instance()
 	{
 		static TextSprite instance;

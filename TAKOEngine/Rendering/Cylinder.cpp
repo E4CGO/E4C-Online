@@ -1,10 +1,10 @@
-#include "Cylinder.h"
+ï»¿#include "Cylinder.h"
 #include "Misc.h"
 #include "GpuResourceUtils.h"
 #include "TAKOEngine/Runtime/tentacle_lib.h"
 #include "TAKOEngine/Rendering/Shaders/PlaneShader.h"
 
-// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 Cylinder::Cylinder(ID3D11Device* device, const char* filename, float scaling)
 	: ModelObject(filename, scaling, ModelObject::RENDER_MODE::NOMODEL)
 {
@@ -13,11 +13,11 @@ Cylinder::Cylinder(ID3D11Device* device, const char* filename, float scaling)
 
 void Cylinder::Update(float elapsedTime)
 {
-	// ƒXƒP[ƒ‹s—ñ¶¬
+	// ã‚¹ã‚±ãƒ¼ãƒ«è¡Œåˆ—ç”Ÿæˆ
 	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
-	// ‰ñ“]s—ñ¶¬
+	// å›è»¢è¡Œåˆ—ç”Ÿæˆ
 	DirectX::XMMATRIX R = AnglesToMatrix(angle);
-	// ˆÊ’us—ñ¶¬
+	// ä½ç½®è¡Œåˆ—ç”Ÿæˆ
 	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 
 	DirectX::XMMATRIX W = S * R * T;
