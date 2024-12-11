@@ -1,31 +1,31 @@
-#include "TAKOEngine/Runtime/tentacle_lib.h"
+ï»¿#include "TAKOEngine/Runtime/tentacle_lib.h"
 
 #include "EffectManager.h"
 
-void EffectManager::Initialize()		// ‰Šú‰»
+void EffectManager::Initialize()		// åˆæœŸåŒ–
 {
-	// EffekseerƒŒƒ“ƒ_ƒ‰¶¬
+	// Effekseerãƒ¬ãƒ³ãƒ€ãƒ©ç”Ÿæˆ
 	effekseerRenderer = EffekseerRendererDX11::Renderer::Create(
 		T_GRAPHICS.GetDevice(),
 		T_GRAPHICS.GetDeviceContext(),
 		2048
 	);
 
-	// Effekseerƒ}ƒl[ƒWƒƒ[¶¬
+	// Effekseerãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ç”Ÿæˆ
 	effekseerManager = Effekseer::Manager::Create(2048);
 
-	// EffekseerƒŒƒ“ƒ_ƒ‰‚ÌŠeíİ’èi“Á•Ê‚ÈƒJƒXƒ^ƒ}ƒCƒY‚ğ‚µ‚È‚¢ê‡‚Í’èŒ^“I‚ÉˆÈ‰º‚Ìİ’è‚ÅOKj
+	// Effekseerãƒ¬ãƒ³ãƒ€ãƒ©ã®å„ç¨®è¨­å®šï¼ˆç‰¹åˆ¥ãªã‚«ã‚¹ã‚¿ãƒã‚¤ã‚ºã‚’ã—ãªã„å ´åˆã¯å®šå‹çš„ã«ä»¥ä¸‹ã®è¨­å®šã§OKï¼‰
 	effekseerManager->SetSpriteRenderer(effekseerRenderer->CreateSpriteRenderer());
 	effekseerManager->SetRibbonRenderer(effekseerRenderer->CreateRibbonRenderer());
 	effekseerManager->SetRingRenderer(effekseerRenderer->CreateRingRenderer());
 	effekseerManager->SetTrackRenderer(effekseerRenderer->CreateTrackRenderer());
 	effekseerManager->SetModelRenderer(effekseerRenderer->CreateModelRenderer());
 
-	// Effekseer“à‚Å‚Ìƒ[ƒ_[‚Ìİ’èi“Á•Ê‚ÈƒJƒXƒ^ƒ}ƒCƒY‚ğ‚µ‚È‚¢ê‡‚ÍˆÈ‰º‚Ìİ’è‚ÅOKj
+	// Effekseerå†…ã§ã®ãƒ­ãƒ¼ãƒ€ãƒ¼ã®è¨­å®šï¼ˆç‰¹åˆ¥ãªã‚«ã‚¹ã‚¿ãƒã‚¤ã‚ºã‚’ã—ãªã„å ´åˆã¯ä»¥ä¸‹ã®è¨­å®šã§OKï¼‰
 	effekseerManager->SetTextureLoader(effekseerRenderer->CreateTextureLoader());
 	effekseerManager->SetModelLoader(effekseerRenderer->CreateModelLoader());
 	effekseerManager->SetMaterialLoader(effekseerRenderer->CreateMaterialLoader());
-	// Effekseer‚ğ¶èÀ•WŒn‚ÅŒvZ‚·‚é
+	// Effekseerã‚’å·¦æ‰‹åº§æ¨™ç³»ã§è¨ˆç®—ã™ã‚‹
 	effekseerManager->SetCoordinateSystem(Effekseer::CoordinateSystem::LH);
 
 	effects[EFFECT_IDX::HIT_SLASH_EFFECT] = new Effect("Data/Effects/Hit01.efk");
@@ -33,29 +33,29 @@ void EffectManager::Initialize()		// ‰Šú‰»
 	effects[EFFECT_IDX::BOMB_EFFECT] = new Effect("Data/Effects/Bomb.efk");
 }
 
-void EffectManager::InitializeDX12()		// ‰Šú‰»
+void EffectManager::InitializeDX12()		// åˆæœŸåŒ–
 {
 	auto graphicsDevice = ::EffekseerRendererDX12::CreateGraphicsDevice(T_GRAPHICS.GetDeviceDX12(), T_GRAPHICS.GetCommandQueue().d3d_command_queue.Get(), 3);
 
 	// Create a manager of effects
-	// ƒGƒtƒFƒNƒg‚Ìƒ}ƒl[ƒWƒƒ[‚Ìì¬
+	// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ã®ä½œæˆ
 	efkManager = ::Effekseer::Manager::Create(8000);
 
 	// Setup effekseer modules
-	// Effekseer‚Ìƒ‚ƒWƒ…[ƒ‹‚ğƒZƒbƒgƒAƒbƒv‚·‚é
+	// Effekseerã®ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã‚’ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—ã™ã‚‹
 	auto format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	efkRenderer = ::EffekseerRendererDX12::Create(graphicsDevice, &format, 1, DXGI_FORMAT_UNKNOWN, false, 8000);
 
 	// Create a memory pool
-	// ƒƒ‚ƒŠƒv[ƒ‹‚Ìì¬
+	// ãƒ¡ãƒ¢ãƒªãƒ—ãƒ¼ãƒ«ã®ä½œæˆ
 	::Effekseer::RefPtr<EffekseerRenderer::SingleFrameMemoryPool> efkMemoryPool = EffekseerRenderer::CreateSingleFrameMemoryPool(efkRenderer->GetGraphicsDevice());
 
 	// Create a command list
-	// ƒRƒ}ƒ“ƒhƒŠƒXƒg‚Ìì¬
+	// ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã®ä½œæˆ
 	::Effekseer::RefPtr<EffekseerRenderer::CommandList> efkCommandList = EffekseerRenderer::CreateCommandList(efkRenderer->GetGraphicsDevice(), efkMemoryPool);
 
 	// Sprcify rendering modules
-	// •`‰æƒ‚ƒWƒ…[ƒ‹‚Ìİ’è
+	// æç”»ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®è¨­å®š
 	efkManager->SetSpriteRenderer(efkRenderer->CreateSpriteRenderer());
 	efkManager->SetRibbonRenderer(efkRenderer->CreateRibbonRenderer());
 	efkManager->SetRingRenderer(efkRenderer->CreateRingRenderer());
@@ -64,8 +64,8 @@ void EffectManager::InitializeDX12()		// ‰Šú‰»
 
 	// Specify a texture, model, curve and material loader
 	// It can be extended by yourself. It is loaded from a file on now.
-	// ƒeƒNƒXƒ`ƒƒAƒ‚ƒfƒ‹AƒJ[ƒuAƒ}ƒeƒŠƒAƒ‹ƒ[ƒ_[‚Ìİ’è‚·‚éB
-	// ƒ†[ƒU[‚ª“Æ©‚ÅŠg’£‚Å‚«‚éBŒ»İ‚Íƒtƒ@ƒCƒ‹‚©‚ç“Ç‚İ‚ñ‚Å‚¢‚éB
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã€ãƒ¢ãƒ‡ãƒ«ã€ã‚«ãƒ¼ãƒ–ã€ãƒãƒ†ãƒªã‚¢ãƒ«ãƒ­ãƒ¼ãƒ€ãƒ¼ã®è¨­å®šã™ã‚‹ã€‚
+	// ãƒ¦ãƒ¼ã‚¶ãƒ¼ãŒç‹¬è‡ªã§æ‹¡å¼µã§ãã‚‹ã€‚ç¾åœ¨ã¯ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰èª­ã¿è¾¼ã‚“ã§ã„ã‚‹ã€‚
 	efkManager->SetTextureLoader(efkRenderer->CreateTextureLoader());
 	efkManager->SetModelLoader(efkRenderer->CreateModelLoader());
 	efkManager->SetMaterialLoader(efkRenderer->CreateMaterialLoader());
@@ -99,30 +99,30 @@ void EffectManager::Update(float elapsedTime)
 
 void EffectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
-	// ƒrƒ…[•ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ‚ğEffekseerƒŒƒ“ƒ_ƒ‰‚Éİ’è
+	// ãƒ“ãƒ¥ãƒ¼ï¼†ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—ã‚’Effekseerãƒ¬ãƒ³ãƒ€ãƒ©ã«è¨­å®š
 	effekseerRenderer->SetCameraMatrix(*reinterpret_cast<const Effekseer::Matrix44*>(&view));
 	effekseerRenderer->SetProjectionMatrix(*reinterpret_cast<const Effekseer::Matrix44*>(&projection));
 
-	// Effekseer•`‰æŠJn
+	// Effekseeræç”»é–‹å§‹
 	effekseerRenderer->BeginRendering();
-	// Effekseer•`‰æÀs
-	// ƒ}ƒl[ƒWƒƒ[’PˆÊ‚Å•`‰æ‚·‚é‚Ì‚Å•`‰æ‡‚ğ§Œä‚·‚éê‡‚Íƒ}ƒl[ƒWƒƒ[‚ğ•¡”ŒÂì¬‚µA
-	// Draw()ŠÖ”‚ğÀs‚·‚é‡˜‚Å§Œä‚Å‚«‚»‚¤
+	// Effekseeræç”»å®Ÿè¡Œ
+	// ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼å˜ä½ã§æç”»ã™ã‚‹ã®ã§æç”»é †ã‚’åˆ¶å¾¡ã™ã‚‹å ´åˆã¯ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ã‚’è¤‡æ•°å€‹ä½œæˆã—ã€
+	// Draw()é–¢æ•°ã‚’å®Ÿè¡Œã™ã‚‹é †åºã§åˆ¶å¾¡ã§ããã†
 	effekseerManager->Draw();
-	// Effekseer•`‰æI—¹
+	// Effekseeræç”»çµ‚äº†
 	effekseerRenderer->EndRendering();
 }
 
 void EffectManager::RenderDX12(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
-	// ƒrƒ…[•ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ‚ğEffekseerƒŒƒ“ƒ_ƒ‰‚Éİ’è
+	// ãƒ“ãƒ¥ãƒ¼ï¼†ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—ã‚’Effekseerãƒ¬ãƒ³ãƒ€ãƒ©ã«è¨­å®š
 	efkRenderer->SetCameraMatrix(*reinterpret_cast<const Effekseer::Matrix44*>(&view));
 	efkRenderer->SetProjectionMatrix(*reinterpret_cast<const Effekseer::Matrix44*>(&projection));
 
 	Effekseer::Manager::UpdateParameter updateParameter;
 	efkManager->Update(updateParameter);
 
-	// Effekseer•`‰æŠJn
+	// Effekseeræç”»é–‹å§‹
 	efkRenderer->BeginRendering();
 
 	Effekseer::Manager::DrawParameter drawParameter;
@@ -130,10 +130,10 @@ void EffectManager::RenderDX12(const DirectX::XMFLOAT4X4& view, const DirectX::X
 	drawParameter.ZFar = 1.0f;
 	drawParameter.ViewProjectionMatrix = efkRenderer->GetCameraProjectionMatrix();
 
-	// Effekseer•`‰æÀs
-	// ƒ}ƒl[ƒWƒƒ[’PˆÊ‚Å•`‰æ‚·‚é‚Ì‚Å•`‰æ‡‚ğ§Œä‚·‚éê‡‚Íƒ}ƒl[ƒWƒƒ[‚ğ•¡”ŒÂì¬‚µA
-	// Draw()ŠÖ”‚ğÀs‚·‚é‡˜‚Å§Œä‚Å‚«‚»‚¤
+	// Effekseeræç”»å®Ÿè¡Œ
+	// ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼å˜ä½ã§æç”»ã™ã‚‹ã®ã§æç”»é †ã‚’åˆ¶å¾¡ã™ã‚‹å ´åˆã¯ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ã‚’è¤‡æ•°å€‹ä½œæˆã—ã€
+	// Draw()é–¢æ•°ã‚’å®Ÿè¡Œã™ã‚‹é †åºã§åˆ¶å¾¡ã§ããã†
 	//efkManager->Draw();
-	// Effekseer•`‰æI—¹
+	// Effekseeræç”»çµ‚äº†
 	efkRenderer->EndRendering();
 }

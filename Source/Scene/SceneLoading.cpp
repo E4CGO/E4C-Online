@@ -1,14 +1,14 @@
-#include "TAKOEngine/Runtime/tentacle_lib.h"
+ï»¿#include "TAKOEngine/Runtime/tentacle_lib.h"
 
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
 
-// ‰Šú‰»
+// åˆæœŸåŒ–
 void SceneLoading::Initialize()
 {
 	thread = new std::thread(LoadingThread, this);
 }
-// I—¹‰»
+// çµ‚äº†åŒ–
 void SceneLoading::Finalize()
 {
 	if (thread != nullptr)
@@ -18,7 +18,7 @@ void SceneLoading::Finalize()
 		thread = nullptr;
 	}
 }
-// XVˆ—
+// æ›´æ–°å‡¦ç†
 void SceneLoading::Update(float elapsedTime)
 {
 	if (nextScene->IsReady())
@@ -26,10 +26,10 @@ void SceneLoading::Update(float elapsedTime)
 		SceneManager::Instance().ChangeScene(nextScene);
 	}
 }
-// •`‰æˆ—
+// æç”»å‡¦ç†
 void SceneLoading::Render()
 {
-	// ‰æ–ÊƒNƒŠƒA
+	// ç”»é¢ã‚¯ãƒªã‚¢
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->Clear(T_GRAPHICS.GetDeviceContext(), 0, 0, 0, 1);
 
 	T_TEXT.Begin();
@@ -56,15 +56,15 @@ void SceneLoading::LoadingThread(SceneLoading* scene)
 {
 	srand(static_cast <unsigned> (time(NULL)));
 
-	// COMŠÖ˜A‚Ì‰Šú‰»‚ÅƒXƒŒƒbƒh–ˆ‚ÉŒÄ‚Ô•K—v‚ª‚ ‚é
+	// COMé–¢é€£ã®åˆæœŸåŒ–ã§ã‚¹ãƒ¬ãƒƒãƒ‰æ¯Žã«å‘¼ã¶å¿…è¦ãŒã‚ã‚‹
 	CoInitialize(nullptr);
 
-	// ŽŸ‚ÌƒV[ƒ“‚Ì‰Šú‰»‚ðs‚¤
+	// æ¬¡ã®ã‚·ãƒ¼ãƒ³ã®åˆæœŸåŒ–ã‚’è¡Œã†
 	scene->nextScene->Initialize();
 
-	// ƒXƒŒƒbƒh‚ªI‚í‚é‘O‚ÉCOMŠÖ˜A‚ÌI—¹‰»
+	// ã‚¹ãƒ¬ãƒƒãƒ‰ãŒçµ‚ã‚ã‚‹å‰ã«COMé–¢é€£ã®çµ‚äº†åŒ–
 	CoUninitialize();
 
-	// ŽŸ‚ÌƒV[ƒ“‚Ì€”õŠ®—¹Ý’è
+	// æ¬¡ã®ã‚·ãƒ¼ãƒ³ã®æº–å‚™å®Œäº†è¨­å®š
 	scene->nextScene->SetReady();
 }

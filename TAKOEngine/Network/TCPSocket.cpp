@@ -1,8 +1,8 @@
-#include "TCPSocket.h"
+ï»¿#include "TCPSocket.h"
 
 bool TCPServerSocket::Connect(const char* address, const char* port)
 {
-	// ƒAƒhƒŒƒXî•ñİ’è
+	// ã‚¢ãƒ‰ãƒ¬ã‚¹æƒ…å ±è¨­å®š
 	struct addrinfo hints;
 	ZeroMemory(&hints, sizeof(hints));
 	hints.ai_family = AF_INET;
@@ -12,26 +12,26 @@ bool TCPServerSocket::Connect(const char* address, const char* port)
 	{
 		return false;
 	}
-	// ƒ\ƒPƒbƒgì¬
+	// ã‚½ã‚±ãƒƒãƒˆä½œæˆ
 	sock = socket(addr->ai_family, addr->ai_socktype, addr->ai_protocol);
 	if (sock == INVALID_SOCKET)
 	{
 		return false;
 	}
-	// ƒ\ƒPƒbƒg‚Ìó‚¯“ü‚êî•ñ‚ğŠÖ˜A•t‚¯
+	// ã‚½ã‚±ãƒƒãƒˆã®å—ã‘å…¥ã‚Œæƒ…å ±ã‚’é–¢é€£ä»˜ã‘
 	iResult = bind(sock, addr->ai_addr, static_cast<int>(addr->ai_addrlen));
 	if (iResult == SOCKET_ERROR)
 	{
 		return false;
 	}
-	// ƒNƒ‰ƒCƒAƒ“ƒg‚ÌÚ‘±‘Ò‚¿ó‚¯€”õ
+	// ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã®æ¥ç¶šå¾…ã¡å—ã‘æº–å‚™
 	iResult = listen(sock, max_conn);
 	if (iResult == SOCKET_ERROR)
 	{
 		return false;
 	}
 
-	// ƒmƒ“ƒuƒƒbƒLƒ“ƒOİ’è
+	// ãƒãƒ³ãƒ–ãƒ­ãƒƒã‚­ãƒ³ã‚°è¨­å®š
 	SetBlocking(false);
 
 	FD_ZERO(&fds);
@@ -42,11 +42,11 @@ bool TCPServerSocket::Connect(const char* address, const char* port)
 
 void TCPServerSocket::SetBlocking(bool block)
 {
-	u_long value = (block) ? 0 : 1;	// 0:ƒuƒƒbƒLƒ“ƒO / 1:ƒmƒ“ƒuƒƒbƒLƒ“ƒO
+	u_long value = (block) ? 0 : 1;	// 0:ãƒ–ãƒ­ãƒƒã‚­ãƒ³ã‚° / 1:ãƒãƒ³ãƒ–ãƒ­ãƒƒã‚­ãƒ³ã‚°
 	ioctlsocket(sock, FIONBIO, &value);
 }
 
-// Ú‘±‹–‰Â
+// æ¥ç¶šè¨±å¯
 bool TCPServerSocket::Accept()
 {
 	Client client;
@@ -65,7 +65,7 @@ bool TCPServerSocket::Accept()
 	return true;
 }
 
-// ‘—M
+// é€ä¿¡
 int TCPServerSocket::Send(int id, const void* data, size_t size)
 {
 	int iResult = send(clients[id].sock, reinterpret_cast<const char*>(data), static_cast<int>(size), 0);
@@ -75,7 +75,7 @@ int TCPServerSocket::Send(int id, const void* data, size_t size)
 	}
 	return iResult;
 }
-// óM
+// å—ä¿¡
 int TCPServerSocket::Receive(int id, void* buffer, size_t size)
 {
 	int recvsize = recv(clients[id].sock, reinterpret_cast<char*>(buffer), static_cast<int>(size), 0);
@@ -97,7 +97,7 @@ bool TCPServerSocket::Disconnect()
 
 bool TCPClientSocket::Connect(const char* address, const char* port)
 {
-	// ƒAƒhƒŒƒXî•ñİ’è
+	// ã‚¢ãƒ‰ãƒ¬ã‚¹æƒ…å ±è¨­å®š
 	struct addrinfo hints;
 	ZeroMemory(&hints, sizeof(hints));
 	hints.ai_family = AF_INET;
@@ -107,14 +107,14 @@ bool TCPClientSocket::Connect(const char* address, const char* port)
 	{
 		return false;
 	}
-	// ƒ\ƒPƒbƒgì¬
+	// ã‚½ã‚±ãƒƒãƒˆä½œæˆ
 	sock = socket(addr->ai_family, addr->ai_socktype, addr->ai_protocol);
 	if (sock == INVALID_SOCKET)
 	{
 		return false;
 	}
 
-	// ƒ^ƒCƒ€ƒAƒEƒgİ’è(10000ms)
+	// ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆè¨­å®š(10000ms)
 	int timeout = 10000;
 	int result = setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<char*>(&timeout), sizeof(timeout));
 	if (result == SOCKET_ERROR)
@@ -122,7 +122,7 @@ bool TCPClientSocket::Connect(const char* address, const char* port)
 		return false;
 	}
 
-	//	ƒT[ƒo[Ú‘±
+	//	ã‚µãƒ¼ãƒãƒ¼æ¥ç¶š
 	result = connect(sock, addr->ai_addr, static_cast<int>(addr->ai_addrlen));
 	if (result == SOCKET_ERROR)
 	{
@@ -135,7 +135,7 @@ bool TCPClientSocket::Connect(const char* address, const char* port)
 	return true;
 }
 
-int TCPClientSocket::Send(const void* data, size_t size) // ‘—M
+int TCPClientSocket::Send(const void* data, size_t size) // é€ä¿¡
 {
 	int iResult = send(sock, reinterpret_cast<const char*>(data), static_cast<int>(size), 0);
 	if (iResult == SOCKET_ERROR)
@@ -145,7 +145,7 @@ int TCPClientSocket::Send(const void* data, size_t size) // ‘—M
 	return iResult;
 }
 
-int TCPClientSocket::Receive(void* buffer, size_t size) // óM
+int TCPClientSocket::Receive(void* buffer, size_t size) // å—ä¿¡
 {
 	struct timeval tv;
 	tv.tv_sec = 0;
@@ -153,9 +153,9 @@ int TCPClientSocket::Receive(void* buffer, size_t size) // óM
 
 	fd_set	fd_work;
 	memcpy(&fd_work, &fds, sizeof(fd_set));
-	// fds‚Éİ’è‚³‚ê‚½ƒ\ƒPƒbƒg‚ª“Ç‚İ‚İ‰Â”\‚É‚È‚é‚Ü‚Å‘Ò‚¿‚Ü‚·
+	// fdsã«è¨­å®šã•ã‚ŒãŸã‚½ã‚±ãƒƒãƒˆãŒèª­ã¿è¾¼ã¿å¯èƒ½ã«ãªã‚‹ã¾ã§å¾…ã¡ã¾ã™
 	int n = select(0, &fd_work, NULL, NULL, &tv);
-	// ƒ^ƒCƒ€ƒAƒEƒg‚Ìê‡‚Éselect‚Í0‚ğ•Ô‚µ‚Ü‚·
+	// ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆã®å ´åˆã«selectã¯0ã‚’è¿”ã—ã¾ã™
 	if (n <= 0) return -1;
 
 	int iResult = recv(sock, reinterpret_cast<char*>(buffer), static_cast<int>(size), 0);

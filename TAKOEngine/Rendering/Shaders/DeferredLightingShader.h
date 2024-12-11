@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "SpriteShader.h"
 
@@ -20,10 +20,10 @@ private:
 		DirectX::XMFLOAT4X4		viewProjection;
 		DirectX::XMFLOAT4		ambientLightColor;
 		DirectionalLightData	directionalLightData;
-		PointLightData			pointLightData[PointLightMax];	// “_ŒõŒ¹
-		SpotLightData			spotLightData[SpotLightMax];	// ƒXƒ|ƒbƒgƒ‰ƒCƒg
-		int						pointLightCount;				// “_ŒõŒ¹”
-		int						spotLightCount;					// ƒXƒ|ƒbƒgƒ‰ƒCƒg”
+		PointLightData			pointLightData[PointLightMax];	// ç‚¹å…‰æº
+		SpotLightData			spotLightData[SpotLightMax];	// ã‚¹ãƒãƒƒãƒˆãƒ©ã‚¤ãƒˆ
+		int						pointLightCount;				// ç‚¹å…‰æºæ•°
+		int						spotLightCount;					// ã‚¹ãƒãƒƒãƒˆãƒ©ã‚¤ãƒˆæ•°
 		DirectX::XMFLOAT2		dummy;
 	};
 };

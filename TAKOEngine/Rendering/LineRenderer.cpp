@@ -1,4 +1,4 @@
-#include <stdio.h>
+ï»¿#include <stdio.h>
 #include <memory>
 #include "Misc.h"
 #include "LineRenderer.h"
@@ -7,13 +7,13 @@
 LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
 	: capacity(vertexCount)
 {
-	// “ü—ÍƒŒƒCƒAƒEƒg
+	// å…¥åŠ›ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆ
 	D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
 	{
 		{ "POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
-	// ’¸“_ƒVƒF[ƒ_[
+	// é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 	GpuResourceUtils::LoadVertexShader(
 		device,
 		"Data/Shader/LineVS.cso",
@@ -23,21 +23,21 @@ LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
 		vertexShader.GetAddressOf()
 	);
 
-	// ƒsƒNƒZƒ‹ƒVƒF[ƒ_[
+	// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 	GpuResourceUtils::LoadPixelShader(
 		device,
 		"Data/Shader/LinePS.cso",
 		pixelShader.GetAddressOf()
 	);
 
-	// ’è”ƒoƒbƒtƒ@
+	// å®šæ•°ãƒãƒƒãƒ•ã‚¡
 	GpuResourceUtils::CreateConstantBuffer(
 		device,
 		sizeof(ConstantBuffer),
 		constantBuffer.GetAddressOf()
 	);
 
-	// ƒuƒŒƒ“ƒhƒXƒe[ƒg
+	// ãƒ–ãƒ¬ãƒ³ãƒ‰ã‚¹ãƒ†ãƒ¼ãƒˆ
 	{
 		D3D11_BLEND_DESC desc;
 		::memset(&desc, 0, sizeof(desc));
@@ -56,7 +56,7 @@ LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 
-	// [“xƒXƒeƒ“ƒVƒ‹ƒXƒe[ƒg
+	// æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ã‚¹ãƒ†ãƒ¼ãƒˆ
 	{
 		D3D11_DEPTH_STENCIL_DESC desc;
 		::memset(&desc, 0, sizeof(desc));
@@ -68,7 +68,7 @@ LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 
-	// ƒ‰ƒXƒ^ƒ‰ƒCƒU[ƒXƒe[ƒg
+	// ãƒ©ã‚¹ã‚¿ãƒ©ã‚¤ã‚¶ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆ
 	{
 		D3D11_RASTERIZER_DESC desc;
 		::memset(&desc, 0, sizeof(desc));
@@ -87,7 +87,7 @@ LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 
-	// ’¸“_ƒoƒbƒtƒ@
+	// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡
 	{
 		D3D11_BUFFER_DESC desc;
 		desc.ByteWidth = sizeof(Vertex) * vertexCount;
@@ -102,31 +102,31 @@ LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
 	}
 }
 
-// •`‰æŠJn
+// æç”»é–‹å§‹
 void LineRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
-	// ƒVƒF[ƒ_[İ’è
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼è¨­å®š
 	context->VSSetShader(vertexShader.Get(), nullptr, 0);
 	context->PSSetShader(pixelShader.Get(), nullptr, 0);
 	context->IASetInputLayout(inputLayout.Get());
 
-	// ’è”ƒoƒbƒtƒ@İ’è
+	// å®šæ•°ãƒãƒƒãƒ•ã‚¡è¨­å®š
 	context->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
 	//context->PSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
 
-	// ƒŒƒ“ƒ_[ƒXƒe[ƒgİ’è
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆè¨­å®š
 	const float blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	context->OMSetBlendState(blendState.Get(), blendFactor, 0xFFFFFFFF);
 	context->OMSetDepthStencilState(depthStencilState.Get(), 0);
 	context->RSSetState(rasterizerState.Get());
 
-	// ƒvƒŠƒ~ƒeƒBƒuİ’è
+	// ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–è¨­å®š
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	context->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
 
-	// ’è”ƒoƒbƒtƒ@XV
+	// å®šæ•°ãƒãƒƒãƒ•ã‚¡æ›´æ–°
 	DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&view);
 	DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&projection);
 	DirectX::XMMATRIX VP = V * P;
@@ -134,7 +134,7 @@ void LineRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X
 	DirectX::XMStoreFloat4x4(&data.wvp, VP);
 	context->UpdateSubresource(constantBuffer.Get(), 0, 0, &data, 0, 0);
 
-	// •`‰æ
+	// æç”»
 	UINT totalVertexCount = static_cast<UINT>(vertices.size());
 	UINT start = 0;
 	UINT count = (totalVertexCount < capacity) ? totalVertexCount : capacity;
@@ -160,7 +160,7 @@ void LineRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X
 	vertices.clear();
 }
 
-// ’¸“_’Ç‰Á
+// é ‚ç‚¹è¿½åŠ 
 void LineRenderer::AddVertex(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT4& color)
 {
 	Vertex v;

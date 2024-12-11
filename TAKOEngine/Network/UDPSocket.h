@@ -1,12 +1,12 @@
-#pragma once
+ï»¿#pragma once
 
 #include <unordered_map>
 
 #include "TAKOEngine/Network/Socket.h"
 
 /*
-* ƒT[ƒo[ƒ\ƒPƒbƒg
-* ƒNƒ‰ƒCƒAƒ“ƒgŠÇ—‚¹‚¸A‘S•”ó‚¯“ü‚ê‚é
+* ã‚µãƒ¼ãƒãƒ¼ã‚½ã‚±ãƒƒãƒˆ
+* ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆç®¡ç†ã›ãšã€å…¨éƒ¨å—ã‘å…¥ã‚Œã‚‹
 */
 
 class UDPServerSocket : public Socket
@@ -17,8 +17,8 @@ public:
 
 	bool Connect(const char* address, const char* port) override;
 
-	int Send(int client_id, const void* data, size_t size); // ‘—M
-	int Receive(void* buffer, size_t size, struct sockaddr_in& client_addr); // óM
+	int Send(int client_id, const void* data, size_t size); // é€ä¿¡
+	int Receive(void* buffer, size_t size, struct sockaddr_in& client_addr); // å—ä¿¡
 	int SendAll(const void* data, size_t size);
 	void Remove(int client_id) { if (clients.find(client_id) != clients.end()) clients.erase(client_id); };
 
@@ -36,6 +36,6 @@ public:
 
 	bool Connect(const char* address, const char* port) override;
 
-	int Send(const void* data, size_t size); // ‘—M
-	int Receive(void* buffer, size_t size); // óM
+	int Send(const void* data, size_t size); // é€ä¿¡
+	int Receive(void* buffer, size_t size); // å—ä¿¡
 };

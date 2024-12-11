@@ -1,17 +1,17 @@
-#include "Misc.h"
+ï»¿#include "Misc.h"
 #include "GpuResourceUtils.h"
 #include "Gizmos.h"
 
-// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 Gizmos::Gizmos(ID3D11Device* device)
 {
-	// “ü—ÍƒŒƒCƒAƒEƒg
+	// å…¥åŠ›ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆ
 	D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
-	// ’¸“_ƒVƒF[ƒ_[
+	// é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 	GpuResourceUtils::LoadVertexShader(
 		device,
 		"Data/Shader/GizmosVs.cso",
@@ -21,28 +21,28 @@ Gizmos::Gizmos(ID3D11Device* device)
 		vertexShader.GetAddressOf()
 	);
 
-	// ƒsƒNƒZƒ‹ƒVƒF[ƒ_[
+	// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 	GpuResourceUtils::LoadPixelShader(
 		device,
 		"Data/Shader/GizmosPS.cso",
 		pixelShader.GetAddressOf()
 	);
 
-	// ’è”ƒoƒbƒtƒ@
+	// å®šæ•°ãƒãƒƒãƒ•ã‚¡
 	GpuResourceUtils::CreateConstantBuffer(
 		device,
 		sizeof(CbMesh),
 		constantBuffer.GetAddressOf()
 	);
 
-	// ” ƒƒbƒVƒ…¶¬
+	// ç®±ãƒ¡ãƒƒã‚·ãƒ¥ç”Ÿæˆ
 	CreateBoxMesh(device, 0.5f, 0.5f, 0.5f);
 	CreateSphereMesh(device, 1.0f, 32);
-	//‰~’ŒƒƒbƒVƒ…¶¬
+	//å††æŸ±ãƒ¡ãƒƒã‚·ãƒ¥ç”Ÿæˆ
 	CreateCylinderMesh(device, 1.0f, 0.0f, 16);
 }
 
-// ” •`‰æ
+// ç®±æç”»
 void Gizmos::DrawBox(
 	const DirectX::XMFLOAT3& position,
 	const DirectX::XMFLOAT3& angle,
@@ -88,7 +88,7 @@ void Gizmos::DrawCylinder(
 	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 	DirectX::XMStoreFloat4x4(&instance.worldTransform, S * T);
 }
-// ƒƒbƒVƒ…¶¬
+// ãƒ¡ãƒƒã‚·ãƒ¥ç”Ÿæˆ
 void Gizmos::CreateMesh(ID3D11Device* device, const std::vector<DirectX::XMFLOAT3>& vertices, Mesh& mesh)
 {
 	D3D11_BUFFER_DESC desc = {  };
@@ -109,7 +109,7 @@ void Gizmos::CreateMesh(ID3D11Device* device, const std::vector<DirectX::XMFLOAT
 	mesh.vertexCount = static_cast<UINT>(vertices.size());
 }
 
-// ” ƒƒbƒVƒ…¶¬
+// ç®±ãƒ¡ãƒƒã‚·ãƒ¥ç”Ÿæˆ
 void Gizmos::CreateBoxMesh(ID3D11Device* device, float width, float height, float depth)
 {
 	DirectX::XMFLOAT3 position[8] = {
@@ -156,17 +156,17 @@ void Gizmos::CreateBoxMesh(ID3D11Device* device, float width, float height, floa
 	vertices.emplace_back(position[3]);
 	vertices.emplace_back(position[7]);
 
-	// ƒƒbƒVƒ…¶¬
+	// ãƒ¡ãƒƒã‚·ãƒ¥ç”Ÿæˆ
 	CreateMesh(device, vertices, boxMesh);
 }
 
-// ‹…ƒƒbƒVƒ…ì¬
+// çƒãƒ¡ãƒƒã‚·ãƒ¥ä½œæˆ
 void Gizmos::CreateSphereMesh(ID3D11Device* device, float radius, int subdivisions)
 {
 	float step = DirectX::XM_2PI / subdivisions;
 	std::vector<DirectX::XMFLOAT3> vertices;
 
-	// XZ•½–Ê
+	// XZå¹³é¢
 	for (int i = 0; i < subdivisions; i++)
 	{
 		for (int j = 0; j < 2; j++)
@@ -180,7 +180,7 @@ void Gizmos::CreateSphereMesh(ID3D11Device* device, float radius, int subdivisio
 		}
 	}
 
-	// XY•½–Ê
+	// XYå¹³é¢
 	for (int i = 0; i < subdivisions; i++)
 	{
 		for (int j = 0; j < 2; j++)
@@ -193,7 +193,7 @@ void Gizmos::CreateSphereMesh(ID3D11Device* device, float radius, int subdivisio
 			p.z = 0.0f;
 		}
 	}
-	// YZ•½–Ê
+	// YZå¹³é¢
 	for (int i = 0; i < subdivisions; i++)
 	{
 		for (int j = 0; j < 2; j++)
@@ -207,16 +207,16 @@ void Gizmos::CreateSphereMesh(ID3D11Device* device, float radius, int subdivisio
 		}
 	}
 
-	// ƒƒbƒVƒ…¶¬
+	// ãƒ¡ãƒƒã‚·ãƒ¥ç”Ÿæˆ
 	CreateMesh(device, vertices, sphereMesh);
 }
-//‰~’ŒƒƒbƒVƒ…ì¬
+//å††æŸ±ãƒ¡ãƒƒã‚·ãƒ¥ä½œæˆ
 void  Gizmos::CreateCylinderMesh(ID3D11Device* device, float radius, float height, int subdivision)
 {
 	float step = DirectX::XM_2PI / subdivision;
 
 	std::vector<DirectX::XMFLOAT3> vertices;
-	//XZ•½–Ê
+	//XZå¹³é¢
 	for (int i = 0; i < subdivision; ++i)
 	{
 		constexpr int circleNum = 100;
@@ -237,54 +237,54 @@ void  Gizmos::CreateCylinderMesh(ID3D11Device* device, float radius, float heigh
 		}
 	}
 
-	//ƒƒbƒVƒ…¶¬
+	//ãƒ¡ãƒƒã‚·ãƒ¥ç”Ÿæˆ
 	CreateMesh(device, vertices, cylinderMesh);
 }
-// •`‰æÀs
+// æç”»å®Ÿè¡Œ
 void Gizmos::Render(const RenderContext& rc)
 {
 	ID3D11DeviceContext* dc = rc.deviceContext;
 
-	// ƒVƒF[ƒ_[İ’è
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼è¨­å®š
 	dc->VSSetShader(vertexShader.Get(), nullptr, 0);
 	dc->PSSetShader(pixelShader.Get(), nullptr, 0);
 	dc->IASetInputLayout(inputLayout.Get());
 
-	// ’è”ƒoƒbƒtƒ@İ’è
+	// å®šæ•°ãƒãƒƒãƒ•ã‚¡è¨­å®š
 	dc->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
 
-	// ƒŒƒ“ƒ_[ƒXƒe[ƒgİ’è
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆè¨­å®š
 	const float blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	dc->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Opaque), blendFactor, 0xFFFFFFFF);
 	dc->OMSetDepthStencilState(rc.renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
 	dc->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullNone));
 
-	// ƒrƒ…[ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñì¬
+	// ãƒ“ãƒ¥ãƒ¼ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—ä½œæˆ
 	DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&rc.camera->GetView());
 	DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&rc.camera->GetProjection());
 	DirectX::XMMATRIX VP = V * P;
 
-	// ƒvƒŠƒ~ƒeƒBƒuİ’è
+	// ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–è¨­å®š
 	UINT stride = sizeof(DirectX::XMFLOAT3);
 	UINT offest = 0;
 	dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
 	for (const Instance& instance : instances)
 	{
-		// ’¸“_ƒoƒbƒtƒ@İ’è
+		// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡è¨­å®š
 		dc->IASetVertexBuffers(0, 1, instance.mesh->vertexBuffer.GetAddressOf(), &stride, &offest);
-		// ƒ[ƒ‹ƒhƒrƒ…[ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñì¬
+		// ãƒ¯ãƒ¼ãƒ«ãƒ‰ãƒ“ãƒ¥ãƒ¼ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—ä½œæˆ
 		DirectX::XMMATRIX W = DirectX::XMLoadFloat4x4(&instance.worldTransform);
 		DirectX::XMMATRIX WVP = W * VP;
 
-		// ’è”ƒoƒbƒtƒ@XV
+		// å®šæ•°ãƒãƒƒãƒ•ã‚¡æ›´æ–°
 		CbMesh cbMesh;
 		DirectX::XMStoreFloat4x4(&cbMesh.worldViewProjection, WVP);
 		cbMesh.color = instance.color;
 
 		dc->UpdateSubresource(constantBuffer.Get(), 0, 0, &cbMesh, 0, 0);
 
-		// •`‰æ
+		// æç”»
 		dc->Draw(instance.mesh->vertexCount, 0);
 	}
 	instances.clear();

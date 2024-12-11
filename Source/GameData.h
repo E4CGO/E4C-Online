@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "TAKOEngine/Tool/Singleton.h"
 #include "TAKOEngine/Editor/Camera/CameraController.h"
@@ -28,14 +28,14 @@ public:
 public:
 	struct GameSetting
 	{
-		float CameraSensitivity = 5.0f;		// ƒJƒƒ‰Š´“x
-		bool CamerainvertX = false;			// ƒJƒƒ‰X”½“]
-		bool CamerainvertY = false;			// ƒJƒƒ‰Y”½“]
-		bool KeyboardInput = true;			// ƒL[ƒ{[ƒh / ƒQ[ƒ€ƒpƒbƒh
+		float CameraSensitivity = 5.0f;		// ã‚«ãƒ¡ãƒ©æ„Ÿåº¦
+		bool CamerainvertX = false;			// ã‚«ãƒ¡ãƒ©Xåè»¢
+		bool CamerainvertY = false;			// ã‚«ãƒ¡ãƒ©Yåè»¢
+		bool KeyboardInput = true;			// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ / ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰
 
-		char token[64];					// ƒƒOƒCƒ“ƒg[ƒNƒ“
+		char token[64];					// ãƒ­ã‚°ã‚¤ãƒ³ãƒˆãƒ¼ã‚¯ãƒ³
 	};
-	struct UserData							// ƒƒOƒCƒ“
+	struct UserData							// ãƒ­ã‚°ã‚¤ãƒ³
 	{
 		int id = -1;
 		std::string useranme = "";
@@ -48,12 +48,12 @@ public:
 	void UpdateSetting(const GameSetting& setting) { gameSetting = setting; };
 	void UpdateUser(const UserData& user) { userData = user; };
 	void Logout();
-	bool SaveGameSetting();	// İ’èƒtƒ@ƒCƒ‹‚Ì‘‚«o‚µ(•Û‘¶)
+	bool SaveGameSetting();	// è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã®æ›¸ãå‡ºã—(ä¿å­˜)
 	std::string& GetIp() { return ip; }
 	void SetIp(std::string ip) { this->ip = ip; }
 	void SetIp(const char* ip) { this->ip = ip; }
 private:
-	bool LoadGameSetting();	// İ’èƒtƒ@ƒCƒ‹‚Ì“Ç‚İ‚İ
+	bool LoadGameSetting();	// è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã®èª­ã¿è¾¼ã¿
 private:
 	bool online = false;
 	uint32_t client_id = 0;
