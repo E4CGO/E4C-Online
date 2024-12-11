@@ -44,10 +44,11 @@ namespace ns_RoomData
 		ARCH_ENTRANCE_01A,
 		ARCH_FLOOR_01A,
 
-		STAIR_STEP_01A,
 		STAIR_RAILING_01A,
+		STAIR_STEP_01A,
 
 		PORTAL,
+		SPAWNER,
 		CONNECTPOINT,
 		TILETYPE_COUNT,
 	};
@@ -74,6 +75,13 @@ namespace ns_RoomData
 		DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f };
 		DirectX::XMFLOAT4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	};
+
+	// ファイル読み込み用データ
+	struct FILE_DATA
+	{
+		std::string fileName = "";
+		float scale = 1.0f;
+	};
 }
 
 using namespace ns_RoomData;
@@ -91,7 +99,7 @@ private:
 	DungeonData();
 	~DungeonData() {}
 
-public:
+public:	
 	// 部屋の生成設定
 	struct RoomGenerateSetting
 	{
@@ -107,14 +115,27 @@ public:
 		int maxDepth;	// 最大深度、親からの距離（深度）がこの値以上になった場合、子の生成をキャンセルする
 	};
 
+	// 初期化
+	void Initialize();
+	// 各種初期化
+	void InitRoomGenerateSettings();
+	void InitDungeonGenerateSetting();
+	void InitModelFileDatas();
+	void InitCollisionFileDatas();
+
 	// 部屋の生成設定を取得
 	RoomGenerateSetting GetRoomGenerateSetting(RoomType type) { return m_roomGenerateSettings.at(static_cast<int>(type)); }
 	// ダンジョンの生成設定を取得
-	DungeonGenerateSetting GetDungeonGenerateSetting() { return m_dungeonGenerateSettings; }
+	DungeonGenerateSetting GetDungeonGenerateSetting() { return m_dungeonGenerateSetting; }
+	// ファイル読み込み用データの取得
+	const std::vector<FILE_DATA> GetModelFileDatas(TileType type) const { return m_modelFileDatas.at(type); }
+	const std::vector<FILE_DATA> GetCollisionFileDatas(TileType type) const { return m_collisionFileDatas.at(type); }
 
 private:
 	std::vector<RoomGenerateSetting> m_roomGenerateSettings;	// 部屋の生成設定配列
-	DungeonGenerateSetting m_dungeonGenerateSettings;			// ダンジョンの生成設定
+	DungeonGenerateSetting m_dungeonGenerateSetting;			// ダンジョンの生成設定
+	std::vector<std::vector<FILE_DATA>> m_modelFileDatas;		// 見た目用ファイル読み込み用データ配列
+	std::vector<std::vector<FILE_DATA>> m_collisionFileDatas;	// 当たり判定用ファイル読み込み用データ配列
 };
 
 #endif // !__INCLUDED_DUNGEON_DATA_H__

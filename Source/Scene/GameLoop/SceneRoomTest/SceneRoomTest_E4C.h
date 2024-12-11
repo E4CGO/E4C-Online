@@ -24,18 +24,24 @@ using namespace ns_RoomData;
 class Node : public ModelObject
 {
 public:
-	Node(std::string name, const char* fileName = "", float scaling = 1.0f) :
-		ModelObject(fileName, scaling), name(name) {}
+	Node(std::string name, TileType type, const char* fileName = "", float scaling = 1.0f) :
+		ModelObject(fileName, scaling), name(name), type(type) {}
 	~Node() = default;
 
+	// 名前
 	void SetName(const std::string newName) { this->name = newName; }
 	const std::string GetName() const { return this->name; }
+
+	// タイプ
+	void SetType(const TileType newType) { this->type = newType; }
+	const TileType GetType() const { return this->type; }
 
 	// 自身を複製する
 	virtual Node* Duplicate() { return nullptr; }
 
 protected:
 	std::string name;
+	TileType type;
 };
 
 
@@ -43,7 +49,6 @@ protected:
 class NodeManager : public ObjectManager<Node>, public Singleton<NodeManager>
 {
 	friend class Singleton<NodeManager>;
-
 public:
 	// 正規表現を用いて重複しない名前を探す
 	std::string GetUniqueName(std::string name);
@@ -51,32 +56,27 @@ public:
 #define NODES NodeManager::Instance()
 
 
-// MapTileノード
+// タイルノード
 class TileNode : public Node
 {
 public:
 	TileNode(std::string name, TileType type = TileType::FLOOR_01A, const char* fileName = "", float scaling = 1.0f) :
-		Node(name, fileName, scaling), type(type) {};
+		Node(name, type, fileName, scaling) {};
 	~TileNode() = default;
-
-	void SetType(const TileType newType) { this->type = newType; }
-	const TileType GetType() const { return this->type; }
 
 	Node* Duplicate() override;
 
 	// デバッグGUI描画
 	void DrawDebugGUI() override;
-
-protected:
-	TileType type;
 };
 
-// Spawnerノード
+
+// スポナーノード
 class SpawnerNode : public Node
 {
 public:
 	SpawnerNode(std::string name) :
-		Node(name) {}
+		Node(name, TileType::SPAWNER) {}
 
 	void Render(const RenderContext& rc) override;
 
@@ -105,9 +105,15 @@ public:
 	void Update(float elapsedTime) override;
 	// 描画処理
 	void Render() override;
+	void RenderDX12() override;
 
 	// 部屋データを指定したjsonからロードする
-	void OpenRoomData();
+	void LoadRoomData();
+	// タイルノードのロード
+	void LoadTileNodeData(const auto& nodeData);
+	// スポナーのロード
+	void LoadSpawnerData(const auto& nodeData);
+
 	// 部屋データをjsonにセーブする
 	void SaveRoomData();
 
@@ -115,11 +121,17 @@ public:
 	void DrawDebugGUI();
 
 	// TileNode追加
-	void AddTileNode(TileType tileType);
+	void AddTileNode(
+		std::string name = "NewNode", TileType type = TileType::FLOOR_01A,
+		DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f },
+		DirectX::XMFLOAT3 angle = { 0.0f, 0.0f, 0.0f },
+		DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f });
 	// Spawner追加
 	void AddSpawner();
 	// ノード複製
 	void DuplicateNode();
+	// ノード削除
+	void RemoveSelectedNode();
 	// ノード全削除
 	void ClearNodes();
 

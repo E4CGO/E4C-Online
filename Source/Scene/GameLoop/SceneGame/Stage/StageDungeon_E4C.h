@@ -97,4 +97,6 @@ protected:
 
 	// ポストエフェクト
 	std::unique_ptr<PostprocessingRendererDX12>	postprocessingRenderer = std::make_unique<PostprocessingRendererDX12>();
+
+	std::unique_ptr<ModelObject> instancingModel;
 };

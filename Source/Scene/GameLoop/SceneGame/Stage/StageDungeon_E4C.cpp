@@ -217,6 +217,28 @@ void StageDungeon_E4C::Initialize()
 	cameraController->SetPlayer(player);
 	CURSOR_OFF;
 
+	// テスト用　インスタンシングモデル
+	instancingModel = std::make_unique<ModelObject>("Data/Model/DungeonAssets/SM_Stairs_Steps_01a.glb", 1, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON);
+	instancingModel->SetShader("SLOPE", ModelShaderDX12Id::ToonInstancing);
+
+	float posX = 0;
+	for (int i = 0; i < 30; ++i)
+	{
+		int id = instancingModel->GetModel()->AllocateInstancingIndex();
+		if (id < 0) continue;
+
+		DirectX::XMMATRIX m;
+		m = DirectX::XMMatrixScaling(1, 1, 1);
+		m *= DirectX::XMMatrixRotationY(DirectX::XMConvertToRadians(0));
+		m *= DirectX::XMMatrixTranslation(posX, 0, 0);
+
+		DirectX::XMFLOAT4X4 tm;
+		DirectX::XMStoreFloat4x4(&tm, m);
+		instancingModel->GetModel()->UpdateTransform(id, tm);
+
+		posX += 4.0f;
+	}
+
 	m_roomOrder.emplace_back(0);
 
 	GenerateDungeon();
@@ -260,6 +282,8 @@ void StageDungeon_E4C::Update(float elapsedTime)
 
 	// 部屋を全てアップデート
 	rootRoom->Update(elapsedTime);
+
+	instancingModel->Update(elapsedTime);
 
 	PlayerCharacterManager::Instance().Update(elapsedTime);
 	GameObjectManager::Instance().Update(elapsedTime);
@@ -348,7 +372,11 @@ void StageDungeon_E4C::RenderDX12()
 		GameObjectManager::Instance().RenderDX12(rc);
 
 		// 見た目用モデル描画
-		InstancingModelManager::Instance().RenderDX12(rc);
+		//InstancingModelManager::Instance().RenderDX12(rc);
+
+		//DirectX::XMFLOAT3 pos = instancingModel->GetPosition();
+		//instancingModel->SetPosition({ pos.x, pos.y + 0.1f, pos.z });
+		instancingModel->RenderDX12(rc);
 
 		MAPTILES.RenderDX12(rc);
 

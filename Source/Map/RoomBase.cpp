@@ -421,39 +421,39 @@ void RoomBase::PlaceMapTile(bool isLeader)
 		// インスタンシング
 		if (T_GRAPHICS.isDX12Active)
 		{
-			ModelObject* model = new ModelObject(modelFileNames.at(0).fileName.c_str(), modelFileNames.at(0).scale, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON);
-			model->SetShader(modelFileNames.at(0).fileName.c_str(), ModelShaderDX12Id::ToonInstancing);
+			//ModelObject* model = new ModelObject(modelFileNames.at(0).fileName.c_str(), modelFileNames.at(0).scale, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON);
+			//model->SetShader(modelFileNames.at(0).fileName.c_str(), ModelShaderDX12Id::ToonInstancing);
 
-			for (int i = 0; i < m_tileDatas.at(tileType).size(); i++)
-			{
-				// 使われていないIDを取得して利用
-				int id = model->GetModel()->AllocateInstancingIndex();
-				if (id < 0) continue;
+			//for (int i = 0; i < m_tileDatas.at(tileType).size(); i++)
+			//{
+			//	// 使われていないIDを取得して利用
+			//	int id = model->GetModel()->AllocateInstancingIndex();
+			//	if (id < 0) continue;
 
-				DirectX::XMFLOAT3 position = m_tileDatas.at(tileType).at(i).position;
-				DirectX::XMFLOAT3 angle = m_tileDatas.at(tileType).at(i).angle;
-				DirectX::XMFLOAT3 scale = m_tileDatas.at(tileType).at(i).scale;
+			//	DirectX::XMFLOAT3 position = m_tileDatas.at(tileType).at(i).position;
+			//	DirectX::XMFLOAT3 angle = m_tileDatas.at(tileType).at(i).angle;
+			//	DirectX::XMFLOAT3 scale = m_tileDatas.at(tileType).at(i).scale;
 
-				DirectX::XMMATRIX m;
-				m = DirectX::XMMatrixScaling(1, 1, 1);
-				m *= DirectX::XMMatrixRotationY(DirectX::XMConvertToRadians(angle.y));
-				m *= DirectX::XMMatrixTranslation(position.x, position.y, position.z);
+			//	DirectX::XMMATRIX m;
+			//	m = DirectX::XMMatrixScaling(1, 1, 1);
+			//	m *= DirectX::XMMatrixRotationY(DirectX::XMConvertToRadians(angle.y));
+			//	m *= DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 
-				DirectX::XMFLOAT4X4 tm;
-				DirectX::XMStoreFloat4x4(&tm, m);
-				model->GetModel()->UpdateTransform(id, tm);
-			}
+			//	DirectX::XMFLOAT4X4 tm;
+			//	DirectX::XMStoreFloat4x4(&tm, m);
+			//	model->GetModel()->UpdateTransform(id, tm);
+			//}
 
-			DirectX::XMFLOAT4X4 worldTransform = {
-				1, 0, 0, 0,
-				0, 1, 0, 0,
-				0, 0, 1, 0,
-				0, 0, 0, 1
-			};
-			model->GetModel()->UpdateTransform(worldTransform);
+			//DirectX::XMFLOAT4X4 worldTransform = {
+			//	1, 0, 0, 0,
+			//	0, 1, 0, 0,
+			//	0, 0, 1, 0,
+			//	0, 0, 0, 1
+			//};
+			//model->GetModel()->UpdateTransform(worldTransform);
 
-			model->Update(0);
-			MAPTILES.Register(model);
+			//model->Update(0);
+			//MAPTILES.Register(model);
 		}
 
 		for (const TILE_DATA& tileData : m_tileDatas.at(tileType))

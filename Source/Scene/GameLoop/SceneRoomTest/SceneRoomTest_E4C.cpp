@@ -116,12 +116,50 @@ void SceneRoomTest_E4C::Render()
 	DrawDebugGUI();
 }
 
+void SceneRoomTest_E4C::RenderDX12()
+{
+	T_GRAPHICS.BeginRender();
+
+	// シーン用定数バッファ更新
+	const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
+		CameraManager::Instance().GetCamera());
+
+	// レンダーコンテキスト設定
+	RenderContextDX12 rc;
+	rc.d3d_command_list = m_frameBuffer->GetCommandList();
+	rc.scene_cbv_descriptor = scene_cbv_descriptor;
+
+	// 3Dモデル描画
+	{
+		m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+
+		// モデル描画
+		MAPTILES.RenderDX12(rc);
+
+		// レンダーターゲットへの書き込み終了待ち
+		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+	}
+
+	// ポストエフェクト描画
+	{
+		//postprocessingRenderer->Render(m_frameBuffer);
+	}
+
+	// 2D描画
+	{
+	}
+
+	T_GRAPHICS.End();
+}
+
 /**************************************************************************//**
 	@brief		部屋データを指定したjsonからロードする
 	@param[in]	なし
 	@return		なし
 *//***************************************************************************/
-void SceneRoomTest_E4C::OpenRoomData()
+void SceneRoomTest_E4C::LoadRoomData()
 {
 	// ダイアログボックスの設定
 	OPENFILENAMEA ofn;
@@ -131,7 +169,7 @@ void SceneRoomTest_E4C::OpenRoomData()
 	ZeroMemory(&ofn, sizeof(OPENFILENAMEA));
 	ofn.lStructSize = sizeof(OPENFILENAMEA);
 	ofn.hwndOwner = NULL;
-	ofn.lpstrFilter = "JSONファイル(*.json)\0*.JSON\0";
+	ofn.lpstrFilter = "JSONファイル(*.json)\0*.json\0";
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFile = filePath;
 	ofn.nMaxFile = sizeof(filePath);
@@ -140,13 +178,10 @@ void SceneRoomTest_E4C::OpenRoomData()
 	ofn.lpstrInitialDir = NULL;
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_OVERWRITEPROMPT;
 
-	int testInt;
-
-	// オープン
+	// ファイルから読み込み
 	if (GetOpenFileNameA(&ofn) == TRUE)
 	{
 		Console::Instance().Log(filePath);
-
 		nlohmann::json loadFile;
 		std::ifstream ifs(filePath);
 
@@ -154,15 +189,85 @@ void SceneRoomTest_E4C::OpenRoomData()
 		{
 			ifs >> loadFile;
 
-			// 部屋の生成設定
-			//roomSetting.weight = loadFile["RoomSetting"]["Weight"];
-			//roomSetting.aabb = loadFile["RoomSetting"]["AABB"]
+			// 部屋の生成設定をロード
+			roomSetting.weight = loadFile["RoomSetting"]["Weight"];
+			roomSetting.aabb.position.x = loadFile["RoomSetting"]["AABB"].at(0);
+			roomSetting.aabb.position.y = loadFile["RoomSetting"]["AABB"].at(1);
+			roomSetting.aabb.position.z = loadFile["RoomSetting"]["AABB"].at(2);
 
-			//Console::Instance().Log(std::to_string(testInt).c_str());
+			// ノードデータロード
+			for (const auto& nodeData : loadFile["NodeDatas"])
+			{
+				// タイプによって処理を分ける
+				TileType tileType = nodeData["Type"];
+
+				switch (tileType)
+				{
+				case PORTAL:			continue;
+				case SPAWNER:			LoadSpawnerData(nodeData);	break;
+				case CONNECTPOINT:		continue;
+				case TILETYPE_COUNT:	continue;
+				default:				LoadTileNodeData(nodeData);	break;
+				}
+			}
 
 			ifs.close();
 		}
 	}
+}
+
+void SceneRoomTest_E4C::LoadTileNodeData(const auto& nodeData)
+{
+	TileType tileType = nodeData["Type"];
+	DirectX::XMFLOAT3 position = {
+		nodeData["Position"].at(0),
+		nodeData["Position"].at(1),
+		nodeData["Position"].at(2)
+	};
+	DirectX::XMFLOAT3 angle = {
+		nodeData["Angle"].at(0),
+		nodeData["Angle"].at(1),
+		nodeData["Angle"].at(2)
+	};
+	DirectX::XMFLOAT3 scale = {
+		nodeData["Scale"].at(0),
+		nodeData["Scale"].at(1),
+		nodeData["Scale"].at(2),
+	};
+
+	FILE_DATA importData = DungeonData::Instance().GetModelFileDatas(tileType).at(0);
+
+	TileNode* newNode = new TileNode(NODES.GetUniqueName("NewNode"), tileType, importData.fileName.c_str(), importData.scale);
+	newNode->SetPosition(position);
+	newNode->SetAngle(angle);
+	newNode->SetScale(scale);
+	NODES.Register(newNode);
+}
+
+void SceneRoomTest_E4C::LoadSpawnerData(const auto& nodeData)
+{
+	TileType tileType = nodeData["Type"];
+	DirectX::XMFLOAT3 position = {
+		nodeData["Position"].at(0),
+		nodeData["Position"].at(1),
+		nodeData["Position"].at(2)
+	};
+	DirectX::XMFLOAT3 angle = {
+		nodeData["Angle"].at(0),
+		nodeData["Angle"].at(1),
+		nodeData["Angle"].at(2)
+	};
+	DirectX::XMFLOAT3 scale = {
+		nodeData["Scale"].at(0),
+		nodeData["Scale"].at(1),
+		nodeData["Scale"].at(2),
+	};
+
+	SpawnerNode* newNode = new SpawnerNode(NODES.GetUniqueName("NewNode"));
+	newNode->SetPosition(position);
+	newNode->SetAngle(angle);
+	newNode->SetScale(scale);
+	NODES.Register(newNode);
 }
 
 /**************************************************************************//**
@@ -180,7 +285,7 @@ void SceneRoomTest_E4C::SaveRoomData()
 	ZeroMemory(&ofn, sizeof(OPENFILENAMEA));
 	ofn.lStructSize = sizeof(OPENFILENAMEA);
 	ofn.hwndOwner = NULL;
-	ofn.lpstrFilter = "JSONファイル(*.json)\0*.JSON\0";
+	ofn.lpstrFilter = "JSONファイル(*.json)\0*.json\0";
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFile = filePath;
 	ofn.nMaxFile = sizeof(filePath);
@@ -190,23 +295,29 @@ void SceneRoomTest_E4C::SaveRoomData()
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_CREATEPROMPT;
 	ofn.lpstrDefExt = "json";
 
-	// セーブ
+	// ファイルに保存
 	if (GetSaveFileNameA(&ofn) == TRUE)
 	{
 		Console::Instance().Log(filePath);
-
 		nlohmann::json saveFile;
 
 		// 部屋の生成設定
-		saveFile["RoomSetting"].push_back({
+		saveFile["RoomSetting"] = {
 			{ "Weight", roomSetting.weight },
-			{ "AABB", { "Position", roomSetting.aabb.position.x }},
-			});
-		//saveFile["RoomSetting"].push_back({ "AABB",
-		//	{ "Position", { roomSetting.aabb.position.x, roomSetting.aabb.position.y, roomSetting.aabb.position.z }},
-		//	{ "Radii", { roomSetting.aabb.radii.x, roomSetting.aabb.radii.y, roomSetting.aabb.radii.z }},
-		//	});
-		//saveFile["RoomSetting"]["AABB"].emplace_back(roomSetting.aabb);
+			{ "AABB", { roomSetting.aabb.position.x, roomSetting.aabb.position.y, roomSetting.aabb.position.z }},
+		};
+
+		// ノードデータ設定
+		saveFile["NodeDatas"] = nlohmann::json::array();
+		for (Node* tileNode : NODES.GetAll())
+		{
+			saveFile["NodeDatas"].push_back({
+				{ "Type", tileNode->GetType() },
+				{ "Position", { tileNode->GetPosition().x, tileNode->GetPosition().y, tileNode->GetPosition().z }},
+				{ "Angle", { tileNode->GetAngle().x, tileNode->GetAngle().y, tileNode->GetAngle().z }},
+				{ "Scale", { tileNode->GetScale().x, tileNode->GetScale().y, tileNode->GetScale().z }},
+				});
+		}
 
 		std::ofstream ofs(filePath);
 		if (ofs.is_open())
@@ -215,46 +326,6 @@ void SceneRoomTest_E4C::SaveRoomData()
 			ofs.close();
 		}
 	}
-
-	//nlohmann::json saveFile;
-
-	//saveFile["RoomSetting"].push_back({
-	//	{ "Weight", roomSetting.weight }
-	//	});
-
-	//nlohmann::json testJson;
-	//testJson["TestData"] = {
-	//	{
-	//		{"Yeah", 315},
-	//		{"Salmon", true}
-	//	}
-	//};
-
-	//saveFile.emplace_back(testJson);
-
-
-
-	////saveFile["RoomData"]["RoomType"] = RoomType::SIMPLE_ROOM_1;
-	////saveFile["RoomData"]["Weight"] = 0;
-
-	//// 接続点データ
-	//CONNECTPOINT_DATA newData[2];
-	//newData[0].position = { 0, 0, 0 };
-	//newData[1].position = { 10, 10, 10 };
-
-	//saveFile["RoomData"] = {
-	//	{"RoomType", RoomType::SIMPLE_ROOM_1},
-	//	{"Weight", 1},
-	//};
-
-	//for (const CONNECTPOINT_DATA& data : newData)
-	//{
-	//	//saveFile["RoomData"]["ConnectPointDatas"].emplace_back(data);
-	//}
-
-	//std::ofstream file("debug_TestRoom.json");
-	//file << saveFile;
-	//file.close();
 }
 
 void SceneRoomTest_E4C::DrawDebugGUI()
@@ -273,7 +344,7 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 		{
 			if (ImGui::BeginMenu("File"))
 			{
-				if (ImGui::MenuItem("Open File")) OpenRoomData();
+				if (ImGui::MenuItem("Load File")) LoadRoomData();
 				if (ImGui::MenuItem("Save File")) SaveRoomData();
 
 				ImGui::EndMenu();
@@ -294,11 +365,11 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 		if (ImGui::BeginMenuBar()) {
 			if (ImGui::BeginMenu("New")) {
 				if (ImGui::BeginMenu("TileNode")) {
-					if (ImGui::MenuItem("Floor01a"))		AddTileNode(TileType::FLOOR_01A);
-					if (ImGui::MenuItem("Wall01a"))			AddTileNode(TileType::WALL_01A);
-					if (ImGui::MenuItem("StairStep01a"))	AddTileNode(TileType::STAIR_STEP_01A);
-					if (ImGui::MenuItem("Portal"))			AddTileNode(TileType::PORTAL);
-					if (ImGui::MenuItem("ConnectPoint"))	AddTileNode(TileType::CONNECTPOINT);
+					if (ImGui::MenuItem("Floor01a"))		AddTileNode("Floor",	TileType::FLOOR_01A);
+					if (ImGui::MenuItem("Wall01a"))			AddTileNode("Wall",		TileType::WALL_01A);
+					if (ImGui::MenuItem("StairStep01a"))	AddTileNode("Stair",	TileType::STAIR_STEP_01A);
+					if (ImGui::MenuItem("Portal"))			AddTileNode("Portal",	TileType::PORTAL);
+					if (ImGui::MenuItem("ConnectPoint"))	AddTileNode("ConnectPoint",	TileType::CONNECTPOINT);
 					ImGui::EndMenu();
 				}
 				if (ImGui::BeginMenu("ObjectNode")) {
@@ -313,6 +384,7 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 			}
 			if (ImGui::MenuItem("Duplicate")) DuplicateNode();
 			if (ImGui::BeginMenu("Remove")) {
+				if (ImGui::MenuItem("Remove Selected Node")) RemoveSelectedNode();
 				if (ImGui::MenuItem("Clear All")) ClearNodes();
 				ImGui::EndMenu();
 			}
@@ -361,24 +433,21 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 	}
 }
 
-void SceneRoomTest_E4C::AddTileNode(TileType type)
+void SceneRoomTest_E4C::AddTileNode(
+	std::string name, TileType type,
+	DirectX::XMFLOAT3 position,
+	DirectX::XMFLOAT3 angle,
+	DirectX::XMFLOAT3 scale)
 {
-	std::string nodeName = "NewNode";
-	std::string fileName = "";
+	FILE_DATA importData = DungeonData::Instance().GetModelFileDatas(type).at(0);
 
-	switch (type)
-	{
-	case TileType::FLOOR_01A:		fileName = "Data/Model/DungeonAssets/SM_Floor_02a.glb";			nodeName = "Floor";			break;
-	case TileType::WALL_01A:		fileName = "Data/Model/DungeonAssets/SM_Wall_Pattern_01a.glb";	nodeName = "Wall";			break;
-	case TileType::STAIR_STEP_01A:	fileName = "Data/Model/DungeonAssets/SM_Stairs_Steps_01a.glb";	nodeName = "Stair";			break;
-	case TileType::PORTAL:																			nodeName = "Portal";		break;
-	case TileType::CONNECTPOINT:																	nodeName = "ConnectPoint";	break;
-	}
-
-	TileNode* newNode = new TileNode(NODES.GetUniqueName(nodeName), type, fileName.c_str());
+	TileNode* newNode = new TileNode(NODES.GetUniqueName("NewNode"), type, importData.fileName.c_str(), importData.scale);
+	newNode->SetPosition(position);
+	newNode->SetAngle(angle);
+	newNode->SetScale(scale);
 	NODES.Register(newNode);
 
-	// 追加したノードを選択させる
+	// 追加したノードを選択
 	selectionNode = newNode;
 }
 
@@ -406,6 +475,11 @@ void SceneRoomTest_E4C::DuplicateNode()
 	}
 }
 
+void SceneRoomTest_E4C::RemoveSelectedNode()
+{
+	NODES.Remove(selectionNode);
+}
+
 void SceneRoomTest_E4C::ClearNodes()
 {
 	NODES.Clear();
@@ -425,18 +499,9 @@ void SceneRoomTest_E4C::AddTemplate3x3Floor()
 
 Node* TileNode::Duplicate()
 {
-	std::string fileName;
+	FILE_DATA importData = DungeonData::Instance().GetModelFileDatas(type).at(0);
 
-	switch (type)
-	{
-	case TileType::FLOOR_01A:		fileName = "Data/Model/DungeonAssets/SM_Floor_02a.glb";			break;
-	case TileType::WALL_01A:		fileName = "Data/Model/DungeonAssets/SM_Wall_Pattern_01a.glb";	break;
-	case TileType::STAIR_STEP_01A:	fileName = "Data/Model/DungeonAssets/SM_Stairs_Steps_01a.glb";	break;
-	case TileType::PORTAL:																			break;
-	case TileType::CONNECTPOINT:																	break;
-	}
-
-	TileNode* newNode = new TileNode(name, type, fileName.c_str());
+	TileNode* newNode = new TileNode(name, type, importData.fileName.c_str(), importData.scale);
 	newNode->SetPosition(this->position);
 	newNode->SetAngle(this->angle);
 	newNode->SetScale(this->scale);
