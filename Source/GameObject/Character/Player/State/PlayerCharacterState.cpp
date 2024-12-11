@@ -193,7 +193,7 @@ namespace PlayerCharacterState
 	}
 	void DodgeState::Exit()
 	{
-		owner->GetCollider()->SetEnable(true);
+		owner->GetMoveCollider()->SetEnable(true);
 	}
 
 	// 怪我
@@ -215,7 +215,7 @@ namespace PlayerCharacterState
 	void DeathState::Enter()
 	{
 		owner->SetAnimation(PlayerCharacter::Animation::ANIM_DEATH, false, 0.1f);
-		owner->GetCollider()->SetEnable(false);
+		owner->GetMoveCollider()->SetEnable(false);
 	}
 	void DeathState::Execute(float elapsedTime)
 	{

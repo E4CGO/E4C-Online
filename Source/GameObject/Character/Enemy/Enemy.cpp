@@ -1,4 +1,5 @@
 ﻿#include "TAKOEngine/Tool/Mathf.h"
+#include "TAKOEngine/Physics/CollisionManager.h"
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Character/Enemy/Enemy.h"
@@ -19,16 +20,11 @@ Enemy::Enemy(const char* filename, float scaling, ModelObject::RENDER_MODE rende
 Enemy::~Enemy()
 {
 	delete stateMachine;
-	for (const std::pair<int, Collider*>& collider : colliders)
+	for (const std::pair<int, Collider*>& collider : m_pColliders)
 	{
-		delete collider.second;
+		COLLISIONS.Remove(collider.second);
 	}
-	for (const std::pair<int, Collider*>& collider : attackColliders)
-	{
-		delete collider.second;
-	}
-	colliders.clear();
-	attackColliders.clear();
+	m_pColliders.clear();
 
 	if (m_pSpawner != nullptr)
 	{
@@ -75,40 +71,26 @@ void Enemy::Render(const RenderContext& rc)
 	Character::Render(rc);
 
 #ifdef _DEBUG
-	for (const std::pair<int, Collider*>& collider : colliders)
+	for (const std::pair<int, Collider*>& collider : m_pColliders)
 	{
 		collider.second->DrawDebugPrimitive({ 1, 1, 1, 1 });
 	}
-
-	Collider* playerCollider = PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetCollider();
-	for (const std::pair<int, Collider*>& collider : attackColliders)
-	{
-		DirectX::XMFLOAT4 color = { 1, 0, 0, 1 };
-		HitResult hit;
-		if (collider.second->Collision(playerCollider, {}, hit)) color = { 0, 0, 1, 1 };
-
-		collider.second->DrawDebugPrimitive(color);
-	}
 #endif // DEBUG
 }
-void Enemy::AttackCollision()
+void Enemy::OnDamage(const ENEMY_COLLISION& hit)
 {
-	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
-	if (!player) return;
-	Collider* playerCollider = player->GetCollider();
-	if (!playerCollider->IsEnable()) return;
-
-	for (const std::pair<int, Collider*>& collider : attackColliders)
+	hp -= hit.damage;
+	if (hp > 0)
 	{
-		HitResult hit;
-		if (collider.second->Collision(playerCollider, {}, hit))
-		{
-			player->OnDamage(hit, atk);
-		}
+		if (hit.power) stateMachine->ChangeState(enemy::STATE::HURT);
+		velocity += hit.force;
+	}
+	else
+	{
+		stateMachine->ChangeState(enemy::STATE::DEATH);
 	}
 }
-
-void Enemy::OnDamage(const ENEMY_COLLISION& hit)
+void Enemy::OnDamage(const ATTACK_DATA& hit)
 {
 	hp -= hit.damage;
 	if (hp > 0)
@@ -135,14 +117,6 @@ Enemy* Enemy::EnemyFactory(uint8_t enemyType)
 		case ENEMY_TYPE::MOUSE: return new MouseMob; break;
 	}
 	return nullptr;
-}
-
-void Enemy::SetRandomMoveTargetPosition()
-{
-	float theta = Mathf::RandomRange(-DirectX::XM_PI, DirectX::XM_PI);
-	float range = Mathf::RandomRange(0.0f, m_SearchRange);
-	m_MoveTargetPosition.x = this->m_SpawnPosition.x + sinf(theta) * range;
-	m_MoveTargetPosition.z = this->m_SpawnPosition.z + cosf(theta) * range;
 }
 
 bool Enemy::SearchPlayer()
@@ -174,4 +148,11 @@ bool Enemy::SearchPlayer()
 		}
 	}
 	return false;
+}
+void Enemy::SetRandomMoveTargetPosition()
+{
+	float theta = Mathf::RandomRange(-DirectX::XM_PI, DirectX::XM_PI);
+	float range = Mathf::RandomRange(0.0f, m_SearchRange);
+	m_MoveTargetPosition.x = this->m_SpawnPosition.x + sinf(theta) * range;
+	m_MoveTargetPosition.z = this->m_SpawnPosition.z + cosf(theta) * range;
 }

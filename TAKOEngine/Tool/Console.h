@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 class Console
 {
@@ -6,7 +6,7 @@ private:
 	Console() = default;
 	~Console() = default;
 public:
-	// ƒCƒ“ƒXƒ^ƒ“ƒX
+	// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
 	static Console& Instance()
 	{
 		static Console instance;

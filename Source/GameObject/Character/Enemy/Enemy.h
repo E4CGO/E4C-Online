@@ -7,7 +7,6 @@
 #include "TAKOEngine/AI/StateMachine.h"
 
 #include <memory>
-#include <unordered_map>
 
 #include "GameObject/Character/Player/PlayerCharacter.h"
 
@@ -45,14 +44,15 @@ public:
 	void SetSpawnPosition(const DirectX::XMFLOAT3& position) { this->m_SpawnPosition = position; }
 
 	virtual void OnDamage(const ENEMY_COLLISION& hit);
+	virtual void OnDamage(const ATTACK_DATA& hit);
 	virtual void OnDeath();
 
-	bool IsShowHp() { return showHp; }
+	const bool IsShowHp() const { return showHp; }
 
 	int GetAttack() { return atk; }
 
 	void SetEnemyId(const uint32_t& id) { enemy_id = id; }
-	uint32_t GetEnemyId() { return enemy_id; }
+	const uint32_t GetEnemyId() const { return enemy_id; }
 
 
 	bool MoveTo(float elapsedTime, const DirectX::XMFLOAT3& target);
@@ -66,11 +66,6 @@ public:
 	int GetState() { return stateMachine->GetStateIndex(); }
 	StateMachine<Enemy>* GetStateMachine() { return stateMachine; }
 
-	std::unordered_map<int, Collider*> GetColliders() { return colliders; }
-	std::unordered_map<int, Collider*> GetAttackColliders() { return attackColliders; }
-	void EnableAttackColliders(bool enable = true) { for (const std::pair<int, Collider*>& collider : attackColliders) collider.second->SetEnable(enable); }
-	virtual void AttackCollision() override;
-
 	static Enemy* EnemyFactory(uint8_t enemyType);
 
 	void SetSpawner(Spawner* spawner) { m_pSpawner = spawner; }
@@ -81,7 +76,7 @@ public:
 	void SetRandomMoveTargetPosition();
 	bool SearchPlayer();
 
-	float GetSearchRange() { return m_SearchRange; }
+	const float GetSearchRange() const { return m_SearchRange; }
 	DirectX::XMFLOAT3 GetMoveTargetPosition() { return m_MoveTargetPosition; }
 
 public:
@@ -138,9 +133,6 @@ protected:
 	StateMachine<Enemy>* stateMachine;
 
 	int subState = -1;
-
-	std::unordered_map<int, Collider*> colliders;		// 当たり判定
-	std::unordered_map<int, Collider*> attackColliders;	// 攻撃判定
 
 	bool showHp = true;	// HP表示
 

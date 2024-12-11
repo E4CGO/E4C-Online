@@ -11,6 +11,7 @@
 #include "GameObject/Character/Character.h"
 #include "GameData.h"
 #include "PlayerCharacterData.h"
+#include "TAKOEngine/Rendering/DebugRenderer/SphereRenderer.h"
 
 class Enemy;
 
@@ -34,6 +35,13 @@ static const uint32_t Input_R_Skill_1 = (1 << 15);	// スキル1リリース
 static const uint32_t Input_R_Skill_2 = (1 << 16);	// スキル2リリース
 static const uint32_t Input_R_Skill_3 = (1 << 17);	// スキル3リリース
 static const uint32_t Input_R_Skill_4 = (1 << 18);	// スキル4リリース
+
+struct ATTACK_DATA
+{
+	int damage = 0;
+	DirectX::XMFLOAT3 force = {};
+	bool power = false;
+};
 
 class PlayerCharacter : public Character
 {
@@ -189,10 +197,6 @@ public:
 	// ステートマシンを取得
 	StateMachine<PlayerCharacter>* GetStateMachine() { return stateMachine; }
 
-	Collider* GetAttackCollider(int idx) { return m_pattackColliders[idx]; }
-	std::unordered_map<int, Collider*> GetAttackColliders() { return m_pattackColliders; }
-	void EnableAttackColliders(bool enable = true) { for (const std::pair<int, Collider*>& collider : m_pattackColliders) collider.second->SetEnable(enable); }
-
 	// 同期用データを取得
 	void GetSyncData(SYNC_DATA& data);
 	// 同期用データを計算
@@ -203,11 +207,14 @@ protected:
 	void RegisterCommonState();
 	void UpdateTarget();													// 自機用アイム目標更新
 	void UpdateHorizontalMove(float elapsedTime) override;					// 水平移動更新処理
+	void PositionAdjustment() override;										// 位置補正処理
 	virtual void UpdateColliders() override;								// 衝突判定の更新
 
 	void UpdateSkillTimers(float elapsedTime);								// スキルタイマー
 
-	bool CollisionVsEnemies(
+	bool CollisionVsEnemies();
+
+	bool CollisionVsEnemyAttack(
 		Collider* collider,
 		int damage,
 		bool power = false,
@@ -216,9 +223,13 @@ protected:
 		float effectScale = 1.0f
 	); // 汎用 敵との判定
 
-private:
-	uint32_t m_client_id = 0;
+	void AttackEnemy(Collider* attackCol, Collider* enemyCol);
 
+private:
+	float radius = 0;	// 当たり判定半径
+	
+	uint32_t m_client_id = 0;
+	
 	uint32_t input = 0;						// キー入力
 	DirectX::XMFLOAT2 inputDirection = {};	// 移動方向
 	DirectX::XMFLOAT3 target = {};			// アイム目標
@@ -251,6 +262,8 @@ private:
 		}
 	};
 	std::unordered_map<int, SkillTimer> skillTimer;
+
+	std::unique_ptr<SphereRenderer> m_sphere;
 protected:
 
 	static inline DirectX::XMFLOAT4 colorSet[COLOR_PATTERN::END] = {
@@ -262,6 +275,7 @@ protected:
 
 	StateMachine<PlayerCharacter>* stateMachine;
 
+	Collider* m_hitCollider;	// ヒット判定
 	std::unordered_map<int, Collider*> m_pattackColliders; // 攻撃判定
 
 	// 同期用

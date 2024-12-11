@@ -32,9 +32,6 @@ public:
 	// 向き
 	void Turn(float elapsedTime, float vx, float vz, float speed);
 
-	// 攻撃コリジョン
-	virtual void AttackCollision() {}
-
 	void FaceTo(const DirectX::XMFLOAT3 point)
 	{
 		angle.y = atan2(point.x - position.x, point.z - position.z);
@@ -57,6 +54,8 @@ protected:
 	void UpdateHorizontalVelocity(float elapsedFrame);
 	// 水平移動更新処理
 	virtual void UpdateHorizontalMove(float elapsedTime);
+	// 位置補正処理
+	virtual void PositionAdjustment();
 
 	// 着地コールバック
 	virtual void OnLanding() {};
@@ -118,7 +117,7 @@ protected:
 	DirectX::XMFLOAT3 velocity = { 0, 0, 0 };		// 速力
 	bool isGround = false;							// 地面フラグ
 	bool isWall = false;							// 壁フラグ
-	float friction = 0.5f;
+	float friction = 1.5f;
 
 	// 移動用
 	float acceleration = 100.0f;					// 加速度

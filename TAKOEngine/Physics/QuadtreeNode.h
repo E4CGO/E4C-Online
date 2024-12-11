@@ -1,5 +1,5 @@
-//! @file QuadtreeNode.h
-//! @note l•ª–Ø‹óŠÔ
+ï»¿//! @file QuadtreeNode.h
+//! @note å››åˆ†æœ¨ç©ºé–“
 
 #ifndef __QUADTREE_NODE_H__
 #define __QUADTREE_NODE_H__
@@ -8,8 +8,8 @@
 
 /**************************************************************************//**
 	@class		QuadtreeNode
-	@brief		l•ª–Ø‹óŠÔ‚Ìˆê‚Â‚Ìƒm[ƒh
-	@par		‚±‚Ì‹óŠÔ‚É‘¶İ‚·‚éƒIƒuƒWƒFƒNƒg‚ğ“o˜^‚·‚é
+	@brief		å››åˆ†æœ¨ç©ºé–“ã®ä¸€ã¤ã®ãƒãƒ¼ãƒ‰
+	@par		ã“ã®ç©ºé–“ã«å­˜åœ¨ã™ã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç™»éŒ²ã™ã‚‹
 *//***************************************************************************/
 class QuadtreeNode
 {
@@ -29,32 +29,32 @@ public:
 	std::vector<AABB*> GetAABBs() const { return m_aabbs; }
 	std::vector<Capsule*> GetCapsules() const { return m_capsules; }
 
-	// ƒIƒuƒWƒFƒNƒg‚ğ“o˜^
+	// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç™»éŒ²
 	void InsertTriangleObject(Triangle& triangle) { m_triangles.push_back(triangle); }
 	void InsertSphereObject(Sphere& sphere) { m_spheres.emplace_back(&sphere); }
 	void InsertAABBObject(AABB& aabb) { m_aabbs.emplace_back(&aabb); }
 	void InsertCapsuleObject(Capsule& capsule) { m_capsules.emplace_back(&capsule); }
-	// ƒIƒuƒWƒFƒNƒg‚ğíœ
+	// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å‰Šé™¤
 	void ClearTriangleObject() { m_triangles.clear(); }
 	void ClearSphereObject() { m_spheres.clear(); }
 	void ClearAABBObject() { m_aabbs.clear(); }
 	void ClearCapsuleObject() { m_capsules.clear(); }
 
 private:
-	DirectX::XMFLOAT3		m_center = {};		// l•ª–Ø‹óŠÔ‚Ì’†S
-	float					m_halfSize = {};	// l•ª–Ø‹óŠÔ‚Ì”¼•Ó’·
-	// “o˜^‚·‚éƒIƒuƒWƒFƒNƒg‚ğŠÇ—‚·‚éƒ}ƒl[ƒWƒƒ[
-	std::vector<Triangle>		m_triangles = {};		// OŠpŒ`“o˜^—p
-	std::vector<Sphere*>		m_spheres = {};			// ‹…“o˜^—p
-	std::vector<AABB*>			m_aabbs = {};			// AABB“o˜^—p
-	std::vector<Capsule*>		m_capsules = {};		// ƒJƒvƒZƒ‹“o˜^—p
+	DirectX::XMFLOAT3		m_center = {};		// å››åˆ†æœ¨ç©ºé–“ã®ä¸­å¿ƒ
+	float					m_halfSize = {};	// å››åˆ†æœ¨ç©ºé–“ã®åŠè¾ºé•·
+	// ç™»éŒ²ã™ã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç®¡ç†ã™ã‚‹ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼
+	std::vector<Triangle>		m_triangles = {};		// ä¸‰è§’å½¢ç™»éŒ²ç”¨
+	std::vector<Sphere*>		m_spheres = {};			// çƒç™»éŒ²ç”¨
+	std::vector<AABB*>			m_aabbs = {};			// AABBç™»éŒ²ç”¨
+	std::vector<Capsule*>		m_capsules = {};		// ã‚«ãƒ—ã‚»ãƒ«ç™»éŒ²ç”¨
 };
 
 
 /**************************************************************************//**
 	@class		QuadtreeNodeManager
-	@brief		l•ª–Ø‹óŠÔƒ}ƒl[ƒWƒƒ[
-	@par		l•ª–Ø‹óŠÔƒm[ƒh‚ğüŒ`ã‚É•À‚×A—lX‚Èˆ—‚ğ·‚ès‚¤
+	@brief		å››åˆ†æœ¨ç©ºé–“ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼
+	@par		å››åˆ†æœ¨ç©ºé–“ãƒãƒ¼ãƒ‰ã‚’ç·šå½¢ä¸Šã«ä¸¦ã¹ã€æ§˜ã€…ãªå‡¦ç†ã‚’åŸ·ã‚Šè¡Œã†
 *//***************************************************************************/
 class QuadtreeNodeManager
 {
@@ -66,18 +66,18 @@ public:
 	~QuadtreeNodeManager() {}
 
 public:
-	struct CrossedNode	// Œğ·‚µ‚½ƒm[ƒh‚Ì‹L˜^—p\‘¢‘Ì
+	struct CrossedNode	// äº¤å·®ã—ãŸãƒãƒ¼ãƒ‰ã®è¨˜éŒ²ç”¨æ§‹é€ ä½“
 	{
-		int			m_linerIndex = 0;	// ”z—ñ”Ô†
-		int			m_level = 0;		// ŠK‘w”Ô†
+		int			m_linerIndex = 0;	// é…åˆ—ç•ªå·
+		int			m_level = 0;		// éšå±¤ç•ªå·
 	};
 
-	// üŒ`l•ª–Ø‚ÌŠK‘w‚ÌƒXƒ^[ƒgƒCƒ“ƒfƒbƒNƒX‚Ìæ“¾
+	// ç·šå½¢å››åˆ†æœ¨ã®éšå±¤ã®ã‚¹ã‚¿ãƒ¼ãƒˆã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã®å–å¾—
 	const uint32_t GetLevelStart(uint32_t level)
 	{
 		return LevelStart[level];
 	}
-	// üŒ`l•ª–Ø‚ÌƒCƒ“ƒfƒbƒNƒX‚©‚çŠK‘w‚ğæ“¾
+	// ç·šå½¢å››åˆ†æœ¨ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹ã‚‰éšå±¤ã‚’å–å¾—
 	const uint32_t GetLevelFromIndex(uint32_t idx)
 	{
 		uint32_t ret = MAX_DEPTH;
@@ -88,44 +88,44 @@ public:
 		return ret;
 	}
 
-	// l•ª–Ø‹óŠÔ‚Ì¶¬
+	// å››åˆ†æœ¨ç©ºé–“ã®ç”Ÿæˆ
 	void CreateQuadtree(DirectX::XMFLOAT3 center, float halfSize, uint32_t depth);
 
-	// ƒ‚[ƒgƒ“ƒR[ƒh‚Ì¶¬
+	// ãƒ¢ãƒ¼ãƒˆãƒ³ã‚³ãƒ¼ãƒ‰ã®ç”Ÿæˆ
 	uint32_t GetMortonCode(const DirectX::XMFLOAT3& point, const QuadtreeNode& route, float halfSize);
 	uint32_t bitSeparete(uint32_t n);
 
-	// “¯ŠK‘w‚Ì—×‚Ìƒ‚[ƒgƒ“ƒR[ƒh‚ğæ“¾
+	// åŒéšå±¤ã®éš£ã®ãƒ¢ãƒ¼ãƒˆãƒ³ã‚³ãƒ¼ãƒ‰ã‚’å–å¾—
 	int GetNextMortonCode(uint32_t before, uint32_t shiftXYZ, bool minus);
 
-	// l•ª–Ø‹óŠÔ‚ÖƒIƒuƒWƒFƒNƒg‚ğ“o˜^‚·‚éÛ‚ÌüŒ`ƒCƒ“ƒfƒbƒNƒX‚ğæ“¾
+	// å››åˆ†æœ¨ç©ºé–“ã¸ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç™»éŒ²ã™ã‚‹éš›ã®ç·šå½¢ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’å–å¾—
 	uint32_t GetLinerIndexInsertObject(DirectX::XMFLOAT3 minPoint, DirectX::XMFLOAT3 maxPoint);
 
-	// l•ª–Ø‹óŠÔ‚ÖOŠpŒ`ƒIƒuƒWƒFƒNƒg‚ğ“o˜^
+	// å››åˆ†æœ¨ç©ºé–“ã¸ä¸‰è§’å½¢ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç™»éŒ²
 	bool InsertTriangleObject(Triangle& triangle);
-	// l•ª–Ø‹óŠÔ‚Ö‹…‘ÌƒIƒuƒWƒFƒNƒg‚ğ“o˜^
+	// å››åˆ†æœ¨ç©ºé–“ã¸çƒä½“ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç™»éŒ²
 	bool InsertSphereObject(Sphere& sphere);
-	// l•ª–Ø‹óŠÔ‚ÖAABBƒIƒuƒWƒFƒNƒg‚ğ“o˜^
+	// å››åˆ†æœ¨ç©ºé–“ã¸AABBã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç™»éŒ²
 	bool InsertAABBObject(AABB& aabb);
-	// l•ª–Ø‹óŠÔ‚ÖƒJƒvƒZƒ‹ƒIƒuƒWƒFƒNƒg‚ğ“o˜^
+	// å››åˆ†æœ¨ç©ºé–“ã¸ã‚«ãƒ—ã‚»ãƒ«ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç™»éŒ²
 	bool InsertCapsuleObject(Capsule& capsule);
 
-	// ƒIƒuƒWƒFƒNƒg‚ğl•ª–Ø‹óŠÔ‚©‚çíœ
+	// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å››åˆ†æœ¨ç©ºé–“ã‹ã‚‰å‰Šé™¤
 	void ClearAllTriangleObject();
 	void ClearAllSphereObject();
 	void ClearAllAABBObject();
 	void ClearAllCapsuleObject();
 
-	// ‘S‚Ä‚Ìƒm[ƒh‚ÅOŠpŒ`‚Æ‚’¼ƒŒƒC‚ÌŒğ·”»’è‚ğs‚¤iÅ‰‚ÉŒğ·‚·‚éOŠpŒ`‚Ì‚İ‚ğ•Ô‚·•û®j
+	// å…¨ã¦ã®ãƒãƒ¼ãƒ‰ã§ä¸‰è§’å½¢ã¨å‚ç›´ãƒ¬ã‚¤ã®äº¤å·®åˆ¤å®šã‚’è¡Œã†ï¼ˆæœ€åˆã«äº¤å·®ã™ã‚‹ä¸‰è§’å½¢ã®ã¿ã‚’è¿”ã™æ–¹å¼ï¼‰
 	bool IntersectVerticalRayVsTriangle(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayEnd, HitResultVector& result);
-	// ‘S‚Ä‚Ìƒm[ƒh‚ÅOŠpŒ`‚ÆƒŒƒC‚ÌŒğ·”»’è‚ğs‚¤iÅ‰‚ÉŒğ·‚·‚éOŠpŒ`‚Ì‚İ‚ğ•Ô‚·•û®j
+	// å…¨ã¦ã®ãƒãƒ¼ãƒ‰ã§ä¸‰è§’å½¢ã¨ãƒ¬ã‚¤ã®äº¤å·®åˆ¤å®šã‚’è¡Œã†ï¼ˆæœ€åˆã«äº¤å·®ã™ã‚‹ä¸‰è§’å½¢ã®ã¿ã‚’è¿”ã™æ–¹å¼ï¼‰
 	bool IntersectRayVsTriangle(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayEnd, HitResultVector& result);
 
-	// ‘S‚Ä‚Ìƒm[ƒh‚ÅOŠpŒ`‚ÆƒXƒtƒBƒAƒLƒƒƒXƒg‚ÌŒğ·”»’è‚ğs‚¤iÅ‰‚ÉŒğ·‚·‚éOŠpŒ`‚Ì‚İ‚ğ•Ô‚·•û®j
+	// å…¨ã¦ã®ãƒãƒ¼ãƒ‰ã§ä¸‰è§’å½¢ã¨ã‚¹ãƒ•ã‚£ã‚¢ã‚­ãƒ£ã‚¹ãƒˆã®äº¤å·®åˆ¤å®šã‚’è¡Œã†ï¼ˆæœ€åˆã«äº¤å·®ã™ã‚‹ä¸‰è§’å½¢ã®ã¿ã‚’è¿”ã™æ–¹å¼ï¼‰
 	bool IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayEnd, float radius, HitResultVector& result);
 	bool IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayEnd, float radius, HitResultVector& result, std::vector<CrossedNode>* nodeList);
 
-	// ‘S‚Ä‚ÌƒIƒuƒWƒFƒNƒg‚Ì‰Ÿ‚µ–ß‚µˆ—‚ğÀs
+	// å…¨ã¦ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®æŠ¼ã—æˆ»ã—å‡¦ç†ã‚’å®Ÿè¡Œ
 	void CollisionAllObjects(
 		uint32_t target,
 		bool singleNode,
@@ -134,27 +134,27 @@ public:
 		std::vector<AABB*>* upperListAABB = {},
 		std::vector<Triangle>* upperListTriangle = {});
 
-	// w’è‚µ‚½ƒm[ƒhˆÈ‰º‘S‚Ä‚Ìƒm[ƒh‚Å“¯‚¶ƒIƒuƒWƒFƒNƒg“¯m‚Ì‰Ÿ‚µ–ß‚µˆ—‚ğÀs
+	// æŒ‡å®šã—ãŸãƒãƒ¼ãƒ‰ä»¥ä¸‹å…¨ã¦ã®ãƒãƒ¼ãƒ‰ã§åŒã˜ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆåŒå£«ã®æŠ¼ã—æˆ»ã—å‡¦ç†ã‚’å®Ÿè¡Œ
 	void CollisionSphereVsSphere(uint32_t target, bool singleNode, std::vector<Sphere*>* upperListSphere);
 	void CollisionCapsuleVsCapsule(uint32_t target, bool singleNode, std::vector<Capsule*>* upperListCapsule);
 	void CollisionAABBVsAABB(uint32_t target, bool singleNode, std::vector<AABB*>* upperListAABB);
 
-	// w’è‚µ‚½ƒm[ƒhˆÈ‰º‘S‚Ä‚Ìƒm[ƒh‚ÅƒIƒuƒWƒFƒNƒg‚ÆOŠpŒ`‚Ì‰Ÿ‚µ–ß‚µˆ—‚ğÀs@¦OŠpŒ`‘¤‚Í“®‚©‚³‚È‚¢
+	// æŒ‡å®šã—ãŸãƒãƒ¼ãƒ‰ä»¥ä¸‹å…¨ã¦ã®ãƒãƒ¼ãƒ‰ã§ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¨ä¸‰è§’å½¢ã®æŠ¼ã—æˆ»ã—å‡¦ç†ã‚’å®Ÿè¡Œã€€â€»ä¸‰è§’å½¢å´ã¯å‹•ã‹ã•ãªã„
 	void CollisionSphereVsTriangle(uint32_t target, bool singleNode, std::vector<Sphere*>* upperListSphere, std::vector<Triangle>* upperListTriangle);
 	void CollisionCapsuleVsTriangle(uint32_t target, bool singleNode, std::vector<Capsule*>* upperListCapsule, std::vector<Triangle>* upperListTriangle);
 	void CollisionAABBVsTriangle(uint32_t target, bool singleNode, std::vector<AABB*>* upperListAABB, std::vector<Triangle>* upperListTriangle);
 
-	// w’è‚µ‚½ƒm[ƒhˆÈ‰º‘S‚Ä‚Ìƒm[ƒh‚ÅƒIƒuƒWƒFƒNƒg‚ÆƒIƒuƒWƒFƒNƒg‚Ì‰Ÿ‚µ–ß‚µˆ—‚ğÀs
+	// æŒ‡å®šã—ãŸãƒãƒ¼ãƒ‰ä»¥ä¸‹å…¨ã¦ã®ãƒãƒ¼ãƒ‰ã§ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¨ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®æŠ¼ã—æˆ»ã—å‡¦ç†ã‚’å®Ÿè¡Œ
 	void CollisionSphereVsCapsule(uint32_t target, bool singleNode, std::vector<Sphere*>* upperListSphere, std::vector<Capsule*>* upperListCapsule);
 	void CollisionSphereVsAABB(uint32_t target, bool singleNode, std::vector<Sphere*>* upperListSphere, std::vector<AABB*>* upperListAABB);
 	void CollisionCapsuleVsAABB(uint32_t target, bool singleNode, std::vector<Capsule*>* upperListCapsule, std::vector<AABB*>* upperListAABB);
 
 	private:
-		std::vector<QuadtreeNode>	m_quadtreeNodes = {};	// l•ª–Øƒm[ƒh”z—ñ
-		uint32_t	m_depth = 0;	// •ªŠ„”
+		std::vector<QuadtreeNode>	m_quadtreeNodes = {};	// å››åˆ†æœ¨ãƒãƒ¼ãƒ‰é…åˆ—
+		uint32_t	m_depth = 0;	// åˆ†å‰²æ•°
 
-		static const uint32_t	MAX_DEPTH = 10u;	// Å‘å•ªŠ„”
-		static constexpr uint32_t LevelStart[MAX_DEPTH] =	// üŒ`l•ª–Ø‚ÌŠeŠK‘w‚ÌŠJnƒCƒ“ƒfƒbƒNƒXB“™”ä”—ñ‚Ì˜a‚ÌŒö®‚ğ—˜—p‚·‚é‚±‚Æ‚Å‹‚Ü‚é‚ª’è”‚È‚Ì‚Å‚ ‚ç‚©‚¶‚ßŒvZ‚µ‚Ä‚¨‚­
+		static const uint32_t	MAX_DEPTH = 10u;	// æœ€å¤§åˆ†å‰²æ•°
+		static constexpr uint32_t LevelStart[MAX_DEPTH] =	// ç·šå½¢å››åˆ†æœ¨ã®å„éšå±¤ã®é–‹å§‹ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã€‚ç­‰æ¯”æ•°åˆ—ã®å’Œã®å…¬å¼ã‚’åˆ©ç”¨ã™ã‚‹ã“ã¨ã§æ±‚ã¾ã‚‹ãŒå®šæ•°ãªã®ã§ã‚ã‚‰ã‹ã˜ã‚è¨ˆç®—ã—ã¦ãŠã
 		{
 			0, 1, 5, 21, 85, 341, 1365, 5461, 21845, 87381
 		};

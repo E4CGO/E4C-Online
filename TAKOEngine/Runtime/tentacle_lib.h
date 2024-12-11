@@ -2,7 +2,9 @@
 
 #define _WINSOCKAPI_
 
+#ifndef IM_ASSERT
 #define IM_ASSERT(_EXPR) ((void)(_EXPR))
+#endif
 
 #pragma warning(disable : 4099)
 

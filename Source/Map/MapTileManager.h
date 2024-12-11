@@ -5,9 +5,6 @@
 #include "GameObject/ObjectManager.h"
 #include "GameObject/ModelObject.h"
 #include "TAKOEngine/Physics/MapQuadtree.h"
-//#include "TAKOEngine/Physics/QuadtreeNode.h"
-//#include "TAKOEngine/Physics/OctreeNode.h"
-//#include "TAKOEngine/Physics/Liner8TreeManager.h"
 
 class MapTileManager : public ObjectManager<ModelObject>, public Singleton<MapTileManager>
 {
@@ -42,9 +39,6 @@ protected:
 	int InsertMapMesh();
 
 private:
-	//QuadtreeNodeManager quadtree;
-	//OctreeNodeManager octree;
-	//Liner8TreeManager<Triangle> tree;
 	MapQuadtree mapQuadtree;
 };
 

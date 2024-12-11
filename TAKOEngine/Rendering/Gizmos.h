@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <vector>
 #include <wrl.h>
@@ -13,7 +13,7 @@ public:
 	Gizmos(ID3D11Device* device);
 	~Gizmos() {}
 
-	// ” •`‰æ
+	// ç®±æç”»
 	void DrawBox(
 		const DirectX::XMFLOAT3& position,
 		const DirectX::XMFLOAT3& angle,
@@ -21,7 +21,7 @@ public:
 		const DirectX::XMFLOAT4& color
 	);
 
-	// ‹…ƒƒbƒVƒ…ì¬
+	// çƒãƒ¡ãƒƒã‚·ãƒ¥ä½œæˆ
 	void DrawShpere(
 		const DirectX::XMFLOAT3& position,
 		float radius,
@@ -54,16 +54,16 @@ private:
 		DirectX::XMFLOAT4 color;
 	};
 
-	// ƒƒbƒVƒ…¶¬
+	// ãƒ¡ãƒƒã‚·ãƒ¥ç”Ÿæˆ
 	void CreateMesh(ID3D11Device* device, const std::vector<DirectX::XMFLOAT3>& vertices, Mesh& mesh);
 
-	// ” ƒƒbƒVƒ…‚Áì¬
+	// ç®±ãƒ¡ãƒƒã‚·ãƒ¥ã£ä½œæˆ
 	void CreateBoxMesh(ID3D11Device* device, float width, float height, float depth);
 
-	// ‹…ƒƒbƒVƒ…ì¬
+	// çƒãƒ¡ãƒƒã‚·ãƒ¥ä½œæˆ
 	void CreateSphereMesh(ID3D11Device* device, float raduis, int subdivisions);
 
-	//‰~’ŒƒƒbƒVƒ…¶¬
+	//å††æŸ±ãƒ¡ãƒƒã‚·ãƒ¥ç”Ÿæˆ
 	void CreateCylinderMesh(ID3D11Device* device, float radius, float height, int subdivision);
 private:
 	Mesh boxMesh;

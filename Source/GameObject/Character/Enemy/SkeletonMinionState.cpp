@@ -1,6 +1,9 @@
+ï»¿//! @file SkeletonMinionState.cpp
+//! @note 
+
 #include "SkeletonMinionState.h"
 
-// UŒ‚ƒXƒe[ƒg
+// æ”»æ’ƒã‚¹ãƒ†ãƒ¼ãƒˆ
 void SkeletonMinionState::AttackState::Enter()
 {
 	owner->GetModel()->PlayAnimation(Enemy::Animation::Attack_Combo, false);
@@ -9,21 +12,22 @@ void SkeletonMinionState::AttackState::Execute(float elapsedTime)
 {
 	if (owner->GetModel()->GetAnimationRate() <= 0.5f)
 	{
-		owner->GetAttackColliders()[SkeletonMinion::AttackCollider::RightHand]->SetEnable(true);
-		owner->GetAttackColliders()[SkeletonMinion::AttackCollider::LeftHand]->SetEnable(false);
+		owner->GetCollider(SkeletonMinion::COLLIDER::RIGHT_HAND)->SetEnable(true);
+		owner->GetCollider(SkeletonMinion::COLLIDER::LEFT_HAND)->SetEnable(false);
 	}
 	else
 	{
-		owner->GetAttackColliders()[SkeletonMinion::AttackCollider::RightHand]->SetEnable(false);
-		owner->GetAttackColliders()[SkeletonMinion::AttackCollider::LeftHand]->SetEnable(true);
+		owner->GetCollider(SkeletonMinion::COLLIDER::RIGHT_HAND)->SetEnable(false);
+		owner->GetCollider(SkeletonMinion::COLLIDER::LEFT_HAND)->SetEnable(true);
 	}
 
-	if (!owner->GetModel()->IsPlayAnimation())
+	if (!owner->IsPlayAnimation())
 	{
 		owner->GetStateMachine()->ChangeState(enemy::STATE::DEATH);
 	}
 }
 void SkeletonMinionState::AttackState::Exit()
 {
-	owner->EnableAttackColliders(false);
+	owner->GetCollider(SkeletonMinion::COLLIDER::RIGHT_HAND)->SetEnable(false);
+	owner->GetCollider(SkeletonMinion::COLLIDER::LEFT_HAND)->SetEnable(false);
 }

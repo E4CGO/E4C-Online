@@ -1,4 +1,9 @@
-#pragma once
+//! @file EnemyState.h
+//! @note 
+
+#ifndef __INCLUDE_ENEMY_STATE_H__
+#define __INCLUDE_ENEMY_STATE_H__
+
 
 #include "TAKOEngine/AI/BaseState.h"
 #include "GameObject/Character/Enemy/Enemy.h"
@@ -102,3 +107,5 @@ namespace enemy
 		void Exit() override;
 	};
 }
+
+#endif // !__INCLUDE_ENEMY_STATE_H__

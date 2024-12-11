@@ -4,6 +4,7 @@
 #ifndef __INCLUDED_MODEL_OBJECT_H__
 #define __INCLUDED_MODEL_OBJECT_H__
 
+#include <unordered_map>
 #include "GameObject.h"
 #include "TAKOEngine/Rendering/Model/ModelDX11.h"
 #include "TAKOEngine/Rendering/Model/GLTFModelDX11.h"
@@ -32,7 +33,9 @@ public:
 		RHS_PBR,
 		RHS_TOON,
 		LHS_PBR,
+		LHS_PBR_Instancing,
 		LHS_TOON,
+		LHS_TOON_Instancing,
 	};
 
 	RENDER_MODE m_renderMode = DX11;
@@ -84,8 +87,10 @@ public:
 	void SetColor(const DirectX::XMFLOAT4 color) { this->m_color = color; }
 
 	// 衝突判定
-	Collider* GetCollider() { return collider.get(); }
-	void SetCollider(Collider::COLLIDER_TYPE collider, int idx = 0);
+	Collider* GetMoveCollider() { return m_pMoveCollider.get(); }
+	void SetMoveCollider(Collider::COLLIDER_TYPE collider, Collider::COLLIDER_OBJ objType, int idx = 0);
+	Collider* GetCollider(uint8_t idx) { return m_pColliders[idx]; }
+	std::unordered_map<uint8_t, Collider*> GetColliders() { return m_pColliders; }
 
 	// アニメーションのスピードを取得
 	float GetAnimationSpeed() { return m_animationSpeed; }
@@ -107,11 +112,14 @@ public:
 		return GetNodePosition(0, offset);
 	}
 protected:
+	void UpdateColliders();
+protected:
 	// 色
 	DirectX::XMFLOAT4 m_color = { 1, 1, 1, 1 };
 
 	// 衝突判定
-	std::unique_ptr<Collider> collider = nullptr;
+	std::unique_ptr<Collider> m_pMoveCollider = nullptr;
+	std::unordered_map<uint8_t, Collider*> m_pColliders;		// 当たり判定
 
 	// シェーダーID
 	ModelShaderId m_shaderId = ModelShaderId::Toon;

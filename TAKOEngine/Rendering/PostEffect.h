@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <wrl.h>
 #include <d3d11.h>
@@ -10,16 +10,16 @@ class PostEffect
 public:
 	PostEffect(ID3D11Device* device);
 
-	// ƒfƒoƒbƒOGUI•`‰æ
+	// ãƒ‡ãƒãƒƒã‚°GUIæç”»
 	void DrawDebugGUI();
 
-	// ŠJnˆ—
+	// é–‹å§‹å‡¦ç†
 	void Begin(const RenderContext& rc);
-	// ‹P“x’Šoˆ—
+	// è¼åº¦æŠ½å‡ºå‡¦ç†
 	void LuminanceExtraction(const RenderContext& rc, ID3D11ShaderResourceView* colorMap);
-	// ƒuƒ‹[ƒ€ˆ—
+	// ãƒ–ãƒ«ãƒ¼ãƒ å‡¦ç†
 	void Bloom(const RenderContext& rc, ID3D11ShaderResourceView* colorMap, ID3D11ShaderResourceView* luminanceMap);
-	// I—¹ˆ—
+	// çµ‚äº†å‡¦ç†
 	void End(const RenderContext& rc);
 
 private:

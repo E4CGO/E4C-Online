@@ -191,6 +191,7 @@ void StageDungeon_E4C::Initialize()
 	LightManager::Instance().SetAmbientColor({ 0.3f, 0.3f, 0.3f, 0.0f });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
+	dl->SetPosition({ 0, 20, 0 });
 	LightManager::Instance().Register(dl);
 
 	// プレイヤー

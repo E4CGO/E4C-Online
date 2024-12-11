@@ -40,6 +40,7 @@ namespace PlayerCharacterState
 		{
 			if (owner->IsPlayer())
 			{
+
 				float time = owner->GetModel()->GetAnimationRate();
 				if (owner->GetModel()->GetAnimationRate() > 0.75f)
 				{
@@ -64,6 +65,7 @@ namespace PlayerCharacterState
 		{
 			if (owner->IsPlayer())
 			{
+
 				if (owner->GetModel()->GetAnimationRate() > 0.75f)
 				{
 					if (owner->InputAttackNormal()) // アニメーション75%完成
@@ -86,7 +88,7 @@ namespace PlayerCharacterState
 		}
 		void AttackNormalState_3::Execute(float elapsedTime)
 		{
-			if (!owner->IsPlayer()) return;
+
 		}
 
 		// スキル_1ステート

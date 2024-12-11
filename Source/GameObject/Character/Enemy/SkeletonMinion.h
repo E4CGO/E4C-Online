@@ -8,20 +8,15 @@ class SkeletonMinion : public Enemy
 public:
 	SkeletonMinion(float scaling = 1.5f);
 	~SkeletonMinion() = default;
-private:
-	void UpdateColliders() override;
 public:
-	enum AttackCollider
+	enum COLLIDER : uint8_t
 	{
-		LeftHand,
-		RightHand
+		BODY,
+		HEAD,
+		LEFT_HAND,
+		RIGHT_HAND
 	};
 protected:
-	enum HitCollider
-	{
-		Body,
-		Head
-	};
 	enum STATE
 	{
 		ATTACK = enemy::STATE::END,

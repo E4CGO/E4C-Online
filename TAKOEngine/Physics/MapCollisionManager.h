@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <vector>
 
@@ -14,9 +14,9 @@ protected:
 	MapCollisionManager() {}
 	~MapCollisionManager();
 public:
-	// ƒfƒoƒbƒOî•ñ‚Ì•\¦
+	// ãƒ‡ãƒãƒƒã‚°æƒ…å ±ã®è¡¨ç¤º
 	void DrawDebugGUI();
 
-	// ƒfƒoƒbƒOƒvƒŠƒ~ƒeƒBƒu‚Ì•\¦
+	// ãƒ‡ãƒãƒƒã‚°ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–ã®è¡¨ç¤º
 	void DrawDebugPrimitive();
 };

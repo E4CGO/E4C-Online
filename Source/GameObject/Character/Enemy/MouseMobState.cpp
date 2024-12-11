@@ -207,13 +207,15 @@ namespace enemy
 		*//***************************************************************************/
 		void AttackState::Execute(float elapsedTime)
 		{
-			owner->GetAttackColliders()[MouseMob::ATTACK_COLLIDER::BodyAtc]->SetEnable(true);
-
 			m_AnimationTimer -= elapsedTime;
 			if (m_AnimationTimer <= 0)
 			{
 				owner->GetStateMachine()->ChangeSubState(BATTLE_STATE::PURSUIT);
 			}
+		}
+
+		void AttackState::Exit()
+		{
 		}
 	}
 }

@@ -1,4 +1,4 @@
-#include "Input.h"
+ï»¿#include "Input.h"
 
 #include "TAKOEngine/Runtime/tentacle_lib.h"
 
@@ -24,7 +24,7 @@ void Input::Init(HWND hWnd) {
 		MouseData.Pos.y = static_cast<float>(p.y);
 	}
 
-	// ‰Šú‰»
+	// åˆæœŸåŒ–
 	gamePadData.keysState[GAME_PAD_BTN::A] = 0;
 	gamePadData.keysState[GAME_PAD_BTN::B] = 0;
 	gamePadData.keysState[GAME_PAD_BTN::X] = 0;
@@ -45,13 +45,13 @@ void Input::Init(HWND hWnd) {
 
 void Input::Update()
 {
-	// ƒL[ƒ{[ƒh
+	// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰
 	UpdateKeyboard();
 
-	// ƒQ[ƒ€ƒpƒbƒh
+	// ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰
 	UpdateGamePad();
 
-	// ƒ}ƒEƒX
+	// ãƒã‚¦ã‚¹
 	UpdateMouse();
 }
 void Input::UpdateKeyboard()
@@ -70,17 +70,17 @@ void Input::UpdateKeyboard()
 }
 void Input::UpdateGamePad()
 {
-	// ƒ{ƒ^ƒ“ƒjƒ…[ƒtƒŒ[ƒ€
+	// ãƒœã‚¿ãƒ³ãƒ‹ãƒ¥ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ 
 	for (auto& [button, state] : gamePadData.keysState)
 	{
 		state = (state << 1) & 3;
 	}
 
-	// ƒ{ƒ^ƒ“î•ñæ“¾
+	// ãƒœã‚¿ãƒ³æƒ…å ±å–å¾—
 	XINPUT_STATE xinputState;
 	if (XInputGetState(gamePadData.slot, &xinputState) == ERROR_SUCCESS)
 	{
-		// •’ÊƒQ[ƒ€ƒpƒbƒh
+		// æ™®é€šã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰
 		XINPUT_GAMEPAD& pad = xinputState.Gamepad;
 		if (pad.wButtons & XINPUT_GAMEPAD_DPAD_UP)					gamePadData.keysState[GAME_PAD_BTN::DPAD_UP] |= 1;
 		if (pad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT)				gamePadData.keysState[GAME_PAD_BTN::DPAD_RIGHT] |= 1;
@@ -125,40 +125,40 @@ void Input::UpdateGamePad()
 	}
 	else
 	{
-		// XInput‚Å“ü—Íî•ñ‚ªæ“¾o—ˆ‚È‚©‚Á‚½ê‡‚ÍWindowsAPI‚Åæ“¾‚·‚é
+		// XInputã§å…¥åŠ›æƒ…å ±ãŒå–å¾—å‡ºæ¥ãªã‹ã£ãŸå ´åˆã¯WindowsAPIã§å–å¾—ã™ã‚‹
 		JOYINFOEX joyInfo;
 		joyInfo.dwSize = sizeof(JOYINFOEX);
-		joyInfo.dwFlags = JOY_RETURNALL;	// ‘S‚Ä‚Ìî•ñ‚ğæ“¾
+		joyInfo.dwFlags = JOY_RETURNALL;	// å…¨ã¦ã®æƒ…å ±ã‚’å–å¾—
 		if (joyGetPosEx(gamePadData.slot, &joyInfo) == JOYERR_NOERROR)
 		{
-			// »•iID‚ğƒ`ƒFƒbƒN‚µ‚ÄPS4ƒRƒ“ƒgƒ[ƒ‰[‚¾‚¯‘Î‰‚·‚é
+			// è£½å“IDã‚’ãƒã‚§ãƒƒã‚¯ã—ã¦PS4ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼ã ã‘å¯¾å¿œã™ã‚‹
 			static const WORD PS4_PID = 1476;
 
 			JOYCAPS joy_caps;
 			if (joyGetDevCaps(gamePadData.slot, &joy_caps, sizeof(JOYCAPS)) == JOYERR_NOERROR)
 			{
-				// \šƒL[
+				// åå­—ã‚­ãƒ¼
 				switch (joyInfo.dwPOV)
 				{
-				case 0xFFFF:break;	// 65535F“ü—Í‚È‚µ
-				case 0x0000: gamePadData.keysState[GAME_PAD_BTN::DPAD_UP] |= 1; break;		// 0: ã
-				case 0x2328: gamePadData.keysState[GAME_PAD_BTN::DPAD_RIGHT] |= 1; break;	// 9000: ‰E
-				case 0x4650: gamePadData.keysState[GAME_PAD_BTN::DPAD_DOWN] |= 1; break;	// 18000: ‰º
-				case 0x6978: gamePadData.keysState[GAME_PAD_BTN::DPAD_LEFT] |= 1; break;	// 27000: ¶
+				case 0xFFFF:break;	// 65535ï¼šå…¥åŠ›ãªã—
+				case 0x0000: gamePadData.keysState[GAME_PAD_BTN::DPAD_UP] |= 1; break;		// 0: ä¸Š
+				case 0x2328: gamePadData.keysState[GAME_PAD_BTN::DPAD_RIGHT] |= 1; break;	// 9000: å³
+				case 0x4650: gamePadData.keysState[GAME_PAD_BTN::DPAD_DOWN] |= 1; break;	// 18000: ä¸‹
+				case 0x6978: gamePadData.keysState[GAME_PAD_BTN::DPAD_LEFT] |= 1; break;	// 27000: å·¦
 
-				case 0x1194: // 4500: ‰Eã
+				case 0x1194: // 4500: å³ä¸Š
 					gamePadData.keysState[GAME_PAD_BTN::DPAD_RIGHT] |= 1;
 					gamePadData.keysState[GAME_PAD_BTN::DPAD_UP] |= 1;
 					break;
-				case 0x34bc: // 13500: ‰E‰º
+				case 0x34bc: // 13500: å³ä¸‹
 					gamePadData.keysState[GAME_PAD_BTN::DPAD_RIGHT] |= 1;
 					gamePadData.keysState[GAME_PAD_BTN::DPAD_DOWN] |= 1;
 					break;
-				case 0x57e4: // 22500: ¶‰º
+				case 0x57e4: // 22500: å·¦ä¸‹
 					gamePadData.keysState[GAME_PAD_BTN::DPAD_LEFT] |= 1;
 					gamePadData.keysState[GAME_PAD_BTN::DPAD_DOWN] |= 1;
 					break;
-				case 0x7b0c: // 31500: ¶ã
+				case 0x7b0c: // 31500: å·¦ä¸Š
 					gamePadData.keysState[GAME_PAD_BTN::DPAD_LEFT] |= 1;
 					gamePadData.keysState[GAME_PAD_BTN::DPAD_UP] |= 1;
 					break;
@@ -166,7 +166,7 @@ void Input::UpdateGamePad()
 
 				if (joy_caps.wPid == PS4_PID)
 				{
-					// ƒ{ƒ^ƒ“î•ñ
+					// ãƒœã‚¿ãƒ³æƒ…å ±
 					if (joyInfo.dwButtons & JOY_BUTTON1)  gamePadData.keysState[GAME_PAD_BTN::X] |= 1;
 					if (joyInfo.dwButtons & JOY_BUTTON2)  gamePadData.keysState[GAME_PAD_BTN::A] |= 1;
 					if (joyInfo.dwButtons & JOY_BUTTON3)  gamePadData.keysState[GAME_PAD_BTN::B] |= 1;
@@ -182,19 +182,19 @@ void Input::UpdateGamePad()
 					//if (joyInfo.dwButtons & JOY_BUTTON13) newButtonState |= BTN_?;	// PS
 					//if (joyInfo.dwButtons & JOY_BUTTON14) newButtonState |= BTN_?;	// Touch
 
-					// ¶ƒXƒeƒBƒbƒN
+					// å·¦ã‚¹ãƒ†ã‚£ãƒƒã‚¯
 					gamePadData.L_Axis = {
 						static_cast<int>(joyInfo.dwXpos - 0x7FFF) / static_cast<float>(0x8000),
 						-static_cast<int>(joyInfo.dwYpos - 0x7FFF) / static_cast<float>(0x8000)
 					};
 
-					// ‰EƒXƒeƒBƒbƒN
+					// å³ã‚¹ãƒ†ã‚£ãƒƒã‚¯
 					gamePadData.R_Axis = {
 						static_cast<int>(joyInfo.dwZpos - 0x7FFF) / static_cast<float>(0x8000),
 						-static_cast<int>(joyInfo.dwRpos - 0x7FFF) / static_cast<float>(0x8000)
 					};
 
-					// LRƒgƒŠƒK[
+					// LRãƒˆãƒªã‚¬ãƒ¼
 					gamePadData.LTrigger = static_cast<float>(joyInfo.dwVpos) / static_cast<float>(0xFFFF);
 					gamePadData.RTrigger = static_cast<float>(joyInfo.dwUpos) / static_cast<float>(0xFFFF);
 
@@ -218,7 +218,7 @@ void Input::UpdateMouse()
 		MouseData.Pos.x = static_cast<float>(p.x);
 		MouseData.Pos.y = static_cast<float>(p.y);
 
-		// ƒEƒBƒ“ƒhƒEƒY“àÀ•W
+		// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚ºå†…åº§æ¨™
 		ScreenToClient(this->hWnd, &p);
 		MouseData.WinPos.x = static_cast<float>(p.x);
 		MouseData.WinPos.y = static_cast<float>(p.y);

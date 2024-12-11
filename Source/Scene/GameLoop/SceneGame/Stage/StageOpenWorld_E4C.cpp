@@ -15,6 +15,7 @@
 
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Tool/Timer.h"
+#include "TAKOEngine/Physics/CollisionManager.h"
 
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
@@ -44,7 +45,7 @@ void StageOpenWorld_E4C::Initialize()
 
 	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
 	stage_collision->Update(0);
-	stage_collision->SetCollider(Collider::COLLIDER_TYPE::MAP);
+	stage_collision->SetMoveCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
 
 	MAPTILES.Register(stage_collision);
 	MAPTILES.CreateSpatialIndex(5, 7);
@@ -79,6 +80,7 @@ void StageOpenWorld_E4C::Initialize()
 	LightManager::Instance().SetAmbientColor({ 0.3f, 0.3f, 0.3f, 0.0f });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
+	dl->SetPosition({ 0, 20, 0 });
 	LightManager::Instance().Register(dl);
 
 	// プレイヤー
@@ -147,6 +149,8 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 		T_INPUT.KeepCursorCenter();
 	}
 	PlayerCharacterManager::Instance().Update(elapsedTime);
+
+	COLLISIONS.Contacts();
 
 	for (auto& it : models)
 	{

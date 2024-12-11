@@ -18,20 +18,14 @@ class MouseMob : public Enemy
 public:
 	MouseMob(float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX11);
 	~MouseMob() = default;
-private:
-	void UpdateColliders() override;
 public:
-	enum ATTACK_COLLIDER
+	enum COLLIDER
 	{
-		BodyAtc
+		ATTACK,
+		BODY,
 	};
 
 protected:
-	enum HitCollider
-	{
-		BodyHit
-	};
-
 	void UpdateTarget();
 };
 

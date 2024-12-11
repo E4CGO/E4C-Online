@@ -32,8 +32,7 @@ bool MapTileManager::SphereCast(const DirectX::XMFLOAT3& start, const DirectX::X
 // 球の押し戻し
 bool MapTileManager::IntersectSphereVsMap(Sphere& sphere)
 {
-	bool ret = false;
-	return ret;
+	return mapQuadtree.IntersectVsSphere(sphere);
 }
 
 // カプセルの押し戻し
@@ -50,7 +49,7 @@ void MapTileManager::CalcMapArea(DirectX::XMFLOAT3& minPos, DirectX::XMFLOAT3& m
 
 	for (ModelObject*& item : items)
 	{
-		if (item->GetCollider() == nullptr) continue;
+		if (item->GetMoveCollider() == nullptr) continue;
 
 		const ModelResource* resource = item->GetModel()->GetResource();
 		for (const ModelResource::Mesh& mesh : resource->GetMeshes())

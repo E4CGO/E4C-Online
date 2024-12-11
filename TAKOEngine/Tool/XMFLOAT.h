@@ -26,7 +26,7 @@ inline bool operator!=(const XMFLOAT3& v1, const XMFLOAT3& v2) { return !(v1 == 
 inline float XMFLOAT3Length(const XMFLOAT3& v) { return XMVectorGetX(XMVector3Length(XMLoadFloat3(&v))); }
 inline float XMFLOAT3LengthSq(const XMFLOAT3& v) { return XMVectorGetX(XMVector3LengthSq(XMLoadFloat3(&v))); }
 inline float XMFLOAT3HorizontalLength(XMFLOAT3 v) { v.y = 0.0f; return XMFLOAT3Length(v); }
-inline float XMFLOAT3HorizontalLengthSq(XMFLOAT3 v) { v.y = 0.0f; return XMFLOAT3HorizontalLengthSq(v); }
+inline float XMFLOAT3HorizontalLengthSq(XMFLOAT3 v) { v.y = 0.0f; return XMFLOAT3LengthSq(v); }
 inline XMFLOAT3 XMFLOAT3Normalize(const XMFLOAT3& v)
 {
 	XMFLOAT3 n;
