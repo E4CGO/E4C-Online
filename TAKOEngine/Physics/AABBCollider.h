@@ -27,7 +27,7 @@ public:
 	//DirectX::XMFLOAT3 GetTop() override;
 
 	// AABB用パラメータセット
-	void SetParam(AABB aabb) override;
+	void SetParam(const AABB& aabb) override;
 
 	const DirectX::XMFLOAT3 GetRadii() const { return m_radii; }
 

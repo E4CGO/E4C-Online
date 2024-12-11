@@ -63,10 +63,10 @@ public:
 	int GetState() { return stateMachine->GetStateIndex(); }
 	StateMachine<Enemy>* GetStateMachine() { return stateMachine; }
 
-	std::unordered_map<int, Collider*> GetColliders() { return colliders; }
-	std::unordered_map<int, Collider*> GetAttackColliders() { return attackColliders; }
-	void EnableAttackColliders(bool enable = true) { for (const std::pair<int, Collider*>& collider : attackColliders) collider.second->SetEnable(enable); }
-	virtual void AttackCollision() override;
+	//std::unordered_map<int, Collider*> GetColliders() { return colliders; }
+	//std::unordered_map<int, Collider*> GetAttackColliders() { return attackColliders; }
+	//void EnableAttackColliders(bool enable = true) { for (const std::pair<int, Collider*>& collider : attackColliders) collider.second->SetEnable(enable); }
+	//virtual void AttackCollision() override;
 
 	static Enemy* EnemyFactory(int enemyType);
 
@@ -121,8 +121,8 @@ protected:
 
 	int subState = -1;
 
-	std::unordered_map<int, Collider*> colliders;		// “–‚½‚è”»’è
-	std::unordered_map<int, Collider*> attackColliders;	// UŒ‚”»’è
+	//std::unordered_map<int, Collider*> colliders;		// “–‚½‚è”»’è
+	//std::unordered_map<int, Collider*> attackColliders;	// UŒ‚”»’è
 
 	bool showHp = true;	// HP•\¦
 

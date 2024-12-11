@@ -30,21 +30,24 @@ public:
 		return false;
 	}
 
+	void Update() override;
+
 	// Capsule用パラメータセット
-	void SetParam(Capsule capsule) override;
+	void SetParam(const Capsule& capsule) override;
 	// Capsule用パラメータゲット
-	Capsule GetCapsule() override { return Capsule(m_offset, m_direction, m_length, m_radius); }
+	Capsule GetCapsule() override { return Capsule(m_offset, m_Ldirection, m_length, m_radius); }
 
 	const float GetLength() const { return m_length; }
 	const float GetRadius() const { return m_radius; }
-	const DirectX::XMFLOAT3 GetDirection() const { return m_direction; }
+	const DirectX::XMFLOAT3 GetDirection() const { return m_Wdirection; }
 
 	void DrawDebugPrimitive(DirectX::XMFLOAT4 color = { 1, 1, 1, 1 }) override;
 
 private:
 	float m_radius = 0.0f;
 	float m_length = 0.0f;
-	DirectX::XMFLOAT3 m_direction = { 0.0f, 0.0f, 0.0f };	// 向き（正規化）
+	DirectX::XMFLOAT3 m_Wdirection = { 0.0f, 0.0f, 0.0f };	// ワールド方向（正規化）
+	DirectX::XMFLOAT3 m_Ldirection = { 0.0f, 0.0f, 0.0f };	// ローカル空間での方向（正規化）
 
 	std::unique_ptr<SphereRenderer> m_sphere[2];
 	std::unique_ptr<CylinderRenderer> m_cylinder;

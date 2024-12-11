@@ -19,23 +19,13 @@ Enemy::Enemy(const char* filename, float scaling) : Character(filename, scaling)
 Enemy::~Enemy()
 {
 	delete stateMachine;
-	for (const std::pair<int, Collider*>& collider : colliders)
-	{
-		COLLISIONS.Remove(collider.second);
-		//delete collider.second;
-	}
-	for (const std::pair<int, Collider*>& collider : attackColliders)
-	{
-		COLLISIONS.Remove(collider.second);
-		//delete collider.second;
-	}
-	colliders.clear();
-	attackColliders.clear();
-
+	
 	if (m_pSpawner != nullptr)
 	{
 		m_pSpawner->EnemyDestoryCallBack(this);
 	}
+
+	m_pColliders.clear();
 }
 
 bool Enemy::MoveTo(float elapsedTime, const DirectX::XMFLOAT3& target)
@@ -88,40 +78,30 @@ void Enemy::Render(const RenderContext& rc)
 	Character::Render(rc);
 
 #ifdef _DEBUG
-	for (const std::pair<int, Collider*>& collider : colliders)
+	for (const std::pair<uint8_t, Collider*>& collider : m_pColliders)
 	{
 		collider.second->DrawDebugPrimitive({ 1, 1, 1, 1 });
 	}
-
-	//Collider* playerCollider = PLAYERS.GetPlayerById(GAME_DATA.GetClientId())->GetCollider();
-	for (const std::pair<int, Collider*>& collider : attackColliders)
-	{
-		DirectX::XMFLOAT4 color = { 1, 0, 0, 1 };
-		//HitResult hit;
-		//if (collider.second->Collision(playerCollider, {}, hit)) color = { 0, 0, 1, 1 };
-
-		collider.second->DrawDebugPrimitive(color);
-	}
 #endif // DEBUG
 }
-void Enemy::AttackCollision()
-{
-	PlayerCharacterManager& pMnager = PlayerCharacterManager::Instance();
-	PlayerCharacter* player = pMnager.GetPlayerCharacterById(GAME_DATA.GetClientId());
-	if (!player) return;
-	Collider* playerCollider = pMnager.GetPlayerCharacterById(GAME_DATA.GetClientId())->GetCollider();
-	if (!playerCollider->IsEnable()) return;
-
-	for (const std::pair<int, Collider*>& collider : attackColliders)
-	{
-		HitResult hit;
-		if (collider.second->Collision(playerCollider, {}, hit))
-		{
-			player->OnDamage(hit, atk);
-
-		}
-	}
-}
+//void Enemy::AttackCollision()
+//{
+//	PlayerCharacterManager& pMnager = PlayerCharacterManager::Instance();
+//	PlayerCharacter* player = pMnager.GetPlayerCharacterById(GAME_DATA.GetClientId());
+//	if (!player) return;
+//	Collider* playerCollider = pMnager.GetPlayerCharacterById(GAME_DATA.GetClientId())->GetCollider();
+//	if (!playerCollider->IsEnable()) return;
+//
+//	for (const std::pair<uint8_t, Collider*>& collider : m_pColliders)
+//	{
+//		HitResult hit;
+//		if (collider.second->Collision(playerCollider, {}, hit))
+//		{
+//			player->OnDamage(hit, atk);
+//
+//		}
+//	}
+//}
 
 void Enemy::OnDamage(const ENEMY_COLLISION& hit)
 {
@@ -152,6 +132,12 @@ void Enemy::OnDamage(const ATTACK_DATA& hit)
 void Enemy::OnDeath()
 {
 	ENEMIES.Remove(this);
+
+	for (const std::pair<uint8_t, Collider*>& collider : m_pColliders)
+	{
+		COLLISIONS.Remove(collider.second);
+	}
+	m_pColliders.clear();
 }
 
 Enemy* Enemy::EnemyFactory(int enemyType)

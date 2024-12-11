@@ -40,7 +40,7 @@ public:
 	) override;
 
 	// Sphere用パラメータセット
-	void SetParam(Sphere sphere) override;
+	void SetParam(const Sphere& sphere) override;
 	// Sphere用パラメータゲット
 	Sphere GetSphere() override { return Sphere(m_offset, m_radius); }
 

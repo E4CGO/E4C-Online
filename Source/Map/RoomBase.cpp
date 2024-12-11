@@ -420,7 +420,7 @@ void RoomBase::PlaceMapTile(bool isLeader)
 				newTile->LoadModel(fileName.c_str(), 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::LHS_PBR);
 			}
 		}
-		if (colliderFileNames.size() != 0) newTile->SetCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
+		if (colliderFileNames.size() != 0) newTile->SetMoveCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
 
 		// 表示用モデルは後に読み込む
 		for (std::string fileName : modelFileNames)

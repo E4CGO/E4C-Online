@@ -11,49 +11,36 @@
 SkeletonMinion::SkeletonMinion(float scaling) : Enemy("Data/Model/Enemy/character_skeleton_minion.gltf", scaling)
 {
 	enemyType = ENEMY_TYPE::SKELETON_MINION;
+	radius = 0.6f;
 	maxHp = hp = 50;
 	atk = 10;
 	moveSpeed = 2.0f;
 	turnSpeed = DirectX::XMConvertToRadians(180);
 
 	// ˆÚ“®—pCollider
-	SetCollider(Collider::COLLIDER_TYPE::SPHERE, Collider::COLLIDER_OBJ::ENEMY);
 	Sphere sphere({ 0, 0.6f / scaling, 0 }, 0.6f);
-	collider->SetParam(sphere);
-	//collider->setTransform(&m_pmodels[0]->FindNode("character_skeleton_minion_body")->worldTransform);
-	collider->SetOwner(this);
+	SetMoveCollider(sphere, Collider::COLLIDER_OBJ::ENEMY);
 
 	// “–‚½‚è”»’è
-	colliders[HitCollider::Body] = new SphereCollider(Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("character_skeleton_minion_body")->worldTransform);
-	colliders[HitCollider::Body]->SetParam(sphere);
-	colliders[HitCollider::Body]->SetOwner(this);
-	colliders[HitCollider::Body]->SetHittableOBJ(Collider::COLLIDER_OBJ::PLAYER_ATTACK | Collider::COLLIDER_OBJ::PLAYER_PROJECTILE);
-	COLLISIONS.Register(colliders[HitCollider::Body]);
+	SetCollider(COLLIDER_ID::COL_BODY, sphere, Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("character_skeleton_minion_body")->worldTransform);
+	m_pColliders[COLLIDER_ID::COL_BODY]->SetHittableOBJ(Collider::COLLIDER_OBJ::PLAYER_ATTACK | Collider::COLLIDER_OBJ::PLAYER_PROJECTILE);
 
-	colliders[HitCollider::Head] = new SphereCollider(Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("character_skeleton_minion_head")->worldTransform);
 	sphere.radius = 0.8f;
-	colliders[HitCollider::Head]->SetParam(sphere);
-	colliders[HitCollider::Head]->SetOwner(this);
-	colliders[HitCollider::Head]->SetHittableOBJ(Collider::COLLIDER_OBJ::PLAYER_ATTACK | Collider::COLLIDER_OBJ::PLAYER_PROJECTILE);
-	COLLISIONS.Register(colliders[HitCollider::Head]);
+	SetCollider(COLLIDER_ID::COL_HEAD, sphere, Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("character_skeleton_minion_head")->worldTransform);
+	m_pColliders[COLLIDER_ID::COL_HEAD]->SetHittableOBJ(Collider::COLLIDER_OBJ::PLAYER_ATTACK | Collider::COLLIDER_OBJ::PLAYER_PROJECTILE);
 	
 	// UŒ‚”»’è
-	attackColliders[AttackCollider::LeftHand] = new SphereCollider(Collider::COLLIDER_OBJ::ENEMY_ATTACK, &m_pmodels[0]->FindNode("character_skeleton_minion_armLeft")->worldTransform);
 	sphere.radius = 0.3f;
 	sphere.position = { 0.25f, -0.45f, 0.0f };
-	attackColliders[AttackCollider::LeftHand]->SetParam(sphere);
-	attackColliders[AttackCollider::LeftHand]->SetOwner(this);
-	attackColliders[AttackCollider::LeftHand]->SetHittableOBJ(Collider::COLLIDER_OBJ::PLAYER);
-	COLLISIONS.Register(attackColliders[AttackCollider::LeftHand]);
+	SetCollider(COLLIDER_ID::COL_LEFT_HAND, sphere, Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("character_skeleton_minion_armLeft")->worldTransform);
+	m_pColliders[COLLIDER_ID::COL_LEFT_HAND]->SetHittableOBJ(Collider::COLLIDER_OBJ::PLAYER);
+	m_pColliders[COLLIDER_ID::COL_LEFT_HAND]->SetEnable(false);
 
-	attackColliders[AttackCollider::RightHand] = new SphereCollider(Collider::COLLIDER_OBJ::ENEMY_ATTACK, &m_pmodels[0]->FindNode("character_skeleton_minion_armRight")->worldTransform);
 	sphere.position = { -0.25f, -0.45f, 0.0f };
-	attackColliders[AttackCollider::RightHand]->SetParam(sphere);
-	attackColliders[AttackCollider::RightHand]->SetOwner(this);
-	attackColliders[AttackCollider::RightHand]->SetHittableOBJ(Collider::COLLIDER_OBJ::PLAYER);
-	COLLISIONS.Register(attackColliders[AttackCollider::RightHand]);
+	SetCollider(COLLIDER_ID::COL_RIGHT_HAND, sphere, Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("character_skeleton_minion_armRight")->worldTransform);
+	m_pColliders[COLLIDER_ID::COL_RIGHT_HAND]->SetHittableOBJ(Collider::COLLIDER_OBJ::PLAYER);
+	m_pColliders[COLLIDER_ID::COL_RIGHT_HAND]->SetEnable(false);
 
-	EnableAttackColliders(false);
 
 	stateMachine->RegisterState(EnemyState::ID::TargetFound, new EnemyState::FollowState(this, 2.0f, SkeletonMinion::State::Attack));
 	stateMachine->RegisterState(SkeletonMinion::State::Attack, new SkeletonMinionState::AttackState(this));
@@ -64,23 +51,6 @@ SkeletonMinion::SkeletonMinion(float scaling) : Enemy("Data/Model/Enemy/characte
 void SkeletonMinion::UpdateTarget()
 {
 	target = GetClosestPlayer(24.0f);
-}
-
-// Õ“Ë”»’èXV
-void SkeletonMinion::UpdateColliders()
-{
-	if (collider)
-	{
-		collider->Update();
-		for (const std::pair<int, Collider*>& attackCollider : attackColliders)
-		{
-			attackCollider.second->Update();
-		}
-		for (const std::pair<int, Collider*>& hitCollider : colliders)
-		{
-			hitCollider.second->Update();
-		}
-	}
 }
 
 SkeletonMinionBoss::SkeletonMinionBoss() : SkeletonMinion(3.0f)

@@ -2,6 +2,7 @@
 #include "Scene/Stage/Stage.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "TAKOEngine/Rendering/LightManager.h"
+#include "TAKOEngine/Physics/CollisionManager.h"
 
 void Stage::Initialize()
 {
@@ -12,7 +13,7 @@ void Stage::Initialize()
 	MAPTILES.Clear();
 	ENEMIES.Clear();
 	enemyList.clear();
-	
+
 }
 
 void Stage::Finalize()
@@ -21,6 +22,7 @@ void Stage::Finalize()
 	ENEMIES.Clear();
 	LightManager::Instance().Clear();
 	enemyList.clear();
+	COLLISIONS.Clear();
 }
 
 void Stage::Update(float elapsedTime)

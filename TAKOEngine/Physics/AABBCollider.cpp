@@ -13,7 +13,7 @@ AABBCollider::AABBCollider(uint16_t _objType, DirectX::XMFLOAT4X4* _transform) :
 }
 
 // AABB用パラメータセット
-void AABBCollider::SetParam(AABB aabb)
+void AABBCollider::SetParam(const AABB& aabb)
 {
 	m_offset = aabb.position;
 	m_radii = aabb.radii;

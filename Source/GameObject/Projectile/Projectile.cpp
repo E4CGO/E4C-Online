@@ -26,7 +26,7 @@ void Projectile::Render(const RenderContext& rc)
 {
 	ModelObject::Render(rc);
 #ifdef _DEBUG
-	if (collider) collider->DrawDebugPrimitive({ 1, 1, 1, 1 });
+	if (m_pMoveCollider) m_pMoveCollider->DrawDebugPrimitive({ 1, 1, 1, 1 });
 #endif // _DEBUG
 }
 
@@ -68,16 +68,16 @@ void Projectile::Destory()
 
 void Projectile::Collision()
 {
-	if (collider == nullptr) return;
+	if (m_pMoveCollider == nullptr) return;
 
 	if ((collisionTarget & COLLISION_TARGET::STAGE) > 0)
 	{
-		Collider* col = collider.get();
+		Collider* col = m_pMoveCollider.get();
 		for (ModelObject*& map : MAPTILES.GetAll())
 		{
 			HitResult hit;
 			DirectX::XMFLOAT3 direction = {};
-			if (map->GetCollider()->Collision(col, {}, hit))
+			if (map->GetMoveCollider()->Collision(col, {}, hit))
 			{
 				if (fabsf(hit.normal.y) < 0.01f)
 				{
@@ -100,7 +100,7 @@ void Projectile::Collision()
 			for (std::pair<int, Collider*> enemyCollider : enemy->GetColliders())
 			{
 				HitResult temp;
-				if (collider->Collision(enemyCollider.second, {}, temp)) // 衝突
+				if (m_pMoveCollider->Collision(enemyCollider.second, {}, temp)) // 衝突
 				{
 					if (temp.distance < hit.distance) // 一番接近計算
 					{

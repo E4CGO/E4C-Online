@@ -11,7 +11,7 @@ private:
 	CollisionManager() {};
 	~CollisionManager() = default;
 public:
-	void Clear() override { items.clear(); }
+	//void Clear() override { items.clear(); }
 	void Contacts();
 };
 

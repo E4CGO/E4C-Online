@@ -33,13 +33,13 @@ public:
 	void SetSphere(const std::vector<DirectX::XMFLOAT3>& centers, float radius, const DirectX::XMFLOAT4& color);
 
 	// 円柱描画
-	void DrawCylinder(const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color);
+	void DrawCylinder(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT3& direction, float radius, float height, const DirectX::XMFLOAT4& color);
 
 	// 立方体描画
 	void DrawCube(const DirectX::XMFLOAT3& position, DirectX::XMFLOAT3& scale, const DirectX::XMFLOAT4& color);
 
 	// カプセル描画
-	void DrawCapsule(const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color);
+	void DrawCapsule(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT3& direction, float radius, float height, const DirectX::XMFLOAT4& color);
 
 private:
 	// 球メッシュ作成
@@ -68,6 +68,7 @@ private:
 	{
 		DirectX::XMFLOAT4	color;
 		DirectX::XMFLOAT3	position;
+		DirectX::XMFLOAT3	direction;
 		float				radius;
 		float				height;
 	};
