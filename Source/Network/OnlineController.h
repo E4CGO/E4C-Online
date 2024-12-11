@@ -114,7 +114,7 @@ namespace Online
 		// 接続状態更新
 		void SetState(const uint8_t& state) { m_state = state; }
 		// 接続ID取得
-		const uint64_t GetId() const { return m_id; }
+		const uint32_t GetId() const { return m_id; }
 		// 接続トークン取得
 		const std::string& GetToken() const { return m_token; }
 
@@ -126,7 +126,7 @@ namespace Online
 		UDPClientSocket*& GetUdpSocket() { return m_pudpSocket; }
 
 		// IDとトークン更新
-		void SignIn(const uint64_t& id, std::string token)
+		void SignIn(const uint32_t& id, std::string token)
 		{
 			m_id = id;
 			m_token = token;
@@ -189,7 +189,7 @@ namespace Online
 		void UDPSendThread();
 	private:
 		uint8_t m_state;		// 接続状態
-		uint64_t m_id;			// 接続ID
+		uint32_t m_id;			// 接続ID
 		std::string m_token;	// 接続用ランダムトークン
 
 		TCPClientSocket* m_ptcpSocket = nullptr;	// TCPソケット

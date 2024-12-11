@@ -1,10 +1,10 @@
-#include "TAKOEngine/Runtime/tentacle_lib.h"
+ï»¿#include "TAKOEngine/Runtime/tentacle_lib.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
 
 #include "LightManager.h"
 #include "DeferredRendering.h"
 
-//‰Šú‰»
+//åˆæœŸåŒ–
 void DeferredRendering::Initialize()
 {
 	ID3D11Device* device = T_GRAPHICS.GetDevice();
@@ -12,10 +12,10 @@ void DeferredRendering::Initialize()
 	sprite = std::make_unique<Sprite>(device);
 }
 
-//MRTİ’è
+//MRTè¨­å®š
 void DeferredRendering::SetDeferredRTV()
 {
-	//Deferred Rendering—p
+	//Deferred Renderingç”¨
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Scene)->Clear(T_GRAPHICS.GetDeviceContext(), 0.2f, 0.2f, 0.2f, 1);
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Normal)->Clear(T_GRAPHICS.GetDeviceContext(), 0.2f, 0.2f, 0.2f, 1);
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Position)->Clear(T_GRAPHICS.GetDeviceContext(), 0.2f, 0.2f, 0.2f, 1);
@@ -30,23 +30,23 @@ void DeferredRendering::SetDeferredRTV()
 		->SetRenderTargets(T_GRAPHICS.GetDeviceContext(), 3, rtv);
 }
 
-//•`‰æ
+//æç”»
 void DeferredRendering::Render()
 {
-	// •`‰æƒRƒ“ƒeƒLƒXƒgİ’è
+	// æç”»ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆè¨­å®š
 	RenderContext rc;
 	rc.camera        =CameraManager::Instance().GetCamera();
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState   = T_GRAPHICS.GetRenderState();
 
-	// ƒ‰ƒCƒg‚Ìî•ñ‚ğ‹l‚ß‚Ş
+	// ãƒ©ã‚¤ãƒˆã®æƒ…å ±ã‚’è©°ã‚è¾¼ã‚€
 	LightManager::Instance().PushRenderContext(rc);
 
-	//DeferredRendering—pSRVİ’è
+	//DeferredRenderingç”¨SRVè¨­å®š
 	rc.deferredData.normal   = T_GRAPHICS.GetFrameBuffer(FrameBufferId::Normal)->GetShaderResourceView().Get();
 	rc.deferredData.position = T_GRAPHICS.GetFrameBuffer(FrameBufferId::Position)->GetShaderResourceView().Get();
 
-	//•`‰æ
+	//æç”»
 	SpriteShader* shader = T_GRAPHICS.GetSpriteShader(SpriteShaderId::Deferred);
 	shader->Begin(rc);
 

@@ -11,6 +11,7 @@
 #include "GameObject/Character/Character.h"
 #include "GameData.h"
 #include "PlayerCharacterData.h"
+#include "TAKOEngine/Rendering/DebugRenderer/SphereRenderer.h"
 
 class Enemy;
 
@@ -35,11 +36,18 @@ static const uint32_t Input_R_Skill_2 = (1 << 16);	// スキル2リリース
 static const uint32_t Input_R_Skill_3 = (1 << 17);	// スキル3リリース
 static const uint32_t Input_R_Skill_4 = (1 << 18);	// スキル4リリース
 
+struct ATTACK_DATA
+{
+	int damage = 0;
+	DirectX::XMFLOAT3 force = {};
+	bool power = false;
+};
+
 class PlayerCharacter : public Character
 {
 public:
 	// コンストラクタ(引数付き)
-	PlayerCharacter(uint64_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
+	PlayerCharacter(uint32_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
 	// コンストラクタ(引数付き)
 	PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataInfo);
 	// デストラクタ
@@ -49,8 +57,8 @@ public:
 	// 同期用
 	struct SYNC_DATA
 	{
-		uint64_t client_id;
-		uint64_t sync_count_id;
+		uint32_t client_id;
+		uint32_t sync_count_id;
 		float position[3];
 		float velocity[3];
 		float rotate;
@@ -153,8 +161,8 @@ public:
 	void FaceToCamera();
 	void TurnByInput();
 
-	uint64_t GetClientId() { return m_client_id; }
-	void SetClientId(const uint64_t id) { m_client_id = id; }
+	uint32_t GetClientId() { return m_client_id; }
+	void SetClientId(const uint32_t id) { m_client_id = id; }
 
 	float GetTurnSpeed() { return turnSpeed; }
 	void SetTurnSpeed(float turnSpeed) { this->turnSpeed = turnSpeed; }
@@ -214,11 +222,14 @@ protected:
 	void RegisterCommonState();
 	void UpdateTarget();													// 自機用アイム目標更新
 	void UpdateHorizontalMove(float elapsedTime) override;					// 水平移動更新処理
+	void PositionAdjustment() override;										// 位置補正処理
 	virtual void UpdateColliders() override;								// 衝突判定の更新
 
 	void UpdateSkillTimers(float elapsedTime);								// スキルタイマー
 
-	bool CollisionVsEnemies(
+	bool CollisionVsEnemies();
+
+	bool CollisionVsEnemyAttack(
 		Collider* collider,
 		int damage,
 		bool power = false,
@@ -227,9 +238,13 @@ protected:
 		float effectScale = 1.0f
 	); // 汎用 敵との判定
 
-private:
-	uint64_t m_client_id = 0;
+	void AttackEnemy(Collider* attackCol, Collider* enemyCol);
 
+private:
+	float radius = 0;	// 当たり判定半径
+	
+	uint32_t m_client_id = 0;
+	
 	uint32_t input = 0;						// キー入力
 	DirectX::XMFLOAT2 inputDirection = {};	// 移動方向
 	DirectX::XMFLOAT3 target = {};			// アイム目標
@@ -262,6 +277,8 @@ private:
 		}
 	};
 	std::unordered_map<int, SkillTimer> skillTimer;
+
+	std::unique_ptr<SphereRenderer> m_sphere;
 protected:
 
 	static inline DirectX::XMFLOAT4 colorSet[COLOR_PATTERN::END] = {
@@ -273,6 +290,7 @@ protected:
 
 	StateMachine<PlayerCharacter>* stateMachine;
 
+	Collider* m_hitCollider;	// ヒット判定
 	std::unordered_map<int, Collider*> m_pattackColliders; // 攻撃判定
 
 	// 同期用
@@ -283,7 +301,7 @@ protected:
 		float time = 0.0f;
 		DirectX::XMFLOAT3 position = {};
 		float angle = 0.0f;
-		uint64_t old_sync_count = 0;
+		uint32_t old_sync_count = 0;
 		SYNC_DATA sync_data = {};
 	} m_tempData;
 };

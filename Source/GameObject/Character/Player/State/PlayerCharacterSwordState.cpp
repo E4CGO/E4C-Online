@@ -1,4 +1,4 @@
-﻿//! @file PlayerCharacterSwordState.cpp
+//! @file PlayerCharacterSwordState.cpp
 //! @note
 
 #include "PlayerCharacterSwordState.h"
@@ -100,6 +100,19 @@ namespace PlayerCharacterState
 		{
 			if (owner->IsPlayer())
 			{
+				if (!owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_1)->IsEnable())
+				{
+					if (owner->GetModel()->GetAnimationRate() > owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_1)->GetHitStartRate())
+					{
+						owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_1)->SetEnable(true);
+					}
+				}
+				if (owner->GetModel()->GetAnimationRate() > owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_1)->GetHitEndRate())
+				{
+					owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_1)->SetEnable(false);
+					owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_1)->ClearHitOthers();
+				}
+
 				float time = owner->GetModel()->GetCurrentAnimationSeconds();
 				if (0.184f <= time && time <= 0.368f)
 				{
@@ -149,6 +162,18 @@ namespace PlayerCharacterState
 			float time = owner->GetModel()->GetCurrentAnimationSeconds();
 			if (owner->IsPlayer())
 			{
+				if (!owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_2)->IsEnable())
+				{
+					if (owner->GetModel()->GetAnimationRate() > owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_2)->GetHitStartRate())
+					{
+						owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_2)->SetEnable(true);
+					}
+				}
+				if (owner->GetModel()->GetAnimationRate() > owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_2)->GetHitEndRate())
+				{
+					owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_2)->SetEnable(false);
+				}
+
 				if (0.185f <= time && time <= 0.418f)
 				{
 					if (owner->InputAttackNormal())
@@ -194,6 +219,18 @@ namespace PlayerCharacterState
 		}
 		void AttackNormalState_3::Execute(float elapsedTime)
 		{
+			if (!owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_3)->IsEnable())
+			{
+				if (owner->GetModel()->GetAnimationRate() > owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_3)->GetHitStartRate())
+				{
+					owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_3)->SetEnable(true);
+				}
+			}
+			if (owner->GetModel()->GetAnimationRate() > owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_3)->GetHitEndRate())
+			{
+				owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_3)->SetEnable(false);
+			}
+
 			float time = owner->GetModel()->GetCurrentAnimationSeconds();
 			if (owner->IsPlayer())
 			{

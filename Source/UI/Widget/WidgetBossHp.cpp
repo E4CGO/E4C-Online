@@ -16,7 +16,7 @@ WidgetBossHp::WidgetBossHp(const char* name, Enemy* enemy) : name(name), enemy(e
 	{
 		gaugeDX12 = RESOURCE.LoadSpriteResourceDX12("Data/Sprites/Gauge/Hp_line_white.png");
 		gaugeFrameDX12 = RESOURCE.LoadSpriteResourceDX12("Data/Sprites/Gauge/Hp_frame.png");
-		m_size = { static_cast<float>(gaugeFrameDX12->GetTextureWidth()), static_cast<float>(gaugeFrameDX12->GetTextureHeight()) };
+		m_size = gaugeFrameDX12->GetTextureSize();
 		m_position = { SCREEN_W / 2.0f - m_size.x / 2.0f, SCREEN_H * 0.8f };
 	}
 

@@ -393,10 +393,11 @@ void RoomBase::PlaceMapTile(bool isLeader)
 			colliderFileNames.emplace_back("Data/Model/DungeonAssets/WALL.glb");
 			break;
 		case TileType::PILLAR:
-			modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_01a.glb");
-			modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_Base_01a.glb");
-			modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_Top_01a.glb");
-			break;
+			continue;
+			//modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_01a.glb");
+			//modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_Base_01a.glb");
+			//modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Pillar_Top_01a.glb");
+			//break;
 		case TileType::STAIR:
 			colliderFileNames.emplace_back("Data/Model/DungeonAssets/SLOPE.glb");
 			break;
@@ -419,7 +420,7 @@ void RoomBase::PlaceMapTile(bool isLeader)
 				newTile->LoadModel(fileName.c_str(), 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::LHS_PBR);
 			}
 		}
-		if (colliderFileNames.size() != 0) newTile->SetCollider(Collider::COLLIDER_TYPE::MAP);
+		if (colliderFileNames.size() != 0) newTile->SetCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
 
 		// 表示用モデルは後に読み込む
 		for (std::string fileName : modelFileNames)

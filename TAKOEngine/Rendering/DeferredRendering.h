@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <d3d11.h>
 #include <imgui.h>
@@ -11,13 +11,13 @@
 class DeferredRendering
 {
 public:
-	//‰Šú‰»
+	//åˆæœŸåŒ–
 	void Initialize();
 
-	//MRTİ’è
+	//MRTè¨­å®š
 	void SetDeferredRTV();
 
-	//•`‰æ
+	//æç”»
 	void Render();
 
 	//GUI

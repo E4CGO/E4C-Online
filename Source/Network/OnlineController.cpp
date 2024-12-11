@@ -161,14 +161,12 @@ namespace Online
 	{
 		clock_t last = clock();
 		const float frequency = 0.25f;
-		uint64_t sync_count_id = 0;
 		while (m_udpFlag)
 		{
 			if ((static_cast<float>(clock() - last) / CLOCKS_PER_SEC) > frequency)
 			{
 				last = clock();
 				m_udpCommands[UDP_CMD::SYNC]->Send(nullptr);
-				sync_count_id++;
 			}
 		}
 	}

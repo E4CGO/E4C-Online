@@ -15,7 +15,7 @@ class NonPlayerCharacter : public PlayerCharacter
 {
 public:
 	// コンストラクタ(引数付き)
-	NonPlayerCharacter(uint64_t id, const char* name, uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
+	NonPlayerCharacter(uint32_t id, const char* name, uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
 	// コンストラクタ(引数付き)
 	NonPlayerCharacter(PlayerCharacterData::CharacterInfo dataInfo);
 	// デストラクタ

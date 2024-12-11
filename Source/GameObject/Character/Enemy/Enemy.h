@@ -1,4 +1,4 @@
-//! @file Enemy.h
+ï»¿//! @file Enemy.h
 //! @note 
 #ifndef __INCLUDED_ENEMY_H__
 #define __INCLUDED_ENEMY_H__
@@ -12,9 +12,9 @@
 
 struct ENEMY_COLLISION
 {
-	uint64_t enemy_id = -1;
-	uint64_t player_id = -1;
-	uint64_t colider_id = -1;
+	uint32_t enemy_id = -1;
+	uint32_t player_id = -1;
+	uint32_t colider_id = -1;
 	int count = -1;
 	int damage = 10;
 	DirectX::XMFLOAT3 force = {};
@@ -23,8 +23,8 @@ struct ENEMY_COLLISION
 
 enum ENEMY_TYPE : uint8_t
 {
-	SKELETON_MINION,						// ƒfƒtƒHƒ‹ƒgœ
-	SKELETON_MINION_BOSS,					// ƒfƒtƒHƒ‹ƒgœƒ{ƒX
+	SKELETON_MINION,						// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆéª¨
+	SKELETON_MINION_BOSS,					// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆéª¨ãƒœã‚¹
 	END,
 };
 
@@ -40,14 +40,15 @@ public:
 	void Render(const RenderContext& rc) override;
 
 	virtual void OnDamage(const ENEMY_COLLISION& hit);
+	virtual void OnDamage(const ATTACK_DATA& hit);
 	virtual void OnDeath();
 
 	bool IsShowHp() { return showHp; }
 
 	int GetAttack() { return atk; }
 
-	void SetEnemyId(const uint64_t& id) { enemy_id = id; }
-	uint64_t GetEnemyId() { return enemy_id; }
+	void SetEnemyId(const uint32_t& id) { enemy_id = id; }
+	uint32_t GetEnemyId() { return enemy_id; }
 
 	bool IsAlive();
 
@@ -105,10 +106,10 @@ public:
 		Wave
 	};
 protected:
-	uint64_t enemy_id = -1;
+	uint32_t enemy_id = 0;
 	uint8_t enemyType = -1;
 
-	int atk = 10; // UŒ‚—Í
+	int atk = 10; // æ”»æ’ƒåŠ›
 
 	PlayerCharacter* target = nullptr;
 
@@ -120,11 +121,11 @@ protected:
 
 	int subState = -1;
 
-	std::unordered_map<int, Collider*> colliders;		// “–‚½‚è”»’è
-	std::unordered_map<int, Collider*> attackColliders;	// UŒ‚”»’è
+	std::unordered_map<int, Collider*> colliders;		// å½“ãŸã‚Šåˆ¤å®š
+	std::unordered_map<int, Collider*> attackColliders;	// æ”»æ’ƒåˆ¤å®š
 
-	bool showHp = true;	// HP•\¦
+	bool showHp = true;	// HPè¡¨ç¤º
 
-	Spawner* m_pSpawner = nullptr; // ƒXƒ|ƒi[
+	Spawner* m_pSpawner = nullptr; // ã‚¹ãƒãƒŠãƒ¼
 };
 #endif

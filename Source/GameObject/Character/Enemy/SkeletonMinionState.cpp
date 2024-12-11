@@ -1,6 +1,6 @@
-#include "SkeletonMinionState.h"
+ï»¿#include "SkeletonMinionState.h"
 
-// UŒ‚ƒXƒe[ƒg
+// æ”»æ’ƒã‚¹ãƒ†ãƒ¼ãƒˆ
 void SkeletonMinionState::AttackState::Enter()
 {
 	owner->GetModel()->PlayAnimation(Enemy::Animation::Attack_Combo, false);
@@ -18,10 +18,14 @@ void SkeletonMinionState::AttackState::Execute(float elapsedTime)
 		owner->GetAttackColliders()[SkeletonMinion::AttackCollider::LeftHand]->SetEnable(true);
 	}
 
-	if (!owner->GetModel()->IsPlayAnimation())
+	if (!owner->IsPlayAnimation())
 	{
-		owner->GetStateMachine()->ChangeState(EnemyState::ID::Death);
+		owner->GetStateMachine()->ChangeState(EnemyState::ID::Idle);
 	}
+	//if (!owner->GetModel()->IsPlayAnimation())
+	//{
+	//	owner->GetStateMachine()->ChangeState(EnemyState::ID::Death);
+	//}
 }
 void SkeletonMinionState::AttackState::Exit()
 {

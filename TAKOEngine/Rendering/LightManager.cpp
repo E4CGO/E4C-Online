@@ -1,13 +1,13 @@
-//! @file LightManager.cpp
+ï»¿//! @file LightManager.cpp
 //! @note
 
 #include "LightManager.h"
 #include "imgui.h"
 
 //***********************************************************
-// @brief       ƒfƒXƒgƒ‰ƒNƒ^
-// @param[in]   ‚È‚µ
-// @return      ‚È‚µ
+// @brief       ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+// @param[in]   ãªã—
+// @return      ãªã—
 //***********************************************************
 LightManager::~LightManager()
 {
@@ -15,9 +15,9 @@ LightManager::~LightManager()
 }
 
 //***********************************************************
-// @brief       ƒ‰ƒCƒg‚ğ“o˜^‚·‚é
-// @param[in]   light  “o˜^‚·‚éŒõŒ¹‚ğw‚·ƒ|ƒCƒ“ƒ^
-// @return      ‚È‚µ
+// @brief       ãƒ©ã‚¤ãƒˆã‚’ç™»éŒ²ã™ã‚‹
+// @param[in]   light  ç™»éŒ²ã™ã‚‹å…‰æºã‚’æŒ‡ã™ãƒã‚¤ãƒ³ã‚¿
+// @return      ãªã—
 //***********************************************************
 void LightManager::Register(Light* light)
 {
@@ -25,9 +25,9 @@ void LightManager::Register(Light* light)
 }
 
 //***********************************************************
-// @brief       ƒ‰ƒCƒg‚Ì“o˜^‚ğ‰ğœ‚·‚é
-// @param[in]   light  “o˜^‚·‚éŒõŒ¹‚ğw‚·ƒ|ƒCƒ“ƒ^
-// @return      ‚È‚µ
+// @brief       ãƒ©ã‚¤ãƒˆã®ç™»éŒ²ã‚’è§£é™¤ã™ã‚‹
+// @param[in]   light  ç™»éŒ²ã™ã‚‹å…‰æºã‚’æŒ‡ã™ãƒã‚¤ãƒ³ã‚¿
+// @return      ãªã—
 //***********************************************************
 void LightManager::Remove(Light* light)
 {
@@ -40,9 +40,9 @@ void LightManager::Remove(Light* light)
 }
 
 //***********************************************************
-// @brief       “o˜^Ï‚İ‚Ìƒ‰ƒCƒg‚ğ‘Síœ‚·‚é
-// @param[in]   ‚È‚µ
-// @return      ‚È‚µ
+// @brief       ç™»éŒ²æ¸ˆã¿ã®ãƒ©ã‚¤ãƒˆã‚’å…¨å‰Šé™¤ã™ã‚‹
+// @param[in]   ãªã—
+// @return      ãªã—
 //***********************************************************
 void LightManager::Clear()
 {
@@ -54,16 +54,16 @@ void LightManager::Clear()
 }
 
 //***********************************************************
-// @brief       ƒ‰ƒCƒgî•ñ‚ğRenderContext‚ÉÏ‚Ş
-// @param[in]   rc   ƒŒƒ“ƒ_[ƒRƒ“ƒeƒLƒXƒg
-// @return      ‚È‚µ
+// @brief       ãƒ©ã‚¤ãƒˆæƒ…å ±ã‚’RenderContextã«ç©ã‚€
+// @param[in]   rc   ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆ
+// @return      ãªã—
 //***********************************************************
 void LightManager::PushRenderContext(RenderContext& rc)
 {
-	// ŠÂ‹«Œõ‚Ìî•ñ‚ğ’Ç‰Á
+	// ç’°å¢ƒå…‰ã®æƒ…å ±ã‚’è¿½åŠ 
 	rc.ambientLightColor = ambientColor;
 
-	// “o˜^‚³‚ê‚Ä‚¢‚éŒõŒ¹‚Ìî•ñ‚ğİ’è
+	// ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹å…‰æºã®æƒ…å ±ã‚’è¨­å®š
 	for (Light* light : lights)
 	{
 		light->PushRenderContext(rc);
@@ -71,9 +71,9 @@ void LightManager::PushRenderContext(RenderContext& rc)
 }
 
 //***********************************************************
-// @brief      ƒfƒoƒbƒOî•ñ‚Ì•\¦
-// @param[in]  ‚È‚µ
-// @return     ‚È‚µ
+// @brief      ãƒ‡ãƒãƒƒã‚°æƒ…å ±ã®è¡¨ç¤º
+// @param[in]  ãªã—
+// @return     ãªã—
 //***********************************************************
 void LightManager::DrawDebugGUI()
 {
@@ -92,9 +92,9 @@ void LightManager::DrawDebugGUI()
 }
 
 //***********************************************************
-// @brief      ƒfƒoƒbƒO}Œ`‚Ì•\¦
-// @param[in]  ‚È‚µ
-// @return     ‚È‚µ
+// @brief      ãƒ‡ãƒãƒƒã‚°å›³å½¢ã®è¡¨ç¤º
+// @param[in]  ãªã—
+// @return     ãªã—
 //***********************************************************
 void LightManager::DrawDebugPrimitive()
 {

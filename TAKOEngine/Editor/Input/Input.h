@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <DirectXMath.h>
 #undef _WINSOCKAPI_
@@ -34,7 +34,7 @@ private:
 	Input() = default;
 	~Input();
 public:
-	// ƒCƒ“ƒXƒ^ƒ“ƒX
+	// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
 	static Input& Instance()
 	{
 		static Input instance;

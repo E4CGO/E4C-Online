@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <string>
 #include <DirectXMath.h>
 #include <Effekseer/Effekseer.h>
@@ -10,15 +10,15 @@ public:
 	Effect(const char* filename, std::string version);
 	~Effect() {};
 
-	// Ä¶
+	// å†ç”Ÿ
 	Effekseer::Handle Play(const DirectX::XMFLOAT3& position, float scale = 1.0f);
 	Effekseer::Handle PlayDX12(const DirectX::XMFLOAT3& position, float scale = 1.0f);
 
-	// ’â~
+	// åœæ­¢
 	void Stop(Effekseer::Handle handle);
-	// À•Wİ’è
+	// åº§æ¨™è¨­å®š
 	void SetPosition(Effekseer::Handle handle, const DirectX::XMFLOAT3& position);
-	// ƒXƒP[ƒ‹İ’è
+	// ã‚¹ã‚±ãƒ¼ãƒ«è¨­å®š
 	void SetScale(Effekseer::Handle handle, const DirectX::XMFLOAT3& scale);
 
 	void SetRotation(Effekseer::Handle handle, const DirectX::XMFLOAT3& rotation);

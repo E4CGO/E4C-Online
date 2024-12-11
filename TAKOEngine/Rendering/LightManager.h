@@ -1,4 +1,4 @@
-//! @file LightManager.h
+ï»¿//! @file LightManager.h
 //! @note
 
 #ifndef __LIGHT_LIGHT_MANAGER_H__
@@ -10,8 +10,8 @@
 
 //*********************************************************
 // @class LightManager
-// @brief ƒ‰ƒCƒgŠÇ—ƒNƒ‰ƒX
-// @par   [à–¾]
+// @brief ãƒ©ã‚¤ãƒˆç®¡ç†ã‚¯ãƒ©ã‚¹
+// @par   [èª¬æ˜]
 //*********************************************************
 class LightManager
 {
@@ -25,29 +25,29 @@ public:
 		return	lightManager;
 	}
 
-	// ƒ‰ƒCƒg‚ğ“o˜^‚·‚é
+	// ãƒ©ã‚¤ãƒˆã‚’ç™»éŒ²ã™ã‚‹
 	void Register(Light* light);
 
-	// ƒ‰ƒCƒg‚Ì“o˜^‚ğ‰ğœ‚·‚é
+	// ãƒ©ã‚¤ãƒˆã®ç™»éŒ²ã‚’è§£é™¤ã™ã‚‹
 	void Remove(Light* light);
 
-	// “o˜^Ï‚İ‚Ìƒ‰ƒCƒg‚ğ‘Síœ‚·‚é
+	// ç™»éŒ²æ¸ˆã¿ã®ãƒ©ã‚¤ãƒˆã‚’å…¨å‰Šé™¤ã™ã‚‹
 	void Clear();
 
-	// ƒ‰ƒCƒgî•ñ‚ğRenderContext‚ÉÏ‚Ş
+	// ãƒ©ã‚¤ãƒˆæƒ…å ±ã‚’RenderContextã«ç©ã‚€
 	void PushRenderContext(RenderContext& rc);
 
-	// ƒfƒoƒbƒOî•ñ‚Ì•\¦
+	// ãƒ‡ãƒãƒƒã‚°æƒ…å ±ã®è¡¨ç¤º
 	void DrawDebugGUI();
 
-	// ƒfƒoƒbƒOƒvƒŠƒ~ƒeƒBƒu‚Ì•\¦
+	// ãƒ‡ãƒãƒƒã‚°ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–ã®è¡¨ç¤º
 	void DrawDebugPrimitive();
 
-	// ŠÂ‹«Œõ
+	// ç’°å¢ƒå…‰
 	DirectX::XMFLOAT4	GetAmbientColor() { return	ambientColor; }
 	void	SetAmbientColor(DirectX::XMFLOAT4 ambientColor) { this->ambientColor = ambientColor; }
 
-	// ƒ‰ƒCƒg‚Ìî•ñ
+	// ãƒ©ã‚¤ãƒˆã®æƒ…å ±
 	int GetLightCount() const { return static_cast<int>(lights.size()); }
 	Light* GetLight(int index) const { return lights.at(index); }
 	std::vector<Light*> GetAllLight() const { return lights; }

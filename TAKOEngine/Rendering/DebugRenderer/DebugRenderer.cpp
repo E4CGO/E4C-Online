@@ -1,9 +1,20 @@
-﻿#include <stdio.h>
-#include <memory>
-#include "Misc.h"
-#include "DebugRenderer.h"
-#include "GpuResourceUtils.h"
+﻿//! @file DebugRenderer.cpp
+//! @note 
 
+#include <stdio.h>
+#include <memory>
+
+#include "TAKOEngine/Rendering/Misc.h"
+#include "TAKOEngine/Rendering/Graphics.h"
+
+#include "TAKOEngine\Rendering\GpuResourceUtils.h"
+#include "DebugRenderer.h"
+
+//*******************************************************
+// @brief     コンストラクタ
+// @param[in] device  ID3D11Device*
+// @return    なし
+//*******************************************************
 DebugRenderer::DebugRenderer(ID3D11Device* device)
 {
 	// 入力レイアウト
@@ -90,11 +101,18 @@ DebugRenderer::DebugRenderer(ID3D11Device* device)
 
 	// 円柱メッシュ作成
 	CreateCylinderMesh(device, 1.0f, 1.0f, 0.0f, 1.0f, 16, 1);
+
 	// 立方体メッシュ作成
 	CreateCubeMesh(device);
 }
 
-// 描画開始
+//*******************************************************
+// @brief     描画
+// @param[in] context     ID3D11DeviceContext*
+// @param[in] view        カメラのビュー
+// @param[in] projection  カメラのプロジェクション
+// @return    なし
+//*******************************************************
 void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
 	// シェーダー設定
@@ -182,24 +200,45 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
 	cubes.clear();
 }
 
-// 球描画
-void DebugRenderer::DrawSphere(const DirectX::XMFLOAT3& center, float radius, const DirectX::XMFLOAT4& color)
+//*******************************************************
+// @brief     球情報セット
+// @param[in] center     球の中心
+// @param[in] radius     半径
+// @param[in] color      色
+// @return    なし
+//*******************************************************
+void DebugRenderer::SetSphere(const DirectX::XMFLOAT3& m_center, float radius, const DirectX::XMFLOAT4& color)
 {
 	Sphere sphere;
-	sphere.center = center;
+	sphere.center = m_center;
 	sphere.radius = radius;
 	sphere.color = color;
 	spheres.emplace_back(sphere);
 }
-void DebugRenderer::DrawSphere(const std::vector<DirectX::XMFLOAT3>& centers, float radius, const DirectX::XMFLOAT4& color)
+
+//*******************************************************
+// @brief     球情報セット
+// @param[in] centers    球の中心の配列(vector型)
+// @param[in] radius     半径
+// @param[in] color      色
+// @return    なし
+//*******************************************************
+void DebugRenderer::SetSphere(const std::vector<DirectX::XMFLOAT3>& centers, float radius, const DirectX::XMFLOAT4& color)
 {
-	for (const DirectX::XMFLOAT3& center : centers)
+	for (const DirectX::XMFLOAT3& m_center : centers)
 	{
-		DrawSphere(center, radius, color);
+		SetSphere(m_center, radius, color);
 	}
 }
 
-// 円柱描画
+//*******************************************************
+// @brief     円柱情報セット
+// @param[in] position   位置
+// @param[in] radius     半径
+// @param[in] height     高さ
+// @param[in] color      色
+// @return    なし
+//*******************************************************
 void DebugRenderer::DrawCylinder(const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color)
 {
 	Cylinder cylinder;
@@ -210,7 +249,13 @@ void DebugRenderer::DrawCylinder(const DirectX::XMFLOAT3& position, float radius
 	cylinders.emplace_back(cylinder);
 }
 
-// 立方体描画
+//*******************************************************
+// @brief     立方体情報セット
+// @param[in] position   位置
+// @param[in] scale      スケール
+// @param[in] color      色
+// @return    なし
+//*******************************************************
 void DebugRenderer::DrawCube(const DirectX::XMFLOAT3& position, DirectX::XMFLOAT3& scale, const DirectX::XMFLOAT4& color)
 {
 	Cube cube;
@@ -220,17 +265,31 @@ void DebugRenderer::DrawCube(const DirectX::XMFLOAT3& position, DirectX::XMFLOAT
 	cubes.emplace_back(cube);
 }
 
-// カプセル描画
+//*******************************************************
+// @brief     カプセル情報セット
+// @param[in] position   位置
+// @param[in] radius     半径
+// @param[in] height     高さ
+// @param[in] color      色
+// @return    なし
+//*******************************************************
 void DebugRenderer::DrawCapsule(const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color)
 {
 	DrawCylinder(position, radius, height, color);
-	DrawSphere(position, radius, color);
+	SetSphere(position, radius, color);
 	DirectX::XMFLOAT3 upPos = position;
 	upPos.y += height;
-	DrawSphere(upPos, radius, color);
+	SetSphere(upPos, radius, color);
 }
 
-// 球メッシュ作成
+//*******************************************************
+// @brief     球メッシュ作成
+// @param[in] device   ID3D11Device*
+// @param[in] radius   半径
+// @param[in] slices   スライス
+// @param[in] stacks   スタック
+// @return    なし
+//*******************************************************
 void DebugRenderer::CreateSphereMesh(ID3D11Device* device, float radius, int slices, int stacks)
 {
 	sphereVertexCount = stacks * slices * 2 + slices * stacks * 2;
@@ -304,7 +363,17 @@ void DebugRenderer::CreateSphereMesh(ID3D11Device* device, float radius, int sli
 	}
 }
 
-// 円柱メッシュ作成
+//*******************************************************
+// @brief     円柱メッシュ作成
+// @param[in] device   ID3D11Device*
+// @param[in] radius1  半径
+// @param[in] radius2  半径
+// @param[in] start    始まり
+// @param[in] height   高さ
+// @param[in] slices   スライス
+// @param[in] stacks   スタック
+// @return    なし
+//*******************************************************
 void DebugRenderer::CreateCylinderMesh(ID3D11Device* device, float radius1, float radius2, float start, float height, int slices, int stacks)
 {
 	cylinderVertexCount = 2 * slices * (stacks + 1) + 2 * slices;
@@ -375,7 +444,11 @@ void DebugRenderer::CreateCylinderMesh(ID3D11Device* device, float radius1, floa
 	}
 }
 
-// 立方体メッシュ作成
+//*******************************************************
+// @brief     立方体メッシュ作成
+// @param[in] device  ID3D11Device*
+// @return    なし
+//*******************************************************
 void DebugRenderer::CreateCubeMesh(ID3D11Device* device)
 {
 	cubeVertexCount = 24;

@@ -32,7 +32,9 @@ public:
 		RHS_PBR,
 		RHS_TOON,
 		LHS_PBR,
+		LHS_PBR_Instancing,
 		LHS_TOON,
+		LHS_TOON_Instancing,
 	};
 
 	RENDER_MODE m_renderMode = DX11;
@@ -85,7 +87,7 @@ public:
 
 	// 衝突判定
 	Collider* GetCollider() { return collider.get(); }
-	void SetCollider(Collider::COLLIDER_TYPE collider, int idx = 0);
+	void SetCollider(Collider::COLLIDER_TYPE collider, Collider::COLLIDER_OBJ objType, int idx = 0);
 
 	// アニメーションのスピードを取得
 	float GetAnimationSpeed() { return m_animationSpeed; }

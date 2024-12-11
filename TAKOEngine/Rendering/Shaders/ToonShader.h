@@ -1,4 +1,4 @@
-//! @file ToonShader.h
+ï»¿//! @file ToonShader.h
 //! @note 
 
 #ifndef __GRAHICS_TOON_SHADER_H__
@@ -9,9 +9,9 @@
 
 //***********************************************************
 // @file   ToonShader
-// @brief  ToonShader‚Ìƒpƒ‰[ƒ[ƒ^İ’èƒNƒ‰ƒX
-// @par    [à–¾]
-// @par    ƒZƒ‹ƒ‹ƒbƒN‚È•`‰æ
+// @brief  ToonShaderã®ãƒ‘ãƒ©ãƒ¼ãƒ¡ãƒ¼ã‚¿è¨­å®šã‚¯ãƒ©ã‚¹
+// @par    [èª¬æ˜]
+// @par    ã‚»ãƒ«ãƒ«ãƒƒã‚¯ãªæç”»
 //***********************************************************
 class ToonShader : public ModelShader
 {
@@ -24,10 +24,10 @@ public:
 	~ToonShader() override = default;
 
 private:
-	// ƒŒƒ“ƒ_[ƒXƒe[ƒgİ’è
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆè¨­å®š
 	void SetRenderState(const RenderContext& rc) override;
 	
-	// ƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[İ’è
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼è¨­å®š
 	void SetShaderResourceView(const ModelResource::Mesh& mesh, ID3D11DeviceContext*& dc) override;
 
 private:
@@ -36,9 +36,9 @@ private:
 
 //***********************************************************
 // @file   ToonShaderDX12
-// @brief  ToonShaderDX12‚Ìƒpƒ‰[ƒ[ƒ^İ’èƒNƒ‰ƒX
-// @par    [à–¾]
-// @par    DX12‚É‘Î‰‚µ‚½ƒZƒ‹ƒ‹ƒbƒN‚È•`‰æ
+// @brief  ToonShaderDX12ã®ãƒ‘ãƒ©ãƒ¼ãƒ¡ãƒ¼ã‚¿è¨­å®šã‚¯ãƒ©ã‚¹
+// @par    [èª¬æ˜]
+// @par    DX12ã«å¯¾å¿œã—ãŸã‚»ãƒ«ãƒ«ãƒƒã‚¯ãªæç”»
 //***********************************************************
 class ToonShaderDX12 : public ModelShaderDX12
 {
