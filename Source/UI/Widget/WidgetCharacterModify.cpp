@@ -1,5 +1,5 @@
-﻿//! @file WidgetCharacterModify.cpp
-//! @note 
+//! @file WidgetCharacterModify.cpp
+//! @note
 #include "WidgetCharacterModify.h"
 #include <unordered_map>
 #include <cstring>
@@ -8,7 +8,7 @@
 
 #include "Scene/GameLoop/SceneCharacter/SceneCharacter_E4C.h"
 /**************************************************************************//**
- 	@brief		コンストラク
+	@brief		コンストラク
 	@param[in]	scene	キャラクターシーン参照ポインタ
 *//***************************************************************************/
 WidgetCharacterModify::WidgetCharacterModify(SceneCharacter_E4C* scene) : m_pScene(scene)
@@ -37,7 +37,6 @@ WidgetCharacterModify::WidgetCharacterModify(SceneCharacter_E4C* scene) : m_pSce
 		"右手装備",
 	};
 
-
 	for (uint8_t i = 0; i < PlayerCharacterData::APPEARANCE_PATTERN::NUM; i++)
 	{
 		uint8_t size = static_cast<uint8_t>(PLAYER_CHARACTER_DATA.GetAppearancePatternSize(i));
@@ -56,7 +55,7 @@ WidgetCharacterModify::WidgetCharacterModify(SceneCharacter_E4C* scene) : m_pSce
 	}
 }
 /**************************************************************************//**
- 	@brief		更新処理
+	@brief		更新処理
 	@param[in]	elapsedTime	経過時間
 *//***************************************************************************/
 void WidgetCharacterModify::Update(float elapsedTime)
@@ -68,13 +67,14 @@ void WidgetCharacterModify::Update(float elapsedTime)
 
 	if (std::memcmp(m_info.pattern, m_infoTemp.pattern, sizeof(m_info.pattern)) != 0) // 更新あり
 	{
+		if (m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT] == 1)
+			m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT] = 0;
 		m_pScene->GetSelectedCharacter()->LoadAppearance(m_info.pattern);
 		m_infoTemp = m_info;
 	}
-
 }
 /**************************************************************************//**
- 	@brief		描画処理
+	@brief		描画処理
 	@param[in]	rc	レンダーコンテンツ
 *//***************************************************************************/
 void WidgetCharacterModify::Render(const RenderContext& rc)
@@ -85,7 +85,7 @@ void WidgetCharacterModify::Render(const RenderContext& rc)
 	}
 }
 /**************************************************************************//**
- 	@brief		DX12描画処理
+	@brief		DX12描画処理
 	@param[in]	rc	レンダーコンテンツ
 *//***************************************************************************/
 void WidgetCharacterModify::RenderDX12(const RenderContextDX12& rc)
@@ -96,7 +96,7 @@ void WidgetCharacterModify::RenderDX12(const RenderContextDX12& rc)
 	}
 }
 /**************************************************************************//**
- 	@brief	編集したデータを保存する
+	@brief	編集したデータを保存する
 *//***************************************************************************/
 void WidgetCharacterModify::SaveData()
 {
@@ -106,7 +106,7 @@ void WidgetCharacterModify::SaveData()
 	);
 }
 /**************************************************************************//**
- 	@brief	デストラクタ
+	@brief	デストラクタ
 *//***************************************************************************/
 WidgetCharacterModify::~WidgetCharacterModify()
 {

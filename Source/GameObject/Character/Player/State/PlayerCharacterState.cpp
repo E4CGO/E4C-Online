@@ -5,19 +5,6 @@
 #include "GameObject/Character/Character.h"
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 
-const uint32_t flag_Dodge = 1 << 0;
-const uint32_t flag_Jump = 1 << 1;
-const uint32_t flag_Move = 1 << 2;
-const uint32_t flag_Stop = 1 << 3;
-const uint32_t flag_Fall = 1 << 4;
-const uint32_t flag_Ground = 1 << 5;
-const uint32_t flag_AttackN = 1 << 6;
-const uint32_t flag_AttackS = 1 << 7;
-const uint32_t flag_Skill_1 = 1 << 8;
-const uint32_t flag_Skill_2 = 1 << 9;
-const uint32_t flag_Skill_3 = 1 << 10;
-const uint32_t flag_Skill_4 = 1 << 11;
-
 namespace PlayerCharacterState
 {
 	void PlayerTransition(PlayerCharacter* owner, uint32_t flags)
@@ -58,11 +45,13 @@ namespace PlayerCharacterState
 			owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::ATTACK_NORMAL));
 			return;
 		}
-		if (flags & flag_AttackS && owner->InputAttackSpecial())
+
+		if (flags & flag_AttackS && owner->InputSpecial())
 		{
 			owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::ATTACK_SPECIAL));
 			return;
 		}
+
 		if (flags & flag_Skill_1 && owner->InputSkill1())
 		{
 			owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::SKILL_1));
@@ -78,7 +67,7 @@ namespace PlayerCharacterState
 	// 待機ステート
 	void IdleState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::ANIM_IDLE, true, 0.1f);
+		owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_IDLE, true, 0.1f);
 	}
 	void IdleState::Execute(float elapsedTime)
 	{
@@ -99,7 +88,7 @@ namespace PlayerCharacterState
 	// 移動ステート
 	void MoveState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::ANIM_MOVE_CONTINUE, true, 0.1f);
+		owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_MOVE_CONTINUE, true, 0.2f);
 	}
 	void MoveState::Execute(float elapsedTime)
 	{
@@ -120,7 +109,7 @@ namespace PlayerCharacterState
 	// ジャンプステート
 	void JumpState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::ANIM_MOVE_CONTINUE, false, 0.1f);
+		owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_MOVE_CONTINUE, false, 0.1f);
 	}
 	void JumpState::Execute(float elapsedTime)
 	{
@@ -138,7 +127,7 @@ namespace PlayerCharacterState
 	// 落下ステート
 	void FallState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::ANIM_MOVE_CONTINUE, true, 0.1f);
+		owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_MOVE_CONTINUE, true, 0.1f);
 	}
 	void FallState::Execute(float elapsedTime)
 	{
@@ -156,7 +145,7 @@ namespace PlayerCharacterState
 	// 着地ステート
 	void LandState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::ANIM_MOVE_START, false, 0.1f);
+		owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_MOVE_START, false, 0.1f);
 	}
 	void LandState::Execute(float elapsedTime)
 	{
@@ -177,7 +166,7 @@ namespace PlayerCharacterState
 	// 回避ステート
 	void DodgeState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::ANIM_MOVE_CONTINUE, false, 0.0f);
+		owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_MOVE_CONTINUE, false, 0.0f);
 		owner->SetHurtCoolTime(0.2f);
 
 		// MP消費
@@ -226,7 +215,7 @@ namespace PlayerCharacterState
 	// 待機用ステート
 	void WaitState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::ANIM_IDLE, true, 0.1f);
+		owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_IDLE, true, 0.1f);
 	}
 	void WaitState::Execute(float elapsedTime)
 	{
@@ -237,7 +226,7 @@ namespace PlayerCharacterState
 	// 待機用 (準備完了)ステート
 	void ReadyState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::ANIM_IDLE, true, 0.1f);
+		owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_IDLE, true, 0.1f);
 	}
 	void ReadyState::Execute(float elapsedTime)
 	{
