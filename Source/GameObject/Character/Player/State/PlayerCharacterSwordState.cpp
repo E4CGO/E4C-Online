@@ -141,6 +141,9 @@ namespace PlayerCharacterState
 					}
 					else if (owner->InputSkill2())
 					{
+						owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_1)->ClearHitOthers();
+						owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_1)->SetEnable(false);
+
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
 					}
 				}
@@ -201,6 +204,9 @@ namespace PlayerCharacterState
 					}
 					else if (owner->InputSkill2())
 					{
+						owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_2)->ClearHitOthers();
+						owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_2)->SetEnable(false);
+
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
 					}
 				}
@@ -268,7 +274,12 @@ namespace PlayerCharacterState
 			else
 			{
 				if (!owner->IsPlayAnimation())
+				{
+					owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_3)->ClearHitOthers();
+					owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_3)->SetEnable(false);
+
 					owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_1);
+				}
 			}
 			if (!owner->IsPlayer()) return;
 		}

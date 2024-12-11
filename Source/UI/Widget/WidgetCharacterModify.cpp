@@ -1,4 +1,4 @@
-﻿//! @file WidgetCharacterModify.cpp
+//! @file WidgetCharacterModify.cpp
 //! @note
 #include "WidgetCharacterModify.h"
 #include <unordered_map>
