@@ -1,4 +1,4 @@
-#include "Map/MapTileManager.h"
+Ôªø#include "Map/MapTileManager.h"
 #include "Scene/Stage/Stage.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "TAKOEngine/Rendering/LightManager.h"
@@ -32,12 +32,12 @@ void Stage::Update(float elapsedTime)
 
 void Stage::Spawne()
 {
-	// ÉXÉ|ÉiÅ[
+	// „Çπ„Éù„Éä„Éº
 	for (int i = pointer; i < enemyList.size(); i++) {
 		ENEMY_LIST_DATA& enemyData = enemyList.at(i);
 		if (enemyData.phase == phase && enemyData.time <= timer)
 		{
-			// ìGê∂ê¨
+			// ÊïµÁîüÊàê
 			Enemy* enemy = ENEMIES.Register(Enemy::EnemyFactory(enemyData.enemyType));
 			enemy->SetPosition(enemyData.position);
 			enemy->SetAngle(enemyData.rotation);

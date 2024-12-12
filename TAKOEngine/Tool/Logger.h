@@ -1,9 +1,9 @@
-#pragma once
+ï»¿#pragma once
 
 class Logger
 {
 public:
-	// ƒƒOo—Í
+	// ãƒ­ã‚°å‡ºåŠ›
 	static void Print(const char* format, ...);
 };
 

@@ -1,9 +1,9 @@
-#include "PostEffect.h"
+ï»¿#include "PostEffect.h"
 #include "GpuResourceUtils.h"
 
 PostEffect::PostEffect(ID3D11Device* device)
 {
-	// ƒtƒ‹ƒXƒNƒŠ[ƒ“ƒNƒAƒbƒh’¸“_ƒVƒF[ƒ_[“Ç‚Ýž‚Ý
+	// ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚¯ã‚¢ãƒƒãƒ‰é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼èª­ã¿è¾¼ã¿
 	GpuResourceUtils::LoadVertexShader(
 		device,
 		"Data/Shader/FullScreenQuadVs.cso",
@@ -12,28 +12,28 @@ PostEffect::PostEffect(ID3D11Device* device)
 		fullscreenQuadVS.GetAddressOf()
 	);
 
-	// ‹P“x’ŠoƒsƒNƒZƒ‹ƒVƒF[ƒ_[“Ç‚Ýž‚Ý
+	// è¼åº¦æŠ½å‡ºãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼èª­ã¿è¾¼ã¿
 	GpuResourceUtils::LoadPixelShader(
 		device,
 		"Data/Shader/luminanceExtractionPS.cso",
 		luminanceExtractionPS.GetAddressOf()
 	);
 
-	// ’è”ƒoƒbƒtƒ@ì¬
+	// å®šæ•°ãƒãƒƒãƒ•ã‚¡ä½œæˆ
 	GpuResourceUtils::CreateConstantBuffer(
 		device,
 		sizeof(CbPostEffect),
 		constantBuffer.GetAddressOf()
 	);
 
-	// ƒuƒ‹[ƒ€‚Õ‚­ƒZƒ‹ƒVƒF[ƒ_[“Ç‚Ýž‚Þ
+	// ãƒ–ãƒ«ãƒ¼ãƒ ã·ãã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼èª­ã¿è¾¼ã‚€
 	GpuResourceUtils::LoadPixelShader(
 		device,
 		"Data/Shader/BloomPS.cso",
 		bloomPS.GetAddressOf()
 	);
 }
-// ƒfƒoƒbƒOGUI•`‰æ
+// ãƒ‡ãƒãƒƒã‚°GUIæç”»
 void PostEffect::DrawDebugGUI()
 {
 	ImGui::DragFloat("LuminanceLowerEdge", &cbPostEffect.luminanceExtractionLowerEdge, 0.01f, 0, 1.0f);
@@ -42,55 +42,55 @@ void PostEffect::DrawDebugGUI()
 	ImGui::DragFloat("BloomIntensity", &cbPostEffect.bloomIntensity, 0.1f, 0, 10.0f);
 }
 
-// ŠJŽnˆ—
+// é–‹å§‹å‡¦ç†
 void PostEffect::Begin(const RenderContext& rc)
 {
 	ID3D11DeviceContext* dc = rc.deviceContext;
 	const RenderState* renderState = rc.renderState;
 
-	// ƒuƒŒƒ“ƒhƒXƒe[ƒgÝ’è
+	// ãƒ–ãƒ¬ãƒ³ãƒ‰ã‚¹ãƒ†ãƒ¼ãƒˆè¨­å®š
 	FLOAT blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	dc->OMSetBlendState(renderState->GetBlendState(BlendState::Opaque), blendFactor, 0xFFFFFFFF);
 
-	// [“xƒXƒeƒ“ƒVƒ‹ƒXƒe[ƒgÝ’è
+	// æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ã‚¹ãƒ†ãƒ¼ãƒˆè¨­å®š
 	dc->OMSetDepthStencilState(renderState->GetDepthStencilState(DepthState::NoTestNoWrite), 0);
 
-	// ƒ‰ƒXƒ^ƒ‰ƒCƒUƒXƒe[ƒgÝ’è
+	// ãƒ©ã‚¹ã‚¿ãƒ©ã‚¤ã‚¶ã‚¹ãƒ†ãƒ¼ãƒˆè¨­å®š
 	dc->RSSetState(renderState->GetRasterizerState(RasterizerState::SolidCullNone));
 
-	// ’¸“_ƒoƒbƒtƒ@Ý’è(Žg—p‚µ‚È)
+	// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡è¨­å®š(ä½¿ç”¨ã—ãª)
 	dc->IASetVertexBuffers(0, 0, nullptr, nullptr, nullptr);
 	dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	dc->IASetInputLayout(nullptr);
 
-	// ƒTƒ“ƒvƒ‰ƒXƒe[ƒgÝ’è
+	// ã‚µãƒ³ãƒ—ãƒ©ã‚¹ãƒ†ãƒ¼ãƒˆè¨­å®š
 	ID3D11SamplerState* samplers[] =
 	{
 		renderState->GetSamplerState(SamplerState::LinearWrap)
 	};
 	dc->PSGetSamplers(0, _countof(samplers), samplers);
 
-	// ’è”ƒoƒbƒtƒ@Ý’è
+	// å®šæ•°ãƒãƒƒãƒ•ã‚¡è¨­å®š
 	dc->PSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
 
-	// ’è”ƒoƒbƒtƒ@XV
+	// å®šæ•°ãƒãƒƒãƒ•ã‚¡æ›´æ–°
 	dc->UpdateSubresource(constantBuffer.Get(), 0, 0, &cbPostEffect, 0, 0);
 }
 
-// ‹P“x’Šoˆ—
+// è¼åº¦æŠ½å‡ºå‡¦ç†
 void PostEffect::LuminanceExtraction(const RenderContext& rc, ID3D11ShaderResourceView* colorMap)
 {
 	ID3D11DeviceContext* dc = rc.deviceContext;
 
-	// ƒVƒF[ƒ_[Ý’è
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼è¨­å®š
 	dc->VSSetShader(fullscreenQuadVS.Get(), 0, 0);
 	dc->PSSetShader(luminanceExtractionPS.Get(), 0, 0);
 
-	// ƒVƒF[ƒ_[ƒŠƒ\[ƒXÝ’è
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹è¨­å®š
 	ID3D11ShaderResourceView* srvs[] = { colorMap };
 	dc->PSSetShaderResources(0, _countof(srvs), srvs);
 
-	// •`‰æ
+	// æç”»
 	dc->Draw(4, 0);
 }
 
@@ -98,24 +98,24 @@ void PostEffect::Bloom(const RenderContext& rc, ID3D11ShaderResourceView* colorM
 {
 	ID3D11DeviceContext* dc = rc.deviceContext;
 
-	// ƒVƒF[ƒ_[éŒ¾
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼å®£è¨€
 	dc->VSSetShader(fullscreenQuadVS.Get(), 0, 0);
 	dc->PSSetShader(bloomPS.Get(), 0, 0);
 
-	// ƒVƒF[ƒ_[ƒŠƒ\[ƒXÝ’è
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹è¨­å®š
 	ID3D11ShaderResourceView* srvs[] = { colorMap, luminanceMap };
 	dc->PSSetShaderResources(0, _countof(srvs), srvs);
 
-	// •`‰æ
+	// æç”»
 	dc->Draw(4, 0);
 }
 
-// I—¹ˆ—
+// çµ‚äº†å‡¦ç†
 void PostEffect::End(const RenderContext& rc)
 {
 	ID3D11DeviceContext* dc = rc.deviceContext;
 
-	// Ý’è‚³‚ê‚Ä‚¢‚éƒVƒF[ƒ_[ƒŠƒ\[ƒX‚ð‰ðœ
+	// è¨­å®šã•ã‚Œã¦ã„ã‚‹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ã‚’è§£é™¤
 	ID3D11ShaderResourceView* srvs[] = { nullptr, nullptr };
 	dc->PSSetShaderResources(0, _countof(srvs), srvs);
 }

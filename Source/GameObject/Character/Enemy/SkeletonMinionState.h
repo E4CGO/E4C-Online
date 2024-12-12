@@ -1,22 +1,22 @@
-#pragma once
+ï»¿#pragma once
 
 #include "EnemyState.h"
 #include "SkeletonMinion.h"
 
 namespace SkeletonMinionState {
-	// UŒ‚ƒXƒe[ƒg
+	// æ”»æ’ƒã‚¹ãƒ†ãƒ¼ãƒˆ
 	class AttackState : public HierarchicalState<Enemy>
 	{
 	public:
-		// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+		// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		AttackState(Enemy* enemy) : HierarchicalState<Enemy>(enemy) {};
-		// ƒfƒXƒgƒ‰ƒNƒ^
+		// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		~AttackState() {}
-		// ƒXƒe[ƒg‚É“ü‚Á‚½‚Ìƒƒ\ƒbƒh
+		// ã‚¹ãƒ†ãƒ¼ãƒˆã«å…¥ã£ãŸæ™‚ã®ãƒ¡ã‚½ãƒƒãƒ‰
 		virtual void Enter() override;
-		// ƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+		// ã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 		void Execute(float elapsedTime) override;
-		// ƒXƒe[ƒg‚©‚ço‚Ä‚¢‚­‚Æ‚«‚Ìƒƒ\ƒbƒh
+		// ã‚¹ãƒ†ãƒ¼ãƒˆã‹ã‚‰å‡ºã¦ã„ãã¨ãã®ãƒ¡ã‚½ãƒƒãƒ‰
 		void Exit() override;
 	};
 }

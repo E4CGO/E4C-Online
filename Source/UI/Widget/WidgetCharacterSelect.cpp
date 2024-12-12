@@ -93,7 +93,7 @@ WidgetCharacterSelect::~WidgetCharacterSelect()
 	@param[in]	scene キャラクター選択シーン参照ポインタ
 	@return		なし
 *//***************************************************************************/
-WidgetCharacter::WidgetCharacter(SceneCharacter_E4C* scene) : m_pScene(scene), m_pCharacter(nullptr), WidgetButtonImage("*", "Data/Sprites/big_background.t.png", [&](WidgetButton*) {
+WidgetCharacter::WidgetCharacter(SceneCharacter_E4C* scene) : m_pScene(scene), m_pCharacter(nullptr), WidgetButtonImage("+", "Data/Sprites/big_background.t.png", [&](WidgetButton*) {
 	PlayerCharacter* newCharacter = new PlayerCharacter({ "", {} });
 	newCharacter->SetPosition({ 3.5f - 3.5f * (m_pScene->GetCharacters().size()), 0.0f, 5.0f });
 	newCharacter->SetKinematic(true);
