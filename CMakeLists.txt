@@ -250,6 +250,8 @@ source_group("Source\\GameObject\\Character\\Player" FILES ${Source__GameObject_
 set(Source__GameObject__Character__Player__State
     "Source/GameObject/Character/Player/State/NonPlayerCharacterState.cpp"
     "Source/GameObject/Character/Player/State/NonPlayerCharacterState.h"
+    "Source/GameObject/Character/Player/State/PlayerCharacterRodState.cpp"
+    "Source/GameObject/Character/Player/State/PlayerCharacterRodState.h"
     "Source/GameObject/Character/Player/State/PlayerCharacterShieldState.cpp"
     "Source/GameObject/Character/Player/State/PlayerCharacterShieldState.h"
     "Source/GameObject/Character/Player/State/PlayerCharacterState.cpp"
@@ -1127,6 +1129,7 @@ if(MSVC)
         /Y-
         /wd4819
         /wd4099
+        /utf-8
     )
     target_link_options(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:

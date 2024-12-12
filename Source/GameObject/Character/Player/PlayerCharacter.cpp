@@ -775,13 +775,15 @@ void PlayerCharacter::OnDamage(const HitResult& hit, int damage)
 	}
 }
 
-void PlayerCharacter::InputMove(float elapsedTime) {
-	if (inputDirection.x == 0 && inputDirection.y == 0) return; // 方向入力なし
+bool PlayerCharacter::InputMove(float elapsedTime) {
+	
 
 	// 移動処理
 	Move(inputDirection.x, inputDirection.y, this->moveSpeed);
 	// 旋回処理
 	TurnByInput();
+
+	return(inputDirection.x != 0 && inputDirection.y != 0);//進行ベクトルがゼロベクトルでない場合入力された
 }
 
 void PlayerCharacter::Jump()

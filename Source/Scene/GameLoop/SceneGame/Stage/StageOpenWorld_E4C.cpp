@@ -69,7 +69,7 @@ void StageOpenWorld_E4C::Initialize()
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 70.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
 		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
-		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/pinkSky.dds");
+		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
 	}
 
 	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
@@ -199,17 +199,6 @@ void StageOpenWorld_E4C::Render()
 
 	UI.Render(rc);
 
-	//MAPTILES.Render(rc);
-
-	//if (ImGui::TreeNode("Camera Positions"))
-	//{
-	//	for (size_t i = 0; i < cameraPositions.size(); ++i)
-	//	{
-	//		std::string label = "Position " + std::to_string(i);  // 各カメラポジションのラベル
-	//		ImGui::DragFloat3(label.c_str(), &cameraPositions[i].x, 1.0f, -FLT_MAX, FLT_MAX);  // カメラポジションの設定
-	//	}
-	//	ImGui::TreePop();
-	//}
 	// デバッグレンダラ描画実行
 
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());

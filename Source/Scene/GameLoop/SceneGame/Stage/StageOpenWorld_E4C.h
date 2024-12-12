@@ -22,6 +22,7 @@
 
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
+#include "Source/GameObject/Props/Spawner.h"
 
 class SceneGame_E4C;
 
@@ -68,6 +69,8 @@ private:
 		"",											// マスク
 		// Setting UI
 	};
+
+
 
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
 
