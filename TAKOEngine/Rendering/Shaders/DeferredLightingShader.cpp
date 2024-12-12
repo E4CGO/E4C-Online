@@ -1,10 +1,10 @@
-#include "DeferredLightingShader.h"
+ï»¿#include "DeferredLightingShader.h"
 #include "TAKOEngine\Rendering\GpuResourceUtils.h"
 
 DeferredLightingShader::DeferredLightingShader(ID3D11Device* device) 
 	: SpriteShader(device, "Data/Shader/DeferredVS.cso", "Data/Shader/DeferredPS.cso")
 {
-	// ƒV[ƒ“—pƒoƒbƒtƒ@
+	// ã‚·ãƒ¼ãƒ³ç”¨ãƒãƒƒãƒ•ã‚¡
 	GpuResourceUtils::CreateConstantBuffer(
 		device,
 		sizeof(CbDeferred),

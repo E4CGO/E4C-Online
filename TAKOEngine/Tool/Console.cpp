@@ -1,4 +1,4 @@
-#include "Console.h"
+ï»¿#include "Console.h"
 
 #include <iostream>
 #include <stdio.h>
@@ -12,7 +12,7 @@ void Console::Open()
 	if (isOpen) return;
 
 	if (::AttachConsole(ATTACH_PARENT_PROCESS) == FALSE) {
-		// ƒGƒNƒXƒvƒ[ƒ‰‚©‚ç‹N“®‚µ‚½ê‡‚ÍV‹K‚ÉƒRƒ“ƒ\[ƒ‹‚ðŠ„‚è“–‚Ä‚é
+		// ã‚¨ã‚¯ã‚¹ãƒ—ãƒ­ãƒ¼ãƒ©ã‹ã‚‰èµ·å‹•ã—ãŸå ´åˆã¯æ–°è¦ã«ã‚³ãƒ³ã‚½ãƒ¼ãƒ«ã‚’å‰²ã‚Šå½“ã¦ã‚‹
 		AllocConsole();
 	}
 	FILE* fpOut = NULL;

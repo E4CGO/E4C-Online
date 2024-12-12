@@ -38,7 +38,6 @@ public:
 	virtual void Execute(PlayerCharacter* chara) {};
 };
 
-
 /**************************************************************************//**
 	@class	PlayerCharacterPatternGender
 	@brief	性別パターン
@@ -100,16 +99,17 @@ public:
 };
 
 /**************************************************************************//**
-	@class	PlayerCharacterPatternAxe
-	@brief	斧モデル実装
+	@class	PlayerCharacterPatternRod
+	@brief	杖モデル実装
 	@par	[説明]
-		斧モーション付きで斧を登録する(未実装)
+		杖モーション付きで杖を登録する
 *//***************************************************************************/
-class PlayerCharacterPatternAxe : public PlayerCharacterPatternSingleModel
+class PlayerCharacterPatternRod : public PlayerCharacterPatternSingleModel
 {
 public:
-	PlayerCharacterPatternAxe(const char* filename) : PlayerCharacterPatternSingleModel(filename) {}
+	PlayerCharacterPatternRod(const char* filename) : PlayerCharacterPatternSingleModel(filename) {}
 
 	void Execute(PlayerCharacter* chara) override;
 };
+
 #endif //!__INCLUDED_PLAYER_CHARACTER_PATTERN_H__

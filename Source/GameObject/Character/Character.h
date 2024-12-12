@@ -17,7 +17,7 @@ public:
 	// コンストラクタ
 	Character() : ModelObject() {};
 	// コンストラクタ（引数付き）
-	Character(const char* filename, float scaling = 1.0f) : ModelObject(filename, scaling) {}
+	Character(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX11) : ModelObject(filename, scaling, renderMode) {}
 	// デストラクタ
 	virtual ~Character() = default;
 	// 更新処理
@@ -31,9 +31,6 @@ public:
 
 	// 向き
 	void Turn(float elapsedTime, float vx, float vz, float speed);
-
-	// 攻撃コリジョン
-	virtual void AttackCollision() {}
 
 	void FaceTo(const DirectX::XMFLOAT3 point)
 	{
@@ -59,8 +56,6 @@ protected:
 	virtual void UpdateHorizontalMove(float elapsedTime);
 	// 位置補正処理
 	virtual void PositionAdjustment();
-	// コライダー更新処理
-	virtual void UpdateColliders();
 
 	// 着地コールバック
 	virtual void OnLanding() {};

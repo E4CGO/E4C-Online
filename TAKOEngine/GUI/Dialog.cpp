@@ -1,4 +1,4 @@
-#include "Dialog.h"
+ï»¿#include "Dialog.h"
 
 #include "TAKOEngine/Runtime/tentacle_lib.h"
 #include "TAKOEngine/Rendering/ResourceManager.h"
@@ -30,11 +30,11 @@ void Dialog::Render()
 	if (!visible) return;
 	if (dialogOwner != nullptr)
 	{
-		// ƒI[ƒi[À•WŒvŽZ
+		// ã‚ªãƒ¼ãƒŠãƒ¼åº§æ¨™è¨ˆç®—
 		DirectX::XMFLOAT3 arrowTarget = dialogOwner->GetScreenPosition();
 		arrowTarget.y -= 100.0f;
 
-		// ŽOŠp•`‰æ
+		// ä¸‰è§’æç”»
 		triangle->Render(
 			T_GRAPHICS.GetDeviceContext(),
 			arrowTarget.x - 20.0f, dialogPosition.y + dialogSize.y, 0.0f,
@@ -43,7 +43,7 @@ void Dialog::Render()
 			dialogColor.x, dialogColor.y, dialogColor.z, dialogColor.w
 		);
 	}
-	// ’·•ûŒ`•`‰æ
+	// é•·æ–¹å½¢æç”»
 	rectangle->Render(
 		T_GRAPHICS.GetDeviceContext(),
 		dialogPosition.x, dialogPosition.y, 0.0f,

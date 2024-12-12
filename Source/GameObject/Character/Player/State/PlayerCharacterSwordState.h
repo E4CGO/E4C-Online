@@ -22,6 +22,53 @@ namespace PlayerCharacterState
 			ATTACK_CONTINUE,
 		};
 
+		// 待機用ステートオブジェクト
+		class WaitState : public HierarchicalState<PlayerCharacter>
+		{
+		public:
+			// コンストラクタ
+			WaitState(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
+			// デストラクタ
+			~WaitState() {}
+			// ステートに入った時のメソッド
+			virtual void Enter() override;
+			// ステートで実行するメソッド
+			void Execute(float elapsedTime) override;
+			// ステートから出ていくときのメソッド
+			void Exit() override;
+		};
+
+		class IdleState : public HierarchicalState<PlayerCharacter>
+		{
+		public:
+			// コンストラクタ
+			IdleState(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
+			// デストラクタ
+			~IdleState() {}
+			// ステートに入った時のメソッド
+			virtual void Enter() override;
+			// ステートで実行するメソッド
+			void Execute(float elapsedTime);
+			// ステートから出ていくときのメソッド
+			void Exit() override;
+		};
+
+		// 移動ステートオブジェクト
+		class MoveState : public HierarchicalState<PlayerCharacter>
+		{
+		public:
+			// コンストラクタ
+			MoveState(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
+			// デストラクタ
+			~MoveState() {}
+			// ステートに入った時のメソッド
+			void Enter() override;
+			// ステートで実行するメソッド
+			void Execute(float elapsedTime);
+			// ステートから出ていくときのメソッド
+			void Exit() override;
+		};
+
 		// 一般攻撃
 		class AttackNormalState : public HierarchicalState<PlayerCharacter>
 		{

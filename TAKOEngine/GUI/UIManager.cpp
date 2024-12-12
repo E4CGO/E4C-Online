@@ -1,8 +1,8 @@
-#include "UIManager.h"
+ï»¿#include "UIManager.h"
 
 void UIManager::Update(float elapsedTime)
 {
-	this->lpCursorName = IDC_ARROW; // ƒfƒtƒHƒ‹ƒg
+	this->lpCursorName = IDC_ARROW; // ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ
 	ObjectManager::Update(elapsedTime);
 	SetCursor(::LoadCursor(NULL, this->lpCursorName));
 }

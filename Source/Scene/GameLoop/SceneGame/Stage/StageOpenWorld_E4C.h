@@ -1,4 +1,8 @@
-#pragma once
+//! @file StageOpenWorld_E4C.h
+//! @note 
+
+#ifndef __INCLUDED_STAGE_OPEN_WORLD_E4C_H__
+#define __INCLUDED_STAGE_OPEN_WORLD_E4C_H__
 
 #include <unordered_set>
 #include <memory>
@@ -8,7 +12,7 @@
 #include "GameObject/GameObject.h"
 #include "GameObject/Character/Player/PlayerCharacter.h"
 #include "GameObject/Props/Teleporter.h"
-#include "GameObject/Props/Spawner.h"
+
 #include "TAKOEngine/Rendering/Shaders/PlaneShader.h"
 
 #include "Scene/Scene.h"
@@ -18,6 +22,7 @@
 
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
+#include "Source/GameObject/Props/Spawner.h"
 
 class SceneGame_E4C;
 
@@ -34,8 +39,6 @@ public:
 	void Render() override;
 
 	void RenderDX12() override;
-protected:
-	void OnPhase() override;
 public:
 	enum PHASE
 	{
@@ -52,7 +55,6 @@ private:
 	std::unique_ptr <Teleporter> teleporter;
 
 	std::unordered_map<std::string, std::unique_ptr<ModelObject>> models;
-	std::unique_ptr<Spawner> spawner;
 
 	std::unique_ptr<ModelObject> sky;
 	DirectX::XMFLOAT4X4 test_transform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
@@ -67,6 +69,8 @@ private:
 		"",											// マスク
 		// Setting UI
 	};
+
+
 
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
 
@@ -87,3 +91,5 @@ private:
 	// ポストエフェクト
 	std::unique_ptr<PostprocessingRendererDX12>	postprocessingRenderer = std::make_unique<PostprocessingRendererDX12>();
 };
+
+#endif // !__INCLUDED_STAGE_OPEN_WORLD_E4C_H__

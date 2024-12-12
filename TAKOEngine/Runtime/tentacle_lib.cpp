@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <tchar.h>
 
-#define FULLSCREEN
+//#define FULLSCREEN
 
 namespace TentacleLib
 {
@@ -71,7 +71,6 @@ namespace TentacleLib
 
 	void Finalize()
 	{
-		//SDL_Quit();
 	}
 
 	void SetSyncInterval(UINT syncInterval)

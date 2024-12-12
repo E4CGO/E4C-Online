@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "SpriteShader.h"
 class MaskShader : public SpriteShader
 {
@@ -7,12 +7,12 @@ public:
 private:
 	void UpdateConstantBuffer(const RenderContext& rc) override;
 private:
-	// è‡’l‚ğ‘—‚é‚½‚ß‚Ì’è”ƒoƒbƒtƒ@—p\‘¢‘Ì
+	// é–¾å€¤ã‚’é€ã‚‹ãŸã‚ã®å®šæ•°ãƒãƒƒãƒ•ã‚¡ç”¨æ§‹é€ ä½“
 	struct CbMask
 	{
-		float			  dissolveThreshold;	// ƒfƒBƒ]ƒ‹ƒu—Ê
-		float			  edgeThreshold; 		// ‰‚Ìè‡’l
+		float			  dissolveThreshold;	// ãƒ‡ã‚£ã‚¾ãƒ«ãƒ–é‡
+		float			  edgeThreshold; 		// ç¸ã®é–¾å€¤
 		DirectX::XMFLOAT2 dummy;
-		DirectX::XMFLOAT4 edgeColor;			// ‰‚ÌF
+		DirectX::XMFLOAT4 edgeColor;			// ç¸ã®è‰²
 	};
 };

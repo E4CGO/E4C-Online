@@ -16,21 +16,10 @@ public:
 		COL_LEFT_HAND,
 		COL_RIGHT_HAND,
 	};
-
-	enum AttackCollider
-	{
-		LeftHand,
-		RightHand
-	};
 protected:
-	enum HitCollider
+	enum STATE
 	{
-		Body,
-		Head
-	};
-	enum State
-	{
-		Attack = EnemyState::ID::End,
+		ATTACK = enemy::STATE::END,
 	};
 
 	void UpdateTarget();

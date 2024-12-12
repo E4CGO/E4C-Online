@@ -252,6 +252,7 @@ void ModelDX12::UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform)
 	// バウンディングボックス計算
 	ComputeWorldBounds();
 
+	// フレームリソース更新
 	UpdateFrameResource(worldTransform);
 }
 
@@ -260,6 +261,9 @@ void ModelDX12::UpdateFrameResource(const DirectX::XMFLOAT4X4 transform)
 {
 	Graphics& graphics = Graphics::Instance();
 
+	// 左手系変換のためのスケーリング行列を作成
+	DirectX::XMMATRIX LeftHandScaling = DirectX::XMMatrixScaling(-scaling, scaling, scaling);
+	
 	//メッシュの更新
 	for (Mesh& mesh : m_meshes)
 	{
@@ -272,14 +276,13 @@ void ModelDX12::UpdateFrameResource(const DirectX::XMFLOAT4X4 transform)
 				const Bone& bone = mesh.bones.at(i);
 				DirectX::XMMATRIX GlobalTransform = DirectX::XMLoadFloat4x4(&bone.node->globalTransform);
 				DirectX::XMMATRIX OffsetTransform = DirectX::XMLoadFloat4x4(&bone.offset_transform);
-				DirectX::XMMATRIX BoneTransform = OffsetTransform * GlobalTransform;
+				DirectX::XMMATRIX BoneTransform = OffsetTransform * (GlobalTransform * LeftHandScaling);
 				DirectX::XMStoreFloat4x4(&frame_resource.cbv_data->bone_transforms[i], BoneTransform);
 			}
 			frame_resource.cbv_data->world_transform = transform;
 		}
 		else
 		{
-			frame_resource.cbv_data->bone_transforms[0] = mesh.node->worldTransform;
 			frame_resource.cbv_data->world_transform = mesh.node->worldTransform;
 		}
 

@@ -1,4 +1,4 @@
-//! @file WidgetMatching.h
+ï»¿//! @file WidgetMatching.h
 //! @note 
 
 #ifndef __INCLUDE_WIDGET_MATCHING_H__
@@ -13,15 +13,15 @@ class Teleporter;
 class WidgetMatching : public WidgetButtonText
 {
 public:
-	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	WidgetMatching(Online::OnlineController* onlineController, Teleporter* teleporter);
-	// ƒfƒXƒgƒ‰ƒNƒ^
+	// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	~WidgetMatching();
 
 	enum STATE : uint8_t {
-		INIT = 0,			// ‰Šú‰»
-		MATCHING,			// ƒ}ƒbƒ`ƒ“ƒO’†
-		FULL				// –ˆõAƒJƒEƒ“ƒgƒ_ƒEƒ“ŠJn
+		INIT = 0,			// åˆæœŸåŒ–
+		MATCHING,			// ãƒãƒƒãƒãƒ³ã‚°ä¸­
+		FULL				// æº€å“¡ã€ã‚«ã‚¦ãƒ³ãƒˆãƒ€ã‚¦ãƒ³é–‹å§‹
 	};
 
 	void Update(float elapsedTime);

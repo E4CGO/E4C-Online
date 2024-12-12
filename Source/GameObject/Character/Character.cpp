@@ -1,3 +1,6 @@
+//! @file Character.cpp
+//! @note 
+
 #include "Character.h"
 #include <iostream>
 #include "Map/MapTileManager.h"
@@ -378,23 +381,6 @@ void Character::PositionAdjustment()
 	//		}
 	//	}
 	//}
-}
-
-/**************************************************************************//**
-	@brief		コライダー更新処理
-	@param[in]	なし
-	@return		なし
-*//***************************************************************************/
-void Character::UpdateColliders()
-{
-	if (m_pMoveCollider)
-	{
-		m_pMoveCollider->Update();
-		for (const std::pair<uint8_t, Collider*>& collider : m_pColliders)
-		{
-			collider.second->Update();
-		}
-	}
 }
 
 void Character::ModifyHp(int hp)

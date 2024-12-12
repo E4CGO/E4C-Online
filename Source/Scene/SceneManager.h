@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "Scene.h"
 
@@ -8,20 +8,20 @@ private:
 	SceneManager() {}
 	~SceneManager() {}
 public:
-	// —Bˆê‚ÌƒCƒ“ƒXƒ^ƒ“ƒXæ“¾
+	// å”¯ä¸€ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹å–å¾—
 	static SceneManager& Instance()
 	{
 		static SceneManager instance;
 		return instance;
 	}
-	// XVˆ—
+	// æ›´æ–°å‡¦ç†
 	void Update(float elapsedTime);
-	// •`‰æˆ—
+	// æç”»å‡¦ç†
 	void Render();
 	void RenderDX12();
-	// ƒV[ƒ“ƒNƒŠƒA
+	// ã‚·ãƒ¼ãƒ³ã‚¯ãƒªã‚¢
 	void Clear();
-	// ƒV[ƒ“Ø‚è‘Ö‚¦
+	// ã‚·ãƒ¼ãƒ³åˆ‡ã‚Šæ›¿ãˆ
 	void ChangeScene(Scene* scene);
 private:
 	Scene* currentScene = nullptr;

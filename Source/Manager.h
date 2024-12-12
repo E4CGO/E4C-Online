@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <vector>
 
@@ -6,14 +6,14 @@ template<typename T>
 class Manager
 {
 public:
-	// ƒAƒCƒeƒ€‚ğ“o˜^‚·‚é
+	// ã‚¢ã‚¤ãƒ†ãƒ ã‚’ç™»éŒ²ã™ã‚‹
 	virtual T* Register(T* item)
 	{
 		items.emplace_back(item);
 		return item;
 	}
 
-	// ƒAƒCƒeƒ€‚Ì“o˜^‚ğ‰ğœ‚·‚é
+	// ã‚¢ã‚¤ãƒ†ãƒ ã®ç™»éŒ²ã‚’è§£é™¤ã™ã‚‹
 	virtual void Remove(T* item)
 	{
 		typename std::vector<T*>::iterator it = std::find(items.begin(), items.end(), item);
@@ -24,7 +24,7 @@ public:
 		}
 	}
 
-	// “o˜^Ï‚İ‚ÌƒAƒCƒeƒ€‚ğ‘Síœ‚·‚é
+	// ç™»éŒ²æ¸ˆã¿ã®ã‚¢ã‚¤ãƒ†ãƒ ã‚’å…¨å‰Šé™¤ã™ã‚‹
 	virtual void Clear()
 	{
 		for (T* item : items)
@@ -41,7 +41,7 @@ public:
 		return item;
 	}
 
-	T* get(int index) { return items.at(index); }
+	T* Get(int index) { return items.at(index); }
 
 	int Count() { return static_cast<int>(items.size()); }
 

@@ -1,4 +1,4 @@
-#pragma once
+Ôªø#pragma once
 #include "SpriteShader.h"
 class UVScrollShader : public SpriteShader
 {
@@ -10,7 +10,7 @@ private:
 private:
 	struct CbScroll
 	{
-		DirectX::XMFLOAT2 uvScrollValue;	// UVÉXÉNÉçÉãíl
-		DirectX::XMFLOAT2 dummy;			// É_É~Å[
+		DirectX::XMFLOAT2 uvScrollValue;	// UV„Çπ„ÇØ„É≠„É´ÂÄ§
+		DirectX::XMFLOAT2 dummy;			// „ÉÄ„Éü„Éº
 	};
 };

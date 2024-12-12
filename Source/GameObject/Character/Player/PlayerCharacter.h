@@ -70,17 +70,26 @@ public:
 	// KayKit Adventurers
 	enum Animation
 	{
-		ANIM_IDLE,
-		ANIM_MOVE_START,
-		ANIM_MOVE_CONTINUE,
-		ANIM_ATTACK_SWORD_COMBO_FIRST,
-		ANIM_ATTACK_SWORD_COMBO_SECOND,
-		ANIM_ATTACK_SWORD_COMBO_THIRD,
-		ANIM_ATTACK_SWORD_SPECIAL_FIRST,
-		ANIM_ATTACK_SWORD_SPECIAL_SECOND,
-		ANIM_GUARD_SHIELD_START,
-		ANIM_GUARD_SHIELD_CONTINUE,
-		ANIM_GUARD_SHIELD_FINISH,
+		ANIM_ROD_IDLE,
+		ANIM_ROD_MOVE_START,
+		ANIM_ROD_MOVE_CONTINUE,
+		ANIM_ROD_CHARGE_START,
+		ANIM_ROD_CHARGE_CONTINUE,
+		ANIM_ROD_ATTACK_COMBO_FIRST,
+		ANIM_ROD_ATTACK_COMBO_SECOND,
+		ANIM_ROD_ATTACK_COMBO_THIRD,
+		ANIM_SWORD_IDLE,
+		ANIM_SWORD_MOVE_START,
+		ANIM_SWORD_MOVE_CONTINUE,
+		ANIM_SWORD_ATTACK_COMBO_FIRST,
+		ANIM_SWORD_ATTACK_COMBO_SECOND,
+		ANIM_SWORD_ATTACK_COMBO_THIRD,
+		ANIM_SWORD_ATTACK_SPECIAL_FIRST,
+		ANIM_SWORD_ATTACK_SPECIAL_SECOND,
+		ANIM_SHIELD_GUARD_START,
+		ANIM_SHIELD_GUARD_CONTINUE,
+		ANIM_SHIELD_GUARD_KNOCKBACK_CONTINUE,
+		ANIM_SHIELD_GUARD_FINISH,
 		ANIM_HURT,
 		ANIM_DEATH
 	};
@@ -137,7 +146,7 @@ public:
 	void LoadAppearance(const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
 
 	void Jump();
-	void InputMove(float elapsedTime);
+	bool InputMove(float elapsedTime);
 
 	DirectX::XMFLOAT2 GetInputDirection();
 	// 入力管理
@@ -145,7 +154,7 @@ public:
 	bool InputJump() { return (input & Input_Jump); }
 	bool InputDodge();
 	bool InputAttackNormal() { return (input & Input_Attack_N) > 0; }
-	bool InputAttackSpecial() { return (input & Input_Attack_S) > 0; }
+	bool InputSpecial() { return (input & Input_Attack_S) > 0; }
 	bool InputSkill1() { return (input & Input_Skill_1) > 0; }
 	bool InputSkill2() { return (input & Input_Skill_2) > 0; }
 	bool InputSkill3() { return (input & Input_Skill_3) > 0; }
@@ -210,10 +219,6 @@ public:
 	// ステートマシンを取得
 	StateMachine<PlayerCharacter>* GetStateMachine() { return stateMachine; }
 
-	//Collider* GetAttackCollider(int idx) { return m_pattackColliders[idx]; }
-	//std::unordered_map<int, Collider*> GetAttackColliders() { return m_pattackColliders; }
-	//void EnableAttackColliders(bool enable = true) { for (const std::pair<int, Collider*>& collider : m_pattackColliders) collider.second->SetEnable(enable); }
-
 	// 同期用データを取得
 	void GetSyncData(SYNC_DATA& data);
 	// 同期用データを計算
@@ -242,9 +247,11 @@ protected:
 
 	void AttackEnemy(Collider* attackCol, Collider* enemyCol);
 
-private:	
+protected:
+	float radius = 0;	// 当たり判定半径
+
 	uint32_t m_client_id = 0;
-	
+
 	uint32_t input = 0;						// キー入力
 	DirectX::XMFLOAT2 inputDirection = {};	// 移動方向
 	DirectX::XMFLOAT3 target = {};			// アイム目標

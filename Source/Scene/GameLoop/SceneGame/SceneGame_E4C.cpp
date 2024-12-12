@@ -20,6 +20,9 @@
 #include "UI/Widget/WidgetCrosshair.h"
 #include "TAKOEngine/GUI/UIManager.h"
 #include "Source\PlayerCharacterData.h"
+#include "GameObject/Props/SpawnerManager.h"
+
+#include "TAKOEngine/Physics/CollisionManager.h"
 
 void SceneGame_E4C::Initialize()
 {
@@ -62,7 +65,9 @@ void SceneGame_E4C::Finalize()
 	CameraManager::Instance().Clear();
 	STAGES.Clear();
 	MAPTILES.Clear();
+	SpawnerManager::Instance().Clear();
 	PlayerCharacterManager::Instance().Clear();
+	COLLISIONS.Clear();
 	UI.Clear();
 }
 

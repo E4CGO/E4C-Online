@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "TAKOEngine/Network/Socket.h"
 
@@ -10,12 +10,12 @@ public:
 
 	bool Connect(const char* address, const char* port) override;
 
-	bool Accept(); // Ú‘±‹–‰Â
+	bool Accept(); // æ¥ç¶šè¨±å¯
 
 	void SetBlocking(bool block = true);
 
-	int Send(int id, const void* data, size_t size); // ‘—M
-	int Receive(int id, void* buffer, size_t size); // óM
+	int Send(int id, const void* data, size_t size); // é€ä¿¡
+	int Receive(int id, void* buffer, size_t size); // å—ä¿¡
 
 	bool Disconnect() override;
 public:
@@ -42,6 +42,6 @@ public:
 
 	bool Connect(const char* address, const char* port) override;
 
-	int Send(const void* data, size_t size); // ‘—M
-	int Receive(void* buffer, size_t size); // óM
+	int Send(const void* data, size_t size); // é€ä¿¡
+	int Receive(void* buffer, size_t size); // å—ä¿¡
 };

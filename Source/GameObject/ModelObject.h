@@ -33,7 +33,9 @@ public:
 		RHS_PBR,
 		RHS_TOON,
 		LHS_PBR,
+		LHS_PBR_Instancing,
 		LHS_TOON,
+		LHS_TOON_Instancing,
 	};
 
 	RENDER_MODE m_renderMode = DX11;
@@ -45,7 +47,7 @@ public:
 	virtual ~ModelObject() = default;
 
 	// モデルを読み取り
-	void LoadModel(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE modelType = ModelObject::MODEL_TYPE::LHS_TOON);
+	void LoadModel(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE modelType = ModelObject::MODEL_TYPE::LHS_TOON);
 
 	void CleanModels();
 
@@ -90,8 +92,8 @@ public:
 	void SetMoveCollider(Sphere sphereParam, Collider::COLLIDER_OBJ objType);
 	
 	// 当たり判定用コライダー
-	std::unordered_map<uint8_t, Collider*> GetColliders() { return m_pColliders; }
-	Collider* GetCollider(uint8_t idx) { return m_pColliders[idx]; }
+	std::unordered_map<uint8_t, Collider*>& GetColliders() { return m_pColliders; }
+	Collider* GetCollider(uint8_t idx) { return (m_pColliders.contains(idx)) ? m_pColliders[idx] : nullptr; }
 	void SetCollider(uint8_t idx, Sphere sphereParam, Collider::COLLIDER_OBJ objType, DirectX::XMFLOAT4X4* transform);
 	void SetCollider(uint8_t idx, Capsule capsuleParam, Collider::COLLIDER_OBJ objType, DirectX::XMFLOAT4X4* transform);
 
@@ -114,6 +116,9 @@ public:
 	{
 		return GetNodePosition(0, offset);
 	}
+protected:
+	// コライダー更新処理
+	virtual void UpdateColliders();
 protected:
 	// 色
 	DirectX::XMFLOAT4 m_color = { 1, 1, 1, 1 };

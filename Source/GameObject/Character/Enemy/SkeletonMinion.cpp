@@ -28,7 +28,7 @@ SkeletonMinion::SkeletonMinion(float scaling) : Enemy("Data/Model/Enemy/characte
 	sphere.radius = 0.8f;
 	SetCollider(COLLIDER_ID::COL_HEAD, sphere, Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("character_skeleton_minion_head")->worldTransform);
 	m_pColliders[COLLIDER_ID::COL_HEAD]->SetHittableOBJ(Collider::COLLIDER_OBJ::PLAYER_ATTACK | Collider::COLLIDER_OBJ::PLAYER_PROJECTILE);
-	
+
 	// 攻撃判定
 	sphere.radius = 0.3f;
 	sphere.position = { 0.25f, -0.45f, 0.0f };
@@ -42,9 +42,9 @@ SkeletonMinion::SkeletonMinion(float scaling) : Enemy("Data/Model/Enemy/characte
 	m_pColliders[COLLIDER_ID::COL_RIGHT_HAND]->SetEnable(false);
 
 
-	stateMachine->RegisterState(EnemyState::ID::TargetFound, new EnemyState::FollowState(this, 2.0f, SkeletonMinion::State::Attack));
-	stateMachine->RegisterState(SkeletonMinion::State::Attack, new SkeletonMinionState::AttackState(this));
-	stateMachine->SetState(EnemyState::Idle);
+	stateMachine->RegisterState(enemy::STATE::TARGET_FOUND, new enemy::FollowState(this, 2.0f, SkeletonMinion::STATE::ATTACK));
+	stateMachine->RegisterState(SkeletonMinion::STATE::ATTACK, new SkeletonMinionState::AttackState(this));
+	stateMachine->SetState(enemy::STATE::IDLE);
 }
 
 SkeletonMinion::~SkeletonMinion()
@@ -76,9 +76,9 @@ SkeletonMinionBoss::SkeletonMinionBoss() : SkeletonMinion(3.0f)
 	// スーパーアーマー
 	armorMaxHp = armorHp = 50;
 
-	stateMachine->RegisterState(EnemyState::ID::Idle, new EnemyState::IdleState(this, 1.0f));
-	stateMachine->RegisterState(EnemyState::ID::TargetFound, new EnemyState::FollowState(this, 3.0f, SkeletonMinion::State::Attack));
-	stateMachine->SetState(EnemyState::ID::Idle);
+	stateMachine->RegisterState(enemy::STATE::IDLE, new enemy::IdleState(this, 1.0f));
+	stateMachine->RegisterState(enemy::STATE::TARGET_FOUND, new enemy::FollowState(this, 3.0f, SkeletonMinion::STATE::ATTACK));
+	stateMachine->SetState(enemy::STATE::IDLE);
 
 	// HPゲージ
 	UI.Register(new WidgetBossHp("スケルドン", this));
@@ -97,7 +97,7 @@ void SkeletonMinionBoss::Update(float elaspedTime)
 
 	Enemy::Update(elaspedTime);
 
-	
+
 }
 void SkeletonMinionBoss::OnDamage(const ENEMY_COLLISION& hit)
 {
@@ -106,10 +106,10 @@ void SkeletonMinionBoss::OnDamage(const ENEMY_COLLISION& hit)
 	if (hp > 0)
 	{
 		if (armorHp <= 0) { // アーマーなし
-			stateMachine->ChangeState(EnemyState::ID::Hurt);
+			stateMachine->ChangeState(enemy::STATE::HURT);
 			hp -= hit.damage / 10 * 2;		// ダウン追加ダメージ
 		}
-		else if (hit.colider_id == HitCollider::Head)	// ヘッドショット アーマーあり
+		else if (hit.colider_id == COLLIDER_ID::COL_HEAD)	// ヘッドショット アーマーあり
 		{
 			armorHp -= hit.damage;
 			if (armorHp <= 0) {		// アーマー解除
@@ -122,6 +122,6 @@ void SkeletonMinionBoss::OnDamage(const ENEMY_COLLISION& hit)
 
 	if (hp <= 0)
 	{
-		stateMachine->ChangeState(EnemyState::ID::Death);
+		stateMachine->ChangeState(enemy::STATE::DEATH);
 	}
 }

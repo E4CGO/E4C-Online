@@ -212,6 +212,8 @@ source_group("Source\\GameObject\\Projectile" FILES ${Source__GameObject__Projec
 set(Source__GameObject__Props
     "Source/GameObject/Props/Spawner.cpp"
     "Source/GameObject/Props/Spawner.h"
+    "Source/GameObject/Props/SpawnerManager.cpp"
+    "Source/GameObject/Props/SpawnerManager.h"
     "Source/GameObject/Props/Teleporter.cpp"
     "Source/GameObject/Props/Teleporter.h"
 )
@@ -224,6 +226,10 @@ set(Source__GameObject__Character__Enemy
     "Source/GameObject/Character/Enemy/EnemyManager.h"
     "Source/GameObject/Character/Enemy/EnemyState.cpp"
     "Source/GameObject/Character/Enemy/EnemyState.h"
+    "Source/GameObject/Character/Enemy/MouseMob.cpp"
+    "Source/GameObject/Character/Enemy/MouseMob.h"
+    "Source/GameObject/Character/Enemy/MouseMobState.cpp"
+    "Source/GameObject/Character/Enemy/MouseMobState.h"
     "Source/GameObject/Character/Enemy/SkeletonMinion.cpp"
     "Source/GameObject/Character/Enemy/SkeletonMinion.h"
     "Source/GameObject/Character/Enemy/SkeletonMinionState.cpp"
@@ -244,6 +250,8 @@ source_group("Source\\GameObject\\Character\\Player" FILES ${Source__GameObject_
 set(Source__GameObject__Character__Player__State
     "Source/GameObject/Character/Player/State/NonPlayerCharacterState.cpp"
     "Source/GameObject/Character/Player/State/NonPlayerCharacterState.h"
+    "Source/GameObject/Character/Player/State/PlayerCharacterRodState.cpp"
+    "Source/GameObject/Character/Player/State/PlayerCharacterRodState.h"
     "Source/GameObject/Character/Player/State/PlayerCharacterShieldState.cpp"
     "Source/GameObject/Character/Player/State/PlayerCharacterShieldState.h"
     "Source/GameObject/Character/Player/State/PlayerCharacterState.cpp"
@@ -260,6 +268,8 @@ set(Source__Network__TCPCommand
     "Source/Network/TCPCommand/TCPClientData.h"
     "Source/Network/TCPCommand/TCPCommand.cpp"
     "Source/Network/TCPCommand/TCPCommand.h"
+    "Source/Network/TCPCommand/TCPEnemy.cpp"
+    "Source/Network/TCPCommand/TCPEnemy.h"
     "Source/Network/TCPCommand/TCPLogin.cpp"
     "Source/Network/TCPCommand/TCPLogin.h"
     "Source/Network/TCPCommand/TCPMatching.cpp"
@@ -1119,6 +1129,7 @@ if(MSVC)
         /Y-
         /wd4819
         /wd4099
+        /utf-8
     )
     target_link_options(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:

@@ -47,9 +47,15 @@ void ModelObject::LoadModel(const char* filename, float scaling, ModelObject::RE
 		m_shaderId = ModelShaderId::Phong;
 		m_dx12_ShaderId = ModelShaderDX12Id::Lambert;
 		break;
+	case ModelObject::LHS_PBR_Instancing:
+		m_dx12_ShaderId = ModelShaderDX12Id::LambertInstancing;
+		break;
 	case ModelObject::LHS_TOON:
 		m_shaderId = ModelShaderId::Toon;
 		m_dx12_ShaderId = ModelShaderDX12Id::Toon;
+		break;
+	case ModelObject::LHS_TOON_Instancing:
+		m_dx12_ShaderId = ModelShaderDX12Id::ToonInstancing;
 		break;
 	default:
 		break;
@@ -422,4 +428,16 @@ DirectX::XMFLOAT3 ModelObject::GetNodePosition(int idx, const DirectX::XMFLOAT3&
 	DirectX::XMStoreFloat3(&pos, DirectX::XMVector3Transform(Offset, W));
 
 	return pos;
+}
+
+/**************************************************************************//**
+ 	@brief	コライダー更新処理
+*//***************************************************************************/
+void ModelObject::UpdateColliders()
+{
+	if (m_pMoveCollider) m_pMoveCollider->Update();
+	for (const std::pair<int, Collider*>& collider : m_pColliders)
+	{
+		collider.second->Update();
+	}
 }

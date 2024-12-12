@@ -1,5 +1,5 @@
 ﻿//! @file Mathf.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDED_TOOL_MATH__
 #define __INCLUDED_TOOL_MATH__

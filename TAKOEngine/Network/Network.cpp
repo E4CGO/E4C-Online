@@ -1,13 +1,13 @@
-#include "Network.h"
+ï»¿#include "Network.h"
 
-// ‰Šú‰»
+// åˆæœŸåŒ–
 bool Network::Initialize()
 {
-	// WinSock‰Šú‰»
+	// WinSockåˆæœŸåŒ–
 	WSADATA	wsaData;
 	WSAStartup(
-		MAKEWORD(2, 2), //WORD Œ^ WinSock ‚Ìƒo[ƒWƒ‡ƒ“ MAKEWORD ƒ}ƒNƒ‚ğg—p‚·‚é
-		&wsaData //WSADATA \‘¢‘Ì‚Ö‚Ìƒ|ƒCƒ“ƒ^i‚±‚±‚É‰Šú‰»‚³‚ê‚½î•ñ‚ª“ü‚éj
+		MAKEWORD(2, 2), //WORD å‹ WinSock ã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ MAKEWORD ãƒã‚¯ãƒ­ã‚’ä½¿ç”¨ã™ã‚‹
+		&wsaData //WSADATA æ§‹é€ ä½“ã¸ã®ãƒã‚¤ãƒ³ã‚¿ï¼ˆã“ã“ã«åˆæœŸåŒ–ã•ã‚ŒãŸæƒ…å ±ãŒå…¥ã‚‹ï¼‰
 	);
 
 	return true;
@@ -18,16 +18,16 @@ void Network::Finalize()
 	WSACleanup();
 }
 
-// IPƒAƒhƒŒƒXæ“¾
+// IPã‚¢ãƒ‰ãƒ¬ã‚¹å–å¾—
 bool Network::GetIpAddress(char* buffer, size_t size)
 {
-	//ƒzƒXƒg–¼‚ğæ“¾‚·‚é
+	//ãƒ›ã‚¹ãƒˆåã‚’å–å¾—ã™ã‚‹
 	char hostname[256];
 	if (gethostname(hostname, sizeof(hostname)) != 0)
 	{
 		return false;
 	}
-	//ƒzƒXƒg–¼‚©‚çIPƒAƒhƒŒƒX‚ğæ“¾‚·‚é
+	//ãƒ›ã‚¹ãƒˆåã‹ã‚‰IPã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—ã™ã‚‹
 	struct addrinfo hints, * res;
 	ZeroMemory(&hints, sizeof(hints));
 	hints.ai_socktype = SOCK_STREAM;

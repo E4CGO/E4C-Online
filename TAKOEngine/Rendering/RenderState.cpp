@@ -1,4 +1,4 @@
-﻿//! @file RenderState.cpp
+//! @file RenderState.cpp
 //! @note
 
 #include "Misc.h"
@@ -790,7 +790,7 @@ RenderStateDX12::RenderStateDX12()
 	//べた塗り&カリングなし
 	{
 		D3D12_RASTERIZER_DESC desc{};
-		desc.FrontCounterClockwise = true;
+		desc.FrontCounterClockwise = false;
 		desc.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
 		desc.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
 		desc.SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;
@@ -806,7 +806,7 @@ RenderStateDX12::RenderStateDX12()
 	//べた塗り&裏面カリング
 	{
 		D3D12_RASTERIZER_DESC desc{};
-		desc.FrontCounterClockwise = true;
+		desc.FrontCounterClockwise = false;
 		desc.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
 		desc.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
 		desc.SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;
@@ -819,10 +819,26 @@ RenderStateDX12::RenderStateDX12()
 		rasterizerStates[static_cast<int>(RasterizerState::SolidCullBack)] = desc;
 	}
 
+	// ベタ塗り&表面カリング
+	{
+		D3D12_RASTERIZER_DESC desc{};
+		desc.FrontCounterClockwise = false;
+		desc.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
+		desc.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
+		desc.SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;
+		desc.DepthClipEnable = true;
+		desc.MultisampleEnable = true;
+		desc.FillMode = D3D12_FILL_MODE_SOLID;
+		desc.CullMode = D3D12_CULL_MODE_FRONT;
+		desc.AntialiasedLineEnable = false;
+
+		rasterizerStates[static_cast<int>(RasterizerState::SolidCullFront)] = desc;
+	}
+
 	//ワイヤーフレーム&カリングなし
 	{
 		D3D12_RASTERIZER_DESC desc{};
-		desc.FrontCounterClockwise = true;
+		desc.FrontCounterClockwise = false;
 		desc.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
 		desc.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
 		desc.SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;
@@ -838,7 +854,7 @@ RenderStateDX12::RenderStateDX12()
 	//ワイヤーフレーム&裏面カリング
 	{
 		D3D12_RASTERIZER_DESC desc{};
-		desc.FrontCounterClockwise = true;
+		desc.FrontCounterClockwise = false;
 		desc.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
 		desc.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
 		desc.SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;

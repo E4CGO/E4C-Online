@@ -1,4 +1,4 @@
-//! @file AABBCollider.h
+ï»¿//! @file AABBCollider.h
 //! @note 
 
 #ifndef __AABB_COLLIDER_H__
@@ -26,7 +26,8 @@ public:
 
 	//DirectX::XMFLOAT3 GetTop() override;
 
-	// AABB—pƒpƒ‰ƒ[ƒ^ƒZƒbƒg
+
+	// AABBç”¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚»ãƒƒãƒˆ
 	void SetParam(const AABB& aabb) override;
 
 	const DirectX::XMFLOAT3 GetRadii() const { return m_radii; }
