@@ -25,7 +25,7 @@ Enemy::~Enemy()
 		m_pSpawner->EnemyDestoryCallBack(this);
 	}
 
-	m_pColliders.clear();
+	//m_pColliders.clear();
 }
 
 bool Enemy::MoveTo(float elapsedTime, const DirectX::XMFLOAT3& target)
@@ -133,11 +133,11 @@ void Enemy::OnDeath()
 {
 	ENEMIES.Remove(this);
 
-	for (const std::pair<uint8_t, Collider*>& collider : m_pColliders)
-	{
-		COLLISIONS.Remove(collider.second);
-	}
-	m_pColliders.clear();
+	//for (const std::pair<uint8_t, Collider*>& collider : m_pColliders)
+	//{
+	//	COLLISIONS.Remove(collider.second);
+	//}
+	//m_pColliders.clear();
 }
 
 Enemy* Enemy::EnemyFactory(int enemyType)

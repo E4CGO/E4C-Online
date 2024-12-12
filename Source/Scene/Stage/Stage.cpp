@@ -22,7 +22,6 @@ void Stage::Finalize()
 	ENEMIES.Clear();
 	LightManager::Instance().Clear();
 	enemyList.clear();
-	COLLISIONS.Clear();
 }
 
 void Stage::Update(float elapsedTime)

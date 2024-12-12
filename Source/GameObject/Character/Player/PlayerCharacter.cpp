@@ -142,6 +142,10 @@ PlayerCharacter::~PlayerCharacter()
 {
 	delete stateMachine;
 
+	for (const std::pair<uint8_t, Collider*>& collider : m_pColliders)
+	{
+		COLLISIONS.Remove(collider.second);
+	}
 	m_pColliders.clear();
 }
 
