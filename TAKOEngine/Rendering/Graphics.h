@@ -168,13 +168,12 @@ public:
 	// DX12のフレームバッファマネージャー
 	FrameBufferManager* GetFrameBufferManager() { return m_framebufferManager.get(); }
 
+	IDWriteFactory* GetDWriteFactory() { return m_dWriteFactory.Get(); }
 	ID3D11On12Device* GetD3D11On12Device() { return m_d3d11On12Device.Get(); }
 	ID2D1DeviceContext2* GetD2D1DeviceContext() { return m_d2dDeviceContext.Get(); }
 	ID3D11DeviceContext* GetD3D112DDeviceContext() { return m_d3d11DeviceContext.Get(); }
 	Microsoft::WRL::ComPtr<ID3D11Resource> GetD3D11BackBuffer(int i) { return m_wrappedBackBuffers[i]; }
 	ID2D1Bitmap1* GetD2D1RenderTargets(int i) { return m_d2dRenderTargets[i].Get(); }
-	ID2D1SolidColorBrush* GetD2D1TextBrush() { return m_textBrush.Get(); }
-	IDWriteTextFormat* GetD2D1TextFormat() { return m_textFormat.Get(); }
 
 	// レンダーステート取得
 	RenderState* GetRenderState() { return renderState.get(); }
@@ -378,15 +377,13 @@ private:
 
 	std::unique_ptr<ImGuiRenderer>						m_imgui_renderer;
 
-	Microsoft::WRL::ComPtr<ID2D1SolidColorBrush> m_textBrush;
-	Microsoft::WRL::ComPtr<IDWriteTextFormat> m_textFormat;
-	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_d3d11DeviceContext;
-	Microsoft::WRL::ComPtr<ID3D11On12Device> m_d3d11On12Device;
-	Microsoft::WRL::ComPtr<ID3D11Resource> m_wrappedBackBuffers[MAX_BUFFER_COUNT];
+	Microsoft::WRL::ComPtr<IDWriteFactory> m_dWriteFactory;
 	Microsoft::WRL::ComPtr<ID2D1Factory3> m_d2dFactory;
 	Microsoft::WRL::ComPtr<ID2D1Device2> m_d2dDevice;
+	Microsoft::WRL::ComPtr<ID3D11On12Device> m_d3d11On12Device;
 	Microsoft::WRL::ComPtr<ID2D1DeviceContext2> m_d2dDeviceContext;
-	Microsoft::WRL::ComPtr<IDWriteFactory> m_dWriteFactory;
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_d3d11DeviceContext;
+	Microsoft::WRL::ComPtr<ID3D11Resource> m_wrappedBackBuffers[MAX_BUFFER_COUNT];
 	Microsoft::WRL::ComPtr<ID2D1Bitmap1> m_d2dRenderTargets[MAX_BUFFER_COUNT];
 
 	D2D1_BITMAP_PROPERTIES1 bitmapProperties;

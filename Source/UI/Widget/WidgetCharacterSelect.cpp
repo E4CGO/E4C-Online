@@ -1,4 +1,4 @@
-﻿//! @file WidgetCharacterSelect.cpp
+//! @file WidgetCharacterSelect.cpp
 //! @note
 
 #include "WidgetCharacterSelect.h"

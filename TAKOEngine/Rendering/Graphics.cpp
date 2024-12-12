@@ -341,9 +341,10 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 #pragma warning(pop)
 				bitmapProperties = D2D1::BitmapProperties1(
 					D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
-					D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED),
-					dpiX,
-					dpiY
+					D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED)
+					//,
+					//dpiX,
+					//dpiY
 				);
 			}
 
@@ -516,22 +517,6 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 		}
 		adapter->Release();
-
-		{
-			m_d2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &m_textBrush);
-			m_dWriteFactory->CreateTextFormat(
-				L"Verdana",
-				NULL,
-				DWRITE_FONT_WEIGHT_NORMAL,
-				DWRITE_FONT_STYLE_NORMAL,
-				DWRITE_FONT_STRETCH_NORMAL,
-				50,
-				L"en-us",
-				&m_textFormat
-			);
-			m_textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
-			m_textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-		}
 
 		// レンダーステート作成
 		renderState = std::make_unique<RenderState>(device.Get());

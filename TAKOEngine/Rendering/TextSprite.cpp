@@ -12,6 +12,22 @@ void TextSprite::Init(ID3D11Device* device)
 	fonts[static_cast<int>(FONT_ID::MsGothic)] = std::make_unique<SpriteFont>(device, L"Data/Font/MsGothic.spritefont");
 
 	m_spriteBatch = std::make_unique<SpriteBatch>(T_GRAPHICS.GetDeviceContext());
+
+	{
+		T_GRAPHICS.GetD2D1DeviceContext()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &m_textBrush);
+		T_GRAPHICS.GetDWriteFactory()->CreateTextFormat(
+			L"Meiryo",
+			NULL,
+			DWRITE_FONT_WEIGHT_NORMAL,
+			DWRITE_FONT_STYLE_NORMAL,
+			DWRITE_FONT_STRETCH_NORMAL,
+			50,
+			L"ja-jp",
+			&m_textFormat
+		);
+		m_textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+		m_textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+	}
 }
 
 TextSprite::~TextSprite()
@@ -26,9 +42,26 @@ void TextSprite::Begin()
 	m_spriteBatch->Begin(SpriteSortMode_Deferred, states.NonPremultiplied());
 }
 
+void TextSprite::BeginDX12()
+{
+	// Acquire our wrapped render target resource for the current back buffer.
+	T_GRAPHICS.GetD3D11On12Device()->AcquireWrappedResources(T_GRAPHICS.GetD3D11BackBuffer(T_GRAPHICS.GetCurrentBufferIndex()).GetAddressOf(), 1);
+
+	// Render text directly to the back buffer.
+	T_GRAPHICS.GetD2D1DeviceContext()->SetTarget(T_GRAPHICS.GetD2D1RenderTargets(T_GRAPHICS.GetCurrentBufferIndex()));
+}
+
 void TextSprite::End()
 {
 	m_spriteBatch->End();
+}
+
+void TextSprite::EndDX12()
+{
+	// Release our wrapped render target resource. Releasing
+	// transitions the back buffer resource to the state specified
+	// as the OutState when the wrapped resource was created.
+	T_GRAPHICS.GetD3D11On12Device()->ReleaseWrappedResources(T_GRAPHICS.GetD3D11BackBuffer(T_GRAPHICS.GetCurrentBufferIndex()).GetAddressOf(), 1);
 }
 
 void TextSprite::Render(
@@ -123,6 +156,34 @@ void TextSprite::Render(
 )
 {
 	Render(font, Encode::string_to_wstring(text), x, y, r, g, b, a, angle, align, scale, border, borderColor);
+}
+
+void TextSprite::RenderDX12(
+	FONT_ID font,
+	std::wstring text,
+	float x, float y,
+	float r, float g, float b, float a,
+	float angle,
+	FONT_ALIGN align,
+	float scale,
+	int border,
+	const DirectX::XMFLOAT4& borderColor)
+{
+	D2D1_SIZE_F rtSize = T_GRAPHICS.GetD2D1RenderTargets(T_GRAPHICS.GetCurrentBufferIndex())->GetSize();
+	D2D1_RECT_F textRect = D2D1::RectF(x - rtSize.width, y - rtSize.height, x + rtSize.width, y + rtSize.height);
+
+	T_GRAPHICS.GetD2D1DeviceContext()->BeginDraw();
+	T_GRAPHICS.GetD2D1DeviceContext()->SetTransform(D2D1::Matrix3x2F::Identity());
+
+	T_GRAPHICS.GetD2D1DeviceContext()->DrawText(
+		text.c_str(),
+		text.length(),
+		m_textFormat.Get(),
+		&textRect,
+		m_textBrush.Get()
+	);
+
+	T_GRAPHICS.GetD2D1DeviceContext()->EndDraw();
 }
 
 void TextSprite::TextBox(
