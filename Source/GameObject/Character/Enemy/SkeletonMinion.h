@@ -9,12 +9,12 @@ public:
 	SkeletonMinion(float scaling = 1.5f);
 	~SkeletonMinion() = default;
 public:
-	enum COLLIDER : uint8_t
+	enum COLLIDER_ID : uint8_t
 	{
-		BODY,
-		HEAD,
-		LEFT_HAND,
-		RIGHT_HAND
+		COL_BODY,
+		COL_HEAD,
+		COL_LEFT_HAND,
+		COL_RIGHT_HAND,
 	};
 protected:
 	enum STATE

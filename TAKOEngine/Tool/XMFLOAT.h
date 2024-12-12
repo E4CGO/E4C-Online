@@ -49,6 +49,13 @@ inline XMMATRIX AnglesToMatrix(XMFLOAT3 angle) {
 	return Y * X * Z;
 }
 
+inline XMVECTOR QuaternionFromToRotation(const XMFLOAT3& v1, const XMFLOAT3& v2)
+{
+	float angle = AngleBetweenXMFLOAT3(v1, v2);
+	if (fabsf(angle) < 0.001f || 3.14f < fabsf(angle)) return XMQuaternionIdentity();
+	else return XMQuaternionRotationAxis(XMVector3Cross(XMLoadFloat3(&v1), XMLoadFloat3(&v2)), angle);
+}
+
 inline XMFLOAT3 MatrixToAngles(XMFLOAT4X4& m)
 {
 	//XMFLOAT3 angle = {};

@@ -40,6 +40,18 @@ namespace PlayerCharacterState
 		{
 			if (owner->IsPlayer())
 			{
+				if (!owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_1)->IsEnable())
+				{
+					if (owner->GetModel()->GetAnimationRate() > owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_1)->GetHitStartRate())
+					{
+						owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_1)->SetEnable(true);
+					}
+				}
+				if (owner->GetModel()->GetAnimationRate() > owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_1)->GetHitEndRate())
+				{
+					owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_1)->SetEnable(false);
+					owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_1)->ClearHitOthers();
+				}
 
 				float time = owner->GetModel()->GetAnimationRate();
 				if (owner->GetModel()->GetAnimationRate() > 0.75f)
@@ -65,7 +77,17 @@ namespace PlayerCharacterState
 		{
 			if (owner->IsPlayer())
 			{
-
+				if (!owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_2)->IsEnable())
+				{
+					if (owner->GetModel()->GetAnimationRate() > owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_2)->GetHitStartRate())
+					{
+						owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_2)->SetEnable(true);
+					}
+				}
+				if (owner->GetModel()->GetAnimationRate() > owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_2)->GetHitEndRate())
+				{
+					owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_2)->SetEnable(false);
+				}
 				if (owner->GetModel()->GetAnimationRate() > 0.75f)
 				{
 					if (owner->InputAttackNormal()) // アニメーション75%完成
@@ -88,7 +110,17 @@ namespace PlayerCharacterState
 		}
 		void AttackNormalState_3::Execute(float elapsedTime)
 		{
-
+			if (!owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_3)->IsEnable())
+			{
+				if (owner->GetModel()->GetAnimationRate() > owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_3)->GetHitStartRate())
+				{
+					owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_3)->SetEnable(true);
+				}
+			}
+			if (owner->GetModel()->GetAnimationRate() > owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_3)->GetHitEndRate())
+			{
+				owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_3)->SetEnable(false);
+			}
 		}
 
 		// スキル_1ステート

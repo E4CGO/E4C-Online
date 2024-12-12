@@ -3,6 +3,7 @@
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "TAKOEngine/Rendering/LightManager.h"
 #include "GameObject/Props/SpawnerManager.h"
+#include "TAKOEngine/Physics/CollisionManager.h"
 
 void Stage::Initialize()
 {

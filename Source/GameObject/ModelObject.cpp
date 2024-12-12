@@ -7,6 +7,7 @@
 #include "TAKOEngine/Physics/CapsuleCollider.h"
 #include "TAKOEngine/Physics/ModelCollider.h"
 #include "TAKOEngine/Physics/MapCollider.h"
+#include "TAKOEngine/Physics/CollisionManager.h"
 
 /**************************************************************************//**
 	@brief		コンストラクタ（引数付き）
@@ -310,38 +311,85 @@ void ModelObject::RenderDX12(const RenderContextDX12& rc)
 }
 
 /**************************************************************************//**
-	@brief		コライダー設定
-	@param[in]	collider	コライダータイプ
+	@brief		移動用コライダー設定
+	@param[in]	shapeType	コライダータイプ
+	@param[in]	objType		オブジェクトタイプ
 	@param[in]	idx			モデルID
 	@return		なし
 *//***************************************************************************/
-void ModelObject::SetMoveCollider(Collider::COLLIDER_TYPE collider, Collider::COLLIDER_OBJ objType, int idx)
+void ModelObject::SetMoveCollider(Collider::COLLIDER_TYPE shapeType, Collider::COLLIDER_OBJ objType, int idx)
 {
-	switch (collider)
+	switch (shapeType)
 	{
 	case Collider::COLLIDER_TYPE::SPHERE:
-		this->m_pMoveCollider = std::make_unique<SphereCollider>(objType, &transform);
+		m_pMoveCollider = std::make_unique<SphereCollider>(objType, &transform);
 		break;
 	case Collider::COLLIDER_TYPE::AABB:
-		this->m_pMoveCollider = std::make_unique<AABBCollider>(objType, &transform);
+		m_pMoveCollider = std::make_unique<AABBCollider>(objType, &transform);
 		break;
 	case Collider::COLLIDER_TYPE::OBB:
-		this->m_pMoveCollider = std::make_unique<OBBCollider>(objType, &transform);
+		m_pMoveCollider = std::make_unique<OBBCollider>(objType, &transform);
 		break;
 	case Collider::COLLIDER_TYPE::CAPSULE:
-		this->m_pMoveCollider = std::make_unique<CapsuleCollider>(objType, &transform);
+		m_pMoveCollider = std::make_unique<CapsuleCollider>(objType, &transform);
 		break;
 	case Collider::COLLIDER_TYPE::MODEL:
-		this->m_pMoveCollider = std::make_unique<ModelCollider>(m_pmodels[idx].get(), objType, &transform);
+		m_pMoveCollider = std::make_unique<ModelCollider>(m_pmodels[idx].get(), objType, &transform);
 		break;
 	case Collider::COLLIDER_TYPE::MAP:
 		//this->collider = std::make_unique<ModelCollider>(model.get());
-		this->m_pMoveCollider = std::make_unique<MapCollider>(m_pmodels[idx].get(), objType, &transform);
+		m_pMoveCollider = std::make_unique<MapCollider>(m_pmodels[idx].get(), objType, &transform);
 		break;
 	default:
-		this->m_pMoveCollider = nullptr;
+		m_pMoveCollider = nullptr;
 		break;
 	}
+
+	m_pMoveCollider->SetOwner(this);
+}
+
+/**************************************************************************//**
+	@brief		移動用コライダー設定
+	@param[in]	sphereParam		球コライダーのパラメータ
+	@param[in]	objType			オブジェクトタイプ
+	@return		なし
+*//***************************************************************************/
+void ModelObject::SetMoveCollider(Sphere sphereParam, Collider::COLLIDER_OBJ objType)
+{
+	m_pMoveCollider = std::make_unique<SphereCollider>(objType, &transform);
+	m_pMoveCollider->SetOwner(this);
+	m_pMoveCollider->SetParam(sphereParam);
+}
+
+/**************************************************************************//**
+	@brief		当たり判定用コライダー設定
+	@param[in]	idx				コライダーID
+	@param[in]	sphereParam		球コライダーのパラメータ
+	@param[in]	objType			オブジェクトタイプ
+	@param[in]	transform		参照するオブジェクト行列
+	@return		作成したコライダーのポインタ
+*//***************************************************************************/
+void ModelObject::SetCollider(uint8_t idx, Sphere sphereParam, Collider::COLLIDER_OBJ objType, DirectX::XMFLOAT4X4* transform)
+{
+	m_pColliders[idx] = new SphereCollider(objType, transform);
+	m_pColliders[idx]->SetOwner(this);
+	m_pColliders[idx]->SetParam(sphereParam);
+	COLLISIONS.Register(m_pColliders[idx]);
+}
+/**************************************************************************//**
+	@brief		当たり判定用コライダー設定
+	@param[in]	idx				コライダーID
+	@param[in]	capsuleParam	カプセルコライダーのパラメータ
+	@param[in]	objType			オブジェクトタイプ
+	@param[in]	transform		参照するオブジェクト行列
+	@return		作成したコライダーのポインタ
+*//***************************************************************************/
+void ModelObject::SetCollider(uint8_t idx, Capsule capsuleParam, Collider::COLLIDER_OBJ objType, DirectX::XMFLOAT4X4* transform)
+{
+	m_pColliders[idx] = new CapsuleCollider(objType, transform);
+	m_pColliders[idx]->SetOwner(this);
+	m_pColliders[idx]->SetParam(capsuleParam);
+	COLLISIONS.Register(m_pColliders[idx]);
 }
 
 /**************************************************************************//**
@@ -387,7 +435,7 @@ DirectX::XMFLOAT3 ModelObject::GetNodePosition(int idx, const DirectX::XMFLOAT3&
 *//***************************************************************************/
 void ModelObject::UpdateColliders()
 {
-	if (m_pMoveCollider != nullptr) m_pMoveCollider->Update();
+	if (m_pMoveCollider) m_pMoveCollider->Update();
 	for (const std::pair<int, Collider*>& collider : m_pColliders)
 	{
 		collider.second->Update();

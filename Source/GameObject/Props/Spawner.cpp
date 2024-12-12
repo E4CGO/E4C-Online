@@ -105,8 +105,8 @@ void Spawner::EnemyDestoryCallBack(Enemy* enemy)
 void Spawner::Render(const RenderContext& rc)
 {
 #ifdef _DEBUG
-	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, m_spawnRadius, 1.5f, { 1,0,0,1 });
-	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, m_searchRadius, 1.5f, { 1,0,1,1 });
+	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, { 0,1,0 }, m_spawnRadius, 1.5f, { 1,0,0,1 });
+	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, { 0,1,0 }, m_searchRadius, 1.5f, { 1,0,1,1 });
 #endif // DEBUG
 
 
@@ -116,7 +116,7 @@ void Spawner::RenderDX12(const RenderContextDX12& rc)
 {
 
 #ifdef _DEBUG
-	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, m_spawnRadius, 1.5f, { 1,0,0,1 });
-	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, m_searchRadius, 1.5f, { 1,0,1,1 });
+	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, { 0,1,0 }, m_spawnRadius, 1.5f, { 1,0,0,1 });
+	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, { 0,1,0 }, m_searchRadius, 1.5f, { 1,0,1,1 });
 #endif // DEBUG
 }

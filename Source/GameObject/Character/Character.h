@@ -90,6 +90,8 @@ public:
 
 	// 高さを取得
 	float GetHeight() { return height; }
+	// 半径を取得
+	float GetRadius() { return radius; }
 
 	// 地面判定
 	bool IsGround() const { return isGround; }
@@ -106,12 +108,10 @@ public:
 	void SetKinematic(bool value) { this->isKinematic = value; }
 
 protected:
-	// コライダー更新処理
-	virtual void UpdateColliders() {};
-protected:
 	// レイキャスト用
 	float stepOffset = 0.5f;						// ステップ高さ
 	float height = 2.0f;							// 高さ
+	float radius = 0.5f;							// 半径
 
 	float gravity = -1.0f;							// 重力
 	DirectX::XMFLOAT3 velocity = { 0, 0, 0 };		// 速力

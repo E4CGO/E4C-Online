@@ -86,11 +86,16 @@ public:
 	// カラー設定
 	void SetColor(const DirectX::XMFLOAT4 color) { this->m_color = color; }
 
-	// 衝突判定
+	// 移動用コライダー
 	Collider* GetMoveCollider() { return m_pMoveCollider.get(); }
-	void SetMoveCollider(Collider::COLLIDER_TYPE collider, Collider::COLLIDER_OBJ objType, int idx = 0);
-	Collider* GetCollider(uint8_t idx) { return m_pColliders[idx]; }
-	std::unordered_map<uint8_t, Collider*> GetColliders() { return m_pColliders; }
+	void SetMoveCollider(Collider::COLLIDER_TYPE shapeType, Collider::COLLIDER_OBJ objType, int idx = 0);
+	void SetMoveCollider(Sphere sphereParam, Collider::COLLIDER_OBJ objType);
+	
+	// 当たり判定用コライダー
+	std::unordered_map<uint8_t, Collider*>& GetColliders() { return m_pColliders; }
+	Collider* GetCollider(uint8_t idx) { return (m_pColliders.contains(idx)) ? m_pColliders[idx] : nullptr; }
+	void SetCollider(uint8_t idx, Sphere sphereParam, Collider::COLLIDER_OBJ objType, DirectX::XMFLOAT4X4* transform);
+	void SetCollider(uint8_t idx, Capsule capsuleParam, Collider::COLLIDER_OBJ objType, DirectX::XMFLOAT4X4* transform);
 
 	// アニメーションのスピードを取得
 	float GetAnimationSpeed() { return m_animationSpeed; }
@@ -112,14 +117,16 @@ public:
 		return GetNodePosition(0, offset);
 	}
 protected:
-	void UpdateColliders();
+	// コライダー更新処理
+	virtual void UpdateColliders();
 protected:
 	// 色
 	DirectX::XMFLOAT4 m_color = { 1, 1, 1, 1 };
 
-	// 衝突判定
+	// 移動用コライダー
 	std::unique_ptr<Collider> m_pMoveCollider = nullptr;
-	std::unordered_map<uint8_t, Collider*> m_pColliders;		// 当たり判定
+	// 当たり判定用コライダー
+	std::unordered_map<uint8_t, Collider*> m_pColliders;
 
 	// シェーダーID
 	ModelShaderId m_shaderId = ModelShaderId::Toon;

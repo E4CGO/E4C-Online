@@ -12,22 +12,22 @@ void SkeletonMinionState::AttackState::Execute(float elapsedTime)
 {
 	if (owner->GetModel()->GetAnimationRate() <= 0.5f)
 	{
-		owner->GetCollider(SkeletonMinion::COLLIDER::RIGHT_HAND)->SetEnable(true);
-		owner->GetCollider(SkeletonMinion::COLLIDER::LEFT_HAND)->SetEnable(false);
+		owner->GetCollider(SkeletonMinion::COLLIDER_ID::COL_RIGHT_HAND)->SetEnable(true);
+		owner->GetCollider(SkeletonMinion::COLLIDER_ID::COL_LEFT_HAND)->SetEnable(false);
 	}
 	else
 	{
-		owner->GetCollider(SkeletonMinion::COLLIDER::RIGHT_HAND)->SetEnable(false);
-		owner->GetCollider(SkeletonMinion::COLLIDER::LEFT_HAND)->SetEnable(true);
+		owner->GetCollider(SkeletonMinion::COLLIDER_ID::COL_RIGHT_HAND)->SetEnable(false);
+		owner->GetCollider(SkeletonMinion::COLLIDER_ID::COL_LEFT_HAND)->SetEnable(true);
 	}
 
 	if (!owner->IsPlayAnimation())
 	{
-		owner->GetStateMachine()->ChangeState(enemy::STATE::DEATH);
+		owner->GetStateMachine()->ChangeState(enemy::STATE::IDLE);
 	}
 }
 void SkeletonMinionState::AttackState::Exit()
 {
-	owner->GetCollider(SkeletonMinion::COLLIDER::RIGHT_HAND)->SetEnable(false);
-	owner->GetCollider(SkeletonMinion::COLLIDER::LEFT_HAND)->SetEnable(false);
+	owner->GetCollider(SkeletonMinion::COLLIDER_ID::COL_RIGHT_HAND)->SetEnable(false);
+	owner->GetCollider(SkeletonMinion::COLLIDER_ID::COL_LEFT_HAND)->SetEnable(false);
 }

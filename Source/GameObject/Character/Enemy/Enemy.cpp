@@ -20,16 +20,13 @@ Enemy::Enemy(const char* filename, float scaling, ModelObject::RENDER_MODE rende
 Enemy::~Enemy()
 {
 	delete stateMachine;
-	for (const std::pair<int, Collider*>& collider : m_pColliders)
-	{
-		COLLISIONS.Remove(collider.second);
-	}
-	m_pColliders.clear();
-
+	
 	if (m_pSpawner != nullptr)
 	{
 		m_pSpawner->EnemyDestoryCallBack(this);
 	}
+
+	m_pColliders.clear();
 }
 
 bool Enemy::MoveTo(float elapsedTime, const DirectX::XMFLOAT3& target)
@@ -71,7 +68,7 @@ void Enemy::Render(const RenderContext& rc)
 	Character::Render(rc);
 
 #ifdef _DEBUG
-	for (const std::pair<int, Collider*>& collider : m_pColliders)
+	for (const std::pair<uint8_t, Collider*>& collider : m_pColliders)
 	{
 		collider.second->DrawDebugPrimitive({ 1, 1, 1, 1 });
 	}
@@ -106,6 +103,12 @@ void Enemy::OnDamage(const ATTACK_DATA& hit)
 void Enemy::OnDeath()
 {
 	ENEMIES.Remove(this);
+
+	for (const std::pair<uint8_t, Collider*>& collider : m_pColliders)
+	{
+		COLLISIONS.Remove(collider.second);
+	}
+	m_pColliders.clear();
 }
 
 Enemy* Enemy::EnemyFactory(uint8_t enemyType)
@@ -149,6 +152,7 @@ bool Enemy::SearchPlayer()
 	}
 	return false;
 }
+
 void Enemy::SetRandomMoveTargetPosition()
 {
 	float theta = Mathf::RandomRange(-DirectX::XM_PI, DirectX::XM_PI);

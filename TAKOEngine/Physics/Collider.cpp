@@ -11,8 +11,6 @@
 
 void Collider::Update()
 {
-	m_prePosition = m_position;
-
 	if (!m_pTransform)
 	{
 		m_position = m_offset;

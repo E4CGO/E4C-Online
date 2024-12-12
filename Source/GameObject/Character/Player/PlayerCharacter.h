@@ -107,6 +107,19 @@ public:
 		READY = 255,	// 待機 (準備完了)
 	};
 
+	enum COLLIDER_ID : uint8_t
+	{
+		COL_BODY,
+		COL_ATTACK_1,
+		COL_ATTACK_2,
+		COL_ATTACK_3,
+		COL_ATTACK_SPECIAL,
+		COL_SKILL_1,
+		COL_SKILL_2,
+		COL_SKILL_3,
+		COL_SKILL_4,
+	};
+
 	enum COLOR_PATTERN {
 		DEFAULT,
 		RED,
@@ -214,20 +227,18 @@ protected:
 
 	bool CollisionVsEnemies();
 
-	bool CollisionVsEnemyAttack(
-		Collider* collider,
-		int damage,
-		bool power = false,
-		float force = 0.0f,
-		int effectIdx = -1,
-		float effectScale = 1.0f
-	); // 汎用 敵との判定
+	//bool CollisionVsEnemyAttack(
+	//	Collider* collider,
+	//	int damage,
+	//	bool power = false,
+	//	float force = 0.0f,
+	//	int effectIdx = -1,
+	//	float effectScale = 1.0f
+	//); // 汎用 敵との判定
 
 	void AttackEnemy(Collider* attackCol, Collider* enemyCol);
 
-private:
-	float radius = 0;	// 当たり判定半径
-	
+protected:	
 	uint32_t m_client_id = 0;
 	
 	uint32_t input = 0;						// キー入力
@@ -275,8 +286,8 @@ protected:
 
 	StateMachine<PlayerCharacter>* stateMachine;
 
-	Collider* m_hitCollider;	// ヒット判定
-	std::unordered_map<int, Collider*> m_pattackColliders; // 攻撃判定
+	//Collider* m_hitCollider;	// ヒット判定
+	//std::unordered_map<int, Collider*> m_pattackColliders; // 攻撃判定
 
 	// 同期用
 	std::mutex m_mut;

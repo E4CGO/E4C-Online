@@ -18,7 +18,7 @@ SphereCollider::SphereCollider(uint16_t _objType, DirectX::XMFLOAT4X4* _transfor
 }
 
 // Sphere用パラメータセット
-void SphereCollider::SetParam(Sphere sphere)
+void SphereCollider::SetParam(const Sphere& sphere)
 {
 	m_offset = sphere.position;
 	m_radius = sphere.radius;
