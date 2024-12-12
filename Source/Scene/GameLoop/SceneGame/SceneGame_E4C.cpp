@@ -22,6 +22,8 @@
 #include "Source\PlayerCharacterData.h"
 #include "GameObject/Props/SpawnerManager.h"
 
+#include "TAKOEngine/Physics/CollisionManager.h"
+
 void SceneGame_E4C::Initialize()
 {
 	stateMachine = std::make_unique<StateMachine<SceneGame_E4C>>();
@@ -65,6 +67,7 @@ void SceneGame_E4C::Finalize()
 	MAPTILES.Clear();
 	SpawnerManager::Instance().Clear();
 	PlayerCharacterManager::Instance().Clear();
+	COLLISIONS.Clear();
 	UI.Clear();
 }
 
