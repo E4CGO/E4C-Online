@@ -2,7 +2,10 @@
 
 Texture2D texture0 : register(t0);
 Texture2D ToonTex  : register(t1);
+Texture2D shadowMap  : register(t2);
+
 SamplerState sampler0 : register(s0);
+SamplerState shadow_sampler : register(s1);
 
 float4 main(VS_OUT pin) : SV_TARGET
 {
@@ -42,6 +45,29 @@ float4 main(VS_OUT pin) : SV_TARGET
         float Ratio = max(dot(L, E), 0);
         R = ToonTex.Sample(sampler0, float2(Rim * Ratio, 1)).r * 0.2f;
     }
+    
+    // 平行光源の影なので、平行光源に対して影を適応
+    float3 shadow = 1;
+    {
+        float3 shadowRexcoord = pin.shadow;
+        
+        //シャドウマップのUV範囲内か、深度値が範囲内か判定する
+        if (shadowRexcoord.z >= 0 && shadowRexcoord.z <= 1 &&
+			shadowRexcoord.x >= 0 && shadowRexcoord.x <= 1 &&
+			shadowRexcoord.y >= 0 && shadowRexcoord.y <= 1)
+        {
+            //シャドウマップから深度値取得
+            float depth = shadowMap.Sample(shadow_sampler, shadowRexcoord.xy).r;
+
+            //深度値を比較して影かどうかを判定する
+            if (shadowRexcoord.z - depth > shadowBias) //shadow = shadowColor;  
+            {
+                shadow = CalcShadowColorPCFFilter(shadowMap, shadow_sampler, shadowRexcoord, shadowColor, shadowBias);
+            }
+        }
+    }
+    D *= shadow;
+    S *= shadow;
     
     // 点光源の処理
     float3 pointDiffuse  = (float3) 0;

@@ -95,9 +95,5 @@ public:
 	float scaling = 1.0f;
 
 private:
-	// インスタンシング用
-	bool exist[InstancingMax] = {};
-	DirectX::XMFLOAT4X4 m_transform[InstancingMax];
-
 	int modelType = 0;
 };

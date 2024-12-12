@@ -33,6 +33,7 @@ public:
 		RHS_TOON,
 		LHS_PBR,
 		LHS_TOON,
+		LHS_Phong,
 	};
 
 	RENDER_MODE m_renderMode = DX11;

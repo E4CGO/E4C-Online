@@ -27,6 +27,7 @@ VS_OUT main(
     vout.tangent  = normalize(t);
     vout.binormal = normalize(cross(vout.normal, vout.tangent));
     vout.color    = materialColor;
-
+    vout.shadow   = CalcShadowTexcoord(position.xyz, lightViewProjection);
+    
     return vout;
 }

@@ -5,7 +5,6 @@
 #define __GRAHICS_GRAHICS_H__
 
 #include <wrl.h>
-#include <memory>
 #include <mutex>
 #include <d3d11.h>
 #include <d3d12.h>
@@ -26,6 +25,7 @@
 #include "TAKOEngine/Tool/ImGuiRenderer.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
 #include "TAKOEngine/Rendering/ParticleRenderer.h"
+#include "TAKOEngine/Rendering/ShadowMapRender.h"
 
 #define MAX_BUFFER_COUNT (2)
 
@@ -53,6 +53,7 @@ enum class ModelShaderDX12Id
 	Toon,
 	ToonInstancing,
 	Skydome,
+	shadowMap,
 
 	EnumCount
 };
@@ -164,6 +165,9 @@ public:
 	FrameBufferDX12* GetFramBufferDX12(FrameBufferDX12Id frameBufferId) { return dx12_frameBuffers[static_cast<int>(frameBufferId)].get(); }
 	// DX12のフレームバッファマネージャー
 	FrameBufferManager* GetFrameBufferManager() { return m_framebufferManager.get(); }
+
+	// シャドウマップ取得
+	ShadowMapRenderDX12* GetShadowRenderer() { return m_shadowMapRenderer.get(); }
 
 	// レンダーステート取得
 	RenderState* GetRenderState() { return renderState.get(); }
@@ -327,6 +331,8 @@ private:
 
 	// パーティクル
 	std::unique_ptr<ParticleCompute> m_compute;
+
+	std::unique_ptr<ShadowMapRenderDX12> m_shadowMapRenderer;
 
 	std::mutex mutex;	// ミューテックス
 

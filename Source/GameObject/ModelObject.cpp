@@ -50,6 +50,9 @@ void ModelObject::LoadModel(const char* filename, float scaling, ModelObject::RE
 		m_shaderId = ModelShaderId::Toon;
 		m_dx12_ShaderId = ModelShaderDX12Id::Toon;
 		break;
+	case ModelObject::LHS_Phong:
+		m_dx12_ShaderId = ModelShaderDX12Id::Phong;
+		break;
 	default:
 		break;
 	}

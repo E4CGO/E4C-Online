@@ -134,7 +134,7 @@ PhongShaderDX12::PhongShaderDX12(ID3D12Device* device, bool instancing)
 	}
 
 	//サンプラーステート設定
-	m_sampler = graphics.GetSampler(SamplerState::LinearWrap);
+	m_sampler = graphics.GetSampler(SamplerState::AnisotropicWrap);
 }
 
 //***********************************************************
@@ -162,6 +162,10 @@ void PhongShaderDX12::Render(const RenderContextDX12& rc, const ModelDX12::Mesh&
 
 	//シーン定数バッファ設定
 	rc.d3d_command_list->SetGraphicsRootDescriptorTable(0, rc.scene_cbv_descriptor->GetGpuHandle());  //CbScene
+
+	// シャドウマップ設定
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(6, rc.shadowMap.shadow_srv_descriptor->GetGpuHandle());
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(7, rc.shadowMap.shadow_sampler_descriptor->GetGpuHandle());
 
 	const ModelResource::Mesh* res_mesh = mesh.mesh;
 	const ModelDX12::Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());

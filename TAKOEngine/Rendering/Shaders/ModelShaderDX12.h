@@ -15,8 +15,8 @@
 
 //******************************************************************
 //  @class  ModelShaderDX12
-//  @brief  ƒVƒF[ƒ_[ŠÖ˜A‚ÌŠî’êƒNƒ‰ƒX(DX12)
-//  @par    [à–¾]
+//  @brief  ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼é–¢é€£ã®åŸºåº•ã‚¯ãƒ©ã‚¹(DX12)
+//  @par    [èª¬æ˜]
 //******************************************************************
 class ModelShaderDX12
 {
@@ -26,15 +26,17 @@ protected:
 public:
 	virtual ~ModelShaderDX12() {};
 
-	//•`‰æ
+	virtual void Finalize() = 0;
+
+	//æç”»
 	virtual void Render(const RenderContextDX12& rc, const ModelDX12::Mesh& mesh) = 0;
 };
 
 //******************************************************************
 //  @class  SkinningPipeline
-//  @brief  ƒXƒLƒjƒ“ƒOƒpƒCƒvƒ‰ƒCƒ“
-//  @par    [à–¾]
-//  @par    ƒRƒ“ƒsƒ…[ƒgƒVƒF[ƒ_[‚ğg—p‚µ‚ÄÅ“K‰»‚ğs‚¤
+//  @brief  ã‚¹ã‚­ãƒ‹ãƒ³ã‚°ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³
+//  @par    [èª¬æ˜]
+//  @par    ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ãƒˆã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’ä½¿ç”¨ã—ã¦æœ€é©åŒ–ã‚’è¡Œã†
 //******************************************************************
 class SkinningPipeline
 {
@@ -42,7 +44,7 @@ public:
 	SkinningPipeline(ID3D12Device* device);
 	~SkinningPipeline();
 
-	//ŒvZ
+	//è¨ˆç®—
 	void Compute(const RenderContextDX12& rc, iModel* model);
 
 private:

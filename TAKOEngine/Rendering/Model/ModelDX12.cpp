@@ -296,6 +296,7 @@ void ModelDX12::UpdateFrameResource(const DirectX::XMFLOAT4X4 transform)
 				{
 					if (!exist[i])  continue;
 
+					// bone
 					frame_resource.cbv_data->transform[frame_resource.instancingCount++] = m_transform[i];
 				}
 				updateBuffers = false;

@@ -57,6 +57,27 @@ void FrameBufferManager::SetRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle, 
 }
 
 //******************************************************************
+// @class     レンダーターゲット設定
+// @param[in] dsvHandle      デプスステンシルハンドル
+// @param[in] ShadowMapSize  シャドウマップのサイズ
+// @return    なし
+//****************************************************************** 
+void FrameBufferManager::SetRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle, UINT ShadowMapSize)
+{
+	// ビューポートの設定
+	D3D12_VIEWPORT d3d_viewport;
+	d3d_viewport.TopLeftX = 0;
+	d3d_viewport.TopLeftY = 0;
+	d3d_viewport.Width    = ShadowMapSize;
+	d3d_viewport.Height   = ShadowMapSize;
+	d3d_viewport.MinDepth = 0.0f;
+	d3d_viewport.MaxDepth = 1.0f;
+	SetViewportAndScissor(d3d_viewport);
+
+	m_commandList->OMSetRenderTargets(0, nullptr, false, &dsvHandle);
+}
+
+//******************************************************************
 // @class     複数枚のレンダーターゲット設定
 // @param[in] numRTV              レンダーターゲット数
 // @param[in] renderTarget[]      レンダーターゲットの配列
@@ -183,6 +204,22 @@ void FrameBufferManager::ClearDepthStencilView(D3D12_CPU_DESCRIPTOR_HANDLE dsvHa
 		dsvHandle,
 		D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
 		clearValue,
+		0,
+		0,
+		nullptr);
+}
+
+//******************************************************************
+// @class      デプスステンシルビューをクリア
+// @param[in]  dsvHandle  デプスステンシルビューのCPUハンドル
+// @return     なし
+//******************************************************************
+void FrameBufferManager::ClearDepthStencilView(D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle)
+{
+	m_commandList->ClearDepthStencilView(
+		dsvHandle,
+		D3D12_CLEAR_FLAG_DEPTH,
+		1.0f,
 		0,
 		0,
 		nullptr);
