@@ -14,6 +14,8 @@
 #include "MapTileManager.h"
 #include "InstancingModelManager.h"
 
+#include <filesystem>
+
 RoomBase::RoomBase(
 	RoomBase* parent, int pointIndex,
 	std::vector<AABB>& roomAABBs,
@@ -404,14 +406,16 @@ void RoomBase::PlaceMapTile(bool isLeader)
 		{
 		case TileType::FLOOR_01A:
 			colliderFileNames.emplace_back("Data/Model/DungeonAssets/FloorCollision_01a.glb", 4.0f);
+			//colliderFileNames.emplace_back("Data/Model/DungeonAssets/SM_Floor_01a.glb", 4.0f);
 			modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Floor_01a.glb", 4.0f);
+			//modelFileNames.emplace_back("Data/Model/DungeonAssets/FloorCollision_01a.glb", 4.0f);
 			break;
 		case TileType::WALL_01A:
 			colliderFileNames.emplace_back("Data/Model/DungeonAssets/WallCollision_01a.glb", 4.0f);
 			modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Wall_Pattern_01a.glb", 4.0f);
 			break;
 		case TileType::STAIR_STEP_01A:
-			colliderFileNames.emplace_back("Data/Model/DungeonAssets/SLOPE_COLLISION.glb", 4.0f);
+			colliderFileNames.emplace_back("Data/Model/DungeonAssets/SlopeCollision_01a.glb", 4.0f);
 			modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Stairs_Steps_01a.glb", 4.0f);
 			break;
 		default:
@@ -419,70 +423,92 @@ void RoomBase::PlaceMapTile(bool isLeader)
 		}
 
 		// インスタンシング
-		if (T_GRAPHICS.isDX12Active)
+		//if (T_GRAPHICS.isDX12Active)
+		//{
+		//	std::filesystem::path filePath = modelFileNames.at(0).fileName;
+		//	std::string fileNameStr = filePath.stem().string();
+		//	const char* fileName = fileNameStr.c_str();
+
+		//	ModelObject* model = new ModelObject(modelFileNames.at(0).fileName.c_str(), modelFileNames.at(0).scale, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON);
+		//	model->SetShader(fileName, ModelShaderDX12Id::ToonInstancing);
+
+		//	for (int i = 0; i < m_tileDatas.at(tileType).size(); i++)
+		//	{
+		//		int modelScale = (1.0f / modelFileNames.at(0).scale);
+
+		//		// 使われていないIDを取得して利用
+		//		int id = model->GetModel()->AllocateInstancingIndex();
+		//		if (id < 0) continue;
+
+		//		DirectX::XMFLOAT3 position = m_tileDatas.at(tileType).at(i).position;
+		//		DirectX::XMFLOAT3 angle = m_tileDatas.at(tileType).at(i).angle;
+		//		DirectX::XMFLOAT3 scale = m_tileDatas.at(tileType).at(i).scale;
+
+		//		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
+		//		DirectX::XMMATRIX R = AnglesToMatrix({ angle.x, angle.z, angle.y });
+		//		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(-position.x * 0.25f, position.y * 0.25f, position.z * 0.25f);
+
+		//		DirectX::XMMATRIX LocalTransform = S * R * T;
+
+		//		DirectX::XMFLOAT4X4 tm;
+		//		DirectX::XMStoreFloat4x4(&tm, LocalTransform);
+
+		//		model->GetModel()->UpdateTransform(id, tm);
+
+		//		if (tileType == TileType::WALL_01A) instancingTransforms.emplace_back(model->GetModel()->GetTransform(id));
+		//	}
+		//	MAPTILES.Register(model);
+		//}
+		//else
 		{
-			//ModelObject* model = new ModelObject(modelFileNames.at(0).fileName.c_str(), modelFileNames.at(0).scale, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON);
-			//model->SetShader(modelFileNames.at(0).fileName.c_str(), ModelShaderDX12Id::ToonInstancing);
-
-			//for (int i = 0; i < m_tileDatas.at(tileType).size(); i++)
-			//{
-			//	// 使われていないIDを取得して利用
-			//	int id = model->GetModel()->AllocateInstancingIndex();
-			//	if (id < 0) continue;
-
-			//	DirectX::XMFLOAT3 position = m_tileDatas.at(tileType).at(i).position;
-			//	DirectX::XMFLOAT3 angle = m_tileDatas.at(tileType).at(i).angle;
-			//	DirectX::XMFLOAT3 scale = m_tileDatas.at(tileType).at(i).scale;
-
-			//	DirectX::XMMATRIX m;
-			//	m = DirectX::XMMatrixScaling(1, 1, 1);
-			//	m *= DirectX::XMMatrixRotationY(DirectX::XMConvertToRadians(angle.y));
-			//	m *= DirectX::XMMatrixTranslation(position.x, position.y, position.z);
-
-			//	DirectX::XMFLOAT4X4 tm;
-			//	DirectX::XMStoreFloat4x4(&tm, m);
-			//	model->GetModel()->UpdateTransform(id, tm);
-			//}
-
-			//DirectX::XMFLOAT4X4 worldTransform = {
-			//	1, 0, 0, 0,
-			//	0, 1, 0, 0,
-			//	0, 0, 1, 0,
-			//	0, 0, 0, 1
-			//};
-			//model->GetModel()->UpdateTransform(worldTransform);
-
-			//model->Update(0);
-			//MAPTILES.Register(model);
+			for (const TILE_DATA& tileData : m_tileDatas.at(tileType))
+			{
+				MapTile* modelTile = new MapTile("", 1.0f, this);
+			
+				for (const ModelFileData& data : modelFileNames)
+				{
+					if (T_GRAPHICS.isDX11Active)
+					{
+						modelTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX11, ModelObject::LHS_TOON);
+					}
+					if (T_GRAPHICS.isDX12Active)
+					{
+						modelTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX12, ModelObject::LHS_TOON);
+					}
+				}
+			
+				modelTile->SetPosition(tileData.position);
+				modelTile->SetAngle(tileData.angle);
+				modelTile->SetScale(tileData.scale);
+				modelTile->Update(0);
+				MAPTILES.Register(modelTile);
+			}
 		}
 
 		for (const TILE_DATA& tileData : m_tileDatas.at(tileType))
 		{
-			MapTile* newTile = new MapTile("", 1.0f, this);
+			MapTile* colliderTile = new MapTile("", 1.0f, this);
 
 			for (const ModelFileData& data : colliderFileNames)
 			{
 				if (T_GRAPHICS.isDX11Active)
 				{
-					newTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX11, ModelObject::LHS_TOON);
+					colliderTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX11, ModelObject::LHS_TOON);
 				}
 				if (T_GRAPHICS.isDX12Active)
 				{
-					newTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX12, ModelObject::LHS_PBR);
+					colliderTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX12, ModelObject::LHS_PBR);
 				}
 			}
+			if (colliderFileNames.size() != 0) colliderTile->SetCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
 
-			continue;
-
-			//if (colliderFileNames.size() != 0) continue;
-
-			newTile->SetPosition(tileData.position);
-			newTile->SetAngle(tileData.angle);
-			newTile->SetScale(tileData.scale);
-			//newTile->SetColor(tileData.color);
-			//newTile->Update(0);
-			newTile->Hide();
-			MAPTILES.Register(newTile);
+			// SetCollider後にPos、Angle、Scaleを設定する
+			colliderTile->SetPosition(tileData.position);
+			colliderTile->SetAngle(tileData.angle);
+			colliderTile->SetScale(tileData.scale);
+			colliderTile->Update(0);
+			colliderTile->Hide();
+			MAPTILES.Register(colliderTile);
 		}
 	}
 }

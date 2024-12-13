@@ -194,7 +194,7 @@ void StageDungeon_E4C::Initialize()
 
 	// プレイヤー
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
-	player->SetPosition({ 5.0f, 5.0f, 5.0f });
+	player->SetPosition({ 0.0f, 5.0f, 0.0f });
 	player->GetStateMachine()->ChangeState(PlayerCharacter::STATE::IDLE);
 
 	// カメラ設定
@@ -217,28 +217,6 @@ void StageDungeon_E4C::Initialize()
 	cameraController->SetPlayer(player);
 	CURSOR_OFF;
 
-	// テスト用　インスタンシングモデル
-	instancingModel = std::make_unique<ModelObject>("Data/Model/DungeonAssets/SM_Stairs_Steps_01a.glb", 1, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON);
-	instancingModel->SetShader("SLOPE", ModelShaderDX12Id::ToonInstancing);
-
-	float posX = 0;
-	for (int i = 0; i < 30; ++i)
-	{
-		int id = instancingModel->GetModel()->AllocateInstancingIndex();
-		if (id < 0) continue;
-
-		DirectX::XMMATRIX m;
-		m = DirectX::XMMatrixScaling(1, 1, 1);
-		m *= DirectX::XMMatrixRotationY(DirectX::XMConvertToRadians(0));
-		m *= DirectX::XMMatrixTranslation(posX, 0, 0);
-
-		DirectX::XMFLOAT4X4 tm;
-		DirectX::XMStoreFloat4x4(&tm, m);
-		instancingModel->GetModel()->UpdateTransform(id, tm);
-
-		posX += 4.0f;
-	}
-
 	m_roomOrder.emplace_back(0);
 
 	GenerateDungeon();
@@ -257,12 +235,60 @@ void StageDungeon_E4C::Initialize()
 	{
 		room->PlaceMapTile(isLeader);
 	}
+
+	// インスタンシングモデルテスト
+	{
+		//FILE_DATA fileData = DUNGEONDATA.GetModelFileDatas(TileType::WALL_01A).at(0);
+
+		//std::filesystem::path filePath = fileData.fileName;
+		//std::string fileNameStr = filePath.stem().string();
+		//const char* fileName = fileNameStr.c_str();
+
+		//ModelObject* instancingModel = new ModelObject(
+		//	fileData.fileName.c_str(),
+		//	fileData.scale,
+		//	ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON);
+		//instancingModel->SetShader(fileName, ModelShaderDX12Id::ToonInstancing);
+
+		//for (int i = 0; i < 4; i++)
+		//{
+		//	// 使われていないIDを取得して利用
+		//	int id = instancingModel->GetModel()->AllocateInstancingIndex();
+		//	if (id < 0) continue;
+
+		//	DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
+		//	DirectX::XMFLOAT3 angle = { DirectX::XMConvertToRadians(90.0f * i), DirectX::XMConvertToRadians(90.0f * i), DirectX::XMConvertToRadians(90.0f * i) };
+		//	DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f };
+
+		//	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
+		//	DirectX::XMMATRIX R = AnglesToMatrix({ angle.x, angle.z, angle.y });
+		//	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(-position.x * 0.25f, position.y * 0.25f, position.z * 0.25f);
+
+		//	DirectX::XMMATRIX LocalTransform = S * R * T;
+
+		//	DirectX::XMFLOAT4X4 tm;
+		//	DirectX::XMStoreFloat4x4(&tm, LocalTransform);
+
+		//	instancingModel->GetModel()->UpdateTransform(id, tm);
+		//}
+		//MAPTILES.Register(instancingModel);
+	}
+
+	//MapTile* stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
+	//stage_collision->SetPosition({ 0.0f, -1.0f, 0.0f });
+	//stage_collision->Update(0);
+	//stage_collision->SetCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
+	//MAPTILES.Register(stage_collision);
+
 	// 部屋の当たり判定を設定
 	MAPTILES.CreateSpatialIndex(5, 7);
+
+	Console::Instance().Open();
 }
 
 void StageDungeon_E4C::Finalize()
 {
+	Console::Instance().Close();
 	GameObjectManager::Instance().Clear();
 }
 
@@ -282,8 +308,6 @@ void StageDungeon_E4C::Update(float elapsedTime)
 
 	// 部屋を全てアップデート
 	rootRoom->Update(elapsedTime);
-
-	instancingModel->Update(elapsedTime);
 
 	PlayerCharacterManager::Instance().Update(elapsedTime);
 	GameObjectManager::Instance().Update(elapsedTime);
@@ -311,6 +335,10 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	{
 		T_INPUT.KeepCursorCenter();
 	}
+	
+	DirectX::XMFLOAT3 pos = PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetPosition();
+
+	Console::Instance().Log(std::string("Player Position: " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z)).c_str());
 
 	timer += elapsedTime;
 }
@@ -367,16 +395,9 @@ void StageDungeon_E4C::RenderDX12()
 
 		// モデル描画
 		PlayerCharacterManager::Instance().RenderDX12(rc);
-		PlayerCharacterManager::Instance().GetPlayerCharacterById()->SetKinematic(true);
+		//PlayerCharacterManager::Instance().GetPlayerCharacterById()->SetKinematic(true);
 
 		GameObjectManager::Instance().RenderDX12(rc);
-
-		// 見た目用モデル描画
-		//InstancingModelManager::Instance().RenderDX12(rc);
-
-		//DirectX::XMFLOAT3 pos = instancingModel->GetPosition();
-		//instancingModel->SetPosition({ pos.x, pos.y + 0.1f, pos.z });
-		instancingModel->RenderDX12(rc);
 
 		MAPTILES.RenderDX12(rc);
 

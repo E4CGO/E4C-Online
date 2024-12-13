@@ -67,6 +67,38 @@ void SceneRoomTest_E4C::Initialize()
 	m_cameraController->SetEnable(true);
 
 	Console::Instance().Open();
+
+	nlohmann::json loadFile;
+	std::ifstream ifs("Data/RoomDatas/SimpleRoom1.json");
+
+	if (ifs.is_open())
+	{
+		ifs >> loadFile;
+
+		// 部屋の生成設定をロード
+		roomSetting.weight = loadFile["RoomSetting"]["Weight"];
+		roomSetting.aabb.position.x = loadFile["RoomSetting"]["AABB"].at(0);
+		roomSetting.aabb.position.y = loadFile["RoomSetting"]["AABB"].at(1);
+		roomSetting.aabb.position.z = loadFile["RoomSetting"]["AABB"].at(2);
+
+		// ノードデータロード
+		for (const auto& nodeData : loadFile["NodeDatas"])
+		{
+			// タイプによって処理を分ける
+			TileType tileType = nodeData["Type"];
+
+			switch (tileType)
+			{
+			case PORTAL:			continue;
+			case SPAWNER:			LoadSpawnerData(nodeData);	break;
+			case CONNECTPOINT:		continue;
+			case TILETYPE_COUNT:	continue;
+			default:				LoadTileNodeData(nodeData);	break;
+			}
+		}
+
+		ifs.close();
+	}
 }
 
 void SceneRoomTest_E4C::Finalize()
@@ -105,6 +137,22 @@ void SceneRoomTest_E4C::Render()
 
 	NODES.Render(rc);
 
+	// デバッグ
+	// AABB描画
+	DirectX::XMFLOAT3 aabbDrawPos;
+	aabbDrawPos = {
+		roomSetting.aabb.position.x - (roomSetting.aabb.radii.x * 0.5f),
+		roomSetting.aabb.position.y - (roomSetting.aabb.radii.y * 0.5f),
+		roomSetting.aabb.position.z - (roomSetting.aabb.radii.z * 0.5f),
+	};
+	T_GRAPHICS.GetDebugRenderer()->DrawCube(aabbDrawPos, roomSetting.aabb.radii, { 1.0f, 1.0f, 1.0f, 1.0f });
+	//DirectX::XMFLOAT3 p = { 1.0f, 1.0f, 1.0f };
+	//T_GRAPHICS.GetDebugRenderer()->DrawCube(roomSetting.aabb.position, p, { 1.0f, 1.0f, 1.0f, 1.0f });
+	//T_GRAPHICS.GetDebugRenderer()->DrawCylinder(roomSetting.aabb.position, 10, 10, { 1.0f, 1.0f, 1.0f, 1.0f });
+
+	//T_GRAPHICS.GetDebugRenderer()->DrawCylinder({ 0.0f, 0.0f, 0.0f }, 16.0f, 1.5f, { 1,0,0,1 });
+	//T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, spawnerData.searchRadius, 1.5f, { 1,0,1,1 });
+
 	//	シャドウマップ描画
 	m_shadowMapRenderer->Render();
 	rc.shadowMapData = m_shadowMapRenderer->GetShadowMapData();
@@ -136,10 +184,25 @@ void SceneRoomTest_E4C::RenderDX12()
 		m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 
 		// モデル描画
-		MAPTILES.RenderDX12(rc);
+		//MAPTILES.RenderDX12(rc);
+		NODES.RenderDX12(rc);
+
+		// AABB描画
+		//T_GRAPHICS.GetDebugRenderer()->DrawCube(roomSetting.aabb.position, roomSetting.aabb.radii, { 1.0f, 1.0f, 1.0f, 1.0f });
+		//DirectX::XMFLOAT3 p = { 1.0f, 1.0f, 1.0f };
+		//T_GRAPHICS.GetDebugRenderer()->DrawCube(roomSetting.aabb.position, p, { 1.0f, 1.0f, 1.0f, 1.0f });
+		//T_GRAPHICS.GetDebugRenderer()->DrawCylinder(roomSetting.aabb.position, 10, 10, { 1.0f, 1.0f, 1.0f, 1.0f });
+
+		T_GRAPHICS.GetDebugRenderer()->DrawCylinder({0.0f, 0.0f, 0.0f}, 16.0f, 1.5f, {1,0,0,1});
+		//T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, spawnerData.searchRadius, 1.5f, { 1,0,1,1 });
 
 		// レンダーターゲットへの書き込み終了待ち
 		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+	}
+
+	// デバッグ描画
+	{
+
 	}
 
 	// ポストエフェクト描画
@@ -408,6 +471,12 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 
 		// 部屋の生成設定
 		ImGui::InputInt("Weight", &roomSetting.weight);
+		// AABB
+		ImGui::DragFloat3("AABB: Position", &roomSetting.aabb.position.x, 1.0f);
+		ImGui::DragFloat3("AABB: Radii", &roomSetting.aabb.radii.x, 1.0f);
+
+		// AABB算出
+		if (ImGui::Button("AABB calc")) CalcAABB();
 
 		ImGui::Separator();
 
@@ -493,6 +562,7 @@ void SceneRoomTest_E4C::DuplicateNode()
 void SceneRoomTest_E4C::RemoveSelectedNode()
 {
 	NODES.Remove(selectionNode);
+	NODES.Update(0);
 	selectionNode = nullptr;
 }
 
@@ -500,6 +570,47 @@ void SceneRoomTest_E4C::ClearNodes()
 {
 	NODES.Clear();
 	selectionNode = nullptr;
+}
+
+void SceneRoomTest_E4C::CalcAABB()
+{
+	float minX, minY, minZ;
+	float maxX, maxY, maxZ;
+	minX = minY = minZ = FLT_MAX;
+	maxX = maxY = maxZ = FLT_MIN;
+
+	if (NODES.Count() == 0)
+	{
+		// ノードがないなら全て0
+		roomSetting.aabb.position = { 0.0f, 0.0f, 0.0f };
+		roomSetting.aabb.radii = { 0.0f, 0.0f, 0.0f };
+		return;
+	}
+
+	for (Node* node : NODES.GetAll())
+	{
+		if (node->GetPosition().x < minX) minX = node->GetPosition().x;
+		if (node->GetPosition().y < minY) minY = node->GetPosition().y;
+		if (node->GetPosition().z < minZ) minZ = node->GetPosition().z;
+		if (node->GetPosition().x > maxX) maxX = node->GetPosition().x;
+		if (node->GetPosition().y > maxY) maxY = node->GetPosition().y;
+		if (node->GetPosition().z > maxZ) maxZ = node->GetPosition().z;
+	}
+
+	float widthX = (maxX - minX);
+	float widthY = (maxY - minY);
+	float widthZ = (maxZ - minZ);
+
+	fabsf(widthX);
+	fabsf(widthY);
+	fabsf(widthZ);
+
+	maxX += 4.0f;
+	maxY += 4.0f;
+	maxZ += 4.0f;
+
+	roomSetting.aabb.position = { widthX * 0.5f, widthY * 0.5f, widthZ * 0.5f };
+	roomSetting.aabb.radii = { widthX, widthY, widthZ };
 }
 
 void SceneRoomTest_E4C::AddTemplate3x3Floor()

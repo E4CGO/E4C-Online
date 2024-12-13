@@ -28,7 +28,7 @@ void DungeonData::InitRoomGenerateSettings()
 		setting.weight = 50;
 		setting.aabb.position = { 0.0f, 3.0f, 8.0f };
 		setting.aabb.radii = { 10.0f, 3.0f, 6.0f };
-		setting.portalPosition = { 0.0f, 0.5f, 12.0f };
+		setting.portalPosition = { 0.0f, 10000.0f, 0.0f };
 		//setting.placementCandidates.emplace_back(RoomType::SIMPLE_ROOM_1);
 		setting.placementCandidates.emplace_back(RoomType::CROSS_ROOM_1);
 		setting.placementCandidates.emplace_back(RoomType::CROSS_ROOM_2);

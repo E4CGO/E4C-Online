@@ -3,6 +3,12 @@
 #include <DirectXMath.h>
 #include "TAKOEngine/Tool/XMFLOAT.h"
 
+#include "TAKOEngine/Runtime/tentacle_lib.h"
+#include "TAKOEngine/Network/HttpRequest.h"
+#include "TAKOEngine/Network/WinSock2Wrapper.h"
+
+#include <fstream>
+
 SimpleRoom1::SimpleRoom1(
 	RoomBase* parent, int pointIndex,
 	std::vector<AABB>& roomAABBs,
@@ -51,23 +57,84 @@ void SimpleRoom1::LoadMapData()
 	DirectX::XMFLOAT4 wallColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 	DirectX::XMFLOAT4 pillarColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-	m_tileDatas.at(TileType::FLOOR_01A).emplace_back(TILE_DATA(
-		{ 0.0f, 0.0f, 0.0f },
-		{ 0.0f, 0.0f, 0.0f },
-		{ 1.0f, 1.0f, 1.0f },
-		floorColor));
+	//m_tileDatas.at(TileType::FLOOR_01A).emplace_back(TILE_DATA(
+	//	{ 0.0f, 0.0f, 0.0f },
+	//	{ 0.0f, 0.0f, 0.0f },
+	//	{ 1.0f, 1.0f, 1.0f },
+	//	floorColor));
 
-	m_tileDatas.at(TileType::FLOOR_01A).emplace_back(TILE_DATA(
-		{ 4.0f, 0.0f, 0.0f },
-		{ 0.0f, 0.0f, 0.0f },
-		{ 1.0f, 1.0f, 1.0f },
-		floorColor));
+	//m_tileDatas.at(TileType::FLOOR_01A).emplace_back(TILE_DATA(
+	//	{ 4.0f, 0.0f, 0.0f },
+	//	{ 0.0f, 0.0f, 0.0f },
+	//	{ 1.0f, 1.0f, 1.0f },
+	//	floorColor));
 
-	m_tileDatas.at(TileType::FLOOR_01A).emplace_back(TILE_DATA(
-		{ 8.0f, 0.0f, 0.0f },
-		{ 0.0f, 0.0f, 0.0f },
-		{ 1.0f, 1.0f, 1.0f },
-		floorColor));
+	//m_tileDatas.at(TileType::FLOOR_01A).emplace_back(TILE_DATA(
+	//	{ 8.0f, 0.0f, 0.0f },
+	//	{ 0.0f, 0.0f, 0.0f },
+	//	{ 1.0f, 1.0f, 1.0f },
+	//	floorColor));
+
+	//m_tileDatas.at(TileType::FLOOR_01A).emplace_back(TILE_DATA(
+	//	{ -4.0f, 0.0f, 0.0f },
+	//	{ 0.0f, 0.0f, 0.0f },
+	//	{ 1.0f, 1.0f, 1.0f },
+	//	floorColor));
+
+	//m_tileDatas.at(TileType::FLOOR_01A).emplace_back(TILE_DATA(
+	//	{ -8.0f, 0.0f, 0.0f },
+	//	{ 0.0f, 0.0f, 0.0f },
+	//	{ 1.0f, 1.0f, 1.0f },
+	//	floorColor));
+
+
+
+	//m_tileDatas.at(TileType::WALL_01A).emplace_back(TILE_DATA(
+	//	{ 0.0f, 0.0f, 0.0f },
+	//	{ 0.0f, 0.0f, 0.0f },
+	//	{ 1.0f, 1.0f, 1.0f },
+	//	floorColor));
+
+	//m_tileDatas.at(TileType::WALL_01A).emplace_back(TILE_DATA(
+	//	{ 0.0f, 4.0f, 0.0f },
+	//	{ 0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f },
+	//	{ 1.0f, 1.0f, 1.0f },
+	//	floorColor));
+
+	nlohmann::json loadFile;
+	std::ifstream ifs("Data/RoomDatas/SimpleRoom1.json");
+
+	if (ifs.is_open())
+	{
+		ifs >> loadFile;
+
+		// ノードデータロード
+		for (const auto& nodeData : loadFile["NodeDatas"])
+		{
+			TileType tileType = nodeData["Type"];
+			DirectX::XMFLOAT3 position = {
+				nodeData["Position"].at(0),
+				nodeData["Position"].at(1),
+				nodeData["Position"].at(2)
+			};
+			DirectX::XMFLOAT3 angle = {
+				nodeData["Angle"].at(0),
+				nodeData["Angle"].at(1),
+				nodeData["Angle"].at(2)
+			};
+			DirectX::XMFLOAT3 scale = {
+				nodeData["Scale"].at(0),
+				nodeData["Scale"].at(1),
+				nodeData["Scale"].at(2),
+			};
+
+			m_tileDatas.at(tileType).emplace_back(TILE_DATA(
+				position,
+				angle,
+				scale));
+		}
+		ifs.close();
+	}
 
 	//m_tileDatas.at(TileType::WALL_01A).emplace_back(TILE_DATA(
 	//	{ -2.0f, 0.0f, -2.0f },

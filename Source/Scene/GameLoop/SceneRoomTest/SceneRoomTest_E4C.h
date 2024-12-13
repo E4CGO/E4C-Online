@@ -135,6 +135,9 @@ public:
 	// ノード全削除
 	void ClearNodes();
 
+	// ノードの座標からAABBを算出する
+	void CalcAABB();
+
 	// テンプレート
 	// 3x3 Floor
 	void AddTemplate3x3Floor();
