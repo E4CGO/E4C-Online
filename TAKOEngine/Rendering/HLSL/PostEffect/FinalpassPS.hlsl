@@ -1,34 +1,34 @@
 #include "Finalpass.hlsli"
 
-// ƒV[ƒ“ƒeƒNƒXƒ`ƒƒ
+// ã‚·ãƒ¼ãƒ³ãƒ†ã‚¯ã‚¹ãƒãƒ£
 Texture2D sceneTexture : register(t0);
 SamplerState sceneSampler : register(s0);
 
-// ƒuƒ‹[ƒ€ƒeƒNƒXƒ`ƒƒ
+// ãƒ–ãƒ«ãƒ¼ãƒ ãƒ†ã‚¯ã‚¹ãƒãƒ£
 Texture2D bloomTexture : register(t1);
 
 float4 main(VS_OUT pin) : SV_TARGET
 {
     float4 color = sceneTexture.Sample(sceneSampler, pin.texcoord) * pin.color;
 
-	// ƒuƒ‹[ƒ€ƒeƒNƒXƒ`ƒƒ‚ð‰ÁŽZ‚·‚é
+	// ãƒ–ãƒ«ãƒ¼ãƒ ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’åŠ ç®—ã™ã‚‹
     color.rgb += bloomTexture.Sample(sceneSampler, pin.texcoord).rgb;
     
-    // F’²•â³ˆ—
+    // è‰²èª¿è£œæ­£å‡¦ç†
 	{
-		// RGB > HSV‚É•ÏŠ·
+		// RGB > HSVã«å¤‰æ›
         color.rgb = RGB2HSV(color.rgb);
 
-        // F‘Š’²®
+        // è‰²ç›¸èª¿æ•´
         color.r += hueShift;
 
-        // Ê“x’²®
+        // å½©åº¦èª¿æ•´
         color.g *= saturation;
 
-        // –¾“x’²®
+        // æ˜Žåº¦èª¿æ•´
         color.b *= brightness;
         
-		// HSV > RGB‚É•ÏŠ·
+		// HSV > RGBã«å¤‰æ›
         color.rgb = HSV2RGB(color.rgb);
     }
 

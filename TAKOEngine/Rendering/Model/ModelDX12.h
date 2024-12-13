@@ -81,16 +81,16 @@ public:
 
 	// インスタンシング用関数----------------------------------
 	//割り当てられた番号を返す
-	int AllocateInstancingIndex();
+	int AllocateInstancingIndex() override;
 
 	//割り当てられた番号を解放する
-	void FreeInstancingIndex(int instancingIndex);
+	void FreeInstancingIndex(int instancingIndex) override;
 
 	//行列計算
-	void UpdateTransform(int instancingIndex, const DirectX::XMFLOAT4X4& transform);
+	void UpdateTransform(int instancingIndex, const DirectX::XMFLOAT4X4& transform) override;
 
 	//現在の姿勢行列を取得
-	const DirectX::XMFLOAT4X4& GetTransform(int instancingIndex) const;
+	const DirectX::XMFLOAT4X4& GetTransform(int instancingIndex) const override;
 
 	float scaling = 1.0f;
 

@@ -1,11 +1,11 @@
-#include "Logger.h"
+ï»¿#include "Logger.h"
 
 #undef _WINSOCKAPI_
 #define _WINSOCKAPI_
 #include <windows.h>
 #include <stdio.h>
 
-// ƒƒOo—Í
+// ãƒ­ã‚°å‡ºåŠ›
 void Logger::Print(const char* format, ...)
 {
 	char message[1024];

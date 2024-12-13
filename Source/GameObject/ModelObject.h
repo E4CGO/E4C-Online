@@ -32,7 +32,9 @@ public:
 		RHS_PBR,
 		RHS_TOON,
 		LHS_PBR,
+		LHS_PBR_Instancing,
 		LHS_TOON,
+		LHS_TOON_Instancing,
 		LHS_Phong,
 	};
 

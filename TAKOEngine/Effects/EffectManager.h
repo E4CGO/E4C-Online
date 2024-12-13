@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <unordered_map>
 
@@ -20,14 +20,14 @@ private:
 public:
 	Effect* GetEffect(int index);
 
-	void Initialize();				// ‰Šú‰»
-	void InitializeDX12();				// ‰Šú‰»
-	void Finalize();				// I—¹
-	void Update(float elapsedTime);	//XV
-	void Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection); // •`‰æ
-	void RenderDX12(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection); // •`‰æ
+	void Initialize();				// åˆæœŸåŒ–
+	void InitializeDX12();				// åˆæœŸåŒ–
+	void Finalize();				// çµ‚äº†
+	void Update(float elapsedTime);	//æ›´æ–°
+	void Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection); // æç”»
+	void RenderDX12(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection); // æç”»
 
-	// Effeckseerƒ}ƒl[ƒWƒƒ[‚Ìæ“¾
+	// Effeckseerãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ã®å–å¾—
 	Effekseer::ManagerRef GetEffekseerManager() { return effekseerManager; }
 	Effekseer::ManagerRef GetEffekseerDX12Manager() { return efkManager; }
 public:

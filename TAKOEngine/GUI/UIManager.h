@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "TAKOEngine/Tool/Singleton.h"
 #include "TAKOEngine/GUI/Widget.h"
@@ -13,7 +13,7 @@ protected:
 	~UIManager() = default;
 
 public:
-	// XVˆ—
+	// æ›´æ–°å‡¦ç†
 	void Update(float elapsedTime) override;
 
 	void SetCursorName(LPWSTR lpCursorName);

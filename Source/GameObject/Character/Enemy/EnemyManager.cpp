@@ -1,4 +1,4 @@
-#include "EnemyManager.h"
+ï»¿#include "EnemyManager.h"
 
 Enemy* EnemyManager::GetEnemyById(int id)
 {
@@ -10,7 +10,7 @@ Enemy* EnemyManager::GetEnemyById(int id)
 	return nullptr;
 }
 
-// ƒŒƒCƒLƒƒƒXƒg
+// ãƒ¬ã‚¤ã‚­ãƒ£ã‚¹ãƒˆ
 bool EnemyManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, HitResult& hit, bool camera)
 {
 	HitResult temp;
@@ -21,7 +21,7 @@ bool EnemyManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOA
 		{
 			if (collider.second->RayCast(start, end, temp) && (temp.distance < hit.distance))
 			{
-				hit = temp; // Å’Z
+				hit = temp; // æœ€çŸ­
 			}
 		}
 	}

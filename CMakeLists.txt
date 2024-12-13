@@ -244,6 +244,8 @@ source_group("Source\\GameObject\\Character\\Player" FILES ${Source__GameObject_
 set(Source__GameObject__Character__Player__State
     "Source/GameObject/Character/Player/State/NonPlayerCharacterState.cpp"
     "Source/GameObject/Character/Player/State/NonPlayerCharacterState.h"
+    "Source/GameObject/Character/Player/State/PlayerCharacterRodState.cpp"
+    "Source/GameObject/Character/Player/State/PlayerCharacterRodState.h"
     "Source/GameObject/Character/Player/State/PlayerCharacterShieldState.cpp"
     "Source/GameObject/Character/Player/State/PlayerCharacterShieldState.h"
     "Source/GameObject/Character/Player/State/PlayerCharacterState.cpp"
@@ -1121,8 +1123,7 @@ if(MSVC)
         /Zi
         ${DEFAULT_CXX_EXCEPTION_HANDLING}
         /Y-
-        /wd4819
-        /wd4099
+        /utf-8
     )
     target_link_options(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:
@@ -1135,8 +1136,6 @@ if(MSVC)
         /MANIFEST
         /DEBUG
         /SUBSYSTEM:WINDOWS
-        /wd4819
-        /wd4099
     )
 endif()
 
@@ -1277,6 +1276,8 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "DirectXTex"
     "d3d11"
     "d3d12"
+    "d2d1.lib"
+    "dwrite.lib"
     "dxgi"
     "xinput"
     "xaudio2"
@@ -1298,6 +1299,8 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "DirectXTex"
     "d3d11"
     "d3d12"
+    "d2d1.lib"
+    "dwrite.lib"
     "dxgi"
     "xinput"
     "xaudio2"
