@@ -1119,8 +1119,6 @@ if(MSVC)
         /Zi
         ${DEFAULT_CXX_EXCEPTION_HANDLING}
         /Y-
-        /wd4819
-        /wd4099
         /utf-8
     )
     target_link_options(${PROJECT_NAME} PRIVATE
@@ -1134,8 +1132,6 @@ if(MSVC)
         /MANIFEST
         /DEBUG
         /SUBSYSTEM:WINDOWS
-        /wd4819
-        /wd4099
     )
 endif()
 
@@ -1276,6 +1272,8 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "DirectXTex"
     "d3d11"
     "d3d12"
+    "d2d1.lib"
+    "dwrite.lib"
     "dxgi"
     "xinput"
     "xaudio2"
@@ -1297,6 +1295,8 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "DirectXTex"
     "d3d11"
     "d3d12"
+    "d2d1.lib"
+    "dwrite.lib"
     "dxgi"
     "xinput"
     "xaudio2"

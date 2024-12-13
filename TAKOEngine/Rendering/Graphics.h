@@ -7,9 +7,12 @@
 #include <wrl.h>
 #include <memory>
 #include <mutex>
+#include <d2d1_3.h>
+#include <dwrite.h>
+#include <d3d11on12.h>
+#include <dxgi1_6.h>
 #include <d3d11.h>
 #include <d3d12.h>
-#include <dxgi1_6.h>
 
 #include "TAKOEngine/Rendering/FrameBuffer.h"
 #include "TAKOEngine/Rendering/FrameBufferManager.h"
@@ -164,6 +167,13 @@ public:
 	FrameBufferDX12* GetFramBufferDX12(FrameBufferDX12Id frameBufferId) { return dx12_frameBuffers[static_cast<int>(frameBufferId)].get(); }
 	// DX12のフレームバッファマネージャー
 	FrameBufferManager* GetFrameBufferManager() { return m_framebufferManager.get(); }
+
+	IDWriteFactory* GetDWriteFactory() { return m_dWriteFactory.Get(); }
+	ID3D11On12Device* GetD3D11On12Device() { return m_d3d11On12Device.Get(); }
+	ID2D1DeviceContext2* GetD2D1DeviceContext() { return m_d2dDeviceContext.Get(); }
+	ID3D11DeviceContext* GetD3D112DDeviceContext() { return m_d3d11DeviceContext.Get(); }
+	Microsoft::WRL::ComPtr<ID3D11Resource> GetD3D11BackBuffer(int i) { return m_wrappedBackBuffers[i]; }
+	ID2D1Bitmap1* GetD2D1RenderTargets(int i) { return m_d2dRenderTargets[i].Get(); }
 
 	// レンダーステート取得
 	RenderState* GetRenderState() { return renderState.get(); }
@@ -366,6 +376,25 @@ private:
 	float m_screen_height;
 
 	std::unique_ptr<ImGuiRenderer>						m_imgui_renderer;
+
+	// DWrite ファクトリー
+	Microsoft::WRL::ComPtr<IDWriteFactory> m_dWriteFactory;
+	// D2D ファクトリー
+	Microsoft::WRL::ComPtr<ID2D1Factory3> m_d2dFactory;
+	// D2D デバイス
+	Microsoft::WRL::ComPtr<ID2D1Device2> m_d2dDevice;
+	// D2Dのために D11デバイス
+	Microsoft::WRL::ComPtr<ID3D11On12Device> m_d3d11On12Device;
+	// D2Dのデバイスコンテクスト
+	Microsoft::WRL::ComPtr<ID2D1DeviceContext2> m_d2dDeviceContext;
+	// D2DのためにD11デバイスコンテクスト
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_d3d11DeviceContext;
+	// 画像バファー
+	Microsoft::WRL::ComPtr<ID3D11Resource> m_wrappedBackBuffers[MAX_BUFFER_COUNT];
+	// 画面バファー
+	Microsoft::WRL::ComPtr<ID2D1Bitmap1> m_d2dRenderTargets[MAX_BUFFER_COUNT];
+	// 画像バファ設定
+	D2D1_BITMAP_PROPERTIES1 bitmapProperties;
 };
 
 #endif // !__GRAHICS_GRAHICS_H__

@@ -76,7 +76,6 @@ void SceneCharacter_E4C::Initialize()
 	stateMachine->RegisterState(STATE::CHARACTER_CREATION, new SceneCharacter_E4CState::CharacterCreationState(this));
 	stateMachine->RegisterState(STATE::START, new SceneCharacter_E4CState::StartState(this));
 	stateMachine->SetState(STATE::INIT);
-
 }
 
 /**************************************************************************//**
@@ -115,7 +114,6 @@ void SceneCharacter_E4C::Update(float elapsedTime)
 	// カメラ更新
 	cameraController->Update();
 	cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
-
 
 	//CameraManager::Instance().GetCamera()->Move2PointToCamera(CameraManager::Instance().GetCamera()->GetEye(), { 6.f,2.f,9.f }, CameraManager::Instance().GetCamera()->GetFocus(), { -3.0f, 0.0, 0.0f }, transitiontime, 2.f, elapsedTime);
 #endif // _DEBUG
@@ -187,7 +185,7 @@ void SceneCharacter_E4C::RenderDX12()
 			for (auto& it : m_previewCharacters)
 			{
 				if (it != nullptr) {
-						it->RenderDX12(rc);
+					it->RenderDX12(rc);
 				}
 			}
 			// レンダーターゲットへの書き込み終了待ち
@@ -201,7 +199,11 @@ void SceneCharacter_E4C::RenderDX12()
 
 		// 2D描画
 		{
+			T_TEXT.BeginDX12();
+
 			UI.RenderDX12(rc);
+
+			T_TEXT.EndDX12();
 		}
 	}
 	TentacleLib::graphics.End();

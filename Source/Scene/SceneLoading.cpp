@@ -49,6 +49,20 @@ void SceneLoading::Render()
 void SceneLoading::RenderDX12()
 {
 	T_GRAPHICS.BeginRender();
+
+	T_TEXT.BeginDX12();
+
+	T_TEXT.RenderDX12(
+		FONT_ID::HGpop,
+		L"Now Loading...",
+		T_GRAPHICS.GetScreenWidth() * 0.85f, T_GRAPHICS.GetScreenHeight() * 0.95f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		0.0f,
+		FONT_ALIGN::LEFT
+	);
+
+	T_TEXT.EndDX12();
+
 	T_GRAPHICS.End();
 }
 
