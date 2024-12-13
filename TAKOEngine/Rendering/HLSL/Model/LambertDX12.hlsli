@@ -21,18 +21,18 @@ cbuffer CbScene : register(b0)
     float4             cameraPosition;
     row_major float4x4 lightViewProjection;
     
-    //ライト情報
+    //繝ｩ繧､繝域ュ蝣ｱ
     float4               ambientLightColor;
     DirectionalLightData directionalLightData;
-    PointLightData       pointLightData[PointLightMax]; 	// 点光源情報
-    SpotLightData        spotLightData[SpotLightMax];   	// スポットライト情報
-    int                  pointLightCount;              		// 点光源数
-    int                  spotLightCount;                	// スポットライト数
+    PointLightData       pointLightData[PointLightMax]; 	// 轤ｹ蜈画ｺ先ュ蝣ｱ
+    SpotLightData        spotLightData[SpotLightMax];   	// 繧ｹ繝昴ャ繝医Λ繧､繝域ュ蝣ｱ
+    int                  pointLightCount;              		// 轤ｹ蜈画ｺ先焚
+    int                  spotLightCount;                	// 繧ｹ繝昴ャ繝医Λ繧､繝域焚
     
     float timerGlobal;
     float timerTick;
 
-	// 影情報
+	// 蠖ｱ諠�蝣ｱ
     float shadowBias;
     float3 shadowColor;
 };

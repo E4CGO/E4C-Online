@@ -341,11 +341,21 @@ DepthStencil::DepthStencil(UINT width, UINT height)
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 }
 
+//***********************************************************
+// @brief       コンストラクタ
+// @param[in]   device　    ID3D12Device*
+// @return      なし
+//***********************************************************
 ShadowMapRenderDX12::ShadowMapRenderDX12(ID3D12Device* device)
 {
 	CreateFrameBuffer(device);
 }
 
+//***********************************************************
+// @brief       終了処理
+// @param[in]   なし
+// @return      なし
+//***********************************************************
 void ShadowMapRenderDX12::Finalize()
 {
 	if (dsv_descriptor != nullptr)
@@ -364,6 +374,11 @@ void ShadowMapRenderDX12::Finalize()
 	}
 }
 
+//***********************************************************
+// @brief       モデル登録
+// @param[in]   model　    iModel*
+// @return      なし
+//***********************************************************
 void ShadowMapRenderDX12::ModelRegister(iModel* model)
 {
 	// モデルが既に登録されているか調べる
@@ -374,6 +389,11 @@ void ShadowMapRenderDX12::ModelRegister(iModel* model)
 	m_models.emplace_back(model);
 }
 
+//***********************************************************
+// @brief       描画
+// @param[in]   frameBuffer    FrameBufferManager*
+// @return      なし
+//***********************************************************
 void ShadowMapRenderDX12::Render(FrameBufferManager* frameBuffer)
 {
 	Graphics& graphics = Graphics::Instance();
