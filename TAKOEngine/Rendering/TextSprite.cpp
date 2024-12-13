@@ -21,7 +21,7 @@ void TextSprite::Init(ID3D11Device* device)
 			DWRITE_FONT_WEIGHT_NORMAL,
 			DWRITE_FONT_STYLE_NORMAL,
 			DWRITE_FONT_STRETCH_NORMAL,
-			50,
+			32,
 			L"ja-jp",
 			&m_textFormat
 		);
@@ -169,8 +169,37 @@ void TextSprite::RenderDX12(
 	int border,
 	const DirectX::XMFLOAT4& borderColor)
 {
-	D2D1_SIZE_F rtSize = T_GRAPHICS.GetD2D1RenderTargets(T_GRAPHICS.GetCurrentBufferIndex())->GetSize();
-	D2D1_RECT_F textRect = D2D1::RectF(x - rtSize.width, y - rtSize.height, x + rtSize.width, y + rtSize.height);
+	DirectX::XMFLOAT2 size;
+	DirectX::XMStoreFloat2(&size, fonts[static_cast<int>(font)]->MeasureString(text.c_str()));
+
+	D2D1_RECT_F textRect = D2D1::RectF(x, y, x + size.x, y + size.y);
+
+	m_textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
+
+	switch (align)
+	{
+	case FONT_ALIGN::TOP_LEFT:
+		break;
+	case FONT_ALIGN::TOP:
+		break;
+	case FONT_ALIGN::TOP_RIGHT:
+		break;
+	case FONT_ALIGN::LEFT:
+		break;
+	case FONT_ALIGN::CENTER:
+		m_textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+		break;
+	case FONT_ALIGN::RIGHT:
+		break;
+	case FONT_ALIGN::BOTTOM_LEFT:
+		break;
+	case FONT_ALIGN::BOTTOM:
+		break;
+	case FONT_ALIGN::BOTTOM_RIGHT:
+		break;
+	default:
+		break;
+	}
 
 	T_GRAPHICS.GetD2D1DeviceContext()->BeginDraw();
 	T_GRAPHICS.GetD2D1DeviceContext()->SetTransform(D2D1::Matrix3x2F::Identity());

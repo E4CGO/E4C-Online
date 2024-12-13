@@ -377,15 +377,23 @@ private:
 
 	std::unique_ptr<ImGuiRenderer>						m_imgui_renderer;
 
+	// DWrite ファクトリー
 	Microsoft::WRL::ComPtr<IDWriteFactory> m_dWriteFactory;
+	// D2D ファクトリー
 	Microsoft::WRL::ComPtr<ID2D1Factory3> m_d2dFactory;
+	// D2D デバイス
 	Microsoft::WRL::ComPtr<ID2D1Device2> m_d2dDevice;
+	// D2Dのために D11デバイス
 	Microsoft::WRL::ComPtr<ID3D11On12Device> m_d3d11On12Device;
+	// D2Dのデバイスコンテクスト
 	Microsoft::WRL::ComPtr<ID2D1DeviceContext2> m_d2dDeviceContext;
+	// D2DのためにD11デバイスコンテクスト
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_d3d11DeviceContext;
+	// 画像バファー
 	Microsoft::WRL::ComPtr<ID3D11Resource> m_wrappedBackBuffers[MAX_BUFFER_COUNT];
+	// 画面バファー
 	Microsoft::WRL::ComPtr<ID2D1Bitmap1> m_d2dRenderTargets[MAX_BUFFER_COUNT];
-
+	// 画像バファ設定
 	D2D1_BITMAP_PROPERTIES1 bitmapProperties;
 };
 

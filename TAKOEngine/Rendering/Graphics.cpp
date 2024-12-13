@@ -299,6 +299,7 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 		}
 
 		{
+			// D2D, DWrite, テキストレンダリング設定
 			{
 				UINT createDeviceFlags = 0;
 				createDeviceFlags |= D3D11_CREATE_DEVICE_BGRA_SUPPORT;
@@ -317,10 +318,8 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 					nullptr
 				);
 
-				// Query the 11On12 device from the 11 device.
 				d3d11Device.As(&m_d3d11On12Device);
 
-				// Create D2D/DWrite components.
 				{
 					D2D1_DEVICE_CONTEXT_OPTIONS deviceOptions = D2D1_DEVICE_CONTEXT_OPTIONS_NONE;
 					D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory3), &d2dFactoryOptions, &m_d2dFactory);
@@ -331,20 +330,9 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 					DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), &m_dWriteFactory);
 				}
 
-				// Query the desktop's dpi settings, which will be used to create
-				// D2D's render targets.
-				float dpiX;
-				float dpiY;
-#pragma warning(push)
-#pragma warning(disable : 4996) // GetDesktopDpi is deprecated.
-				m_d2dFactory->GetDesktopDpi(&dpiX, &dpiY);
-#pragma warning(pop)
 				bitmapProperties = D2D1::BitmapProperties1(
 					D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
 					D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED)
-					//,
-					//dpiX,
-					//dpiY
 				);
 			}
 
@@ -892,8 +880,7 @@ void Graphics::CreateRTVForFameBuffer()
 
 		m_d3d_device->CreateRenderTargetView(d3d_rtv_resource[i].Get(), nullptr, rtv_descriptor[i]->GetCpuHandle());
 
-		//NAME_D3D12_OBJECT_INDEXED(d3d_rtv_resource, i);
-
+		//　テキスト画面バファー
 		D3D11_RESOURCE_FLAGS d3d11Flags = { D3D11_BIND_RENDER_TARGET };
 		m_d3d11On12Device->CreateWrappedResource(
 			d3d_rtv_resource[i].Get(),
@@ -903,7 +890,7 @@ void Graphics::CreateRTVForFameBuffer()
 			IID_PPV_ARGS(&m_wrappedBackBuffers[i])
 		);
 
-		// Create a render target for D2D to draw directly to this back buffer.
+		//　テキストバファー
 		Microsoft::WRL::ComPtr<IDXGISurface> surface;
 		m_wrappedBackBuffers[i].As(&surface);
 		m_d2dDeviceContext->CreateBitmapFromDxgiSurface(

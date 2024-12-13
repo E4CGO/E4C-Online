@@ -111,6 +111,8 @@ private:
 	std::unique_ptr<DirectX::SpriteFont> fonts[static_cast<int>(FONT_ID::EnumCount)];
 	std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch;
 
+	// テキスト見た目
 	Microsoft::WRL::ComPtr<ID2D1SolidColorBrush> m_textBrush;
+	// テキストのパラメーター
 	Microsoft::WRL::ComPtr<IDWriteTextFormat> m_textFormat;
 };
