@@ -6,8 +6,6 @@
 #include "TAKOEngine/Sound/Sound.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
 
-#include "TAKOEngine/Tool/Encode.h"
-
 #include <imgui.h>
 #include <string>
 #include <fstream>
