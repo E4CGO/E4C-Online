@@ -65,27 +65,6 @@ void StageOpenWorld_E4C::Initialize()
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 70.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
 		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
 		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/pinkSky.dds");
-
-		test = std::make_unique<ModelObject>("Data/Model/DungeonAssets/WALL.glb", 1, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON);
-		test->SetShader("WALL", ModelShaderDX12Id::ToonInstancing);
-
-		float posX = 0;
-		for (int i = 0; i < 3; ++i)
-		{
-			int id = test->GetModel()->AllocateInstancingIndex();
-			if (id < 0) continue;
-			
-			DirectX::XMMATRIX m;
-			m = DirectX::XMMatrixScaling(1, 1, 1);
-			m *= DirectX::XMMatrixRotationY(DirectX::XMConvertToRadians(0));
-			m *= DirectX::XMMatrixTranslation(posX, 0, 0);
-			
-			DirectX::XMFLOAT4X4 tm;
-			DirectX::XMStoreFloat4x4(&tm, m);
-			test->GetModel()->UpdateTransform(id, tm);
-			
-			posX += 10;
-		}
 	}
 
 	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
@@ -174,8 +153,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	}
 
 	sky->Update(elapsedTime);
-
-	test->Update(elapsedTime);
 
 	spawner->Update(elapsedTime);
 
@@ -266,8 +243,6 @@ void StageOpenWorld_E4C::RenderDX12()
 
 		// スポナー
 		spawner->RenderDX12(rc);
-
-		test->RenderDX12(rc);
 
 		// skyBox
 		{
