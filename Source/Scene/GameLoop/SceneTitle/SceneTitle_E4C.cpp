@@ -144,8 +144,13 @@ void SceneTitle_E4C::RenderDX12()
 		rc.d3d_command_list = m_frameBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
+		T_TEXT.BeginDX12();
+
 		UI.RenderDX12(rc);
+
+		T_TEXT.EndDX12();
 	}
+
 	T_GRAPHICS.End();
 }
 

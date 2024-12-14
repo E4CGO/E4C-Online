@@ -385,7 +385,7 @@ LambertShaderDX12::~LambertShaderDX12()
 //***********************************************************
 // @brief       描画
 // @param[in]   rc     レンダーコンテキスト
-// @param[in]   model  描画対象のモデルデータを指すポインタ
+// @param[in]   mesh   描画対象のモデルデータのmesh
 // @return      なし
 //***********************************************************
 void LambertShaderDX12::Render(const RenderContextDX12& rc, const ModelDX12::Mesh& mesh)
@@ -398,6 +398,10 @@ void LambertShaderDX12::Render(const RenderContextDX12& rc, const ModelDX12::Mes
 
 	// シーン定数バッファ設定
 	rc.d3d_command_list->SetGraphicsRootDescriptorTable(0, rc.scene_cbv_descriptor->GetGpuHandle());
+
+	// シャドウマップ設定
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(5, rc.shadowMap.shadow_srv_descriptor->GetGpuHandle());
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(6, rc.shadowMap.shadow_sampler_descriptor->GetGpuHandle());
 
 	const ModelResource::Mesh* res_mesh = mesh.mesh;
 	const ModelDX12::Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());

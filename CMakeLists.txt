@@ -658,6 +658,8 @@ set(TAKOEngine__Rendering__HLSL__Lighting
     "TAKOEngine/Rendering/HLSL/Lighting/DeferredVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Lighting/Light.hlsli"
     "TAKOEngine/Rendering/HLSL/Lighting/ShadowMap.hlsli"
+    "TAKOEngine/Rendering/HLSL/Lighting/ShadowMapDX12.hlsli"
+    "TAKOEngine/Rendering/HLSL/Lighting/ShadowMapDX12VS.hlsl"
     "TAKOEngine/Rendering/HLSL/Lighting/ShadowmapFunctions.hlsli"
     "TAKOEngine/Rendering/HLSL/Lighting/ShadowMapVS.hlsl"
 )
@@ -869,6 +871,7 @@ set(SHADER_NAMES
     "LineVS.cso"
     "DeferredPS.cso"
     "DeferredVS.cso"
+    "ShadowMapDX12VS.cso"
     "ShadowMapVS.cso"
     "DefaultModelPS.cso"
     "DefaultModelVS.cso"
@@ -940,6 +943,7 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/LineVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Lighting/DeferredPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Lighting/DeferredVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Lighting/ShadowMapDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Lighting/ShadowMapVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/DefaultModelPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/DefaultModelVS.hlsl,5.0,Vertex,main"
@@ -1126,8 +1130,6 @@ if(MSVC)
         /Zi
         ${DEFAULT_CXX_EXCEPTION_HANDLING}
         /Y-
-        /wd4819
-        /wd4099
         /utf-8
     )
     target_link_options(${PROJECT_NAME} PRIVATE
@@ -1141,8 +1143,6 @@ if(MSVC)
         /MANIFEST
         /DEBUG
         /SUBSYSTEM:WINDOWS
-        /wd4819
-        /wd4099
     )
 endif()
 
@@ -1283,6 +1283,8 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "DirectXTex"
     "d3d11"
     "d3d12"
+    "d2d1.lib"
+    "dwrite.lib"
     "dxgi"
     "xinput"
     "xaudio2"
@@ -1304,6 +1306,8 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "DirectXTex"
     "d3d11"
     "d3d12"
+    "d2d1.lib"
+    "dwrite.lib"
     "dxgi"
     "xinput"
     "xaudio2"

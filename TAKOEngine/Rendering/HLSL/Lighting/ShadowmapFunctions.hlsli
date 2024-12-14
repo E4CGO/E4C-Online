@@ -1,80 +1,80 @@
 //---------------------------------------------
-//      ƒVƒƒƒhƒEƒ}ƒbƒvQÆ—pî•ñ‚ÌŒvZ
+//      ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—å‚ç…§ç”¨æƒ…å ±ã®è¨ˆç®—
 //---------------------------------------------
-// worldPosition       : ƒ[ƒ‹ƒhÀ•W
-// lightViewProjection : ƒ‰ƒCƒgƒrƒ…[ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ
-// •Ô‚·’l               : ƒVƒƒƒhƒEƒ}ƒbƒvQÆ—p‚ÌUVÀ•W‹y‚Ñ[“xî•ñ
+// worldPosition       : ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™
+// lightViewProjection : ãƒ©ã‚¤ãƒˆãƒ“ãƒ¥ãƒ¼ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—
+// è¿”ã™å€¤               : ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—å‚ç…§ç”¨ã®UVåº§æ¨™åŠã³æ·±åº¦æƒ…å ±
 float3 CalcShadowTexcoord(float3 worldPosition, matrix lightViewProjection)
 {
-	//ƒNƒŠƒbƒv‹óŠÔ‚ÌÀ•W‚É•ÏŠ·
+	//ã‚¯ãƒªãƒƒãƒ—ç©ºé–“ã®åº§æ¨™ã«å¤‰æ›
 	float4 worldViewProjectionPosition = mul(float4(worldPosition, 1), lightViewProjection);
 
-	//“§‹œZ‚µ‚ÄNDCÀ•W‚É•ÏŠ·
+	//é€è¦–é™¤ç®—ã—ã¦NDCåº§æ¨™ã«å¤‰æ›
 	worldViewProjectionPosition /= worldViewProjectionPosition.w;
 
-	//NDCÀ•W‚ÌXYÀ•W‚ğUVÀ•W‚É•ÏŠ·
-	//Z’l‚Í‚·‚Å‚É0 ~ 1‚Ì”ÍˆÍ‚É•ÏŠ·‚³‚ê‚Ä‚¢‚é‚Ì‚ÅA‰½‚à‚µ‚È‚­‚Ä—Ç‚¢
+	//NDCåº§æ¨™ã®XYåº§æ¨™ã‚’UVåº§æ¨™ã«å¤‰æ›
+	//Zå€¤ã¯ã™ã§ã«0 ~ 1ã®ç¯„å›²ã«å¤‰æ›ã•ã‚Œã¦ã„ã‚‹ã®ã§ã€ä½•ã‚‚ã—ãªãã¦è‰¯ã„
 	worldViewProjectionPosition.y = -worldViewProjectionPosition.y;
 	worldViewProjectionPosition.xy = 0.5f * worldViewProjectionPosition.xy + 0.5f;
-
+	
 	return worldViewProjectionPosition.xyz;
 }
 
 //----------------------------------------------------
-//     ƒVƒƒƒhƒEƒ}ƒbƒv‚©‚ç[“x’l‚ğæ“¾‚µ‚Ä‰e‚©‚Ç‚¤‚©‚ğ“n‚·
+//     ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ã‹ã‚‰æ·±åº¦å€¤ã‚’å–å¾—ã—ã¦å½±ã‹ã©ã†ã‹ã‚’æ¸¡ã™
 //----------------------------------------------------
-// tex            : ƒVƒƒƒhƒEƒ}ƒbƒv
-// samplerState   : ƒTƒ“ƒvƒ‰[ƒXƒe[ƒg
-// shadowTexcoord : ƒVƒƒƒhƒEƒ}ƒbƒvQÆ—pî•ñ
-// shadowColor    : ‰e‚ÌF
-// shadowBias     : [“x”äŠr—p‚ÌƒIƒtƒZƒbƒg’l
-// •Ô‚·’l          :‰e‚©‚Ç‚¤‚©
+// tex            : ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—
+// samplerState   : ã‚µãƒ³ãƒ—ãƒ©ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆ
+// shadowTexcoord : ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—å‚ç…§ç”¨æƒ…å ±
+// shadowColor    : å½±ã®è‰²
+// shadowBias     : æ·±åº¦æ¯”è¼ƒç”¨ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆå€¤
+// è¿”ã™å€¤          :å½±ã‹ã©ã†ã‹
 float3 CalcShadowColor(Texture2D tex, SamplerState samplerState, float3 shadowTexcoord, float3 shadowColor, float shadowBias)
 {
-	//ƒVƒƒƒhƒEƒ}ƒbƒv‚©‚ç[“x’læ“¾
+	//ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ã‹ã‚‰æ·±åº¦å€¤å–å¾—
 	float depth = tex.Sample(samplerState, shadowTexcoord.xy).r;
 
-	//[“x’l‚ğ”äŠr‚µ‚Ä‰e‚©‚Ç‚¤‚©‚ğ”»’è‚·‚é
+	//æ·±åº¦å€¤ã‚’æ¯”è¼ƒã—ã¦å½±ã‹ã©ã†ã‹ã‚’åˆ¤å®šã™ã‚‹
 	float shadow = step(shadowTexcoord.z - depth, shadowBias);
 
 	return lerp(shadowColor, 1, shadow);
 }
 
 //-------------------------------------------------
-//      PCFƒtƒBƒ‹ƒ^[•t‚«ƒ\ƒtƒgƒVƒƒƒhƒEƒ}ƒbƒv
+//      PCFãƒ•ã‚£ãƒ«ã‚¿ãƒ¼ä»˜ãã‚½ãƒ•ãƒˆã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—
 //-------------------------------------------------
-//tex             : ƒVƒƒƒhƒEƒ}ƒbƒv
-//samplerState	  : ƒTƒ“ƒvƒ‰[ƒXƒe[ƒg
-//shadowTexcoord  : ƒVƒƒƒhƒEƒ}ƒbƒvQÆ—pî•ñ
-//shadowBias	  : [“x”äŠr—p‚ÌƒIƒtƒZƒbƒg’l
-//shadowColor	  : ‰e‚ÌF
-//•Ô‚·’l			  : ‰e‚ÌF
+//tex             : ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—
+//samplerState	  : ã‚µãƒ³ãƒ—ãƒ©ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆ
+//shadowTexcoord  : ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—å‚ç…§ç”¨æƒ…å ±
+//shadowBias	  : æ·±åº¦æ¯”è¼ƒç”¨ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆå€¤
+//shadowColor	  : å½±ã®è‰²
+//è¿”ã™å€¤			  : å½±ã®è‰²
 float3 CalcShadowColorPCFFilter(Texture2D tex, SamplerState samplerState, float3 shadowTexcoord, float3 shadowColor, float shadowBias)
 {
-	//ƒeƒNƒZƒ‹ƒTƒCƒY‚ÌŒvZ
+	//ãƒ†ã‚¯ã‚»ãƒ«ã‚µã‚¤ã‚ºã®è¨ˆç®—
 	float2 texelSize;
 	{
-		//ƒeƒNƒXƒ`ƒƒ‚Ìc•‰¡•‚ğæ“¾‚·‚é
+		//ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ç¸¦å¹…æ¨ªå¹…ã‚’å–å¾—ã™ã‚‹
 		uint width, height;
 		tex.GetDimensions(width, height);
 
-		//Zo
+		//ç®—å‡º
 		texelSize = float2(1.0f / width, 1.0f / height);
 	}
 
 	float factor = 0;
-	static const int PCFKernelSize = 5;    //w’è‚ÍŠï”‚É‚·‚é‚±‚Æ
+	static const int PCFKernelSize = 5;    //æŒ‡å®šã¯å¥‡æ•°ã«ã™ã‚‹ã“ã¨
 
 	for (int x = -PCFKernelSize / 2; x <= PCFKernelSize / 2; ++x)
 	{
 		for (int y = -PCFKernelSize / 2; y <= PCFKernelSize / 2; ++y)
 		{
-			//ƒVƒƒƒhƒEƒ}ƒbƒv‚©‚ç[“x’læ“¾
+			//ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ã‹ã‚‰æ·±åº¦å€¤å–å¾—
 			float depth = tex.Sample(samplerState, shadowTexcoord.xy + texelSize * float2(x, y)).r;
 			factor += step(shadowTexcoord.z - depth, shadowBias);
 		}
 	}
 
-	//[“x’l‚ğ”äŠr‚µ‚Ä‰e‚©‚Ç‚¤‚©‚ğ”»’è‚·‚é
+	//æ·±åº¦å€¤ã‚’æ¯”è¼ƒã—ã¦å½±ã‹ã©ã†ã‹ã‚’åˆ¤å®šã™ã‚‹
 	return lerp(shadowColor, 1, factor / (PCFKernelSize * PCFKernelSize));
 }

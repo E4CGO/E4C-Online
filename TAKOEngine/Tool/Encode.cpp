@@ -82,7 +82,6 @@ std::string Encode::shift_jis_to_utf8(const std::string& shiftJISStr) {
 	return utf8Str;
 }
 
-
 std::string Encode::utf8_to_shift_jis(const std::string& utf8Str) {
 	// UTF-8 -> UTF-16 (WideChar)
 	int wideStrSize = MultiByteToWideChar(CP_UTF8, 0, utf8Str.c_str(), -1, nullptr, 0);
@@ -104,4 +103,10 @@ std::string Encode::utf8_to_shift_jis(const std::string& utf8Str) {
 	WideCharToMultiByte(codePage, 0, &wideStr[0], -1, &shiftJisStr[0], shiftJisStrSize, nullptr, nullptr);
 
 	return std::string(shiftJisStr.begin(), shiftJisStr.end() - 1); // 終端文字を除外
+}
+
+std::wstring Encode::utf8_to_wstring(const std::string& str)
+{
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> myconv;
+	return myconv.from_bytes(str);
 }

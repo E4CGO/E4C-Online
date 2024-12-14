@@ -12,6 +12,7 @@ struct CbScene
 	DirectX::XMFLOAT4X4 view;
 	DirectX::XMFLOAT4X4 projection;
 	DirectX::XMFLOAT4   camera_position;
+	DirectX::XMFLOAT4X4	light_view_projection;
 
 	//ライト情報
 	DirectX::XMFLOAT4		ambientLightColor;
@@ -23,6 +24,10 @@ struct CbScene
 
 	float					timerGlobal;
 	float					timerTick;
+
+	// 影情報
+	float shadowBias;
+	DirectX::XMFLOAT3 shadowColor;
 };
 
 struct CbLambertMaterial
