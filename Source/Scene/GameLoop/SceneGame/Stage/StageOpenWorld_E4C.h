@@ -56,6 +56,7 @@ private:
 	std::unique_ptr<Spawner> spawner;
 
 	std::unique_ptr<ModelObject> sky;
+	std::unique_ptr<ModelObject> test;
 	
 	std::unique_ptr<SpriteDX12>			m_sprites[8];
 
