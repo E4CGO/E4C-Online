@@ -16,7 +16,8 @@ cbuffer CbScene : register(b0)
 {
     row_major float4x4 view;
     row_major float4x4 Projection;
-    float4 cameraPosition;
+    float4             cameraPosition;
+    row_major float4x4 lightViewProjection;
     
     //ライト情報
     float4               ambientLightColor;

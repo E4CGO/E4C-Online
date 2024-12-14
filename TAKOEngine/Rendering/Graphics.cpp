@@ -105,6 +105,13 @@ void Graphics::FinishDX12()
 			m_sampler_descriptor_heap->PushDescriptor(m_sampler[i]->GetDescriptor());
 		}
 	}
+
+	for (int i = 0; i < static_cast<int>(ModelShaderDX12Id::EnumCount); i++)
+	{
+		dx12_modelshaders[i]->Finalize();
+	}
+
+	m_shadowMapRenderer->Finalize();
 }
 
 //******************************************************************
@@ -566,6 +573,7 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Toon)] = std::make_unique<ToonShaderDX12>(m_d3d_device.Get());
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::ToonInstancing)] = std::make_unique<ToonShaderDX12>(m_d3d_device.Get(), true);
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Skydome)] = std::make_unique<SkydomeShaderDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::shadowMap)] = std::make_unique<ShadowMapShaderDX12>(m_d3d_device.Get());
 
 		// スプライトシェーダー生成
 		spriteShaders[static_cast<int>(SpriteShaderId::Default)] = std::make_unique<DefaultSpriteShader>(device.Get());
@@ -594,6 +602,9 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 
 		//スキニング
 		m_skinning_pipeline = std::make_unique<SkinningPipeline>(m_d3d_device.Get());
+
+		// シャドウマップ
+		m_shadowMapRenderer = std::make_unique<ShadowMapRenderDX12>(m_d3d_device.Get());
 	}
 }
 
@@ -811,6 +822,10 @@ const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera)
 	cb_scene_data->camera_position.y = camera->GetEye().y;
 	cb_scene_data->camera_position.z = camera->GetEye().z;
 
+	// 影情報
+	cb_scene_data->shadowBias = 0.001f;
+	cb_scene_data->shadowColor = { 0.5f, 0.5f, 0.5f };
+
 	// ライト情報
 	cb_scene_data->ambientLightColor = ligtManager.GetAmbientColor();
 
@@ -825,6 +840,19 @@ const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera)
 			cb_scene_data->directionalLightData.direction.z = light->GetDirection().z;
 			cb_scene_data->directionalLightData.direction.w = 0.0f;
 			cb_scene_data->directionalLightData.color = light->GetColor();
+
+			// ライトビュープロジェクション
+			{
+				DirectX::XMVECTOR LightDirection = DirectX::XMVector3Normalize(DirectX::XMVectorSet(light->GetDirection().x, light->GetDirection().y, light->GetDirection().z, 0));
+				DirectX::XMVECTOR Up    = DirectX::XMVectorSet(0, 1, 0, 0);
+				DirectX::XMVECTOR Focus = DirectX::XMVectorZero();
+
+				DirectX::XMVECTOR Eye = DirectX::XMVectorSubtract(Focus, DirectX::XMVectorScale(LightDirection, 50.0f));
+				DirectX::XMMATRIX View = DirectX::XMMatrixLookAtLH(Eye, Focus, Up);
+				DirectX::XMMATRIX Projection = DirectX::XMMatrixOrthographicLH(60, 60, 0.1f, 100.0f);
+				DirectX::XMMATRIX LightViewProjection = DirectX::XMMatrixMultiply(View, Projection);
+				DirectX::XMStoreFloat4x4(&cb_scene_data->light_view_projection, LightViewProjection);
+			}
 			break;
 		}
 		case	LightType::Point:

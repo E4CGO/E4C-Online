@@ -35,6 +35,8 @@ public:
 		LHS_PBR_Instancing,
 		LHS_TOON,
 		LHS_TOON_Instancing,
+		LHS_Phong,
+		LHS_Phong_Instancing,
 	};
 
 	RENDER_MODE m_renderMode = DX11;

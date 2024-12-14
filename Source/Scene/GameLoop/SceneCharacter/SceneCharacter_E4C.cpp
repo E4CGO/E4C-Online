@@ -182,6 +182,13 @@ void SceneCharacter_E4C::RenderDX12()
 			m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 			m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 
+			// シャドウマップ
+			{
+				T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
+				rc.shadowMap.shadow_srv_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSRV();
+				rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();
+			}
+
 			for (auto& it : m_previewCharacters)
 			{
 				if (it != nullptr) {
