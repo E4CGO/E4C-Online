@@ -411,36 +411,22 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 	ImVec2 screenSize = { TentacleLib::graphics.GetScreenWidth(), TentacleLib::graphics.GetScreenHeight() };
 	ImVec2 windowSize = { 256.0f, 512.0f };
 
-	ImGui::SetNextWindowPos(ImVec2(32.0f, 32.0f), ImGuiCond_Once);
-	ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+	//ImGui::SetNextWindowPos(ImVec2(32.0f, 32.0f), ImGuiCond_Once);
+	//ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
 
-	bool check = false;
-	if (ImGui::Begin("SceneRoomTest_E4C", &check, ImGuiWindowFlags_MenuBar))
-	{
-		//if (ImGui::BeginMainMenuBar())
-		if (ImGui::BeginMenuBar())
-		{
-			if (ImGui::BeginMenu("File"))
-			{
-				if (ImGui::MenuItem("Load File")) LoadRoomData();
-				if (ImGui::MenuItem("Save File")) SaveRoomData();
-
-				ImGui::EndMenu();
-			}
-
-			ImGui::EndMenuBar();
-		}
-	}
-	ImGui::End();
-
-	ImGui::SetNextWindowPos(ImVec2((256.0f + 32.0f), 32.0f), ImGuiCond_Once);
-	ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+	//ImGui::SetNextWindowPos(ImVec2((256.0f + 32.0f), 32.0f), ImGuiCond_Once);
+	//ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
 
 	// ひえらるき～
 	if (ImGui::Begin("Hierarchy", nullptr, ImGuiWindowFlags_MenuBar))
 	{
 		// メニュー
 		if (ImGui::BeginMenuBar()) {
+			if (ImGui::BeginMenu("File")) {
+				if (ImGui::MenuItem("Load File")) LoadRoomData();
+				if (ImGui::MenuItem("Save File")) SaveRoomData();
+				ImGui::EndMenu();
+			}
 			if (ImGui::BeginMenu("New")) {
 				if (ImGui::BeginMenu("TileNode")) {
 					if (ImGui::MenuItem("Floor01a"))		AddTileNode("Floor",	TileType::FLOOR_01A);
@@ -470,13 +456,17 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 		}
 
 		// 部屋の生成設定
-		ImGui::InputInt("Weight", &roomSetting.weight);
-		// AABB
-		ImGui::DragFloat3("AABB: Position", &roomSetting.aabb.position.x, 1.0f);
-		ImGui::DragFloat3("AABB: Radii", &roomSetting.aabb.radii.x, 1.0f);
+		if (ImGui::TreeNodeEx("RoomSetting", ImGuiTreeNodeFlags_DefaultOpen)) {
+			// Weight
+			ImGui::InputInt("Weight", &roomSetting.weight);
+			// AABB
+			ImGui::DragFloat3("AABB: Position", &roomSetting.aabb.position.x, 1.0f);
+			ImGui::DragFloat3("AABB: Radii", &roomSetting.aabb.radii.x, 1.0f);
+			// AABB算出
+			if (ImGui::Button("AABB calc")) CalcAABB();
 
-		// AABB算出
-		if (ImGui::Button("AABB calc")) CalcAABB();
+			ImGui::TreePop();
+		}
 
 		ImGui::Separator();
 
@@ -498,6 +488,8 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 			}
 			ImGui::TreePop();
 		}
+
+		ImGui::Separator();
 	}
 	ImGui::End();
 
@@ -597,19 +589,11 @@ void SceneRoomTest_E4C::CalcAABB()
 		if (node->GetPosition().z > maxZ) maxZ = node->GetPosition().z;
 	}
 
-	float widthX = (maxX - minX);
-	float widthY = (maxY - minY);
-	float widthZ = (maxZ - minZ);
+	float widthX = fabsf(maxX - minX) + 4.0f;
+	float widthY = fabsf(maxY - minY) + 4.0f;
+	float widthZ = fabsf(maxZ - minZ) + 4.0f;
 
-	fabsf(widthX);
-	fabsf(widthY);
-	fabsf(widthZ);
-
-	maxX += 4.0f;
-	maxY += 4.0f;
-	maxZ += 4.0f;
-
-	roomSetting.aabb.position = { widthX * 0.5f, widthY * 0.5f, widthZ * 0.5f };
+	roomSetting.aabb.position = { (widthX * 0.5f) - 2.0f, (widthY * 0.5f), (widthZ * 0.5f) + 2.0f };
 	roomSetting.aabb.radii = { widthX, widthY, widthZ };
 }
 

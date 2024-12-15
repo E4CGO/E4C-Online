@@ -406,9 +406,7 @@ void RoomBase::PlaceMapTile(bool isLeader)
 		{
 		case TileType::FLOOR_01A:
 			colliderFileNames.emplace_back("Data/Model/DungeonAssets/FloorCollision_01a.glb", 4.0f);
-			//colliderFileNames.emplace_back("Data/Model/DungeonAssets/SM_Floor_01a.glb", 4.0f);
 			modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Floor_01a.glb", 4.0f);
-			//modelFileNames.emplace_back("Data/Model/DungeonAssets/FloorCollision_01a.glb", 4.0f);
 			break;
 		case TileType::WALL_01A:
 			colliderFileNames.emplace_back("Data/Model/DungeonAssets/WallCollision_01a.glb", 4.0f);
