@@ -238,40 +238,45 @@ void StageDungeon_E4C::Initialize()
 
 	// インスタンシングモデルテスト
 	{
-		//FILE_DATA fileData = DUNGEONDATA.GetModelFileDatas(TileType::WALL_01A).at(0);
+		FILE_DATA fileData = DUNGEONDATA.GetModelFileDatas(TileType::WALL_01A).at(0);
 
-		//std::filesystem::path filePath = fileData.fileName;
-		//std::string fileNameStr = filePath.stem().string();
-		//const char* fileName = fileNameStr.c_str();
+		std::filesystem::path filePath = fileData.fileName;
+		std::string fileNameStr = filePath.stem().string();
+		const char* fileName = fileNameStr.c_str();
 
-		//ModelObject* instancingModel = new ModelObject(
-		//	fileData.fileName.c_str(),
-		//	fileData.scale,
-		//	ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON);
-		//instancingModel->SetShader(fileName, ModelShaderDX12Id::ToonInstancing);
+		ModelObject* instancingModel = new ModelObject(
+			fileData.fileName.c_str(),
+			fileData.scale,
+			ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON);
+		instancingModel->SetShader(fileName, ModelShaderDX12Id::ToonInstancing);
 
-		//for (int i = 0; i < 4; i++)
-		//{
-		//	// 使われていないIDを取得して利用
-		//	int id = instancingModel->GetModel()->AllocateInstancingIndex();
-		//	if (id < 0) continue;
+		float angleY = 0;
+		DirectX::XMMATRIX LeftHandScaling = DirectX::XMMatrixScaling(-1, 1, 1);
+		for (int i = 0; i < 4; ++i)
+		{
+			int id = instancingModel->GetModel()->AllocateInstancingIndex();
+			if (id < 0) continue;
 
-		//	DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
-		//	DirectX::XMFLOAT3 angle = { DirectX::XMConvertToRadians(90.0f * i), DirectX::XMConvertToRadians(90.0f * i), DirectX::XMConvertToRadians(90.0f * i) };
-		//	DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f };
+			// スケール行列生成
+			DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1, 1, 1);
+			// 回転行列生成
+			DirectX::XMMATRIX X = DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(90));
+			DirectX::XMMATRIX Y = DirectX::XMMatrixRotationY(DirectX::XMConvertToRadians(angleY));
+			DirectX::XMMATRIX Z = DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(0));
+			DirectX::XMMATRIX R = X * Y * Z;
+			// 位置行列生成
+			DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
+			DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x * 0.25f, position.y * 0.25f, position.z * 0.25f);
 
-		//	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
-		//	DirectX::XMMATRIX R = AnglesToMatrix({ angle.x, angle.z, angle.y });
-		//	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(-position.x * 0.25f, position.y * 0.25f, position.z * 0.25f);
+			DirectX::XMMATRIX W = (S * R * T) * LeftHandScaling;
 
-		//	DirectX::XMMATRIX LocalTransform = S * R * T;
+			DirectX::XMFLOAT4X4 tm;
+			DirectX::XMStoreFloat4x4(&tm, W);
+			instancingModel->GetModel()->UpdateTransform(id, tm);
 
-		//	DirectX::XMFLOAT4X4 tm;
-		//	DirectX::XMStoreFloat4x4(&tm, LocalTransform);
-
-		//	instancingModel->GetModel()->UpdateTransform(id, tm);
-		//}
-		//MAPTILES.Register(instancingModel);
+			angleY += 90;
+		}
+		MAPTILES.Register(instancingModel);
 	}
 
 	//MapTile* stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
@@ -335,7 +340,12 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	{
 		T_INPUT.KeepCursorCenter();
 	}
-	
+
+	for (auto& model : PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetModels())
+	{
+		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
+	}
+
 	DirectX::XMFLOAT3 pos = PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetPosition();
 
 	Console::Instance().Log(std::string("Player Position: " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z)).c_str());
@@ -392,6 +402,13 @@ void StageDungeon_E4C::RenderDX12()
 		m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 		m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 		m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+
+		// シャドウマップ
+		{
+			//T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
+			rc.shadowMap.shadow_srv_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSRV();
+			rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();
+		}
 
 		// モデル描画
 		PlayerCharacterManager::Instance().RenderDX12(rc);

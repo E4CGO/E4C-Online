@@ -58,11 +58,50 @@ void StageOpenWorld_E4C::Initialize()
 	{
 		models.emplace("map", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models.emplace("tower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
-		//models.emplace("boss", std::make_unique<ModelObject>("Data/Model/Enemy/MDL_ENMboss_1129.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON));
-		//models["boss"]->SetPosition({ 10.0, 0.0f, 10.0f });
+		models.emplace("boss", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMboss_1205.glb", 2.5f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON));
+		models["boss"]->SetPosition({ 10.0, 0.0f, 10.0f });
+		models["boss"]->SetAnimation(0, true);
 
-		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 70.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
+		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 500.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
 		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
+		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
+
+		test = std::make_unique<ModelObject>("Data/Model/DungeonAssets/WALL.glb", 1, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON);
+		test->SetShader("WALL", ModelShaderDX12Id::ToonInstancing);
+
+		DirectX::XMFLOAT3 pos[] =
+		{
+			{0,0,0},
+			{0,0,0},
+			{3.5f,0,-4},
+			{3.5f,0,-4},
+		};
+
+		float angleY = 0;
+		DirectX::XMMATRIX LeftHandScaling = DirectX::XMMatrixScaling(-1, 1, 1);
+		for (int i = 0; i < 4; ++i)
+		{
+			int id = test->GetModel()->AllocateInstancingIndex();
+			if (id < 0) continue;
+
+			// スケール行列生成
+			DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1, 1, 1);
+			// 回転行列生成
+			DirectX::XMMATRIX X = DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(90));
+			DirectX::XMMATRIX Y = DirectX::XMMatrixRotationY(DirectX::XMConvertToRadians(angleY));
+			DirectX::XMMATRIX Z = DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(0));
+			DirectX::XMMATRIX R = X * Y * Z;
+			// 位置行列生成
+			DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(pos[i].x, pos[i].y, pos[i].z);
+
+			DirectX::XMMATRIX W = (S * R * T) * LeftHandScaling;
+
+			DirectX::XMFLOAT4X4 tm;
+			DirectX::XMStoreFloat4x4(&tm, W);
+			test->GetModel()->UpdateTransform(id, tm);
+
+			angleY += 90;
+		}
 		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
 	}
 
@@ -74,7 +113,7 @@ void StageOpenWorld_E4C::Initialize()
 	LightManager::Instance().SetAmbientColor({ 0.3f, 0.3f, 0.3f, 0.0f });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
-	dl->SetPosition({ 0, 20, 0 });
+	//dl->SetPosition({ 0, 20, 0 });
 	LightManager::Instance().Register(dl);
 
 	// プレイヤー
@@ -153,9 +192,19 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 
 	sky->Update(elapsedTime);
 
+	spawner->Update(elapsedTime);
+
+	test->Update(elapsedTime);
 	teleporter->Update(elapsedTime);
 
 	timer += elapsedTime;
+
+	T_GRAPHICS.GetShadowRenderer()->ModelRegister(models["map"]->GetModel().get());
+	T_GRAPHICS.GetShadowRenderer()->ModelRegister(models["tower"]->GetModel().get());
+	for (auto& model : PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetModels())
+	{
+		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
+	}
 }
 
 void StageOpenWorld_E4C::Render()
@@ -213,6 +262,13 @@ void StageOpenWorld_E4C::RenderDX12()
 		m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 		m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 
+		// シャドウマップ
+		{
+			T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
+			rc.shadowMap.shadow_srv_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSRV();
+			rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();
+		}
+
 		// プレイヤー
 		PlayerCharacterManager::Instance().RenderDX12(rc);
 
@@ -223,6 +279,11 @@ void StageOpenWorld_E4C::RenderDX12()
 		{
 			it.second->RenderDX12(rc);
 		}
+
+		// スポナー
+		spawner->RenderDX12(rc);
+
+		test->RenderDX12(rc);
 
 		// skyBox
 		{
@@ -241,7 +302,11 @@ void StageOpenWorld_E4C::RenderDX12()
 
 	// 2D描画
 	{
+		T_TEXT.BeginDX12();
+
 		UI.RenderDX12(rc);
+
+		T_TEXT.EndDX12();
 	}
 
 	T_GRAPHICS.End();

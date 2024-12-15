@@ -1,4 +1,4 @@
-﻿//! @file ModelShaderDX12.h
+//! @file ModelShaderDX12.h
 //! @note
 
 #ifndef __GRAPHICS_MODEL_SHADERDX12_H__
@@ -25,6 +25,8 @@ protected:
 
 public:
 	virtual ~ModelShaderDX12() {};
+
+	virtual void Finalize() = 0;
 
 	//描画
 	virtual void Render(const RenderContextDX12& rc, const ModelDX12::Mesh& mesh) = 0;

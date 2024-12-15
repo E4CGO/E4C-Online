@@ -1,5 +1,5 @@
 //! @file GameObject.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDED_GAME_OBJECT_H__
 #define __INCLUDED_GAME_OBJECT_H__
@@ -10,7 +10,6 @@
 #include <DirectXMath.h>
 
 // モデル用オブジェクト
-
 
 /**************************************************************************//**
 	@class	GameObject

@@ -1,4 +1,4 @@
-﻿//! @file WidgetCharacterSelect.cpp
+//! @file WidgetCharacterSelect.cpp
 //! @note
 
 #include "WidgetCharacterSelect.h"
@@ -39,10 +39,12 @@ void WidgetCharacterSelect::Update(float elapsedTime)
 	for (int i = 0; i < characters.size(); i++)
 	{
 		DirectX::XMFLOAT3 position = characters.at(i)->GetScreenPosition();
+
 		m_pCharacterButtons[i]->SetPosition({ position.x - m_pCharacterButtons[i]->GetSize().x * 0.5f, SCREEN_H * 0.1f });
 		posX -= 3.5;
 	}
 	posX = T_GRAPHICS.GetScreenPosition({ posX, 0.0f, 5.0f }).x;
+
 	m_pCharacterButtons[characters.size()]->SetPosition({ posX - m_pCharacterButtons[characters.size()]->GetSize().x * 0.5f, SCREEN_H * 0.1f });
 
 	for (WidgetCharacter* button : m_pCharacterButtons)

@@ -1,5 +1,5 @@
 ﻿//! @file PostprocessingRenderer.h
-//! @note 
+//! @note
 
 #include <imgui.h>
 
@@ -218,7 +218,7 @@ void PostprocessingRendererDX12::Render(FrameBufferManager* framBuffer)
 	RenderContextDX12 rc;
 	rc.d3d_command_list = framBuffer->GetCommandList();
 	rc.luminanceExtractionData = bloomData.luminanceExtractionData;
-	rc.gaussianFilterData      = bloomData.gaussianFilterData;
+	rc.gaussianFilterData = bloomData.gaussianFilterData;
 
 	// 高輝度抽出用バッファに描画先を変更して高輝度抽出
 	{
@@ -234,11 +234,11 @@ void PostprocessingRendererDX12::Render(FrameBufferManager* framBuffer)
 			T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance)->GetWidth(),
 			T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance)->GetHeight(),
 			0, 0,
-			T_GRAPHICS.GetScreenWidth(), 
+			T_GRAPHICS.GetScreenWidth(),
 			T_GRAPHICS.GetScreenHeight(),
 			0,
 			1, 1, 1, 1);
-		
+
 		shader->Render(rc, renderSprite[static_cast<int>(RenderTarget::Luminance)].get());
 
 		framBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance));
@@ -268,7 +268,7 @@ void PostprocessingRendererDX12::Render(FrameBufferManager* framBuffer)
 
 	// 元のバッファに戻す
 	{
-		D3D12_VIEWPORT view = T_GRAPHICS.GetViwePort();
+		D3D12_VIEWPORT view = T_GRAPHICS.GetViewPort();
 		framBuffer->SetViewportAndScissor(view);
 		framBuffer->SetRenderTarget(T_GRAPHICS.GetCurrentFrameBuffuerRTV(), T_GRAPHICS.GetCurrentFrameBuffuerDSV());
 	}
@@ -284,7 +284,7 @@ void PostprocessingRendererDX12::Render(FrameBufferManager* framBuffer)
 			T_GRAPHICS.GetScreenWidth(), T_GRAPHICS.GetScreenHeight(),
 			0,
 			1, 1, 1, 1);
-		
+
 		rc.finalpassnData.bloomTexture = renderSprite[static_cast<int>(RenderTarget::GaussianBlur)]->GetDescriptor();
 		rc.colorGradingData = colorGradingData;
 

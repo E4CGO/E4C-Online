@@ -56,11 +56,8 @@ private:
 	std::unique_ptr<Spawner> spawner;
 
 	std::unique_ptr<ModelObject> sky;
-	DirectX::XMFLOAT4X4 test_transform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
-	DirectX::XMFLOAT3 test_position = { 0, 0, 0 };
-	DirectX::XMFLOAT4 test_rotation = { 0, 0, 0, 0 };
-	DirectX::XMFLOAT3 test_scale = { 1, 1, 1 };
-
+	std::unique_ptr<ModelObject> test;
+	
 	std::unique_ptr<SpriteDX12>			m_sprites[8];
 
 	// Sprite Preload
