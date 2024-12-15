@@ -696,7 +696,12 @@ DirectX::XMFLOAT3 Graphics::GetScreenPosition(const DirectX::XMFLOAT3 worldPosit
 	DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&CameraManager::Instance().GetCamera()->GetProjection());
 	DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
 
-	return GetScreenPosition(worldPosition, viewport, View, Projection, World);
+	if (T_GRAPHICS.isDX11Active)
+	{
+		return GetScreenPosition(worldPosition, viewport, View, Projection, World);
+	}
+
+	return GetScreenPosition(worldPosition, T_GRAPHICS.GetViewPort(), View, Projection, World);
 }
 
 //******************************************************************
@@ -844,7 +849,7 @@ const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera)
 			// ライトビュープロジェクション
 			{
 				DirectX::XMVECTOR LightDirection = DirectX::XMVector3Normalize(DirectX::XMVectorSet(light->GetDirection().x, light->GetDirection().y, light->GetDirection().z, 0));
-				DirectX::XMVECTOR Up    = DirectX::XMVectorSet(0, 1, 0, 0);
+				DirectX::XMVECTOR Up = DirectX::XMVectorSet(0, 1, 0, 0);
 				DirectX::XMVECTOR Focus = DirectX::XMVectorZero();
 
 				DirectX::XMVECTOR Eye = DirectX::XMVectorSubtract(Focus, DirectX::XMVectorScale(LightDirection, 50.0f));
