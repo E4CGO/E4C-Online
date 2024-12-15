@@ -286,7 +286,7 @@ public:
 	}
 
 	// ビューポートを取得
-	D3D12_VIEWPORT GetViwePort()
+	D3D12_VIEWPORT GetViewPort()
 	{
 		return m_viewport;
 	}

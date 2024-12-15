@@ -81,7 +81,7 @@ void PlayerCharacterPatternSword::Execute(PlayerCharacter* chara)
 
 	{
 		using namespace PlayerCharacterState::Sword;
-		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::WAITING), new MoveState(chara));
+		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::WAITING), new WaitState(chara));
 		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::IDLE), new IdleState(chara));
 		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::MOVE), new MoveState(chara));
 
@@ -122,7 +122,7 @@ void PlayerCharacterPatternRod::Execute(PlayerCharacter* chara)
 
 	{
 		using namespace PlayerCharacterState::Rod;
-		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::WAITING), new MoveState(chara));
+		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::WAITING), new WaitState(chara));
 		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::IDLE), new IdleState(chara));
 		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::MOVE), new MoveState(chara));
 
