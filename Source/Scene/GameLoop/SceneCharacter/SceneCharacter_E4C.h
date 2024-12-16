@@ -113,6 +113,7 @@ private:
 		"Data/Model/Character/PlayerModels/MDL_PLAYER_SWORD_ANIMATION.glb",
 		"Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD1_ANIMATION.glb",
 		"Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD2_ANIMATION.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_ROD_ANIMATION.glb",
 	};
 	std::unordered_set<std::shared_ptr<ModelResource>> modelPreLoad;
 
