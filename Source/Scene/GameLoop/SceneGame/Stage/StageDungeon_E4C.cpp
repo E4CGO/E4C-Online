@@ -40,8 +40,8 @@ void StageDungeon_E4C::GenerateDungeon()
 
 		// ダンジョンの自動生成を行う
 		std::vector<RoomType> placeableRooms;
-		//placeableRooms.emplace_back(DungeonData::SIMPLE_ROOM_1);
-		placeableRooms.emplace_back(RoomType::CROSS_ROOM_1);
+		placeableRooms.emplace_back(RoomType::SIMPLE_ROOM_1);
+		//placeableRooms.emplace_back(RoomType::CROSS_ROOM_1);
 
 		// 生成可能な部屋の重みの合計
 		int totalWeight = 0;
@@ -217,7 +217,13 @@ void StageDungeon_E4C::Initialize()
 	cameraController->SetPlayer(player);
 	CURSOR_OFF;
 
-	m_roomOrder.emplace_back(0);
+	m_roomOrder.emplace_back(RoomType::SIMPLE_ROOM_1);
+	m_roomOrder.emplace_back(RoomType::SIMPLE_ROOM_1);
+	m_roomOrder.emplace_back(RoomType::DEAD_END);
+	m_roomOrder.emplace_back(RoomType::DEAD_END);
+	m_roomOrder.emplace_back(RoomType::SIMPLE_ROOM_1);
+	m_roomOrder.emplace_back(RoomType::DEAD_END);
+	m_roomOrder.emplace_back(RoomType::DEAD_END);
 
 	GenerateDungeon();
 
@@ -238,45 +244,45 @@ void StageDungeon_E4C::Initialize()
 
 	// インスタンシングモデルテスト
 	{
-		FILE_DATA fileData = DUNGEONDATA.GetModelFileDatas(TileType::WALL_01A).at(0);
+		//FILE_DATA fileData = DUNGEONDATA.GetModelFileDatas(TileType::WALL_01A).at(0);
 
-		std::filesystem::path filePath = fileData.fileName;
-		std::string fileNameStr = filePath.stem().string();
-		const char* fileName = fileNameStr.c_str();
+		//std::filesystem::path filePath = fileData.fileName;
+		//std::string fileNameStr = filePath.stem().string();
+		//const char* fileName = fileNameStr.c_str();
 
-		ModelObject* instancingModel = new ModelObject(
-			fileData.fileName.c_str(),
-			fileData.scale,
-			ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON);
-		instancingModel->SetShader(fileName, ModelShaderDX12Id::ToonInstancing);
+		//ModelObject* instancingModel = new ModelObject(
+		//	fileData.fileName.c_str(),
+		//	fileData.scale,
+		//	ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON);
+		//instancingModel->SetShader(fileName, ModelShaderDX12Id::ToonInstancing);
 
-		float angleY = 0;
-		DirectX::XMMATRIX LeftHandScaling = DirectX::XMMatrixScaling(-1, 1, 1);
-		for (int i = 0; i < 4; ++i)
-		{
-			int id = instancingModel->GetModel()->AllocateInstancingIndex();
-			if (id < 0) continue;
+		//float posY = 0;
+		//DirectX::XMMATRIX LeftHandScaling = DirectX::XMMatrixScaling(-1, 1, 1);
+		//for (int i = 0; i < 4; ++i)
+		//{
+		//	int id = instancingModel->GetModel()->AllocateInstancingIndex();
+		//	if (id < 0) continue;
 
-			// スケール行列生成
-			DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1, 1, 1);
-			// 回転行列生成
-			DirectX::XMMATRIX X = DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(90));
-			DirectX::XMMATRIX Y = DirectX::XMMatrixRotationY(DirectX::XMConvertToRadians(angleY));
-			DirectX::XMMATRIX Z = DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(0));
-			DirectX::XMMATRIX R = X * Y * Z;
-			// 位置行列生成
-			DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
-			DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x * 0.25f, position.y * 0.25f, position.z * 0.25f);
+		//	// スケール行列生成
+		//	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1, 1, 1);
+		//	// 回転行列生成
+		//	DirectX::XMMATRIX X = DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(0));
+		//	DirectX::XMMATRIX Y = DirectX::XMMatrixRotationY(DirectX::XMConvertToRadians(0));
+		//	DirectX::XMMATRIX Z = DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(0));
+		//	DirectX::XMMATRIX R = X * Y * Z;
+		//	// 位置行列生成
+		//	DirectX::XMFLOAT3 position = { 0.0f, posY, 0.0f };
+		//	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x * 0.25f, position.y * 0.25f, position.z * 0.25f);
 
-			DirectX::XMMATRIX W = (S * R * T) * LeftHandScaling;
+		//	DirectX::XMMATRIX W = (S * R * T) * LeftHandScaling;
 
-			DirectX::XMFLOAT4X4 tm;
-			DirectX::XMStoreFloat4x4(&tm, W);
-			instancingModel->GetModel()->UpdateTransform(id, tm);
+		//	DirectX::XMFLOAT4X4 tm;
+		//	DirectX::XMStoreFloat4x4(&tm, W);
+		//	instancingModel->GetModel()->UpdateTransform(id, tm);
 
-			angleY += 90;
-		}
-		MAPTILES.Register(instancingModel);
+		//	posY += 2.0f;
+		//}
+		//MAPTILES.Register(instancingModel);
 	}
 
 	//MapTile* stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
@@ -346,9 +352,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
 	}
 
-	DirectX::XMFLOAT3 pos = PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetPosition();
-
-	Console::Instance().Log(std::string("Player Position: " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z)).c_str());
+	//PlayerCharacterManager::Instance().GetPlayerCharacterById()->SetKinematic(true);
 
 	timer += elapsedTime;
 }
@@ -417,6 +421,16 @@ void StageDungeon_E4C::RenderDX12()
 		GameObjectManager::Instance().RenderDX12(rc);
 
 		MAPTILES.RenderDX12(rc);
+
+		for (RoomBase* room : rootRoom->GetAll())
+		{
+			room->Render(rc);
+
+			DirectX::XMFLOAT3 p = { 0, 0, 0 };
+			DirectX::XMFLOAT3 s = { 5, 5, 5 };
+
+			//T_GRAPHICS.GetDebugRenderer()->DrawCube(p, s, {1.0f, 1.0f, 1.0f, 1.0f});
+		}
 
 		// レンダーターゲットへの書き込み終了待ち
 		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));

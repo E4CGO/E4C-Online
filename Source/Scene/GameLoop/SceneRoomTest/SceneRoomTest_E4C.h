@@ -90,6 +90,22 @@ protected:
 };
 
 
+// 接続点ノード
+class ConnectPointNode : public Node
+{
+public:
+	ConnectPointNode(std::string name) :
+		Node(name, TileType::CONNECTPOINT) {}
+
+	void Render(const RenderContext& rc) override;
+
+	Node* Duplicate() override;
+
+	// デバッグGUI描画
+	void DrawDebugGUI() override;
+};
+
+
 class SceneRoomTest_E4C : public Scene
 {
 public:
@@ -106,6 +122,16 @@ public:
 	// 描画処理
 	void Render() override;
 	void RenderDX12() override;
+
+	// データ一次保管用
+	struct IMPORT_DATA
+	{
+		DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT3 angle = { 0.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f };
+
+		TileType type = TileType::FLOOR_01A;
+	};
 
 	// 部屋データを指定したjsonからロードする
 	void LoadRoomData();
@@ -128,6 +154,8 @@ public:
 		DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f });
 	// Spawner追加
 	void AddSpawner();
+	// ConnectPoint追加
+	void AddConnectPoint();
 	// ノード複製
 	void DuplicateNode();
 	// ノード削除

@@ -36,6 +36,9 @@ RoomBase::RoomBase(
 		this->m_angle = parent->GetConnectPointData(pointIndex).angle;
 	}
 
+	m_debugCube = std::make_unique<CubeRenderer>(T_GRAPHICS.GetDeviceDX12());
+	m_debugDebugCube = std::make_unique<CubeRenderer>(T_GRAPHICS.GetDeviceDX12());
+
 	// 深度を取得
 	depth = GetDepth();
 
@@ -183,6 +186,8 @@ void RoomBase::GenerateNextRoom(
 					AABB nextRoomAABB = CalcAABB(dungeonData.GetRoomGenerateSetting(type).aabb,
 						m_connectPointDatas.at(i).position, DirectX::XMConvertToDegrees(m_connectPointDatas.at(i).angle.y));
 
+					m_debugAABBs.emplace_back(nextRoomAABB);
+
 					bool isHit = false;
 
 					// 自分以外のAABBとの当たり判定を行う
@@ -213,8 +218,8 @@ void RoomBase::GenerateNextRoom(
 							&result))
 						{
 							// AABBと衝突するなら配列に保存しない
-							isHit = true;
-							break;
+							//isHit = true;
+							//break;
 						}
 					}
 					// 衝突しなかった場合は配列に保存する
@@ -331,7 +336,7 @@ void RoomBase::GenerateNextRoom(
 				break;
 
 			case RoomType::DEAD_END:
-				nextRoom = new DeadEndRoom(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+				nextRoom = new DeadEndRoom(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
 				break;
 			}
 			AddRoom(nextRoom);
@@ -352,39 +357,49 @@ AABB RoomBase::CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const
 	{
 		AABB buf = aabb;
 
-		aabb.position.x = aabb.position.z;
-		aabb.position.z = buf.position.x;
-		aabb.radii.x = aabb.radii.z;
+		aabb.radii.x = buf.radii.z;
 		aabb.radii.z = buf.radii.x;
+
+		//aabb.position.x = aabb.position.z;
+		//aabb.position.z = buf.position.x;
+		//aabb.radii.x = aabb.radii.z;
+		//aabb.radii.z = buf.radii.x;
 	}
 
 	// 90度
 	if (degree > 89.9f && degree < 90.1f)
 	{
-
+		// 位置補正
+		//aabb.position.x += tileScale;
 	}
 
 	// 180度
 	if (degree > 179.9f && degree < 180.1f)
 	{
-		// 位置補正
-		//aabb.position.z += tileScale;
-
 		// zを反転
-		aabb.position.z = -aabb.position.z;
+		//aabb.position.z = -aabb.position.z;
+
+		// 位置補正
+		//aabb.position.x += tileScale;
+		//aabb.position.z += tileScale + tileScale + (tileScale * 0.5f);
 	}
 
 	// 270度
 	if (degree > 269.9f && degree < 270.1f)
 	{
 		// xを反転
-		aabb.position.x = -aabb.position.x;
+		//aabb.position.x = -aabb.position.x;
 
 		// 位置補正
 		//aabb.position.x += tileScale;
 	}
 
 	aabb.position += pos;
+
+	//aabb.radii.x *= 0.2f;
+	//aabb.radii.z *= 0.9f;
+
+	//aabb.radii *= 0.2f;
 
 	return aabb;
 }
@@ -396,6 +411,46 @@ void RoomBase::PlaceMapTile(bool isLeader)
 		std::string fileName;
 		float scale = 1.0;
 	};
+
+	//{
+	//	ModelObject* test = new ModelObject("Data/Model/DungeonAssets/WALL.glb", 1, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON);
+	//	test->SetShader("WALL", ModelShaderDX12Id::ToonInstancing);
+
+	//	DirectX::XMFLOAT3 pos[] =
+	//	{
+	//		{0,0,0},
+	//		{0,0,0},
+	//		{3.5f,0,-4},
+	//		{3.5f,0,-4},
+	//	};
+
+	//	float angleY = 0;
+	//	DirectX::XMMATRIX LeftHandScaling = DirectX::XMMatrixScaling(-1, 1, 1);
+	//	for (int i = 0; i < 4; ++i)
+	//	{
+	//		int id = test->GetModel()->AllocateInstancingIndex();
+	//		if (id < 0) continue;
+
+	//		// スケール行列生成
+	//		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1, 1, 1);
+	//		// 回転行列生成
+	//		DirectX::XMMATRIX X = DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(90));
+	//		DirectX::XMMATRIX Y = DirectX::XMMatrixRotationY(DirectX::XMConvertToRadians(angleY));
+	//		DirectX::XMMATRIX Z = DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(0));
+	//		DirectX::XMMATRIX R = X * Y * Z;
+	//		// 位置行列生成
+	//		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(pos[i].x, pos[i].y, pos[i].z);
+
+	//		DirectX::XMMATRIX W = (S * R * T) * LeftHandScaling;
+
+	//		DirectX::XMFLOAT4X4 tm;
+	//		DirectX::XMStoreFloat4x4(&tm, W);
+	//		test->GetModel()->UpdateTransform(id, tm);
+
+	//		angleY += 90;
+	//	}
+	//	MAPTILES.Register(test);
+	//}
 
 	for (uint8_t tileType = TileType::FLOOR_01A; tileType < TileType::TILETYPE_COUNT; tileType++)
 	{
@@ -411,6 +466,7 @@ void RoomBase::PlaceMapTile(bool isLeader)
 		case TileType::WALL_01A:
 			colliderFileNames.emplace_back("Data/Model/DungeonAssets/WallCollision_01a.glb", 4.0f);
 			modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Wall_Pattern_01a.glb", 4.0f);
+			//modelFileNames.emplace_back("Data/Model/DungeonAssets/WALL.glb", 1.0f);
 			break;
 		case TileType::STAIR_STEP_01A:
 			colliderFileNames.emplace_back("Data/Model/DungeonAssets/SlopeCollision_01a.glb", 4.0f);
@@ -422,40 +478,62 @@ void RoomBase::PlaceMapTile(bool isLeader)
 
 		// インスタンシング
 		//if (T_GRAPHICS.isDX12Active)
+		////if (tileType != TileType::WALL_01A)
 		//{
-		//	std::filesystem::path filePath = modelFileNames.at(0).fileName;
+		//	FILE_DATA fileData = { modelFileNames.at(0).fileName, modelFileNames.at(0).scale };
+
+		//	std::filesystem::path filePath = fileData.fileName;
 		//	std::string fileNameStr = filePath.stem().string();
 		//	const char* fileName = fileNameStr.c_str();
 
-		//	ModelObject* model = new ModelObject(modelFileNames.at(0).fileName.c_str(), modelFileNames.at(0).scale, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON);
-		//	model->SetShader(fileName, ModelShaderDX12Id::ToonInstancing);
+		//	ModelObject* instancingModel = new ModelObject(
+		//		fileData.fileName.c_str(),
+		//		fileData.scale,
+		//		ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON);
+		//	instancingModel->SetShader(fileName, ModelShaderDX12Id::ToonInstancing);
 
-		//	for (int i = 0; i < m_tileDatas.at(tileType).size(); i++)
+		//	DirectX::XMMATRIX LeftHandScaling = DirectX::XMMatrixScaling(-1, 1, 1);
+
+		//	for (int i = 0; i < m_tileDatas.at(tileType).size(); ++i)
 		//	{
-		//		int modelScale = (1.0f / modelFileNames.at(0).scale);
-
-		//		// 使われていないIDを取得して利用
-		//		int id = model->GetModel()->AllocateInstancingIndex();
+		//		int id = instancingModel->GetModel()->AllocateInstancingIndex();
 		//		if (id < 0) continue;
 
-		//		DirectX::XMFLOAT3 position = m_tileDatas.at(tileType).at(i).position;
+		//		DirectX::XMFLOAT3 position = m_tileDatas.at(tileType).at(i).position + m_position;
 		//		DirectX::XMFLOAT3 angle = m_tileDatas.at(tileType).at(i).angle;
 		//		DirectX::XMFLOAT3 scale = m_tileDatas.at(tileType).at(i).scale;
 
-		//		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
-		//		DirectX::XMMATRIX R = AnglesToMatrix({ angle.x, angle.z, angle.y });
-		//		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(-position.x * 0.25f, position.y * 0.25f, position.z * 0.25f);
+		//		// 床ならangleX = 0.0f
+		//		// 壁ならangleX = 90.0f
+		//		// angleYをマイナスに
+		//		// positionXをマイナスに
 
-		//		DirectX::XMMATRIX LocalTransform = S * R * T;
+		//		// スケール行列生成
+		//		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x * fileData.scale, scale.y * fileData.scale, scale.z * fileData.scale);
+		//		// 回転行列生成
+		//		float angleX = 0.0f;
+		//		DirectX::XMMATRIX R = DirectX::XMMatrixIdentity();
+		//		if (tileType == TileType::WALL_01A)
+		//		{
+		//			angleX = 0.0f;
+		//			DirectX::XMMATRIX X = DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(angleX));
+		//			//DirectX::XMMATRIX Y = DirectX::XMMatrixRotationY(-angle.y);
+		//			DirectX::XMMATRIX Y = DirectX::XMMatrixRotationY(0);
+		//			//DirectX::XMMATRIX Z = DirectX::XMMatrixRotationZ(angle.z);
+		//			DirectX::XMMATRIX Z = DirectX::XMMatrixRotationZ(0);
+
+		//			R = X * Y * Z;
+		//		}
+		//		// 位置行列生成
+		//		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(-position.x, position.y, position.z);
+
+		//		DirectX::XMMATRIX W = (S * R * T) * LeftHandScaling;
 
 		//		DirectX::XMFLOAT4X4 tm;
-		//		DirectX::XMStoreFloat4x4(&tm, LocalTransform);
-
-		//		model->GetModel()->UpdateTransform(id, tm);
-
-		//		if (tileType == TileType::WALL_01A) instancingTransforms.emplace_back(model->GetModel()->GetTransform(id));
+		//		DirectX::XMStoreFloat4x4(&tm, W);
+		//		instancingModel->GetModel()->UpdateTransform(id, tm);
 		//	}
-		//	MAPTILES.Register(model);
+		//	MAPTILES.Register(instancingModel);
 		//}
 		//else
 		{
@@ -505,7 +583,7 @@ void RoomBase::PlaceMapTile(bool isLeader)
 			colliderTile->SetAngle(tileData.angle);
 			colliderTile->SetScale(tileData.scale);
 			colliderTile->Update(0);
-			colliderTile->Hide();
+			//colliderTile->Hide();
 			MAPTILES.Register(colliderTile);
 		}
 	}

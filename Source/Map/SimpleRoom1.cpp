@@ -28,34 +28,103 @@ SimpleRoom1::SimpleRoom1(
 
 void SimpleRoom1::LoadMapData()
 {
-	// 接続点データを設定
-	{
-		TILE_DATA newPoint;
-		newPoint.position = DirectX::XMFLOAT3(12.0f, 0.0f, 8.0f);
-		newPoint.angle = m_angle + DirectX::XMFLOAT3(0.0f, DirectX::XMConvertToRadians(90.0f), 0.0f);
+	nlohmann::json loadFile;
+	std::ifstream ifs("Data/RoomDatas/SimpleRoom1.json");
 
-		// ワールド座標に変換し保存
-		DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&m_transform);
-		DirectX::XMVECTOR PointPos = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&newPoint.position), WorldTransform);
-		DirectX::XMStoreFloat3(&newPoint.position, PointPos);
-		m_connectPointDatas.emplace_back(newPoint);
+	if (ifs.is_open())
+	{
+		ifs >> loadFile;
+
+		// ノードデータロード
+		for (const auto& nodeData : loadFile["NodeDatas"])
+		{
+			TileType tileType = nodeData["Type"];
+
+			switch (tileType)
+			{
+			case ns_RoomData::PORTAL: continue;
+			case ns_RoomData::SPAWNER: continue;
+			case ns_RoomData::CONNECTPOINT:
+			{
+				DirectX::XMFLOAT3 position = {
+					nodeData["Position"].at(0),
+					nodeData["Position"].at(1),
+					nodeData["Position"].at(2)
+				};
+				DirectX::XMFLOAT3 angle = {
+					nodeData["Angle"].at(0),
+					nodeData["Angle"].at(1),
+					nodeData["Angle"].at(2)
+				};
+
+				TILE_DATA newPoint;
+				newPoint.position = DirectX::XMFLOAT3(position);
+				newPoint.angle = m_angle + angle;
+
+				// ワールド座標に変換し保存
+				DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&m_transform);
+				DirectX::XMVECTOR PointPos = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&newPoint.position), WorldTransform);
+				DirectX::XMStoreFloat3(&newPoint.position, PointPos);
+				m_connectPointDatas.emplace_back(newPoint);
+			}
+			continue;
+
+			default:
+				break;
+			}
+
+			DirectX::XMFLOAT3 position = {
+				nodeData["Position"].at(0),
+				nodeData["Position"].at(1),
+				nodeData["Position"].at(2)
+			};
+			DirectX::XMFLOAT3 angle = {
+				nodeData["Angle"].at(0),
+				nodeData["Angle"].at(1),
+				nodeData["Angle"].at(2)
+			};
+			DirectX::XMFLOAT3 scale = {
+				nodeData["Scale"].at(0),
+				nodeData["Scale"].at(1),
+				nodeData["Scale"].at(2),
+			};
+
+			m_tileDatas.at(tileType).emplace_back(TILE_DATA(
+				position,
+				angle,
+				scale));
+		}
+		ifs.close();
 	}
 
-	{
-		TILE_DATA newPoint;
-		newPoint.position = DirectX::XMFLOAT3(-12.0f, 0.0f, 8.0f);
-		newPoint.angle = m_angle + DirectX::XMFLOAT3(0.0f, DirectX::XMConvertToRadians(-90.0f), 0.0f);
+	//// 接続点データを設定
+	//{
+	//	TILE_DATA newPoint;
+	//	newPoint.position = DirectX::XMFLOAT3(12.0f, 0.0f, 8.0f);
+	//	newPoint.angle = m_angle + DirectX::XMFLOAT3(0.0f, DirectX::XMConvertToRadians(90.0f), 0.0f);
 
-		// ワールド座標に変換し保存
-		DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&m_transform);
-		DirectX::XMVECTOR PointPos = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&newPoint.position), WorldTransform);
-		DirectX::XMStoreFloat3(&newPoint.position, PointPos);
-		m_connectPointDatas.emplace_back(newPoint);
-	}
+	//	// ワールド座標に変換し保存
+	//	DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&m_transform);
+	//	DirectX::XMVECTOR PointPos = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&newPoint.position), WorldTransform);
+	//	DirectX::XMStoreFloat3(&newPoint.position, PointPos);
+	//	m_connectPointDatas.emplace_back(newPoint);
+	//}
 
-	DirectX::XMFLOAT4 floorColor = { 0.8f, 0.8f, 0.8f, 1.0f };
-	DirectX::XMFLOAT4 wallColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-	DirectX::XMFLOAT4 pillarColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+	//{
+	//	TILE_DATA newPoint;
+	//	newPoint.position = DirectX::XMFLOAT3(-12.0f, 0.0f, 8.0f);
+	//	newPoint.angle = m_angle + DirectX::XMFLOAT3(0.0f, DirectX::XMConvertToRadians(-90.0f), 0.0f);
+
+	//	// ワールド座標に変換し保存
+	//	DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&m_transform);
+	//	DirectX::XMVECTOR PointPos = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&newPoint.position), WorldTransform);
+	//	DirectX::XMStoreFloat3(&newPoint.position, PointPos);
+	//	m_connectPointDatas.emplace_back(newPoint);
+	//}
+
+	//DirectX::XMFLOAT4 floorColor = { 0.8f, 0.8f, 0.8f, 1.0f };
+	//DirectX::XMFLOAT4 wallColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+	//DirectX::XMFLOAT4 pillarColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 	//m_tileDatas.at(TileType::FLOOR_01A).emplace_back(TILE_DATA(
 	//	{ 0.0f, 0.0f, 0.0f },
@@ -100,41 +169,6 @@ void SimpleRoom1::LoadMapData()
 	//	{ 0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f },
 	//	{ 1.0f, 1.0f, 1.0f },
 	//	floorColor));
-
-	nlohmann::json loadFile;
-	std::ifstream ifs("Data/RoomDatas/SimpleRoom1.json");
-
-	if (ifs.is_open())
-	{
-		ifs >> loadFile;
-
-		// ノードデータロード
-		for (const auto& nodeData : loadFile["NodeDatas"])
-		{
-			TileType tileType = nodeData["Type"];
-			DirectX::XMFLOAT3 position = {
-				nodeData["Position"].at(0),
-				nodeData["Position"].at(1),
-				nodeData["Position"].at(2)
-			};
-			DirectX::XMFLOAT3 angle = {
-				nodeData["Angle"].at(0),
-				nodeData["Angle"].at(1),
-				nodeData["Angle"].at(2)
-			};
-			DirectX::XMFLOAT3 scale = {
-				nodeData["Scale"].at(0),
-				nodeData["Scale"].at(1),
-				nodeData["Scale"].at(2),
-			};
-
-			m_tileDatas.at(tileType).emplace_back(TILE_DATA(
-				position,
-				angle,
-				scale));
-		}
-		ifs.close();
-	}
 
 	//m_tileDatas.at(TileType::WALL_01A).emplace_back(TILE_DATA(
 	//	{ -2.0f, 0.0f, -2.0f },

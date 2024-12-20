@@ -1,5 +1,11 @@
 #include "DungeonData.h"
 
+#include "TAKOEngine/Runtime/tentacle_lib.h"
+#include "TAKOEngine/Network/HttpRequest.h"
+#include "TAKOEngine/Network/WinSock2Wrapper.h"
+
+#include <fstream>
+
 DungeonData::DungeonData()
 {
 	// 初期化
@@ -29,11 +35,29 @@ void DungeonData::InitRoomGenerateSettings()
 		setting.aabb.position = { 0.0f, 3.0f, 8.0f };
 		setting.aabb.radii = { 10.0f, 3.0f, 6.0f };
 		setting.portalPosition = { 0.0f, 10000.0f, 0.0f };
-		//setting.placementCandidates.emplace_back(RoomType::SIMPLE_ROOM_1);
-		setting.placementCandidates.emplace_back(RoomType::CROSS_ROOM_1);
-		setting.placementCandidates.emplace_back(RoomType::CROSS_ROOM_2);
-		setting.placementCandidates.emplace_back(RoomType::END_ROOM);
-		setting.placementCandidates.emplace_back(RoomType::PASSAGE_1);
+		setting.placementCandidates.emplace_back(RoomType::SIMPLE_ROOM_1);
+		//setting.placementCandidates.emplace_back(RoomType::CROSS_ROOM_1);
+		//setting.placementCandidates.emplace_back(RoomType::CROSS_ROOM_2);
+		//setting.placementCandidates.emplace_back(RoomType::END_ROOM);
+		//setting.placementCandidates.emplace_back(RoomType::PASSAGE_1);
+
+		// ファイルロード
+		nlohmann::json loadFile;
+		std::ifstream ifs("Data/RoomDatas/SimpleRoom1.json");
+
+		if (ifs.is_open())
+		{
+			ifs >> loadFile;
+
+			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
+			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
+			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
+			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
+			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
+			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
+
+			ifs.close();
+		}
 
 		m_roomGenerateSettings.at(SIMPLE_ROOM_1) = setting;
 	}
@@ -105,7 +129,7 @@ void DungeonData::InitRoomGenerateSettings()
 
 void DungeonData::InitDungeonGenerateSetting()
 {
-	m_dungeonGenerateSetting.maxDepth = 4;
+	m_dungeonGenerateSetting.maxDepth = 1;
 }
 
 void DungeonData::InitModelFileDatas()

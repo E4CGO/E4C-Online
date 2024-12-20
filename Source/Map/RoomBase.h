@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "TAKOEngine/Rendering/DebugRenderer/CubeRenderer.h"
 #include "Map/DungeonData.h"
 #include <vector>
 
@@ -34,6 +35,32 @@ public:
 		for (RoomBase* child : childs)
 		{
 			child->Update(elapsedTime);
+		}
+	}
+
+	virtual void Render(const RenderContextDX12 rc)
+	{
+		{
+			DirectX::XMFLOAT3 aabbDrawPos;
+			aabbDrawPos = {
+				m_aabb.position.x - (m_aabb.radii.x * 0.5f),
+				m_aabb.position.y - (m_aabb.radii.y * 0.5f),
+				m_aabb.position.z - (m_aabb.radii.z * 0.5f),
+			};
+			m_debugCube->SetCube(aabbDrawPos, m_aabb.radii, { 1.0f, 1.0f, 1.0f, 1.0f });
+			//m_debugCube->Render(rc);
+		}
+
+		for (const AABB& d_aabb : m_debugAABBs)
+		{
+			DirectX::XMFLOAT3 d_aabbPos;
+			d_aabbPos = {
+				d_aabb.position.x - (d_aabb.radii.x * 0.5f),
+				d_aabb.position.y - (d_aabb.radii.y * 0.5f),
+				d_aabb.position.z - (d_aabb.radii.z * 0.5f),
+			};
+			m_debugDebugCube->SetCube(d_aabbPos, d_aabb.radii, { 1.0f, 0.0f, 0.0f, 1.0f });
+			//m_debugDebugCube->Render(rc);
 		}
 	}
 
@@ -186,6 +213,11 @@ protected:
 	};
 
 	std::vector<std::vector<TILE_DATA>> m_tileDatas;
+
+	std::unique_ptr<CubeRenderer> m_debugCube;
+
+	std::unique_ptr<CubeRenderer> m_debugDebugCube;
+	std::vector<AABB> m_debugAABBs;
 
 	//std::vector<TILE_DATA> m_tileDatas;
 	std::vector<TILE_DATA> m_connectPointDatas;

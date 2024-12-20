@@ -65,40 +65,6 @@ void SceneRoomTest_E4C::Initialize()
 	m_cameraController = std::make_unique<FreeCameraController>();
 	m_cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
 	m_cameraController->SetEnable(true);
-
-	Console::Instance().Open();
-
-	nlohmann::json loadFile;
-	std::ifstream ifs("Data/RoomDatas/SimpleRoom1.json");
-
-	if (ifs.is_open())
-	{
-		ifs >> loadFile;
-
-		// 部屋の生成設定をロード
-		roomSetting.weight = loadFile["RoomSetting"]["Weight"];
-		roomSetting.aabb.position.x = loadFile["RoomSetting"]["AABB"].at(0);
-		roomSetting.aabb.position.y = loadFile["RoomSetting"]["AABB"].at(1);
-		roomSetting.aabb.position.z = loadFile["RoomSetting"]["AABB"].at(2);
-
-		// ノードデータロード
-		for (const auto& nodeData : loadFile["NodeDatas"])
-		{
-			// タイプによって処理を分ける
-			TileType tileType = nodeData["Type"];
-
-			switch (tileType)
-			{
-			case PORTAL:			continue;
-			case SPAWNER:			LoadSpawnerData(nodeData);	break;
-			case CONNECTPOINT:		continue;
-			case TILETYPE_COUNT:	continue;
-			default:				LoadTileNodeData(nodeData);	break;
-			}
-		}
-
-		ifs.close();
-	}
 }
 
 void SceneRoomTest_E4C::Finalize()
@@ -141,9 +107,9 @@ void SceneRoomTest_E4C::Render()
 	// AABB描画
 	DirectX::XMFLOAT3 aabbDrawPos;
 	aabbDrawPos = {
-		roomSetting.aabb.position.x - (roomSetting.aabb.radii.x * 0.5f),
-		roomSetting.aabb.position.y - (roomSetting.aabb.radii.y * 0.5f),
-		roomSetting.aabb.position.z - (roomSetting.aabb.radii.z * 0.5f),
+		roomSetting.aabb.position.x/* - (roomSetting.aabb.radii.x * 0.5f)*/,
+		roomSetting.aabb.position.y/* - (roomSetting.aabb.radii.y * 0.5f)*/,
+		roomSetting.aabb.position.z/* - (roomSetting.aabb.radii.z * 0.5f)*/,
 	};
 	T_GRAPHICS.GetDebugRenderer()->DrawCube(aabbDrawPos, roomSetting.aabb.radii, { 1.0f, 1.0f, 1.0f, 1.0f });
 	//DirectX::XMFLOAT3 p = { 1.0f, 1.0f, 1.0f };
@@ -245,6 +211,9 @@ void SceneRoomTest_E4C::LoadRoomData()
 	ofn.lpstrInitialDir = NULL;
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_OVERWRITEPROMPT;
 
+	// ノードデータ一次保管用
+	std::vector<IMPORT_DATA> importDatas;
+
 	// ファイルから読み込み
 	if (GetOpenFileNameA(&ofn) == TRUE)
 	{
@@ -259,24 +228,46 @@ void SceneRoomTest_E4C::LoadRoomData()
 
 			// 部屋の生成設定をロード
 			roomSetting.weight = loadFile["RoomSetting"]["Weight"];
-			roomSetting.aabb.position.x = loadFile["RoomSetting"]["AABB"].at(0);
-			roomSetting.aabb.position.y = loadFile["RoomSetting"]["AABB"].at(1);
-			roomSetting.aabb.position.z = loadFile["RoomSetting"]["AABB"].at(2);
+			roomSetting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
+			roomSetting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
+			roomSetting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
+			roomSetting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
+			roomSetting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
+			roomSetting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
 
 			// ノードデータロード
 			for (const auto& nodeData : loadFile["NodeDatas"])
 			{
-				// タイプによって処理を分ける
 				TileType tileType = nodeData["Type"];
+				DirectX::XMFLOAT3 position = {
+					nodeData["Position"].at(0),
+					nodeData["Position"].at(1),
+					nodeData["Position"].at(2)
+				};
+				DirectX::XMFLOAT3 angle = {
+					nodeData["Angle"].at(0),
+					nodeData["Angle"].at(1),
+					nodeData["Angle"].at(2)
+				};
+				DirectX::XMFLOAT3 scale = {
+					nodeData["Scale"].at(0),
+					nodeData["Scale"].at(1),
+					nodeData["Scale"].at(2),
+				};
 
-				switch (tileType)
-				{
-				case PORTAL:			continue;
-				case SPAWNER:			LoadSpawnerData(nodeData);	break;
-				case CONNECTPOINT:		continue;
-				case TILETYPE_COUNT:	continue;
-				default:				LoadTileNodeData(nodeData);	break;
-				}
+				importDatas.emplace_back(position, angle, scale, tileType);
+
+				//// タイプによって処理を分ける
+				//TileType tileType = nodeData["Type"];
+
+				//switch (tileType)
+				//{
+				//case PORTAL:			continue;
+				//case SPAWNER:			LoadSpawnerData(nodeData);	break;
+				//case CONNECTPOINT:		continue;
+				//case TILETYPE_COUNT:	continue;
+				//default:				LoadTileNodeData(nodeData);	break;
+				//}
 			}
 
 			ifs.close();
@@ -285,6 +276,11 @@ void SceneRoomTest_E4C::LoadRoomData()
 
 	// 元のカレントディレクトリに戻す
 	SetCurrentDirectoryA(currentDirectory);
+
+	for (const IMPORT_DATA& data : importDatas)
+	{
+		AddTileNode("NewNode", data.type, data.position, data.angle, data.scale);
+	}
 }
 
 void SceneRoomTest_E4C::LoadTileNodeData(const auto& nodeData)
@@ -379,7 +375,11 @@ void SceneRoomTest_E4C::SaveRoomData()
 		// 部屋の生成設定
 		saveFile["RoomSetting"] = {
 			{ "Weight", roomSetting.weight },
-			{ "AABB", { roomSetting.aabb.position.x, roomSetting.aabb.position.y, roomSetting.aabb.position.z }},
+		};
+
+		saveFile["RoomSetting"]["AABB"] = {
+			{ "Position", { roomSetting.aabb.position.x, roomSetting.aabb.position.y, roomSetting.aabb.position.z }},
+			{ "Radii", { roomSetting.aabb.radii.x, roomSetting.aabb.radii.y, roomSetting.aabb.radii.z }}
 		};
 
 		// ノードデータ設定
@@ -433,11 +433,12 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 					if (ImGui::MenuItem("Wall01a"))			AddTileNode("Wall",		TileType::WALL_01A);
 					if (ImGui::MenuItem("StairStep01a"))	AddTileNode("Stair",	TileType::STAIR_STEP_01A);
 					if (ImGui::MenuItem("Portal"))			AddTileNode("Portal",	TileType::PORTAL);
-					if (ImGui::MenuItem("ConnectPoint"))	AddTileNode("ConnectPoint",	TileType::CONNECTPOINT);
+					//if (ImGui::MenuItem("ConnectPoint"))	AddTileNode("ConnectPoint",	TileType::CONNECTPOINT);
 					ImGui::EndMenu();
 				}
 				if (ImGui::BeginMenu("ObjectNode")) {
 					if (ImGui::MenuItem("Spawner"))	AddSpawner();
+					if (ImGui::MenuItem("ConnectPoint")) AddConnectPoint();
 					ImGui::EndMenu();
 				}
 				if (ImGui::BeginMenu("Template")) {
@@ -517,7 +518,22 @@ void SceneRoomTest_E4C::AddTileNode(
 {
 	FILE_DATA importData = DungeonData::Instance().GetModelFileDatas(type).at(0);
 
-	TileNode* newNode = new TileNode(NODES.GetUniqueName("NewNode"), type, importData.fileName.c_str(), importData.scale);
+	switch (type) {
+	case ns_RoomData::PORTAL: return;
+	case ns_RoomData::SPAWNER: return;
+	case ns_RoomData::CONNECTPOINT:
+	{
+		ConnectPointNode* newNode = new ConnectPointNode(NODES.GetUniqueName(name));
+		newNode->SetPosition(position);
+		newNode->SetAngle(angle);
+		NODES.Register(newNode);
+
+		selectionNode = newNode;
+	}
+	return;
+	}
+
+	TileNode* newNode = new TileNode(NODES.GetUniqueName(name), type, importData.fileName.c_str(), importData.scale);
 	newNode->SetPosition(position);
 	newNode->SetAngle(angle);
 	newNode->SetScale(scale);
@@ -535,6 +551,16 @@ void SceneRoomTest_E4C::AddSpawner()
 	// 追加したノードを選択させる
 	selectionNode = newNode;
 }
+
+void SceneRoomTest_E4C::AddConnectPoint()
+{
+	ConnectPointNode* newNode = new ConnectPointNode(NODES.GetUniqueName("ConnectPoint"));
+	NODES.Register(newNode);
+
+	// 追加したノードを選択させる
+	selectionNode = newNode;
+}
+
 
 void SceneRoomTest_E4C::DuplicateNode()
 {
@@ -816,4 +842,55 @@ std::string NodeManager::GetUniqueName(std::string name)
 
 	// 数字をカッコで囲んで返す
 	return name + "(" + std::to_string(nextNumber) + ")";
+}
+
+void ConnectPointNode::Render(const RenderContext& rc)
+{
+	// 継承元のRender呼び出し
+	ModelObject::Render(rc);
+
+	T_GRAPHICS.GetDebugRenderer()->SetSphere(position, 1.0f, { 1.0f, 1.0f, 1.0f, 1.0f });
+}
+
+Node* ConnectPointNode::Duplicate()
+{
+	ConnectPointNode* newNode = new ConnectPointNode(name);
+	newNode->SetPosition(this->position);
+	newNode->SetAngle(this->angle);
+	newNode->SetScale(this->scale);
+
+	return newNode;
+}
+
+void ConnectPointNode::DrawDebugGUI()
+{
+	ImGui::Text("Type: CONNECTPOINT");
+
+	// name
+	{
+		std::string inputName = name;
+		if (ImGui::InputText("Name", inputName.data(), 256))
+		{
+			std::string newName = inputName.c_str();
+
+			// 正規表現も行ってからセットする
+			name = NODES.GetUniqueName(newName);
+		}
+	}
+
+	// pos
+	ImGui::DragFloat3("Position", &position.x, 0.1f);
+	// angle
+	DirectX::XMFLOAT3 debugAngle = angle;
+	debugAngle.x = DirectX::XMConvertToDegrees(debugAngle.x);
+	debugAngle.y = DirectX::XMConvertToDegrees(debugAngle.y);
+	debugAngle.z = DirectX::XMConvertToDegrees(debugAngle.z);
+	if (ImGui::DragFloat3("Angle", &debugAngle.x, 1.0f))
+	{
+		angle.x = DirectX::XMConvertToRadians(debugAngle.x);
+		angle.y = DirectX::XMConvertToRadians(debugAngle.y);
+		angle.z = DirectX::XMConvertToRadians(debugAngle.z);
+	}
+	// scale
+	ImGui::DragFloat3("Scale", &scale.x, 0.1f);
 }

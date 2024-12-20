@@ -76,7 +76,7 @@ namespace ns_RoomData
 		DirectX::XMFLOAT4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	};
 
-	// ファイル読み込み用データ
+	// モデルファイル読み込み用データ
 	struct FILE_DATA
 	{
 		std::string fileName = "";
