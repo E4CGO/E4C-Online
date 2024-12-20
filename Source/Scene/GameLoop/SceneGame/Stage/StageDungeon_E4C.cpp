@@ -352,7 +352,10 @@ void StageDungeon_E4C::Update(float elapsedTime)
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
 	}
 
-	//PlayerCharacterManager::Instance().GetPlayerCharacterById()->SetKinematic(true);
+	for (auto& model : PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetModels())
+	{
+		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
+	}
 
 	timer += elapsedTime;
 }
@@ -409,6 +412,7 @@ void StageDungeon_E4C::RenderDX12()
 
 		// シャドウマップ
 		{
+			// TODO: 影
 			//T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
 			rc.shadowMap.shadow_srv_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSRV();
 			rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();

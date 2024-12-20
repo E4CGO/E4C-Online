@@ -32,6 +32,14 @@ void SceneCharacter_E4C::Initialize()
 			modelPreLoad.insert(RESOURCE.LoadModelResource(filename));
 		}
 	}
+	else
+	{
+		// Model Resource Preload
+		for (auto& filename : modelList)
+		{
+			modelPreLoad.insert(RESOURCE.LoadModelDX12Resource(filename));
+		}
+	}
 
 	//シャドウマップレンダラ
 	shadowMapRenderer->Initialize();
