@@ -477,65 +477,64 @@ void RoomBase::PlaceMapTile(bool isLeader)
 		}
 
 		// インスタンシング
-		//if (T_GRAPHICS.isDX12Active)
-		////if (tileType != TileType::WALL_01A)
-		//{
-		//	FILE_DATA fileData = { modelFileNames.at(0).fileName, modelFileNames.at(0).scale };
+		if (T_GRAPHICS.isDX12Active && tileType != TileType::WALL_01A)
+		{
+			FILE_DATA fileData = { modelFileNames.at(0).fileName, modelFileNames.at(0).scale };
 
-		//	std::filesystem::path filePath = fileData.fileName;
-		//	std::string fileNameStr = filePath.stem().string();
-		//	const char* fileName = fileNameStr.c_str();
+			std::filesystem::path filePath = fileData.fileName;
+			std::string fileNameStr = filePath.stem().string();
+			const char* fileName = fileNameStr.c_str();
 
-		//	ModelObject* instancingModel = new ModelObject(
-		//		fileData.fileName.c_str(),
-		//		fileData.scale,
-		//		ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON);
-		//	instancingModel->SetShader(fileName, ModelShaderDX12Id::ToonInstancing);
+			ModelObject* instancingModel = new ModelObject(
+				fileData.fileName.c_str(),
+				fileData.scale,
+				ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON);
+			instancingModel->SetShader(fileName, ModelShaderDX12Id::ToonInstancing);
 
-		//	DirectX::XMMATRIX LeftHandScaling = DirectX::XMMatrixScaling(-1, 1, 1);
+			DirectX::XMMATRIX LeftHandScaling = DirectX::XMMatrixScaling(-1, 1, 1);
 
-		//	for (int i = 0; i < m_tileDatas.at(tileType).size(); ++i)
-		//	{
-		//		int id = instancingModel->GetModel()->AllocateInstancingIndex();
-		//		if (id < 0) continue;
+			for (int i = 0; i < m_tileDatas.at(tileType).size(); ++i)
+			{
+				int id = instancingModel->GetModel()->AllocateInstancingIndex();
+				if (id < 0) continue;
 
-		//		DirectX::XMFLOAT3 position = m_tileDatas.at(tileType).at(i).position + m_position;
-		//		DirectX::XMFLOAT3 angle = m_tileDatas.at(tileType).at(i).angle;
-		//		DirectX::XMFLOAT3 scale = m_tileDatas.at(tileType).at(i).scale;
+				DirectX::XMFLOAT3 position = m_tileDatas.at(tileType).at(i).position;
+				DirectX::XMFLOAT3 angle = m_tileDatas.at(tileType).at(i).angle;
+				DirectX::XMFLOAT3 scale = m_tileDatas.at(tileType).at(i).scale;
 
-		//		// 床ならangleX = 0.0f
-		//		// 壁ならangleX = 90.0f
-		//		// angleYをマイナスに
-		//		// positionXをマイナスに
+				// 床ならangleX = 0.0f
+				// 壁ならangleX = 90.0f
+				// angleYをマイナスに
+				// positionXをマイナスに
 
-		//		// スケール行列生成
-		//		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x * fileData.scale, scale.y * fileData.scale, scale.z * fileData.scale);
-		//		// 回転行列生成
-		//		float angleX = 0.0f;
-		//		DirectX::XMMATRIX R = DirectX::XMMatrixIdentity();
-		//		if (tileType == TileType::WALL_01A)
-		//		{
-		//			angleX = 0.0f;
-		//			DirectX::XMMATRIX X = DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(angleX));
-		//			//DirectX::XMMATRIX Y = DirectX::XMMatrixRotationY(-angle.y);
-		//			DirectX::XMMATRIX Y = DirectX::XMMatrixRotationY(0);
-		//			//DirectX::XMMATRIX Z = DirectX::XMMatrixRotationZ(angle.z);
-		//			DirectX::XMMATRIX Z = DirectX::XMMatrixRotationZ(0);
+				// スケール行列生成
+				DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x * fileData.scale, scale.y * fileData.scale, scale.z * fileData.scale);
+				// 回転行列生成
+				float angleX = 0.0f;
+				DirectX::XMMATRIX R = DirectX::XMMatrixIdentity();
+				if (tileType == TileType::WALL_01A)
+				{
+					angleX = 0.0f;
+					DirectX::XMMATRIX X = DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(angleX));
+					DirectX::XMMATRIX Y = DirectX::XMMatrixRotationY(angle.y);
+					DirectX::XMMATRIX Z = DirectX::XMMatrixRotationZ(angle.z);
 
-		//			R = X * Y * Z;
-		//		}
-		//		// 位置行列生成
-		//		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(-position.x, position.y, position.z);
+					R = X * Y * Z;
+				}
+				// 位置行列生成
+				DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(-position.x, position.y, position.z);
 
-		//		DirectX::XMMATRIX W = (S * R * T) * LeftHandScaling;
+				DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&m_transform);
 
-		//		DirectX::XMFLOAT4X4 tm;
-		//		DirectX::XMStoreFloat4x4(&tm, W);
-		//		instancingModel->GetModel()->UpdateTransform(id, tm);
-		//	}
-		//	MAPTILES.Register(instancingModel);
-		//}
-		//else
+				DirectX::XMMATRIX W = (S * R * T) * P * LeftHandScaling;
+
+				DirectX::XMFLOAT4X4 tm;
+				DirectX::XMStoreFloat4x4(&tm, W);
+				instancingModel->GetModel()->UpdateTransform(id, tm);
+			}
+			MAPTILES.Register(instancingModel);
+		}
+		else
 		{
 			for (const TILE_DATA& tileData : m_tileDatas.at(tileType))
 			{
@@ -583,7 +582,7 @@ void RoomBase::PlaceMapTile(bool isLeader)
 			colliderTile->SetAngle(tileData.angle);
 			colliderTile->SetScale(tileData.scale);
 			colliderTile->Update(0);
-			//colliderTile->Hide();
+			colliderTile->Hide();
 			MAPTILES.Register(colliderTile);
 		}
 	}

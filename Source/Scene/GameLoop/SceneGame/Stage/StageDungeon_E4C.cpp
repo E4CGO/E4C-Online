@@ -194,7 +194,7 @@ void StageDungeon_E4C::Initialize()
 
 	// プレイヤー
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
-	player->SetPosition({ 0.0f, 5.0f, 0.0f });
+	player->SetPosition({ 0.0f, 5.0f, 2.0f });
 	player->GetStateMachine()->ChangeState(PlayerCharacter::STATE::IDLE);
 
 	// カメラ設定
@@ -219,6 +219,10 @@ void StageDungeon_E4C::Initialize()
 
 	m_roomOrder.emplace_back(RoomType::SIMPLE_ROOM_1);
 	m_roomOrder.emplace_back(RoomType::SIMPLE_ROOM_1);
+	m_roomOrder.emplace_back(RoomType::SIMPLE_ROOM_1);
+	m_roomOrder.emplace_back(RoomType::DEAD_END);
+	m_roomOrder.emplace_back(RoomType::DEAD_END);
+	m_roomOrder.emplace_back(RoomType::SIMPLE_ROOM_1);
 	m_roomOrder.emplace_back(RoomType::DEAD_END);
 	m_roomOrder.emplace_back(RoomType::DEAD_END);
 	m_roomOrder.emplace_back(RoomType::SIMPLE_ROOM_1);
@@ -241,55 +245,6 @@ void StageDungeon_E4C::Initialize()
 	{
 		room->PlaceMapTile(isLeader);
 	}
-
-	// インスタンシングモデルテスト
-	{
-		//FILE_DATA fileData = DUNGEONDATA.GetModelFileDatas(TileType::WALL_01A).at(0);
-
-		//std::filesystem::path filePath = fileData.fileName;
-		//std::string fileNameStr = filePath.stem().string();
-		//const char* fileName = fileNameStr.c_str();
-
-		//ModelObject* instancingModel = new ModelObject(
-		//	fileData.fileName.c_str(),
-		//	fileData.scale,
-		//	ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON);
-		//instancingModel->SetShader(fileName, ModelShaderDX12Id::ToonInstancing);
-
-		//float posY = 0;
-		//DirectX::XMMATRIX LeftHandScaling = DirectX::XMMatrixScaling(-1, 1, 1);
-		//for (int i = 0; i < 4; ++i)
-		//{
-		//	int id = instancingModel->GetModel()->AllocateInstancingIndex();
-		//	if (id < 0) continue;
-
-		//	// スケール行列生成
-		//	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1, 1, 1);
-		//	// 回転行列生成
-		//	DirectX::XMMATRIX X = DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(0));
-		//	DirectX::XMMATRIX Y = DirectX::XMMatrixRotationY(DirectX::XMConvertToRadians(0));
-		//	DirectX::XMMATRIX Z = DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(0));
-		//	DirectX::XMMATRIX R = X * Y * Z;
-		//	// 位置行列生成
-		//	DirectX::XMFLOAT3 position = { 0.0f, posY, 0.0f };
-		//	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x * 0.25f, position.y * 0.25f, position.z * 0.25f);
-
-		//	DirectX::XMMATRIX W = (S * R * T) * LeftHandScaling;
-
-		//	DirectX::XMFLOAT4X4 tm;
-		//	DirectX::XMStoreFloat4x4(&tm, W);
-		//	instancingModel->GetModel()->UpdateTransform(id, tm);
-
-		//	posY += 2.0f;
-		//}
-		//MAPTILES.Register(instancingModel);
-	}
-
-	//MapTile* stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
-	//stage_collision->SetPosition({ 0.0f, -1.0f, 0.0f });
-	//stage_collision->Update(0);
-	//stage_collision->SetCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
-	//MAPTILES.Register(stage_collision);
 
 	// 部屋の当たり判定を設定
 	MAPTILES.CreateSpatialIndex(5, 7);

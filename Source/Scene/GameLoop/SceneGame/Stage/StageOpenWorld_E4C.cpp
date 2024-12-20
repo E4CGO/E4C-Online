@@ -159,7 +159,7 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 
 	spawner->Update(elapsedTime);
 
-	test->Update(elapsedTime);
+	//test->Update(elapsedTime);
 	teleporter->Update(elapsedTime);
 
 	timer += elapsedTime;

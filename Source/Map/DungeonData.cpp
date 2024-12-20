@@ -49,12 +49,12 @@ void DungeonData::InitRoomGenerateSettings()
 		{
 			ifs >> loadFile;
 
-			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
-			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
-			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
-			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
-			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
-			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
+			//setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
+			//setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
+			//setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
+			//setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
+			//setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
+			//setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
 
 			ifs.close();
 		}

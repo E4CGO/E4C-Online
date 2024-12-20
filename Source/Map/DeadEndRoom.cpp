@@ -22,13 +22,13 @@ DeadEndRoom::DeadEndRoom(
 
 void DeadEndRoom::LoadMapData()
 {
-	// 行き止まりの壁だけ設置する
-	m_tileDatas.at(TileType::WALL_01A).emplace_back(TILE_DATA(
-		{ -2.0f, 0.0f, -2.0f },
-		{ 0.0f, DirectX::XMConvertToRadians(270.0f), 0.0f },
-		{ 1.0f, 1.0f, 1.0f }));
-	m_tileDatas.at(TileType::WALL_01A).emplace_back(TILE_DATA(
-		{ -2.0f, 3.0f, -2.0f },
-		{ 0.0f, DirectX::XMConvertToRadians(270.0f), 0.0f },
-		{ 1.0f, 1.0f, 1.0f }));
+	//// 行き止まりの壁だけ設置する
+	//m_tileDatas.at(TileType::WALL_01A).emplace_back(TILE_DATA(
+	//	{ -2.0f, 0.0f, -2.0f },
+	//	{ 0.0f, DirectX::XMConvertToRadians(270.0f), 0.0f },
+	//	{ 1.0f, 1.0f, 1.0f }));
+	//m_tileDatas.at(TileType::WALL_01A).emplace_back(TILE_DATA(
+	//	{ -2.0f, 3.0f, -2.0f },
+	//	{ 0.0f, DirectX::XMConvertToRadians(270.0f), 0.0f },
+	//	{ 1.0f, 1.0f, 1.0f }));
 }
