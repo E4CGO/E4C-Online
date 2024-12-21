@@ -1,25 +1,24 @@
 ﻿#include "StageDungeon_E4C.h"
 #include "StageOpenWorld_E4C.h"
 
-#include "TAKOEngine/GUI/UIManager.h"
-
-#include "GameObject/GameObjectManager.h"
-
-#include "GameObject/ModelObject.h"
-#include "Scene/Stage/StageManager.h"
-#include "Scene/Stage/Stage.h"
-
 #include "Map/MapTileManager.h"
 #include "Map/MapTile.h"
 #include "Map/DungeonData.h"
 #include "Map/InstancingModelManager.h"
 
+#include "TAKOEngine/GUI/UIManager.h"
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Tool/GLTFImporter.h"
 #include "TAKOEngine/Tool/Timer.h"
 
-#include "GameObject/Character/Player/PlayerCharacterManager.h"
+#include "GameObject/GameObjectManager.h"
+#include "GameObject/ModelObject.h"
+#include "Scene/Stage/StageManager.h"
+#include "Scene/Stage/Stage.h"
 
+#include "GameObject/Character/Player/PlayerCharacterManager.h"
+#include "GameObject/Character/Enemy/EnemyManager.h"
+#include "GameObject/Props/Spawner.h"
 #include "GameObject/Props/Teleporter.h"
 
 #include "Network/OnlineController.h"
@@ -234,6 +233,10 @@ void StageDungeon_E4C::Initialize()
 	// 一番遠い部屋のうち、ランダムな一つを抽選しテレポーターを設置する
 	RoomBase* lastRoom = rootRoom->GetFarthestChild().at(std::rand() % rootRoom->GetFarthestChild().size());
 
+	Spawner* spawner = new Spawner(0, 5, 5);
+	spawner->SetPosition({ 0, 1, 0 });
+	GameObjectManager::Instance().Register(spawner);
+
 	TeleportToOpenworld* teleporter = new TeleportToOpenworld();
 	teleporter->SetPosition(lastRoom->GetCenterPos());
 	teleporter->SetAngle({ 90.0f * RADIAN1, 0.0f, 0.0f });
@@ -277,6 +280,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 
 	PlayerCharacterManager::Instance().Update(elapsedTime);
 	GameObjectManager::Instance().Update(elapsedTime);
+	ENEMIES.Update(elapsedTime);
 	MAPTILES.Update(elapsedTime);
 
 	if (T_INPUT.KeyDown(VK_MENU))
@@ -375,10 +379,8 @@ void StageDungeon_E4C::RenderDX12()
 
 		// モデル描画
 		PlayerCharacterManager::Instance().RenderDX12(rc);
-		//PlayerCharacterManager::Instance().GetPlayerCharacterById()->SetKinematic(true);
-
 		GameObjectManager::Instance().RenderDX12(rc);
-
+		ENEMIES.RenderDX12(rc);
 		MAPTILES.RenderDX12(rc);
 
 		for (RoomBase* room : rootRoom->GetAll())

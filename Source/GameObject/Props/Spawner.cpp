@@ -12,7 +12,7 @@
 *//***************************************************************************/
 Spawner::Spawner(uint8_t enemyType, int maxExistedEnemiesNum, int maxSpawnEnemiesNum) : m_enemyType(enemyType), m_maxExistedEnemiesNum(maxExistedEnemiesNum), m_maxSpawnedEnemiesNum(maxSpawnEnemiesNum), GameObject()
 {
-	
+	m_cylinderRenderer = std::make_unique<CylinderRenderer>(T_GRAPHICS.GetDeviceDX12(), 2);
 }
 
 /**************************************************************************//**
@@ -101,9 +101,15 @@ void Spawner::Render(const RenderContext& rc)
 
 void Spawner::RenderDX12(const RenderContextDX12& rc)
 {
-
 #ifdef _DEBUG
 	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, m_spawnRadius, 1.5f, { 1,0,0,1 });
 	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, m_searchRadius, 1.5f, { 1,0,1,1 });
+
+	m_cylinderRenderer->SetCylinder(position, m_spawnRadius, 1.0f, { 1, 0, 0, 0 });
+	m_cylinderRenderer->Render(rc);
+
+	m_cylinderRenderer->SetCylinder(position, m_searchRadius, 1.0f, { 1, 0, 0, 0 });
+	m_cylinderRenderer->Render(rc);
+
 #endif // DEBUG
 }

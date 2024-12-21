@@ -85,6 +85,18 @@ void StageOpenWorld_E4C::Initialize()
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
 	player->SetPosition({ 5.0f, 10.0f, 5.0f });
 
+	//{
+	//	Enemy* enemy = Enemy::EnemyFactory(0);
+	//	enemy->SetPosition({ 0, 5, 0 });
+	//	ENEMIES.Register(enemy);
+	//}
+
+	//{
+	//	Enemy* enemy = Enemy::EnemyFactory(1);
+	//	enemy->SetPosition({ 0, 5, 0 });
+	//	ENEMIES.Register(enemy);
+	//}
+
 	// カメラ設定
 	Camera* mainCamera = CameraManager::Instance().GetCamera();
 	mainCamera->SetPerspectiveFov(
