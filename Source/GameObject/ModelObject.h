@@ -48,7 +48,7 @@ public:
 	virtual ~ModelObject() = default;
 
 	// モデルを読み取り
-	void LoadModel(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE modelType = ModelObject::MODEL_TYPE::LHS_TOON);
+	void LoadModel(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE modelType = ModelObject::MODEL_TYPE::LHS_TOON);
 
 	void CleanModels();
 

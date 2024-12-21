@@ -17,7 +17,7 @@ public:
 	// コンストラクタ
 	Character() : ModelObject() {};
 	// コンストラクタ（引数付き）
-	Character(const char* filename, float scaling = 1.0f) : ModelObject(filename, scaling) {}
+	Character(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX11) : ModelObject(filename, scaling, renderMode) {}
 	// デストラクタ
 	virtual ~Character() = default;
 	// 更新処理
