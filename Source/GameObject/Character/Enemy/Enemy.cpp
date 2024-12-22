@@ -1,9 +1,10 @@
 #include "TAKOEngine/Tool/Mathf.h"
-
+#include "TAKOEngine/Physics/CollisionManager.h"
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Character/Enemy/Enemy.h"
 #include "GameObject/Character/Enemy/SkeletonMinion.h"
+#include "GameObject/Props/Spawner.h"
 
 Enemy::Enemy(const char* filename, float scaling) : Character(filename, scaling)
 {
@@ -20,20 +21,38 @@ Enemy::~Enemy()
 	delete stateMachine;
 	for (const std::pair<int, Collider*>& collider : colliders)
 	{
-		delete collider.second;
+		COLLISIONS.Remove(collider.second);
+		//delete collider.second;
 	}
 	for (const std::pair<int, Collider*>& collider : attackColliders)
 	{
-		delete collider.second;
+		COLLISIONS.Remove(collider.second);
+		//delete collider.second;
 	}
 	colliders.clear();
 	attackColliders.clear();
+
+	if (m_pSpawner != nullptr)
+	{
+		m_pSpawner->EnemyDestoryCallBack(this);
+	}
 }
 
 bool Enemy::MoveTo(float elapsedTime, const DirectX::XMFLOAT3& target)
 {
 	return Character::MoveTo(elapsedTime, target, moveSpeed, turnSpeed);
 }
+
+bool Enemy::IsAlive()
+{
+	if (hp >= 1)
+	{
+		return true;
+	}
+	return false;
+}
+
+
 void Enemy::TurnTo(float elapsedTime, const DirectX::XMFLOAT3& target)
 {
 	DirectX::XMFLOAT3 d = target - position;
@@ -45,7 +64,7 @@ PlayerCharacter* Enemy::GetClosestPlayer(float limit)
 	PlayerCharacter* result = nullptr;
 	limit *= limit;
 
-	for (PlayerCharacter*& player : PlayerCharacterManager::Instance().GetAll())
+	for (auto& player : PlayerCharacterManager::Instance().GetAll())
 	{
 		float d = XMFLOAT3LengthSq(player->GetPosition() - position);
 		if (d < limit)
@@ -74,12 +93,12 @@ void Enemy::Render(const RenderContext& rc)
 		collider.second->DrawDebugPrimitive({ 1, 1, 1, 1 });
 	}
 
-	Collider* playerCollider = PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetCollider();
+	//Collider* playerCollider = PLAYERS.GetPlayerById(GAME_DATA.GetClientId())->GetCollider();
 	for (const std::pair<int, Collider*>& collider : attackColliders)
 	{
 		DirectX::XMFLOAT4 color = { 1, 0, 0, 1 };
-		HitResult hit;
-		if (collider.second->Collision(playerCollider, {}, hit)) color = { 0, 0, 1, 1 };
+		//HitResult hit;
+		//if (collider.second->Collision(playerCollider, {}, hit)) color = { 0, 0, 1, 1 };
 
 		collider.second->DrawDebugPrimitive(color);
 	}
@@ -87,9 +106,10 @@ void Enemy::Render(const RenderContext& rc)
 }
 void Enemy::AttackCollision()
 {
-	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
+	PlayerCharacterManager& pMnager = PlayerCharacterManager::Instance();
+	PlayerCharacter* player = pMnager.GetPlayerCharacterById(GAME_DATA.GetClientId());
 	if (!player) return;
-	Collider* playerCollider = player->GetCollider();
+	Collider* playerCollider = pMnager.GetPlayerCharacterById(GAME_DATA.GetClientId())->GetCollider();
 	if (!playerCollider->IsEnable()) return;
 
 	for (const std::pair<int, Collider*>& collider : attackColliders)
@@ -98,6 +118,7 @@ void Enemy::AttackCollision()
 		if (collider.second->Collision(playerCollider, {}, hit))
 		{
 			player->OnDamage(hit, atk);
+
 		}
 	}
 }
@@ -115,34 +136,22 @@ void Enemy::OnDamage(const ENEMY_COLLISION& hit)
 		stateMachine->ChangeState(EnemyState::ID::Death);
 	}
 }
-void Enemy::OnDeath() { ENEMIES.Remove(this); }
-
-void Enemy::ImportData(ENEMY_DATA data)
+void Enemy::OnDamage(const ATTACK_DATA& hit)
 {
-	position = data.position;
-	velocity = data.velocity;
-	target = PlayerCharacterManager::Instance().GetPlayerCharacterById(data.target);
-	angle = data.angle;
-	if (stateMachine->GetStateIndex() != data.state)
+	hp -= hit.damage;
+	if (hp > 0)
 	{
-		stateMachine->ChangeState(data.state);
+		if (hit.power) stateMachine->ChangeState(EnemyState::ID::Hurt);
+		velocity += hit.force;
 	}
-	subState = data.subState;
-	hp = data.hp;
-	maxHp = data.maxHp;
+	else
+	{
+		stateMachine->ChangeState(EnemyState::ID::Death);
+	}
 }
-void Enemy::ExportData(ENEMY_DATA& data)
+void Enemy::OnDeath()
 {
-	data.enemy_id = enemy_id;
-	data.enemyType = enemyType;
-	data.position = position;
-	data.velocity = velocity;
-	data.target = (target) ? target->GetClientId() : -1;
-	data.angle = angle;
-	data.state = stateMachine->GetStateIndex();
-	data.subState = subState;
-	data.hp = hp;
-	data.maxHp = maxHp;
+	ENEMIES.Remove(this);
 }
 
 Enemy* Enemy::EnemyFactory(int enemyType)

@@ -210,6 +210,8 @@ set(Source__GameObject__Projectile
 source_group("Source\\GameObject\\Projectile" FILES ${Source__GameObject__Projectile})
 
 set(Source__GameObject__Props
+    "Source/GameObject/Props/Spawner.cpp"
+    "Source/GameObject/Props/Spawner.h"
     "Source/GameObject/Props/Teleporter.cpp"
     "Source/GameObject/Props/Teleporter.h"
 )
@@ -242,6 +244,10 @@ source_group("Source\\GameObject\\Character\\Player" FILES ${Source__GameObject_
 set(Source__GameObject__Character__Player__State
     "Source/GameObject/Character/Player/State/NonPlayerCharacterState.cpp"
     "Source/GameObject/Character/Player/State/NonPlayerCharacterState.h"
+    "Source/GameObject/Character/Player/State/PlayerCharacterRodState.cpp"
+    "Source/GameObject/Character/Player/State/PlayerCharacterRodState.h"
+    "Source/GameObject/Character/Player/State/PlayerCharacterShieldState.cpp"
+    "Source/GameObject/Character/Player/State/PlayerCharacterShieldState.h"
     "Source/GameObject/Character/Player/State/PlayerCharacterState.cpp"
     "Source/GameObject/Character/Player/State/PlayerCharacterState.h"
     "Source/GameObject/Character/Player/State/PlayerCharacterSwordState.cpp"
@@ -324,6 +330,10 @@ set(Source__UI__Widget
     "Source/UI/Widget/WidgetButtonImage.h"
     "Source/UI/Widget/WidgetButtonText.cpp"
     "Source/UI/Widget/WidgetButtonText.h"
+    "Source/UI/Widget/WidgetCharacterModify.cpp"
+    "Source/UI/Widget/WidgetCharacterModify.h"
+    "Source/UI/Widget/WidgetCharacterSelect.cpp"
+    "Source/UI/Widget/WidgetCharacterSelect.h"
     "Source/UI/Widget/WidgetCrosshair.cpp"
     "Source/UI/Widget/WidgetCrosshair.h"
     "Source/UI/Widget/WidgetDragFloat.cpp"
@@ -334,6 +344,8 @@ set(Source__UI__Widget
     "Source/UI/Widget/WidgetImage.h"
     "Source/UI/Widget/WidgetInputBool.cpp"
     "Source/UI/Widget/WidgetInputBool.h"
+    "Source/UI/Widget/WidgetInputInt.cpp"
+    "Source/UI/Widget/WidgetInputInt.h"
     "Source/UI/Widget/WidgetMatching.cpp"
     "Source/UI/Widget/WidgetMatching.h"
     "Source/UI/Widget/WidgetSettingWindow.cpp"
@@ -386,8 +398,8 @@ set(TAKOEngine__Network
 source_group("TAKOEngine\\Network" FILES ${TAKOEngine__Network})
 
 set(TAKOEngine__Physics
-    "TAKOEngine/Physics/BoundingBoxCollider.cpp"
-    "TAKOEngine/Physics/BoundingBoxCollider.h"
+    "TAKOEngine/Physics/AABBCollider.cpp"
+    "TAKOEngine/Physics/AABBCollider.h"
     "TAKOEngine/Physics/CapsuleCollider.cpp"
     "TAKOEngine/Physics/CapsuleCollider.h"
     "TAKOEngine/Physics/Collider.cpp"
@@ -407,6 +419,8 @@ set(TAKOEngine__Physics
     "TAKOEngine/Physics/MapQuadtree.h"
     "TAKOEngine/Physics/ModelCollider.cpp"
     "TAKOEngine/Physics/ModelCollider.h"
+    "TAKOEngine/Physics/OBBCollider.cpp"
+    "TAKOEngine/Physics/OBBCollider.h"
     "TAKOEngine/Physics/OctreeNode.cpp"
     "TAKOEngine/Physics/OctreeNode.h"
     "TAKOEngine/Physics/QuadtreeNode.cpp"
@@ -414,8 +428,6 @@ set(TAKOEngine__Physics
     "TAKOEngine/Physics/RigidBody.h"
     "TAKOEngine/Physics/SphereCollider.cpp"
     "TAKOEngine/Physics/SphereCollider.h"
-    "TAKOEngine/Physics/UnrotatedBoxCollider.cpp"
-    "TAKOEngine/Physics/UnrotatedBoxCollider.h"
 )
 source_group("TAKOEngine\\Physics" FILES ${TAKOEngine__Physics})
 
@@ -424,8 +436,6 @@ set(TAKOEngine__Rendering
     "TAKOEngine/Rendering/ConstantBuffer.h"
     "TAKOEngine/Rendering/Cylinder.cpp"
     "TAKOEngine/Rendering/Cylinder.h"
-    "TAKOEngine/Rendering/DebugRenderer.cpp"
-    "TAKOEngine/Rendering/DebugRenderer.h"
     "TAKOEngine/Rendering/DeferredRendering.cpp"
     "TAKOEngine/Rendering/DeferredRendering.h"
     "TAKOEngine/Rendering/Descriptor.cpp"
@@ -456,14 +466,14 @@ set(TAKOEngine__Rendering
     "TAKOEngine/Rendering/MyRender.h"
     "TAKOEngine/Rendering/ParticleRenderer.cpp"
     "TAKOEngine/Rendering/ParticleRenderer.h"
-    "TAKOEngine/Rendering/PipelineState.cpp"
-    "TAKOEngine/Rendering/PipelineState.h"
     "TAKOEngine/Rendering/Plane.cpp"
     "TAKOEngine/Rendering/Plane.h"
     "TAKOEngine/Rendering/PostEffect.cpp"
     "TAKOEngine/Rendering/PostEffect.h"
     "TAKOEngine/Rendering/PostprocessingRenderer.cpp"
     "TAKOEngine/Rendering/PostprocessingRenderer.h"
+    "TAKOEngine/Rendering/PrimitiveRenderer.cpp"
+    "TAKOEngine/Rendering/PrimitiveRenderer.h"
     "TAKOEngine/Rendering/RenderContext.h"
     "TAKOEngine/Rendering/RenderState.cpp"
     "TAKOEngine/Rendering/RenderState.h"
@@ -539,6 +549,18 @@ set(TAKOEngine__Editor__Input
 )
 source_group("TAKOEngine\\Editor\\Input" FILES ${TAKOEngine__Editor__Input})
 
+set(TAKOEngine__Rendering__DebugRenderer
+    "TAKOEngine/Rendering/DebugRenderer/CubeRenderer.cpp"
+    "TAKOEngine/Rendering/DebugRenderer/CubeRenderer.h"
+    "TAKOEngine/Rendering/DebugRenderer/CylinderRenderer.cpp"
+    "TAKOEngine/Rendering/DebugRenderer/CylinderRenderer.h"
+    "TAKOEngine/Rendering/DebugRenderer/DebugRenderer.cpp"
+    "TAKOEngine/Rendering/DebugRenderer/DebugRenderer.h"
+    "TAKOEngine/Rendering/DebugRenderer/SphereRenderer.cpp"
+    "TAKOEngine/Rendering/DebugRenderer/SphereRenderer.h"
+)
+source_group("TAKOEngine\\Rendering\\DebugRenderer" FILES ${TAKOEngine__Rendering__DebugRenderer})
+
 set(TAKOEngine__Rendering__Model
     "TAKOEngine/Rendering/Model/GLTFModelDX11.cpp"
     "TAKOEngine/Rendering/Model/GLTFModelDX11.h"
@@ -610,6 +632,9 @@ source_group("TAKOEngine\\Rendering\\HLSL\\Common" FILES ${TAKOEngine__Rendering
 
 set(TAKOEngine__Rendering__HLSL__Debug
     "TAKOEngine/Rendering/HLSL/Debug/Debug.hlsli"
+    "TAKOEngine/Rendering/HLSL/Debug/DebugDX12.hlsli"
+    "TAKOEngine/Rendering/HLSL/Debug/DebugDX12PS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Debug/DebugDX12VS.hlsl"
     "TAKOEngine/Rendering/HLSL/Debug/DebugPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Debug/DebugVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Debug/Gizmos.hlsli"
@@ -627,6 +652,8 @@ set(TAKOEngine__Rendering__HLSL__Lighting
     "TAKOEngine/Rendering/HLSL/Lighting/DeferredVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Lighting/Light.hlsli"
     "TAKOEngine/Rendering/HLSL/Lighting/ShadowMap.hlsli"
+    "TAKOEngine/Rendering/HLSL/Lighting/ShadowMapDX12.hlsli"
+    "TAKOEngine/Rendering/HLSL/Lighting/ShadowMapDX12VS.hlsl"
     "TAKOEngine/Rendering/HLSL/Lighting/ShadowmapFunctions.hlsli"
     "TAKOEngine/Rendering/HLSL/Lighting/ShadowMapVS.hlsl"
 )
@@ -721,6 +748,9 @@ set(TAKOEngine__Rendering__HLSL__Primitives
     "TAKOEngine/Rendering/HLSL/Primitives/PortalSquarePS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/PortalVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/RunningDustPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/PrimitiveRenderer.hlsli"
+    "TAKOEngine/Rendering/HLSL/Primitives/PrimitiveRendererPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/PrimitiveRendererVS.hlsl"
 )
 source_group("TAKOEngine\\Rendering\\HLSL\\Primitives" FILES ${TAKOEngine__Rendering__HLSL__Primitives})
 
@@ -786,6 +816,7 @@ set(ALL_FILES
     ${TAKOEngine__Tool}
     ${TAKOEngine__Editor__Camera}
     ${TAKOEngine__Editor__Input}
+    ${TAKOEngine__Rendering__DebugRenderer}
     ${TAKOEngine__Rendering__HLSL}
     ${TAKOEngine__Rendering__Model}
     ${TAKOEngine__Rendering__Shaders}
@@ -826,6 +857,8 @@ endfunction()
 
 #List of HLSL shaders
 set(SHADER_NAMES
+    "DebugDX12PS.cso"
+    "DebugDX12VS.cso"
     "DebugPS.cso"
     "DebugVS.cso"
     "GizmosPS.cso"
@@ -834,6 +867,7 @@ set(SHADER_NAMES
     "LineVS.cso"
     "DeferredPS.cso"
     "DeferredVS.cso"
+    "ShadowMapDX12VS.cso"
     "ShadowMapVS.cso"
     "DefaultModelPS.cso"
     "DefaultModelVS.cso"
@@ -884,6 +918,8 @@ set(SHADER_NAMES
     "PortalSquarePS.cso"
     "PortalVS.cso"
     "RunningDustPS.cso"
+    "PrimitiveRendererPS.cso"
+    "PrimitiveRendererVS.cso"
     "SkyBoxDX12PS.cso"
     "SkyBoxDX12VS.cso"
     "SkydomePS.cso"
@@ -895,6 +931,8 @@ set(SHADER_NAMES
 
 # List of shader settings
 set(HLSL_SHADERS
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/DebugDX12PS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/DebugDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/DebugPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/DebugVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/GizmosPS.hlsl,5.0,Pixel,main"
@@ -903,6 +941,7 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/LineVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Lighting/DeferredPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Lighting/DeferredVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Lighting/ShadowMapDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Lighting/ShadowMapVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/DefaultModelPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/DefaultModelVS.hlsl,5.0,Vertex,main"
@@ -952,6 +991,8 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PortalPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PortalSquarePS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PortalVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PrimitiveRendererPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PrimitiveRendererVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/RunningDustPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Skydome/SkyBoxDX12PS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Skydome/SkyBoxDX12VS.hlsl,5.0,Vertex,main"
@@ -1089,8 +1130,7 @@ if(MSVC)
         /Zi
         ${DEFAULT_CXX_EXCEPTION_HANDLING}
         /Y-
-        /wd4819
-        /wd4099
+        /utf-8
     )
     target_link_options(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:
@@ -1103,8 +1143,6 @@ if(MSVC)
         /MANIFEST
         /DEBUG
         /SUBSYSTEM:WINDOWS
-        /wd4819
-        /wd4099
     )
 endif()
 
@@ -1229,12 +1267,9 @@ if(MSVC)
 endif()
 
 if(MSVC)
-    foreach(CurrentShaderFile IN LISTS SHADER_NAMES)
-        add_custom_command(
-            TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/Data/Shader/${CurrentShaderFile} ${CMAKE_BINARY_DIR}/Data/Shader
-            COMMENT "Copying shaders ${CurrentShaderFile}")
-    endforeach()
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/Data/Shader ${CMAKE_BINARY_DIR}/Data/Shader
+            COMMENT "Copying shaders")
 endif()
 
 
@@ -1248,6 +1283,8 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "DirectXTex"
     "d3d11"
     "d3d12"
+    "d2d1.lib"
+    "dwrite.lib"
     "dxgi"
     "xinput"
     "xaudio2"
@@ -1269,6 +1306,8 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "DirectXTex"
     "d3d11"
     "d3d12"
+    "d2d1.lib"
+    "dwrite.lib"
     "dxgi"
     "xinput"
     "xaudio2"

@@ -1,40 +1,40 @@
-#include "TAKOEngine/Runtime/tentacle_lib.h"
+ï»¿#include "TAKOEngine/Runtime/tentacle_lib.h"
 
 #include "Effect.h"
 #include "EffectManager.h"
 
-// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 Effect::Effect(const char* filename)
 {
 	std::lock_guard<std::mutex> lock(T_GRAPHICS.GetMutex());
-	// Effekseer‚ÌƒŠƒ\[ƒX‚ğ“Ç‚İ‚Ş
-	// Effekseer‚ÍUTF-16‚Ìƒtƒ@ƒCƒ‹ƒpƒXˆÈŠO‚Í‘Î‰‚µ‚Ä‚¢‚È‚¢‚½‚ß•¶šƒR[ƒh•ÏŠ·‚ª•K—v
+	// Effekseerã®ãƒªã‚½ãƒ¼ã‚¹ã‚’èª­ã¿è¾¼ã‚€
+	// Effekseerã¯UTF-16ã®ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ä»¥å¤–ã¯å¯¾å¿œã—ã¦ã„ãªã„ãŸã‚æ–‡å­—ã‚³ãƒ¼ãƒ‰å¤‰æ›ãŒå¿…è¦
 	char16_t utf16Filename[256];
 	Effekseer::ConvertUtf8ToUtf16(utf16Filename, 256, filename);
-	// EffekseerƒGƒtƒFƒNƒg‚ğ“Ç‚İ‚İ
+	// Effekseerã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’èª­ã¿è¾¼ã¿
 	effekseerEffect = Effekseer::Effect::Create(Manager(), (EFK_CHAR*)utf16Filename);
 }
 
-// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 Effect::Effect(const char* filename, std::string version)
 {
 	std::lock_guard<std::mutex> lock(T_GRAPHICS.GetMutex());
-	// Effekseer‚ÌƒŠƒ\[ƒX‚ğ“Ç‚İ‚Ş
-	// Effekseer‚ÍUTF-16‚Ìƒtƒ@ƒCƒ‹ƒpƒXˆÈŠO‚Í‘Î‰‚µ‚Ä‚¢‚È‚¢‚½‚ß•¶šƒR[ƒh•ÏŠ·‚ª•K—v
+	// Effekseerã®ãƒªã‚½ãƒ¼ã‚¹ã‚’èª­ã¿è¾¼ã‚€
+	// Effekseerã¯UTF-16ã®ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ä»¥å¤–ã¯å¯¾å¿œã—ã¦ã„ãªã„ãŸã‚æ–‡å­—ã‚³ãƒ¼ãƒ‰å¤‰æ›ãŒå¿…è¦
 	char16_t utf16Filename[256];
 	Effekseer::ConvertUtf8ToUtf16(utf16Filename, 256, filename);
-	// EffekseerƒGƒtƒFƒNƒg‚ğ“Ç‚İ‚İ
+	// Effekseerã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’èª­ã¿è¾¼ã¿
 	effekseerEffect = Effekseer::Effect::Create(ManagerDX12(), (EFK_CHAR*)utf16Filename);
 }
 
-// Ä¶
+// å†ç”Ÿ
 Effekseer::Handle Effect::Play(const DirectX::XMFLOAT3& position, float scale)
 {
 	Effekseer::Handle handle = Manager()->Play(effekseerEffect, position.x, position.y, position.z);
 	Manager()->SetScale(handle, scale, scale, scale);
 	return handle;
 }
-// Ä¶
+// å†ç”Ÿ
 Effekseer::Handle Effect::PlayDX12(const DirectX::XMFLOAT3& position, float scale)
 {
 	Effekseer::Handle handle = ManagerDX12()->Play(effekseerEffect, position.x, position.y, position.z);
@@ -42,18 +42,18 @@ Effekseer::Handle Effect::PlayDX12(const DirectX::XMFLOAT3& position, float scal
 	return handle;
 }
 
-// ’â~
+// åœæ­¢
 void Effect::Stop(Effekseer::Handle handle)
 {
 	Manager()->StopEffect(handle);
 }
-// À•Wİ’è
+// åº§æ¨™è¨­å®š
 void Effect::SetPosition(Effekseer::Handle handle, const DirectX::XMFLOAT3& position)
 {
 	Manager()->SetLocation(handle, position.x, position.y, position.z);
 	Manager()->SetTargetLocation(handle, position.x, position.y, position.z);
 }
-// ƒXƒP[ƒ‹İ’è
+// ã‚¹ã‚±ãƒ¼ãƒ«è¨­å®š
 void Effect::SetScale(Effekseer::Handle handle, const DirectX::XMFLOAT3& scale)
 {
 	Manager()->SetScale(handle, scale.x, scale.y, scale.z);

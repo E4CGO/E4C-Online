@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <time.h>
 
@@ -9,7 +9,7 @@ namespace TentacleLib {
 		Timer() = default;
 		~Timer() = default;
 	public:
-		// ƒCƒ“ƒXƒ^ƒ“ƒX
+		// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
 		static Timer& Instance()
 		{
 			static Timer instance;

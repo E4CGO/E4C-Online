@@ -89,7 +89,7 @@ void GLTFImporter::cumulate_transforms(std::vector<ModelResource::node>& model_n
 			DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(node.scale.x, node.scale.y, node.scale.z) };
 			DirectX::XMMATRIX R{ DirectX::XMMatrixRotationQuaternion(DirectX::XMVectorSet(node.rotation.x, node.rotation.y, node.rotation.z, node.rotation.w)) };
 			DirectX::XMMATRIX T{ DirectX::XMMatrixTranslation(node.translation.x, node.translation.y, node.translation.z) };
-			DirectX::XMStoreFloat4x4(&node.global_transform , S * R * T * DirectX::XMLoadFloat4x4(&parent_global_transforms.top()));
+			DirectX::XMStoreFloat4x4(&node.global_transform, S * R * T * DirectX::XMLoadFloat4x4(&parent_global_transforms.top()));
 			for (int child_index : node.children)
 			{
 				parent_global_transforms.push(node.global_transform);

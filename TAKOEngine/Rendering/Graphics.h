@@ -5,11 +5,13 @@
 #define __GRAHICS_GRAHICS_H__
 
 #include <wrl.h>
-#include <memory>
 #include <mutex>
+#include <d2d1_3.h>
+#include <dwrite.h>
+#include <d3d11on12.h>
+#include <dxgi1_6.h>
 #include <d3d11.h>
 #include <d3d12.h>
-#include <dxgi1_6.h>
 
 #include "TAKOEngine/Rendering/FrameBuffer.h"
 #include "TAKOEngine/Rendering/FrameBufferManager.h"
@@ -19,13 +21,14 @@
 #include "TAKOEngine/Rendering/Shaders/ModelShaderDX12.h"
 #include "TAKOEngine/Rendering/Shaders/SpriteShader.h"
 #include "TAKOEngine/Rendering/Shaders/SpriteShaderDX12.h"
-#include "TAKOEngine/Rendering/DebugRenderer.h"
+#include "TAKOEngine/Rendering/DebugRenderer/DebugRenderer.h"
 #include "TAKOEngine/Rendering/LineRenderer.h"
 #include "TAKOEngine/Rendering/Descriptor.h"
 #include "TAKOEngine/Rendering/ConstantBuffer.h"
 #include "TAKOEngine/Tool/ImGuiRenderer.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
 #include "TAKOEngine/Rendering/ParticleRenderer.h"
+#include "TAKOEngine/Rendering/ShadowMapRender.h"
 
 #define MAX_BUFFER_COUNT (2)
 
@@ -54,6 +57,7 @@ enum class ModelShaderDX12Id
 	Toon,
 	ToonInstancing,
 	Skydome,
+	shadowMap,
 
 	EnumCount
 };
@@ -137,7 +141,7 @@ public:
 	}
 
 	bool isDX12Active = false;
-	bool isDX11Active = true;
+	bool isDX11Active = false;
 
 	struct CommandQueue
 	{
@@ -165,6 +169,16 @@ public:
 	FrameBufferDX12* GetFramBufferDX12(FrameBufferDX12Id frameBufferId) { return dx12_frameBuffers[static_cast<int>(frameBufferId)].get(); }
 	// DX12のフレームバッファマネージャー
 	FrameBufferManager* GetFrameBufferManager() { return m_framebufferManager.get(); }
+
+	IDWriteFactory* GetDWriteFactory() { return m_dWriteFactory.Get(); }
+	ID3D11On12Device* GetD3D11On12Device() { return m_d3d11On12Device.Get(); }
+	ID2D1DeviceContext2* GetD2D1DeviceContext() { return m_d2dDeviceContext.Get(); }
+	ID3D11DeviceContext* GetD3D112DDeviceContext() { return m_d3d11DeviceContext.Get(); }
+	Microsoft::WRL::ComPtr<ID3D11Resource> GetD3D11BackBuffer(int i) { return m_wrappedBackBuffers[i]; }
+	ID2D1Bitmap1* GetD2D1RenderTargets(int i) { return m_d2dRenderTargets[i].Get(); }
+
+	// シャドウマップ取得
+	ShadowMapRenderDX12* GetShadowRenderer() { return m_shadowMapRenderer.get(); }
 
 	// レンダーステート取得
 	RenderState* GetRenderState() { return renderState.get(); }
@@ -218,6 +232,12 @@ public:
 		const  DirectX::XMMATRIX& View,
 		const  DirectX::XMMATRIX& Projection,
 		const DirectX::XMMATRIX World);
+	DirectX::XMFLOAT3 GetScreenPosition(
+		const DirectX::XMFLOAT3 worldPosition,
+		const D3D12_VIEWPORT& viewport,
+		const  DirectX::XMMATRIX& View,
+		const  DirectX::XMMATRIX& Projection,
+		const DirectX::XMMATRIX World);
 	DirectX::XMFLOAT3 GetScreenPosition(const DirectX::XMFLOAT3 worldPosition);
 
 	void WaitIdle();
@@ -267,10 +287,13 @@ public:
 	}
 
 	// ビューポートを取得
-	D3D12_VIEWPORT GetViwePort()
+	D3D12_VIEWPORT GetViewPort()
 	{
 		return m_viewport;
 	}
+
+	void SetDX12Render(bool isRender) { isDX12Active = isRender; }
+	void SetDX11Render(bool isRender) { isDX11Active = isRender; }
 
 private:
 	// イメージコピー
@@ -320,6 +343,8 @@ private:
 	// パーティクル
 	std::unique_ptr<ParticleCompute> m_compute;
 
+	std::unique_ptr<ShadowMapRenderDX12> m_shadowMapRenderer;
+
 	std::mutex mutex;	// ミューテックス
 
 	static Graphics* s_instance;
@@ -358,6 +383,25 @@ private:
 	float m_screen_height;
 
 	std::unique_ptr<ImGuiRenderer>						m_imgui_renderer;
+
+	// DWrite ファクトリー
+	Microsoft::WRL::ComPtr<IDWriteFactory> m_dWriteFactory;
+	// D2D ファクトリー
+	Microsoft::WRL::ComPtr<ID2D1Factory3> m_d2dFactory;
+	// D2D デバイス
+	Microsoft::WRL::ComPtr<ID2D1Device2> m_d2dDevice;
+	// D2Dのために D11デバイス
+	Microsoft::WRL::ComPtr<ID3D11On12Device> m_d3d11On12Device;
+	// D2Dのデバイスコンテクスト
+	Microsoft::WRL::ComPtr<ID2D1DeviceContext2> m_d2dDeviceContext;
+	// D2DのためにD11デバイスコンテクスト
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_d3d11DeviceContext;
+	// 画像バファー
+	Microsoft::WRL::ComPtr<ID3D11Resource> m_wrappedBackBuffers[MAX_BUFFER_COUNT];
+	// 画面バファー
+	Microsoft::WRL::ComPtr<ID2D1Bitmap1> m_d2dRenderTargets[MAX_BUFFER_COUNT];
+	// 画像バファ設定
+	D2D1_BITMAP_PROPERTIES1 bitmapProperties;
 };
 
 #endif // !__GRAHICS_GRAHICS_H__

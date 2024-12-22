@@ -93,7 +93,7 @@ SkydomeShaderDX12::SkydomeShaderDX12(ID3D12Device* device)
 		pipeline_state_desc.BlendState = renderState->GetBlendState(BlendState::Opaque);
 
 		//深度ステンシルステート
-		pipeline_state_desc.DepthStencilState = renderState->GetDepthState(DepthState::NoTestNoWrite);
+		pipeline_state_desc.DepthStencilState = renderState->GetDepthState(DepthState::TestAndWrite);
 
 		//ラスタライザーステート
 		pipeline_state_desc.RasterizerState = renderState->GetRasterizer(RasterizerState::SolidCullNone);
@@ -124,9 +124,6 @@ SkydomeShaderDX12::SkydomeShaderDX12(ID3D12Device* device)
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 		m_d3d_pipeline_state->SetName(L"SkydomeShaderPipelineState");
 	}
-
-	//サンプラーステート設定
-	m_sampler = graphics.GetSampler(SamplerState::LinearWrap);
 }
 
 //***********************************************************
@@ -141,10 +138,10 @@ SkydomeShaderDX12::~SkydomeShaderDX12()
 //***********************************************************
 // @brief       描画
 // @param[in]   rc     レンダーコンテキスト
-// @param[in]   model  描画対象のモデルデータを指すポインタ
+// @param[in]   mesh   描画対象のモデルデータのmesh
 // @return      なし
 //***********************************************************
-void SkydomeShaderDX12::Render(const RenderContextDX12& rc, ModelDX12* model)
+void SkydomeShaderDX12::Render(const RenderContextDX12& rc, const ModelDX12::Mesh& mesh)
 {
 	Graphics& graphics = Graphics::Instance();
 
@@ -155,29 +152,26 @@ void SkydomeShaderDX12::Render(const RenderContextDX12& rc, ModelDX12* model)
 	//シーン定数バッファ設定
 	rc.d3d_command_list->SetGraphicsRootDescriptorTable(0, rc.scene_cbv_descriptor->GetGpuHandle());  //CbScene
 
-	for (const ModelDX12::Mesh& mesh : model->GetMeshes())
-	{
-		const ModelResource::Mesh* res_mesh = mesh.mesh;
-		const ModelDX12::Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
+	const ModelResource::Mesh* res_mesh = mesh.mesh;
+	const ModelDX12::Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
 
-		// メッシュ定数バッファ設定
-		rc.d3d_command_list->SetGraphicsRootDescriptorTable(1, frame_resource.cbv_descriptor->GetGpuHandle());  //CbMesh
+	// メッシュ定数バッファ設定
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(1, frame_resource.cbv_descriptor->GetGpuHandle());  //CbMesh
 
-		// 頂点バッファ設定
-		rc.d3d_command_list->IASetVertexBuffers(0, 1, mesh.bones.empty() ? &mesh.mesh->d3d_vbv : &frame_resource.d3d_vbv);
-		rc.d3d_command_list->IASetIndexBuffer(&res_mesh->d3d_ibv);
-		rc.d3d_command_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	// 頂点バッファ設定
+	rc.d3d_command_list->IASetVertexBuffers(0, 1, mesh.bones.empty() ? &mesh.mesh->d3d_vbv : &frame_resource.d3d_vbv);
+	rc.d3d_command_list->IASetIndexBuffer(&res_mesh->d3d_ibv);
+	rc.d3d_command_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		// サブセット
-		const ModelResource::Material* material = res_mesh->material;
+	// サブセット
+	const ModelResource::Material* material = res_mesh->material;
 
-		// マテリアル定数バッファ設定
-		rc.d3d_command_list->SetGraphicsRootDescriptorTable(2, material->cbv_descriptor->GetGpuHandle());  //CbMaterial
+	// マテリアル定数バッファ設定
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(2, material->cbv_descriptor->GetGpuHandle());  //CbMaterial
 
-		// シェーダーリソースビュー設定
-		rc.d3d_command_list->SetGraphicsRootDescriptorTable(3, rc.skydomeData.skyTexture->GetGpuHandle());  //Skydomeテクスチャ
+	// シェーダーリソースビュー設定
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(3, rc.skydomeData.skyTexture->GetGpuHandle());  //Skydomeテクスチャ
 
-		// 描画
-		rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), 1, 0, 0, 0);
-	}
+	// 描画
+	rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), 1, 0, 0, 0);
 }

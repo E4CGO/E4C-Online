@@ -1,4 +1,4 @@
-//! @file RenderState.h
+ï»¿//! @file RenderState.h
 //! @note
 
 #ifndef __GRAHICS_RENDER_STATE_H__
@@ -10,7 +10,7 @@
 
 #include "TAKOEngine\Rendering\Descriptor.h"
 
-//ƒTƒ“ƒvƒ‰[ƒXƒe[ƒg
+//ã‚µãƒ³ãƒ—ãƒ©ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆ
 enum class SamplerState
 {
 	PointWrap,
@@ -25,7 +25,7 @@ enum class SamplerState
 	EnumCount
 };
 
-// ƒfƒvƒXƒXƒe[ƒg
+// ãƒ‡ãƒ—ã‚¹ã‚¹ãƒ†ãƒ¼ãƒˆ
 enum class DepthState
 {
 	TestAndWrite,
@@ -36,7 +36,7 @@ enum class DepthState
 	EnumCount
 };
 
-// ƒuƒŒƒ“ƒhƒXƒe[ƒg
+// ãƒ–ãƒ¬ãƒ³ãƒ‰ã‚¹ãƒ†ãƒ¼ãƒˆ
 enum class BlendState
 {
 	Opaque,
@@ -44,16 +44,18 @@ enum class BlendState
 	OIT,
 	Additive,
 	Subtraction,
+	Screen,
 	Multiply,
 
 	EnumCount
 };
 
-// ƒ‰ƒXƒ^ƒ‰ƒCƒUƒXƒe[ƒg
+// ãƒ©ã‚¹ã‚¿ãƒ©ã‚¤ã‚¶ã‚¹ãƒ†ãƒ¼ãƒˆ
 enum class RasterizerState
 {
 	SolidCullNone,
 	SolidCullBack,
+	SolidCullBackCCW,
 	SolidCullFront,
 	WireCullnone,
 	WireCullBack,
@@ -63,8 +65,8 @@ enum class RasterizerState
 
 //****************************************************************
 // @class RenderState
-// @brief ƒTƒ“ƒvƒ‰[AƒfƒvƒXAƒuƒŒƒ“ƒhAƒ‰ƒXƒ^ƒ‰ƒCƒU[ƒXƒe[ƒg‚Ìİ’èoræ“¾
-// @par   [à–¾]
+// @brief ã‚µãƒ³ãƒ—ãƒ©ãƒ¼ã€ãƒ‡ãƒ—ã‚¹ã€ãƒ–ãƒ¬ãƒ³ãƒ‰ã€ãƒ©ã‚¹ã‚¿ãƒ©ã‚¤ã‚¶ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆã®è¨­å®šorå–å¾—
+// @par   [èª¬æ˜]
 //****************************************************************
 class RenderState
 {
@@ -72,25 +74,25 @@ public:
 	RenderState(ID3D11Device* device);
 	~RenderState() = default;
 
-	// ƒTƒ“ƒvƒ‰ƒXƒe[ƒgæ“¾
+	// ã‚µãƒ³ãƒ—ãƒ©ã‚¹ãƒ†ãƒ¼ãƒˆå–å¾—
 	ID3D11SamplerState* GetSamplerState(SamplerState state) const
 	{
 		return samplerStates[static_cast<int>(state)].Get();
 	}
 
-	// ƒfƒvƒXƒXƒe[ƒgæ“¾
+	// ãƒ‡ãƒ—ã‚¹ã‚¹ãƒ†ãƒ¼ãƒˆå–å¾—
 	ID3D11DepthStencilState* GetDepthStencilState(DepthState state) const
 	{
 		return depthStencilStates[static_cast<int>(state)].Get();
 	}
 
-	// ƒuƒŒƒ“ƒhƒXƒe[ƒgæ“¾
+	// ãƒ–ãƒ¬ãƒ³ãƒ‰ã‚¹ãƒ†ãƒ¼ãƒˆå–å¾—
 	ID3D11BlendState* GetBlendState(BlendState state) const
 	{
 		return blendStates[static_cast<int>(state)].Get();
 	}
 
-	// ƒ‰ƒXƒ^ƒ‰ƒCƒU\ƒXƒe[ƒgæ“¾
+	// ãƒ©ã‚¹ã‚¿ãƒ©ã‚¤ã‚¶â€•ã‚¹ãƒ†ãƒ¼ãƒˆå–å¾—
 	ID3D11RasterizerState* GetRasterizerState(RasterizerState state) const
 	{
 		return rasterizerStates[static_cast<int>(state)].Get();
@@ -104,8 +106,8 @@ private:
 
 //*****************************************************************
 // @class SamplerManager
-// @brief ƒTƒ“ƒvƒ‰[‚ğ¶¬
-// @par   [à–¾]
+// @brief ã‚µãƒ³ãƒ—ãƒ©ãƒ¼ã‚’ç”Ÿæˆ
+// @par   [èª¬æ˜]
 //*****************************************************************
 class SamplerManager
 {
@@ -118,14 +120,14 @@ public:
 private:
 	const Descriptor* m_sampler_descriptor = nullptr;
 
-	// ƒTƒ“ƒvƒ‰[‚ğì¬‚·‚é“à•”ŠÖ”
+	// ã‚µãƒ³ãƒ—ãƒ©ãƒ¼ã‚’ä½œæˆã™ã‚‹å†…éƒ¨é–¢æ•°
 	void CreateSampler(ID3D12Device* device, SamplerState type, D3D12_SAMPLER_DESC& samplerDesc);
 };
 
 //****************************************************************
 // @class RenderStateDX12
-// @brief ƒfƒvƒXAƒuƒŒƒ“ƒhAƒ‰ƒXƒ^ƒ‰ƒCƒU[ƒXƒe[ƒg‚Ìİ’èoræ“¾
-// @par   [à–¾]
+// @brief ãƒ‡ãƒ—ã‚¹ã€ãƒ–ãƒ¬ãƒ³ãƒ‰ã€ãƒ©ã‚¹ã‚¿ãƒ©ã‚¤ã‚¶ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆã®è¨­å®šorå–å¾—
+// @par   [èª¬æ˜]
 //****************************************************************
 class RenderStateDX12
 {
@@ -133,19 +135,19 @@ public:
 	RenderStateDX12();
 	~RenderStateDX12() = default;
 
-	//ƒuƒŒƒ“ƒhƒXƒe[ƒgæ“¾
+	//ãƒ–ãƒ¬ãƒ³ãƒ‰ã‚¹ãƒ†ãƒ¼ãƒˆå–å¾—
 	D3D12_BLEND_DESC GetBlendState(BlendState state) const
 	{
 		return blendStates[static_cast<int>(state)];
 	}
 
-	//ƒfƒvƒXƒXƒe[ƒgæ“¾
+	//ãƒ‡ãƒ—ã‚¹ã‚¹ãƒ†ãƒ¼ãƒˆå–å¾—
 	D3D12_DEPTH_STENCIL_DESC GetDepthState(DepthState state) const
 	{
 		return depthStencilStates[static_cast<int>(state)];
 	}
 
-	//ƒ‰ƒXƒ^ƒ‰ƒCƒU[ƒXƒe[ƒgæ“¾
+	//ãƒ©ã‚¹ã‚¿ãƒ©ã‚¤ã‚¶ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆå–å¾—
 	D3D12_RASTERIZER_DESC GetRasterizer(RasterizerState state) const
 	{
 		return rasterizerStates[static_cast<int>(state)];

@@ -14,6 +14,9 @@ ModelDX11::ModelDX11(ID3D11Device* device, const char* filename, float scaling, 
 {
 	resource = ResourceManager::Instance().LoadModelResource(filename);
 
+	// モデルの名前設定
+	extractBaseName(filename);
+
 	// ノードキャッシュ
 	const std::vector<ModelResource::Node>& resNodes = resource->GetNodes();
 	nodeCaches.resize(resNodes.size());
@@ -88,16 +91,6 @@ void ModelDX11::UpdateAnimation(float elapsedTime)
 {
 	ComputeAnimation(elapsedTime);
 	ComputeBlending(elapsedTime);
-}
-
-void ModelDX11::CopyAnimations(iModel* model)
-{
-	resource->SetAnimations(model->GetResource()->GetAnimations());
-}
-
-void ModelDX11::CopyNodes(iModel* model)
-{
-	resource->SetNodes(model->GetResource()->GetNodes());
 }
 
 void ModelDX11::ComputeAnimation(float elapsedTime)
@@ -297,6 +290,16 @@ ModelDX11::Node* ModelDX11::FindNode(const char* name)
 	}
 	// 見つからなかった
 	return nullptr;
+}
+
+void ModelDX11::CopyAnimations(iModel* model)
+{
+	resource->SetAnimations(model->GetResource()->GetAnimations());
+}
+
+void ModelDX11::CopyNodes(iModel* model)
+{
+	resource->SetNodes(model->GetResource()->GetNodes());
 }
 
 //デバッグ情報

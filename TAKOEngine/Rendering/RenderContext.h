@@ -173,6 +173,13 @@ struct SkydomeData
 	const Descriptor* skyTexture = nullptr;
 };
 
+//影情報
+struct ShadowMapDataDX12
+{
+	const Descriptor* shadow_srv_descriptor = nullptr;
+	const Descriptor* shadow_sampler_descriptor = nullptr;
+};
+
 // パーティクル情報
 struct ParticleData
 {
@@ -237,7 +244,7 @@ struct RenderContextDX12
 {
 	ID3D12GraphicsCommandList* d3d_command_list = nullptr;
 	const Descriptor* scene_cbv_descriptor = nullptr;
-
+	
 	DirectX::XMFLOAT4X4	view;
 	DirectX::XMFLOAT4X4	projection;
 	DirectX::XMFLOAT4	light_direction;
@@ -253,6 +260,9 @@ struct RenderContextDX12
 
 	// パーティクル情報
 	ParticleData            particleData;
+
+	// 影情報
+	ShadowMapDataDX12       shadowMap;
 };
 
 #endif // !__INCLUDE_RENDER_CONTEXT_H__

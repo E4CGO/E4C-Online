@@ -4,6 +4,7 @@
 #include "WidgetButtonText.h"
 #include "TAKOEngine/Runtime/tentacle_lib.h"
 #include "TAKOEngine/Tool/XMFLOAT.h"
+#include "TAKOEngine/Tool/Encode.h"
 
 /**************************************************************************//**
 	@brief		コンストラクタ
@@ -38,4 +39,14 @@ void WidgetButtonText::Render(const RenderContext& rc)
 
 void WidgetButtonText::RenderDX12(const RenderContextDX12& rc)
 {
+	T_TEXT.RenderDX12(
+		FONT_ID::HGpop,
+		Encode::string_to_wstring(m_text),
+		m_position.x, m_position.y,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		0.0f,
+		FONT_ALIGN::TOP_LEFT,
+		m_scale,
+		0
+	);
 }

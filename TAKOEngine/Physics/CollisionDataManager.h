@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <DirectXMath.h>
 
@@ -8,8 +8,8 @@
 #include "GameObject/Character/Enemy/Enemy.h"
 
 /*
-ƒNƒ‰ƒCƒAƒ“ƒg‚ÌÕ“Ë”»’èƒXƒgƒbƒN
-Œ‹‰Ê‚ğƒzƒXƒg‚É‘—M‚·‚é
+ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã®è¡çªåˆ¤å®šã‚¹ãƒˆãƒƒã‚¯
+çµæœã‚’ãƒ›ã‚¹ãƒˆã«é€ä¿¡ã™ã‚‹
 */
 
 class CollisionDataManager : public Manager<ENEMY_COLLISION>, public Singleton<CollisionDataManager>

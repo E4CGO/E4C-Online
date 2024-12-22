@@ -36,7 +36,7 @@ void SceneTitle::Initialize()
 	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
 
 	// パーティクル
-	m_particle = std::make_unique<ParticleRenderer>();
+	//m_particle = std::make_unique<ParticleRenderer>();
 
 	// モデル
 	{
@@ -77,10 +77,10 @@ void SceneTitle::Initialize()
 		shadowMapRenderer->ModelRegister(rouge->GetModel().get());
 
 		//test = std::make_unique<ModelDX12>("Data/Model/Character/Barbarian.glb");
-		test = std::make_unique<ModelDX12>("Data/Model/Enemy/Goblin.glb");
-		test->PlayAnimation(0, true);
+		//test = std::make_unique<ModelDX12>("Data/Model/Enemy/Goblin.glb");
+		//test->PlayAnimation(0, true);
 
-		sky = std::make_unique<ModelDX12>("Data/Model/Cube/Cube.fbx");
+		//sky = std::make_unique<ModelDX12>("Data/Model/Cube/Cube.fbx");
 
 		float posX = 0;
 		for (int i = 0; i < 3; ++i)
@@ -193,22 +193,22 @@ void SceneTitle::Update(float elapsedTime)
 	knight->Update(elapsedTime);
 	rouge->Update(elapsedTime);
 
-	if (test != nullptr && T_GRAPHICS.isDX12Active)
-	{
-		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(test_scale.x, test_scale.y, test_scale.z);
-		DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(
-			DirectX::XMConvertToRadians(test_rotation.x),
-			DirectX::XMConvertToRadians(test_rotation.y),
-			DirectX::XMConvertToRadians(test_rotation.z));
-		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(test_position.x, test_position.y, test_position.z);
-		DirectX::XMMATRIX TRANSFORM = S * R * T;
-		DirectX::XMStoreFloat4x4(&test_transform, TRANSFORM);
-		//test->SetTransformMatrix(test_transform);
-		test->UpdateAnimation(elapsedTime);
-		test->UpdateTransform();
+	//if (test != nullptr && T_GRAPHICS.isDX12Active)
+	//{
+	//	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(test_scale.x, test_scale.y, test_scale.z);
+	//	DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(
+	//		DirectX::XMConvertToRadians(test_rotation.x),
+	//		DirectX::XMConvertToRadians(test_rotation.y),
+	//		DirectX::XMConvertToRadians(test_rotation.z));
+	//	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(test_position.x, test_position.y, test_position.z);
+	//	DirectX::XMMATRIX TRANSFORM = S * R * T;
+	//	DirectX::XMStoreFloat4x4(&test_transform, TRANSFORM);
+	//	//test->SetTransformMatrix(test_transform);
+	//	test->UpdateAnimation(elapsedTime);
+	//	test->UpdateTransform();
 
-		sky->UpdateTransform();
-	}
+	//	sky->UpdateTransform();
+	//}
 
 #ifdef _DEBUG
 	// カメラ更新
@@ -276,23 +276,23 @@ void SceneTitle::RenderDX12()
 			m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 
 			//スキニング
-			test->UpdateFrameResource(test_transform);
-			sky->UpdateFrameResource(test_transform);
-			m_skinning_pipeline->Compute(rc, test.get());
+			//test->UpdateFrameResource(test_transform);
+			//sky->UpdateFrameResource(test_transform);
+			//m_skinning_pipeline->Compute(rc, test.get());
 
-			// skyBox
-			{
-				rc.skydomeData.skyTexture = m_sprites[1]->GetDescriptor();
-				ModelShaderDX12* shader = T_GRAPHICS.GetModelShaderDX12(ModelShaderDX12Id::Skydome);
-				shader->Render(rc, sky.get());
-			}
+			//// skyBox
+			//{
+			//	rc.skydomeData.skyTexture = m_sprites[1]->GetDescriptor();
+			//	ModelShaderDX12* shader = T_GRAPHICS.GetModelShaderDX12(ModelShaderDX12Id::Skydome);
+			//	shader->Render(rc, sky.get());
+			//}
 
-			// モデル描画
-			ModelShaderDX12* shader = T_GRAPHICS.GetModelShaderDX12(ModelShaderDX12Id::ToonInstancing);
-			if (test != nullptr)
-			{
-				shader->Render(rc, test.get());
-			}
+			//// モデル描画
+			//ModelShaderDX12* shader = T_GRAPHICS.GetModelShaderDX12(ModelShaderDX12Id::ToonInstancing);
+			//if (test != nullptr)
+			//{
+			//	shader->Render(rc, test.get());
+			//}
 
 			// パーティクル描画
 			m_particle->Render(m_frameBuffer);

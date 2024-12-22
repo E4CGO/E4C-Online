@@ -34,7 +34,7 @@ void SceneTitle_E4C::Initialize()
 	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
 
 	// 光
-	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
+	LightManager::Instance().SetAmbientColor({ 0.3f, 0.3f, 0.3f, 0.0f });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
@@ -144,8 +144,13 @@ void SceneTitle_E4C::RenderDX12()
 		rc.d3d_command_list = m_frameBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
+		T_TEXT.BeginDX12();
+
 		UI.RenderDX12(rc);
+
+		T_TEXT.EndDX12();
 	}
+
 	T_GRAPHICS.End();
 }
 

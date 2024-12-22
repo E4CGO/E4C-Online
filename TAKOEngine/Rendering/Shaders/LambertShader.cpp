@@ -268,7 +268,7 @@ void LambertShader::SetRenderState(const RenderContext& rc)
 	const float blend_factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	dc->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Opaque), blend_factor, 0xFFFFFFFF);
 	dc->OMSetDepthStencilState(rc.renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
-	dc->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullFront));
+	dc->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullBackCCW));
 }
 
 void LambertShader::SetShaderResourceView(const ModelResource::Mesh& mesh, ID3D11DeviceContext*& dc)
@@ -370,7 +370,7 @@ LambertShaderDX12::LambertShaderDX12(ID3D12Device* device, bool instancing)
 	}
 
 	//サンプラーステート設定
-	m_sampler = graphics.GetSampler(SamplerState::LinearWrap);
+	m_sampler = graphics.GetSampler(SamplerState::AnisotropicWrap);
 }
 
 //***********************************************************
@@ -385,19 +385,12 @@ LambertShaderDX12::~LambertShaderDX12()
 //***********************************************************
 // @brief       描画
 // @param[in]   rc     レンダーコンテキスト
-// @param[in]   model  描画対象のモデルデータを指すポインタ
+// @param[in]   mesh   描画対象のモデルデータのmesh
 // @return      なし
 //***********************************************************
-void LambertShaderDX12::Render(const RenderContextDX12& rc, ModelDX12* model)
+void LambertShaderDX12::Render(const RenderContextDX12& rc, const ModelDX12::Mesh& mesh)
 {
 	Graphics& graphics = Graphics::Instance();
-
-	// カメラに写っている範囲のオブジェクトをフラグでマークする配列を用意
-	std::vector<bool> visibleObjects(model->GetMeshes().size(), false);
-
-	// 視錐台カリングを実行して可視オブジェクトをマーク
-	FrustumCulling::FrustumCullingFlag(CameraManager::Instance().GetCamera(), model->GetMeshes(), visibleObjects);
-	int culling = 0;
 
 	// パイプライン設定
 	rc.d3d_command_list->SetGraphicsRootSignature(m_d3d_root_signature.Get());
@@ -406,42 +399,41 @@ void LambertShaderDX12::Render(const RenderContextDX12& rc, ModelDX12* model)
 	// シーン定数バッファ設定
 	rc.d3d_command_list->SetGraphicsRootDescriptorTable(0, rc.scene_cbv_descriptor->GetGpuHandle());
 
-	for (const ModelDX12::Mesh& mesh : model->GetMeshes())
+	// シャドウマップ設定
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(5, rc.shadowMap.shadow_srv_descriptor->GetGpuHandle());
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(6, rc.shadowMap.shadow_sampler_descriptor->GetGpuHandle());
+
+	const ModelResource::Mesh* res_mesh = mesh.mesh;
+	const ModelDX12::Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
+
+	// メッシュ定数バッファ設定
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(1, frame_resource.cbv_descriptor->GetGpuHandle());
+
+	// 頂点バッファ設定
+	rc.d3d_command_list->IASetVertexBuffers(0, 1, mesh.bones.empty() ? &mesh.mesh->d3d_vbv : &frame_resource.d3d_vbv);
+	rc.d3d_command_list->IASetIndexBuffer(&res_mesh->d3d_ibv);
+	rc.d3d_command_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// サブセット
+	const ModelResource::Material* material = res_mesh->material;
+
+	// マテリアル定数バッファ設定
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(2, material->cbv_descriptor->GetGpuHandle());
+
+	// シェーダーリソースビュー設定
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(3, material->srv_descriptor->GetGpuHandle());
+
+	//サンプラーステート設定
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(4, m_sampler->GetDescriptor()->GetGpuHandle());
+
+	// 描画
+	if (frame_resource.instancingCount == 0)
 	{
-		if (!visibleObjects[culling++]) continue;
-
-		const ModelResource::Mesh* res_mesh = mesh.mesh;
-		const ModelDX12::Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
-
-		// メッシュ定数バッファ設定
-		rc.d3d_command_list->SetGraphicsRootDescriptorTable(1, frame_resource.cbv_descriptor->GetGpuHandle());
-
-		// 頂点バッファ設定
-		rc.d3d_command_list->IASetVertexBuffers(0, 1, mesh.bones.empty() ? &mesh.mesh->d3d_vbv : &frame_resource.d3d_vbv);
-		rc.d3d_command_list->IASetIndexBuffer(&res_mesh->d3d_ibv);
-		rc.d3d_command_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		// サブセット
-		const ModelResource::Material* material = res_mesh->material;
-
-		// マテリアル定数バッファ設定
-		rc.d3d_command_list->SetGraphicsRootDescriptorTable(2, material->cbv_descriptor->GetGpuHandle());
-
-		// シェーダーリソースビュー設定
-		rc.d3d_command_list->SetGraphicsRootDescriptorTable(3, material->srv_descriptor->GetGpuHandle());
-
-		//サンプラーステート設定
-		rc.d3d_command_list->SetGraphicsRootDescriptorTable(4, m_sampler->GetDescriptor()->GetGpuHandle());
-
-		// 描画
-		if (frame_resource.instancingCount == 0)
-		{
-			rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), 1, 0, 0, 0);
-		}
-		else
-		{
-			//インスタンシング
-			rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), frame_resource.instancingCount, 0, 0, 0);
-		}
+		rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), 1, 0, 0, 0);
+	}
+	else
+	{
+		//インスタンシング
+		rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), frame_resource.instancingCount, 0, 0, 0);
 	}
 }

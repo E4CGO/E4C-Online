@@ -17,7 +17,8 @@ namespace Online
 	{
 		DATA_SET signinData;
 
-		if (m_pcontroller->GetTcpSocket()->Receive(&signinData, sizeof(DATA_SET::id) + sizeof(DATA_SET::token_size)) > 0)
+		const size_t data_size = (sizeof(uint32_t) + sizeof(uint64_t));
+		if (m_pcontroller->GetTcpSocket()->Receive(&signinData, data_size) > 0)
 		{
 			signinData.token = new char[signinData.token_size + 1];
 			ZeroMemory(signinData.token, signinData.token_size + 1);

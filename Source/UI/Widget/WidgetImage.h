@@ -32,6 +32,7 @@ public:
 protected:
 	// 画像スプライト
 	std::shared_ptr<Sprite> m_pSprite;
+	std::shared_ptr<SpriteDX12> m_pSpriteDX12;
 	// 角度
 	float m_angle = 0;
 	// 色

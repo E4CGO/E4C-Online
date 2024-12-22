@@ -131,7 +131,7 @@ namespace Online
 	*//***************************************************************************/
 	void OnlineController::UDPRecvThread()
 	{
-		const size_t buffer_size = 1024;
+		const size_t buffer_size = 5120;
 		uint8_t buffer[buffer_size];
 		DATA_HEADER header;
 		int header_size = sizeof(DATA_HEADER);
@@ -161,14 +161,12 @@ namespace Online
 	{
 		clock_t last = clock();
 		const float frequency = 0.25f;
-		uint64_t sync_count_id = 0;
 		while (m_udpFlag)
 		{
 			if ((static_cast<float>(clock() - last) / CLOCKS_PER_SEC) > frequency)
 			{
 				last = clock();
 				m_udpCommands[UDP_CMD::SYNC]->Send(nullptr);
-				sync_count_id++;
 			}
 		}
 	}
@@ -186,7 +184,7 @@ namespace Online
 		data.name = "テスト";
 		for (int i = 0; i < PlayerCharacterData::APPEARANCE_PATTERN::NUM; i++)
 		{
-			data.appearance[i] = info.Character.pattern[i];
+			data.appearance[i] = info.pattern[i];
 		}
 
 		return m_tcpCommands[TCP_CMD::LOGIN]->Send(&data);

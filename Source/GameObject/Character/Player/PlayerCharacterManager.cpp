@@ -16,13 +16,23 @@ void PlayerCharacterManager::Update(float elapsedTime)
 }
 /**************************************************************************//**
 	@brief		プレイヤーキャラクター描画処理
-	@param[in]	elapsedTime 経過時間
+	@param[in]	rc レンダーコンテキスト
 	@return		なし
 *//***************************************************************************/
 void PlayerCharacterManager::Render(const RenderContext& rc)
 {
 	std::lock_guard<std::mutex> lock(m_mut);
 	ObjectManager<PlayerCharacter>::Render(rc);
+}
+/**************************************************************************//**
+	@brief		プレイヤーキャラクター描画処理
+	@param[in]	rc レンダーコンテキスト
+	@return		なし
+*//***************************************************************************/
+void PlayerCharacterManager::RenderDX12(const RenderContextDX12& rc)
+{
+	std::lock_guard<std::mutex> lock(m_mut);
+	ObjectManager<PlayerCharacter>::RenderDX12(rc);
 }
 
 /**************************************************************************//**
@@ -39,7 +49,7 @@ PlayerCharacter* PlayerCharacterManager::GetPlayerCharacterById(void)
 	@param[in]	client_id	クライアントID
 	@return		プレイヤーキャラクター参照ポインタ
 *//***************************************************************************/
-PlayerCharacter* PlayerCharacterManager::GetPlayerCharacterById(uint64_t client_id)
+PlayerCharacter* PlayerCharacterManager::GetPlayerCharacterById(uint32_t client_id)
 {
 	for (PlayerCharacter* player : this->items)
 	{
@@ -55,7 +65,7 @@ PlayerCharacter* PlayerCharacterManager::GetPlayerCharacterById(uint64_t client_
 	@param[in]	appearance	プレイヤー外見パターン
 	@return		プレイヤーキャラクター参照ポインタ
 *//***************************************************************************/
-PlayerCharacter* PlayerCharacterManager::UpdatePlayerData(const uint64_t client_id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM])
+PlayerCharacter* PlayerCharacterManager::UpdatePlayerData(const uint32_t client_id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM])
 {
 	std::lock_guard<std::mutex> lock(m_mut);
 	PlayerCharacter* player = GetPlayerCharacterById(client_id);
@@ -89,7 +99,7 @@ PlayerCharacter* PlayerCharacterManager::UpdatePlayerData(const uint64_t client_
 	@param[in]	data 同期データ
 	@return		なし
 *//***************************************************************************/
-void PlayerCharacterManager::SyncPlayer(const uint64_t client_id, const PlayerCharacter::SYNC_DATA& data)
+void PlayerCharacterManager::SyncPlayer(const uint32_t client_id, const PlayerCharacter::SYNC_DATA& data)
 {
 	PlayerCharacter* player = GetPlayerCharacterById(client_id);
 	if (player == nullptr) return;
@@ -104,7 +114,7 @@ void PlayerCharacterManager::SyncPlayer(const uint64_t client_id, const PlayerCh
 	@param[in]	client_id クライアントID
 	@return		なし
 *//***************************************************************************/
-void PlayerCharacterManager::Remove(const uint64_t client_id)
+void PlayerCharacterManager::Remove(const uint32_t client_id)
 {
 	std::lock_guard<std::mutex> lock(m_mut);
 	PlayerCharacter* player = GetPlayerCharacterById(client_id);

@@ -4,6 +4,7 @@
 
 #include "TAKOEngine/Rendering/Sprite.h"
 #include "TAKOEngine/GUI/Widget.h"
+#include "TAKOEngine/Rendering/FrameBufferManager.h"
 
 class WidgetEnemiesHp : public Widget
 {
@@ -15,4 +16,8 @@ public:
 	virtual void RenderDX12(const RenderContextDX12& rc) override;
 private:
 	std::shared_ptr<Sprite> gauge;
+	std::shared_ptr<SpriteDX12> m_gaugeDX12;
+
+	// フレームバッファマネージャー
+	FrameBufferManager * m_frameBuffer = nullptr;
 };

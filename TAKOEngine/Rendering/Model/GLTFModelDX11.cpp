@@ -1,4 +1,4 @@
-#include "GLTFModelDX11.h"
+ï»¿#include "GLTFModelDX11.h"
 
 #include <filesystem>
 #include <fstream>
@@ -14,11 +14,11 @@
 #include "TAKOEngine/Rendering/ConstantBuffer.h"
 
 /**************************************************************************//**
-	@brief		ƒ‚ƒfƒ‹ƒ[ƒfƒBƒ“ƒO
+	@brief		ãƒ¢ãƒ‡ãƒ«ãƒ­ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 	@param[in]    device	ID3D11Device
-	@param[in]    filename	ƒtƒ@ƒCƒ‹ƒpƒX
-	@param[in]    scaling	ƒXƒP[ƒ‹
-	@param[in]    modelType	ƒ‚ƒfƒ‹ƒ^ƒCƒv
+	@param[in]    filename	ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹
+	@param[in]    scaling	ã‚¹ã‚±ãƒ¼ãƒ«
+	@param[in]    modelType	ãƒ¢ãƒ‡ãƒ«ã‚¿ã‚¤ãƒ—
 *//***************************************************************************/
 GLTFModelDX11::GLTFModelDX11(ID3D11Device* device, const std::string& filename, float scaling, int modelType) : scaling(scaling), modelType(modelType)
 {
@@ -39,8 +39,8 @@ GLTFModelDX11::GLTFModelDX11(ID3D11Device* device, const std::string& filename, 
 }
 
 /**************************************************************************//**
-	@brief		ƒgƒ‰ƒ“ƒXƒtƒH[ƒ€ŒvZ
-	@param[in]    nodes	ƒ‚ƒfƒ‹ƒm[ƒh
+	@brief		ãƒˆãƒ©ãƒ³ã‚¹ãƒ•ã‚©ãƒ¼ãƒ è¨ˆç®—
+	@param[in]    nodes	ãƒ¢ãƒ‡ãƒ«ãƒãƒ¼ãƒ‰
 *//***************************************************************************/
 void GLTFModelDX11::cumulate_transforms(std::vector<ModelResource::node>& nodes)
 {
@@ -71,11 +71,11 @@ void GLTFModelDX11::cumulate_transforms(std::vector<ModelResource::node>& nodes)
 	std::function<void(int)> traverse{ [&](int node_index)->void
 	{
 			ModelResource::node& node{nodes.at(node_index)};
-			DirectX::XMMATRIX C{ DirectX::XMLoadFloat4x4(&coordinate_system_transforms[modelType]) * DirectX::XMMatrixScaling(scaling, scaling, scaling) };
+			DirectX::XMMATRIX C{ DirectX::XMLoadFloat4x4(&coordinate_system_transforms[modelType])};
 			DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(node.scale.x, node.scale.y, node.scale.z) };
 			DirectX::XMMATRIX R{ DirectX::XMMatrixRotationQuaternion(DirectX::XMVectorSet(node.rotation.x, node.rotation.y, node.rotation.z, node.rotation.w)) };
 			DirectX::XMMATRIX T{ DirectX::XMMatrixTranslation(node.translation.x, node.translation.y, node.translation.z) };
-			DirectX::XMStoreFloat4x4(&node.global_transform , C * S * R * T * DirectX::XMLoadFloat4x4(&parent_global_transforms.top()));
+			DirectX::XMStoreFloat4x4(&node.global_transform, C * S * R * T * DirectX::XMLoadFloat4x4(&parent_global_transforms.top()));
 			for (int child_index : node.children)
 			{
 				parent_global_transforms.push(node.global_transform);
@@ -85,16 +85,16 @@ void GLTFModelDX11::cumulate_transforms(std::vector<ModelResource::node>& nodes)
 	} };
 	for (std::vector<int>::value_type node_index : scenes.at(0).nodes)
 	{
-		parent_global_transforms.push({ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 });
+		parent_global_transforms.push({ scaling, 0, 0, 0, 0, scaling, 0, 0, 0, 0, scaling, 0, 0, 0, 0, 1 });
 		traverse(node_index);
 		parent_global_transforms.pop();
 	}
 }
 
 /**************************************************************************//**
-	@brief		ƒoƒtƒ@ì¬
-	@param[in]    accessor	tinygltfƒoƒtƒ@
-	@return		ƒoƒtƒ@
+	@brief		ãƒãƒ•ã‚¡ä½œæˆ
+	@param[in]    accessor	tinygltfãƒãƒ•ã‚¡
+	@return		ãƒãƒ•ã‚¡
 *//***************************************************************************/
 ModelResource::buffer_view GLTFModelDX11::make_buffer_view(const tinygltf::Accessor& accessor)
 {
@@ -229,10 +229,10 @@ ModelResource::buffer_view GLTFModelDX11::make_buffer_view(const tinygltf::Acces
 }
 
 /**************************************************************************//**
-	@brief		ƒAƒjƒ[ƒVƒ‡ƒ“İ’è
-	@param[in]    animation_index	ƒCƒ“ƒfƒbƒNƒX
-	@param[in]    time				ƒ^ƒCƒ}[
-	@param[in]    animated_nodes	ƒAƒjƒ[ƒVƒ‡ƒ“
+	@brief		ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³è¨­å®š
+	@param[in]    animation_index	ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+	@param[in]    time				ã‚¿ã‚¤ãƒãƒ¼
+	@param[in]    animated_nodes	ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³
 *//***************************************************************************/
 void GLTFModelDX11::animate(size_t animation_index, float time, std::vector<ModelResource::node>& animated_nodes)
 {
@@ -312,8 +312,8 @@ void GLTFModelDX11::animate(size_t animation_index, float time, std::vector<Mode
 }
 
 /**************************************************************************//**
-	@brief		¢ŠEs—ñİ’è
-	@param[in]    worldTransform	¢ŠEs—ñ
+	@brief		ä¸–ç•Œè¡Œåˆ—è¨­å®š
+	@param[in]    worldTransform	ä¸–ç•Œè¡Œåˆ—
 *//***************************************************************************/
 void GLTFModelDX11::UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform)
 {
@@ -340,8 +340,8 @@ bool GLTFModelDX11::IsPlayAnimation() const
 }
 
 /**************************************************************************//**
-	@brief		ƒAƒjƒ[ƒVƒ‡ƒ“ƒAƒbƒvƒf[ƒg
-	@param[in]    elapsedTime	ƒ^ƒCƒ}[
+	@brief		ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¢ãƒƒãƒ—ãƒ‡ãƒ¼ãƒˆ
+	@param[in]    elapsedTime	ã‚¿ã‚¤ãƒãƒ¼
 *//***************************************************************************/
 void GLTFModelDX11::UpdateAnimation(float elapsedTime)
 {

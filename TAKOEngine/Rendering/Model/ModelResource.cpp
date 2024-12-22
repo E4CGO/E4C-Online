@@ -406,6 +406,9 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 	// アニメーションデート読み取り
 	importer.LoadAnimations(animations, nodes);
 
+	// バウンディングボックス計算
+	ComputeLocalBounds();
+
 	// マテリアル
 	for (Material& material : materials)
 	{

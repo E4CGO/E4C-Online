@@ -2,7 +2,10 @@
 
 Texture2D texture0 : register(t0);
 Texture2D ToonTex  : register(t1);
+Texture2D shadowMap  : register(t2);
+
 SamplerState sampler0 : register(s0);
+SamplerState shadow_sampler : register(s1);
 
 float4 main(VS_OUT pin) : SV_TARGET
 {
@@ -11,80 +14,102 @@ float4 main(VS_OUT pin) : SV_TARGET
     float3 E = normalize(cameraPosition.xyz - pin.position.xyz);
     float3 L = normalize(directionalLightData.direction.xyz);
     
-    // ƒ}ƒeƒŠƒAƒ‹’è”
+    // ãƒãƒ†ãƒªã‚¢ãƒ«å®šæ•°
     float3 ka = float3(1, 1, 1);
     float3 kd = float3(1, 1, 1);
     float3 ks = float3(0.2f, 0.2f, 0.2f);
-    float shiness = 128;
+    float shiness = 20;
     
-    //	ŠÂ‹«Œõ
+    //	ç’°å¢ƒå…‰
     float3 A = ka.rgb * ambientLightColor.rgb;
 
-	//	ŠgU”½Ë
+	//	æ‹¡æ•£åå°„
     float3 D;
 	{
         float U = dot(-L, N) * 0.5f + 0.5f;
         D = ToonTex.Sample(sampler0, float2(U, 1)).rgb;
-
     }
 
-	//	‹¾–Ê”½Ë
+	//	é¡é¢åå°„
     float3 S;
 	{
         float U = dot(normalize(reflect(L, N)), E) * 0.5f + 0.5f;
         S = ToonTex.Sample(sampler0, float2(U, 1)).rgb;
-        S = pow(saturate(S), 20) * 0.5f;
+        S = pow(saturate(S), 20) * 0.2f;
     }
 
-	//	ƒŠƒ€ƒ‰ƒCƒg
+	//	ãƒªãƒ ãƒ©ã‚¤ãƒˆ
     float3 R;
 	{
         float Rim = 1.0f - max(dot(N, E), 0.0f);
         float Ratio = max(dot(L, E), 0);
-        R = ToonTex.Sample(sampler0, float2(Rim * Ratio, 1)).r;
+        R = ToonTex.Sample(sampler0, float2(Rim * Ratio, 1)).r * 0.2f;
     }
     
-    // “_ŒõŒ¹‚Ìˆ—
+    // å¹³è¡Œå…‰æºã®å½±ãªã®ã§ã€å¹³è¡Œå…‰æºã«å¯¾ã—ã¦å½±ã‚’é©å¿œ
+    float3 shadow = 1;
+    {
+        float3 shadowRexcoord = pin.shadow;
+        
+        //ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ã®UVç¯„å›²å†…ã‹ã€æ·±åº¦å€¤ãŒç¯„å›²å†…ã‹åˆ¤å®šã™ã‚‹
+        if (shadowRexcoord.z >= 0 && shadowRexcoord.z <= 1 &&
+			shadowRexcoord.x >= 0 && shadowRexcoord.x <= 1 &&
+			shadowRexcoord.y >= 0 && shadowRexcoord.y <= 1)
+        {
+            //ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ã‹ã‚‰æ·±åº¦å€¤å–å¾—
+            float depth = shadowMap.Sample(shadow_sampler, shadowRexcoord.xy).r;
+
+            //æ·±åº¦å€¤ã‚’æ¯”è¼ƒã—ã¦å½±ã‹ã©ã†ã‹ã‚’åˆ¤å®šã™ã‚‹
+            if (shadowRexcoord.z - depth > shadowBias) //shadow = shadowColor;  
+            {
+                shadow = CalcShadowColorPCFFilter(shadowMap, shadow_sampler, shadowRexcoord, shadowColor, shadowBias);
+            }
+        }
+    }
+    D *= shadow;
+    S *= shadow;
+    
+    // ç‚¹å…‰æºã®å‡¦ç†
     float3 pointDiffuse  = (float3) 0;
     float3 pointSpecular = (float3) 0;
     int i;
     for (i = 0; i < pointLightCount; ++i)
     {
-		// ƒ‰ƒCƒgƒxƒNƒgƒ‹‚ğZo
+		// ãƒ©ã‚¤ãƒˆãƒ™ã‚¯ãƒˆãƒ«ã‚’ç®—å‡º
         float3 lightVector = pin.position.xyz - pointLightData[i].position.xyz;
 
-		// ƒ‰ƒCƒgƒxƒNƒgƒ‹‚Ì’·‚³‚ğZo
+		// ãƒ©ã‚¤ãƒˆãƒ™ã‚¯ãƒˆãƒ«ã®é•·ã•ã‚’ç®—å‡º
         float lightLength = length(lightVector);
 
-		// ƒ‰ƒCƒg‚Ì‰e‹¿”ÍˆÍŠO‚È‚çŒã‚ÌŒvZ‚ğ‚µ‚È‚¢B
+		// ãƒ©ã‚¤ãƒˆã®å½±éŸ¿ç¯„å›²å¤–ãªã‚‰å¾Œã®è¨ˆç®—ã‚’ã—ãªã„ã€‚
         if (lightLength > pointLightData[i].range) continue;
 
-		// ‹——£Œ¸Š‚ğZo‚·‚é
+		// è·é›¢æ¸›è¡°ã‚’ç®—å‡ºã™ã‚‹
         float attenuate = clamp(1.0f - lightLength / pointLightData[i].range, 0.0, 1.0);
         lightVector     = lightVector / lightLength;
         pointDiffuse   += CalcLambertDiffuse(N, lightVector, pointLightData[i].color.rgb, kd.rgb) * attenuate;
         pointSpecular  += CalcPhongSpecular(N, lightVector, pointLightData[i].color.rgb, E, shiness, ks.rgb) * attenuate;
     }
 
-	// ƒXƒ|ƒbƒgƒ‰ƒCƒg‚Ìˆ—
+	// ã‚¹ãƒãƒƒãƒˆãƒ©ã‚¤ãƒˆã®å‡¦ç†
     float3 spotDiffuse  = (float3) 0;
     float3 spotSpecular = (float3) 0;
     for (i = 0; i < spotLightCount; ++i)
     {
-		// ƒ‰ƒCƒgƒxƒNƒgƒ‹‚ğZo
+		// ãƒ©ã‚¤ãƒˆãƒ™ã‚¯ãƒˆãƒ«ã‚’ç®—å‡º
         float3 lightVector = pin.position.xyz - spotLightData[i].position.xyz;
 
-		// ƒ‰ƒCƒgƒxƒNƒgƒ‹‚Ì’·‚³‚ğZo
+		// ãƒ©ã‚¤ãƒˆãƒ™ã‚¯ãƒˆãƒ«ã®é•·ã•ã‚’ç®—å‡º
         float lightLength = length(lightVector);
 
         if (lightLength > spotLightData[i].range) continue;
 
-		// ‹——£Œ¸Š‚ğZo‚·‚é
+		// è·é›¢æ¸›è¡°ã‚’ç®—å‡ºã™ã‚‹
         float attenuate = clamp(1.0f - lightLength / spotLightData[i].range, 0.0, 1.0);
 
         lightVector = normalize(lightVector);
 
-		// Šp“xŒ¸Š‚ğZo‚µ‚Äattenuate‚ÉæZ‚·‚é
+		// è§’åº¦æ¸›è¡°ã‚’ç®—å‡ºã—ã¦attenuateã«ä¹—ç®—ã™ã‚‹
         float3 spotDirection = spotLightData[i].direction;;
         float angle = dot(lightVector, spotDirection);
         float area  = spotLightData[i].innerCorn - spotLightData[i].outerCorn;
@@ -94,8 +119,10 @@ float4 main(VS_OUT pin) : SV_TARGET
         spotSpecular += CalcPhongSpecular(N, lightVector, spotLightData[i].color.rgb, E, shiness, ks.rgb) * attenuate;
     }
     
-    C.rgb *= A + D + S + R;
-    C.rgb += pointDiffuse + spotDiffuse + pointSpecular + spotSpecular;
+    C.rgb *= A + (D + pointDiffuse + spotDiffuse);
+    C.rgb += S + pointSpecular + spotSpecular;
+    
+    C.rgb += R;
     
     return C;
 }

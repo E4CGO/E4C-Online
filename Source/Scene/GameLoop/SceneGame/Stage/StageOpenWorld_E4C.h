@@ -10,6 +10,7 @@
 #include "GameObject/Character/Player/PlayerCharacter.h"
 #include "TAKOEngine/Rendering/Plane.h"
 #include "GameObject/Props/Teleporter.h"
+#include "GameObject/Props/Spawner.h"
 #include "TAKOEngine/Rendering/Shaders/PlaneShader.h"
 
 #include "Scene/Scene.h"
@@ -19,6 +20,7 @@
 
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
+#include "Source/GameObject/Props/Spawner.h"
 
 using namespace DirectX;
 
@@ -35,6 +37,8 @@ public:
 	void Update(float elapsedTime) override;
 
 	void Render() override;
+
+	void RenderDX12() override;
 protected:
 	void OnPhase() override;
 public:
@@ -52,8 +56,12 @@ private:
 
 	std::unique_ptr <Teleporter> teleporter;
 
-	std::unique_ptr<ModelObject> map;
-	std::unique_ptr<ModelObject> tower;
+	std::unordered_map<std::string, std::unique_ptr<ModelObject>> models;
+	std::unique_ptr<Spawner> spawner;
+
+	std::unique_ptr<ModelObject> sky;
+	
+	std::unique_ptr<SpriteDX12>			m_sprites[8];
 
 	std::unique_ptr<Plane> portalSquare;
 
@@ -70,9 +78,9 @@ private:
 	std::unordered_set<const char*> spriteList = {
 		"",											// マスク
 		// Setting UI
-		"Data/Sprites/UI/start.png",
-		"Data/Sprites/big_background.t.png"
 	};
+
+
 
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
 
@@ -86,4 +94,10 @@ private:
 		{5,3,4},
 		{8,3,8}
 	};
+
+	// フレームバッファマネージャー
+	FrameBufferManager* m_frameBuffer = nullptr;
+
+	// ポストエフェクト
+	std::unique_ptr<PostprocessingRendererDX12>	postprocessingRenderer = std::make_unique<PostprocessingRendererDX12>();
 };

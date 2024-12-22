@@ -1,10 +1,4 @@
-#include "EnemyManager.h"
-
-Enemy* EnemyManager::Register(Enemy* enemy)
-{
-	enemy->SetEnemyId(++count);
-	return ObjectManager<Enemy>::Register(enemy);
-}
+ï»¿#include "EnemyManager.h"
 
 Enemy* EnemyManager::GetEnemyById(int id)
 {
@@ -16,7 +10,7 @@ Enemy* EnemyManager::GetEnemyById(int id)
 	return nullptr;
 }
 
-// ƒŒƒCƒLƒƒƒXƒg
+// ãƒ¬ã‚¤ã‚­ãƒ£ã‚¹ãƒˆ
 bool EnemyManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, HitResult& hit, bool camera)
 {
 	HitResult temp;
@@ -27,25 +21,9 @@ bool EnemyManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOA
 		{
 			if (collider.second->RayCast(start, end, temp) && (temp.distance < hit.distance))
 			{
-				hit = temp; // Å’Z
+				hit = temp; // æœ€çŸ­
 			}
 		}
 	}
 	return hit.distance < FLT_MAX;
-}
-
-// XV‚à‚µ‚­‚Í¶¬
-Enemy* EnemyManager::UpdateOrCreate(ENEMY_DATA data)
-{
-	Enemy* enemy = GetEnemyById(data.enemy_id);
-	if (enemy == nullptr)
-	{
-		if (data.hp <= 0) return nullptr;
-		enemy = ObjectManager<Enemy>::Register(Enemy::EnemyFactory(data.enemyType));
-		enemy->SetEnemyId(data.enemy_id);
-	}
-
-	enemy->ImportData(data);
-
-	return enemy;
 }

@@ -37,7 +37,7 @@ void StageManager::RenderDX12()
 {
 	if (m_pCurrentStage != nullptr)
 	{
-		m_pCurrentStage->Render();
+		m_pCurrentStage->RenderDX12();
 	}
 }
 // シーンクリア

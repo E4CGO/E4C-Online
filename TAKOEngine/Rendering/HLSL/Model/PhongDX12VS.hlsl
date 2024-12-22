@@ -10,27 +10,20 @@ VS_OUT main(
 	float3 normal      : NORMAL,
 	float3 tangent     : TANGENT)
 {
-#if 0
-    float3 p = { 0, 0, 0 };
-    float3 n = { 0, 0, 0 };
-    for (int i = 0; i < 4; i++)
-    {
-        p += (boneWeights[i] * mul(position, boneTransforms[boneIndices[i]])).xyz;
-        n += (boneWeights[i] * mul(float4(normal.xyz, 0), boneTransforms[boneIndices[i]])).xyz;
-    }
-#else
-	float3 p = position.xyz;
-#endif
+    position = mul(position, world_transform);
     
     VS_OUT vout;
     float4x4 viewProjection = mul(view, Projection);
-    vout.vertex   = mul(float4(p, 1.0f), mul(world_transform, viewProjection));
+    vout.vertex   = mul(position, viewProjection);
     vout.texcoord = texcoord;
     vout.normal   = normal;
     vout.position = position.xyz;
     vout.tangent  = tangent;
     vout.binormal = normalize(cross(vout.normal, vout.tangent));
-    vout.color    = materialColor;
+    vout.color.rgb = color.rgb * materialColor.rgb;
+    vout.color.a   = color.a;
 
+    vout.shadow = CalcShadowTexcoord(position.xyz, lightViewProjection);
+    
     return vout;
 }
