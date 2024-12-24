@@ -438,29 +438,29 @@ void ShadowMapRenderDX12::CreateFrameBuffer(ID3D12Device* device)
 {
 	// ヒーププロパティの設定
 	D3D12_HEAP_PROPERTIES d3d_heap_props{};
-	d3d_heap_props.Type                 = D3D12_HEAP_TYPE_DEFAULT;
-	d3d_heap_props.CPUPageProperty      = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	d3d_heap_props.Type = D3D12_HEAP_TYPE_DEFAULT;
+	d3d_heap_props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
 	d3d_heap_props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-	d3d_heap_props.CreationNodeMask     = 1;
-	d3d_heap_props.VisibleNodeMask      = 1;
+	d3d_heap_props.CreationNodeMask = 1;
+	d3d_heap_props.VisibleNodeMask = 1;
 
 	// リソースの設定
 	D3D12_RESOURCE_DESC d3d_resource_desc{};
-	d3d_resource_desc.Dimension          = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-	d3d_resource_desc.Alignment          = 0;
-	d3d_resource_desc.Width              = ShadowMapSize;
-	d3d_resource_desc.Height             = ShadowMapSize;
-	d3d_resource_desc.DepthOrArraySize   = 1;
-	d3d_resource_desc.MipLevels          = 1;
-	d3d_resource_desc.Format             = DXGI_FORMAT_R32_TYPELESS;
-	d3d_resource_desc.SampleDesc.Count   = 1;
+	d3d_resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	d3d_resource_desc.Alignment = 0;
+	d3d_resource_desc.Width = ShadowMapSize;
+	d3d_resource_desc.Height = ShadowMapSize;
+	d3d_resource_desc.DepthOrArraySize = 1;
+	d3d_resource_desc.MipLevels = 1;
+	d3d_resource_desc.Format = DXGI_FORMAT_R32_TYPELESS;
+	d3d_resource_desc.SampleDesc.Count = 1;
 	d3d_resource_desc.SampleDesc.Quality = 0;
-	d3d_resource_desc.Layout             = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-	d3d_resource_desc.Flags              = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+	d3d_resource_desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	d3d_resource_desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 
 	D3D12_CLEAR_VALUE dsvClearValue;
-	dsvClearValue.Format               = DXGI_FORMAT_D32_FLOAT;
-	dsvClearValue.DepthStencil.Depth   = 1.0f;
+	dsvClearValue.Format = DXGI_FORMAT_D32_FLOAT;
+	dsvClearValue.DepthStencil.Depth = 1.0f;
 	dsvClearValue.DepthStencil.Stencil = 0;
 
 	// リソースの生成
@@ -478,9 +478,9 @@ void ShadowMapRenderDX12::CreateFrameBuffer(ID3D12Device* device)
 
 	// デプスステンシルビューの設定
 	D3D12_DEPTH_STENCIL_VIEW_DESC d3d_dsv_desc{};
-	d3d_dsv_desc.Format        = DXGI_FORMAT_D32_FLOAT;
+	d3d_dsv_desc.Format = DXGI_FORMAT_D32_FLOAT;
 	d3d_dsv_desc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-	d3d_dsv_desc.Flags         = D3D12_DSV_FLAG_NONE;
+	d3d_dsv_desc.Flags = D3D12_DSV_FLAG_NONE;
 
 	// デプスステンシルビュー生成
 	device->CreateDepthStencilView(
@@ -490,10 +490,10 @@ void ShadowMapRenderDX12::CreateFrameBuffer(ID3D12Device* device)
 
 	// シェーダーリソースビューの設定
 	D3D12_SHADER_RESOURCE_VIEW_DESC d3d_srv_desc = {};
-	d3d_srv_desc.ViewDimension             = D3D12_SRV_DIMENSION_TEXTURE2D;
-	d3d_srv_desc.Shader4ComponentMapping   = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	d3d_srv_desc.Format                    = DXGI_FORMAT_R32_FLOAT;
-	d3d_srv_desc.Texture2D.MipLevels       = d3d_resource_desc.MipLevels;
+	d3d_srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	d3d_srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	d3d_srv_desc.Format = DXGI_FORMAT_R32_FLOAT;
+	d3d_srv_desc.Texture2D.MipLevels = d3d_resource_desc.MipLevels;
 	d3d_srv_desc.Texture2D.MostDetailedMip = 0;
 
 	// ディスクリプタ取得

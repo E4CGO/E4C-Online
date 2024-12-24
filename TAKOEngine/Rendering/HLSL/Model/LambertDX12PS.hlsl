@@ -25,7 +25,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     
     // 平行光源の計算
     float3 directionalDiffuse  = ClacHalfLambert(N, L, directionalLightData.color.rgb, kd);
-    float3 directionalSpecular = CalcPhongSpecular(N, L, directionalLightData.color.rgb, E, shiness, ks);
+    float3 directionalSpecular = CalcPhongSpecular(N, L, directionalLightData.color.rgb, E, shiness, ks) * 0.3f;
     
     // 平行光源の影なので、平行光源に対して影を適応
     float3 shadow = 1;

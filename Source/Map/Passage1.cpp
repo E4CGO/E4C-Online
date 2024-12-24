@@ -11,7 +11,7 @@ Passage1::Passage1(
 	: RoomBase(parent, pointIndex, roomAABBs, isAutoGeneration, roomOrder, orderIndex)
 {
 	// 部屋タイプを設定
-	roomType = DungeonData::PASSAGE_1;
+	roomType = RoomType::PASSAGE_1;
 
 	// 次の部屋の生成を行う
 	GenerateNextRoom(
@@ -24,7 +24,7 @@ void Passage1::LoadMapData()
 {
 	// 接続点データを設定
 	{
-		CONNECTPOINT_DATA newPoint;
+		TILE_DATA newPoint;
 		newPoint.position = DirectX::XMFLOAT3(0.0f, 3.0f, 24.0f);
 		newPoint.angle = m_angle + DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 
@@ -39,89 +39,65 @@ void Passage1::LoadMapData()
 	DirectX::XMFLOAT4 wallColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 	DirectX::XMFLOAT4 pillarColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-	m_tileDatas.emplace_back(TILE_DATA(TileType::STAIR,
+	m_tileDatas.at(TileType::STAIR_STEP_01A).emplace_back(TILE_DATA(
 		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
 		DirectX::XMFLOAT3(0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f),
 		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
 		floorColor));
 
-	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
+	m_tileDatas.at(TileType::FLOOR_01A).emplace_back(TILE_DATA(
 		DirectX::XMFLOAT3(0.0f, 3.0f, 4.0f),
 		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
 		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
 		floorColor));
-	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
+	m_tileDatas.at(TileType::FLOOR_01A).emplace_back(TILE_DATA(
 		DirectX::XMFLOAT3(0.0f, 3.0f, 8.0f),
 		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
 		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
 		floorColor));
-	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
+	m_tileDatas.at(TileType::FLOOR_01A).emplace_back(TILE_DATA(
 		DirectX::XMFLOAT3(0.0f, 3.0f, 12.0f),
 		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
 		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
 		floorColor));
-	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
+	m_tileDatas.at(TileType::FLOOR_01A).emplace_back(TILE_DATA(
 		DirectX::XMFLOAT3(0.0f, 3.0f, 16.0f),
 		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
 		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
 		floorColor));
-	m_tileDatas.emplace_back(TILE_DATA(TileType::FLOOR,
+	m_tileDatas.at(TileType::FLOOR_01A).emplace_back(TILE_DATA(
 		DirectX::XMFLOAT3(0.0f, 3.0f, 20.0f),
 		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
 		DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f),
 		floorColor));
 
 	// 壁
-	m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+	m_tileDatas.at(TileType::WALL_01A).emplace_back(TILE_DATA(
 		{ -2.0f, 0.0f, -2.0f },
 		{ 0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f },
 		{ 1.0f, 1.0f, 1.0f }));
-	m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
-		{ -2.0f, 0.0f, -2.0f },
-		{ 0.0f, 0.0f, 0.0f },
-		{ 1.0f, 1.0f, 1.0f }));
-	m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+	m_tileDatas.at(TileType::WALL_01A).emplace_back(TILE_DATA(
 		{ 2.0f, 0.0f, -2.0f },
 		{ 0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f },
-		{ 1.0f, 1.0f, 1.0f }));
-	m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
-		{ 2.0f, 0.0f, -2.0f },
-		{ 0.0f, 0.0f, 0.0f },
 		{ 1.0f, 1.0f, 1.0f }));
 
 	for (int i = 0; i < 6; i++)
 	{
-		m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+		m_tileDatas.at(TileType::WALL_01A).emplace_back(TILE_DATA(
 			{ -2.0f, 3.0f, -2.0f + (4.0f * i) },
 			{ 0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f },
 			{ 1.0f, 1.0f, 1.0f }));
-		m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+		m_tileDatas.at(TileType::WALL_01A).emplace_back(TILE_DATA(
 			{ -2.0f, 6.0f, -2.0f + (4.0f * i) },
 			{ 0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f },
 			{ 1.0f, 1.0f, 1.0f }));
-		m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
-			{ -2.0f, 3.0f, -2.0f + (4.0f * i) },
-			{ 0.0f, 0.0f, 0.0f },
-			{ 1.0f, 1.0f, 1.0f }));
-		m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
-			{ -2.0f, 6.0f, -2.0f + (4.0f * i) },
-			{ 0.0f, 0.0f, 0.0f },
-			{ 1.0f, 1.0f, 1.0f }));
-		m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+		m_tileDatas.at(TileType::WALL_01A).emplace_back(TILE_DATA(
 			{ 2.0f, 3.0f, -2.0f + (4.0f * i) },
 			{ 0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f },
 			{ 1.0f, 1.0f, 1.0f }));
-		m_tileDatas.emplace_back(TILE_DATA(TileType::WALL,
+		m_tileDatas.at(TileType::WALL_01A).emplace_back(TILE_DATA(
 			{ 2.0f, 6.0f, -2.0f + (4.0f * i) },
 			{ 0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f },
-			{ 1.0f, 1.0f, 1.0f }));
-		m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
-			{ 2.0f, 3.0f, -2.0f + (4.0f * i) },
-			{ 0.0f, 0.0f, 0.0f },
-			{ 1.0f, 1.0f, 1.0f }));
-		m_tileDatas.emplace_back(TILE_DATA(TileType::PILLAR,
-			{ 2.0f, 6.0f, -2.0f + (4.0f * i) },
-			{ 0.0f, 0.0f, 0.0f },
 			{ 1.0f, 1.0f, 1.0f }));
 	}
 }

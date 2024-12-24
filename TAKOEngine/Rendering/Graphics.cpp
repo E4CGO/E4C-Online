@@ -854,7 +854,7 @@ const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera)
 
 				DirectX::XMVECTOR Eye = DirectX::XMVectorSubtract(Focus, DirectX::XMVectorScale(LightDirection, 50.0f));
 				DirectX::XMMATRIX View = DirectX::XMMatrixLookAtLH(Eye, Focus, Up);
-				DirectX::XMMATRIX Projection = DirectX::XMMatrixOrthographicLH(60, 60, 0.1f, 100.0f);
+				DirectX::XMMATRIX Projection = DirectX::XMMatrixOrthographicLH(100, 100, 0.1f, 1000.0f);
 				DirectX::XMMATRIX LightViewProjection = DirectX::XMMatrixMultiply(View, Projection);
 				DirectX::XMStoreFloat4x4(&cb_scene_data->light_view_projection, LightViewProjection);
 			}
