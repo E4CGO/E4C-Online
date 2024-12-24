@@ -21,10 +21,17 @@ MouseMob::MouseMob(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("
 	m_SearchRange = 24.0f;
 	m_AttackRange = 1.25f;
 
+	DirectX::XMFLOAT4X4 testTransform = {
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1
+	};
+
 	// 当たり判定
-	colliders[HitCollider::BodyHit] = new SphereCollider(scaling * 1.2f);
+	colliders[HitCollider::BodyHit] = new SphereCollider((uint16_t)Collider::COLLIDER_TYPE::SPHERE, &testTransform);
 	// 攻撃判定
-	attackColliders[AttackCollider::BodyAtc] = new SphereCollider(scaling * 0.6f);
+	attackColliders[AttackCollider::BodyAtc] = new SphereCollider((uint16_t)Collider::COLLIDER_TYPE::SPHERE, &testTransform);
 	EnableAttackColliders(false);
 
 	using namespace MouseMobState;

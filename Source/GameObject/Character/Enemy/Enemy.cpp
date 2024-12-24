@@ -4,6 +4,7 @@
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Character/Enemy/Enemy.h"
 #include "GameObject/Character/Enemy/SkeletonMinion.h"
+#include "GameObject/Character/Enemy/MouseMob.h"
 #include "GameObject/Props/Spawner.h"
 
 Enemy::Enemy(const char* filename, float scaling, ModelObject::RENDER_MODE renderMode) : Character(filename, scaling, renderMode)
@@ -160,6 +161,7 @@ Enemy* Enemy::EnemyFactory(int enemyType)
 	{
 	case ENEMY_TYPE::SKELETON_MINION: return new SkeletonMinion; break;
 	case ENEMY_TYPE::SKELETON_MINION_BOSS: return new SkeletonMinionBoss; break;
+	case ENEMY_TYPE::MOUSE: return new MouseMob; break;
 	}
 	return nullptr;
 }

@@ -148,14 +148,19 @@ public:
 
 	// TileNode追加
 	void AddTileNode(
-		std::string name = "NewNode", TileType type = TileType::FLOOR_01A,
+		std::string name = "Node", TileType type = TileType::FLOOR_01A,
 		DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f },
 		DirectX::XMFLOAT3 angle = { 0.0f, 0.0f, 0.0f },
 		DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f });
 	// Spawner追加
-	void AddSpawner();
+	void AddSpawner(
+		std::string name = "Spawner",
+		DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f });
 	// ConnectPoint追加
-	void AddConnectPoint();
+	void AddConnectPoint(
+		std::string name = "ConnectPoint",
+		DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f },
+		DirectX::XMFLOAT3 angle = { 0.0f, 0.0f, 0.0f });
 	// ノード複製
 	void DuplicateNode();
 	// ノード削除

@@ -279,36 +279,43 @@ void SceneRoomTest_E4C::LoadRoomData()
 
 	for (const IMPORT_DATA& data : importDatas)
 	{
-		AddTileNode("NewNode", data.type, data.position, data.angle, data.scale);
+		switch (data.type)
+		{
+		case TileType::SPAWNER:			AddSpawner("Spawner", data.position);									break;
+		case TileType::CONNECTPOINT:	AddConnectPoint("ConnectPoint", data.position, data.angle);				break;
+		default:						AddTileNode("Node", data.type, data.position, data.angle, data.scale);	break;
+		}
+
+		//AddTileNode("NewNode", data.type, data.position, data.angle, data.scale);
 	}
 }
 
 void SceneRoomTest_E4C::LoadTileNodeData(const auto& nodeData)
 {
-	TileType tileType = nodeData["Type"];
-	DirectX::XMFLOAT3 position = {
-		nodeData["Position"].at(0),
-		nodeData["Position"].at(1),
-		nodeData["Position"].at(2)
-	};
-	DirectX::XMFLOAT3 angle = {
-		nodeData["Angle"].at(0),
-		nodeData["Angle"].at(1),
-		nodeData["Angle"].at(2)
-	};
-	DirectX::XMFLOAT3 scale = {
-		nodeData["Scale"].at(0),
-		nodeData["Scale"].at(1),
-		nodeData["Scale"].at(2),
-	};
+	//TileType tileType = nodeData["Type"];
+	//DirectX::XMFLOAT3 position = {
+	//	nodeData["Position"].at(0),
+	//	nodeData["Position"].at(1),
+	//	nodeData["Position"].at(2)
+	//};
+	//DirectX::XMFLOAT3 angle = {
+	//	nodeData["Angle"].at(0),
+	//	nodeData["Angle"].at(1),
+	//	nodeData["Angle"].at(2)
+	//};
+	//DirectX::XMFLOAT3 scale = {
+	//	nodeData["Scale"].at(0),
+	//	nodeData["Scale"].at(1),
+	//	nodeData["Scale"].at(2),
+	//};
 
-	FILE_DATA importData = DungeonData::Instance().GetModelFileDatas(tileType).at(0);
+	//FILE_DATA importData = DungeonData::Instance().GetModelFileDatas(tileType).at(0);
 
-	TileNode* newNode = new TileNode(NODES.GetUniqueName("NewNode"), tileType, importData.fileName.c_str(), importData.scale);
-	newNode->SetPosition(position);
-	newNode->SetAngle(angle);
-	newNode->SetScale(scale);
-	NODES.Register(newNode);
+	//TileNode* newNode = new TileNode(NODES.GetUniqueName("NewNode"), tileType, importData.fileName.c_str(), importData.scale);
+	//newNode->SetPosition(position);
+	//newNode->SetAngle(angle);
+	//newNode->SetScale(scale);
+	//NODES.Register(newNode);
 }
 
 void SceneRoomTest_E4C::LoadSpawnerData(const auto& nodeData)
@@ -429,10 +436,40 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 			}
 			if (ImGui::BeginMenu("New")) {
 				if (ImGui::BeginMenu("TileNode")) {
-					if (ImGui::MenuItem("Floor01a"))		AddTileNode("Floor",	TileType::FLOOR_01A);
-					if (ImGui::MenuItem("Wall01a"))			AddTileNode("Wall",		TileType::WALL_01A);
-					if (ImGui::MenuItem("StairStep01a"))	AddTileNode("Stair",	TileType::STAIR_STEP_01A);
-					if (ImGui::MenuItem("Portal"))			AddTileNode("Portal",	TileType::PORTAL);
+					if (ImGui::MenuItem("Floor01a"))		AddTileNode("Floor",		TileType::FLOOR_01A);
+					if (ImGui::MenuItem("Floor01b"))		AddTileNode("Floor",		TileType::FLOOR_01B);
+					if (ImGui::MenuItem("Floor02a"))		AddTileNode("Floor",		TileType::FLOOR_02A);
+					if (ImGui::MenuItem("Floor03a"))		AddTileNode("Floor",		TileType::FLOOR_03A);
+					if (ImGui::MenuItem("FloorCloud01a"))	AddTileNode("FloorCloud",	TileType::FLOOR_CLOUD_01A);
+
+					if (ImGui::MenuItem("Wall01a"))			AddTileNode("Wall",			TileType::WALL_01A);
+					if (ImGui::MenuItem("Wall01b"))			AddTileNode("Wall",			TileType::WALL_01B);
+					if (ImGui::MenuItem("Wall02a"))			AddTileNode("Wall",			TileType::WALL_02A);
+					if (ImGui::MenuItem("Wall02b"))			AddTileNode("Wall",			TileType::WALL_02B);
+					if (ImGui::MenuItem("Wall03a"))			AddTileNode("Wall",			TileType::WALL_03A);
+					if (ImGui::MenuItem("Wall04a"))			AddTileNode("Wall",			TileType::WALL_04A);
+					if (ImGui::MenuItem("WallCloud"))		AddTileNode("WallCloud",	TileType::WALL_CLOUD);
+
+					if (ImGui::MenuItem("Arch01a"))			AddTileNode("Arch",			TileType::ARCH_01A);
+					if (ImGui::MenuItem("ArchEntrance01a"))	AddTileNode("ArchEntrance",	TileType::ARCH_ENTRANCE_01A);
+					if (ImGui::MenuItem("ArchFloor01a"))	AddTileNode("ArchFloor",	TileType::ARCH_FLOOR_01A);
+
+					if (ImGui::MenuItem("StairRailing01a"))	AddTileNode("StairRailing",	TileType::STAIR_RAILING_01A);
+					if (ImGui::MenuItem("StairStep01a"))	AddTileNode("StairStep",	TileType::STAIR_STEP_01A);
+
+					if (ImGui::MenuItem("Caramel01"))		AddTileNode("Caramel",		TileType::CARAMEL_01);
+					if (ImGui::MenuItem("Caramel02"))		AddTileNode("Caramel",		TileType::CARAMEL_02);
+					if (ImGui::MenuItem("Cloud01"))			AddTileNode("Cloud",		TileType::CLOUD_01);
+					if (ImGui::MenuItem("Cloud02"))			AddTileNode("Cloud",		TileType::CLOUD_02);
+					if (ImGui::MenuItem("Cream01"))			AddTileNode("Cream",		TileType::CREAM_01);
+					if (ImGui::MenuItem("Cream02"))			AddTileNode("Cream",		TileType::CREAM_02);
+					if (ImGui::MenuItem("Lolipop01a"))		AddTileNode("Lolipop",		TileType::LOLIPOP_01A);
+					if (ImGui::MenuItem("Lolipop01b"))		AddTileNode("Lolipop",		TileType::LOLIPOP_01B);
+					if (ImGui::MenuItem("Lolipop02a"))		AddTileNode("Lolipop",		TileType::LOLIPOP_02A);
+					if (ImGui::MenuItem("Star"))			AddTileNode("Star",			TileType::STAR);
+					if (ImGui::MenuItem("FireHydrant"))		AddTileNode("FireHydrant",	TileType::FIRE_HYDRANT);
+
+					//if (ImGui::MenuItem("Portal"))			AddTileNode("Portal",		TileType::PORTAL);
 					//if (ImGui::MenuItem("ConnectPoint"))	AddTileNode("ConnectPoint",	TileType::CONNECTPOINT);
 					ImGui::EndMenu();
 				}
@@ -519,18 +556,10 @@ void SceneRoomTest_E4C::AddTileNode(
 	FILE_DATA importData = DungeonData::Instance().GetModelFileDatas(type).at(0);
 
 	switch (type) {
-	case ns_RoomData::PORTAL: return;
-	case ns_RoomData::SPAWNER: return;
-	case ns_RoomData::CONNECTPOINT:
-	{
-		ConnectPointNode* newNode = new ConnectPointNode(NODES.GetUniqueName(name));
-		newNode->SetPosition(position);
-		newNode->SetAngle(angle);
-		NODES.Register(newNode);
-
-		selectionNode = newNode;
-	}
-	return;
+	case ns_RoomData::PORTAL:
+	case ns_RoomData::SPAWNER:
+	case ns_RoomData::CONNECTPOINT: return;	// ポータル、スポナー、接続点は別の関数で生成する
+	default: break;
 	}
 
 	TileNode* newNode = new TileNode(NODES.GetUniqueName(name), type, importData.fileName.c_str(), importData.scale);
@@ -543,18 +572,26 @@ void SceneRoomTest_E4C::AddTileNode(
 	selectionNode = newNode;
 }
 
-void SceneRoomTest_E4C::AddSpawner()
+void SceneRoomTest_E4C::AddSpawner(
+	std::string name,
+	DirectX::XMFLOAT3 position)
 {
-	SpawnerNode* newNode = new SpawnerNode(NODES.GetUniqueName("Spawner"));
+	SpawnerNode* newNode = new SpawnerNode(NODES.GetUniqueName(name));
+	newNode->SetPosition(position);
 	NODES.Register(newNode);
 
 	// 追加したノードを選択させる
 	selectionNode = newNode;
 }
 
-void SceneRoomTest_E4C::AddConnectPoint()
+void SceneRoomTest_E4C::AddConnectPoint(
+	std::string name,
+	DirectX::XMFLOAT3 position,
+	DirectX::XMFLOAT3 angle)
 {
-	ConnectPointNode* newNode = new ConnectPointNode(NODES.GetUniqueName("ConnectPoint"));
+	ConnectPointNode* newNode = new ConnectPointNode(NODES.GetUniqueName(name));
+	newNode->SetPosition(position);
+	newNode->SetAngle(angle);
 	NODES.Register(newNode);
 
 	// 追加したノードを選択させる

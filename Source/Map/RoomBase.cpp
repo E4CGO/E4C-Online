@@ -10,9 +10,12 @@
 #include "Map/Passage1.h"
 #include "Map/DeadEndRoom.h"
 
+#include "GameObject/GameObjectManager.h"
 #include "MapTile.h"
 #include "MapTileManager.h"
 #include "InstancingModelManager.h"
+
+#include "GameObject/Props/Spawner.h"
 
 #include <filesystem>
 
@@ -406,184 +409,167 @@ AABB RoomBase::CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const
 
 void RoomBase::PlaceMapTile(bool isLeader)
 {
-	struct ModelFileData
-	{
-		std::string fileName;
-		float scale = 1.0;
-	};
-
-	//{
-	//	ModelObject* test = new ModelObject("Data/Model/DungeonAssets/WALL.glb", 1, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON);
-	//	test->SetShader("WALL", ModelShaderDX12Id::ToonInstancing);
-
-	//	DirectX::XMFLOAT3 pos[] =
-	//	{
-	//		{0,0,0},
-	//		{0,0,0},
-	//		{3.5f,0,-4},
-	//		{3.5f,0,-4},
-	//	};
-
-	//	float angleY = 0;
-	//	DirectX::XMMATRIX LeftHandScaling = DirectX::XMMatrixScaling(-1, 1, 1);
-	//	for (int i = 0; i < 4; ++i)
-	//	{
-	//		int id = test->GetModel()->AllocateInstancingIndex();
-	//		if (id < 0) continue;
-
-	//		// スケール行列生成
-	//		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1, 1, 1);
-	//		// 回転行列生成
-	//		DirectX::XMMATRIX X = DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(90));
-	//		DirectX::XMMATRIX Y = DirectX::XMMatrixRotationY(DirectX::XMConvertToRadians(angleY));
-	//		DirectX::XMMATRIX Z = DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(0));
-	//		DirectX::XMMATRIX R = X * Y * Z;
-	//		// 位置行列生成
-	//		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(pos[i].x, pos[i].y, pos[i].z);
-
-	//		DirectX::XMMATRIX W = (S * R * T) * LeftHandScaling;
-
-	//		DirectX::XMFLOAT4X4 tm;
-	//		DirectX::XMStoreFloat4x4(&tm, W);
-	//		test->GetModel()->UpdateTransform(id, tm);
-
-	//		angleY += 90;
-	//	}
-	//	MAPTILES.Register(test);
-	//}
-
 	for (uint8_t tileType = TileType::FLOOR_01A; tileType < TileType::TILETYPE_COUNT; tileType++)
 	{
-		std::vector<ModelFileData> colliderFileNames;	// 当たり判定用モデル
-		std::vector<ModelFileData> modelFileNames;		// 描画用モデル
+		if (m_tileDatas.at(tileType).size() < 1) continue;
 
-		switch (tileType)
+		// Spawnerは特殊
+		if (tileType == TileType::SPAWNER)
 		{
-		case TileType::FLOOR_01A:
-			colliderFileNames.emplace_back("Data/Model/DungeonAssets/FloorCollision_01a.glb", 4.0f);
-			modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Floor_01a.glb", 4.0f);
-			break;
-		case TileType::WALL_01A:
-			colliderFileNames.emplace_back("Data/Model/DungeonAssets/WallCollision_01a.glb", 4.0f);
-			modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Wall_Pattern_01a.glb", 4.0f);
-			//modelFileNames.emplace_back("Data/Model/DungeonAssets/WALL.glb", 1.0f);
-			break;
-		case TileType::STAIR_STEP_01A:
-			colliderFileNames.emplace_back("Data/Model/DungeonAssets/SlopeCollision_01a.glb", 4.0f);
-			modelFileNames.emplace_back("Data/Model/DungeonAssets/SM_Stairs_Steps_01a.glb", 4.0f);
-			break;
-		default:
+			for (const TILE_DATA& data : m_tileDatas.at(tileType))
+			{
+				Spawner* spawner = new Spawner(2, 2, -1);
+				spawner->SetPosition(data.position);
+
+				GameObjectManager::Instance().Register(spawner);
+			}
 			continue;
 		}
 
-		// インスタンシング
-		if (T_GRAPHICS.isDX12Active && tileType != TileType::WALL_01A)
+		// ConnectPointはコンストラクタで既に読込み済だからcontinue
+		if (tileType == TileType::CONNECTPOINT) continue;
+
+		std::vector<FILE_DATA> collisionFileDatas;	// 当たり判定用
+		std::vector<FILE_DATA> modelFileDatas;		// 描画用
+
+		// 当たり判定用のデータが登録されているなら取得
+		if (DUNGEONDATA.GetCollisionFileDatas((TileType)tileType).size() > 0)
 		{
-			FILE_DATA fileData = { modelFileNames.at(0).fileName, modelFileNames.at(0).scale };
-
-			std::filesystem::path filePath = fileData.fileName;
-			std::string fileNameStr = filePath.stem().string();
-			const char* fileName = fileNameStr.c_str();
-
-			ModelObject* instancingModel = new ModelObject(
-				fileData.fileName.c_str(),
-				fileData.scale,
-				ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON);
-			instancingModel->SetShader(fileName, ModelShaderDX12Id::ToonInstancing);
-
-			DirectX::XMMATRIX LeftHandScaling = DirectX::XMMatrixScaling(-1, 1, 1);
-
-			for (int i = 0; i < m_tileDatas.at(tileType).size(); ++i)
-			{
-				int id = instancingModel->GetModel()->AllocateInstancingIndex();
-				if (id < 0) continue;
-
-				DirectX::XMFLOAT3 position = m_tileDatas.at(tileType).at(i).position;
-				DirectX::XMFLOAT3 angle = m_tileDatas.at(tileType).at(i).angle;
-				DirectX::XMFLOAT3 scale = m_tileDatas.at(tileType).at(i).scale;
-
-				// 床ならangleX = 0.0f
-				// 壁ならangleX = 90.0f
-				// angleYをマイナスに
-				// positionXをマイナスに
-
-				// スケール行列生成
-				DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x * fileData.scale, scale.y * fileData.scale, scale.z * fileData.scale);
-				// 回転行列生成
-				float angleX = 0.0f;
-				DirectX::XMMATRIX R = DirectX::XMMatrixIdentity();
-				if (tileType == TileType::WALL_01A)
-				{
-					angleX = 0.0f;
-					DirectX::XMMATRIX X = DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(angleX));
-					DirectX::XMMATRIX Y = DirectX::XMMatrixRotationY(angle.y);
-					DirectX::XMMATRIX Z = DirectX::XMMatrixRotationZ(angle.z);
-
-					R = X * Y * Z;
-				}
-				// 位置行列生成
-				DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(-position.x, position.y, position.z);
-
-				DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&m_transform);
-
-				DirectX::XMMATRIX W = (S * R * T) * P * LeftHandScaling;
-
-				DirectX::XMFLOAT4X4 tm;
-				DirectX::XMStoreFloat4x4(&tm, W);
-				instancingModel->GetModel()->UpdateTransform(id, tm);
-			}
-			MAPTILES.Register(instancingModel);
+			collisionFileDatas.emplace_back(DUNGEONDATA.GetCollisionFileDatas((TileType)tileType).at(0));
 		}
-		else
+
+		// 描画用のデータが登録されているなら取得
+		if (DUNGEONDATA.GetModelFileDatas((TileType)tileType).size() > 0)
+		{
+			modelFileDatas.emplace_back(DUNGEONDATA.GetModelFileDatas((TileType)tileType).at(0));
+		}
+
+		// 先に描画用モデルの読込を行う
+		// 描画用データがあるなら
+		if (modelFileDatas.size() > 0)
+		{
+			// ここのコメントアウトを解除するとインスタンシング
+
+			// インスタンシング
+			//if (T_GRAPHICS.isDX12Active &&
+			//	tileType == TileType::FLOOR_01A &&
+			//	tileType == TileType::FLOOR_01B &&
+			//	tileType == TileType::FLOOR_02A &&
+			//	tileType == TileType::FLOOR_03A &&
+			//	tileType == TileType::ARCH_FLOOR_01A &&
+			//	tileType == TileType::FLOOR_CLOUD_01A)
+			//{
+			//	FILE_DATA fileData = { modelFileDatas.at(0).fileName, modelFileDatas.at(0).scale };
+
+			//	std::filesystem::path filePath = fileData.fileName;
+			//	std::string fileNameStr = filePath.stem().string();
+			//	const char* fileName = fileNameStr.c_str();
+
+			//	ModelObject* instancingModel = new ModelObject(
+			//		fileData.fileName.c_str(),
+			//		fileData.scale,
+			//		ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON);
+			//	instancingModel->SetShader(fileName, ModelShaderDX12Id::ToonInstancing);
+
+			//	DirectX::XMMATRIX LeftHandScaling = DirectX::XMMatrixScaling(-1, 1, 1);
+
+			//	for (int i = 0; i < m_tileDatas.at(tileType).size(); ++i)
+			//	{
+			//		int id = instancingModel->GetModel()->AllocateInstancingIndex();
+			//		if (id < 0) continue;
+
+			//		DirectX::XMFLOAT3 position = m_tileDatas.at(tileType).at(i).position;
+			//		DirectX::XMFLOAT3 angle = m_tileDatas.at(tileType).at(i).angle;
+			//		DirectX::XMFLOAT3 scale = m_tileDatas.at(tileType).at(i).scale;
+
+			//		// 床ならangleX = 0.0f
+			//		// 壁ならangleX = 90.0f
+			//		// angleYをマイナスに
+			//		// positionXをマイナスに
+
+			//		// スケール行列生成
+			//		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x * fileData.scale, scale.y * fileData.scale, scale.z * fileData.scale);
+			//		// 回転行列生成
+			//		float angleX = 0.0f;
+			//		DirectX::XMMATRIX R = DirectX::XMMatrixIdentity();
+			//		if (tileType == TileType::WALL_01A)
+			//		{
+			//			angleX = 0.0f;
+			//			DirectX::XMMATRIX X = DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(angleX));
+			//			DirectX::XMMATRIX Y = DirectX::XMMatrixRotationY(angle.y);
+			//			DirectX::XMMATRIX Z = DirectX::XMMatrixRotationZ(angle.z);
+
+			//			R = X * Y * Z;
+			//		}
+			//		// 位置行列生成
+			//		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(-position.x, position.y, position.z);
+
+			//		DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&m_transform);
+
+			//		DirectX::XMMATRIX W = (S * R * T) * P * LeftHandScaling;
+
+			//		DirectX::XMFLOAT4X4 tm;
+			//		DirectX::XMStoreFloat4x4(&tm, W);
+			//		instancingModel->GetModel()->UpdateTransform(id, tm);
+			//	}
+			//	MAPTILES.Register(instancingModel);
+			//}
+			//// 通常の読み込み
+			//else
+			{
+				for (const TILE_DATA& tileData : m_tileDatas.at(tileType))
+				{
+					MapTile* modelTile = new MapTile("", 1.0f, this);
+
+					for (const FILE_DATA& data : modelFileDatas)
+					{
+						if (T_GRAPHICS.isDX11Active)
+						{
+							modelTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX11, ModelObject::LHS_TOON);
+						}
+						if (T_GRAPHICS.isDX12Active)
+						{
+							modelTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX12, ModelObject::LHS_TOON);
+						}
+					}
+
+					modelTile->SetPosition(tileData.position);
+					modelTile->SetAngle(tileData.angle);
+					modelTile->SetScale(tileData.scale);
+					modelTile->Update(0);
+					MAPTILES.Register(modelTile);
+				}
+			}
+		}
+
+		// 当たり判定用データがあるなら
+		if (collisionFileDatas.size() > 0)
 		{
 			for (const TILE_DATA& tileData : m_tileDatas.at(tileType))
 			{
-				MapTile* modelTile = new MapTile("", 1.0f, this);
-			
-				for (const ModelFileData& data : modelFileNames)
+				MapTile* colliderTile = new MapTile("", 1.0f, this);
+
+				for (const FILE_DATA& data : collisionFileDatas)
 				{
 					if (T_GRAPHICS.isDX11Active)
 					{
-						modelTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX11, ModelObject::LHS_TOON);
+						colliderTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX11, ModelObject::LHS_TOON);
 					}
 					if (T_GRAPHICS.isDX12Active)
 					{
-						modelTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX12, ModelObject::LHS_TOON);
+						colliderTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX12, ModelObject::LHS_PBR);
 					}
 				}
-			
-				modelTile->SetPosition(tileData.position);
-				modelTile->SetAngle(tileData.angle);
-				modelTile->SetScale(tileData.scale);
-				modelTile->Update(0);
-				MAPTILES.Register(modelTile);
+				if (collisionFileDatas.size() != 0) colliderTile->SetCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
+
+				// SetCollider後にPos、Angle、Scaleを設定する
+				colliderTile->SetPosition(tileData.position);
+				colliderTile->SetAngle(tileData.angle);
+				colliderTile->SetScale(tileData.scale);
+				colliderTile->Update(0);
+				colliderTile->Hide();
+				MAPTILES.Register(colliderTile);
 			}
-		}
-
-		for (const TILE_DATA& tileData : m_tileDatas.at(tileType))
-		{
-			MapTile* colliderTile = new MapTile("", 1.0f, this);
-
-			for (const ModelFileData& data : colliderFileNames)
-			{
-				if (T_GRAPHICS.isDX11Active)
-				{
-					colliderTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX11, ModelObject::LHS_TOON);
-				}
-				if (T_GRAPHICS.isDX12Active)
-				{
-					colliderTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX12, ModelObject::LHS_PBR);
-				}
-			}
-			if (colliderFileNames.size() != 0) colliderTile->SetCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
-
-			// SetCollider後にPos、Angle、Scaleを設定する
-			colliderTile->SetPosition(tileData.position);
-			colliderTile->SetAngle(tileData.angle);
-			colliderTile->SetScale(tileData.scale);
-			colliderTile->Update(0);
-			colliderTile->Hide();
-			MAPTILES.Register(colliderTile);
 		}
 	}
 }

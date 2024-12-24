@@ -29,7 +29,7 @@ SimpleRoom1::SimpleRoom1(
 void SimpleRoom1::LoadMapData()
 {
 	nlohmann::json loadFile;
-	std::ifstream ifs("Data/RoomDatas/SimpleRoom1.json");
+	std::ifstream ifs("Data/RoomDatas/TestFloor_01a.json");
 
 	if (ifs.is_open())
 	{
@@ -43,7 +43,6 @@ void SimpleRoom1::LoadMapData()
 			switch (tileType)
 			{
 			case ns_RoomData::PORTAL: continue;
-			case ns_RoomData::SPAWNER: continue;
 			case ns_RoomData::CONNECTPOINT:
 			{
 				DirectX::XMFLOAT3 position = {

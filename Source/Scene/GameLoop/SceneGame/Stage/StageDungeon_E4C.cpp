@@ -217,25 +217,11 @@ void StageDungeon_E4C::Initialize()
 	CURSOR_OFF;
 
 	m_roomOrder.emplace_back(RoomType::SIMPLE_ROOM_1);
-	m_roomOrder.emplace_back(RoomType::SIMPLE_ROOM_1);
-	m_roomOrder.emplace_back(RoomType::SIMPLE_ROOM_1);
-	m_roomOrder.emplace_back(RoomType::DEAD_END);
-	m_roomOrder.emplace_back(RoomType::DEAD_END);
-	m_roomOrder.emplace_back(RoomType::SIMPLE_ROOM_1);
-	m_roomOrder.emplace_back(RoomType::DEAD_END);
-	m_roomOrder.emplace_back(RoomType::DEAD_END);
-	m_roomOrder.emplace_back(RoomType::SIMPLE_ROOM_1);
-	m_roomOrder.emplace_back(RoomType::DEAD_END);
-	m_roomOrder.emplace_back(RoomType::DEAD_END);
 
 	GenerateDungeon();
 
 	// 一番遠い部屋のうち、ランダムな一つを抽選しテレポーターを設置する
 	RoomBase* lastRoom = rootRoom->GetFarthestChild().at(std::rand() % rootRoom->GetFarthestChild().size());
-
-	Spawner* spawner = new Spawner(0, 5, 5);
-	spawner->SetPosition({ 0, 1, 0 });
-	GameObjectManager::Instance().Register(spawner);
 
 	TeleportToOpenworld* teleporter = new TeleportToOpenworld();
 	teleporter->SetPosition(lastRoom->GetCenterPos());

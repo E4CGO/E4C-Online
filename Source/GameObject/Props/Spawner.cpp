@@ -69,6 +69,7 @@ void Spawner::Spawn()
 	DirectX::XMFLOAT3 offset = { cosf(angle) * distance, 0.0f, sinf(angle) * distance };
 
 	enemy->SetPosition(position + offset);
+	enemy->SetSpawnPosition(position + offset);
 	enemy->SetSpawner(this);
 	m_pSpawnedEnemies.insert(ENEMIES.Register(enemy));
 }

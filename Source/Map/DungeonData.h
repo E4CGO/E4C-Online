@@ -28,28 +28,50 @@ namespace ns_RoomData
 	// タイルタイプ
 	enum TileType : uint8_t
 	{
+		// 床タイル
 		FLOOR_01A = 0,
 		FLOOR_01B,
 		FLOOR_02A,
 		FLOOR_03A,
+		FLOOR_CLOUD_01A,
 
+		// 壁タイル
 		WALL_01A,
 		WALL_01B,
 		WALL_02A,
 		WALL_02B,
 		WALL_03A,
 		WALL_04A,
+		WALL_CLOUD,
 
+		// アーチタイル
 		ARCH_01A,
 		ARCH_ENTRANCE_01A,
 		ARCH_FLOOR_01A,
 
+		// 階段タイル
 		STAIR_RAILING_01A,
 		STAIR_STEP_01A,
 
+		// 小物タイル
+		CARAMEL_01,
+		CARAMEL_02,
+		CLOUD_01,
+		CLOUD_02,
+		CREAM_01,
+		CREAM_02,
+		LOLIPOP_01A,
+		LOLIPOP_01B,
+		LOLIPOP_02A,
+		STAR,
+		FIRE_HYDRANT,
+
+		// ゲームオブジェクトタイル
 		PORTAL,
 		SPAWNER,
 		CONNECTPOINT,
+
+		// enumCount
 		TILETYPE_COUNT,
 	};
 
@@ -128,7 +150,9 @@ public:
 	// ダンジョンの生成設定を取得
 	DungeonGenerateSetting GetDungeonGenerateSetting() { return m_dungeonGenerateSetting; }
 	// ファイル読み込み用データの取得
-	const std::vector<FILE_DATA> GetModelFileDatas(TileType type) const { return m_modelFileDatas.at(type); }
+	const std::vector<FILE_DATA> GetModelFileDatas(TileType type) const {
+		int a = 0;
+		int b = 0; return m_modelFileDatas.at(type); }
 	const std::vector<FILE_DATA> GetCollisionFileDatas(TileType type) const { return m_collisionFileDatas.at(type); }
 
 private:

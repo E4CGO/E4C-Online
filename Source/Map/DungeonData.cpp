@@ -141,6 +141,7 @@ void DungeonData::InitModelFileDatas()
 	m_modelFileDatas.at(FLOOR_01B).emplace_back("Data/Model/DungeonAssets/SM_Floor_01b.glb", 4.0f);
 	m_modelFileDatas.at(FLOOR_02A).emplace_back("Data/Model/DungeonAssets/SM_Floor_02a.glb", 4.0f);
 	m_modelFileDatas.at(FLOOR_03A).emplace_back("Data/Model/DungeonAssets/SM_Floor_03a.glb", 4.0f);
+	m_modelFileDatas.at(FLOOR_CLOUD_01A).emplace_back("Data/Model/DungeonAssets/SM_Floor_Cloud_01a.glb", 4.0f);
 
 	m_modelFileDatas.at(WALL_01A).emplace_back("Data/Model/DungeonAssets/SM_Wall_Pattern_01a.glb", 4.0f);
 	m_modelFileDatas.at(WALL_01B).emplace_back("Data/Model/DungeonAssets/SM_Wall_Pattern_01b.glb", 4.0f);
@@ -148,6 +149,7 @@ void DungeonData::InitModelFileDatas()
 	m_modelFileDatas.at(WALL_02B).emplace_back("Data/Model/DungeonAssets/SM_Wall_Pattern_02b.glb", 4.0f);
 	m_modelFileDatas.at(WALL_03A).emplace_back("Data/Model/DungeonAssets/SM_Wall_Pattern_03a.glb", 4.0f);
 	m_modelFileDatas.at(WALL_04A).emplace_back("Data/Model/DungeonAssets/SM_Wall_Pattern_04a.glb", 4.0f);
+	m_modelFileDatas.at(WALL_CLOUD).emplace_back("Data/Model/DungeonAssets/SM_Wall_Cloud.glb", 4.0f);
 
 	m_modelFileDatas.at(ARCH_01A).emplace_back("Data/Model/DungeonAssets/SM_Arch_01a.glb", 4.0f);
 	m_modelFileDatas.at(ARCH_ENTRANCE_01A).emplace_back("Data/Model/DungeonAssets/SM_Arch_Entrance_01a.glb", 4.0f);
@@ -155,6 +157,18 @@ void DungeonData::InitModelFileDatas()
 
 	m_modelFileDatas.at(STAIR_RAILING_01A).emplace_back("Data/Model/DungeonAssets/SM_Stairs_Railing_01a.glb", 4.0f);
 	m_modelFileDatas.at(STAIR_STEP_01A).emplace_back("Data/Model/DungeonAssets/SM_Stairs_Steps_01a.glb", 4.0f);
+
+	m_modelFileDatas.at(CARAMEL_01).emplace_back("Data/Model/DungeonAssets/SM_Caramel_01.glb", 4.0f);
+	m_modelFileDatas.at(CARAMEL_02).emplace_back("Data/Model/DungeonAssets/SM_Caramel_02.glb", 4.0f);
+	m_modelFileDatas.at(CLOUD_01).emplace_back("Data/Model/DungeonAssets/SM_Cloud_01.glb", 4.0f);
+	m_modelFileDatas.at(CLOUD_02).emplace_back("Data/Model/DungeonAssets/SM_Cloud_02.glb", 4.0f);
+	m_modelFileDatas.at(CREAM_01).emplace_back("Data/Model/DungeonAssets/SM_Cream_01.glb", 4.0f);
+	m_modelFileDatas.at(CREAM_02).emplace_back("Data/Model/DungeonAssets/SM_Cream_02.glb", 4.0f);
+	m_modelFileDatas.at(LOLIPOP_01A).emplace_back("Data/Model/DungeonAssets/SM_Lollipop_01a.glb", 4.0f);
+	m_modelFileDatas.at(LOLIPOP_01B).emplace_back("Data/Model/DungeonAssets/SM_Lollipop_01b.glb", 4.0f);
+	m_modelFileDatas.at(LOLIPOP_02A).emplace_back("Data/Model/DungeonAssets/SM_Lollipop_02a.glb", 4.0f);
+	m_modelFileDatas.at(STAR).emplace_back("Data/Model/DungeonAssets/SM_Star.glb", 4.0f);
+	m_modelFileDatas.at(FIRE_HYDRANT).emplace_back("Data/Model/DungeonAssets/SM_Fire_Hydrant.glb", 4.0f);
 
 	// モデルない組～
 	m_modelFileDatas.at(PORTAL).emplace_back("", 0.0f);
@@ -171,13 +185,15 @@ void DungeonData::InitCollisionFileDatas()
 	m_collisionFileDatas.at(FLOOR_01B).emplace_back("Data/Model/DungeonAssets/FloorCollision_01a.glb", 4.0f);
 	m_collisionFileDatas.at(FLOOR_02A).emplace_back("Data/Model/DungeonAssets/FloorCollision_01a.glb", 4.0f);
 	m_collisionFileDatas.at(FLOOR_03A).emplace_back("Data/Model/DungeonAssets/FloorCollision_01a.glb", 4.0f);
+	m_collisionFileDatas.at(FLOOR_CLOUD_01A).emplace_back("Data/Model/DungeonAssets/FloorCollision_01a.glb", 4.0f);
 
 	m_collisionFileDatas.at(WALL_01A).emplace_back("Data/Model/DungeonAssets/WallCollision_01a.glb", 4.0f);
 	m_collisionFileDatas.at(WALL_01B).emplace_back("Data/Model/DungeonAssets/WallCollision_01a.glb", 4.0f);
 	m_collisionFileDatas.at(WALL_02A).emplace_back("Data/Model/DungeonAssets/WallCollision_01a.glb", 4.0f);
 	m_collisionFileDatas.at(WALL_02B).emplace_back("Data/Model/DungeonAssets/WallCollision_01a.glb", 4.0f);
-	m_collisionFileDatas.at(WALL_03A).emplace_back("Data/Model/DungeonAssets/WallCollision_01a.glb", 4.0f);
-	m_collisionFileDatas.at(WALL_04A).emplace_back("Data/Model/DungeonAssets/WallCollision_01a.glb", 4.0f);
+	m_collisionFileDatas.at(WALL_03A).emplace_back("Data/Model/DungeonAssets/WallCollision_01b.glb", 4.0f);
+	m_collisionFileDatas.at(WALL_04A).emplace_back("Data/Model/DungeonAssets/WallCollision_01b.glb", 4.0f);
+	m_collisionFileDatas.at(WALL_CLOUD).emplace_back("Data/Model/DungeonAssets/WallCollision_01b.glb", 4.0f);
 
 	//m_collisionFileDatas.at(ARCH_01A).emplace_back("Data/Model/DungeonAssets/SM_Arch_01a.glb", 4.0f);
 	//m_collisionFileDatas.at(ARCH_ENTRANCE_01A).emplace_back("Data/Model/DungeonAssets/SM_Arch_Entrance_01a.glb", 4.0f);
