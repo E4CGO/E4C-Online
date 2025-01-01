@@ -145,6 +145,8 @@ void ModelResource::Mesh::serialize(Archive& archive)
 		CEREAL_NVP(indices),
 		CEREAL_NVP(bones),
 		CEREAL_NVP(nodeIndex),
+		CEREAL_NVP(nodeIndices),
+		CEREAL_NVP(offsetTransforms),
 		CEREAL_NVP(materialIndex),
 		CEREAL_NVP(localBounds)
 	);
@@ -248,8 +250,7 @@ void ModelResource::Load(ID3D11Device* device, const char* filename)
 			// ディフューズテクスチャ読み込み
 			std::filesystem::path diffuseTexturePath(dirpath / material.diffuseTextureFileName);
 			HRESULT hr = GpuResourceUtils::LoadTexture(device, diffuseTexturePath.string().c_str(), material.diffuseMap.GetAddressOf());
-			// TODO: FIX ERROR
-			//_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 		}
 		if (material.normalTextureFileName.empty())
 		{
@@ -376,35 +377,47 @@ void ModelResource::Load(const char* filename)
 	::_splitpath_s(filename, drive, sizeof(drive), dir, sizeof(dir), nullptr, 0, nullptr, 0);
 	::_makepath_s(dirname, sizeof(dirname), drive, dir, nullptr, nullptr);
 
-	// デシリアライズ
-	//Deserialize(filename);
-
 	// モデル構築
 	BuildModel(dirname, filename);
 }
 
 void ModelResource::BuildModel(const char* dirname, const char* filename)
 {
+	std::filesystem::path filepath(filename);
+	std::filesystem::path dirpath(filepath.parent_path());
+
 	Graphics& graphics = Graphics::Instance();
 
 	ID3D12Device* d3d_device = graphics.GetDeviceDX12();
 
 	HRESULT hr = S_OK;
 
-	// 汎用モデルファイル読み込む
-	AssimpImporter importer(filename);
+	filepath.replace_extension(".cereal");
+	if (std::filesystem::exists(filepath))
+	{
+		// 独自形式のモデルファイルの読み込み
+		Deserialize(filepath.string().c_str());
+	}
+	else
+	{
+		// 汎用モデルファイル読み込む
+		AssimpImporter importer(filename);
 
-	// マテリアルデータ読み取り
-	importer.LoadMaterials(materials);
+		// マテリアルデータ読み取り
+		importer.LoadMaterials(materials);
 
-	// ノードデータ読み取り
-	importer.LoadNodes(nodes);
+		// ノードデータ読み取り
+		importer.LoadNodes(nodes);
 
-	// メッシュデータ読み取り
-	importer.LoadMeshes(meshes, nodes);
+		// メッシュデータ読み取り
+		importer.LoadMeshes(meshes, nodes);
 
-	// アニメーションデート読み取り
-	importer.LoadAnimations(animations, nodes);
+		// アニメーションデート読み取り
+		importer.LoadAnimations(animations, nodes);
+
+		//// 独自形式のモデルファイルを保存
+		Serialize(filepath.string().c_str());
+	}
 
 	// バウンディングボックス計算
 	ComputeLocalBounds();
@@ -423,14 +436,19 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 			::MultiByteToWideChar(CP_ACP, 0, filename, -1, wfilename, 256);
 
 			// テクスチャ読み込み
-			hr = graphics.LoadTexture(filename, material.d3d_srv_resource.GetAddressOf());
-			if (FAILED(hr))
+			if (material.diffuseTextureFileName.empty())
 			{
-				// 読み込み失敗したらダミーテクスチャを作る
-				LOG("load failed : %s\n", filename);
-
 				hr = graphics.CreateDummyTexture(material.d3d_srv_resource.GetAddressOf());
 				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+			}
+			else
+			{
+				hr = graphics.LoadTexture(filename, material.d3d_srv_resource.GetAddressOf());
+				if (FAILED(hr))
+				{
+					// 読み込み失敗したらダミーテクスチャを作る
+					LOG("load failed : %s\n", filename);
+				}
 			}
 
 			// シェーダーリソースビューの生成
@@ -468,14 +486,19 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 			::MultiByteToWideChar(CP_ACP, 0, filename, -1, wfilename, 256);
 
 			// テクスチャ読み込み
-			hr = graphics.LoadTexture(filename, material.d3d_normal_srv_resource.GetAddressOf());
-			if (FAILED(hr))
+			if (material.normalTextureFileName.empty())
 			{
-				// 読み込み失敗したらダミーテクスチャを作る
-				LOG("load failed : %s\n", filename);
-
 				hr = graphics.CreateDummyTexture(material.d3d_normal_srv_resource.GetAddressOf());
 				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+			}
+			else
+			{
+				hr = graphics.LoadTexture(filename, material.d3d_normal_srv_resource.GetAddressOf());
+				if (FAILED(hr))
+				{
+					// 読み込み失敗したらダミーテクスチャを作る
+					LOG("load failed : %s\n", filename);
+				}
 			}
 
 			// シェーダーリソースビューの生成
