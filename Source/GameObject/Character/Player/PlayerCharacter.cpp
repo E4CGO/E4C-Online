@@ -611,8 +611,8 @@ void PlayerCharacter::SwordTrail()
 						DirectX::XMStoreFloat3(&tipFloat3, Tip);
 
 
-						sword->AddVertex(rootFloat3, trailColor);
-						sword->AddVertex(tipFloat3, { 0,0,0,1 });
+						sword->AddVertex(rootFloat3, {1,1,1,1},{0,1});
+						sword->AddVertex(tipFloat3, { 1,1,1,1 }, {0,1});
 
 					}
 				}

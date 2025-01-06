@@ -12,6 +12,7 @@ LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
 	{
 		{ "POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{"TEXCOORD",  0,DXGI_FORMAT_R32G32_FLOAT,        0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 	// 頂点シェーダー
 	GpuResourceUtils::LoadVertexShader(
@@ -100,6 +101,8 @@ LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
 		HRESULT hr = device->CreateBuffer(&desc, nullptr, vertexBuffer.GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
+
+	GpuResourceUtils::LoadTexture(device, "Data/Sprites/pizza.jpg", texture.ReleaseAndGetAddressOf(), &textureDesc);
 }
 
 // 描画開始
@@ -108,6 +111,7 @@ void LineRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X
 	// シェーダー設定
 	context->VSSetShader(vertexShader.Get(), nullptr, 0);
 	context->PSSetShader(pixelShader.Get(), nullptr, 0);
+	context->PSSetShaderResources(0, 1, texture.GetAddressOf());
 	context->IASetInputLayout(inputLayout.Get());
 
 	// 定数バッファ設定
@@ -161,10 +165,11 @@ void LineRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X
 }
 
 // 頂点追加
-void LineRenderer::AddVertex(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT4& color)
+void LineRenderer::AddVertex(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT4& color, const DirectX::XMFLOAT2& texcoord)
 {
 	Vertex v;
 	v.position = position;
 	v.color = color;
+	v.texcoord = texcoord;
 	vertices.emplace_back(v);
 }

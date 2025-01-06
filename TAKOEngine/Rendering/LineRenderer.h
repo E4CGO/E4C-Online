@@ -16,7 +16,7 @@ public:
 	void Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
 	// 頂点追加
-	void AddVertex(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT4& color);
+	void AddVertex(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT4& color, const DirectX::XMFLOAT2& texcoord);
 
 private:
 	struct ConstantBuffer
@@ -28,6 +28,7 @@ private:
 	{
 		DirectX::XMFLOAT3	position;
 		DirectX::XMFLOAT4	color;
+		DirectX::XMFLOAT2	texcoord;
 	};
 
 
@@ -42,6 +43,10 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState>	rasterizerState;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState>	depthStencilState;
 
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture;
+
 	std::vector<Vertex>			vertices;
 	UINT						capacity = 0;
+
+	D3D11_TEXTURE2D_DESC textureDesc = {};
 };
