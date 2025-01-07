@@ -936,7 +936,6 @@ set(SHADER_NAMES
 
 # List of shader settings
 set(HLSL_SHADERS
-    "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectXTK12/Src/Shaders
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/DebugDX12PS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/DebugDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/DebugPS.hlsl,5.0,Pixel,main"
