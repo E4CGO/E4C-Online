@@ -305,7 +305,7 @@ void ModelObject::RenderDX12(const RenderContextDX12& rc)
 			}
 
 			// フラグがfalseの場合はフラスタム外なのでスキップ
-			//if (!visibleObjects[culling++]) continue;
+			if (!visibleObjects[culling++]) continue;
 
 			if (mesh.frame_resources.size() == 0) continue;
 
