@@ -19,8 +19,7 @@ void DungeonData::Initialize()
 	InitDungeonGenerateSetting();
 	InitModelFileDatas();
 	InitCollisionFileDatas();
-
-	m_dungeonGenerateSetting.maxDepth = 4;
+	InitFileNames();
 }
 
 void DungeonData::InitRoomGenerateSettings()
@@ -125,6 +124,13 @@ void DungeonData::InitRoomGenerateSettings()
 		setting.aabb.radii = { 0.0f, 0.0f, 0.0f };
 		m_roomGenerateSettings.at(DEAD_END) = setting;
 	}
+
+	// TUTO_END
+	{
+		RoomGenerateSetting setting;
+		setting.portalPosition = { 0.0f, 0.0f, 10.0f };
+		m_roomGenerateSettings.at(TUTO_END) = setting;
+	}
 }
 
 void DungeonData::InitDungeonGenerateSetting()
@@ -197,8 +203,20 @@ void DungeonData::InitCollisionFileDatas()
 
 	//m_collisionFileDatas.at(ARCH_01A).emplace_back("Data/Model/DungeonAssets/SM_Arch_01a.glb", 4.0f);
 	//m_collisionFileDatas.at(ARCH_ENTRANCE_01A).emplace_back("Data/Model/DungeonAssets/SM_Arch_Entrance_01a.glb", 4.0f);
-	//m_collisionFileDatas.at(ARCH_FLOOR_01A).emplace_back("Data/Model/DungeonAssets/SM_Arch_Floor_01a.glb", 4.0f);
+	m_collisionFileDatas.at(ARCH_FLOOR_01A).emplace_back("Data/Model/DungeonAssets/FloorCollision_01a.glb", 4.0f);
 
 	//m_collisionFileDatas.at(STAIR_RAILING_01A).emplace_back("Data/Model/DungeonAssets/SM_Stairs_Railing_01a.glb", 4.0f);
 	//m_collisionFileDatas.at(STAIR_STEP_01A).emplace_back("Data/Model/DungeonAssets/SM_Stairs_Steps_01a.glb", 4.0f);
+}
+
+void DungeonData::InitFileNames()
+{
+	// 部屋タイプの数で配列をリサイズする
+	m_fileNames.resize(ROOMTYPE_COUNT);
+
+	m_fileNames.at(SIMPLE_ROOM_1) = (char*)("Data/RoomDatas/TutoFloor_Start.json");
+	m_fileNames.at(TUTO_START) = (char*)("Data/RoomDatas/TutoFloor_Start.json");
+	m_fileNames.at(TUTO_NOTHINGROOM) = (char*)("Data/RoomDatas/TutoFloor_Nothing.json");
+	m_fileNames.at(TUTO_SPAWNERROOM) = (char*)("Data/RoomDatas/TutoFloor_Spawner.json");
+	m_fileNames.at(TUTO_END) = (char*)("Data/RoomDatas/TutoFloor_End.json");
 }

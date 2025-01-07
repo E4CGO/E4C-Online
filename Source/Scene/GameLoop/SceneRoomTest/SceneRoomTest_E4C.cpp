@@ -516,6 +516,7 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 				if (selectionNode == node) nodeFlags |= ImGuiTreeNodeFlags_Selected;
 				if (node) {
 					ImGui::PushID(index);
+
 					if (ImGui::TreeNodeEx(node->GetName().c_str(), nodeFlags)) {
 						if (ImGui::IsItemFocused()) selectionNode = node;
 					}

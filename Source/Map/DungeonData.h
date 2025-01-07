@@ -22,6 +22,12 @@ namespace ns_RoomData
 		CROSS_ROOM_2,
 		PASSAGE_1,
 		DEAD_END,
+
+		TUTO_START,			// チュートリアル：最初の部屋
+		TUTO_NOTHINGROOM,	// チュートリアル：何もない部屋
+		TUTO_SPAWNERROOM,	// チュートリアル：スポナーのある部屋
+		TUTO_END,			// チュートリアル：最後の部屋
+
 		ROOMTYPE_COUNT,
 	};
 
@@ -144,6 +150,7 @@ public:
 	void InitDungeonGenerateSetting();
 	void InitModelFileDatas();
 	void InitCollisionFileDatas();
+	void InitFileNames();
 
 	// 部屋の生成設定を取得
 	RoomGenerateSetting GetRoomGenerateSetting(RoomType type) { return m_roomGenerateSettings.at(static_cast<int>(type)); }
@@ -154,12 +161,15 @@ public:
 		int a = 0;
 		int b = 0; return m_modelFileDatas.at(type); }
 	const std::vector<FILE_DATA> GetCollisionFileDatas(TileType type) const { return m_collisionFileDatas.at(type); }
+	// ファイル名の取得
+	const char* GetFileName(RoomType type) { return m_fileNames.at(type); }
 
 private:
 	std::vector<RoomGenerateSetting> m_roomGenerateSettings;	// 部屋の生成設定配列
 	DungeonGenerateSetting m_dungeonGenerateSetting;			// ダンジョンの生成設定
 	std::vector<std::vector<FILE_DATA>> m_modelFileDatas;		// 見た目用ファイル読み込み用データ配列
 	std::vector<std::vector<FILE_DATA>> m_collisionFileDatas;	// 当たり判定用ファイル読み込み用データ配列
+	std::vector<char*> m_fileNames;						// ファイル名配列
 };
 #define DUNGEONDATA DungeonData::Instance()
 

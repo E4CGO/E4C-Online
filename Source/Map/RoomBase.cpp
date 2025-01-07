@@ -3,13 +3,6 @@
 #include <TAKOEngine\Tool\XMFLOAT.h>
 #include <imgui.h>
 
-#include "Map/SimpleRoom1.h"
-#include "Map/EndRoom1.h"
-#include "Map/CrossRoom1.h"
-#include "Map/CrossRoom2.h"
-#include "Map/Passage1.h"
-#include "Map/DeadEndRoom.h"
-
 #include "GameObject/GameObjectManager.h"
 #include "MapTile.h"
 #include "MapTileManager.h"
@@ -47,6 +40,48 @@ RoomBase::RoomBase(
 
 	// 後の接続点データ設定、部屋モデル配置のために行列更新処理を行う
 	UpdateTransform();
+}
+
+RoomBase::RoomBase(
+	RoomBase* parent, int pointIndex,
+	RoomType roomType,
+	std::vector<AABB>& roomAABBs,
+	bool isAutoGeneration,
+	std::vector<uint8_t>& roomOrder, int& orderIndex)
+{
+	this->roomType = roomType;
+
+	// タイルデータのリサイズ
+	m_tileDatas.resize(TileType::TILETYPE_COUNT);
+
+	// 親と接続点番号を代入
+	this->parent = parent;
+	this->parentConnectPointIndex = pointIndex;
+
+	// 親の接続点データから座標の補正を行う
+	if (this->parent != nullptr)
+	{
+		this->m_position = parent->GetConnectPointData(pointIndex).position;
+		this->m_angle = parent->GetConnectPointData(pointIndex).angle;
+	}
+
+	m_debugCube = std::make_unique<CubeRenderer>(T_GRAPHICS.GetDeviceDX12());
+	m_debugDebugCube = std::make_unique<CubeRenderer>(T_GRAPHICS.GetDeviceDX12());
+
+	// 深度を取得
+	depth = GetDepth();
+
+	// 後の接続点データ設定、部屋モデル配置のために行列更新処理を行う
+	UpdateTransform();
+
+	// 部屋データのロード
+	LoadMapData();
+
+	// 次の部屋の生成を行う
+	GenerateNextRoom(
+		roomAABBs,
+		isAutoGeneration,
+		roomOrder, orderIndex);
 }
 
 void RoomBase::UpdateTransform()
@@ -250,35 +285,43 @@ void RoomBase::GenerateNextRoom(
 
 						if (randomValue < 0)
 						{
-							RoomBase* nextRoom = nullptr;
-
-							switch (type)
-							{
-							case RoomType::SIMPLE_ROOM_1:
-								nextRoom = new SimpleRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-								break;
-
-							case RoomType::END_ROOM:
-								nextRoom = new EndRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-								break;
-
-							case RoomType::CROSS_ROOM_1:
-								nextRoom = new CrossRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-								break;
-
-							case RoomType::CROSS_ROOM_2:
-								nextRoom = new CrossRoom2(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-								break;
-
-							case RoomType::PASSAGE_1:
-								nextRoom = new Passage1(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-								break;
-
-							default:
-								break;
-							}
+							RoomBase* nextRoom = new RoomBase(this, i, type, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
 							AddRoom(nextRoom);
-							break;
+
+							//RoomBase* nextRoom = nullptr;
+
+							//switch (type)
+							//{
+							//case RoomType::SIMPLE_ROOM_1:
+							//	//nextRoom = new SimpleRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+							//	nextRoom = new RoomBase(this, i, ns_RoomData::SIMPLE_ROOM_1, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+							//	break;
+
+							//case RoomType::END_ROOM:
+							//	//nextRoom = new EndRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+							//	nextRoom = new RoomBase(this, i, ns_RoomData::END_ROOM, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+							//	break;
+
+							//case RoomType::CROSS_ROOM_1:
+							//	//nextRoom = new CrossRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+							//	nextRoom = new RoomBase(this, i, ns_RoomData::CROSS_ROOM_1, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+							//	break;
+
+							//case RoomType::CROSS_ROOM_2:
+							//	//nextRoom = new CrossRoom2(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+							//	nextRoom = new RoomBase(this, i, ns_RoomData::CROSS_ROOM_2, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+							//	break;
+
+							//case RoomType::PASSAGE_1:
+							//	//nextRoom = new Passage1(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+							//	nextRoom = new RoomBase(this, i, ns_RoomData::PASSAGE_1, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+							//	break;
+
+							//default:
+							//	break;
+							//}
+							//AddRoom(nextRoom);
+							//break;
 						}
 					}
 				}
@@ -287,7 +330,8 @@ void RoomBase::GenerateNextRoom(
 				{
 					//EndRoom1* end = new EndRoom1(this, i);
 					//AddRoom(end);
-					DeadEndRoom* deadEnd = new DeadEndRoom(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+					//DeadEndRoom* deadEnd = new DeadEndRoom(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+					RoomBase* deadEnd = new RoomBase(this, i, RoomType::DEAD_END, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
 					AddRoom(deadEnd);
 				}
 			}
@@ -298,7 +342,8 @@ void RoomBase::GenerateNextRoom(
 			// 接続点の数だけ行き止まり用の部屋を生成する
 			for (int i = 0; i < m_connectPointDatas.size(); i++)
 			{
-				DeadEndRoom* deadEnd = new DeadEndRoom(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+				//DeadEndRoom* deadEnd = new DeadEndRoom(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+				RoomBase* deadEnd = new RoomBase(this, i, RoomType::DEAD_END, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
 				AddRoom(deadEnd);
 			}
 		}
@@ -312,37 +357,44 @@ void RoomBase::GenerateNextRoom(
 			// もしも配列のサイズを超えてしまうならreturn
 			if (orderIndex >= roomOrder.size()) return;
 
-			uint8_t nextRoomType = roomOrder.at(orderIndex);
+			RoomType nextRoomType = static_cast<RoomType>(roomOrder.at(orderIndex));
 
-			RoomBase* nextRoom = nullptr;
-
-			switch (nextRoomType)
-			{
-			case RoomType::SIMPLE_ROOM_1:
-				nextRoom = new SimpleRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
-				break;
-
-			case RoomType::END_ROOM:
-				nextRoom = new EndRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
-				break;
-
-			case RoomType::CROSS_ROOM_1:
-				nextRoom = new CrossRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
-				break;
-
-			case RoomType::CROSS_ROOM_2:
-				nextRoom = new CrossRoom2(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
-				break;
-
-			case RoomType::PASSAGE_1:
-				nextRoom = new Passage1(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
-				break;
-
-			case RoomType::DEAD_END:
-				nextRoom = new DeadEndRoom(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
-				break;
-			}
+			RoomBase* nextRoom = new RoomBase(this, i, nextRoomType, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
 			AddRoom(nextRoom);
+
+			//switch (nextRoomType)
+			//{
+			//case RoomType::SIMPLE_ROOM_1:
+			//	//nextRoom = new SimpleRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
+			//	nextRoom = new RoomBase(this, i, ns_RoomData::SIMPLE_ROOM_1, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+			//	break;
+
+			//case RoomType::END_ROOM:
+			//	//nextRoom = new EndRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
+			//	nextRoom = new RoomBase(this, i, ns_RoomData::END_ROOM, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+			//	break;
+
+			//case RoomType::CROSS_ROOM_1:
+			//	//nextRoom = new CrossRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
+			//	nextRoom = new RoomBase(this, i, ns_RoomData::CROSS_ROOM_1, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+			//	break;
+
+			//case RoomType::CROSS_ROOM_2:
+			//	//nextRoom = new CrossRoom2(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
+			//	nextRoom = new RoomBase(this, i, ns_RoomData::CROSS_ROOM_2, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+			//	break;
+
+			//case RoomType::PASSAGE_1:
+			//	//nextRoom = new Passage1(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
+			//	nextRoom = new RoomBase(this, i, ns_RoomData::PASSAGE_1, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+			//	break;
+
+			//case RoomType::DEAD_END:
+			//	//nextRoom = new DeadEndRoom(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
+			//	nextRoom = new RoomBase(this, i, ns_RoomData::DEAD_END, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+			//	break;
+			//}
+			//AddRoom(nextRoom);
 		}
 	}
 }
@@ -407,6 +459,79 @@ AABB RoomBase::CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const
 	return aabb;
 }
 
+void RoomBase::LoadMapData()
+{
+	nlohmann::json loadFile;
+	//std::ifstream ifs("Data/RoomDatas/TutoFloor_Start.json");
+	std::ifstream ifs(DUNGEONDATA.GetFileName(roomType));
+
+	if (ifs.is_open())
+	{
+		ifs >> loadFile;
+
+		// ノードデータロード
+		for (const auto& nodeData : loadFile["NodeDatas"])
+		{
+			TileType tileType = nodeData["Type"];
+
+			switch (tileType)
+			{
+			case ns_RoomData::PORTAL: continue;
+			//case ns_RoomData::SPAWNER: continue;
+			case ns_RoomData::CONNECTPOINT:
+			{
+				DirectX::XMFLOAT3 position = {
+					nodeData["Position"].at(0),
+					nodeData["Position"].at(1),
+					nodeData["Position"].at(2)
+				};
+				DirectX::XMFLOAT3 angle = {
+					nodeData["Angle"].at(0),
+					nodeData["Angle"].at(1),
+					nodeData["Angle"].at(2)
+				};
+
+				TILE_DATA newPoint;
+				newPoint.position = DirectX::XMFLOAT3(position);
+				newPoint.angle = m_angle + angle;
+
+				// ワールド座標に変換し保存
+				DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&m_transform);
+				DirectX::XMVECTOR PointPos = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&newPoint.position), WorldTransform);
+				DirectX::XMStoreFloat3(&newPoint.position, PointPos);
+				m_connectPointDatas.emplace_back(newPoint);
+			}
+			continue;
+
+			default:
+				break;
+			}
+
+			DirectX::XMFLOAT3 position = {
+				nodeData["Position"].at(0),
+				nodeData["Position"].at(1),
+				nodeData["Position"].at(2)
+			};
+			DirectX::XMFLOAT3 angle = {
+				nodeData["Angle"].at(0),
+				nodeData["Angle"].at(1),
+				nodeData["Angle"].at(2)
+			};
+			DirectX::XMFLOAT3 scale = {
+				nodeData["Scale"].at(0),
+				nodeData["Scale"].at(1),
+				nodeData["Scale"].at(2),
+			};
+
+			m_tileDatas.at(tileType).emplace_back(TILE_DATA(
+				position,
+				angle,
+				scale));
+		}
+		ifs.close();
+	}
+}
+
 void RoomBase::PlaceMapTile(bool isLeader)
 {
 	for (uint8_t tileType = TileType::FLOOR_01A; tileType < TileType::TILETYPE_COUNT; tileType++)
@@ -419,7 +544,7 @@ void RoomBase::PlaceMapTile(bool isLeader)
 			for (const TILE_DATA& data : m_tileDatas.at(tileType))
 			{
 				Spawner* spawner = new Spawner(2, 2, -1);
-				spawner->SetPosition(data.position);
+				spawner->SetPosition(m_position + data.position);
 
 				GameObjectManager::Instance().Register(spawner);
 			}
