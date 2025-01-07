@@ -54,6 +54,11 @@ void StageOpenWorld_E4C::Initialize()
 		models["boss"]->SetAnimation(0, true);
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 250.0f, ModelObject::RENDER_MODE::DX11);
+		mouse = std::make_unique<MouseMob>(.5f);
+		mouse->SetPosition({ 20.0, 0.0f, 10.0f });
+		mouse->SetSpawnPosition({ 20.0, 0.0f, 10.0f });
+
+		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 70.0f, ModelObject::RENDER_MODE::DX11);
 		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
 
 		plane = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "Data/Sprites/gem.png", 1.0f, XMFLOAT3{ -15.0f,5.0f,5.0f }, 5.0f, 5.0f);
@@ -69,7 +74,10 @@ void StageOpenWorld_E4C::Initialize()
 		models.emplace("tower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models.emplace("boss", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMboss_1205.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON));
 		models["boss"]->SetPosition({ 10.0, 0.0f, 10.0f });
-		models["boss"]->SetAnimation(0, true);
+
+		mouse = std::make_unique<MouseMob>(.5f, ModelObject::RENDER_MODE::DX12);
+		mouse->SetPosition({ 20.0, 0.0f, 10.0f });
+		mouse->SetSpawnPosition({ 20.0, 0.0f, 10.0f });
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 250.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
 		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
@@ -103,6 +111,18 @@ void StageOpenWorld_E4C::Initialize()
 	// プレイヤー
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
 	player->SetPosition({ 15.0f, 15.0f, 5.0f });
+
+	//{
+	//	Enemy* enemy = Enemy::EnemyFactory(0);
+	//	enemy->SetPosition({ 0, 5, 0 });
+	//	ENEMIES.Register(enemy);
+	//}
+
+	//{
+	//	Enemy* enemy = Enemy::EnemyFactory(1);
+	//	enemy->SetPosition({ 0, 5, 0 });
+	//	ENEMIES.Register(enemy);
+	//}
 
 	// カメラ設定
 	Camera* mainCamera = CameraManager::Instance().GetCamera();
@@ -180,7 +200,10 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 
 	spawner->Update(elapsedTime);
 
+	//test->Update(elapsedTime);
 	teleporter->Update(elapsedTime);
+
+	mouse->Update(elapsedTime);
 
 	portalSquare->Update(elapsedTime);
 	runningDust1->Update(elapsedTime);
@@ -229,6 +252,9 @@ void StageOpenWorld_E4C::Render()
 
 	teleporter->Render(rc);
 
+	mouse->Render(rc);
+
+	ENEMIES.Render(rc);
 	portalSquare->Render(rc);
 	runningDust1->Render(rc);
 
@@ -268,6 +294,8 @@ void StageOpenWorld_E4C::RenderDX12()
 			rc.shadowMap.shadow_srv_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSRV();
 			rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();
 		}
+
+		mouse->RenderDX12(rc);
 
 		// プレイヤー
 		PlayerCharacterManager::Instance().RenderDX12(rc);

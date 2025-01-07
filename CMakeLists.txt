@@ -224,6 +224,10 @@ set(Source__GameObject__Character__Enemy
     "Source/GameObject/Character/Enemy/EnemyManager.h"
     "Source/GameObject/Character/Enemy/EnemyState.cpp"
     "Source/GameObject/Character/Enemy/EnemyState.h"
+    "Source/GameObject/Character/Enemy/MouseMob.cpp"
+    "Source/GameObject/Character/Enemy/MouseMob.h"
+    "Source/GameObject/Character/Enemy/MouseMobState.cpp"
+    "Source/GameObject/Character/Enemy/MouseMobState.h"
     "Source/GameObject/Character/Enemy/SkeletonMinion.cpp"
     "Source/GameObject/Character/Enemy/SkeletonMinion.h"
     "Source/GameObject/Character/Enemy/SkeletonMinionState.cpp"
@@ -304,6 +308,12 @@ set(Source__Scene__GameLoop__SceneGame
     "Source/Scene/GameLoop/SceneGame/SceneGame_E4CState.h"
 )
 source_group("Source\\Scene\\GameLoop\\SceneGame" FILES ${Source__Scene__GameLoop__SceneGame})
+
+set(Source__Scene__GameLoop__SceneRoomTest
+    "Source/Scene/GameLoop/SceneRoomTest/SceneRoomTest_E4C.cpp"
+    "Source/Scene/GameLoop/SceneRoomTest/SceneRoomTest_E4C.h"
+)
+source_group("Source\\Scene\\GameLoop\\SceneRoomTest" FILES ${Source__Scene__GameLoop__SceneRoomTest})
 
 set(Source__Scene__GameLoop__SceneTitle
     "Source/Scene/GameLoop/SceneTitle/SceneTitle_E4C.cpp"
@@ -803,6 +813,7 @@ set(ALL_FILES
     ${Source__Scene__Stage}
     ${Source__Scene__GameLoop__SceneCharacter}
     ${Source__Scene__GameLoop__SceneGame}
+    ${Source__Scene__GameLoop__SceneRoomTest}
     ${Source__Scene__GameLoop__SceneTitle}
     ${Source__Scene__GameLoop__SceneGame__Stage}
     ${Source__UI__Widget}

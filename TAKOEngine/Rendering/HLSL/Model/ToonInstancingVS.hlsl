@@ -18,8 +18,6 @@ VS_OUT main(
     n = mul(float4(n, 0), instancingTransform[instanceId]).xyz;
     t = mul(float4(t, 0), instancingTransform[instanceId]).xyz;
     
-    p = mul(float4(p, 1.0f), world_transform);
-    
     VS_OUT vout;
     float4x4 viewProjection = mul(view, Projection);
     vout.vertex   = mul(float4(p, 1.0f), viewProjection);

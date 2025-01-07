@@ -129,3 +129,59 @@ float3 CalcToonDiffuse(Texture2D toonTexture, SamplerState toonSamplerState, flo
 
     return lightColor * c * kd;
 }
+
+//--------------------------------------------
+// トゥーン鏡面反射計算関数
+//--------------------------------------------
+// toonTexture		: トゥーン用U方向ランプテクスチャ
+// toonSamplerState	: トゥーン用サンプラーステート
+// normal			: 法線(正規化済み)
+// lightVector		: 入射ベクトル(正規化済み)
+// lightColor		: 入射光色
+// eyeVector			: 視線ベクトル(正規化済み)
+// shininess			: 光沢度(質感調整値)
+// ks					: 反射率(反射の強さ)
+// 返す値				: 鏡面反射色
+float3 CalcToonSpecular(Texture2D toonTexture, SamplerState toonSamplerState, float3 normal, float3 lightVector, float3 lightColor, float3 eyeVector, float shininess, float3 ks)
+{
+    // 入射ベクトルを法線方向に対して反射させた反射ベクトルを算出
+    float3 R = reflect(lightVector, normal);
+
+    // 反射ベクトルと視線ベクトルとで内積
+    float d = max(dot(R, eyeVector), 0);
+
+    // トゥーンの階段的な反射強度を計算
+    float u = clamp(d * 0.4 + 0.6, 0.1, 0.9);
+
+    // トゥーンテクスチャから色を取得
+    float3 c = toonTexture.Sample(toonSamplerState, float2(u, 0.1));
+
+    // 光沢度と反射率を乗算して返す
+    return lightColor * c * ks;
+}
+
+//--------------------------------------------
+// トゥーンリムライト計算関数
+//--------------------------------------------
+// toonTexture		: トゥーン用U方向ランプテクスチャ
+// toonSamplerState	: トゥーン用サンプラーステート
+// normal			: 法線(正規化済み)
+// eyeVector			: 視線ベクトル(正規化済み)
+// lightVector		: 入射ベクトル(正規化済み)
+// lightColor		: 入射光色
+// rimPower			: リムライトの強さ(初期値はテキトーなので自分で設定するが吉)
+// 返す値			: リムライト色
+float3 CalcToonRimLight(Texture2D toonTexture, SamplerState toonSamplerState, float3 normal, float3 eyeVector, float3 lightVector, float3 lightColor)
+{
+    // リムライトの計算
+    float rim = 1.0f - saturate(dot(eyeVector, normal));
+
+    // トゥーンの階段的なリムライト強度を計算
+    float u = clamp(rim * 0.4 + 0.6, 0.1, 0.9);
+
+    // トゥーンテクスチャから色を取得
+    float3 c = toonTexture.Sample(toonSamplerState, float2(u, 0.1));
+
+    // 入射光とリムライトの色を乗算して返す
+    return lightColor * c * rim;
+}

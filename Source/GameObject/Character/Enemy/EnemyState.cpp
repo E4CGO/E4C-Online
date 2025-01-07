@@ -3,7 +3,8 @@
 // 待機ステート
 void EnemyState::IdleState::Enter()
 {
-	owner->GetModel()->PlayAnimation(Enemy::Animation::Idle, true);
+	if (owner->GetModel()->GetCurrentAnimationIndex() >= 0)
+		owner->GetModel()->PlayAnimation(Enemy::Animation::Idle, true);
 	waitTimer = waitTime;
 }
 void EnemyState::IdleState::Execute(float elapsedTime)
@@ -27,7 +28,8 @@ void EnemyState::IdleState::Exit()
 // 移動ステート
 void EnemyState::MoveState::Enter()
 {
-	owner->GetModel()->PlayAnimation(Enemy::Animation::Walk, true);
+	if (owner->GetModel()->GetCurrentAnimationIndex() >= 0)
+		owner->GetModel()->PlayAnimation(Enemy::Animation::Walk, true);
 }
 void EnemyState::MoveState::Execute(float elapsedTime)
 {
@@ -43,7 +45,8 @@ void EnemyState::MoveState::Exit()
 // 追跡ステート
 void EnemyState::FollowState::Enter()
 {
-	owner->GetModel()->PlayAnimation(Enemy::Animation::Walk, true);
+	if (owner->GetModel()->GetCurrentAnimationIndex() >= 0)
+		owner->GetModel()->PlayAnimation(Enemy::Animation::Walk, true);
 }
 void EnemyState::FollowState::Execute(float elapsedTime)
 {
@@ -74,7 +77,8 @@ void EnemyState::FollowState::Exit()
 void EnemyState::HurtState::Enter()
 {
 	owner->SetAnimationSpeed(3.0f);
-	owner->GetModel()->PlayAnimation(Enemy::Animation::Dash_Back, false);
+	if (owner->GetModel()->GetCurrentAnimationIndex() >= 0)
+		owner->GetModel()->PlayAnimation(Enemy::Animation::Dash_Back, false);
 }
 void EnemyState::HurtState::Execute(float elapsedTime)
 {
@@ -91,7 +95,8 @@ void EnemyState::HurtState::Exit()
 // 死亡ステート
 void EnemyState::DeathState::Enter()
 {
-	owner->GetModel()->PlayAnimation(Enemy::Animation::Defeat, false);
+	if (owner->GetModel()->GetCurrentAnimationIndex() >= 0)
+		owner->GetModel()->PlayAnimation(Enemy::Animation::Defeat, false);
 	for (std::pair<int, Collider*> collider : owner->GetColliders()) collider.second->SetEnable(false);
 }
 void EnemyState::DeathState::Execute(float elapsedTime)

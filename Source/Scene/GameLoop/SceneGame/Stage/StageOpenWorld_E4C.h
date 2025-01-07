@@ -11,6 +11,8 @@
 #include "TAKOEngine/Rendering/Plane.h"
 #include "GameObject/Props/Teleporter.h"
 #include "GameObject/Props/Spawner.h"
+#include "GameObject/Character/Enemy/MouseMob.h"
+
 #include "TAKOEngine/Rendering/Shaders/PlaneShader.h"
 
 #include "Scene/Scene.h"
@@ -60,7 +62,7 @@ private:
 	std::unique_ptr<Spawner> spawner;
 
 	std::unique_ptr<ModelObject> sky;
-
+	std::unique_ptr<MouseMob> mouse;
 	std::unique_ptr<SpriteDX12>			m_sprites[8];
 
 	std::unique_ptr<Plane> portalSquare;

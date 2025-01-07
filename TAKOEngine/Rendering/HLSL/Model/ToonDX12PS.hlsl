@@ -16,9 +16,9 @@ float4 main(VS_OUT pin) : SV_TARGET
     
     // マテリアル定数
     float3 ka = float3(1, 1, 1);
-    float3 kd = float3(1, 1, 1);
-    float3 ks = float3(0.2f, 0.2f, 0.2f);
-    float shiness = 20;
+    float3 kd = float3(0.5f, 0.5f, 0.5f);
+    float3 ks = float3(0.5f, 0.5f, 0.5f);
+    float shiness = 120;
     
     //	環境光
     float3 A = ka.rgb * ambientLightColor.rgb;
@@ -26,24 +26,19 @@ float4 main(VS_OUT pin) : SV_TARGET
 	//	拡散反射
     float3 D;
 	{
-        float U = dot(-L, N) * 0.5f + 0.5f;
-        D = ToonTex.Sample(sampler0, float2(U, 1)).rgb;
+        D = CalcToonDiffuse(ToonTex, sampler0, N, L, directionalLightData.color.rgb, kd);
     }
 
 	//	鏡面反射
     float3 S;
 	{
-        float U = dot(normalize(reflect(L, N)), E) * 0.5f + 0.5f;
-        S = ToonTex.Sample(sampler0, float2(U, 1)).rgb;
-        S = pow(saturate(S), 20) * 0.2f;
+        S = CalcToonSpecular(ToonTex, sampler0, N, L, directionalLightData.color.rgb, E, shiness, ks) * 0.5f;
     }
 
 	//	リムライト
     float3 R;
 	{
-        float Rim = 1.0f - max(dot(N, E), 0.0f);
-        float Ratio = max(dot(L, E), 0);
-        R = ToonTex.Sample(sampler0, float2(Rim * Ratio, 1)).r * 0.2f;
+        R = CalcToonRimLight(ToonTex, sampler0, N, E, L, directionalLightData.color.rgb) * 0.2f;
     }
     
     // 平行光源の影なので、平行光源に対して影を適応

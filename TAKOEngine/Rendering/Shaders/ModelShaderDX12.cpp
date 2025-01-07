@@ -77,6 +77,7 @@ void SkinningPipeline::Compute(const RenderContextDX12& rc, iModel* model)
 	for (const ModelDX12::Mesh& mesh : model->GetMeshes())
 	{
 		if (mesh.mesh->bones.empty()) continue;
+		if (mesh.frame_resources.empty()) continue;
 
 		const ModelDX12::Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
 
