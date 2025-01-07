@@ -3,10 +3,12 @@
 #include <unordered_set>
 #include <memory>
 #include <array>
+#include <deque>
 
 #include "GameObject/ModelObject.h"
 #include "GameObject/GameObject.h"
 #include "GameObject/Character/Player/PlayerCharacter.h"
+#include "TAKOEngine/Rendering/Plane.h"
 #include "GameObject/Props/Teleporter.h"
 #include "GameObject/Props/Spawner.h"
 #include "GameObject/Character/Enemy/MouseMob.h"
@@ -21,6 +23,8 @@
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
 #include "Source/GameObject/Props/Spawner.h"
+
+using namespace DirectX;
 
 class SceneGame_E4C;
 
@@ -58,22 +62,30 @@ private:
 	std::unique_ptr<Spawner> spawner;
 
 	std::unique_ptr<ModelObject> sky;
-	DirectX::XMFLOAT4X4 test_transform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
-	DirectX::XMFLOAT3 test_position = { 0, 0, 0 };
-	DirectX::XMFLOAT4 test_rotation = { 0, 0, 0, 0 };
-	DirectX::XMFLOAT3 test_scale = { 1, 1, 1 };
-
 	std::unique_ptr<MouseMob> mouse;
-
 	std::unique_ptr<SpriteDX12>			m_sprites[8];
+
+	std::unique_ptr<Plane> portalSquare;
+
+	std::unique_ptr<Fireball> fireBall;
+
+	std::unique_ptr<Plane> plane;
+	std::unique_ptr<PlaneDX12> plane2;
+
+	std::unique_ptr<RunningDust> runningDust1;
+	std::deque<RunningDust> runningDust;
+	bool running = true;
+	float f_timer;
+	int f_count = 0.0f;// 何個目のモデルか数える
+	float f_INTERVAL = 0.1f;// push の間隔
+	float f_popINTERVAL = 0.3f;// pop の間隔
+	float f_alpha = 0.2f;// 透明度
 
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {
 		"",											// マスク
 		// Setting UI
 	};
-
-
 
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
 
