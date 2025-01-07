@@ -16,12 +16,6 @@
 
 #include "Map/MapTile.h"
 #include "Map/RoomBase.h"
-#include "Map/SimpleRoom1.h"
-#include "Map/EndRoom1.h"
-#include "Map/CrossRoom1.h"
-#include "Map/CrossRoom2.h"
-#include "Map/Passage1.h"
-#include "Map/DeadEndRoom.h"
 
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"

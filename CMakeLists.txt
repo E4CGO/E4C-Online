@@ -156,26 +156,15 @@ set(Source__GameObject
 source_group("Source\\GameObject" FILES ${Source__GameObject})
 
 set(Source__Map
-    "Source/Map/CrossRoom1.cpp"
-    "Source/Map/CrossRoom1.h"
-    "Source/Map/CrossRoom2.cpp"
-    "Source/Map/CrossRoom2.h"
-    "Source/Map/DeadEndRoom.cpp"
-    "Source/Map/DeadEndRoom.h"
     "Source/Map/DungeonData.cpp"
     "Source/Map/DungeonData.h"
-    "Source/Map/EndRoom1.cpp"
-    "Source/Map/EndRoom1.h"
+    "Source/Map/InstancingModelManager.h"
     "Source/Map/MapTile.cpp"
     "Source/Map/MapTile.h"
     "Source/Map/MapTileManager.cpp"
     "Source/Map/MapTileManager.h"
-    "Source/Map/Passage1.cpp"
-    "Source/Map/Passage1.h"
     "Source/Map/RoomBase.cpp"
     "Source/Map/RoomBase.h"
-    "Source/Map/SimpleRoom1.cpp"
-    "Source/Map/SimpleRoom1.h"
 )
 source_group("Source\\Map" FILES ${Source__Map})
 
@@ -947,6 +936,7 @@ set(SHADER_NAMES
 
 # List of shader settings
 set(HLSL_SHADERS
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectXTK12/Src/Shaders
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/DebugDX12PS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/DebugDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/DebugPS.hlsl,5.0,Pixel,main"

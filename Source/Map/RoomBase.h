@@ -17,6 +17,14 @@ public:
 		bool isAutoGeneration,
 		std::vector<uint8_t>& roomOrder, int& orderIndex);
 
+	// コンストラクタ
+	RoomBase(
+		RoomBase* parent, int pointIndex,
+		RoomType roomType,
+		std::vector<AABB>& roomAABBs,
+		bool isAutoGeneration,
+		std::vector<uint8_t>& roomOrder, int& orderIndex);
+
 	// ですとら
 	virtual ~RoomBase()
 	{
@@ -190,7 +198,7 @@ public:
 	AABB CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const;
 
 	// 部屋データをロード
-	virtual void LoadMapData() {}
+	virtual void LoadMapData();
 
 	// 部屋タイルを配置
 	void PlaceMapTile(bool isLeader = false);
