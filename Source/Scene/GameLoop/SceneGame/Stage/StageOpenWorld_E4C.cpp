@@ -66,7 +66,7 @@ void StageOpenWorld_E4C::Initialize()
 	{
 		models.emplace("map", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models.emplace("tower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
-		models.emplace("boss", std::make_unique<ModelObject>("Data/Model/Enemy/MDL_ENMboss_1129.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON));
+		models.emplace("boss", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMboss_1205.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON));
 		models["boss"]->SetPosition({ 10.0, 0.0f, 10.0f });
 
 		mouse = std::make_unique<MouseMob>(.5f, ModelObject::RENDER_MODE::DX12);
