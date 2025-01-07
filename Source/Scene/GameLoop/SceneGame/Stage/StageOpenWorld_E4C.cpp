@@ -55,6 +55,12 @@ void StageOpenWorld_E4C::Initialize()
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 250.0f, ModelObject::RENDER_MODE::DX11);
 		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
+
+		plane = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "Data/Sprites/gem.png", 1.0f, XMFLOAT3{ -15.0f,5.0f,5.0f }, 5.0f, 5.0f);
+		plane->SetShader(ModelShaderId::Plane);
+
+		fireBall = std::make_unique<Fireball>(T_GRAPHICS.GetDevice(), "Data/Sprites/fire.png", 1.0f, XMFLOAT3{ -30.0f,5.0f,5.0f });
+		fireBall->SetShader(ModelShaderId::Fireball);
 	}
 
 	if (T_GRAPHICS.isDX12Active)
@@ -68,14 +74,24 @@ void StageOpenWorld_E4C::Initialize()
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 250.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
 		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
 		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
+
+		plane2 = std::make_unique<PlaneDX12>("Data/Sprites/gem.png", 1.0f, XMFLOAT3{ -15.0f,5.0f,5.0f }, 5.0f, 5.0f);
+		plane2->SetShader(ModelShaderId::Plane);
 	}
 
 	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
 	teleporter->SetPosition({ 16, 8.5, -46 });
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
 
-	portalSquare = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, XMFLOAT3{ 10.0f,10.0f,5.0f }, 5.0f, 5.0f);
+	portalSquare = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, XMFLOAT3{ 10.0f,5.0f,5.0f }, 5.0f, 5.0f);
 	portalSquare->SetShader(ModelShaderId::PortalSquare);
+
+	// プレイヤーが走るときの土埃
+	runningDust1 = std::make_unique<RunningDust>(T_GRAPHICS.GetDevice(), "Data/Sprites/smoke.png", 100.0f,
+		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),	// position
+		1.0f,			// alpha
+		f_count,	// model_id
+		0);		// age
 
 	// 光
 	LightManager::Instance().SetAmbientColor({ 0.3f, 0.3f, 0.3f, 0.0f });
@@ -87,17 +103,6 @@ void StageOpenWorld_E4C::Initialize()
 	// プレイヤー
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
 	player->SetPosition({ 15.0f, 15.0f, 5.0f });
-	// プレイヤーが走るときの土埃
-	runningDust1 = std::make_unique<RunningDust>(T_GRAPHICS.GetDevice(), "Data/Sprites/smoke.png", 100.0f,
-		DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),	// position
-		1.0f,			// alpha
-		f_count,	// model_id
-		0);		// age
-	//runningDust.push_back(Fireball{ T_GRAPHICS.GetDevice(), "Data/Sprites/smoke.png", 100.0f,
-	//									player->GetPosition(),	// position
-	//									1.0f,			// alpha
-	//									f_count,	// model_id
-	//									0 });		// age
 
 	// カメラ設定
 	Camera* mainCamera = CameraManager::Instance().GetCamera();
@@ -180,6 +185,8 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	portalSquare->Update(elapsedTime);
 	runningDust1->Update(elapsedTime);
 
+	//plane2->Update(elapsedTime);
+
 	timer += elapsedTime;
 
 	for (auto& it : models)
@@ -218,12 +225,16 @@ void StageOpenWorld_E4C::Render()
 		it.second->Render(rc);
 	}
 
-	teleporter->Render(rc);
-
 	ENEMIES.Render(rc);
+
+	teleporter->Render(rc);
 
 	portalSquare->Render(rc);
 	runningDust1->Render(rc);
+
+	plane->Render(rc);
+
+	fireBall->Render(rc);
 
 	UI.Render(rc);
 
@@ -271,6 +282,8 @@ void StageOpenWorld_E4C::RenderDX12()
 
 		// スポナー
 		spawner->RenderDX12(rc);
+
+		plane2->RenderDX12(rc);
 
 		// skyBox
 		{

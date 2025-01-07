@@ -564,6 +564,7 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 		modelShaders[static_cast<int>(ModelShaderId::Billboard)] = std::make_unique<BillboardShader>(device.Get());
 		modelShaders[static_cast<int>(ModelShaderId::Fireball)] = std::make_unique<FireballShader>(device.Get());
 		modelShaders[static_cast<int>(ModelShaderId::Lambert)] = std::make_unique<LambertShader>(device.Get());
+		modelShaders[static_cast<int>(ModelShaderId::PortalSquare)] = std::make_unique<PortalSquareShader>(device.Get());
 
 		// DX12のモデルシェーダー生成
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Lambert)] = std::make_unique<LambertShaderDX12>(m_d3d_device.Get());
@@ -574,6 +575,7 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::ToonInstancing)] = std::make_unique<ToonShaderDX12>(m_d3d_device.Get(), true);
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Skydome)] = std::make_unique<SkydomeShaderDX12>(m_d3d_device.Get());
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::shadowMap)] = std::make_unique<ShadowMapShaderDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Plane)] = std::make_unique<PlaneShaderDX12>(m_d3d_device.Get());
 
 		// スプライトシェーダー生成
 		spriteShaders[static_cast<int>(SpriteShaderId::Default)] = std::make_unique<DefaultSpriteShader>(device.Get());
@@ -584,7 +586,6 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 		spriteShaders[static_cast<int>(SpriteShaderId::LuminanceExtraction)] = std::make_unique<LuminanceExtractionShader>(device.Get());
 		spriteShaders[static_cast<int>(SpriteShaderId::Finalpass)] = std::make_unique<FinalpassShader>(device.Get());
 		spriteShaders[static_cast<int>(SpriteShaderId::Deferred)] = std::make_unique<DeferredLightingShader>(device.Get());
-	modelShaders[static_cast<int>(ModelShaderId::PortalSquare)] = std::make_unique<PortalSquareShader>(device.Get());
 
 		// DX12のスプライトシェーダー生成
 		dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::Default)] = std::make_unique<DefaultSpriteShaderDX12>(m_d3d_device.Get());

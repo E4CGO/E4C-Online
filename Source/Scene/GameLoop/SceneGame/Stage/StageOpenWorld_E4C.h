@@ -60,10 +60,15 @@ private:
 	std::unique_ptr<Spawner> spawner;
 
 	std::unique_ptr<ModelObject> sky;
-	
+
 	std::unique_ptr<SpriteDX12>			m_sprites[8];
 
 	std::unique_ptr<Plane> portalSquare;
+
+	std::unique_ptr<Fireball> fireBall;
+
+	std::unique_ptr<Plane> plane;
+	std::unique_ptr<PlaneDX12> plane2;
 
 	std::unique_ptr<RunningDust> runningDust1;
 	std::deque<RunningDust> runningDust;
@@ -79,8 +84,6 @@ private:
 		"",											// マスク
 		// Setting UI
 	};
-
-
 
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
 

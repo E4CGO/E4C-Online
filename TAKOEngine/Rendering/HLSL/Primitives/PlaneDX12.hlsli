@@ -1,29 +1,28 @@
 #include	"../Lighting/Light.hlsli"
 
-// 鬆らせ繧ｷ繧ｧ繝ｼ繝繝ｼ蜃ｺ蜉帙ョ繝ｼ繧ｿ
+// 頂点シェーダー出力データ
 struct VS_OUT
 {
-	float4 position : SV_POSITION;
-	float4 color	: COLOR;
-	float2 texcoord : TEXCOORD;
+    float4 position : SV_POSITION;
+    float4 color : COLOR;
+    float2 texcoord : TEXCOORD;
 };
 
 cbuffer CbScene : register(b0)
 {
+    row_major float4x4 View;
+    row_major float4x4 Projection;
     float4 cameraPosition;
-    row_major float4x4 ViewProjection;
-
-    //繝ｩ繧､繝域ュ蝣ｱ
+    row_major float4x4 lightViewProjection;
+    
+    //ライト情報
     float4 ambientLightColor;
     DirectionalLightData directionalLightData;
-    PointLightData pointLightData[PointLightMax]; // 轤ｹ蜈画ｺ先ュ蝣ｱ
-    SpotLightData spotLightData[SpotLightMax]; // 繧ｹ繝昴ャ繝医Λ繧､繝域ュ蝣ｱ
-    int pointLightCount; // 轤ｹ蜈画ｺ先焚
-    int spotLightCount; // 繧ｹ繝昴ャ繝医Λ繧､繝域焚
-    
-    float timerGlobal;
-    float timerTick;
-}
+    PointLightData pointLightData[PointLightMax]; // 点光源情報
+    SpotLightData spotLightData[SpotLightMax]; // スポットライト情報
+    int pointLightCount; // 点光源数
+    int spotLightCount; // スポットライト数
+};
 
 #define ROOT_SIG "RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT), \
                   DescriptorTable(CBV(b0), visibility=SHADER_VISIBILITY_ALL), \

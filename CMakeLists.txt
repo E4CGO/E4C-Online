@@ -741,16 +741,19 @@ set(TAKOEngine__Rendering__HLSL__Primitives
     "TAKOEngine/Rendering/HLSL/Primitives/FireballPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/FireballVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/Plane.hlsli"
+    "TAKOEngine/Rendering/HLSL/Primitives/PlaneDX12.hlsli"
+    "TAKOEngine/Rendering/HLSL/Primitives/PlaneDX12PS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/PlaneDX12VS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/PlanePS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/PlaneVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/Portal.hlsli"
     "TAKOEngine/Rendering/HLSL/Primitives/PortalPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/PortalSquarePS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/PortalVS.hlsl"
-    "TAKOEngine/Rendering/HLSL/Primitives/RunningDustPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/PrimitiveRenderer.hlsli"
     "TAKOEngine/Rendering/HLSL/Primitives/PrimitiveRendererPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/PrimitiveRendererVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/RunningDustPS.hlsl"
 )
 source_group("TAKOEngine\\Rendering\\HLSL\\Primitives" FILES ${TAKOEngine__Rendering__HLSL__Primitives})
 
@@ -788,7 +791,6 @@ set(ALL_FILES
     ${Source__Network}
     ${Source__Scene}
     ${Source__UI}
-    ${Source__VFX}
     ${Source__GameObject__Character}
     ${Source__GameObject__Projectile}
     ${Source__GameObject__Props}
@@ -857,6 +859,7 @@ endfunction()
 
 #List of HLSL shaders
 set(SHADER_NAMES
+    "GenerateMips.cso"
     "DebugDX12PS.cso"
     "DebugDX12VS.cso"
     "DebugPS.cso"
@@ -912,14 +915,16 @@ set(SHADER_NAMES
     "BillboardVS.cso"
     "FireballPS.cso"
     "FireballVS.cso"
+    "PlaneDX12PS.cso"
+    "PlaneDX12VS.cso"
     "PlanePS.cso"
     "PlaneVS.cso"
     "PortalPS.cso"
     "PortalSquarePS.cso"
     "PortalVS.cso"
-    "RunningDustPS.cso"
     "PrimitiveRendererPS.cso"
     "PrimitiveRendererVS.cso"
+    "RunningDustPS.cso"
     "SkyBoxDX12PS.cso"
     "SkyBoxDX12VS.cso"
     "SkydomePS.cso"
@@ -986,6 +991,8 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/BillboardVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/FireballPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/FireballVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlaneDX12PS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlaneDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlanePS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlaneVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PortalPS.hlsl,5.0,Pixel,main"

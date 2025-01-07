@@ -271,6 +271,201 @@ void Plane::Render(const RenderContext& rc)
 	shader->End(rc);
 }
 
+PlaneDX12::PlaneDX12(const char* filename, float scaling, XMFLOAT3 centerPos, float positionZ, float plane_width)
+{
+	HRESULT hr = S_OK;
+
+	Graphics& graphics = Graphics::Instance();
+	const RenderStateDX12* renderState = graphics.GetRenderStateDX12();
+	ID3D12Device* d3d_device = graphics.GetDeviceDX12();
+
+	// 頂点データー
+	std::vector <ModelResource::Vertex> vertices = {
+		{ { centerPos.x + plane_width, centerPos.y - plane_width, positionZ }, { 1.0f, 0.0f, 0.0f, 0.0f }, { 0, 0, 0, 0 }, { 0.0f, 0.0f }, { 0.5f, 0.5f, 0.5f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+		{ { centerPos.x + plane_width, centerPos.y + plane_width, positionZ }, { 1.0f, 0.0f, 0.0f, 0.0f }, { 0, 0, 0, 0 }, { 1.0f, 0.0f }, { 0.5f, 0.5f, 0.5f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+		{ { centerPos.x - plane_width, centerPos.y - plane_width, positionZ }, { 1.0f, 0.0f, 0.0f, 0.0f }, { 0, 0, 0, 0 }, { 0.0f, 1.0f }, { 0.5f, 0.5f, 0.5f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+		{ { centerPos.x - plane_width, centerPos.y + plane_width, positionZ }, { 1.0f, 0.0f, 0.0f, 0.0f }, { 0, 0, 0, 0 }, { 1.0f, 1.0f }, { 0.5f, 0.5f, 0.5f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } }
+	};
+
+	// 頂点バッファの生成
+	{
+		const UINT vertexBufferSize = static_cast<UINT>(sizeof(ModelResource::Vertex) * vertices.size());
+
+		// ヒーププロパティの設定
+		D3D12_HEAP_PROPERTIES d3d_heap_props{};
+		d3d_heap_props.Type = D3D12_HEAP_TYPE_UPLOAD;
+		d3d_heap_props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+		d3d_heap_props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+		d3d_heap_props.CreationNodeMask = 1;
+		d3d_heap_props.VisibleNodeMask = 1;
+
+		// リソースの設定
+		D3D12_RESOURCE_DESC d3d_resource_desc{};
+		d3d_resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		d3d_resource_desc.Alignment = 0;
+		d3d_resource_desc.Width = vertexBufferSize;
+		d3d_resource_desc.Height = 1;
+		d3d_resource_desc.DepthOrArraySize = 1;
+		d3d_resource_desc.MipLevels = 1;
+		d3d_resource_desc.Format = DXGI_FORMAT_UNKNOWN;
+		d3d_resource_desc.SampleDesc.Count = 1;
+		d3d_resource_desc.SampleDesc.Quality = 0;
+		d3d_resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+		d3d_resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+		// リソース生成
+		hr = d3d_device->CreateCommittedResource(
+			&d3d_heap_props,
+			D3D12_HEAP_FLAG_NONE,
+			&d3d_resource_desc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(mesh.d3d_vb_resource.GetAddressOf())
+		);
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+		mesh.d3d_vb_resource->SetName(L"PlaneVertexBuffer");
+
+		// 頂点バッファビュー
+		mesh.d3d_vbv.BufferLocation = mesh.d3d_vb_resource->GetGPUVirtualAddress();
+		mesh.d3d_vbv.SizeInBytes = static_cast<UINT>(d3d_resource_desc.Width);
+		mesh.d3d_vbv.StrideInBytes = sizeof(ModelResource::Vertex);
+
+		// マップする
+
+		void* mappedData = nullptr;
+		hr = mesh.d3d_vb_resource->Map(0, nullptr, &mappedData);
+		memcpy(mappedData, vertices.data(), vertices.size() * sizeof(ModelResource::Vertex));
+		mesh.d3d_vb_resource->Unmap(0, nullptr);
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+	}
+
+	// インデックスバッファの生成
+	{
+		UINT indices[] = {
+			0, 1, 2,
+			2, 1, 3
+		};
+
+		const UINT indexBufferSize = sizeof(indices);
+
+		// ヒーププロパティの設定
+		D3D12_HEAP_PROPERTIES d3d_heap_props{};
+		d3d_heap_props.Type = D3D12_HEAP_TYPE_UPLOAD;
+		d3d_heap_props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+		d3d_heap_props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+		d3d_heap_props.CreationNodeMask = 1;
+		d3d_heap_props.VisibleNodeMask = 1;
+
+		// リソースの設定
+		D3D12_RESOURCE_DESC d3d_resource_desc{};
+		d3d_resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		d3d_resource_desc.Alignment = 0;
+		d3d_resource_desc.Width = indexBufferSize;
+		d3d_resource_desc.Height = 1;
+		d3d_resource_desc.DepthOrArraySize = 1;
+		d3d_resource_desc.MipLevels = 1;
+		d3d_resource_desc.Format = DXGI_FORMAT_UNKNOWN;
+		d3d_resource_desc.SampleDesc.Count = 1;
+		d3d_resource_desc.SampleDesc.Quality = 0;
+		d3d_resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+		d3d_resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+		// リソース生成
+		hr = d3d_device->CreateCommittedResource(
+			&d3d_heap_props,
+			D3D12_HEAP_FLAG_NONE,
+			&d3d_resource_desc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(mesh.d3d_ib_resource.GetAddressOf())
+		);
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+		mesh.d3d_ib_resource->SetName(L"PlaneIndexBuffer");
+
+		// インデックスバッファビュー設定
+		mesh.d3d_ibv.BufferLocation = mesh.d3d_ib_resource->GetGPUVirtualAddress();
+		mesh.d3d_ibv.SizeInBytes = static_cast<UINT>(d3d_resource_desc.Width);
+		mesh.d3d_ibv.Format = DXGI_FORMAT_R32_UINT;
+
+		// インデックスデータ設定
+		void* mappedData = nullptr;
+		hr = mesh.d3d_ib_resource->Map(0, nullptr, &mappedData);
+		memcpy(mappedData, &indices, 6 * sizeof(UINT));
+		mesh.d3d_ib_resource->Unmap(0, nullptr);
+	}
+
+	mesh.material = new ModelResource::Material;
+
+	// テクスチャの生成
+	{
+		if (filename != nullptr)
+		{
+			// テクスチャ読み込み
+			hr = Graphics::Instance().LoadTexture(filename, mesh.material->d3d_srv_resource.GetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+		}
+		else
+		{
+			// ダミーテクスチャ生成
+			hr = Graphics::Instance().CreateDummyTexture(mesh.material->d3d_srv_resource.GetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+		}
+
+		// ディスクリプタ取得
+		mesh.material->srv_descriptor = Graphics::Instance().GetShaderResourceDescriptorHeap()->PopDescriptor();
+
+		// シェーダーリソースビューの生成
+		D3D12_RESOURCE_DESC d3d_resource_desc = mesh.material->d3d_srv_resource->GetDesc();
+
+		// シェーダーリソースビューの設定
+		D3D12_SHADER_RESOURCE_VIEW_DESC d3d_srv_desc = {};
+		d3d_srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+		d3d_srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		d3d_srv_desc.Format = d3d_resource_desc.Format;
+		d3d_srv_desc.Texture2D.MipLevels = d3d_resource_desc.MipLevels;
+		d3d_srv_desc.Texture2D.MostDetailedMip = 0;
+
+		// シェーダリソースビューを生成
+		d3d_device->CreateShaderResourceView(
+			mesh.material->d3d_srv_resource.Get(),
+			&d3d_srv_desc,
+			mesh.material->srv_descriptor->GetCpuHandle()
+		);
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+		// テクスチャ情報の取得
+		textureSize.x = static_cast<int>(d3d_resource_desc.Width);
+		textureSize.y = static_cast<int>(d3d_resource_desc.Height);
+	}
+}
+
+void PlaneDX12::RenderDX12(const RenderContextDX12& rc)
+{
+	ModelShaderDX12* shader = nullptr;
+	ModelShaderDX12Id shaderId = static_cast<ModelShaderDX12Id>(ModelShaderDX12Id::Plane);
+
+	// パイプライン設定
+	shader = T_GRAPHICS.GetModelShaderDX12(shaderId);
+
+	m_Mesh.mesh = &mesh;
+	//描画
+	shader->Render(rc, m_Mesh);
+}
+
+void PlaneDX12::Update(float elapsedTime)
+{
+	// スケール行列生成
+	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
+	// 回転行列生成
+	DirectX::XMMATRIX R = AnglesToMatrix(angle);
+	// 位置行列生成
+	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
+
+	DirectX::XMMATRIX W = S * R * T;
+
+	DirectX::XMStoreFloat4x4(&transform, W);
+}
+
 /**************************************************************************//**
 	@brief		看板のメッシュを作るコンストラクタ
 	@param[in]    device	デバイス

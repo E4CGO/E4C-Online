@@ -133,4 +133,21 @@ public:
 	FireballShader(ID3D11Device* device) : BillboardShader(device, "Data/Shader/BillboardVS.cso", "Data/Shader/FireballPS.cso") {}
 };
 
+class PlaneShaderDX12 : public ModelShaderDX12
+{
+public:
+	PlaneShaderDX12(ID3D12Device* device);
+	virtual ~PlaneShaderDX12() override = default;
+
+	void Finalize() override {};
+
+	void Render(const RenderContextDX12& rc, const ModelDX12::Mesh& mesh) override;
+
+private:
+	Microsoft::WRL::ComPtr<ID3D12PipelineState>		m_d3d_pipeline_state;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature>		m_d3d_root_signature;
+
+	SamplerManager* m_sampler = nullptr;
+};
+
 #endif //!__INCLUDED_PLANE_SHADER_H__

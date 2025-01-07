@@ -53,6 +53,7 @@ public:
 	virtual void Render(const RenderContext& rc) override;
 
 public:
+
 	// アクセサ
 	// 位置取得
 	const DirectX::XMFLOAT3& GetPosition() const { return position; }
@@ -74,7 +75,46 @@ protected:
 
 	ModelResource::Mesh mesh;
 
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView;
+	DirectX::XMFLOAT2 textureSize = {};
+};
+
+class PlaneDX12 : public ModelObject
+{
+public:
+	PlaneDX12(const char* filename, float scaling, XMFLOAT3 positions, float positionZ, float plane_width);
+
+	virtual ~PlaneDX12()
+	{
+		if (mesh.material != nullptr)
+		{
+			delete mesh.material;
+			mesh.material = nullptr;
+		}
+	}
+
+	virtual void Update(float elapsedTime) override;
+
+	virtual void RenderDX12(const RenderContextDX12& rc) override;
+
+public:
+
+	// アクセサ
+	// 位置取得
+	const DirectX::XMFLOAT3& GetPosition() const { return position; }
+	// 位置設定
+	void SetPosition(const DirectX::XMFLOAT3& position) { this->position = position; }
+	// 回転取得
+	const DirectX::XMFLOAT3& GetAngle() const { return angle; }
+	// 回転設定
+	void SetAngle(const DirectX::XMFLOAT3& angle) { this->angle = angle; }
+	// スケール取得
+	const DirectX::XMFLOAT3& GetScale() const { return scale; }
+	// スケール設定
+	void SetScale(const DirectX::XMFLOAT3& scale) { this->scale = scale; }
+protected:
+
+	ModelDX12::Mesh m_Mesh;
+	ModelResource::Mesh mesh;
 
 	DirectX::XMFLOAT2 textureSize = {};
 };

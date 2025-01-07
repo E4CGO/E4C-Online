@@ -58,6 +58,7 @@ enum class ModelShaderDX12Id
 	ToonInstancing,
 	Skydome,
 	shadowMap,
+	Plane,
 
 	EnumCount
 };
