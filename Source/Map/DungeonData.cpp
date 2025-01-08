@@ -15,11 +15,13 @@ DungeonData::DungeonData()
 void DungeonData::Initialize()
 {
 	// 各種初期化
+	// ファイル名は後で使うため先に初期化を行っておく
+	InitFileNames();
+
 	InitRoomGenerateSettings();
 	InitDungeonGenerateSetting();
 	InitModelFileDatas();
 	InitCollisionFileDatas();
-	InitFileNames();
 }
 
 void DungeonData::InitRoomGenerateSettings()
@@ -31,8 +33,8 @@ void DungeonData::InitRoomGenerateSettings()
 	{
 		RoomGenerateSetting setting;
 		setting.weight = 50;
-		setting.aabb.position = { 0.0f, 3.0f, 8.0f };
-		setting.aabb.radii = { 10.0f, 3.0f, 6.0f };
+		//setting.aabb.position = { 0.0f, 3.0f, 8.0f };
+		//setting.aabb.radii = { 10.0f, 3.0f, 6.0f };
 		setting.portalPosition = { 0.0f, 10000.0f, 0.0f };
 		setting.placementCandidates.emplace_back(RoomType::SIMPLE_ROOM_1);
 		//setting.placementCandidates.emplace_back(RoomType::CROSS_ROOM_1);
@@ -42,18 +44,18 @@ void DungeonData::InitRoomGenerateSettings()
 
 		// ファイルロード
 		nlohmann::json loadFile;
-		std::ifstream ifs("Data/RoomDatas/SimpleRoom1.json");
+		std::ifstream ifs(m_fileNames.at(SIMPLE_ROOM_1));
 
 		if (ifs.is_open())
 		{
 			ifs >> loadFile;
 
-			//setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
-			//setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
-			//setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
-			//setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
-			//setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
-			//setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
+			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
+			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
+			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
+			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
+			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
+			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
 
 			ifs.close();
 		}
@@ -120,8 +122,25 @@ void DungeonData::InitRoomGenerateSettings()
 	{
 		RoomGenerateSetting setting;
 		setting.weight = 0;
-		setting.aabb.position = { 0.0f, 0.0f, 0.0f };
-		setting.aabb.radii = { 0.0f, 0.0f, 0.0f };
+
+		// ファイルロード
+		nlohmann::json loadFile;
+		std::ifstream ifs(m_fileNames.at(DEAD_END));
+
+		if (ifs.is_open())
+		{
+			ifs >> loadFile;
+
+			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
+			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
+			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
+			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
+			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
+			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
+
+			ifs.close();
+		}
+		
 		m_roomGenerateSettings.at(DEAD_END) = setting;
 	}
 
@@ -135,7 +154,7 @@ void DungeonData::InitRoomGenerateSettings()
 
 void DungeonData::InitDungeonGenerateSetting()
 {
-	m_dungeonGenerateSetting.maxDepth = 1;
+	m_dungeonGenerateSetting.maxDepth = 3;
 }
 
 void DungeonData::InitModelFileDatas()
@@ -214,7 +233,10 @@ void DungeonData::InitFileNames()
 	// 部屋タイプの数で配列をリサイズする
 	m_fileNames.resize(ROOMTYPE_COUNT);
 
-	m_fileNames.at(SIMPLE_ROOM_1) = (char*)("Data/RoomDatas/TutoFloor_Start.json");
+	m_fileNames.at(SIMPLE_ROOM_1) = (char*)("Data/RoomDatas/TestFloor_T.json");
+	m_fileNames.at(DEAD_END) = (char*)("Data/RoomDatas/TestFloor_End.json");
+
+	// チュートリアルフロア
 	m_fileNames.at(TUTO_START) = (char*)("Data/RoomDatas/TutoFloor_Start.json");
 	m_fileNames.at(TUTO_NOTHINGROOM) = (char*)("Data/RoomDatas/TutoFloor_Nothing.json");
 	m_fileNames.at(TUTO_SPAWNERROOM) = (char*)("Data/RoomDatas/TutoFloor_Spawner.json");

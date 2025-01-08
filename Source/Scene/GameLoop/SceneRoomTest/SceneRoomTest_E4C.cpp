@@ -20,7 +20,6 @@
 
 #include "Map/MapTile.h"
 #include "Map/MapTileManager.h"
-#include "Map/CrossRoom1.h"
 
 #include "GameData.h"
 

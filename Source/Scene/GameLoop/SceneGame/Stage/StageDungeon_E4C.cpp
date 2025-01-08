@@ -64,63 +64,6 @@ void StageDungeon_E4C::GenerateDungeon()
 					m_roomAABBs,
 					true,
 					m_roomOrder, orderIndex);
-
-				//switch (type)
-				//{
-				//case RoomType::SIMPLE_ROOM_1:
-				//	rootRoom = std::make_unique<RoomBase>(
-				//		nullptr, -1,
-				//		RoomType::SIMPLE_ROOM_1,
-				//		m_roomAABBs,
-				//		true,
-				//		m_roomOrder, orderIndex);
-				//	break;
-
-				//case RoomType::END_ROOM:
-				//	rootRoom = std::make_unique<RoomBase>(
-				//		nullptr, -1,
-				//		RoomType::END_ROOM,
-				//		m_roomAABBs,
-				//		true,
-				//		m_roomOrder, orderIndex);
-				//	break;
-
-				//case RoomType::CROSS_ROOM_1:
-				//	rootRoom = std::make_unique<RoomBase>(
-				//		nullptr, -1,
-				//		RoomType::CROSS_ROOM_1,
-				//		m_roomAABBs,
-				//		true,
-				//		m_roomOrder, orderIndex);
-				//	break;
-
-				//case RoomType::CROSS_ROOM_2:
-				//	rootRoom = std::make_unique<RoomBase>(
-				//		nullptr, -1,
-				//		RoomType::CROSS_ROOM_2,
-				//		m_roomAABBs,
-				//		true,
-				//		m_roomOrder, orderIndex);
-				//	break;
-
-				//case RoomType::PASSAGE_1:
-				//	rootRoom = std::make_unique<RoomBase>(
-				//		nullptr, -1,
-				//		RoomType::PASSAGE_1,
-				//		m_roomAABBs,
-				//		true,
-				//		m_roomOrder, orderIndex);
-				//	break;
-
-				//case RoomType::DEAD_END:
-				//	rootRoom = std::make_unique<RoomBase>(
-				//		nullptr, -1,
-				//		RoomType::DEAD_END,
-				//		m_roomAABBs,
-				//		true,
-				//		m_roomOrder, orderIndex);
-				//	break;
-				//}
 			}
 		}
 		// 生成順番に登録する
@@ -143,63 +86,6 @@ void StageDungeon_E4C::GenerateDungeon()
 			m_roomAABBs,
 			false,
 			m_roomOrder, orderIndex);
-
-		//switch (m_roomOrder.front())
-		//{
-		//case RoomType::SIMPLE_ROOM_1:
-		//	rootRoom = std::make_unique<RoomBase>(
-		//		nullptr, -1,
-		//		RoomType::SIMPLE_ROOM_1,
-		//		m_roomAABBs,
-		//		false,
-		//		m_roomOrder, orderIndex);
-		//	break;
-
-		//case RoomType::END_ROOM:
-		//	rootRoom = std::make_unique<RoomBase>(
-		//		nullptr, -1,
-		//		RoomType::END_ROOM,
-		//		m_roomAABBs,
-		//		false,
-		//		m_roomOrder, orderIndex);
-		//	break;
-
-		//case RoomType::CROSS_ROOM_1:
-		//	rootRoom = std::make_unique<RoomBase>(
-		//		nullptr, -1,
-		//		RoomType::CROSS_ROOM_1,
-		//		m_roomAABBs,
-		//		false,
-		//		m_roomOrder, orderIndex);
-		//	break;
-
-		//case RoomType::CROSS_ROOM_2:
-		//	rootRoom = std::make_unique<RoomBase>(
-		//		nullptr, -1,
-		//		RoomType::CROSS_ROOM_2,
-		//		m_roomAABBs,
-		//		false,
-		//		m_roomOrder, orderIndex);
-		//	break;
-
-		//case RoomType::PASSAGE_1:
-		//	rootRoom = std::make_unique<RoomBase>(
-		//		nullptr, -1,
-		//		RoomType::PASSAGE_1,
-		//		m_roomAABBs,
-		//		false,
-		//		m_roomOrder, orderIndex);
-		//	break;
-
-		//case RoomType::DEAD_END:
-		//	rootRoom = std::make_unique<RoomBase>(
-		//		nullptr, -1,
-		//		RoomType::DEAD_END,
-		//		m_roomAABBs,
-		//		false,
-		//		m_roomOrder, orderIndex);
-		//	break;
-		//}
 	}
 }
 
@@ -242,11 +128,11 @@ void StageDungeon_E4C::Initialize()
 	cameraController->SetPlayer(player);
 	CURSOR_OFF;
 
-	m_roomOrder.emplace_back(RoomType::TUTO_START);
-	m_roomOrder.emplace_back(RoomType::TUTO_NOTHINGROOM);
-	m_roomOrder.emplace_back(RoomType::TUTO_SPAWNERROOM);
-	m_roomOrder.emplace_back(RoomType::TUTO_NOTHINGROOM);
-	m_roomOrder.emplace_back(RoomType::TUTO_END);
+	//m_roomOrder.emplace_back(RoomType::TUTO_START);
+	//m_roomOrder.emplace_back(RoomType::TUTO_NOTHINGROOM);
+	//m_roomOrder.emplace_back(RoomType::TUTO_SPAWNERROOM);
+	//m_roomOrder.emplace_back(RoomType::TUTO_NOTHINGROOM);
+	//m_roomOrder.emplace_back(RoomType::TUTO_END);
 
 	GenerateDungeon();
 
@@ -267,8 +153,6 @@ void StageDungeon_E4C::Initialize()
 
 	// 部屋の当たり判定を設定
 	MAPTILES.CreateSpatialIndex(5, 7);
-
-	Console::Instance().Open();
 }
 
 void StageDungeon_E4C::Finalize()
@@ -276,7 +160,6 @@ void StageDungeon_E4C::Finalize()
 	ENEMIES.Clear();
 	MAPTILES.Clear();
 
-	Console::Instance().Close();
 	GameObjectManager::Instance().Clear();
 }
 
@@ -288,6 +171,13 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	{
 		onlineController->RoomIn();
 		onlineController->BeginSync();
+	}
+
+	// プレイヤーのYが-30.0fより下なら初期位置付近に戻す
+	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
+	if (player->GetPosition().y < -30.0f)
+	{
+		player->SetPosition({ 0.0f, 1.0f, 0.0f });
 	}
 
 	// ゲームループ内で
