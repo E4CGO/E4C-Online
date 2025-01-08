@@ -23,21 +23,9 @@ MouseMob::MouseMob(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("
 	m_SearchRange = 24.0f;
 	m_AttackRange = 1.25f;
 
-	//DirectX::XMFLOAT4X4 testTransform = {
-	//	1, 0, 0, 0,
-	//	0, 1, 0, 0,
-	//	0, 0, 1, 0,
-	//	0, 0, 0, 1
-	//};
 
-	// 当たり判定
-	//m_pColliders[HitCollider::BodyHit] = new SphereCollider(scaling * 1.2f);
 	// 衝突判定
 	SetMoveCollider({ { 0, radius / scale.y, 0 }, radius }, Collider::COLLIDER_OBJ::ENEMY);
-	//colliders[HitCollider::BodyHit] = new SphereCollider((uint16_t)Collider::COLLIDER_TYPE::SPHERE, &testTransform);
-	//// 攻撃判定
-	//attackColliders[AttackCollider::BodyAtc] = new SphereCollider((uint16_t)Collider::COLLIDER_TYPE::SPHERE, &testTransform);
-	//EnableAttackColliders(false);
 
 	m_pColliders.clear();
 	// ヒット判定

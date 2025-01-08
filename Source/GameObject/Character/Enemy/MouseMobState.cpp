@@ -199,6 +199,16 @@ namespace enemy
 		void AttackState::Enter()
 		{
 			m_AnimationTimer = m_WaitTimer;
+
+			//DirectX::XMFLOAT4X4* matrix = &owner->GetModel(0)->FindNode("JOT_C_Sword")->worldTransform;
+			//Sphere attack{ { 0, 0.6f / XMFLOAT3Length({matrix->_21, matrix->_22, matrix->_23}), 0} , 0.5f };
+
+			//ModelObject::ATTACK_COLLIDER_DATA attackData;
+			//attackData.power = 10;
+			//attackData.idx = MouseMob::COLLIDER::ATTACK;
+			//attackData.objType = Collider::COLLIDER_OBJ::ENEMY_ATTACK;
+			//attackData.hittableOBJ = Collider::COLLIDER_OBJ::PLAYER;
+			//owner->MakeAttackCollider(attackData, attack, matrix);
 		}
 
 		/**************************************************************************//**
