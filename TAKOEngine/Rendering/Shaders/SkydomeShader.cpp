@@ -138,7 +138,7 @@ SkydomeShaderDX12::~SkydomeShaderDX12()
 //***********************************************************
 // @brief       描画
 // @param[in]   rc     レンダーコンテキスト
-// @param[in]   model  描画対象のモデルデータを指すポインタ
+// @param[in]   mesh   描画対象のモデルデータのmesh
 // @return      なし
 //***********************************************************
 void SkydomeShaderDX12::Render(const RenderContextDX12& rc, const ModelDX12::Mesh& mesh)

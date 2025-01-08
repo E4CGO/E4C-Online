@@ -20,13 +20,14 @@ VS_OUT main(
     
     VS_OUT vout;
     float4x4 viewProjection = mul(view, Projection);
-    vout.vertex   = mul(float4(p, 1.0f), mul(world_transform, viewProjection));
+    vout.vertex   = mul(float4(p, 1.0f), viewProjection);
     vout.texcoord = texcoord;
-    vout.normal   = normalize(n);
+    vout.normal   = n;
     vout.position = p;
-    vout.tangent  = normalize(t);
+    vout.tangent  = t;
     vout.binormal = normalize(cross(vout.normal, vout.tangent));
     vout.color    = materialColor;
-
+    vout.shadow   = CalcShadowTexcoord(position.xyz, lightViewProjection);
+    
     return vout;
 }

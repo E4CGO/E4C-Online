@@ -16,7 +16,7 @@
 class MouseMob : public Enemy
 {
 public:
-	MouseMob(float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX11);
+	MouseMob(float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX12);
 	~MouseMob() = default;
 public:
 	enum COLLIDER

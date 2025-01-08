@@ -1,8 +1,4 @@
-﻿//! @file StageDungeon_E4C.h
-//! @note 
-
-#ifndef __INCLUDED_STAGE_DUNGEON_E4C_H__
-#define __INCLUDED_STAGE_DUNGEON_E4C_H__
+﻿#pragma once
 
 #include <memory>
 #include <array>
@@ -13,21 +9,19 @@
 #include "GameObject/Character/Player/PlayerCharacter.h"
 #include "TAKOEngine/Rendering/Shaders/PlaneShader.h"
 
+#include "Map/DungeonData.h"
+
 #include "Scene/Scene.h"
 #include "Scene/Stage/Stage.h"
 
 #include "Map/MapTile.h"
 #include "Map/RoomBase.h"
-#include "Map/SimpleRoom1.h"
-#include "Map/EndRoom1.h"
-#include "Map/CrossRoom1.h"
-#include "Map/CrossRoom2.h"
-#include "Map/Passage1.h"
-#include "Map/DeadEndRoom.h"
 
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
 #include "TAKOEngine/Tool/GLTFImporter.h"
+
+using namespace ns_RoomData;
 
 class SceneGame_E4C;
 
@@ -64,6 +58,8 @@ public:
 
 	void RenderDX12() override;
 protected:
+	void OnPhase() override;
+protected:
 	SceneGame_E4C* m_pScene;
 
 	std::unique_ptr<ThridPersonCameraController> cameraController;
@@ -95,6 +91,6 @@ protected:
 
 	// ポストエフェクト
 	std::unique_ptr<PostprocessingRendererDX12>	postprocessingRenderer = std::make_unique<PostprocessingRendererDX12>();
-};
 
-#endif // !__INCLUDED_STAGE_DUNGEON_E4C_H__
+	std::unique_ptr<ModelObject> instancingModel;
+};

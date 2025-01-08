@@ -27,6 +27,7 @@ public:
 
 	// レンダーターゲット設定
 	void SetRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle, D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle);
+	void SetRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle, UINT ShadowMapSize = 2048);
 	void SetRenderTarget(FrameBufferDX12* renderTarget);
 
 	// 複数枚のレンダーターゲット設定
@@ -55,6 +56,7 @@ public:
 
 	// デプスステンシルビューをクリア
 	void ClearDepthStencilView(D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle, float clearValue);
+	void ClearDepthStencilView(D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle);
 
 	// レンダーターゲットのクリア
 	void ClearRenderTargetView(D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle, const float* clearColor);
