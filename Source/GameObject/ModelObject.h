@@ -96,6 +96,20 @@ public:
 	Collider* GetCollider(uint8_t idx) { return (m_pColliders.contains(idx)) ? m_pColliders[idx] : nullptr; }
 	void SetCollider(uint8_t idx, Sphere sphereParam, Collider::COLLIDER_OBJ objType, DirectX::XMFLOAT4X4* transform);
 	void SetCollider(uint8_t idx, Capsule capsuleParam, Collider::COLLIDER_OBJ objType, DirectX::XMFLOAT4X4* transform);
+	void MakeAttackCollider(int power, uint8_t idx, Sphere sphereParam, Collider::COLLIDER_OBJ objType, uint16_t hittableOBJ, DirectX::XMFLOAT4X4* transform);
+	void MakeAttackCollider(int power, uint8_t idx, Capsule capsuleParam, Collider::COLLIDER_OBJ objType, uint16_t hittableOBJ, DirectX::XMFLOAT4X4* transform);
+	struct ATTACK_COLLIDER_DATA
+	{
+		int power = 0;
+		uint8_t idx = 0;
+		Collider::COLLIDER_OBJ objType = Collider::COLLIDER_OBJ::HIT_ERR;
+		uint16_t hittableOBJ = 0;
+		float hitStartRate = 0.0f;
+		float hitEndRate = 1.0f;
+	};
+	void MakeAttackCollider(ATTACK_COLLIDER_DATA data, Sphere sphereParam, DirectX::XMFLOAT4X4* transform);
+	void MakeAttackCollider(ATTACK_COLLIDER_DATA data, Capsule capsuleParam, DirectX::XMFLOAT4X4* transform);
+	void DeleteAttackCollider(uint8_t idx);
 
 	// アニメーションのスピードを取得
 	float GetAnimationSpeed() { return m_animationSpeed; }

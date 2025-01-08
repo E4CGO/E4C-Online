@@ -104,6 +104,9 @@ public:
 	int GetMaxHp() { return maxHp; }
 	void ModifyHp(int hp);
 
+	// 被ダメージコールバック
+	virtual void OnDamage(int damage) { hp -= damage; }
+
 	//物理計算フラグ
 	void SetKinematic(bool value) { this->isKinematic = value; }
 

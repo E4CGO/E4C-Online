@@ -1,5 +1,31 @@
 ﻿#include "EnemyManager.h"
 
+void EnemyManager::Update(float elapsedTime)
+{
+	ObjectManager::Update(elapsedTime);
+
+	// エネミー同士の衝突処理
+	size_t size = this->items.size();
+	HitResult hit;
+	for (size_t i = 0; i < size; i++)
+	{
+		Collider* col1 = items.at(i)->GetMoveCollider();
+		if (!col1) continue;
+
+		for (size_t j = i + 1; j < size; j++)
+		{
+			Collider* col2 = items.at(j)->GetMoveCollider();
+			if (!col2) continue;
+
+			if (col1->Collision(col2, {}, hit))
+			{
+				items.at(i)->AddImpulse({ hit.normal.x * hit.distance, 0, hit.normal.z * hit.distance });
+				items.at(j)->AddImpulse({ -hit.normal.x * hit.distance, 0, -hit.normal.z * hit.distance });
+			}
+		}
+	}
+}
+
 Enemy* EnemyManager::GetEnemyById(int id)
 {
 	for (Enemy*& enemy : items)

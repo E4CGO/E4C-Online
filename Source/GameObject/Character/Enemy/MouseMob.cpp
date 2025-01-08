@@ -15,6 +15,7 @@ MouseMob::MouseMob(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("
 {
 	// 敵の基本パラメーター
 	enemyType = ENEMY_TYPE::MOUSE;
+	radius = 1.0f;
 	maxHp = hp = 50;
 	atk = 10;
 	moveSpeed = 2.0f;
@@ -24,6 +25,13 @@ MouseMob::MouseMob(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("
 
 	// 当たり判定
 	//m_pColliders[HitCollider::BodyHit] = new SphereCollider(scaling * 1.2f);
+	// 衝突判定
+	SetMoveCollider({ { 0, radius / scale.y, 0 }, radius }, Collider::COLLIDER_OBJ::ENEMY);
+
+	m_pColliders.clear();
+	// ヒット判定
+	Sphere sphere{ { 0, radius / scale.y, 0 }, radius };
+	SetCollider(COLLIDER::BODY, sphere, Collider::COLLIDER_OBJ::ENEMY, &transform);
 
 	{
 		using namespace enemy::mouseMob;

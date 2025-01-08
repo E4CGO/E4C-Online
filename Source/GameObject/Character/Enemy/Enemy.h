@@ -43,6 +43,7 @@ public:
 
 	void SetSpawnPosition(const DirectX::XMFLOAT3& position) { this->m_SpawnPosition = position; }
 
+	virtual void OnDamage(int damage) override;
 	virtual void OnDamage(const ENEMY_COLLISION& hit);
 	virtual void OnDamage(const ATTACK_DATA& hit);
 	virtual void OnDeath();

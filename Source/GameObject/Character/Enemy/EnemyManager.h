@@ -13,6 +13,8 @@ protected:
 	~EnemyManager() = default;
 
 public:
+	void Update(float elapsedTime) override;
+	
 	Enemy* GetEnemyById(int id);
 	// レイキャスト
 	bool RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, HitResult& hit, bool camera = false);
