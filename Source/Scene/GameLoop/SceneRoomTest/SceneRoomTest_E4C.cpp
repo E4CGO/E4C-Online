@@ -102,21 +102,14 @@ void SceneRoomTest_E4C::Render()
 
 	NODES.Render(rc);
 
-	// デバッグ
-	// AABB描画
-	DirectX::XMFLOAT3 aabbDrawPos;
-	aabbDrawPos = {
-		roomSetting.aabb.position.x/* - (roomSetting.aabb.radii.x * 0.5f)*/,
-		roomSetting.aabb.position.y/* - (roomSetting.aabb.radii.y * 0.5f)*/,
-		roomSetting.aabb.position.z/* - (roomSetting.aabb.radii.z * 0.5f)*/,
+	// AABBの描画
+	// radiiは半径なので2倍して直径にしてから描画を行う
+	DirectX::XMFLOAT3 diameter = {
+	roomSetting.aabb.radii.x * 2.0f,
+	roomSetting.aabb.radii.y * 2.0f,
+	roomSetting.aabb.radii.z * 2.0f
 	};
-	T_GRAPHICS.GetDebugRenderer()->DrawCube(aabbDrawPos, roomSetting.aabb.radii, { 1.0f, 1.0f, 1.0f, 1.0f });
-	//DirectX::XMFLOAT3 p = { 1.0f, 1.0f, 1.0f };
-	//T_GRAPHICS.GetDebugRenderer()->DrawCube(roomSetting.aabb.position, p, { 1.0f, 1.0f, 1.0f, 1.0f });
-	//T_GRAPHICS.GetDebugRenderer()->DrawCylinder(roomSetting.aabb.position, 10, 10, { 1.0f, 1.0f, 1.0f, 1.0f });
-
-	//T_GRAPHICS.GetDebugRenderer()->DrawCylinder({ 0.0f, 0.0f, 0.0f }, 16.0f, 1.5f, { 1,0,0,1 });
-	//T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, spawnerData.searchRadius, 1.5f, { 1,0,1,1 });
+	T_GRAPHICS.GetDebugRenderer()->DrawCube(roomSetting.aabb.position, diameter, { 1.0f, 1.0f, 1.0f, 1.0f });
 
 	//	シャドウマップ描画
 	m_shadowMapRenderer->Render();
@@ -149,34 +142,24 @@ void SceneRoomTest_E4C::RenderDX12()
 		m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 
 		// モデル描画
-		//MAPTILES.RenderDX12(rc);
 		NODES.RenderDX12(rc);
 
-		// AABB描画
-		//T_GRAPHICS.GetDebugRenderer()->DrawCube(roomSetting.aabb.position, roomSetting.aabb.radii, { 1.0f, 1.0f, 1.0f, 1.0f });
-		//DirectX::XMFLOAT3 p = { 1.0f, 1.0f, 1.0f };
-		//T_GRAPHICS.GetDebugRenderer()->DrawCube(roomSetting.aabb.position, p, { 1.0f, 1.0f, 1.0f, 1.0f });
-		//T_GRAPHICS.GetDebugRenderer()->DrawCylinder(roomSetting.aabb.position, 10, 10, { 1.0f, 1.0f, 1.0f, 1.0f });
-
-		T_GRAPHICS.GetDebugRenderer()->DrawCylinder({0.0f, 0.0f, 0.0f}, 16.0f, 1.5f, {1,0,0,1});
-		//T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, spawnerData.searchRadius, 1.5f, { 1,0,1,1 });
+		// AABBの描画
+		// radiiは半径なので2倍して直径にしてから描画を行う
+		DirectX::XMFLOAT3 diameter = {
+		roomSetting.aabb.radii.x * 2.0f,
+		roomSetting.aabb.radii.y * 2.0f,
+		roomSetting.aabb.radii.z * 2.0f
+		};
+		T_GRAPHICS.GetDebugRenderer()->DrawCube(roomSetting.aabb.position, diameter, { 1.0f, 1.0f, 1.0f, 1.0f });
 
 		// レンダーターゲットへの書き込み終了待ち
 		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 	}
 
-	// デバッグ描画
-	{
-
-	}
-
 	// ポストエフェクト描画
 	{
 		//postprocessingRenderer->Render(m_frameBuffer);
-	}
-
-	// 2D描画
-	{
 	}
 
 	T_GRAPHICS.End();

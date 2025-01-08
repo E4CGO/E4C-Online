@@ -195,6 +195,8 @@ void RoomBase::GenerateNextRoom(
 					AABB nextRoomAABB = CalcAABB(DUNGEONDATA.GetRoomGenerateSetting(type).aabb,
 						m_connectPointDatas.at(i).position, DirectX::XMConvertToDegrees(m_connectPointDatas.at(i).angle.y));
 
+					m_debugAABBs.emplace_back(nextRoomAABB);
+
 					// 新規生成する子の部屋のAABBとそれ以外のAABBとの当たり判定を行う
 					bool isHit = false;
 					for (const AABB& anotherRoomAABB : roomAABBs)
@@ -242,6 +244,7 @@ void RoomBase::GenerateNextRoom(
 						{
 							RoomBase* nextRoom = new RoomBase(this, i, type, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
 							AddRoom(nextRoom);
+							break;
 						}
 					}
 				}
@@ -292,7 +295,10 @@ AABB RoomBase::CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const
 
 	// 90度
 	if (degree > 89.9f && degree < 90.1f)
-	{		
+	{
+		aabb.radii.x = buf.radii.z;
+		aabb.radii.z = buf.radii.x;
+
 		aabb.position.x = buf.position.z;
 		aabb.position.z = buf.position.x;
 	}
@@ -306,6 +312,9 @@ AABB RoomBase::CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const
 	// 270度
 	if (degree > 269.9f && degree < 270.1f)
 	{
+		aabb.radii.x = buf.radii.z;
+		aabb.radii.z = buf.radii.x;
+
 		aabb.position.x = -buf.position.z;
 		aabb.position.z = buf.position.x;
 	}
@@ -332,7 +341,36 @@ void RoomBase::LoadMapData()
 			switch (tileType)
 			{
 			case ns_RoomData::PORTAL: continue;
-			//case ns_RoomData::SPAWNER: continue;
+
+			case ns_RoomData::SPAWNER:
+			{
+				DirectX::XMFLOAT3 position = {
+					nodeData["Position"].at(0),
+					nodeData["Position"].at(1),
+					nodeData["Position"].at(2)
+				};
+				DirectX::XMFLOAT3 angle = {
+					nodeData["Angle"].at(0),
+					nodeData["Angle"].at(1),
+					nodeData["Angle"].at(2)
+				};
+
+				TILE_DATA newData;
+				newData.position = DirectX::XMFLOAT3(position);
+				newData.angle = m_angle + angle;
+
+				// ワールド座標に変換し保存
+				DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&m_transform);
+				DirectX::XMVECTOR PointPos = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&newData.position), WorldTransform);
+				DirectX::XMStoreFloat3(&newData.position, PointPos);
+				m_tileDatas.at(tileType).emplace_back(TILE_DATA(
+					position,
+					angle,
+					{ 1.0f, 1.0f, 1.0f })
+				);
+			}
+			continue;
+
 			case ns_RoomData::CONNECTPOINT:
 			{
 				DirectX::XMFLOAT3 position = {

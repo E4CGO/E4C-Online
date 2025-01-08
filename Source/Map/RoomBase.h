@@ -48,7 +48,6 @@ public:
 
 	virtual void Render(const RenderContextDX12 rc)
 	{
-
 		// AABBの描画
 		// radiiは半径なので2倍して直径にしてからSetCubeを行う
 		// 自身のAABB
@@ -58,8 +57,8 @@ public:
 				m_aabb.radii.y * 2.0f,
 				m_aabb.radii.z * 2.0f
 			};
-			m_aabbCube->SetCube(m_aabb.position, diameter, { 1.0f, 1.0f, 1.0f, 1.0f });
-			m_aabbCube->Render(rc);
+			//m_aabbCube->SetCube(m_aabb.position, diameter, { 1.0f, 1.0f, 1.0f, 1.0f });
+			//m_aabbCube->Render(rc);
 		}
 
 		// 子の部屋を生成する時のAABB
@@ -70,8 +69,8 @@ public:
 				m_debugAABBs.at(i).radii.y * 2.0f,
 				m_debugAABBs.at(i).radii.z * 2.0f
 			};
-			m_debugCubes.at(i)->SetCube(m_debugAABBs.at(i).position, diameter, { 1.0f, 0.0f, 0.0f, 1.0f });
-			m_debugCubes.at(i)->Render(rc);
+			//m_debugCubes.at(i)->SetCube(m_debugAABBs.at(i).position, diameter, { 1.0f, 0.0f, 0.0f, 1.0f });
+			//m_debugCubes.at(i)->Render(rc);
 		}
 	}
 

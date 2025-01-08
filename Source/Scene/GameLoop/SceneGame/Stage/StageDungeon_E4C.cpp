@@ -39,33 +39,49 @@ void StageDungeon_E4C::GenerateDungeon()
 
 		// ダンジョンの自動生成を行う
 		std::vector<RoomType> placeableRooms;
-		placeableRooms.emplace_back(RoomType::SIMPLE_ROOM_1);
-		//placeableRooms.emplace_back(RoomType::CROSS_ROOM_1);
+		placeableRooms.emplace_back(RoomType::FIRST_START);
 
-		// 生成可能な部屋の重みの合計
-		int totalWeight = 0;
-		for (RoomType type : placeableRooms)
+		// 部屋候補が一つしかないならそれを生成
+		if (placeableRooms.size() == 1)
 		{
-			totalWeight += dungeonData.GetRoomGenerateSetting(type).weight;
+			int orderIndex = 0;
+
+			rootRoom = std::make_unique<RoomBase>(
+				nullptr, -1,
+				placeableRooms.at(0),
+				m_roomAABBs,
+				true,
+				m_roomOrder, orderIndex);
 		}
-
-		int randomValue = std::rand() % totalWeight;
-		for (RoomType type : placeableRooms)
+		// 複数あるなら
+		else
 		{
-			randomValue -= dungeonData.GetRoomGenerateSetting(type).weight;
-
-			if (randomValue < 0)
+			// 生成可能な部屋の重みの合計
+			int totalWeight = 0;
+			for (RoomType type : placeableRooms)
 			{
-				int orderIndex = 0;
+				totalWeight += dungeonData.GetRoomGenerateSetting(type).weight;
+			}
 
-				rootRoom = std::make_unique<RoomBase>(
-					nullptr, -1,
-					type,
-					m_roomAABBs,
-					true,
-					m_roomOrder, orderIndex);
+			int randomValue = std::rand() % totalWeight;
+			for (RoomType type : placeableRooms)
+			{
+				randomValue -= dungeonData.GetRoomGenerateSetting(type).weight;
+
+				if (randomValue < 0)
+				{
+					int orderIndex = 0;
+
+					rootRoom = std::make_unique<RoomBase>(
+						nullptr, -1,
+						type,
+						m_roomAABBs,
+						true,
+						m_roomOrder, orderIndex);
+				}
 			}
 		}
+
 		// 生成順番に登録する
 		for (RoomBase* room : rootRoom->GetAll())
 		{
@@ -177,7 +193,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
 	if (player->GetPosition().y < -30.0f)
 	{
-		player->SetPosition({ 0.0f, 1.0f, 0.0f });
+		player->SetPosition({ 0.0f, 1.0f, 1.0f });
 	}
 
 	// ゲームループ内で

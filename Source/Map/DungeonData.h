@@ -23,6 +23,17 @@ namespace ns_RoomData
 		PASSAGE_1,
 		DEAD_END,
 
+		FIRST_START,	// 最初のフロア：最初の部屋
+		FIRST_I,		// 最初のフロア：Ｉ字の部屋
+		FIRST_T,		// 最初のフロア：Ｔ字の部屋
+		FIRST_SPAWNER,	// 最初のフロア：スポナーの部屋
+		FIRST_END,		// 最初のフロア：最後の部屋
+
+		TEST_I,		// テスト：Ｉ字の部屋
+		TEST_T,		// テスト：Ｔ字の部屋
+		TEST_X,		// テスト：十字の部屋
+		TEST_END,	// テスト：最後の部屋
+
 		TUTO_START,			// チュートリアル：最初の部屋
 		TUTO_NOTHINGROOM,	// チュートリアル：何もない部屋
 		TUTO_SPAWNERROOM,	// チュートリアル：スポナーのある部屋

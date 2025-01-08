@@ -144,6 +144,231 @@ void DungeonData::InitRoomGenerateSettings()
 		m_roomGenerateSettings.at(DEAD_END) = setting;
 	}
 
+	// FIRST_START
+	{
+		RoomGenerateSetting setting;
+		setting.weight = 0;
+		setting.placementCandidates.emplace_back(RoomType::FIRST_I);
+		setting.placementCandidates.emplace_back(RoomType::FIRST_T);
+		setting.placementCandidates.emplace_back(RoomType::FIRST_SPAWNER);
+
+		// ファイルロード
+		nlohmann::json loadFile;
+		std::ifstream ifs(m_fileNames.at(FIRST_START));
+		if (ifs.is_open())
+		{
+			ifs >> loadFile;
+			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
+			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
+			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
+			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
+			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
+			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
+			ifs.close();
+		}
+		m_roomGenerateSettings.at(FIRST_START) = setting;
+	}
+
+	// FIRST_I
+	{
+		RoomGenerateSetting setting;
+		setting.weight = 15;
+		setting.placementCandidates.emplace_back(RoomType::FIRST_I);
+		setting.placementCandidates.emplace_back(RoomType::FIRST_T);
+		setting.placementCandidates.emplace_back(RoomType::FIRST_SPAWNER);
+		setting.placementCandidates.emplace_back(RoomType::FIRST_END);
+
+		// ファイルロード
+		nlohmann::json loadFile;
+		std::ifstream ifs(m_fileNames.at(FIRST_I));
+		if (ifs.is_open())
+		{
+			ifs >> loadFile;
+			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
+			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
+			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
+			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
+			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
+			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
+			ifs.close();
+		}
+		m_roomGenerateSettings.at(FIRST_I) = setting;
+	}
+
+	// FIRST_T
+	{
+		RoomGenerateSetting setting;
+		setting.weight = 20;
+		setting.placementCandidates.emplace_back(RoomType::FIRST_I);
+		setting.placementCandidates.emplace_back(RoomType::FIRST_T);
+		setting.placementCandidates.emplace_back(RoomType::FIRST_SPAWNER);
+		setting.placementCandidates.emplace_back(RoomType::FIRST_END);
+
+		// ファイルロード
+		nlohmann::json loadFile;
+		std::ifstream ifs(m_fileNames.at(FIRST_T));
+		if (ifs.is_open())
+		{
+			ifs >> loadFile;
+			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
+			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
+			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
+			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
+			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
+			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
+			ifs.close();
+		}
+		m_roomGenerateSettings.at(FIRST_T) = setting;
+	}
+
+	// FIRST_SPAWNER
+	{
+		RoomGenerateSetting setting;
+		setting.weight = 10;
+		setting.placementCandidates.emplace_back(RoomType::FIRST_I);
+		setting.placementCandidates.emplace_back(RoomType::FIRST_T);
+		setting.placementCandidates.emplace_back(RoomType::FIRST_END);
+
+		// ファイルロード
+		nlohmann::json loadFile;
+		std::ifstream ifs(m_fileNames.at(FIRST_SPAWNER));
+		if (ifs.is_open())
+		{
+			ifs >> loadFile;
+			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
+			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
+			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
+			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
+			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
+			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
+			ifs.close();
+		}
+		m_roomGenerateSettings.at(FIRST_SPAWNER) = setting;
+	}
+
+	// FIRST_END
+	{
+		RoomGenerateSetting setting;
+		setting.weight = 5;
+
+		// ファイルロード
+		nlohmann::json loadFile;
+		std::ifstream ifs(m_fileNames.at(FIRST_END));
+		if (ifs.is_open())
+		{
+			ifs >> loadFile;
+			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
+			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
+			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
+			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
+			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
+			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
+			ifs.close();
+		}
+		m_roomGenerateSettings.at(FIRST_END) = setting;
+	}
+
+	// TEST_I
+	{
+		RoomGenerateSetting setting;
+		setting.weight = 10;
+		setting.placementCandidates.emplace_back(RoomType::TEST_I);
+		setting.placementCandidates.emplace_back(RoomType::TEST_T);
+		setting.placementCandidates.emplace_back(RoomType::TEST_X);
+		//setting.placementCandidates.emplace_back(RoomType::TEST_END);
+
+		// ファイルロード
+		nlohmann::json loadFile;
+		std::ifstream ifs(m_fileNames.at(TEST_I));
+		if (ifs.is_open())
+		{
+			ifs >> loadFile;
+			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
+			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
+			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
+			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
+			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
+			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
+			ifs.close();
+		}
+		m_roomGenerateSettings.at(TEST_I) = setting;
+	}
+
+	// TEST_T
+	{
+		RoomGenerateSetting setting;
+		setting.weight = 20;
+		setting.placementCandidates.emplace_back(RoomType::TEST_I);
+		setting.placementCandidates.emplace_back(RoomType::TEST_T);
+		setting.placementCandidates.emplace_back(RoomType::TEST_X);
+		//setting.placementCandidates.emplace_back(RoomType::TEST_END);
+
+		// ファイルロード
+		nlohmann::json loadFile;
+		std::ifstream ifs(m_fileNames.at(TEST_T));
+		if (ifs.is_open())
+		{
+			ifs >> loadFile;
+			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
+			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
+			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
+			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
+			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
+			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
+			ifs.close();
+		}
+		m_roomGenerateSettings.at(TEST_T) = setting;
+	}
+
+	// TEST_X
+	{
+		RoomGenerateSetting setting;
+		setting.weight = 5;
+		setting.placementCandidates.emplace_back(RoomType::TEST_I);
+		setting.placementCandidates.emplace_back(RoomType::TEST_T);
+		setting.placementCandidates.emplace_back(RoomType::TEST_X);
+		//setting.placementCandidates.emplace_back(RoomType::TEST_END);
+
+		// ファイルロード
+		nlohmann::json loadFile;
+		std::ifstream ifs(m_fileNames.at(TEST_X));
+		if (ifs.is_open())
+		{
+			ifs >> loadFile;
+			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
+			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
+			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
+			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
+			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
+			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
+			ifs.close();
+		}
+
+		m_roomGenerateSettings.at(TEST_X) = setting;
+	}
+
+	// TEST_END
+	{
+		RoomGenerateSetting setting;
+		setting.weight = 5;
+
+		// ファイルロード
+		nlohmann::json loadFile;
+		std::ifstream ifs(m_fileNames.at(TEST_END));
+		if (ifs.is_open())
+		{
+			ifs >> loadFile;
+			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
+			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
+			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
+			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
+			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
+			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
+			ifs.close();
+		}
+		m_roomGenerateSettings.at(TEST_END) = setting;
+	}
+
 	// TUTO_END
 	{
 		RoomGenerateSetting setting;
@@ -154,7 +379,7 @@ void DungeonData::InitRoomGenerateSettings()
 
 void DungeonData::InitDungeonGenerateSetting()
 {
-	m_dungeonGenerateSetting.maxDepth = 3;
+	m_dungeonGenerateSetting.maxDepth = 4;
 }
 
 void DungeonData::InitModelFileDatas()
@@ -235,6 +460,20 @@ void DungeonData::InitFileNames()
 
 	m_fileNames.at(SIMPLE_ROOM_1) = (char*)("Data/RoomDatas/TestFloor_T.json");
 	m_fileNames.at(DEAD_END) = (char*)("Data/RoomDatas/TestFloor_End.json");
+
+	// 最初のフロア
+	m_fileNames.at(FIRST_START) = (char*)("Data/RoomDatas/FirstFloor_Start.json");
+	m_fileNames.at(FIRST_I) = (char*)("Data/RoomDatas/FirstFloor_I.json");
+	m_fileNames.at(FIRST_T) = (char*)("Data/RoomDatas/FirstFloor_T.json");
+	m_fileNames.at(FIRST_SPAWNER) = (char*)("Data/RoomDatas/FirstFloor_Spawner.json");
+	m_fileNames.at(FIRST_END) = (char*)("Data/RoomDatas/FirstFloor_End.json");
+
+
+	// テストフロア
+	m_fileNames.at(TEST_I) = (char*)("Data/RoomDatas/TestFloor_I.json");
+	m_fileNames.at(TEST_T) = (char*)("Data/RoomDatas/TestFloor_T.json");
+	m_fileNames.at(TEST_X) = (char*)("Data/RoomDatas/TestFloor_X.json");
+	m_fileNames.at(TEST_END) = (char*)("Data/RoomDatas/TestFloor_End.json");
 
 	// チュートリアルフロア
 	m_fileNames.at(TUTO_START) = (char*)("Data/RoomDatas/TutoFloor_Start.json");
