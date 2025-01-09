@@ -601,7 +601,7 @@ void PlayerCharacter::SwordTrail()
 					for (int j = 0; j < division; ++j)
 					{
 						float t = j / static_cast<float>(division - 1); // division - 1で割ることで、tの値が0から1になるように調整
-
+						float texcoordV = i / static_cast<float>(MAX_POLYGON - 3); // 軌跡全体に沿ったV座標を計算
 						DirectX::XMVECTOR Root = DirectX::XMVectorCatmullRom(Root0, Root1, Root2, Root3, t);
 						DirectX::XMVECTOR Tip = DirectX::XMVectorCatmullRom(Tips0, Tips1, Tips2, Tips3, t);
 
@@ -611,8 +611,8 @@ void PlayerCharacter::SwordTrail()
 						DirectX::XMStoreFloat3(&tipFloat3, Tip);
 
 
-						sword->AddVertex(rootFloat3, {1,1,1,1},{0,1});
-						sword->AddVertex(tipFloat3, { 1,1,1,1 }, {0,1});
+						sword->AddVertex(rootFloat3, {1,1,1,1},{0,texcoordV});
+						sword->AddVertex(tipFloat3, { 1,1,1,1 }, {1,texcoordV});
 
 					}
 				}

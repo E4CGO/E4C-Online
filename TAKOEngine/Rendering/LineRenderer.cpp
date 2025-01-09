@@ -102,7 +102,7 @@ LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 
-	GpuResourceUtils::LoadTexture(device, "Data/Sprites/pizza.jpg", texture.ReleaseAndGetAddressOf(), &textureDesc);
+	GpuResourceUtils::LoadTexture(device, "Data/Sprites/trail.png", texture.ReleaseAndGetAddressOf(), &textureDesc);
 }
 
 // 描画開始
@@ -116,7 +116,7 @@ void LineRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X
 
 	// 定数バッファ設定
 	context->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
-	//context->PSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
+    context->PSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
 
 	// レンダーステート設定
 	const float blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
