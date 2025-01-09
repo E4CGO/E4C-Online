@@ -346,7 +346,16 @@ DepthStencil::DepthStencil(UINT width, UINT height)
 // @param[in]   device　    ID3D12Device*
 // @return      なし
 //***********************************************************
-ShadowMapRenderDX12::ShadowMapRenderDX12(ID3D12Device* device)
+ShadowMapRenderDX12::ShadowMapRenderDX12()
+{
+}
+
+//***********************************************************
+// @brief       初期化
+// @param[in]   device　    ID3D12Device*
+// @return      なし
+//***********************************************************
+void ShadowMapRenderDX12::Init(ID3D12Device* device)
 {
 	CreateFrameBuffer(device);
 }
@@ -358,6 +367,11 @@ ShadowMapRenderDX12::ShadowMapRenderDX12(ID3D12Device* device)
 //***********************************************************
 void ShadowMapRenderDX12::Finalize()
 {
+	if (m_models.size() != 0)
+	{
+		m_models.clear();
+	}
+
 	if (dsv_descriptor != nullptr)
 	{
 		Graphics::Instance().GetDepthStencilDescriptorHeap()->PushDescriptor(dsv_descriptor);
