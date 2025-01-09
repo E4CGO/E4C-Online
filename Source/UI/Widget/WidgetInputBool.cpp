@@ -5,6 +5,7 @@
 
 #include "TAKOEngine/Runtime/tentacle_lib.h"
 #include "TAKOEngine/Rendering/ResourceManager.h"
+#include "TAKOEngine/Tool/Encode.h"
 
 /**************************************************************************//**
 	@brief	コンストラクタ
@@ -75,6 +76,15 @@ void WidgetInputBool::RenderDX12(const RenderContextDX12& rc)
 {
 	DirectX::XMFLOAT2 checkboxSize = { m_size.y, m_size.y };
 
+	T_TEXT.RenderDX12(
+		FONT_ID::HGpop,
+		Encode::string_to_wstring(m_label),
+		m_position.x, m_position.y + m_size.y / 2.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		0.0f,
+		FONT_ALIGN::TOP_LEFT,
+		0.5f,
+		1);
 
 	if (*m_pValue)
 	{

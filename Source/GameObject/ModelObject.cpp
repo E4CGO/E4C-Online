@@ -58,6 +58,12 @@ void ModelObject::LoadModel(const char* filename, float scaling, ModelObject::RE
 	case ModelObject::LHS_TOON_Instancing:
 		m_dx12_ShaderId = ModelShaderDX12Id::ToonInstancing;
 		break;
+	case ModelObject::LHS_Phong:
+		m_dx12_ShaderId = ModelShaderDX12Id::Phong;
+		break;
+	case ModelObject::LHS_Phong_Instancing:
+		m_dx12_ShaderId = ModelShaderDX12Id::PhongInstancing;
+		break;
 	default:
 		break;
 	}
@@ -312,7 +318,7 @@ void ModelObject::RenderDX12(const RenderContextDX12& rc)
 }
 
 /**************************************************************************//**
-	@brief		移動用コライダー設定
+	@brief		移動用コライダー設定(名前がSetCollider→SetMoveColliderに変わりました。Mapの当たり判定は基本こっちのみ)
 	@param[in]	shapeType	コライダータイプ
 	@param[in]	objType		オブジェクトタイプ
 	@param[in]	idx			モデルID

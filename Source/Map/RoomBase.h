@@ -1,7 +1,10 @@
 ﻿#pragma once
 
+#include "TAKOEngine/Rendering/DebugRenderer/CubeRenderer.h"
 #include "Map/DungeonData.h"
 #include <vector>
+
+using namespace ns_RoomData;
 
 // 部屋ベース
 class RoomBase
@@ -10,6 +13,14 @@ public:
 	// コンストラクタ
 	RoomBase(
 		RoomBase* parent, int pointIndex,
+		std::vector<AABB>& roomAABBs,
+		bool isAutoGeneration,
+		std::vector<uint8_t>& roomOrder, int& orderIndex);
+
+	// コンストラクタ
+	RoomBase(
+		RoomBase* parent, int pointIndex,
+		RoomType roomType,
 		std::vector<AABB>& roomAABBs,
 		bool isAutoGeneration,
 		std::vector<uint8_t>& roomOrder, int& orderIndex);
@@ -23,39 +34,6 @@ public:
 		}
 	}
 
-	enum TileType
-	{
-		FLOOR = 0,
-		WALL,
-		PILLAR,
-		STAIR,
-		SPAWNER,
-	};
-
-	// 配置するタイルデータ
-	struct TILE_DATA
-	{
-		TileType type;
-
-		DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
-		DirectX::XMFLOAT3 angle = { 0.0f, 0.0f, 0.0f };
-		DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f };
-		DirectX::XMFLOAT4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	};
-
-	// 接続点データ
-	struct CONNECTPOINT_DATA
-	{
-		DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
-		DirectX::XMFLOAT3 angle = { 0.0f, 0.0f, 0.0f };
-		DirectX::XMFLOAT4X4 transform = {
-			1, 0, 0, 0,
-			0, 1, 0, 0,
-			0, 0, 1, 0,
-			0, 0, 0, 1
-		};
-	};
-
 	virtual void Initialize() {}
 
 	virtual void Update(float elapsedTime)
@@ -65,6 +43,32 @@ public:
 		for (RoomBase* child : childs)
 		{
 			child->Update(elapsedTime);
+		}
+	}
+
+	virtual void Render(const RenderContextDX12 rc)
+	{
+		{
+			DirectX::XMFLOAT3 aabbDrawPos;
+			aabbDrawPos = {
+				m_aabb.position.x - (m_aabb.radii.x * 0.5f),
+				m_aabb.position.y - (m_aabb.radii.y * 0.5f),
+				m_aabb.position.z - (m_aabb.radii.z * 0.5f),
+			};
+			m_debugCube->SetCube(aabbDrawPos, m_aabb.radii, { 1.0f, 1.0f, 1.0f, 1.0f });
+			//m_debugCube->Render(rc);
+		}
+
+		for (const AABB& d_aabb : m_debugAABBs)
+		{
+			DirectX::XMFLOAT3 d_aabbPos;
+			d_aabbPos = {
+				d_aabb.position.x - (d_aabb.radii.x * 0.5f),
+				d_aabb.position.y - (d_aabb.radii.y * 0.5f),
+				d_aabb.position.z - (d_aabb.radii.z * 0.5f),
+			};
+			m_debugDebugCube->SetCube(d_aabbPos, d_aabb.radii, { 1.0f, 0.0f, 0.0f, 1.0f });
+			//m_debugDebugCube->Render(rc);
 		}
 	}
 
@@ -92,7 +96,7 @@ public:
 	}
 
 	// 自分の部屋タイプを取得する
-	DungeonData::RoomType GetRoomType() { return roomType; }
+	RoomType GetRoomType() { return roomType; }
 
 	// 自分を含め全ての部屋を取得する
 	std::vector<RoomBase*> GetAll(std::vector<RoomBase*> rooms = {})
@@ -129,7 +133,7 @@ public:
 		if (this->childs.size() == 0)
 		{
 			// DEAD_END（行き止まり）なら親を登録
-			if (this->roomType == DungeonData::DEAD_END)
+			if (this->roomType == RoomType::DEAD_END)
 			{
 				childs.emplace_back(this->parent);
 			}
@@ -178,25 +182,23 @@ public:
 
 	// 親を設定
 	void SetParent(RoomBase* parent) { this->parent = parent; }
-
 	// 子を追加する
 	void AddRoom(RoomBase* room) { this->childs.emplace_back(room); }
 
 	// 部屋の接続点データを取得
-	std::vector<CONNECTPOINT_DATA> GetConnectPointData() const { return m_connectPointDatas; }
-	CONNECTPOINT_DATA GetConnectPointData(int index) const { return m_connectPointDatas.at(index); }
+	std::vector<TILE_DATA> GetConnectPointData() const { return m_connectPointDatas; }
+	const TILE_DATA GetConnectPointData(int index) const { return m_connectPointDatas.at(index); }
 
 	// 行列取得
 	DirectX::XMFLOAT4X4 GetTransform() { return m_transform; }
 
 	// AABB取得
 	AABB GetAABB() const { return m_aabb; }
-
 	// AABB算出
 	AABB CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const;
 
 	// 部屋データをロード
-	virtual void LoadMapData() {}
+	virtual void LoadMapData();
 
 	// 部屋タイルを配置
 	void PlaceMapTile(bool isLeader = false);
@@ -218,8 +220,15 @@ protected:
 		0, 0, 0, 1
 	};
 
-	std::vector<TILE_DATA> m_tileDatas;
-	std::vector<CONNECTPOINT_DATA> m_connectPointDatas;
+	std::vector<std::vector<TILE_DATA>> m_tileDatas;
+
+	std::unique_ptr<CubeRenderer> m_debugCube;
+
+	std::unique_ptr<CubeRenderer> m_debugDebugCube;
+	std::vector<AABB> m_debugAABBs;
+
+	//std::vector<TILE_DATA> m_tileDatas;
+	std::vector<TILE_DATA> m_connectPointDatas;
 
 	float tileScale = 4.0f;
 
@@ -227,7 +236,7 @@ protected:
 	int depth = 0;
 	AABB m_aabb = {};		// 当たり判定
 
-	DungeonData::RoomType roomType = DungeonData::RoomType::END_ROOM;
+	RoomType roomType = RoomType::END_ROOM;
 
 	RoomBase* parent = nullptr;		// 親
 	std::vector<RoomBase*> childs;	// 子

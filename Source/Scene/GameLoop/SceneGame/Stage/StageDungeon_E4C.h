@@ -13,21 +13,19 @@
 #include "GameObject/Character/Player/PlayerCharacter.h"
 #include "TAKOEngine/Rendering/Shaders/PlaneShader.h"
 
+#include "Map/DungeonData.h"
+
 #include "Scene/Scene.h"
 #include "Scene/Stage/Stage.h"
 
 #include "Map/MapTile.h"
 #include "Map/RoomBase.h"
-#include "Map/SimpleRoom1.h"
-#include "Map/EndRoom1.h"
-#include "Map/CrossRoom1.h"
-#include "Map/CrossRoom2.h"
-#include "Map/Passage1.h"
-#include "Map/DeadEndRoom.h"
 
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
 #include "TAKOEngine/Tool/GLTFImporter.h"
+
+using namespace ns_RoomData;
 
 class SceneGame_E4C;
 
@@ -95,6 +93,8 @@ protected:
 
 	// ポストエフェクト
 	std::unique_ptr<PostprocessingRendererDX12>	postprocessingRenderer = std::make_unique<PostprocessingRendererDX12>();
+
+	std::unique_ptr<ModelObject> instancingModel;
 };
 
 #endif // !__INCLUDED_STAGE_DUNGEON_E4C_H__

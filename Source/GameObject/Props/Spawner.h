@@ -7,6 +7,8 @@
 #include "Source/GameObject/GameObject.h"
 #include "Source/GameObject/Character/Enemy/Enemy.h"
 
+#include "TAKOEngine/Rendering/DebugRenderer/CylinderRenderer.h"
+
 /**************************************************************************//**
 	@class  Spawner
 	@brief  敵を生成する
@@ -55,6 +57,7 @@ private:
 	float m_spawnTime = 2.0f;				// エネミー生成するまでの秒数
 
 	std::set<Enemy*> m_pSpawnedEnemies;		// スポナーが管理するリスト
+	std::unique_ptr<CylinderRenderer> m_cylinderRenderer;	// 円柱デバッグ表示用
 };
 #endif //! __INCLUDED_SPAWNER_H__
 

@@ -8,6 +8,8 @@
 
 #include <memory>
 
+#include "TAKOEngine/Tool/Mathf.h"
+
 #include "GameObject/Character/Player/PlayerCharacter.h"
 
 struct ENEMY_COLLISION
@@ -55,6 +57,7 @@ public:
 	void SetEnemyId(const uint32_t& id) { enemy_id = id; }
 	const uint32_t GetEnemyId() const { return enemy_id; }
 
+	bool IsAlive();
 
 	bool MoveTo(float elapsedTime, const DirectX::XMFLOAT3& target);
 	void TurnTo(float elapsedTime, const DirectX::XMFLOAT3& target);
@@ -74,6 +77,7 @@ public:
 	const bool IsMine() const { return m_isMine; }
 	void SetMine(bool flag = true) { m_isMine = flag; }
 
+<<<<<<<<< Temporary merge branch 1
 	void SetRandomMoveTargetPosition();
 	bool SearchPlayer();
 

@@ -1,5 +1,5 @@
 ﻿//! @file PhongShader.cpp
-//! @note 
+//! @note
 
 #include "TAKOEngine/Rendering/Misc.h"
 #include "TAKOEngine/Rendering/Graphics.h"
@@ -47,7 +47,7 @@ void PhongShader::SetShaderResourceView(const ModelResource::Mesh& mesh, ID3D11D
 //***********************************************************
 PhongShaderDX12::PhongShaderDX12(ID3D12Device* device, bool instancing)
 {
-	Graphics&                 graphics = Graphics::Instance();
+	Graphics& graphics = Graphics::Instance();
 	const RenderStateDX12* renderState = graphics.GetRenderStateDX12();
 
 	HRESULT hr = S_OK;
@@ -79,9 +79,9 @@ PhongShaderDX12::PhongShaderDX12(ID3D12Device* device, bool instancing)
 		pipeline_state_desc.pRootSignature = m_d3d_root_signature.Get();
 
 		pipeline_state_desc.VS.pShaderBytecode = vsData.data();
-		pipeline_state_desc.VS.BytecodeLength  = vsData.size();
+		pipeline_state_desc.VS.BytecodeLength = vsData.size();
 		pipeline_state_desc.PS.pShaderBytecode = psData.data();
-		pipeline_state_desc.PS.BytecodeLength  = psData.size();
+		pipeline_state_desc.PS.BytecodeLength = psData.size();
 
 		// 入力レイアウト
 		D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
@@ -104,7 +104,7 @@ PhongShaderDX12::PhongShaderDX12(ID3D12Device* device, bool instancing)
 		pipeline_state_desc.DepthStencilState = renderState->GetDepthState(DepthState::TestAndWrite);
 
 		//ラスタライザーステート
-		pipeline_state_desc.RasterizerState = renderState->GetRasterizer(RasterizerState::SolidCullNone);
+		pipeline_state_desc.RasterizerState = renderState->GetRasterizer(RasterizerState::SolidCullBack);
 
 		//プリミティブトポロジー
 		pipeline_state_desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -114,11 +114,11 @@ PhongShaderDX12::PhongShaderDX12(ID3D12Device* device, bool instancing)
 
 		//レンダーターゲット数
 		pipeline_state_desc.NumRenderTargets = 1;
-		pipeline_state_desc.RTVFormats[0]    = RenderTargetFormat;
-		pipeline_state_desc.DSVFormat        = DepthStencilFormat;
+		pipeline_state_desc.RTVFormats[0] = RenderTargetFormat;
+		pipeline_state_desc.DSVFormat = DepthStencilFormat;
 
 		//マルチサンプリング
-		pipeline_state_desc.SampleDesc.Count   = 1;
+		pipeline_state_desc.SampleDesc.Count = 1;
 		pipeline_state_desc.SampleDesc.Quality = 0;
 
 		//アダプタ
@@ -134,7 +134,7 @@ PhongShaderDX12::PhongShaderDX12(ID3D12Device* device, bool instancing)
 	}
 
 	//サンプラーステート設定
-	m_sampler = graphics.GetSampler(SamplerState::LinearWrap);
+	m_sampler = graphics.GetSampler(SamplerState::AnisotropicWrap);
 }
 
 //***********************************************************
@@ -162,6 +162,10 @@ void PhongShaderDX12::Render(const RenderContextDX12& rc, const ModelDX12::Mesh&
 
 	//シーン定数バッファ設定
 	rc.d3d_command_list->SetGraphicsRootDescriptorTable(0, rc.scene_cbv_descriptor->GetGpuHandle());  //CbScene
+
+	// シャドウマップ設定
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(6, rc.shadowMap.shadow_srv_descriptor->GetGpuHandle());
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(7, rc.shadowMap.shadow_sampler_descriptor->GetGpuHandle());
 
 	const ModelResource::Mesh* res_mesh = mesh.mesh;
 	const ModelDX12::Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());

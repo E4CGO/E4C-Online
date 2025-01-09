@@ -1,6 +1,9 @@
 ﻿#pragma once
 
 #include <d3d11.h>
+#include <d2d1_3.h>
+#include <dwrite.h>
+#include <wrl.h>
 #include <memory>
 #include <string>
 
@@ -44,7 +47,9 @@ public:
 	void Init(ID3D11Device* device);
 
 	void Begin();
+	void BeginDX12();
 	void End();
+	void EndDX12();
 	void Render(
 		FONT_ID font,
 		const wchar_t* text,
@@ -79,6 +84,17 @@ public:
 		const DirectX::XMFLOAT4& borderColor = { 0.0f, 0.0f, 0.0f, 1.0f }
 	);
 
+	void RenderDX12(
+		FONT_ID font,
+		std::wstring text,
+		float x, float y,
+		float r = 1.0f, float g = 1.0f, float b = 1.0f, float a = 1.0f,
+		float angle = 0.0f,
+		FONT_ALIGN align = FONT_ALIGN::TOP_LEFT,
+		float scale = 1.0f,
+		int border = 0,
+		const DirectX::XMFLOAT4& borderColor = { 0.0f, 0.0f, 0.0f, 1.0f });
+
 	void TextBox(
 		FONT_ID font,
 		std::string text,
@@ -94,4 +110,9 @@ private:
 private:
 	std::unique_ptr<DirectX::SpriteFont> fonts[static_cast<int>(FONT_ID::EnumCount)];
 	std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch;
+
+	// テキスト見た目
+	Microsoft::WRL::ComPtr<ID2D1SolidColorBrush> m_textBrush;
+	// テキストのパラメーター
+	Microsoft::WRL::ComPtr<IDWriteTextFormat> m_textFormat;
 };
