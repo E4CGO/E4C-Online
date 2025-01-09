@@ -198,7 +198,7 @@ void DungeonData::InitRoomGenerateSettings()
 	// FIRST_T
 	{
 		RoomGenerateSetting setting;
-		setting.weight = 20;
+		setting.weight = 35;
 		setting.placementCandidates.emplace_back(RoomType::FIRST_I);
 		setting.placementCandidates.emplace_back(RoomType::FIRST_T);
 		setting.placementCandidates.emplace_back(RoomType::FIRST_SPAWNER);
@@ -379,7 +379,7 @@ void DungeonData::InitRoomGenerateSettings()
 
 void DungeonData::InitDungeonGenerateSetting()
 {
-	m_dungeonGenerateSetting.maxDepth = 4;
+	m_dungeonGenerateSetting.maxDepth = 7;
 }
 
 void DungeonData::InitModelFileDatas()

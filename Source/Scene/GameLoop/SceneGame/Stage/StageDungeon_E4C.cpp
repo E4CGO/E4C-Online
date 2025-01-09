@@ -38,22 +38,15 @@ void StageDungeon_E4C::GenerateDungeon()
 		isLeader = true;
 
 		// ダンジョンの自動生成を行う
+		// 生成する部屋タイプを算出
+		RoomType firstRoomType = RoomType::FIRST_START;
+
 		std::vector<RoomType> placeableRooms;
 		placeableRooms.emplace_back(RoomType::FIRST_START);
 
-		// 部屋候補が一つしかないならそれを生成
-		if (placeableRooms.size() == 1)
-		{
-			int orderIndex = 0;
-
-			rootRoom = std::make_unique<RoomBase>(
-				nullptr, -1,
-				placeableRooms.at(0),
-				m_roomAABBs,
-				true,
-				m_roomOrder, orderIndex);
-		}
-		// 複数あるなら
+		// 部屋候補が一つしかない場合
+		if (placeableRooms.size() == 1) firstRoomType = placeableRooms.at(0);
+		// 複数候補があるならランダムで一つ
 		else
 		{
 			// 生成可能な部屋の重みの合計
@@ -68,19 +61,18 @@ void StageDungeon_E4C::GenerateDungeon()
 			{
 				randomValue -= dungeonData.GetRoomGenerateSetting(type).weight;
 
-				if (randomValue < 0)
-				{
-					int orderIndex = 0;
-
-					rootRoom = std::make_unique<RoomBase>(
-						nullptr, -1,
-						type,
-						m_roomAABBs,
-						true,
-						m_roomOrder, orderIndex);
-				}
+				if (randomValue < 0) firstRoomType = type;
 			}
 		}
+
+		bool isLastRoomGenerated = false;
+
+		// 部屋の生成を開始する（再帰）
+		rootRoom = std::make_unique<RoomBase>(
+			nullptr, -1,
+			firstRoomType,
+			m_roomAABBs,
+			isLastRoomGenerated);
 
 		// 生成順番に登録する
 		for (RoomBase* room : rootRoom->GetAll())
@@ -98,9 +90,8 @@ void StageDungeon_E4C::GenerateDungeon()
 
 		rootRoom = std::make_unique<RoomBase>(
 			nullptr, -1,
-			static_cast<ns_RoomData::RoomType>(m_roomOrder.front()),
+			(RoomType)(m_roomOrder.at(0)),
 			m_roomAABBs,
-			false,
 			m_roomOrder, orderIndex);
 	}
 }
@@ -153,13 +144,13 @@ void StageDungeon_E4C::Initialize()
 	GenerateDungeon();
 
 	// 一番遠い部屋のうち、ランダムな一つを抽選しテレポーターを設置する
-	RoomBase* lastRoom = rootRoom->GetFarthestChild().at(std::rand() % rootRoom->GetFarthestChild().size());
+	//RoomBase* lastRoom = rootRoom->GetFarthestChild().at(std::rand() % rootRoom->GetFarthestChild().size());
 
-	TeleportToOpenworld* teleporter = new TeleportToOpenworld();
-	teleporter->SetPosition(lastRoom->GetPosition() + DUNGEONDATA.GetRoomGenerateSetting(lastRoom->GetRoomType()).portalPosition);
-	teleporter->SetAngle({ 90.0f * RADIAN1, 0.0f, 0.0f });
-	teleporter->SetScale({ 10.0f, 10.0f, 1.0f });
-	GameObjectManager::Instance().Register(teleporter);
+	//TeleportToOpenworld* teleporter = new TeleportToOpenworld();
+	//teleporter->SetPosition(lastRoom->GetPosition() + DUNGEONDATA.GetRoomGenerateSetting(lastRoom->GetRoomType()).portalPosition);
+	//teleporter->SetAngle({ 90.0f * RADIAN1, 0.0f, 0.0f });
+	//teleporter->SetScale({ 10.0f, 10.0f, 1.0f });
+	//GameObjectManager::Instance().Register(teleporter);
 
 	// 部屋のモデルを配置
 	for (RoomBase* room : rootRoom->GetAll())

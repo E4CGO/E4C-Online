@@ -11,10 +11,12 @@
 
 RoomBase::RoomBase(
 	RoomBase* parent, int pointIndex,
+	RoomType roomType,
 	std::vector<AABB>& roomAABBs,
-	bool isAutoGeneration,
-	std::vector<uint8_t>& roomOrder, int& orderIndex)
+	bool& isLastRoomGenerated)
 {
+	this->roomType = roomType;
+
 	// タイルデータのリサイズ
 	m_tileDatas.resize(TileType::TILETYPE_COUNT);
 
@@ -31,7 +33,7 @@ RoomBase::RoomBase(
 
 	// AABB描画用
 	m_aabbCube = std::make_unique<CubeRenderer>(T_GRAPHICS.GetDeviceDX12());
-	m_debugCubes.resize(256);
+	m_debugCubes.resize(16);
 	for (std::unique_ptr<CubeRenderer>& cubeRenderer : m_debugCubes)
 	{
 		cubeRenderer = std::make_unique<CubeRenderer>(T_GRAPHICS.GetDeviceDX12());
@@ -42,13 +44,18 @@ RoomBase::RoomBase(
 
 	// 後の接続点データ設定、部屋モデル配置のために行列更新処理を行う
 	UpdateTransform();
+
+	// 部屋データのロード
+	LoadMapData();
+
+	// 次の部屋の生成を行う
+	GenerateNextRoomAutomatically(roomAABBs, isLastRoomGenerated);
 }
 
 RoomBase::RoomBase(
 	RoomBase* parent, int pointIndex,
 	RoomType roomType,
 	std::vector<AABB>& roomAABBs,
-	bool isAutoGeneration,
 	std::vector<uint8_t>& roomOrder, int& orderIndex)
 {
 	this->roomType = roomType;
@@ -85,10 +92,7 @@ RoomBase::RoomBase(
 	LoadMapData();
 
 	// 次の部屋の生成を行う
-	GenerateNextRoom(
-		roomAABBs,
-		isAutoGeneration,
-		roomOrder, orderIndex);
+	GenerateNextRoomFromOrder(roomAABBs, roomOrder, orderIndex);
 }
 
 void RoomBase::UpdateTransform()
@@ -164,10 +168,144 @@ DirectX::XMFLOAT3 RoomBase::GetCenterPos()
 	return m_position + placePos;
 }
 
-void RoomBase::GenerateNextRoom(
+void RoomBase::GenerateNextRoomAutomatically(
 	std::vector<AABB>& roomAABBs,
-	bool isAutoGeneration,
-	std::vector<uint8_t>& roomOrder, int& orderIndex)
+	bool& isLastRoomGenerated)
+{
+	// 自身のAABBを算出
+	m_aabb = CalcAABB(DUNGEONDATA.GetRoomGenerateSetting(roomType).aabb,
+		m_position, DirectX::XMConvertToDegrees(m_angle.y));
+
+	// 最大深度が設定値より浅いなら次の部屋を生成する
+	if (depth < DUNGEONDATA.GetDungeonGenerateSetting().maxDepth)
+	{
+		// 配置時に他の部屋と重ならない部屋のみを配列に保存する
+		std::vector<std::vector<RoomType>> placeableRooms;
+		placeableRooms.resize(m_connectPointDatas.size());
+
+		// 接続点の数だけ当たり判定を行い、生成を行う
+		for (int i = 0; i < m_connectPointDatas.size(); i++)
+		{
+			for (RoomType type : DUNGEONDATA.GetRoomGenerateSetting(roomType).placementCandidates)
+			{
+				// 新規生成する子のAABBを算出
+				AABB nextAABB = CalcAABB(DUNGEONDATA.GetRoomGenerateSetting(type).aabb,
+					m_connectPointDatas.at(i).position, DirectX::XMConvertToDegrees(m_connectPointDatas.at(i).angle.y));
+
+				// 新規生成する子のAABBと他のAABB（この部屋のAABBは除く）との衝突判定を行う
+				// 子のAABBはちょっと大きくして部屋が干渉するのを防ぐ
+				bool isHit = false;
+				for (const AABB& anotherAABB : roomAABBs)
+				{
+					// AABBの位置が同じ==自分のAABBと判定して処理をスキップする
+					if (Mathf::cmpf(anotherAABB.position.x, m_aabb.position.x) &&
+						Mathf::cmpf(anotherAABB.position.y, m_aabb.position.y) &&
+						Mathf::cmpf(anotherAABB.position.z, m_aabb.position.z)) continue;
+
+					IntersectionResult result;
+					DirectX::XMFLOAT3 tmpNextRadii = {
+						nextAABB.radii.x + 4.0f,
+						nextAABB.radii.y,
+						nextAABB.radii.z + 4.0f
+					};
+					DirectX::XMFLOAT3 tmpAnotherRadii = anotherAABB.radii;
+
+					if (Collision::IntersectAABBVsAABB(
+						DirectX::XMLoadFloat3(&nextAABB.position),
+						DirectX::XMLoadFloat3(&tmpNextRadii),
+						DirectX::XMLoadFloat3(&anotherAABB.position),
+						DirectX::XMLoadFloat3(&tmpAnotherRadii),
+						&result))
+					{
+						// AABBと衝突するなら配列に保存しない
+						isHit = true;
+
+						// 当たり判定に使用したAABBはデバッグ四角形描画のために保存しておく
+						m_debugAABBs.emplace_back(AABB(nextAABB.position, tmpNextRadii));
+
+						break;
+					}
+				}
+				// 衝突しなかった場合は配列に保存する
+				if (!isHit)
+				{
+					placeableRooms.at(i).emplace_back(type);
+				}
+			}
+
+			// 当たり判定が終わったところで
+			// 自身のAABBを配列に保存
+			roomAABBs.emplace_back(m_aabb);
+
+			// 子の部屋を生成する
+			// 他の部屋と重ならない部屋があるならば生成を開始する
+			if (placeableRooms.at(i).size() > 0)
+			{
+				// 生成可能な部屋の重みの合計
+				int totalWeight = 0;
+				for (RoomType type : placeableRooms.at(i))
+				{
+					totalWeight += DUNGEONDATA.GetRoomGenerateSetting(type).weight;
+				}
+
+				int randomValue = std::rand() % totalWeight;
+				for (RoomType type : placeableRooms.at(i))
+				{
+					randomValue -= DUNGEONDATA.GetRoomGenerateSetting(type).weight;
+
+					if (randomValue < 0)
+					{
+						RoomBase* nextRoom = new RoomBase(this, i, type, roomAABBs, isLastRoomGenerated);
+						AddRoom(nextRoom);
+						break;
+					}
+				}
+			}
+			// 何も生成できないならば行き止まり用の部屋を生成する
+			else
+			{
+				RoomBase* deadEnd = new RoomBase(this, i, RoomType::DEAD_END, roomAABBs, isLastRoomGenerated);
+				AddRoom(deadEnd);
+			}
+		}
+	}
+	// 一定の深度を超えた場合は行き止まり用の部屋を生成する
+	else
+	{
+		// 自身のAABBを配列に保存
+		roomAABBs.emplace_back(m_aabb);
+
+		if (!isLastRoomGenerated)
+		{
+			isLastRoomGenerated = true;
+
+			RoomBase* endRoom = new RoomBase(this, 0, RoomType::FIRST_END, roomAABBs, isLastRoomGenerated);
+
+			if (m_connectPointDatas.size() > 1)
+			{
+				for (int i = 1; i < m_connectPointDatas.size(); i++)
+				{
+					RoomBase* deadEnd = new RoomBase(this, i, RoomType::DEAD_END, roomAABBs, isLastRoomGenerated);
+					AddRoom(deadEnd);
+				}
+			}
+		}
+		else
+		{
+			// 接続点の数だけ行き止まり用の部屋を生成する
+			for (int i = 0; i < m_connectPointDatas.size(); i++)
+			{
+				RoomBase* deadEnd = new RoomBase(this, i, RoomType::DEAD_END, roomAABBs, isLastRoomGenerated);
+				AddRoom(deadEnd);
+			}
+		}
+	}
+}
+
+void RoomBase::GenerateNextRoomFromOrder(
+	std::vector<AABB>& roomAABBs,
+	std::vector<uint8_t>& roomOrder,
+	int& orderIndex)
 {
 	// 自身のAABBを算出
 	m_aabb = CalcAABB(DUNGEONDATA.GetRoomGenerateSetting(roomType).aabb,
@@ -176,113 +314,17 @@ void RoomBase::GenerateNextRoom(
 	// AABB配列に保存
 	roomAABBs.emplace_back(m_aabb);
 
-	// 自動生成を行う
-	if (isAutoGeneration)
+	// 接続点の数だけ子を生成する
+	for (int i = 0; i < m_connectPointDatas.size(); i++)
 	{
-		// 最大深度が設定値より浅いなら次の部屋を生成する
-		if (depth < DUNGEONDATA.GetDungeonGenerateSetting().maxDepth)
-		{
-			// 配置時に他の部屋と重ならない部屋のみを配列に保存する
-			std::vector<std::vector<RoomType>> placeableRooms;
-			placeableRooms.resize(m_connectPointDatas.size());
+		// もしも配列のサイズを超えてしまうならreturn
+		if (orderIndex >= roomOrder.size()) return;
 
-			// 接続点の数だけ当たり判定を行い、生成を行う
-			for (int i = 0; i < m_connectPointDatas.size(); i++)
-			{
-				for (RoomType type : DUNGEONDATA.GetRoomGenerateSetting(roomType).placementCandidates)
-				{
-					// 新規生成する子の部屋のAABBを算出
-					AABB nextRoomAABB = CalcAABB(DUNGEONDATA.GetRoomGenerateSetting(type).aabb,
-						m_connectPointDatas.at(i).position, DirectX::XMConvertToDegrees(m_connectPointDatas.at(i).angle.y));
-
-					m_debugAABBs.emplace_back(nextRoomAABB);
-
-					// 新規生成する子の部屋のAABBとそれ以外のAABBとの当たり判定を行う
-					bool isHit = false;
-					for (const AABB& anotherRoomAABB : roomAABBs)
-					{
-						IntersectionResult result;
-						DirectX::XMFLOAT3 temp_NextRadii = nextRoomAABB.radii;
-						DirectX::XMFLOAT3 temp_AnotherRadii = anotherRoomAABB.radii;
-
-						if (Collision::IntersectAABBVsAABB(
-							DirectX::XMLoadFloat3(&nextRoomAABB.position),
-							DirectX::XMLoadFloat3(&temp_NextRadii),
-							DirectX::XMLoadFloat3(&anotherRoomAABB.position),
-							DirectX::XMLoadFloat3(&temp_AnotherRadii),
-							&result))
-						{
-							// AABBと衝突するなら配列に保存しない
-							isHit = true;
-							break;
-						}
-					}
-					// 衝突しなかった場合は配列に保存する
-					if (!isHit)
-					{
-						placeableRooms.at(i).emplace_back(type);
-					}
-				}
-
-				// 子の部屋を生成する
-				// 他の部屋と重ならない部屋があるならば生成を開始する
-				if (placeableRooms.at(i).size() > 0)
-				{
-					// 生成可能な部屋の重みの合計
-					int totalWeight = 0;
-					for (RoomType type : placeableRooms.at(i))
-					{
-						totalWeight += DUNGEONDATA.GetRoomGenerateSetting(type).weight;
-					}
-
-					int randomValue = std::rand() % totalWeight;
-					for (RoomType type : placeableRooms.at(i))
-					{
-						randomValue -= DUNGEONDATA.GetRoomGenerateSetting(type).weight;
-
-						if (randomValue < 0)
-						{
-							RoomBase* nextRoom = new RoomBase(this, i, type, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-							AddRoom(nextRoom);
-							break;
-						}
-					}
-				}
-				// 何も生成できないならば行き止まり用の部屋を生成する
-				else
-				{
-					RoomBase* deadEnd = new RoomBase(this, i, RoomType::DEAD_END, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-					AddRoom(deadEnd);
-				}
-			}
-		}
-		// 一定の深度を超えた場合は行き止まり用の部屋を生成する
-		else
-		{
-			// 接続点の数だけ行き止まり用の部屋を生成する
-			for (int i = 0; i < m_connectPointDatas.size(); i++)
-			{
-				RoomBase* deadEnd = new RoomBase(this, i, RoomType::DEAD_END, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-				AddRoom(deadEnd);
-			}
-		}
-	}
-	// 自動生成は行わず、生成順（roomOrder）で生成を行う
-	else
-	{
-		// 接続点の数だけ子を生成する
-		for (int i = 0; i < m_connectPointDatas.size(); i++)
-		{
-			// もしも配列のサイズを超えてしまうならreturn
-			if (orderIndex >= roomOrder.size()) return;
-
-			RoomType nextRoomType = static_cast<RoomType>(roomOrder.at(orderIndex));
-
-			RoomBase* nextRoom = new RoomBase(this, i, nextRoomType, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
-			AddRoom(nextRoom);
-		}
+		RoomBase* nextRoom = new RoomBase(this, i, (RoomType)(roomOrder.at(orderIndex)), roomAABBs, roomOrder, ++orderIndex);
+		AddRoom(nextRoom);
 	}
 }
+
 
 
 AABB RoomBase::CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const

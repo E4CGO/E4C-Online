@@ -10,19 +10,18 @@ using namespace ns_RoomData;
 class RoomBase
 {
 public:
-	// コンストラクタ
-	RoomBase(
-		RoomBase* parent, int pointIndex,
-		std::vector<AABB>& roomAABBs,
-		bool isAutoGeneration,
-		std::vector<uint8_t>& roomOrder, int& orderIndex);
-
-	// コンストラクタ
+	// コンストラクタ（自動生成）
 	RoomBase(
 		RoomBase* parent, int pointIndex,
 		RoomType roomType,
 		std::vector<AABB>& roomAABBs,
-		bool isAutoGeneration,
+		bool& isLastRoomGenerated);
+
+	// コンストラクタ（roomOrderに従う）
+	RoomBase(
+		RoomBase* parent, int pointIndex,
+		RoomType roomType,
+		std::vector<AABB>& roomAABBs,
 		std::vector<uint8_t>& roomOrder, int& orderIndex);
 
 	// ですとら
@@ -81,10 +80,14 @@ public:
 	DirectX::XMFLOAT3 GetAngle() { return m_angle; }
 	DirectX::XMFLOAT3 GetScale() { return m_scale; }
 
-	// 次の部屋を生成する
-	void GenerateNextRoom(
+	// 次の部屋を生成する（自動生成）
+	void GenerateNextRoomAutomatically(
 		std::vector<AABB>& roomAABBs,
-		bool isAutoGeneration,
+		bool& isLastRoomGenerated);
+
+	// 次の部屋を生成する（roomOrderに従う）
+	void GenerateNextRoomFromOrder(
+		std::vector<AABB>& roomAABBs,
 		std::vector<uint8_t>& roomOrder, int& orderIndex);
 
 	// 自分の深度を取得する
