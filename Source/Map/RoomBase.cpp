@@ -75,7 +75,7 @@ RoomBase::RoomBase(
 	UpdateTransform();
 
 	// 部屋データのロード
-	LoadMapData();
+	//LoadMapData();
 
 	// 次の部屋の生成を行う
 	GenerateNextRoom(
@@ -638,6 +638,9 @@ void RoomBase::PlaceMapTile(bool isLeader)
 			//		instancingModel->GetModel()->UpdateTransform(id, tm);
 			//	}
 			//	MAPTILES.Register(instancingModel);
+				
+			//  // ステージの影登録
+			//	//T_GRAPHICS.GetShadowRenderer()->ModelRegister(instancingModel->GetModel(0).get());
 			//}
 			//// 通常の読み込み
 			//else
@@ -663,6 +666,9 @@ void RoomBase::PlaceMapTile(bool isLeader)
 					modelTile->SetScale(tileData.scale);
 					modelTile->Update(0);
 					MAPTILES.Register(modelTile);
+					
+					// ステージの影登録
+					T_GRAPHICS.GetShadowRenderer()->ModelRegister(modelTile->GetModel(0).get());
 				}
 			}
 		}
