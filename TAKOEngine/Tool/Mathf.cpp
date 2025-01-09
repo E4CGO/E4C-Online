@@ -1,7 +1,6 @@
 ﻿#include "Mathf.h"
 #include <stdlib.h>
 #include <math.h>
-#include "XMFLOAT.h"
 
 float Mathf::Lerp(float a, float b, float t)
 {
@@ -40,9 +39,4 @@ float Mathf::RandomRange(float max, float min)
 bool Mathf::cmpf(float a, float b, float epsilon)
 {
 	return fabs(a - b) < epsilon;
-}
-
-bool Mathf::cmpfloat3(DirectX::XMFLOAT3 a, DirectX::XMFLOAT3 b, float epsilon)
-{
-	return XMFLOAT3Length(b - a) < epsilon;
 }

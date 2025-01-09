@@ -16,6 +16,7 @@ SkeletonMinion::SkeletonMinion(float scaling) : Enemy("Data/Model/Enemy/characte
 	atk = 10;
 	moveSpeed = 2.0f;
 	turnSpeed = DirectX::XMConvertToRadians(180);
+	m_SearchRange = 24.0f;
 
 	// 移動用Collider
 	Sphere sphere({ 0, 0.6f / scaling, 0 }, 0.6f);
@@ -44,15 +45,17 @@ SkeletonMinion::SkeletonMinion(float scaling) : Enemy("Data/Model/Enemy/characte
 
 
 
-	stateMachine->RegisterState(enemy::STATE::TARGET_FOUND, new enemy::FollowState(this, 2.0f, SkeletonMinion::STATE::ATTACK));
+	stateMachine->RegisterState(Enemy::STATE::IDLE, new SkeletonMinionState::IdleState(this, 2.0f));
+	stateMachine->RegisterState(SkeletonMinion::STATE::TARGET_FOUND, new EnemyState::FollowState(this, 2.0f, SkeletonMinion::STATE::ATTACK));
 	stateMachine->RegisterState(SkeletonMinion::STATE::ATTACK, new SkeletonMinionState::AttackState(this));
-	stateMachine->SetState(enemy::STATE::IDLE);
+	stateMachine->SetState(Enemy::STATE::IDLE);
 }
 
 // 一番近いプレイヤーをターゲット
 void SkeletonMinion::UpdateTarget()
 {
-	target = GetClosestPlayer(24.0f);
+	PlayerCharacter* player = GetClosestPlayer();
+	m_target = (player == nullptr) ? UINT32_MAX : player->GetClientId();
 }
 
 SkeletonMinionBoss::SkeletonMinionBoss() : SkeletonMinion(3.0f)
@@ -69,9 +72,9 @@ SkeletonMinionBoss::SkeletonMinionBoss() : SkeletonMinion(3.0f)
 	// スーパーアーマー
 	armorMaxHp = armorHp = 50;
 
-	stateMachine->RegisterState(enemy::STATE::IDLE, new enemy::IdleState(this, 1.0f));
-	stateMachine->RegisterState(enemy::STATE::TARGET_FOUND, new enemy::FollowState(this, 3.0f, SkeletonMinion::STATE::ATTACK));
-	stateMachine->SetState(enemy::STATE::IDLE);
+	stateMachine->RegisterState(Enemy::STATE::IDLE, new EnemyState::IdleState(this, 1.0f));
+	stateMachine->RegisterState(SkeletonMinion::STATE::TARGET_FOUND, new EnemyState::FollowState(this, 3.0f, SkeletonMinion::STATE::ATTACK));
+	stateMachine->SetState(Enemy::STATE::IDLE);
 
 	// HPゲージ
 	UI.Register(new WidgetBossHp("スケルドン", this));
@@ -99,7 +102,7 @@ void SkeletonMinionBoss::OnDamage(const ENEMY_COLLISION& hit)
 	if (hp > 0)
 	{
 		if (armorHp <= 0) { // アーマーなし
-			stateMachine->ChangeState(enemy::STATE::HURT);
+			stateMachine->ChangeState(Enemy::STATE::HURT);
 			hp -= hit.damage / 10 * 2;		// ダウン追加ダメージ
 		}
 		else if (hit.colider_id == COLLIDER_ID::COL_HEAD)	// ヘッドショット アーマーあり
@@ -115,6 +118,6 @@ void SkeletonMinionBoss::OnDamage(const ENEMY_COLLISION& hit)
 
 	if (hp <= 0)
 	{
-		stateMachine->ChangeState(enemy::STATE::DEATH);
+		stateMachine->ChangeState(Enemy::STATE::DEATH);
 	}
 }

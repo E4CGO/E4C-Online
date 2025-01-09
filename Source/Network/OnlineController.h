@@ -15,6 +15,8 @@
 
 #include "UI/Widget/WidgetMatching.h"
 
+#include "GameObject/Character/Enemy/Enemy.h"
+
 namespace Online
 {
 
@@ -161,7 +163,8 @@ namespace Online
 
 		// エネミーの生成送信
 		void NewEnemy(const uint8_t enemyType, uint8_t spawnerId, uint8_t count = 1);
-
+		// エネミーの同期送信
+		void SyncEnemy(std::vector<Enemy::SYNC_DATA>& data);
 
 		// 同期開始
 		void BeginSync()

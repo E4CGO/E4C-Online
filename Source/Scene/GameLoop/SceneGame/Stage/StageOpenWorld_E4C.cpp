@@ -100,8 +100,10 @@ void StageOpenWorld_E4C::Initialize()
 		player->GetPosition(),	// 注視点
 		{ 0, 0.969f, -0.248f }	// 上ベクトル
 	);
-	Spawner* spawner = new Spawner(ENEMY_TYPE::MOUSE, 3, -1);
-	spawner->SetPosition({ 0.0f, 2.0f, 0.0f });
+	//Spawner* spawner = new Spawner(ENEMY_TYPE::MOUSE, 3, -1);
+	Spawner* spawner = new Spawner(ENEMY_TYPE::BEAR_BOSS, 1, 1);
+	spawner->SetPosition({ 15.0f, 2.0f, 0.0f });
+	spawner->SetSearchRadius(10.0f);
 	SpawnerManager::Instance().Register(spawner);
 
 	cameraController = std::make_unique<ThridPersonCameraController>();

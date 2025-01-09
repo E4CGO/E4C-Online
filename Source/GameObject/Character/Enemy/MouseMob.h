@@ -16,13 +16,13 @@
 class MouseMob : public Enemy
 {
 public:
-	MouseMob(float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX11);
+	MouseMob(float scaling = 0.5f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX11);
 	~MouseMob() = default;
 public:
-	enum COLLIDER
+	enum COLLIDER_ID : uint8_t
 	{
-		ATTACK,
-		BODY,
+		COL_ATTACK,
+		COL_BODY,
 	};
 
 protected:

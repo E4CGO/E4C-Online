@@ -46,8 +46,8 @@ namespace Online
 		m_tcpCommands[TCP_CMD::ROOM_OUT] = new TCPRoomOut(this, TCP_CMD::ROOM_OUT);
 
 		m_tcpCommands[TCP_CMD::ENEMY_NEW] = new TCPEnemyNew(this, TCP_CMD::ENEMY_NEW);
-		//m_tcpCommands[TCP_CMD::ENEMY_SYNC] = new (this, TCP_CMD::ENEMY_SYNC);
-		//m_tcpCommands[TCP_CMD::ENEMY_OWNER] = new (this, TCP_CMD::ENEMY_OWNER);
+		m_tcpCommands[TCP_CMD::ENEMY_SYNC] = new TCPEnemySync(this, TCP_CMD::ENEMY_SYNC);
+		m_tcpCommands[TCP_CMD::ENEMY_OWNER] = new TCPEnemyOwner (this, TCP_CMD::ENEMY_OWNER);
 		//m_tcpCommands[TCP_CMD::ENEMY_DESTROY] = new (this, TCP_CMD::ENEMY_DESTROY);
 
 
@@ -321,6 +321,15 @@ namespace Online
 			count,
 		};
 		m_tcpCommands[TCP_CMD::ENEMY_NEW]->Send(&data);
+	}
+
+	/**************************************************************************//**
+	 	@brief		エネミーの同期送信
+		@param[in]	data
+	*//***************************************************************************/
+	void OnlineController::SyncEnemy(std::vector<Enemy::SYNC_DATA>& data)
+	{
+		m_tcpCommands[TCP_CMD::ENEMY_SYNC]->Send(&data);
 	}
 
 	/**************************************************************************//**

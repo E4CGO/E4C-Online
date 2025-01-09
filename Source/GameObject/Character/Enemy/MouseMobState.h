@@ -5,12 +5,12 @@
 #define __INCLUDED_MOUSE_MOB_STATE_H__
 
 #include "MouseMob.h"
-namespace enemy
+namespace EnemyState
 {
 	namespace mouseMob {
 		enum STATE
 		{
-			SEARCH = enemy::STATE::END,
+			SEARCH = Enemy::STATE::END,
 			BATTLE,
 			RECIEVE,
 		};
