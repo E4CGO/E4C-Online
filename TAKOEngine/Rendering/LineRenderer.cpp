@@ -3,7 +3,8 @@
 #include "Misc.h"
 #include "LineRenderer.h"
 #include "GpuResourceUtils.h"
-
+#include "Graphics.h"
+#include "RenderState.h"
 LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
 	: capacity(vertexCount)
 {
@@ -44,7 +45,7 @@ LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
 		::memset(&desc, 0, sizeof(desc));
 		desc.AlphaToCoverageEnable = false;
 		desc.IndependentBlendEnable = false;
-		desc.RenderTarget[0].BlendEnable = false;
+		desc.RenderTarget[0].BlendEnable = true;
 		desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
 		desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
 		desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
@@ -108,6 +109,8 @@ LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
 // 描画開始
 void LineRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
+	RenderState* renderState = Graphics::Instance().GetRenderState();
+
 	// シェーダー設定
 	context->VSSetShader(vertexShader.Get(), nullptr, 0);
 	context->PSSetShader(pixelShader.Get(), nullptr, 0);

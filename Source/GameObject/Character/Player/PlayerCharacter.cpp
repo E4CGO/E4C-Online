@@ -682,14 +682,16 @@ void PlayerCharacter::Render(const RenderContext& rc)
 {
 	Character::Render(rc);
 	
-	LineRenderer* sword = Graphics::Instance().GetLineRenderer();
-	sword->Render(T_GRAPHICS.GetDeviceContext(), rc.camera->GetView(), rc.camera->GetProjection());
+
 	
 
 	DirectX::XMFLOAT3 front = CameraManager::Instance().GetCamera()->GetFront();
 	DirectX::XMFLOAT3 eye = CameraManager::Instance().GetCamera()->GetEye();
 	DirectX::XMFLOAT3 namePos = this->position + DirectX::XMFLOAT3{ 0, 2.2f, 0 };
 	float dot = XMFLOAT3Dot(front, namePos - eye);
+
+	LineRenderer* sword = Graphics::Instance().GetLineRenderer();
+	sword->Render(T_GRAPHICS.GetDeviceContext(), rc.camera->GetView(), rc.camera->GetProjection());
 	if (dot < 0.0f) return;
 
 	// 名前表示
@@ -773,13 +775,15 @@ void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
 {
 	Character::RenderDX12(rc);
 
-	LineRenderer* sword = Graphics::Instance().GetLineRenderer();
-	sword->Render(T_GRAPHICS.GetDeviceContext(), rc.view, rc.projection);
+	
 
 	DirectX::XMFLOAT3 front = CameraManager::Instance().GetCamera()->GetFront();
 	DirectX::XMFLOAT3 eye = CameraManager::Instance().GetCamera()->GetEye();
 	DirectX::XMFLOAT3 namePos = this->position + DirectX::XMFLOAT3{ 0, 2.2f, 0 };
 	float dot = XMFLOAT3Dot(front, namePos - eye);
+
+	LineRenderer* sword = Graphics::Instance().GetLineRenderer();
+	sword->Render(T_GRAPHICS.GetDeviceContext(), rc.view, rc.projection);
 	if (dot < 0.0f) return;
 
 #ifdef _DEBUG
