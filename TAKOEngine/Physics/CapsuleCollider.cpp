@@ -44,7 +44,7 @@ void CapsuleCollider::Update()
 		DirectX::XMMATRIX matrix = DirectX::XMLoadFloat4x4(m_pTransform);
 		DirectX::XMStoreFloat3(&m_position, DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat3(&m_offset), matrix));
 
-		if (!DirectX::XMVector3Equal(DirectX::XMLoadFloat3(&m_Ldirection), { 0.0f, 1.0f, 0.0f }))
+		//if (!DirectX::XMVector3Equal(DirectX::XMLoadFloat3(&m_Ldirection), { 0.0f, 1.0f, 0.0f }))
 		{
 			// オフセット行列抽出
 			DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(matrix.r[3].m128_f32[0], matrix.r[3].m128_f32[1], matrix.r[3].m128_f32[2]);

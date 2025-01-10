@@ -42,13 +42,19 @@ SkeletonMinion::SkeletonMinion(float scaling) : Enemy("Data/Model/Enemy/characte
 	m_pColliders[COLLIDER_ID::COL_RIGHT_HAND]->SetHittableOBJ(Collider::COLLIDER_OBJ::PLAYER);
 	m_pColliders[COLLIDER_ID::COL_RIGHT_HAND]->SetEnable(false);
 
-
-
-
 	stateMachine->RegisterState(Enemy::STATE::IDLE, new SkeletonMinionState::IdleState(this, 2.0f));
 	stateMachine->RegisterState(SkeletonMinion::STATE::TARGET_FOUND, new EnemyState::FollowState(this, 2.0f, SkeletonMinion::STATE::ATTACK));
 	stateMachine->RegisterState(SkeletonMinion::STATE::ATTACK, new SkeletonMinionState::AttackState(this));
 	stateMachine->SetState(Enemy::STATE::IDLE);
+}
+
+SkeletonMinion::~SkeletonMinion()
+{
+	for (const std::pair<uint8_t, Collider*>& collider : m_pColliders)
+	{
+		COLLISIONS.Remove(collider.second);
+	}
+	m_pColliders.clear();
 }
 
 // 一番近いプレイヤーをターゲット
@@ -97,27 +103,30 @@ void SkeletonMinionBoss::Update(float elaspedTime)
 }
 void SkeletonMinionBoss::OnDamage(const ENEMY_COLLISION& hit)
 {
-	hp -= hit.damage;
-
-	if (hp > 0)
+	if (IsMine())
 	{
-		if (armorHp <= 0) { // アーマーなし
-			stateMachine->ChangeState(Enemy::STATE::HURT);
-			hp -= hit.damage / 10 * 2;		// ダウン追加ダメージ
-		}
-		else if (hit.colider_id == COLLIDER_ID::COL_HEAD)	// ヘッドショット アーマーあり
+		hp -= hit.damage;
+
+		if (hp > 0)
 		{
-			armorHp -= hit.damage;
-			if (armorHp <= 0) {		// アーマー解除
-				armorHp = 0;
-				recoverArmorTimer = recoverArmorTime;	// アーマー回復タイマー
+			if (armorHp <= 0) { // アーマーなし
+				stateMachine->ChangeState(Enemy::STATE::HURT);
+				hp -= hit.damage / 10 * 2;		// ダウン追加ダメージ
 			}
+			else if (hit.colider_id == COLLIDER_ID::COL_HEAD)	// ヘッドショット アーマーあり
+			{
+				armorHp -= hit.damage;
+				if (armorHp <= 0) {		// アーマー解除
+					armorHp = 0;
+					recoverArmorTimer = recoverArmorTime;	// アーマー回復タイマー
+				}
+			}
+			velocity += hit.force * 0.1f;
 		}
-		velocity += hit.force * 0.1f;
-	}
 
-	if (hp <= 0)
-	{
-		stateMachine->ChangeState(Enemy::STATE::DEATH);
+		if (hp <= 0)
+		{
+			stateMachine->ChangeState(Enemy::STATE::DEATH);
+		}
 	}
 }

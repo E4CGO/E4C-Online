@@ -3,7 +3,6 @@
 #include "EnemyManager.h"
 #include "Network/OnlineController.h"
 
-
 /**************************************************************************//**
 	@brief		エネミーの更新処理
 	@param[in]	elapsedTime 経過時間
@@ -13,6 +12,27 @@ void EnemyManager::Update(float elapsedTime)
 {
 	std::lock_guard<std::mutex> lock(m_mut);
 	ObjectManager<Enemy>::Update(elapsedTime);
+
+	// エネミー同士の衝突処理
+	size_t size = this->items.size();
+	HitResult hit;
+	for (size_t i = 0; i < size; i++)
+	{
+		Collider* col1 = items.at(i)->GetMoveCollider();
+		if (!col1) continue;
+
+		for (size_t j = i + 1; j < size; j++)
+		{
+			Collider* col2 = items.at(j)->GetMoveCollider();
+			if (!col2) continue;
+
+			if (col1->Collision(col2, {}, hit))
+			{
+				items.at(i)->AddImpulse({ hit.normal.x * hit.distance, 0, hit.normal.z * hit.distance });
+				items.at(j)->AddImpulse({ -hit.normal.x * hit.distance, 0, -hit.normal.z * hit.distance });
+			}
+		}
+	}
 
 	// 一気同期
 	if (m_syncEnemies.size() > 0)

@@ -5,7 +5,7 @@
 const LONG SCREEN_WIDTH = 1280;
 const LONG SCREEN_HEIGHT = 720;
 
-LPCWSTR GAME_TITLE = _T("P2Pダンジョン・アドベンチャーDX12");
+LPCWSTR GAME_TITLE = _T("Ludus Somnia");
 
 LRESULT CALLBACK fnWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {

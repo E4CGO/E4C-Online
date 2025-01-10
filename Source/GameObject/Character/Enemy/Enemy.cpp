@@ -19,12 +19,16 @@ Enemy::Enemy(const char* filename, float scaling, ModelObject::RENDER_MODE rende
 Enemy::~Enemy()
 {
 	delete stateMachine;
-	
+
 	if (m_pSpawner != nullptr)
 	{
 		m_pSpawner->EnemyDestoryCallBack(this);
 	}
 
+	for (const std::pair<uint8_t, Collider*>& collider : m_pColliders)
+	{
+		COLLISIONS.Remove(collider.second);
+	}
 	m_pColliders.clear();
 }
 
@@ -32,6 +36,17 @@ bool Enemy::MoveTo(float elapsedTime, const DirectX::XMFLOAT3& target)
 {
 	return Character::MoveTo(elapsedTime, target, moveSpeed, turnSpeed);
 }
+
+bool Enemy::IsAlive()
+{
+	if (hp >= 1)
+	{
+		return true;
+	}
+	return false;
+}
+
+
 void Enemy::TurnTo(float elapsedTime, const DirectX::XMFLOAT3& target)
 {
 	DirectX::XMFLOAT3 d = target - position;
@@ -73,6 +88,22 @@ void Enemy::Render(const RenderContext& rc)
 	}
 #endif // DEBUG
 }
+void Enemy::OnDamage(int damage)
+{
+	if (IsMine())
+	{
+		hp -= damage;
+		if (hp > 0)
+		{
+			EnemyState::StateTransition(this, STATE::HURT);
+		}
+		else
+		{
+			EnemyState::StateTransition(this, STATE::DEATH);
+		}
+	}
+
+}
 void Enemy::OnDamage(const ENEMY_COLLISION& hit)
 {
 	hp -= hit.damage;
@@ -102,22 +133,16 @@ void Enemy::OnDamage(const ATTACK_DATA& hit)
 void Enemy::OnDeath()
 {
 	ENEMIES.Remove(this);
-
-	for (const std::pair<uint8_t, Collider*>& collider : m_pColliders)
-	{
-		COLLISIONS.Remove(collider.second);
-	}
-	m_pColliders.clear();
 }
 
 Enemy* Enemy::EnemyFactory(uint8_t enemyType)
 {
 	switch (enemyType)
 	{
-		case ENEMY_TYPE::SKELETON_MINION: return new SkeletonMinion; break;
-		case ENEMY_TYPE::SKELETON_MINION_BOSS: return new SkeletonMinionBoss; break;
-		case ENEMY_TYPE::MOUSE: return new MouseMob; break;
-		case ENEMY_TYPE::BEAR_BOSS: return new BearBoss; break;
+	case ENEMY_TYPE::SKELETON_MINION: return new SkeletonMinion; break;
+	case ENEMY_TYPE::SKELETON_MINION_BOSS: return new SkeletonMinionBoss; break;
+	case ENEMY_TYPE::MOUSE: return new MouseMob; break;
+	case ENEMY_TYPE::BEAR_BOSS: return new BearBoss; break;
 	}
 	return nullptr;
 }
@@ -155,23 +180,23 @@ bool Enemy::SearchPlayer()
 }
 
 /**************************************************************************//**
- 	@brief	同期用データ生成
+	@brief	同期用データ生成
 	@return 同期用データ
 *//***************************************************************************/
 const Enemy::SYNC_DATA Enemy::SyncData()
 {
-	 return SYNC_DATA {
-		enemy_id,
-		enemyType,
-		{ position.x, position.y, position.z },
-		m_target,
-		{ m_TargetPosition.x, m_TargetPosition.y, m_TargetPosition.z },
-		angle.y,
-		static_cast<uint8_t>(stateMachine->GetStateIndex())
+	return SYNC_DATA{
+	   enemy_id,
+	   enemyType,
+	   { position.x, position.y, position.z },
+	   m_target,
+	   { m_TargetPosition.x, m_TargetPosition.y, m_TargetPosition.z },
+	   angle.y,
+	   static_cast<uint8_t>(stateMachine->GetStateIndex())
 	};
 }
 /**************************************************************************//**
- 	@brief		同期を入力
+	@brief		同期を入力
 	@param[in]	data	同期データ
 *//***************************************************************************/
 void Enemy::Sync(const Enemy::SYNC_DATA& data)

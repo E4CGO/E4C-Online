@@ -8,6 +8,8 @@
 
 #include <memory>
 
+#include "TAKOEngine/Tool/Mathf.h"
+
 #include "GameObject/Character/Player/PlayerCharacter.h"
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 
@@ -27,7 +29,7 @@ enum ENEMY_TYPE : uint8_t
 	SKELETON_MINION,						// デフォルト骨
 	SKELETON_MINION_BOSS,					// デフォルト骨ボス
 
-	MOUSE,									//　ネズミ
+	MOUSE,									// ネズミ
 	BEAR_BOSS,								// 熊ボス
 	END,
 };
@@ -70,6 +72,7 @@ public:
 
 	void SetSpawnPosition(const DirectX::XMFLOAT3& position) { this->m_SpawnPosition = position; }
 
+	virtual void OnDamage(int damage) override;
 	virtual void OnDamage(const ENEMY_COLLISION& hit);
 	virtual void OnDamage(const ATTACK_DATA& hit);
 	virtual void OnDeath();
@@ -80,6 +83,8 @@ public:
 
 	void SetEnemyId(const uint32_t& id) { enemy_id = id; }
 	const uint32_t GetEnemyId() const { return enemy_id; }
+
+	bool IsAlive();
 
 	bool MoveTo(float elapsedTime, const DirectX::XMFLOAT3& target);
 	void TurnTo(float elapsedTime, const DirectX::XMFLOAT3& target);

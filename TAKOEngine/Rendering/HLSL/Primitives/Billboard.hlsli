@@ -38,3 +38,8 @@ cbuffer CbScene : register(b0)
     float timerGlobal;
     float timerTick;
 }
+
+cbuffer CbWorldMatrix : register(b1)
+{
+    row_major float4x4 WorldMatrix;
+}

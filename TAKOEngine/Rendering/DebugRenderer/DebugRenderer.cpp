@@ -242,6 +242,20 @@ void DebugRenderer::SetSphere(const std::vector<DirectX::XMFLOAT3>& centers, flo
 // @param[in] color      色
 // @return    なし
 //*******************************************************
+void DebugRenderer::DrawCylinder(const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color)
+{
+	DebugRenderer::DrawCylinder(position, { 0.0f, 1.0f, 0.0f }, radius, height, color);
+}
+
+//*******************************************************
+// @brief     円柱情報セット
+// @param[in] position   位置
+// @param[in] direction  方向
+// @param[in] radius     半径
+// @param[in] height     高さ
+// @param[in] color      色
+// @return    なし
+//*******************************************************
 void DebugRenderer::DrawCylinder(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT3& direction, float radius, float height, const DirectX::XMFLOAT4& color)
 {
 	Cylinder cylinder;

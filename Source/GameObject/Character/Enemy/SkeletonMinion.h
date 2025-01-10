@@ -7,7 +7,7 @@ class SkeletonMinion : public Enemy
 {
 public:
 	SkeletonMinion(float scaling = 1.5f);
-	~SkeletonMinion() = default;
+	virtual ~SkeletonMinion();
 public:
 	enum Animation
 	{

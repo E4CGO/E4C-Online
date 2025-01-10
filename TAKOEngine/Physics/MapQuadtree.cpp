@@ -488,13 +488,13 @@ bool MapQuadtree::IntersectVsSphere(Sphere& sphere)
 	XMVECTOR position = XMLoadFloat3(&sphere.position);
 	bool hit = false;
 
-	// カプセルの最小点が四分木の最小点を含むノードから数えて何個目のノードに居るか算出（０個目スタート）
+	// 球の最小点が四分木の最小点を含むノードから数えて何個目のノードに居るか算出（０個目スタート）
 	const uint32_t minX = static_cast<uint32_t>((minPos.x - m_quadtreeNodes[0].m_minPos.x) / m_quadtreeNodes[GetLevelStart(m_level)].m_size.x);
 	if (minX >= 1u << m_level) return false;	// 範囲外ならfalse
 	const uint32_t minZ = static_cast<uint32_t>((minPos.z - m_quadtreeNodes[0].m_minPos.z) / m_quadtreeNodes[GetLevelStart(m_level)].m_size.z);
 	if (minZ >= 1u << m_level) return false;	// 範囲外ならfalse
 
-	// カプセルの最大点が四分木の最小点を含むノードから数えて何個目のノードに居るか算出（０個目スタート）
+	// 球の最大点が四分木の最小点を含むノードから数えて何個目のノードに居るか算出（０個目スタート）
 	const uint32_t maxX = static_cast<uint32_t>((maxPos.x - m_quadtreeNodes[0].m_minPos.x) / m_quadtreeNodes[GetLevelStart(m_level)].m_size.x);
 	if (maxX >= 1u << m_level) return false;	// 範囲外ならfalse
 	const uint32_t maxZ = static_cast<uint32_t>((maxPos.z - m_quadtreeNodes[0].m_minPos.z) / m_quadtreeNodes[GetLevelStart(m_level)].m_size.z);
@@ -617,7 +617,7 @@ bool MapQuadtree::IntersectVsSphereInNode(
 
 			if (Collision::IntersectSphereVsTriangle(spherePos, radius, triPos, &intersect, true))
 			{
-				// カプセルのみ押し戻し処理
+				// 球のみ押し戻し処理
 				spherePos = XMVectorAdd(spherePos, XMVectorScale(intersect.normal, intersect.penetration));
 				hit = true;
 				ret = true;

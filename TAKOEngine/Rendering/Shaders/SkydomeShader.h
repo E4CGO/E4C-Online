@@ -38,6 +38,8 @@ public:
 	SkydomeShaderDX12(ID3D12Device* device);
 	~SkydomeShaderDX12() override;
 
+	void Finalize() override {};
+
 	void Render(const RenderContextDX12& rc, const ModelDX12::Mesh& mesh) override;
 
 private:

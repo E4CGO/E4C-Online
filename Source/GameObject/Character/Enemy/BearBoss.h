@@ -16,7 +16,7 @@
 class BearBoss : public Enemy
 {
 public:
-	BearBoss(float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX11);
+	BearBoss(float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX12);
 	~BearBoss() = default;
 public:
 	enum COLLIDER_ID : uint8_t

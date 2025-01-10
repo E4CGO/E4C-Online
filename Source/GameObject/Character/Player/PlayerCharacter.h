@@ -245,7 +245,7 @@ protected:
 	//	float effectScale = 1.0f
 	//); // 汎用 敵との判定
 
-	void AttackEnemy(Collider* attackCol, Collider* enemyCol);
+	//void AttackEnemy(Collider* attackCol, Collider* enemyCol);
 
 protected:
 	float radius = 0;	// 当たり判定半径

@@ -159,17 +159,18 @@ public:
 	void SetHittableOBJ(uint16_t hit) { m_hittableOBJType = hit; }
 	const uint16_t GetHittableOBJ() const { return m_hittableOBJType; }
 
-	std::vector<GameObject*> GetHitOthers() { return m_hitOthers; }
-	void RegisterHitOthers(GameObject* other) { m_hitOthers.emplace_back(other); }
-	void ClearHitOthers() { m_hitOthers.clear(); }
+	//std::vector<GameObject*> GetHitOthers() { return m_hitOthers; }
+	//void RegisterHitOthers(GameObject* other) { m_hitOthers.emplace_back(other); }
+	//void ClearHitOthers() { m_hitOthers.clear(); }
 
-	void SetHitDamage(int damage) { m_hitDamage = damage; }
-	const int GetHitDamage() const { return m_hitDamage; }
+	//void SetHitDamage(int damage) { m_hitDamage = damage; }
+	//const int GetHitDamage() const { return m_hitDamage; }
 
-	void SetHitStartRate(float rate) { m_hitStartRate = rate; }
-	const float GetHitStartRate() const { return m_hitStartRate; }
-	void SetHitEndRate(float rate) { m_hitEndRate = rate; }
-	const float GetHitEndRate() const { return m_hitEndRate; }
+	virtual void SetCurrentRate(float currentRate){}
+	//void SetHitStartRate(float rate) { m_hitStartRate = rate; }
+	//const float GetHitStartRate() const { return m_hitStartRate; }
+	//void SetHitEndRate(float rate) { m_hitEndRate = rate; }
+	//const float GetHitEndRate() const { return m_hitEndRate; }
 
 	bool IsEnable() const { return m_enable; }
 	void SetEnable(bool e) { m_enable = e; }
@@ -182,10 +183,10 @@ protected:
 	COLLIDER_TYPE m_shapeType = COLLIDER_TYPE::DEFAULT;
 	uint16_t m_OBJType = 0;
 	uint16_t m_hittableOBJType = 0;
-	std::vector<GameObject*> m_hitOthers;	// 攻撃が当たった相手を保存して複数回当たらないようにする
-	int m_hitDamage = 0;			// 与ダメージ
-	float m_hitStartRate = 0.0f;	// 攻撃判定が発生するタイミングのアニメーションレート(min0%)
-	float m_hitEndRate = 1.0f;	// 攻撃判定が消滅するタイミングのアニメーションレート(max100%)
+	//std::vector<GameObject*> m_hitOthers;	// 攻撃が当たった相手を保存して複数回当たらないようにする
+	//int m_hitDamage = 0;			// 与ダメージ
+	//float m_hitStartRate = 0.0f;	// 攻撃判定が発生するタイミングのアニメーションレート(min0%)
+	//float m_hitEndRate = 1.0f;	// 攻撃判定が消滅するタイミングのアニメーションレート(max100%)
 	bool m_enable = true;
 	
 

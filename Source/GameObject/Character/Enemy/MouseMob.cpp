@@ -15,6 +15,7 @@ MouseMob::MouseMob(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("
 {
 	// 敵の基本パラメーター
 	enemyType = ENEMY_TYPE::MOUSE;
+	radius = 1.0f;
 	maxHp = hp = 50;
 	atk = 10;
 	moveSpeed = 2.0f;
@@ -22,14 +23,15 @@ MouseMob::MouseMob(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("
 	m_SearchRange = 24.0f;
 	m_AttackRange = 1.25f;
 
-	// 移動用Collider
-	Sphere sphere({ 0, 1.0f * scaling, 0 }, 1.0f * scaling);
-	SetMoveCollider(sphere, Collider::COLLIDER_OBJ::ENEMY);
-
 	// 当たり判定
-	SetCollider(COLLIDER_ID::COL_BODY, sphere, Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("JOT_C_Head")->worldTransform);
-	m_pColliders[COLLIDER_ID::COL_BODY]->SetHittableOBJ(Collider::COLLIDER_OBJ::PLAYER_ATTACK | Collider::COLLIDER_OBJ::PLAYER_PROJECTILE);
+	//m_pColliders[HitCollider::BodyHit] = new SphereCollider(scaling * 1.2f);
+	// 衝突判定
+	SetMoveCollider({ { 0, radius / scale.y, 0 }, radius }, Collider::COLLIDER_OBJ::ENEMY);
 
+	m_pColliders.clear();
+	// ヒット判定
+	Sphere sphere{ { 0, radius / scale.y, 0 }, radius };
+	SetCollider(COLLIDER_ID::COL_BODY, sphere, Collider::COLLIDER_OBJ::ENEMY, &transform);
 	{
 		using namespace EnemyState;
 		// 基本ステート

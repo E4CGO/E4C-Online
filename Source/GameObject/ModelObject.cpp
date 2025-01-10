@@ -7,6 +7,7 @@
 #include "TAKOEngine/Physics/CapsuleCollider.h"
 #include "TAKOEngine/Physics/ModelCollider.h"
 #include "TAKOEngine/Physics/MapCollider.h"
+#include "TAKOEngine/Physics/AttackCollider.h"
 #include "TAKOEngine/Physics/CollisionManager.h"
 
 /**************************************************************************//**
@@ -56,6 +57,12 @@ void ModelObject::LoadModel(const char* filename, float scaling, ModelObject::RE
 		break;
 	case ModelObject::LHS_TOON_Instancing:
 		m_dx12_ShaderId = ModelShaderDX12Id::ToonInstancing;
+		break;
+	case ModelObject::LHS_Phong:
+		m_dx12_ShaderId = ModelShaderDX12Id::Phong;
+		break;
+	case ModelObject::LHS_Phong_Instancing:
+		m_dx12_ShaderId = ModelShaderDX12Id::PhongInstancing;
 		break;
 	default:
 		break;
@@ -311,7 +318,7 @@ void ModelObject::RenderDX12(const RenderContextDX12& rc)
 }
 
 /**************************************************************************//**
-	@brief		移動用コライダー設定
+	@brief		移動用コライダー設定(名前がSetCollider→SetMoveColliderに変わりました。Mapの当たり判定は基本こっちのみ)
 	@param[in]	shapeType	コライダータイプ
 	@param[in]	objType		オブジェクトタイプ
 	@param[in]	idx			モデルID
@@ -367,7 +374,7 @@ void ModelObject::SetMoveCollider(Sphere sphereParam, Collider::COLLIDER_OBJ obj
 	@param[in]	sphereParam		球コライダーのパラメータ
 	@param[in]	objType			オブジェクトタイプ
 	@param[in]	transform		参照するオブジェクト行列
-	@return		作成したコライダーのポインタ
+	@return		なし
 *//***************************************************************************/
 void ModelObject::SetCollider(uint8_t idx, Sphere sphereParam, Collider::COLLIDER_OBJ objType, DirectX::XMFLOAT4X4* transform)
 {
@@ -382,7 +389,7 @@ void ModelObject::SetCollider(uint8_t idx, Sphere sphereParam, Collider::COLLIDE
 	@param[in]	capsuleParam	カプセルコライダーのパラメータ
 	@param[in]	objType			オブジェクトタイプ
 	@param[in]	transform		参照するオブジェクト行列
-	@return		作成したコライダーのポインタ
+	@return		なし
 *//***************************************************************************/
 void ModelObject::SetCollider(uint8_t idx, Capsule capsuleParam, Collider::COLLIDER_OBJ objType, DirectX::XMFLOAT4X4* transform)
 {
@@ -390,6 +397,71 @@ void ModelObject::SetCollider(uint8_t idx, Capsule capsuleParam, Collider::COLLI
 	m_pColliders[idx]->SetOwner(this);
 	m_pColliders[idx]->SetParam(capsuleParam);
 	COLLISIONS.Register(m_pColliders[idx]);
+}
+
+/**************************************************************************//**
+	@brief		攻撃判定用コライダー生成
+	@param[in]	power			攻撃力
+	@param[in]	idx				コライダーID
+	@param[in]	sphereParam		球コライダーのパラメータ
+	@param[in]	objType			オブジェクトタイプ
+	@param[in]	hittableOBJ		ヒットするオブジェクトタイプ
+	@param[in]	transform		参照するオブジェクト行列
+	@return		なし
+*//***************************************************************************/
+void ModelObject::MakeAttackCollider(int power, uint8_t idx, Sphere sphereParam, Collider::COLLIDER_OBJ objType, uint16_t hittableOBJ, DirectX::XMFLOAT4X4* transform)
+{
+	m_pColliders[idx] = new AttackSphereCollider(power, objType, transform);
+	m_pColliders[idx]->SetHittableOBJ(hittableOBJ);
+	m_pColliders[idx]->SetOwner(this);
+	m_pColliders[idx]->SetParam(sphereParam);
+	COLLISIONS.Register(m_pColliders[idx]);
+}
+void ModelObject::MakeAttackCollider(ATTACK_COLLIDER_DATA data, Sphere sphereParam, DirectX::XMFLOAT4X4* transform)
+{
+	m_pColliders[data.idx] = new AttackSphereCollider(data.power, data.objType, transform, data.hitStartRate, data.hitEndRate);
+	m_pColliders[data.idx]->SetHittableOBJ(data.hittableOBJ);
+	m_pColliders[data.idx]->SetOwner(this);
+	m_pColliders[data.idx]->SetParam(sphereParam);
+	COLLISIONS.Register(m_pColliders[data.idx]);
+}
+/**************************************************************************//**
+	@brief		攻撃判定用コライダー生成
+	@param[in]	power			攻撃力
+	@param[in]	idx				コライダーID
+	@param[in]	capsuleParam	カプセルコライダーのパラメータ
+	@param[in]	objType			オブジェクトタイプ
+	@param[in]	hittableOBJ		ヒットするオブジェクトタイプ
+	@param[in]	transform		参照するオブジェクト行列
+	@return		なし
+*//***************************************************************************/
+void ModelObject::MakeAttackCollider(int power, uint8_t idx, Capsule capsuleParam, Collider::COLLIDER_OBJ objType, uint16_t hittableOBJ, DirectX::XMFLOAT4X4* transform)
+{
+	m_pColliders[idx] = new AttackCapsuleCollider(power, objType, transform);
+	m_pColliders[idx]->SetHittableOBJ(hittableOBJ);
+	m_pColliders[idx]->SetOwner(this);
+	m_pColliders[idx]->SetParam(capsuleParam);
+	COLLISIONS.Register(m_pColliders[idx]);
+}
+void ModelObject::MakeAttackCollider(ATTACK_COLLIDER_DATA data, Capsule capsuleParam, DirectX::XMFLOAT4X4* transform)
+{
+	m_pColliders[data.idx] = new AttackCapsuleCollider(data.power, data.objType, transform, data.hitStartRate, data.hitEndRate);
+	m_pColliders[data.idx]->SetHittableOBJ(data.hittableOBJ);
+	m_pColliders[data.idx]->SetOwner(this);
+	m_pColliders[data.idx]->SetParam(capsuleParam);
+	COLLISIONS.Register(m_pColliders[data.idx]);
+}
+
+/**************************************************************************//**
+	@brief		攻撃判定用コライダー消去
+	@param[in]	idx				コライダーID
+	@return		なし
+*//***************************************************************************/
+void ModelObject::DeleteAttackCollider(uint8_t idx)
+{
+	auto it = std::next(m_pColliders.begin(), idx);
+	COLLISIONS.Remove(m_pColliders[idx]);
+	m_pColliders.erase(it);
 }
 
 /**************************************************************************//**

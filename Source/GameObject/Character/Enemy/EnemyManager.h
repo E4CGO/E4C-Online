@@ -24,6 +24,7 @@ public:
 	void RenderDX12(const RenderContextDX12& rc) override;
 
 	Enemy* GetEnemyById(const uint32_t& id);
+
 	// レイキャスト
 	bool RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, HitResult& hit, bool camera = false);
 	// 同期エネミーID登録

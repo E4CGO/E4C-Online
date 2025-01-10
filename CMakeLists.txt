@@ -156,26 +156,15 @@ set(Source__GameObject
 source_group("Source\\GameObject" FILES ${Source__GameObject})
 
 set(Source__Map
-    "Source/Map/CrossRoom1.cpp"
-    "Source/Map/CrossRoom1.h"
-    "Source/Map/CrossRoom2.cpp"
-    "Source/Map/CrossRoom2.h"
-    "Source/Map/DeadEndRoom.cpp"
-    "Source/Map/DeadEndRoom.h"
     "Source/Map/DungeonData.cpp"
     "Source/Map/DungeonData.h"
-    "Source/Map/EndRoom1.cpp"
-    "Source/Map/EndRoom1.h"
+    "Source/Map/InstancingModelManager.h"
     "Source/Map/MapTile.cpp"
     "Source/Map/MapTile.h"
     "Source/Map/MapTileManager.cpp"
     "Source/Map/MapTileManager.h"
-    "Source/Map/Passage1.cpp"
-    "Source/Map/Passage1.h"
     "Source/Map/RoomBase.cpp"
     "Source/Map/RoomBase.h"
-    "Source/Map/SimpleRoom1.cpp"
-    "Source/Map/SimpleRoom1.h"
 )
 source_group("Source\\Map" FILES ${Source__Map})
 
@@ -317,6 +306,12 @@ set(Source__Scene__GameLoop__SceneGame
 )
 source_group("Source\\Scene\\GameLoop\\SceneGame" FILES ${Source__Scene__GameLoop__SceneGame})
 
+set(Source__Scene__GameLoop__SceneRoomTest
+    "Source/Scene/GameLoop/SceneRoomTest/SceneRoomTest_E4C.cpp"
+    "Source/Scene/GameLoop/SceneRoomTest/SceneRoomTest_E4C.h"
+)
+source_group("Source\\Scene\\GameLoop\\SceneRoomTest" FILES ${Source__Scene__GameLoop__SceneRoomTest})
+
 set(Source__Scene__GameLoop__SceneTitle
     "Source/Scene/GameLoop/SceneTitle/SceneTitle_E4C.cpp"
     "Source/Scene/GameLoop/SceneTitle/SceneTitle_E4C.h"
@@ -412,6 +407,8 @@ source_group("TAKOEngine\\Network" FILES ${TAKOEngine__Network})
 set(TAKOEngine__Physics
     "TAKOEngine/Physics/AABBCollider.cpp"
     "TAKOEngine/Physics/AABBCollider.h"
+    "TAKOEngine/Physics/AttackCollider.cpp"
+    "TAKOEngine/Physics/AttackCollider.h"
     "TAKOEngine/Physics/CapsuleCollider.cpp"
     "TAKOEngine/Physics/CapsuleCollider.h"
     "TAKOEngine/Physics/Collider.cpp"
@@ -664,6 +661,8 @@ set(TAKOEngine__Rendering__HLSL__Lighting
     "TAKOEngine/Rendering/HLSL/Lighting/DeferredVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Lighting/Light.hlsli"
     "TAKOEngine/Rendering/HLSL/Lighting/ShadowMap.hlsli"
+    "TAKOEngine/Rendering/HLSL/Lighting/ShadowMapDX12.hlsli"
+    "TAKOEngine/Rendering/HLSL/Lighting/ShadowMapDX12VS.hlsl"
     "TAKOEngine/Rendering/HLSL/Lighting/ShadowmapFunctions.hlsli"
     "TAKOEngine/Rendering/HLSL/Lighting/ShadowMapVS.hlsl"
 )
@@ -751,14 +750,19 @@ set(TAKOEngine__Rendering__HLSL__Primitives
     "TAKOEngine/Rendering/HLSL/Primitives/FireballPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/FireballVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/Plane.hlsli"
+    "TAKOEngine/Rendering/HLSL/Primitives/PlaneDX12.hlsli"
+    "TAKOEngine/Rendering/HLSL/Primitives/PlaneDX12PS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/PlaneDX12VS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/PlanePS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/PlaneVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/Portal.hlsli"
     "TAKOEngine/Rendering/HLSL/Primitives/PortalPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/PortalSquarePS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/PortalVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/PrimitiveRenderer.hlsli"
     "TAKOEngine/Rendering/HLSL/Primitives/PrimitiveRendererPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/PrimitiveRendererVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/RunningDustPS.hlsl"
 )
 source_group("TAKOEngine\\Rendering\\HLSL\\Primitives" FILES ${TAKOEngine__Rendering__HLSL__Primitives})
 
@@ -808,6 +812,7 @@ set(ALL_FILES
     ${Source__Scene__Stage}
     ${Source__Scene__GameLoop__SceneCharacter}
     ${Source__Scene__GameLoop__SceneGame}
+    ${Source__Scene__GameLoop__SceneRoomTest}
     ${Source__Scene__GameLoop__SceneTitle}
     ${Source__Scene__GameLoop__SceneGame__Stage}
     ${Source__UI__Widget}
@@ -864,6 +869,7 @@ endfunction()
 
 #List of HLSL shaders
 set(SHADER_NAMES
+    "GenerateMips.cso"
     "DebugDX12PS.cso"
     "DebugDX12VS.cso"
     "DebugPS.cso"
@@ -874,6 +880,7 @@ set(SHADER_NAMES
     "LineVS.cso"
     "DeferredPS.cso"
     "DeferredVS.cso"
+    "ShadowMapDX12VS.cso"
     "ShadowMapVS.cso"
     "DefaultModelPS.cso"
     "DefaultModelVS.cso"
@@ -918,12 +925,16 @@ set(SHADER_NAMES
     "BillboardVS.cso"
     "FireballPS.cso"
     "FireballVS.cso"
+    "PlaneDX12PS.cso"
+    "PlaneDX12VS.cso"
     "PlanePS.cso"
     "PlaneVS.cso"
     "PortalPS.cso"
+    "PortalSquarePS.cso"
     "PortalVS.cso"
     "PrimitiveRendererPS.cso"
     "PrimitiveRendererVS.cso"
+    "RunningDustPS.cso"
     "SkyBoxDX12PS.cso"
     "SkyBoxDX12VS.cso"
     "SkydomePS.cso"
@@ -945,6 +956,7 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/LineVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Lighting/DeferredPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Lighting/DeferredVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Lighting/ShadowMapDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Lighting/ShadowMapVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/DefaultModelPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/DefaultModelVS.hlsl,5.0,Vertex,main"
@@ -989,12 +1001,16 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/BillboardVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/FireballPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/FireballVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlaneDX12PS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlaneDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlanePS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlaneVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PortalPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PortalSquarePS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PortalVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PrimitiveRendererPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PrimitiveRendererVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/RunningDustPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Skydome/SkyBoxDX12PS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Skydome/SkyBoxDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Skydome/SkydomePS.hlsl,5.0,Pixel,main"
@@ -1131,8 +1147,6 @@ if(MSVC)
         /Zi
         ${DEFAULT_CXX_EXCEPTION_HANDLING}
         /Y-
-        /wd4819
-        /wd4099
         /utf-8
     )
     target_link_options(${PROJECT_NAME} PRIVATE
@@ -1146,8 +1160,6 @@ if(MSVC)
         /MANIFEST
         /DEBUG
         /SUBSYSTEM:WINDOWS
-        /wd4819
-        /wd4099
     )
 endif()
 
@@ -1288,6 +1300,8 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "DirectXTex"
     "d3d11"
     "d3d12"
+    "d2d1.lib"
+    "dwrite.lib"
     "dxgi"
     "xinput"
     "xaudio2"
@@ -1309,6 +1323,8 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "DirectXTex"
     "d3d11"
     "d3d12"
+    "d2d1.lib"
+    "dwrite.lib"
     "dxgi"
     "xinput"
     "xaudio2"
