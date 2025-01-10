@@ -516,6 +516,8 @@ set(TAKOEngine__Tool
     "TAKOEngine/Tool/Logger.h"
     "TAKOEngine/Tool/Mathf.cpp"
     "TAKOEngine/Tool/Mathf.h"
+    "TAKOEngine/Tool/PerlinNoise.cpp"
+    "TAKOEngine/Tool/PerlinNoise.h"
     "TAKOEngine/Tool/Singleton.h"
     "TAKOEngine/Tool/Timer.cpp"
     "TAKOEngine/Tool/Timer.h"

@@ -110,6 +110,8 @@ inline XMFLOAT2 operator-(XMFLOAT2 v, float num) { return XMFLOAT2(v.x - num, v.
 inline XMFLOAT2 operator*(XMFLOAT2 v, float num) { return XMFLOAT2(v.x * num, v.y * num); }
 inline XMFLOAT2 operator/(XMFLOAT2 v, float num) { return XMFLOAT2(v.x / num, v.y / num); }
 
+inline XMFLOAT2 operator*(float num, XMFLOAT2 v) { return XMFLOAT2(v.x * num, v.y * num); }
+
 inline void operator+=(XMFLOAT2& v, const float& num) { v.x += num; v.y += num; }
 inline void operator-=(XMFLOAT2& v, const float& num) { v.x -= num; v.y -= num; }
 inline void operator*=(XMFLOAT2& v, const float& num) { v.x *= num; v.y *= num; }
