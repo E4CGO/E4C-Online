@@ -1,4 +1,4 @@
-#include "PerlinNoise.h"
+﻿#include "PerlinNoise.h"
 
 
 float NoiseGenerator::fract(float x)
