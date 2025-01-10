@@ -175,6 +175,8 @@ public:
 	// 3x3 Floor
 	void AddTemplate3x3Floor();
 
+	const std::string GetDefaultName(int index) const { return nodeDefaultNames.at(index); }
+
 private:
 	std::unique_ptr<myRenderer::shadow::ShadowMapRender> m_shadowMapRenderer = std::make_unique<myRenderer::shadow::ShadowMapRender>();
 	FrameBufferManager* m_frameBuffer;
@@ -191,4 +193,6 @@ private:
 		"Data/Sprites/UI/exit.png"
 	};
 	std::unordered_set<std::shared_ptr<Sprite>> m_spritePreLoad;
+
+	std::vector<std::string> nodeDefaultNames;
 };

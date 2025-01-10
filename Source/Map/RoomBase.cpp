@@ -275,22 +275,24 @@ void RoomBase::GenerateNextRoomAutomatically(
 		// 自身のAABBを配列に保存
 		roomAABBs.emplace_back(m_aabb);
 
-		if (!isLastRoomGenerated)
-		{
-			isLastRoomGenerated = true;
+		//if (!isLastRoomGenerated)
+		//{
+		//	if (m_connectPointDatas.size() == 0) return;
 
-			RoomBase* endRoom = new RoomBase(this, 0, RoomType::FIRST_END, roomAABBs, isLastRoomGenerated);
+		//	isLastRoomGenerated = true;
 
-			if (m_connectPointDatas.size() > 1)
-			{
-				for (int i = 1; i < m_connectPointDatas.size(); i++)
-				{
-					RoomBase* deadEnd = new RoomBase(this, i, RoomType::DEAD_END, roomAABBs, isLastRoomGenerated);
-					AddRoom(deadEnd);
-				}
-			}
-		}
-		else
+		//	RoomBase* endRoom = new RoomBase(this, 0, RoomType::FIRST_END, roomAABBs, isLastRoomGenerated);
+
+		//	if (m_connectPointDatas.size() > 1)
+		//	{
+		//		for (int i = 1; i < m_connectPointDatas.size(); i++)
+		//		{
+		//			RoomBase* deadEnd = new RoomBase(this, i, RoomType::DEAD_END, roomAABBs, isLastRoomGenerated);
+		//			AddRoom(deadEnd);
+		//		}
+		//	}
+		//}
+		//else
 		{
 			// 接続点の数だけ行き止まり用の部屋を生成する
 			for (int i = 0; i < m_connectPointDatas.size(); i++)
@@ -504,7 +506,6 @@ void RoomBase::PlaceMapTile(bool isLeader)
 			modelFileDatas.emplace_back(DUNGEONDATA.GetModelFileDatas((TileType)tileType).at(0));
 		}
 
-		// 先に描画用モデルの読込を行う
 		// 描画用データがあるなら
 		if (modelFileDatas.size() > 0)
 		{
@@ -597,7 +598,16 @@ void RoomBase::PlaceMapTile(bool isLeader)
 					modelTile->SetAngle(tileData.angle);
 					modelTile->SetScale(tileData.scale);
 					modelTile->Update(0);
-					MAPTILES.Register(modelTile);
+
+					// 当たり判定データが無い場合は当たり判定としても使う
+					if (collisionFileDatas.size() <= 0)
+					{
+						MAPTILES.Register(modelTile);
+					}
+					else
+					{
+						GameObjectManager::Instance().Register(modelTile);
+					}
 				}
 			}
 		}

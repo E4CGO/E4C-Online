@@ -45,14 +45,11 @@ namespace ns_RoomData
 	// タイルタイプ
 	enum TileType : uint8_t
 	{
-		// 床タイル
 		FLOOR_01A = 0,
 		FLOOR_01B,
 		FLOOR_02A,
 		FLOOR_03A,
 		FLOOR_CLOUD_01A,
-
-		// 壁タイル
 		WALL_01A,
 		WALL_01B,
 		WALL_02A,
@@ -60,17 +57,11 @@ namespace ns_RoomData
 		WALL_03A,
 		WALL_04A,
 		WALL_CLOUD,
-
-		// アーチタイル
 		ARCH_01A,
 		ARCH_ENTRANCE_01A,
 		ARCH_FLOOR_01A,
-
-		// 階段タイル
 		STAIR_RAILING_01A,
 		STAIR_STEP_01A,
-
-		// 小物タイル
 		CARAMEL_01,
 		CARAMEL_02,
 		CLOUD_01,
@@ -82,11 +73,10 @@ namespace ns_RoomData
 		LOLIPOP_02A,
 		STAR,
 		FIRE_HYDRANT,
-
-		// ゲームオブジェクトタイル
 		PORTAL,
 		SPAWNER,
 		CONNECTPOINT,
+		FOUNTAIN,
 
 		// enumCount
 		TILETYPE_COUNT,

@@ -419,6 +419,7 @@ void DungeonData::InitModelFileDatas()
 	m_modelFileDatas.at(LOLIPOP_02A).emplace_back("Data/Model/DungeonAssets/SM_Lollipop_02a.glb", 4.0f);
 	m_modelFileDatas.at(STAR).emplace_back("Data/Model/DungeonAssets/SM_Star.glb", 4.0f);
 	m_modelFileDatas.at(FIRE_HYDRANT).emplace_back("Data/Model/DungeonAssets/SM_Fire_Hydrant.glb", 4.0f);
+	m_modelFileDatas.at(FOUNTAIN).emplace_back("Data/Model/DungeonAssets/SM_Fountain_01.glb", 4.0f);
 
 	// モデルない組～
 	m_modelFileDatas.at(PORTAL).emplace_back("", 0.0f);
