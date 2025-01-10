@@ -720,7 +720,7 @@ void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
 				}
 			}
 		}
-		ImGui::End();
+
 
 		for (const std::pair<uint8_t, Collider*>& attackCollider : m_pColliders)
 		{

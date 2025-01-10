@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Mathf.h"
+
 using namespace DirectX;
 
 inline XMFLOAT3 operator+(XMFLOAT3 v1, XMFLOAT3 v2) { return XMFLOAT3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z); }
@@ -103,6 +105,17 @@ inline XMFLOAT3 MatrixToAngles(XMMATRIX& quaternion)
 	DirectX::XMFLOAT4X4 mat;
 	DirectX::XMStoreFloat4x4(&mat, quaternion);
 	return MatrixToAngles(mat);
+}
+
+inline XMFLOAT3 GetRandomPointInCircleArea(const XMFLOAT3& center, const float radius)
+{
+	XMFLOAT3 result = center;
+
+	float angle = Mathf::RandomRange(0.0f, DirectX::XM_2PI);
+	float distance = Mathf::RandomRange(0.0f, radius);
+	result += { cosf(angle) * distance, 0.0f, sinf(angle) * distance };
+
+	return result;
 }
 
 inline XMFLOAT2 operator+(XMFLOAT2 v1, XMFLOAT2 v2) { return XMFLOAT2(v1.x + v2.x, v1.y + v2.y); }

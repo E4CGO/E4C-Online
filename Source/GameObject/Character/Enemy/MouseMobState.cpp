@@ -5,7 +5,7 @@
 
 #include "TAKOEngine/Tool/Mathf.h"
 
-namespace enemy
+namespace EnemyState
 {
 
 	namespace mouseMob
@@ -74,7 +74,7 @@ namespace enemy
 			owner->UpdateTarget();
 
 			// 目的地点までのXZ平面での距離判定
-			float distSq = XMFLOAT3HorizontalLengthSq(owner->GetPosition() - owner->GetMoveTargetPosition());
+			float distSq = XMFLOAT3HorizontalLengthSq(owner->GetPosition() - owner->GetTargetPosition());
 
 			// 目的地へ着いた
 			if (distSq < m_ArrivedRadius * m_ArrivedRadius)
@@ -84,7 +84,7 @@ namespace enemy
 			}
 
 			// 目的地点へ移動
-			owner->MoveTo(elapsedTime, DirectX::XMFLOAT3(owner->GetMoveTargetPosition().x, owner->GetPosition().y, owner->GetMoveTargetPosition().z));
+			owner->MoveTo(elapsedTime, DirectX::XMFLOAT3(owner->GetTargetPosition().x, owner->GetPosition().y, owner->GetTargetPosition().z));
 
 			// プレイヤー索敵
 			if (owner->SearchPlayer())
@@ -158,15 +158,21 @@ namespace enemy
 			m_StateTimer -= elapsedTime;
 			m_AttackTimer -= elapsedTime;
 
-			float distSq = XMFLOAT3LengthSq(owner->GetPosition() - owner->GetTarget()->GetPosition());
+			PlayerCharacter* target = PlayerCharacterManager::Instance().GetPlayerCharacterById(owner->GetTarget());
+			if (target == nullptr)
+			{
+				::EnemyState::StateTransition(owner, ::Enemy::STATE::IDLE);
+			}
+
+			float distSq = XMFLOAT3LengthSq(owner->GetPosition() - target->GetPosition());
 
 			// 目的地点へ移動
 			if (distSq > m_AttackRange * m_AttackRange)
 			{
-				owner->MoveTo(elapsedTime, owner->GetTarget()->GetPosition());
+				owner->MoveTo(elapsedTime, target->GetPosition());
 			}
 
-			owner->TurnTo(elapsedTime, owner->GetTarget()->GetPosition());
+			owner->TurnTo(elapsedTime, target->GetPosition());
 
 			// 攻撃範囲に入ったとき攻撃ステートへ遷移
 			if (distSq <= m_AttackRange * m_AttackRange)

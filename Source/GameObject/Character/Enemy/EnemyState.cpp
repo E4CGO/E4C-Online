@@ -4,27 +4,45 @@
 #include "EnemyState.h"
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 
-namespace enemy
+#include "Network/OnlineController.h"
+#include "GameObject/Character/Enemy/EnemyManager.h"
+
+namespace EnemyState
 {
+	/**************************************************************************//**
+	 	@brief		エネミーステート変更関数・自動同期
+		@param[in]	enemy	エネミー参照ポインタ
+		@param[in]	state	ステート
+	*//***************************************************************************/
+	void StateTransition(Enemy* enemy, uint8_t state)
+	{
+		if (!enemy->IsMine())
+		{
+			enemy->GetStateMachine()->ChangeState(Enemy::STATE::IDLE); // デフォルトステート
+			return;
+		}
+		enemy->GetStateMachine()->ChangeState(state);
+
+		if (ONLINE_CONTROLLER->GetState() != Online::Controller::STATE::OFFLINE)
+		{
+			// TODO
+			ENEMIES.RegisterSync(enemy->GetEnemyId());
+		}
+	}
+
 	// 待機ステート
 	void IdleState::Enter()
 	{
-		if (owner->GetModel()->GetCurrentAnimationIndex() >= 0)
-			owner->GetModel()->PlayAnimation(Enemy::Animation::Idle, true);
-		waitTimer = waitTime;
+		m_waitTimer = m_waitTime;
 	}
 	void IdleState::Execute(float elapsedTime)
 	{
-		owner->UpdateTarget();
-		waitTimer -= elapsedTime;
+		if (m_waitTimer == 0.0f) return;
 
-		if (owner->GetTarget() != nullptr)
+		m_waitTimer -= elapsedTime;
+		if (m_waitTimer <= 0.0f)
 		{
-			owner->TurnTo(elapsedTime, owner->GetTarget()->GetPosition());
-			if (waitTimer <= 0.0f)
-			{
-				owner->GetStateMachine()->ChangeState(STATE::TARGET_FOUND);
-			}
+			m_waitTimer = 0.0f;
 		}
 	}
 	void IdleState::Exit()
@@ -34,14 +52,12 @@ namespace enemy
 	// 移動ステート
 	void MoveState::Enter()
 	{
-		if (owner->GetModel()->GetCurrentAnimationIndex() >= 0)
-			owner->GetModel()->PlayAnimation(Enemy::Animation::Walk, true);
 	}
 	void MoveState::Execute(float elapsedTime)
 	{
-		if (owner->MoveTo(elapsedTime, position))
+		if (owner->MoveTo(elapsedTime, owner->GetTargetPosition()))
 		{
-			owner->GetStateMachine()->ChangeState(nextState);
+			StateTransition(owner, static_cast<uint8_t>(m_nextState));
 		}
 	}
 	void MoveState::Exit()
@@ -51,28 +67,21 @@ namespace enemy
 	// 追跡ステート
 	void FollowState::Enter()
 	{
-		if (owner->GetModel()->GetCurrentAnimationIndex() >= 0)
-			owner->GetModel()->PlayAnimation(Enemy::Animation::Walk, true);
 	}
 	void FollowState::Execute(float elapsedTime)
 	{
-
-
-
-		PlayerCharacter* target = owner->GetTarget();
-		if (!target)
+		PlayerCharacter* target = PlayerCharacterManager::Instance().GetPlayerCharacterById(owner->GetTarget());
+		if (target == nullptr)
 		{
-			owner->GetStateMachine()->ChangeState(STATE::IDLE);
+			StateTransition(owner, Enemy::STATE::IDLE);
 			return;
 		}
 
-		owner->MoveTo(elapsedTime, owner->GetTarget()->GetPosition());
+		owner->MoveTo(elapsedTime, target->GetPosition());
 
-		DirectX::XMFLOAT3 diff = owner->GetTarget()->GetPosition() - owner->GetPosition();
-		diff.y = 0; // Y軸無視
-		if (XMFLOAT3LengthSq(diff) < distance * distance)
+		if (XMFLOAT3HorizontalLength(target->GetPosition() - owner->GetPosition()) < m_distance * m_distance)
 		{
-			owner->GetStateMachine()->ChangeState(nextState);
+			StateTransition(owner, static_cast<uint8_t>(m_nextState));
 		}
 	}
 	void FollowState::Exit()
@@ -82,27 +91,21 @@ namespace enemy
 	// 怪我ステート
 	void HurtState::Enter()
 	{
-		owner->SetAnimationSpeed(3.0f);
-		if (owner->GetModel()->GetCurrentAnimationIndex() >= 0)
-			owner->GetModel()->PlayAnimation(Enemy::Animation::Dash_Back, false);
 	}
 	void HurtState::Execute(float elapsedTime)
 	{
 		if (!owner->GetModel()->IsPlayAnimation())
 		{
-			owner->GetStateMachine()->ChangeState(STATE::IDLE);
+			StateTransition(owner, Enemy::STATE::IDLE);
 		}
 	}
 	void HurtState::Exit()
 	{
-		owner->SetAnimationSpeed(1.0f);
 	}
 
 	// 死亡ステート
 	void DeathState::Enter()
 	{
-		if (owner->GetModel()->GetCurrentAnimationIndex() >= 0)
-			owner->GetModel()->PlayAnimation(Enemy::Animation::Defeat, false);
 		for (std::pair<int, Collider*> collider : owner->GetColliders()) collider.second->SetEnable(false);
 	}
 	void DeathState::Execute(float elapsedTime)

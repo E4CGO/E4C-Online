@@ -1,10 +1,10 @@
 ﻿#include "TAKOEngine/Tool/Mathf.h"
 #include "TAKOEngine/Physics/CollisionManager.h"
-#include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Character/Enemy/Enemy.h"
 #include "GameObject/Character/Enemy/SkeletonMinion.h"
 #include "GameObject/Character/Enemy/MouseMob.h"
+#include "GameObject/Character/Enemy/BearBoss.h"
 #include "GameObject/Props/Spawner.h"
 
 Enemy::Enemy(const char* filename, float scaling, ModelObject::RENDER_MODE renderMode) : Character(filename, scaling, renderMode)
@@ -12,15 +12,14 @@ Enemy::Enemy(const char* filename, float scaling, ModelObject::RENDER_MODE rende
 	//SetCollider(Collider::COLLIDER_TYPE::MODEL);
 
 	stateMachine = new StateMachine<Enemy>;
-	stateMachine->RegisterState(enemy::STATE::IDLE, new enemy::IdleState(this, 2.0f));
-	stateMachine->RegisterState(enemy::STATE::HURT, new enemy::HurtState(this));
-	stateMachine->RegisterState(enemy::STATE::DEATH, new enemy::DeathState(this));
+	stateMachine->RegisterState(Enemy::STATE::HURT, new EnemyState::HurtState(this));
+	stateMachine->RegisterState(Enemy::STATE::DEATH, new EnemyState::DeathState(this));
 }
 
 Enemy::~Enemy()
 {
 	delete stateMachine;
-	
+
 	if (m_pSpawner != nullptr)
 	{
 		m_pSpawner->EnemyDestoryCallBack(this);
@@ -91,14 +90,17 @@ void Enemy::Render(const RenderContext& rc)
 }
 void Enemy::OnDamage(int damage)
 {
-	hp -= damage;
-	if (hp > 0)
+	if (IsMine())
 	{
-		stateMachine->ChangeState(enemy::STATE::HURT);
-	}
-	else
-	{
-		stateMachine->ChangeState(enemy::STATE::DEATH);
+		hp -= damage;
+		if (hp > 0)
+		{
+			EnemyState::StateTransition(this, STATE::HURT);
+		}
+		else
+		{
+			EnemyState::StateTransition(this, STATE::DEATH);
+		}
 	}
 
 }
@@ -107,12 +109,12 @@ void Enemy::OnDamage(const ENEMY_COLLISION& hit)
 	hp -= hit.damage;
 	if (hp > 0)
 	{
-		if (hit.power) stateMachine->ChangeState(enemy::STATE::HURT);
+		if (hit.power) stateMachine->ChangeState(Enemy::STATE::HURT);
 		velocity += hit.force;
 	}
 	else
 	{
-		stateMachine->ChangeState(enemy::STATE::DEATH);
+		stateMachine->ChangeState(Enemy::STATE::DEATH);
 	}
 }
 void Enemy::OnDamage(const ATTACK_DATA& hit)
@@ -120,12 +122,12 @@ void Enemy::OnDamage(const ATTACK_DATA& hit)
 	hp -= hit.damage;
 	if (hp > 0)
 	{
-		if (hit.power) stateMachine->ChangeState(enemy::STATE::HURT);
+		if (hit.power) stateMachine->ChangeState(Enemy::STATE::HURT);
 		velocity += hit.force;
 	}
 	else
 	{
-		stateMachine->ChangeState(enemy::STATE::DEATH);
+		stateMachine->ChangeState(Enemy::STATE::DEATH);
 	}
 }
 void Enemy::OnDeath()
@@ -137,16 +139,18 @@ Enemy* Enemy::EnemyFactory(uint8_t enemyType)
 {
 	switch (enemyType)
 	{
-		case ENEMY_TYPE::SKELETON_MINION: return new SkeletonMinion; break;
-		case ENEMY_TYPE::SKELETON_MINION_BOSS: return new SkeletonMinionBoss; break;
-		case ENEMY_TYPE::MOUSE: return new MouseMob; break;
+	case ENEMY_TYPE::SKELETON_MINION: return new SkeletonMinion; break;
+	case ENEMY_TYPE::SKELETON_MINION_BOSS: return new SkeletonMinionBoss; break;
+	case ENEMY_TYPE::MOUSE: return new MouseMob; break;
+	case ENEMY_TYPE::BEAR_BOSS: return new BearBoss; break;
 	}
 	return nullptr;
 }
 
 bool Enemy::SearchPlayer()
 {
-	if (!target) return false;
+	PlayerCharacter* target = PlayerCharacterManager::Instance().GetPlayerCharacterById(m_target);
+	if (target == nullptr) return false;
 
 	const DirectX::XMFLOAT3& closestPlayerPosition = target->GetPosition();
 
@@ -175,10 +179,41 @@ bool Enemy::SearchPlayer()
 	return false;
 }
 
+/**************************************************************************//**
+	@brief	同期用データ生成
+	@return 同期用データ
+*//***************************************************************************/
+const Enemy::SYNC_DATA Enemy::SyncData()
+{
+	return SYNC_DATA{
+	   enemy_id,
+	   enemyType,
+	   { position.x, position.y, position.z },
+	   m_target,
+	   { m_TargetPosition.x, m_TargetPosition.y, m_TargetPosition.z },
+	   angle.y,
+	   static_cast<uint8_t>(stateMachine->GetStateIndex())
+	};
+}
+/**************************************************************************//**
+	@brief		同期を入力
+	@param[in]	data	同期データ
+*//***************************************************************************/
+void Enemy::Sync(const Enemy::SYNC_DATA& data)
+{
+	enemy_id = data.enemy_id;
+	enemyType = data.type;
+	position = { data.position[0],data.position[1], data.position[2] };
+	m_target = data.target_id;
+	m_TargetPosition = { data.targetPosition[0], data.targetPosition[1], data.targetPosition[2] };
+	angle.y = data.rotate;
+	stateMachine->ChangeState(data.state);
+}
+
 void Enemy::SetRandomMoveTargetPosition()
 {
 	float theta = Mathf::RandomRange(-DirectX::XM_PI, DirectX::XM_PI);
 	float range = Mathf::RandomRange(0.0f, m_SearchRange);
-	m_MoveTargetPosition.x = this->m_SpawnPosition.x + sinf(theta) * range;
-	m_MoveTargetPosition.z = this->m_SpawnPosition.z + cosf(theta) * range;
+	m_TargetPosition.x = this->m_SpawnPosition.x + sinf(theta) * range;
+	m_TargetPosition.z = this->m_SpawnPosition.z + cosf(theta) * range;
 }

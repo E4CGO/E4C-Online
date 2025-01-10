@@ -209,6 +209,10 @@ set(Source__GameObject__Props
 source_group("Source\\GameObject\\Props" FILES ${Source__GameObject__Props})
 
 set(Source__GameObject__Character__Enemy
+    "Source/GameObject/Character/Enemy/BearBoss.cpp"
+    "Source/GameObject/Character/Enemy/BearBoss.h"
+    "Source/GameObject/Character/Enemy/BearBossState.cpp"
+    "Source/GameObject/Character/Enemy/BearBossState.h"
     "Source/GameObject/Character/Enemy/Enemy.cpp"
     "Source/GameObject/Character/Enemy/Enemy.h"
     "Source/GameObject/Character/Enemy/EnemyManager.cpp"

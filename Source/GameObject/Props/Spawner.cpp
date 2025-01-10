@@ -31,7 +31,8 @@ void Spawner::Update(float elapsedTime)
 		m_spawnTimer += elapsedTime;
 		while (m_spawnTimer > m_spawnTime)
 		{
-			m_spawnTimer -= m_spawnTime;
+			//m_spawnTimer -= m_spawnTime;
+			m_spawnTimer = 0;
 
 			Online::Controller* onlineController = ONLINE_CONTROLLER;
 			if (onlineController != nullptr && onlineController->GetState() == Online::State::SYNC)
@@ -40,7 +41,8 @@ void Spawner::Update(float elapsedTime)
 			}
 			else
 			{
-				Spawn();
+				Enemy* enemy = Spawn();
+				enemy->SetIsMine();
 			}
 		}
 	}

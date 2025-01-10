@@ -13,7 +13,6 @@
 #include <string>
 #include <algorithm>
 #include <fstream>
-#include <commdlg.h>
 
 #include "Scene/SceneManager.h"
 #include "SceneRoomTest_E4C.h"

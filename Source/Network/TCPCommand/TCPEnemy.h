@@ -40,6 +40,41 @@ namespace Online {
 		bool Send(void* data) override;
 	};
 
+	/**************************************************************************//**
+		@class		TCPEnemySync
+		@brief		エネミー同期処理クラス
+		@par	[説明]
+					エネミー同期データを受信・送信する
+	*//***************************************************************************/
+	class TCPEnemySync : public TCPCommand
+	{
+	public:
+		TCPEnemySync(OnlineController* controller, uint8_t cmd) : TCPCommand(controller, cmd) {};
+		~TCPEnemySync() {};
+
+		// データ受信
+		bool Receive(size_t size) override;
+		// データ送信
+		bool Send(void* data) override;
+	};
+
+	/**************************************************************************//**
+		@class		TCPEnemyOwner
+		@brief		エネミーオーナーの変更
+		@par	[説明]
+					サーバーから担当エネミーの指定
+	*//***************************************************************************/
+	class TCPEnemyOwner : public TCPCommand
+	{
+	public:
+		TCPEnemyOwner(OnlineController* controller, uint8_t cmd) : TCPCommand(controller, cmd) {};
+		~TCPEnemyOwner() {};
+
+		// データ受信
+		bool Receive(size_t size) override;
+		// データ送信 (無し)
+		bool Send(void* data) { return true; }
+	};
 }
 
 #endif // !__ONLINE_TCP_ENEMY_H__
