@@ -1,10 +1,15 @@
 #include "PerlinNoise.h"
 
+
 float NoiseGenerator::fract(float x)
 {
     return x - floor(x);
 }
-
+/**************************************************************************//**
+     @brief    
+    @param[in]    v
+    @return    
+*//***************************************************************************/
 DirectX::XMFLOAT2 NoiseGenerator::fract(DirectX::XMFLOAT2 v)
 {
     DirectX::XMFLOAT2 R{ 0, 0 };
@@ -12,6 +17,11 @@ DirectX::XMFLOAT2 NoiseGenerator::fract(DirectX::XMFLOAT2 v)
     R.y = v.y - floor(v.y);
     return R;
 }
+/**************************************************************************//**
+     @brief    
+    @param[in]    v
+    @return    
+*//***************************************************************************/
 DirectX::XMFLOAT3 NoiseGenerator::fract(DirectX::XMFLOAT3 v)
 {
     DirectX::XMFLOAT3 R;
@@ -20,34 +30,66 @@ DirectX::XMFLOAT3 NoiseGenerator::fract(DirectX::XMFLOAT3 v)
     R.z = v.z - floor(v.z);
     return R;
 }
+/**************************************************************************//**
+     @brief    
+    @param[in]    outFloor
+    @param[in]    outFract
+    @param[in]    x
+*//***************************************************************************/
 void NoiseGenerator::floor_fract(float& outFloor, float& outFract, float x)
 {
     outFloor = floor(x);
     outFract = x - outFloor;
 }
+/**************************************************************************//**
+     @brief    
+    @param[in]    outFloor
+    @param[in]    outFract
+    @param[in]    x
+*//***************************************************************************/
 void NoiseGenerator::floor_fract(int& outFloor, float& outFract, float x)
 {
     float f = floor(x);
     outFloor = int(f);
     outFract = x - f;
 }
-
+/**************************************************************************//**
+     @brief    
+    @param[in]    p
+    @return    
+*//***************************************************************************/
 float NoiseGenerator::value_hash(DirectX::XMFLOAT2 p)
 {
     p = 50.0f * fract(p * 0.3183099f) + DirectX::XMFLOAT2(0.71f, 0.113f);
     return -1.0f + 2.0f * fract(p.x * p.y * (p.x + p.y));
 }
-
+/**************************************************************************//**
+     @brief    
+    @param[in]    t
+    @return    
+*//***************************************************************************/
 DirectX::XMFLOAT2 NoiseGenerator::fade(DirectX::XMFLOAT2 t)
 {
     return t * t * t * (t * (t * 6.0f - 15.0f) + 10.0f);
 }
+/**************************************************************************//**
+     @brief    
+    @param[in]    t
+    @return    
+*//***************************************************************************/
 DirectX::XMFLOAT3 NoiseGenerator::fade(DirectX::XMFLOAT3 t)
 {
     return t * t * t * (t * (t * 6.0f - 15.0f) + 10.0f);
 }
 
-
+/**************************************************************************//**
+     @brief    
+    @param[in]    permutation
+    @param[in]    x
+    @param[in]    y
+    @param[in]    z
+    @return    
+*//***************************************************************************/
 float NoiseGenerator::perlin_grad(int permutation, float x, float y, float z)
 {
     int h = permutation & 15;
@@ -55,6 +97,12 @@ float NoiseGenerator::perlin_grad(int permutation, float x, float y, float z)
     float v = h < 4 ? y : ((h == 12 || h == 14) ? x : z);
     return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
 }
+/**************************************************************************//**
+     @brief    
+    @param[in]    p
+    @param[in]    scale
+    @return    
+*//***************************************************************************/
 float NoiseGenerator::PerlinNoise(DirectX::XMFLOAT3 p, float scale)
 {
     p *= scale;
@@ -103,6 +151,11 @@ float NoiseGenerator::PerlinNoise(DirectX::XMFLOAT3 p, float scale)
 
 
 // https://www.shadertoy.com/view/3d3fWN
+/**************************************************************************//**
+     @brief    
+    @param[in]    x
+    @return    
+*//***************************************************************************/
 DirectX::XMFLOAT3 NoiseGenerator::worley_hash(DirectX::XMFLOAT3 x)
 {
     DirectX::XMFLOAT3 p = fract(x * DirectX::XMFLOAT3(0.1031f, 0.11369f, 0.13787f));
@@ -114,7 +167,12 @@ DirectX::XMFLOAT3 NoiseGenerator::worley_hash(DirectX::XMFLOAT3 x)
     p += p.x * q.x + p.y * q.y + p.z * q.z;
     return fract(DirectX::XMFLOAT3((p.x + p.y) * p.z, (p.x + p.z) + p.y, (p.y + p.z) + p.x)) + 2.0f - 1.0f;
 }
-
+/**************************************************************************//**
+     @brief    
+    @param[in]    p
+    @param[in]    divide
+    @return    
+*//***************************************************************************/
 float NoiseGenerator::WorleyNoise(DirectX::XMFLOAT3 p, float divide)
 {
     DirectX::XMFLOAT3 fl{ 0, 0, 0 }, fr{ 0,0,0 };
