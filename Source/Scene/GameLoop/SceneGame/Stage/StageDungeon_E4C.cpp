@@ -58,56 +58,69 @@ void StageDungeon_E4C::GenerateDungeon()
 			{
 				int orderIndex = 0;
 
-				switch (type)
-				{
-				case RoomType::SIMPLE_ROOM_1:
-					rootRoom = std::make_unique<SimpleRoom1>(
-						nullptr, -1,
-						m_roomAABBs,
-						true,
-						m_roomOrder, orderIndex);
-					break;
+				rootRoom = std::make_unique<RoomBase>(
+					nullptr, -1,
+					type,
+					m_roomAABBs,
+					true,
+					m_roomOrder, orderIndex);
 
-				case RoomType::END_ROOM:
-					rootRoom = std::make_unique<EndRoom1>(
-						nullptr, -1,
-						m_roomAABBs,
-						true,
-						m_roomOrder, orderIndex);
-					break;
+				//switch (type)
+				//{
+				//case RoomType::SIMPLE_ROOM_1:
+				//	rootRoom = std::make_unique<RoomBase>(
+				//		nullptr, -1,
+				//		RoomType::SIMPLE_ROOM_1,
+				//		m_roomAABBs,
+				//		true,
+				//		m_roomOrder, orderIndex);
+				//	break;
 
-				case RoomType::CROSS_ROOM_1:
-					rootRoom = std::make_unique<CrossRoom1>(
-						nullptr, -1,
-						m_roomAABBs,
-						true,
-						m_roomOrder, orderIndex);
-					break;
+				//case RoomType::END_ROOM:
+				//	rootRoom = std::make_unique<RoomBase>(
+				//		nullptr, -1,
+				//		RoomType::END_ROOM,
+				//		m_roomAABBs,
+				//		true,
+				//		m_roomOrder, orderIndex);
+				//	break;
 
-				case RoomType::CROSS_ROOM_2:
-					rootRoom = std::make_unique<CrossRoom2>(
-						nullptr, -1,
-						m_roomAABBs,
-						true,
-						m_roomOrder, orderIndex);
-					break;
+				//case RoomType::CROSS_ROOM_1:
+				//	rootRoom = std::make_unique<RoomBase>(
+				//		nullptr, -1,
+				//		RoomType::CROSS_ROOM_1,
+				//		m_roomAABBs,
+				//		true,
+				//		m_roomOrder, orderIndex);
+				//	break;
 
-				case RoomType::PASSAGE_1:
-					rootRoom = std::make_unique<Passage1>(
-						nullptr, -1,
-						m_roomAABBs,
-						true,
-						m_roomOrder, orderIndex);
-					break;
+				//case RoomType::CROSS_ROOM_2:
+				//	rootRoom = std::make_unique<RoomBase>(
+				//		nullptr, -1,
+				//		RoomType::CROSS_ROOM_2,
+				//		m_roomAABBs,
+				//		true,
+				//		m_roomOrder, orderIndex);
+				//	break;
 
-				case RoomType::DEAD_END:
-					rootRoom = std::make_unique<DeadEndRoom>(
-						nullptr, -1,
-						m_roomAABBs,
-						true,
-						m_roomOrder, orderIndex);
-					break;
-				}
+				//case RoomType::PASSAGE_1:
+				//	rootRoom = std::make_unique<RoomBase>(
+				//		nullptr, -1,
+				//		RoomType::PASSAGE_1,
+				//		m_roomAABBs,
+				//		true,
+				//		m_roomOrder, orderIndex);
+				//	break;
+
+				//case RoomType::DEAD_END:
+				//	rootRoom = std::make_unique<RoomBase>(
+				//		nullptr, -1,
+				//		RoomType::DEAD_END,
+				//		m_roomAABBs,
+				//		true,
+				//		m_roomOrder, orderIndex);
+				//	break;
+				//}
 			}
 		}
 		// 生成順番に登録する
@@ -124,56 +137,69 @@ void StageDungeon_E4C::GenerateDungeon()
 
 		int orderIndex = 1;
 
-		switch (m_roomOrder.front())
-		{
-		case RoomType::SIMPLE_ROOM_1:
-			rootRoom = std::make_unique<SimpleRoom1>(
-				nullptr, -1,
-				m_roomAABBs,
-				false,
-				m_roomOrder, orderIndex);
-			break;
+		rootRoom = std::make_unique<RoomBase>(
+			nullptr, -1,
+			static_cast<ns_RoomData::RoomType>(m_roomOrder.front()),
+			m_roomAABBs,
+			false,
+			m_roomOrder, orderIndex);
 
-		case RoomType::END_ROOM:
-			rootRoom = std::make_unique<EndRoom1>(
-				nullptr, -1,
-				m_roomAABBs,
-				false,
-				m_roomOrder, orderIndex);
-			break;
+		//switch (m_roomOrder.front())
+		//{
+		//case RoomType::SIMPLE_ROOM_1:
+		//	rootRoom = std::make_unique<RoomBase>(
+		//		nullptr, -1,
+		//		RoomType::SIMPLE_ROOM_1,
+		//		m_roomAABBs,
+		//		false,
+		//		m_roomOrder, orderIndex);
+		//	break;
 
-		case RoomType::CROSS_ROOM_1:
-			rootRoom = std::make_unique<CrossRoom1>(
-				nullptr, -1,
-				m_roomAABBs,
-				false,
-				m_roomOrder, orderIndex);
-			break;
+		//case RoomType::END_ROOM:
+		//	rootRoom = std::make_unique<RoomBase>(
+		//		nullptr, -1,
+		//		RoomType::END_ROOM,
+		//		m_roomAABBs,
+		//		false,
+		//		m_roomOrder, orderIndex);
+		//	break;
 
-		case RoomType::CROSS_ROOM_2:
-			rootRoom = std::make_unique<CrossRoom2>(
-				nullptr, -1,
-				m_roomAABBs,
-				false,
-				m_roomOrder, orderIndex);
-			break;
+		//case RoomType::CROSS_ROOM_1:
+		//	rootRoom = std::make_unique<RoomBase>(
+		//		nullptr, -1,
+		//		RoomType::CROSS_ROOM_1,
+		//		m_roomAABBs,
+		//		false,
+		//		m_roomOrder, orderIndex);
+		//	break;
 
-		case RoomType::PASSAGE_1:
-			rootRoom = std::make_unique<Passage1>(
-				nullptr, -1,
-				m_roomAABBs,
-				false,
-				m_roomOrder, orderIndex);
-			break;
+		//case RoomType::CROSS_ROOM_2:
+		//	rootRoom = std::make_unique<RoomBase>(
+		//		nullptr, -1,
+		//		RoomType::CROSS_ROOM_2,
+		//		m_roomAABBs,
+		//		false,
+		//		m_roomOrder, orderIndex);
+		//	break;
 
-		case RoomType::DEAD_END:
-			rootRoom = std::make_unique<DeadEndRoom>(
-				nullptr, -1,
-				m_roomAABBs,
-				false,
-				m_roomOrder, orderIndex);
-			break;
-		}
+		//case RoomType::PASSAGE_1:
+		//	rootRoom = std::make_unique<RoomBase>(
+		//		nullptr, -1,
+		//		RoomType::PASSAGE_1,
+		//		m_roomAABBs,
+		//		false,
+		//		m_roomOrder, orderIndex);
+		//	break;
+
+		//case RoomType::DEAD_END:
+		//	rootRoom = std::make_unique<RoomBase>(
+		//		nullptr, -1,
+		//		RoomType::DEAD_END,
+		//		m_roomAABBs,
+		//		false,
+		//		m_roomOrder, orderIndex);
+		//	break;
+		//}
 	}
 }
 
@@ -188,7 +214,6 @@ void StageDungeon_E4C::Initialize()
 	LightManager::Instance().SetAmbientColor({ 0.3f, 0.3f, 0.3f, 0.0f });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
-	dl->SetPosition({ 0, 20, 0 });
 	LightManager::Instance().Register(dl);
 
 	// プレイヤー
@@ -216,7 +241,11 @@ void StageDungeon_E4C::Initialize()
 	cameraController->SetPlayer(player);
 	CURSOR_OFF;
 
-	m_roomOrder.emplace_back(RoomType::SIMPLE_ROOM_1);
+	m_roomOrder.emplace_back(RoomType::TUTO_START);
+	m_roomOrder.emplace_back(RoomType::TUTO_NOTHINGROOM);
+	m_roomOrder.emplace_back(RoomType::TUTO_SPAWNERROOM);
+	m_roomOrder.emplace_back(RoomType::TUTO_NOTHINGROOM);
+	m_roomOrder.emplace_back(RoomType::TUTO_END);
 
 	GenerateDungeon();
 
@@ -224,7 +253,7 @@ void StageDungeon_E4C::Initialize()
 	RoomBase* lastRoom = rootRoom->GetFarthestChild().at(std::rand() % rootRoom->GetFarthestChild().size());
 
 	TeleportToOpenworld* teleporter = new TeleportToOpenworld();
-	teleporter->SetPosition(lastRoom->GetCenterPos());
+	teleporter->SetPosition(lastRoom->GetPosition() + DUNGEONDATA.GetRoomGenerateSetting(lastRoom->GetRoomType()).portalPosition);
 	teleporter->SetAngle({ 90.0f * RADIAN1, 0.0f, 0.0f });
 	teleporter->SetScale({ 10.0f, 10.0f, 1.0f });
 	GameObjectManager::Instance().Register(teleporter);
@@ -239,12 +268,19 @@ void StageDungeon_E4C::Initialize()
 	MAPTILES.CreateSpatialIndex(5, 7);
 
 	Console::Instance().Open();
+
+	// 影初期化
+	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
 }
 
 void StageDungeon_E4C::Finalize()
 {
+	ENEMIES.Clear();
+	MAPTILES.Clear();
+
 	Console::Instance().Close();
 	GameObjectManager::Instance().Clear();
+	T_GRAPHICS.GetShadowRenderer()->Finalize();
 }
 
 void StageDungeon_E4C::Update(float elapsedTime)
@@ -292,11 +328,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 		T_INPUT.KeepCursorCenter();
 	}
 
-	for (auto& model : PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetModels())
-	{
-		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
-	}
-
+	// キャラクターの影登録
 	for (auto& model : PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetModels())
 	{
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
@@ -358,7 +390,7 @@ void StageDungeon_E4C::RenderDX12()
 		// シャドウマップ
 		{
 			// TODO: 影
-			//T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
+			T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
 			rc.shadowMap.shadow_srv_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSRV();
 			rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();
 		}

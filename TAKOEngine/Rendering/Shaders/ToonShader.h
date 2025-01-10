@@ -1,5 +1,5 @@
 ﻿//! @file ToonShader.h
-//! @note 
+//! @note
 
 #ifndef __GRAHICS_TOON_SHADER_H__
 #define __GRAHICS_TOON_SHADER_H__
@@ -26,7 +26,7 @@ public:
 private:
 	// レンダーステート設定
 	void SetRenderState(const RenderContext& rc) override;
-	
+
 	// シェーダーリソースビュー設定
 	void SetShaderResourceView(const ModelResource::Mesh& mesh, ID3D11DeviceContext*& dc) override;
 
@@ -43,7 +43,7 @@ private:
 class ToonShaderDX12 : public ModelShaderDX12
 {
 public:
-	ToonShaderDX12(ID3D12Device* device, bool instancing = false); 
+	ToonShaderDX12(ID3D12Device* device, bool instancing = false);
 	~ToonShaderDX12() override;
 
 	void Finalize() override {};

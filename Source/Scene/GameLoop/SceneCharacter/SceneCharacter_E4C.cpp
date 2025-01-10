@@ -84,6 +84,9 @@ void SceneCharacter_E4C::Initialize()
 	stateMachine->RegisterState(STATE::CHARACTER_CREATION, new SceneCharacter_E4CState::CharacterCreationState(this));
 	stateMachine->RegisterState(STATE::START, new SceneCharacter_E4CState::StartState(this));
 	stateMachine->SetState(STATE::INIT);
+
+	// 影初期化
+	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
 }
 
 /**************************************************************************//**
@@ -101,6 +104,8 @@ void SceneCharacter_E4C::Finalize()
 	UI.Clear();
 	shadowMapRenderer->Clear();
 	CameraManager::Instance().Clear();
+
+	T_GRAPHICS.GetShadowRenderer()->Finalize();
 }
 
 /**************************************************************************//**

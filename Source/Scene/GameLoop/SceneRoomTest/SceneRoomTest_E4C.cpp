@@ -20,7 +20,7 @@
 
 #include "Map/MapTile.h"
 #include "Map/MapTileManager.h"
-#include "Map/CrossRoom1.h"
+//#include "Map/CrossRoom1.h"
 
 #include "GameData.h"
 
@@ -159,7 +159,7 @@ void SceneRoomTest_E4C::RenderDX12()
 		//T_GRAPHICS.GetDebugRenderer()->DrawCube(roomSetting.aabb.position, p, { 1.0f, 1.0f, 1.0f, 1.0f });
 		//T_GRAPHICS.GetDebugRenderer()->DrawCylinder(roomSetting.aabb.position, 10, 10, { 1.0f, 1.0f, 1.0f, 1.0f });
 
-		T_GRAPHICS.GetDebugRenderer()->DrawCylinder({0.0f, 0.0f, 0.0f}, 16.0f, 1.5f, {1,0,0,1});
+		T_GRAPHICS.GetDebugRenderer()->DrawCylinder({ 0.0f, 0.0f, 0.0f }, 16.0f, 1.5f, { 1,0,0,1 });
 		//T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, spawnerData.searchRadius, 1.5f, { 1,0,1,1 });
 
 		// レンダーターゲットへの書き込み終了待ち
@@ -168,7 +168,6 @@ void SceneRoomTest_E4C::RenderDX12()
 
 	// デバッグ描画
 	{
-
 	}
 
 	// ポストエフェクト描画
@@ -436,38 +435,38 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 			}
 			if (ImGui::BeginMenu("New")) {
 				if (ImGui::BeginMenu("TileNode")) {
-					if (ImGui::MenuItem("Floor01a"))		AddTileNode("Floor",		TileType::FLOOR_01A);
-					if (ImGui::MenuItem("Floor01b"))		AddTileNode("Floor",		TileType::FLOOR_01B);
-					if (ImGui::MenuItem("Floor02a"))		AddTileNode("Floor",		TileType::FLOOR_02A);
-					if (ImGui::MenuItem("Floor03a"))		AddTileNode("Floor",		TileType::FLOOR_03A);
-					if (ImGui::MenuItem("FloorCloud01a"))	AddTileNode("FloorCloud",	TileType::FLOOR_CLOUD_01A);
+					if (ImGui::MenuItem("Floor01a"))		AddTileNode("Floor", TileType::FLOOR_01A);
+					if (ImGui::MenuItem("Floor01b"))		AddTileNode("Floor", TileType::FLOOR_01B);
+					if (ImGui::MenuItem("Floor02a"))		AddTileNode("Floor", TileType::FLOOR_02A);
+					if (ImGui::MenuItem("Floor03a"))		AddTileNode("Floor", TileType::FLOOR_03A);
+					if (ImGui::MenuItem("FloorCloud01a"))	AddTileNode("FloorCloud", TileType::FLOOR_CLOUD_01A);
 
-					if (ImGui::MenuItem("Wall01a"))			AddTileNode("Wall",			TileType::WALL_01A);
-					if (ImGui::MenuItem("Wall01b"))			AddTileNode("Wall",			TileType::WALL_01B);
-					if (ImGui::MenuItem("Wall02a"))			AddTileNode("Wall",			TileType::WALL_02A);
-					if (ImGui::MenuItem("Wall02b"))			AddTileNode("Wall",			TileType::WALL_02B);
-					if (ImGui::MenuItem("Wall03a"))			AddTileNode("Wall",			TileType::WALL_03A);
-					if (ImGui::MenuItem("Wall04a"))			AddTileNode("Wall",			TileType::WALL_04A);
-					if (ImGui::MenuItem("WallCloud"))		AddTileNode("WallCloud",	TileType::WALL_CLOUD);
+					if (ImGui::MenuItem("Wall01a"))			AddTileNode("Wall", TileType::WALL_01A);
+					if (ImGui::MenuItem("Wall01b"))			AddTileNode("Wall", TileType::WALL_01B);
+					if (ImGui::MenuItem("Wall02a"))			AddTileNode("Wall", TileType::WALL_02A);
+					if (ImGui::MenuItem("Wall02b"))			AddTileNode("Wall", TileType::WALL_02B);
+					if (ImGui::MenuItem("Wall03a"))			AddTileNode("Wall", TileType::WALL_03A);
+					if (ImGui::MenuItem("Wall04a"))			AddTileNode("Wall", TileType::WALL_04A);
+					if (ImGui::MenuItem("WallCloud"))		AddTileNode("WallCloud", TileType::WALL_CLOUD);
 
-					if (ImGui::MenuItem("Arch01a"))			AddTileNode("Arch",			TileType::ARCH_01A);
-					if (ImGui::MenuItem("ArchEntrance01a"))	AddTileNode("ArchEntrance",	TileType::ARCH_ENTRANCE_01A);
-					if (ImGui::MenuItem("ArchFloor01a"))	AddTileNode("ArchFloor",	TileType::ARCH_FLOOR_01A);
+					if (ImGui::MenuItem("Arch01a"))			AddTileNode("Arch", TileType::ARCH_01A);
+					if (ImGui::MenuItem("ArchEntrance01a"))	AddTileNode("ArchEntrance", TileType::ARCH_ENTRANCE_01A);
+					if (ImGui::MenuItem("ArchFloor01a"))	AddTileNode("ArchFloor", TileType::ARCH_FLOOR_01A);
 
-					if (ImGui::MenuItem("StairRailing01a"))	AddTileNode("StairRailing",	TileType::STAIR_RAILING_01A);
-					if (ImGui::MenuItem("StairStep01a"))	AddTileNode("StairStep",	TileType::STAIR_STEP_01A);
+					if (ImGui::MenuItem("StairRailing01a"))	AddTileNode("StairRailing", TileType::STAIR_RAILING_01A);
+					if (ImGui::MenuItem("StairStep01a"))	AddTileNode("StairStep", TileType::STAIR_STEP_01A);
 
-					if (ImGui::MenuItem("Caramel01"))		AddTileNode("Caramel",		TileType::CARAMEL_01);
-					if (ImGui::MenuItem("Caramel02"))		AddTileNode("Caramel",		TileType::CARAMEL_02);
-					if (ImGui::MenuItem("Cloud01"))			AddTileNode("Cloud",		TileType::CLOUD_01);
-					if (ImGui::MenuItem("Cloud02"))			AddTileNode("Cloud",		TileType::CLOUD_02);
-					if (ImGui::MenuItem("Cream01"))			AddTileNode("Cream",		TileType::CREAM_01);
-					if (ImGui::MenuItem("Cream02"))			AddTileNode("Cream",		TileType::CREAM_02);
-					if (ImGui::MenuItem("Lolipop01a"))		AddTileNode("Lolipop",		TileType::LOLIPOP_01A);
-					if (ImGui::MenuItem("Lolipop01b"))		AddTileNode("Lolipop",		TileType::LOLIPOP_01B);
-					if (ImGui::MenuItem("Lolipop02a"))		AddTileNode("Lolipop",		TileType::LOLIPOP_02A);
-					if (ImGui::MenuItem("Star"))			AddTileNode("Star",			TileType::STAR);
-					if (ImGui::MenuItem("FireHydrant"))		AddTileNode("FireHydrant",	TileType::FIRE_HYDRANT);
+					if (ImGui::MenuItem("Caramel01"))		AddTileNode("Caramel", TileType::CARAMEL_01);
+					if (ImGui::MenuItem("Caramel02"))		AddTileNode("Caramel", TileType::CARAMEL_02);
+					if (ImGui::MenuItem("Cloud01"))			AddTileNode("Cloud", TileType::CLOUD_01);
+					if (ImGui::MenuItem("Cloud02"))			AddTileNode("Cloud", TileType::CLOUD_02);
+					if (ImGui::MenuItem("Cream01"))			AddTileNode("Cream", TileType::CREAM_01);
+					if (ImGui::MenuItem("Cream02"))			AddTileNode("Cream", TileType::CREAM_02);
+					if (ImGui::MenuItem("Lolipop01a"))		AddTileNode("Lolipop", TileType::LOLIPOP_01A);
+					if (ImGui::MenuItem("Lolipop01b"))		AddTileNode("Lolipop", TileType::LOLIPOP_01B);
+					if (ImGui::MenuItem("Lolipop02a"))		AddTileNode("Lolipop", TileType::LOLIPOP_02A);
+					if (ImGui::MenuItem("Star"))			AddTileNode("Star", TileType::STAR);
+					if (ImGui::MenuItem("FireHydrant"))		AddTileNode("FireHydrant", TileType::FIRE_HYDRANT);
 
 					//if (ImGui::MenuItem("Portal"))			AddTileNode("Portal",		TileType::PORTAL);
 					//if (ImGui::MenuItem("ConnectPoint"))	AddTileNode("ConnectPoint",	TileType::CONNECTPOINT);
@@ -516,6 +515,7 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 				if (selectionNode == node) nodeFlags |= ImGuiTreeNodeFlags_Selected;
 				if (node) {
 					ImGui::PushID(index);
+
 					if (ImGui::TreeNodeEx(node->GetName().c_str(), nodeFlags)) {
 						if (ImGui::IsItemFocused()) selectionNode = node;
 					}
@@ -597,7 +597,6 @@ void SceneRoomTest_E4C::AddConnectPoint(
 	// 追加したノードを選択させる
 	selectionNode = newNode;
 }
-
 
 void SceneRoomTest_E4C::DuplicateNode()
 {
@@ -710,7 +709,7 @@ void TileNode::DrawDebugGUI()
 			name = NODES.GetUniqueName(newName);
 		}
 	}
-	
+
 	// pos
 	ImGui::DragFloat3("Position", &position.x, 0.1f);
 	// angle
@@ -772,7 +771,7 @@ void SpawnerNode::DrawDebugGUI()
 	}
 	// scale
 	ImGui::DragFloat3("Scale", &scale.x, 0.1f);
-	
+
 	// スポナーデータ
 	if (ImGui::TreeNodeEx("SpawnerData", ImGuiTreeNodeFlags_DefaultOpen)) {
 		// enemyType

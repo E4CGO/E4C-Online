@@ -13,7 +13,7 @@ GSInput main(
 {
     GSInput output;
 	
-    output.Position = position;
+    output.Position = mul(position, WorldMatrix);
     output.texcoord = texcoord;
     output.Color = color;
 	
