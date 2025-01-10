@@ -77,7 +77,6 @@ public:
 	const bool IsMine() const { return m_isMine; }
 	void SetMine(bool flag = true) { m_isMine = flag; }
 
-<<<<<<<<< Temporary merge branch 1
 	void SetRandomMoveTargetPosition();
 	bool SearchPlayer();
 

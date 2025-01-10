@@ -63,7 +63,7 @@ private:
 	std::unordered_map<std::string, std::unique_ptr<ModelObject>> models;
 
 	std::unique_ptr<ModelObject> sky;
-	std::unique_ptr<MouseMob> mouse;
+	//std::unique_ptr<MouseMob> mouse;
 	std::unique_ptr<SpriteDX12>			m_sprites[8];
 
 	std::unique_ptr<Plane> portalSquare;

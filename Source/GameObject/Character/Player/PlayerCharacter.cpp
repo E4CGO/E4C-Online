@@ -605,43 +605,43 @@ void PlayerCharacter::Render(const RenderContext& rc)
 	m_pMoveCollider->DrawDebugPrimitive({ 1, 1, 1, 1 });
 	if (IsPlayer())
 	{
-		ImVec2 pos = ImGui::GetMainViewport()->Pos;
-		ImGui::SetNextWindowPos(ImVec2(pos.x + 10, pos.y + 10), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowSize(ImVec2(300, 450), ImGuiCond_FirstUseEver);
+		//ImVec2 pos = ImGui::GetMainViewport()->Pos;
+		//ImGui::SetNextWindowPos(ImVec2(pos.x + 10, pos.y + 10), ImGuiCond_FirstUseEver);
+		//ImGui::SetNextWindowSize(ImVec2(300, 450), ImGuiCond_FirstUseEver);
 
-		if (ImGui::Begin("AttackCollider", nullptr, ImGuiWindowFlags_None))
-		{
-			for (const std::pair<uint8_t, Collider*>& attackCollider : m_pColliders)
-			{
-				if (attackCollider.first == COLLIDER_ID::COL_BODY) continue;
+		//if (ImGui::Begin("AttackCollider", nullptr, ImGuiWindowFlags_None))
+		//{
+		//	for (const std::pair<uint8_t, Collider*>& attackCollider : m_pColliders)
+		//	{
+		//		if (attackCollider.first == COLLIDER_ID::COL_BODY) continue;
 
-				std::string name = "Attack" + std::to_string(attackCollider.first + 1);
-				if (ImGui::TreeNode(name.c_str()))
-				{
-					float radius = attackCollider.second->GetSphere().radius;
-					XMFLOAT3 offset = attackCollider.second->GetSphere().position * scale;
-					//float hitStartRate = attackCollider.second->GetHitStartRate() * 100.0f;	// %表示に
-					//float hitEndRate = attackCollider.second->GetHitEndRate() * 100.0f;		// %表示に
+		//		std::string name = "Attack" + std::to_string(attackCollider.first + 1);
+		//		if (ImGui::TreeNode(name.c_str()))
+		//		{
+		//			float radius = attackCollider.second->GetSphere().radius;
+		//			XMFLOAT3 offset = attackCollider.second->GetSphere().position * scale;
+		//			//float hitStartRate = attackCollider.second->GetHitStartRate() * 100.0f;	// %表示に
+		//			//float hitEndRate = attackCollider.second->GetHitEndRate() * 100.0f;		// %表示に
 
-					ImGui::InputFloat("radius", &radius);
-					ImGui::InputFloat3("offset", &offset.x);
-					//ImGui::InputFloat("hitStartRate(%)", &hitStartRate);
-					//if (hitStartRate < 0.0f)	hitStartRate = 0.0f;
-					//if (hitStartRate > hitEndRate)	hitStartRate = hitEndRate;
-					//ImGui::InputFloat("hitEndRate(%)", &hitEndRate);
-					//if (hitEndRate < hitStartRate)	hitEndRate = hitStartRate;
-					//if (hitEndRate > 100.0f)	hitEndRate = 100.0f;
+		//			ImGui::InputFloat("radius", &radius);
+		//			ImGui::InputFloat3("offset", &offset.x);
+		//			//ImGui::InputFloat("hitStartRate(%)", &hitStartRate);
+		//			//if (hitStartRate < 0.0f)	hitStartRate = 0.0f;
+		//			//if (hitStartRate > hitEndRate)	hitStartRate = hitEndRate;
+		//			//ImGui::InputFloat("hitEndRate(%)", &hitEndRate);
+		//			//if (hitEndRate < hitStartRate)	hitEndRate = hitStartRate;
+		//			//if (hitEndRate > 100.0f)	hitEndRate = 100.0f;
 
-					Sphere sphere(offset / scale, radius);
-					attackCollider.second->SetParam(sphere);
-					//attackCollider.second->SetHitStartRate(hitStartRate * 0.01f);
-					//attackCollider.second->SetHitEndRate(hitEndRate * 0.01f);
+		//			Sphere sphere(offset / scale, radius);
+		//			attackCollider.second->SetParam(sphere);
+		//			//attackCollider.second->SetHitStartRate(hitStartRate * 0.01f);
+		//			//attackCollider.second->SetHitEndRate(hitEndRate * 0.01f);
 
-					ImGui::TreePop();
-				}
-			}
-		}
-		ImGui::End();
+		//			ImGui::TreePop();
+		//		}
+		//	}
+		//}
+		//ImGui::End();
 
 		for (const std::pair<uint8_t, Collider*>& attackCollider : m_pColliders)
 		{

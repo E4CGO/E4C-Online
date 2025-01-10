@@ -59,9 +59,9 @@ void StageOpenWorld_E4C::Initialize()
 		models["boss"]->SetAnimation(0, true);
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 250.0f, ModelObject::RENDER_MODE::DX11);
-		mouse = std::make_unique<MouseMob>(.5f);
-		mouse->SetPosition({ 20.0, 0.0f, 10.0f });
-		mouse->SetSpawnPosition({ 20.0, 0.0f, 10.0f });
+		//mouse = std::make_unique<MouseMob>(.5f);
+		//mouse->SetPosition({ 20.0, 0.0f, 10.0f });
+		//mouse->SetSpawnPosition({ 20.0, 0.0f, 10.0f });
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 70.0f, ModelObject::RENDER_MODE::DX11);
 		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
@@ -80,9 +80,9 @@ void StageOpenWorld_E4C::Initialize()
 		models.emplace("boss", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMboss_1205.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON));
 		models["boss"]->SetPosition({ 10.0, 0.0f, 10.0f });
 
-		mouse = std::make_unique<MouseMob>(.5f, ModelObject::RENDER_MODE::DX12);
-		mouse->SetPosition({ 20.0, 0.0f, 10.0f });
-		mouse->SetSpawnPosition({ 20.0, 0.0f, 10.0f });
+		//mouse = std::make_unique<MouseMob>(.5f, ModelObject::RENDER_MODE::DX12);
+		//mouse->SetPosition({ 20.0, 0.0f, 10.0f });
+		//mouse->SetSpawnPosition({ 20.0, 0.0f, 10.0f });
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 250.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
 		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
@@ -207,8 +207,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 
 	teleporter->Update(elapsedTime);
 
-	mouse->Update(elapsedTime);
-
 	portalSquare->Update(elapsedTime);
 	runningDust1->Update(elapsedTime);
 
@@ -256,8 +254,6 @@ void StageOpenWorld_E4C::Render()
 
 	SpawnerManager::Instance().Render(rc);
 
-	mouse->Render(rc);
-
 	ENEMIES.Render(rc);
 	portalSquare->Render(rc);
 	runningDust1->Render(rc);
@@ -299,8 +295,6 @@ void StageOpenWorld_E4C::RenderDX12()
 			rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();
 		}
 
-		mouse->RenderDX12(rc);
-
 		// プレイヤー
 		PlayerCharacterManager::Instance().RenderDX12(rc);
 
@@ -338,6 +332,9 @@ void StageOpenWorld_E4C::RenderDX12()
 
 		T_TEXT.EndDX12();
 	}
+
+	// ImGUI描画
+	//T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
 
 	T_GRAPHICS.End();
 }
