@@ -59,6 +59,7 @@ enum class ModelShaderDX12Id
 	Skydome,
 	shadowMap,
 	Plane,
+	PortalSquare,
 
 	EnumCount
 };
@@ -257,7 +258,7 @@ public:
 
 	void FinishDX12();
 
-	const Descriptor* UpdateSceneConstantBuffer(const Camera* camera);
+	const Descriptor* UpdateSceneConstantBuffer(const Camera* camera, float timerGlobalTime, float timerGlobalDeltaTime);
 
 	// テクスチャ読み込み
 	HRESULT LoadTexture(const char* filename, ID3D12Resource** d3d_resource);

@@ -59,6 +59,11 @@ public:
 	void RenderDX12() override;
 protected:
 	void OnPhase() override;
+
+private:
+	// シーンGUI描画
+	void DrawSceneGUI();
+
 protected:
 	SceneGame_E4C* m_pScene;
 

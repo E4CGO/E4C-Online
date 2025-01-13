@@ -16,9 +16,10 @@ void SceneTitle_E4CState::InitState::Enter()
 
 	m_imgLogo = new WidgetImage("Data/Sprites/UI/Title/title_logo.png");
 	m_imgLogo->SetPosition({ SCREEN_W * .64f,  SCREEN_H * .15f });
-	m_imgLogo->SetSize({ m_imgLogo->GetSize().x * .5f, m_imgLogo->GetSize().y * .5f });
+	m_imgLogo->SetSize({ m_imgLogo->GetSize().x * .5f * SCREEN_W / 1920.0f, m_imgLogo->GetSize().y * .5f * SCREEN_H / 1080.0f });
 	UI.Register(m_imgLogo);
 
+	// TODO:
 	//for (int i = 0; i < m_MenuOptions.size(); i++)
 	//{
 	//	std::string spriteName = "Data/Sprites/UI/Title/" + m_MenuOptions[i] + "_d.png";
@@ -36,28 +37,28 @@ void SceneTitle_E4CState::InitState::Enter()
 		owner->GetStateMachine()->ChangeState(SceneTitle_E4C::STATE::START);
 		});
 	m_btnStart->SetPosition({ SCREEN_W * .7f, SCREEN_H * 0.5f });
-	m_btnStart->SetSize({ m_btnStart->GetSize().x * .5f , m_btnStart->GetSize().y * .5f });
+	m_btnStart->SetSize({ m_btnStart->GetSize().x * .5f * SCREEN_W / 1920.0f, m_btnStart->GetSize().y * .5f * SCREEN_H / 1080.0f });
 	UI.Register(m_btnStart);
 
 	m_btnOption = new WidgetButtonImage("", "Data/Sprites/UI/Title/option_d.png", "Data/Sprites/UI/Title/option_h.png", [&](WidgetButton*) {
 		owner->GetStateMachine()->ChangeState(SceneTitle_E4C::STATE::OPTION);
 		});
 	m_btnOption->SetPosition({ SCREEN_W * .7f, SCREEN_H * 0.5f + m_btnStart->GetSize().y * 1.2f * 1.0f });
-	m_btnOption->SetSize({ m_btnOption->GetSize().x * .5f , m_btnOption->GetSize().y * .5f });
+	m_btnOption->SetSize({ m_btnOption->GetSize().x * .5f * SCREEN_W / 1920.0f, m_btnOption->GetSize().y * .5f * SCREEN_H / 1080.0f });
 	UI.Register(m_btnOption);
 
 	m_btnCredits = new WidgetButtonImage("", "Data/Sprites/UI/Title/credits_d.png", "Data/Sprites/UI/Title/credits_h.png", [&](WidgetButton*) {
 		owner->GetStateMachine()->ChangeState(SceneTitle_E4C::STATE::CREDITS);
 		});
 	m_btnCredits->SetPosition({ SCREEN_W * .7f, SCREEN_H * 0.5f + m_btnStart->GetSize().y * 1.2f * 2.0f });
-	m_btnCredits->SetSize({ m_btnCredits->GetSize().x * .5f ,  m_btnCredits->GetSize().y * .5f });
+	m_btnCredits->SetSize({ m_btnCredits->GetSize().x * .5f * SCREEN_W / 1920.0f,  m_btnCredits->GetSize().y * .5f * SCREEN_H / 1080.0f });
 	UI.Register(m_btnCredits);
 
 	m_btnExit = new WidgetButtonImage("", "Data/Sprites/UI/Title/exit_d.png", "Data/Sprites/UI/Title/exit_h.png", [&](WidgetButton*) {
 		owner->GetStateMachine()->ChangeState(SceneTitle_E4C::STATE::EXIT);
 		});
 	m_btnExit->SetPosition({ SCREEN_W * .7f, SCREEN_H * 0.5f + m_btnStart->GetSize().y * 1.2f * 3.0f });
-	m_btnExit->SetSize({ m_btnExit->GetSize().x * .5f, m_btnExit->GetSize().y * .5f });
+	m_btnExit->SetSize({ m_btnExit->GetSize().x * .5f * SCREEN_W / 1920.0f, m_btnExit->GetSize().y * .5f * SCREEN_H / 1080.0f });
 	UI.Register(m_btnExit);
 }
 
@@ -109,14 +110,6 @@ void SceneTitle_E4CState::OptionState::Enter()
 	m_settingWindow = new WidgetSettingWindow;
 
 	UI.Register(m_settingWindow);
-
-	m_btnBack = new WidgetButtonImage("", "Data/Sprites/UI/back.png", [&](WidgetButton*) {
-		owner->GetStateMachine()->ChangeState(SceneTitle_E4C::STATE::INIT);
-		});
-	m_btnBack->SetPosition({ SCREEN_W * .8f, SCREEN_H * 0.8f });
-	m_btnBack->SetSize({ m_btnBack->GetSize().x,  m_btnBack->GetSize().y });
-
-	UI.Register(m_btnBack);
 }
 /**************************************************************************//**
 	@brief	オープション画面アップデート
@@ -124,6 +117,10 @@ void SceneTitle_E4CState::OptionState::Enter()
 *//***************************************************************************/
 void SceneTitle_E4CState::OptionState::Execute(float elapsedTime)
 {
+	if (m_settingWindow->IsEnd())
+	{
+		owner->GetStateMachine()->ChangeState(SceneTitle_E4C::STATE::INIT);
+	}
 }
 /**************************************************************************//**
 	@brief	切り替え終了

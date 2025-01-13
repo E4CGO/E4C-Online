@@ -70,6 +70,7 @@ public:
 
 	// シェーダー設定
 	void SetShader(const ModelShaderId id) { m_shaderId = id; };
+	void SetShaderDX12(const ModelShaderDX12Id id) { m_dx12_ShaderId = id; };
 	void SetShader(const char* modelName, const ModelShaderDX12Id id, const std::vector<const char*>& materialNames = {});
 
 	// モデルの名前検索

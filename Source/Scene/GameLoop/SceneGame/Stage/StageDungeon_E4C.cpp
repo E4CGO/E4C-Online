@@ -374,7 +374,7 @@ void StageDungeon_E4C::RenderDX12()
 
 	// シーン用定数バッファ更新
 	const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
-		CameraManager::Instance().GetCamera());
+		CameraManager::Instance().GetCamera(), 0, 0);
 
 	// レンダーコンテキスト設定
 	RenderContextDX12 rc;
@@ -428,5 +428,9 @@ void StageDungeon_E4C::RenderDX12()
 }
 
 void StageDungeon_E4C::OnPhase()
+{
+}
+
+void StageDungeon_E4C::DrawSceneGUI()
 {
 }

@@ -104,6 +104,7 @@ public:
 	int GetHp() { return hp; }
 	int GetMaxHp() { return maxHp; }
 	void ModifyHp(int hp);
+	void SetCurrentHp(int hp) { this->hp = hp; }
 
 	//物理計算フラグ
 	void SetKinematic(bool value) { this->isKinematic = value; }
@@ -134,7 +135,7 @@ protected:
 	bool isKinematic = false;
 
 	// HP
-	int hp = 1;
-	int maxHp = 1;
+	int hp = 100;
+	int maxHp = 100;
 };
 #endif
