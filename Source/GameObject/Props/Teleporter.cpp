@@ -128,7 +128,7 @@ Teleporter::Teleporter(Stage* stage, Online::OnlineController* onlineController)
 void Teleporter::Update(float elapsedTime)
 {
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
-	const float radius = 0.5f * scale.x;
+	const float radius = m_interractionDistance * scale.x;
 	if (player != nullptr && XMFLOAT3LengthSq(player->GetPosition() - (position - DirectX::XMFLOAT3{ 0.0f, 0.5f * scale.y, 0.0f })) < radius* radius)
 	{
 		m_timer += elapsedTime;

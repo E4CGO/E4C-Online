@@ -62,8 +62,8 @@ void SceneGame_E4C::Finalize()
 	CameraManager::Instance().Clear();
 	STAGES.Clear();
 	MAPTILES.Clear();
-	PlayerCharacterManager::Instance().Clear();
 	UI.Clear();
+	PlayerCharacterManager::Instance().Clear();
 }
 
 // 更新処理

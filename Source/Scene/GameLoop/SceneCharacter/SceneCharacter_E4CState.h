@@ -8,16 +8,15 @@
 #include "TAKOEngine/AI/BaseState.h"
 #include "Source/UI/Widget/WidgetButtonImage.h"
 #include "UI/Widget/WidgetButtonText.h"
+#include "Source/UI/Widget/WidgetPauseMenu.h"
 
 #include "Scene/GameLoop/SceneCharacter/SceneCharacter_E4C.h"
 
 #include "UI/Widget/WidgetCharacterSelect.h"
 #include "UI/Widget/WidgetCharacterModify.h"
 
-
 namespace SceneCharacter_E4CState
 {
-
 	/**************************************************************************//**
 		@class	InitState
 		@brief	初期化とJSONからデーターを読み込み
@@ -38,7 +37,6 @@ namespace SceneCharacter_E4CState
 		void Exit() override;
 	private:
 		float timer = 0.0f;
-
 	};
 
 	/**************************************************************************//**
@@ -65,6 +63,7 @@ namespace SceneCharacter_E4CState
 		float m_cameraTimer = 0.0f;
 		const float m_cameraTime = 0.5f;
 		WidgetCharacterSelect* m_pWidgetCharacterSelect;
+		WidgetPauseMenu* m_pPauseMenu;
 	};
 
 	/**************************************************************************//**

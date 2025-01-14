@@ -150,4 +150,21 @@ private:
 	SamplerManager* m_sampler = nullptr;
 };
 
+class PortalSquareShaderDX12 : public ModelShaderDX12
+{
+public:
+	PortalSquareShaderDX12(ID3D12Device* device);
+	virtual ~PortalSquareShaderDX12() override = default;
+
+	void Finalize() override {};
+
+	void Render(const RenderContextDX12& rc, const ModelDX12::Mesh& mesh) override;
+
+private:
+	Microsoft::WRL::ComPtr<ID3D12PipelineState>		m_d3d_pipeline_state;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature>		m_d3d_root_signature;
+
+	SamplerManager* m_sampler = nullptr;
+};
+
 #endif //!__INCLUDED_PLANE_SHADER_H__
