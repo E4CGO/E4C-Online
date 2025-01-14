@@ -20,6 +20,7 @@
 #include "UI/Widget/WidgetCrosshair.h"
 #include "TAKOEngine/GUI/UIManager.h"
 #include "Source\PlayerCharacterData.h"
+#include "TAKOEngine/Rendering/LineRenderer.h"
 
 void SceneGame_E4C::Initialize()
 {
@@ -81,9 +82,9 @@ void SceneGame_E4C::Render()
 	RenderContext rc;
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
-
+	
 	STAGES.Render();
-
+	
 	UI.Render(rc);
 
 	T_TEXT.End();

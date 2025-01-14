@@ -56,6 +56,7 @@ LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
 
 		HRESULT hr = device->CreateBlendState(&desc, blendState.GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
 	}
 
 	// 深度ステンシルステート
@@ -65,7 +66,6 @@ LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
 		desc.DepthEnable = true;
 		desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 		desc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
-
 		HRESULT hr = device->CreateDepthStencilState(&desc, depthStencilState.GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
@@ -83,7 +83,7 @@ LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
 		desc.MultisampleEnable = true;
 		desc.FillMode = D3D11_FILL_SOLID;
 		desc.CullMode = D3D11_CULL_NONE;
-		desc.AntialiasedLineEnable = false;
+		desc.AntialiasedLineEnable = false; 
 
 		HRESULT hr = device->CreateRasterizerState(&desc, rasterizerState.GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
@@ -103,7 +103,8 @@ LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 
-	GpuResourceUtils::LoadTexture(device, "Data/Sprites/trail.png", texture.ReleaseAndGetAddressOf(), &textureDesc);
+	//GpuResourceUtils::LoadTexture(device, "Data/Sprites/20160517231910.png", texture.ReleaseAndGetAddressOf(), &textureDesc);
+	GpuResourceUtils::LoadTexture(device, "Data/Sprites/trail2.png", texture.ReleaseAndGetAddressOf(), &textureDesc);
 }
 
 // 描画開始

@@ -782,8 +782,8 @@ void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
 	DirectX::XMFLOAT3 namePos = this->position + DirectX::XMFLOAT3{ 0, 2.2f, 0 };
 	float dot = XMFLOAT3Dot(front, namePos - eye);
 
-	LineRenderer* sword = Graphics::Instance().GetLineRenderer();
-	sword->Render(T_GRAPHICS.GetDeviceContext(), rc.view, rc.projection);
+	/*LineRenderer* sword = Graphics::Instance().GetLineRenderer();
+	sword->Render(T_GRAPHICS.GetDeviceContext(), rc.view, rc.projection);*/
 	if (dot < 0.0f) return;
 
 #ifdef _DEBUG

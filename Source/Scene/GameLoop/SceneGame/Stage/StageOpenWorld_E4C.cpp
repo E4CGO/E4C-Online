@@ -175,8 +175,7 @@ void StageOpenWorld_E4C::Render()
 	// ライトの情報を詰め込む
 	LightManager::Instance().PushRenderContext(rc);
 
-	// 描画
-	PlayerCharacterManager::Instance().Render(rc);
+	
 
 	for (auto& it : models)
 	{
@@ -189,6 +188,8 @@ void StageOpenWorld_E4C::Render()
 
 	UI.Render(rc);
 
+	// 描画
+	PlayerCharacterManager::Instance().Render(rc);
 	// デバッグレンダラ描画実行
 
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
