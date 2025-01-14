@@ -80,6 +80,18 @@ namespace EnemyState
 			void Execute(float elapsedTime) override;
 			// ステートから出ていくときのメソッド
 			void Exit() override;
+
+			struct ATTACK_ARM
+			{
+				int power = 0;
+				uint8_t idx = 0;
+				Collider::COLLIDER_OBJ objType = Collider::COLLIDER_OBJ::HIT_ERR;
+				uint16_t hittableOBJ = 0;
+				float hitStartRate = 0.0f;
+				float hitEndRate = 1.0f;
+				Capsule capsule{};
+			};
+			ATTACK_ARM attackArms[2];
 		};
 	}
 }

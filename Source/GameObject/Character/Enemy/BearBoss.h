@@ -8,10 +8,10 @@
 #include "EnemyState.h"
 
 /**************************************************************************//**
-	@class　MouseMob
-	@brief	ネズミ敵を作成、管理
+	@class　BearBoss
+	@brief	ボスクマを作成、管理
 	@par    [説明]
-			ネズミ敵の設定クラス
+			ボスクマの設定クラス
 *//***************************************************************************/
 class BearBoss : public Enemy
 {
@@ -23,8 +23,12 @@ public:
 	{
 		COL_ATTACK,
 		COL_BODY,
+		COL_HEAD,
+		COL_BUTTON,
 		COL_LEFT_HAND,
 		COL_RIGHT_HAND,
+		COL_LEFT_LEG,
+		COL_RIGHT_LEG,
 	};
 
 	enum ANIMATION : uint8_t

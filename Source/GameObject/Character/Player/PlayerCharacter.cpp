@@ -108,12 +108,12 @@ PlayerCharacter::PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataI
 	// 衝突判定
 	SetMoveCollider({ { 0, radius, 0 }, radius }, Collider::COLLIDER_OBJ::PLAYER);
 	m_pColliders.clear();
-	Capsule capsule{};
-	capsule.radius = radius;
-	capsule.position = { 0, capsule.radius / scale.y, 0 };
-	capsule.direction = { 0.0f, 1.0f, 0.0f };
-	capsule.length = height - capsule.radius * 2;
-	SetCollider(COLLIDER_ID::COL_BODY, capsule, Collider::COLLIDER_OBJ::PLAYER, &transform);
+	//Capsule capsule{};
+	//capsule.radius = radius;
+	//capsule.position = { 0, capsule.radius / scale.y, 0 };
+	//capsule.direction = { 0.0f, 1.0f, 0.0f };
+	//capsule.length = height - capsule.radius * 2;
+	//SetCollider(COLLIDER_ID::COL_BODY, capsule, Collider::COLLIDER_OBJ::PLAYER, &transform);
 
 	LoadAppearance(dataInfo.pattern);
 
@@ -293,14 +293,30 @@ bool  PlayerCharacter::CollisionVsEnemies()
 	for (Enemy*& enemy : ENEMIES.GetAll())
 	{
 		if (!enemy->GetMoveCollider()) continue;
-
+		
 		if (m_pMoveCollider->Collision(enemy->GetMoveCollider(), {}, hit))
 		{
+			hit.position.y = position.y;
+			hit.normal.y = 0.0f;
 			position = hit.position + hit.normal * radius;
 			m_pMoveCollider->SetPosition(position);
 
-			position.y -= radius;
+			//position.y -= radius;
 			isHit = true;
+		}
+
+		for (auto& col : enemy->GetColliders())
+		{
+			if (m_pMoveCollider->Collision(col.second, {}, hit))
+			{
+				hit.position.y = position.y;
+				hit.normal.y = 0.0f;
+				position = hit.position + hit.normal * radius;
+				m_pMoveCollider->SetPosition(position);
+
+				//position.y -= radius;
+				isHit = true;
+			}
 		}
 	}
 	return isHit;
@@ -680,14 +696,15 @@ void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
 	if (dot < 0.0f) return;
 
 #ifdef _DEBUG
-	m_pColliders[COLLIDER_ID::COL_BODY]->DrawDebugPrimitive({ 0, 1, 0, 1 });
 	m_pMoveCollider->DrawDebugPrimitive({ 1, 1, 1, 1 });
-	if (IsPlayer())
+	if (IsPlayer()&& !m_pColliders.empty())
 	{
+		m_pColliders[COLLIDER_ID::COL_BODY]->DrawDebugPrimitive({ 0, 1, 0, 1 });
+
 		ImVec2 pos = ImGui::GetMainViewport()->Pos;
 		ImGui::SetNextWindowPos(ImVec2(pos.x + 10, pos.y + 10), ImGuiCond_FirstUseEver);
 		ImGui::SetNextWindowSize(ImVec2(300, 450), ImGuiCond_FirstUseEver);
-
+		
 		if (ImGui::Begin("AttackCollider", nullptr, ImGuiWindowFlags_None))
 		{
 			for (const std::pair<uint8_t, Collider*>& attackCollider : m_pColliders)
@@ -720,7 +737,7 @@ void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
 				}
 			}
 		}
-
+		ImGui::End();
 
 		for (const std::pair<uint8_t, Collider*>& attackCollider : m_pColliders)
 		{

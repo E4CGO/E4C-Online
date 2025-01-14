@@ -309,5 +309,7 @@ void StageOpenWorld_E4C::RenderDX12()
 		T_TEXT.EndDX12();
 	}
 
+	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(rc.d3d_command_list);
+
 	T_GRAPHICS.End();
 }

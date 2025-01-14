@@ -140,7 +140,7 @@ namespace PlayerCharacterState
 			// ステートで実行するメソッド
 			void Execute(float elapsedTime) override;
 			// ステートから出ていくときのメソッド
-			void Exit() override {};
+			void Exit() override;
 		};
 
 		// スキル_1 回レ

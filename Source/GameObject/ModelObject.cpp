@@ -315,6 +315,31 @@ void ModelObject::RenderDX12(const RenderContextDX12& rc)
 			shader->Render(rc, mesh);
 		}
 	}
+
+#ifdef _DEBUG
+	if(m_pMoveCollider)
+	{
+		m_pMoveCollider->DrawDebugPrimitive({ 1, 1, 1, 1 });
+	}
+	if (!m_pColliders.empty())
+	{
+		for (const std::pair<uint8_t, Collider*>& attackCollider : m_pColliders)
+		{
+			//if (attackCollider.first == COLLIDER_ID::COL_BODY) continue;
+			DirectX::XMFLOAT4 color = { 1, 1, 1, 1 };
+			if (attackCollider.second->GetOBJType() & (Collider::COLLIDER_OBJ::PLAYER | Collider::COLLIDER_OBJ::ENEMY | Collider::COLLIDER_OBJ::ITEM))
+			{
+				color = { 0, 1, 0, 1 };
+			}
+			else if (attackCollider.second->GetOBJType() & (Collider::COLLIDER_OBJ::PLAYER_ATTACK | Collider::COLLIDER_OBJ::PLAYER_PROJECTILE | Collider::COLLIDER_OBJ::ENEMY_ATTACK | Collider::COLLIDER_OBJ::ENEMY_PROJECTILE))
+			{
+				color = { 1, 0, 0, 1 };
+			}
+
+			attackCollider.second->DrawDebugPrimitive(color);
+		}
+	}
+#endif // _DEBUG
 }
 
 /**************************************************************************//**
@@ -459,9 +484,8 @@ void ModelObject::MakeAttackCollider(ATTACK_COLLIDER_DATA data, Capsule capsuleP
 *//***************************************************************************/
 void ModelObject::DeleteAttackCollider(uint8_t idx)
 {
-	auto it = std::next(m_pColliders.begin(), idx);
 	COLLISIONS.Remove(m_pColliders[idx]);
-	m_pColliders.erase(it);
+	m_pColliders.erase(idx);
 }
 
 /**************************************************************************//**

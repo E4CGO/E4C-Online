@@ -95,7 +95,7 @@ void Enemy::OnDamage(int damage)
 		hp -= damage;
 		if (hp > 0)
 		{
-			EnemyState::StateTransition(this, STATE::HURT);
+			//EnemyState::StateTransition(this, STATE::HURT);
 		}
 		else
 		{

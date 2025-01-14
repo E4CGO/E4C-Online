@@ -14,7 +14,7 @@ public:
 		: m_power(_power), SphereCollider(_objType, _transform), m_hitStartRate(_hitStartRate), m_hitEndRate(_hitEndRate) { m_enable = false; }
 	~AttackSphereCollider() = default;
 
-	void Update() override;
+	virtual void Update() override;
 
 	virtual void OnCollision(Collider* other) override;
 	int GetPower() { return m_power; }
