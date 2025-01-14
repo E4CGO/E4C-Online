@@ -96,7 +96,6 @@ void StageOpenWorld_E4C::Initialize()
 	LightManager::Instance().SetAmbientColor({ 0.3f, 0.3f, 0.3f, 0.0f });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
-	//dl->SetPosition({ 0, 20, 0 });
 	LightManager::Instance().Register(dl);
 
 	// プレイヤー
@@ -127,12 +126,18 @@ void StageOpenWorld_E4C::Initialize()
 	cameraController->SetEnable(true);
 	cameraController->SetPlayer(player);
 	CURSOR_OFF;
+
+	// 影初期化
+	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
+}
+
+void StageOpenWorld_E4C::Finalize()
+{
+	T_GRAPHICS.GetShadowRenderer()->Finalize();
 }
 
 void StageOpenWorld_E4C::Update(float elapsedTime)
 {
-	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
-
 	Camera* camera = CameraManager::Instance().GetCamera();
 	Online::OnlineController* onlineController = m_pScene->GetOnlineController();
 	if (onlineController->GetState() == Online::OnlineController::STATE::LOGINED)
@@ -188,7 +193,7 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 
 	//plane2->Update(elapsedTime);
 
-	m_timer += elapsedTime;
+	timer += elapsedTime;
 
 	for (auto& it : models)
 	{
@@ -199,6 +204,8 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	{
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
 	}
+
+	m_timer += elapsedTime;
 }
 
 void StageOpenWorld_E4C::Render()

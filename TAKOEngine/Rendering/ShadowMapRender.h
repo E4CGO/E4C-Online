@@ -105,8 +105,10 @@ namespace myRenderer
 class ShadowMapRenderDX12
 {
 public:
-	ShadowMapRenderDX12(ID3D12Device* device);
+	ShadowMapRenderDX12();
 	~ShadowMapRenderDX12() {};
+
+	void Init(ID3D12Device* device);
 
 	void Finalize();
 

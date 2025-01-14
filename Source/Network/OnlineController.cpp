@@ -204,7 +204,7 @@ namespace Online
 		TCPLogin::CHARA_DATA data;
 		const PlayerCharacterData::CharacterInfo& info = PlayerCharacterData::Instance().GetCurrentCharacter();
 		//data.name = info.name;
-		data.name = "テスト";
+		data.name = info.name;
 		for (int i = 0; i < PlayerCharacterData::APPEARANCE_PATTERN::NUM; i++)
 		{
 			data.appearance[i] = info.pattern[i];

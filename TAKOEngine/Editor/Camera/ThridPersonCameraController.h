@@ -14,6 +14,10 @@ public:
 
 	void SetPlayer(Character* player) { this->player = player; }
 
+	void CameraShake(float elapsedTime);
+
+	void Imgui();
+
 	DirectX::XMFLOAT2  GetOffset() { return offset; };
 	void SetOffset(float x, float y) { offsetLerp = { x, y }; };
 	void SetDistance(float d) override { distanceLerp = d; };
@@ -51,7 +55,18 @@ private:
 	float distanceLerp;
 	DirectX::XMFLOAT2 offsetLerp;
 
+
+
+	DirectX::XMFLOAT3 shakeOffset{};
+	DirectX::XMFLOAT3 shakenTarget{};
+	float shakeAmplitude; // シェイクの振幅
+	DirectX::XMFLOAT3 shakeFrequency; // シェイクの周波数
+	// カメラシェイク用の時間
+	float shakeTime = 0.0f;
+	
 	float distanceCache;
+
+	bool shake = false;
 };
 
 #define TPSCamera ThridPersonCameraController::Instance()

@@ -117,6 +117,7 @@ namespace PlayerCharacterState
 		}
 		void AttackNormalState_1::Execute(float elapsedTime)
 		{
+			
 			if (owner->IsPlayer())
 			{
 				owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_1)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
@@ -140,6 +141,7 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_2);
 					}
+					
 				}
 				else if (0.435f <= time)
 				{
@@ -180,6 +182,8 @@ namespace PlayerCharacterState
 		{
 			owner->SetAnimationSpeed(1.0f);
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_COMBO_SECOND, false, 0.2f);
+
+		
 		}
 		void AttackNormalState_2::Execute(float elapsedTime)
 		{
@@ -204,6 +208,7 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_3);
 					}
+
 				}
 				else if (0.835f <= time)
 				{
@@ -240,6 +245,8 @@ namespace PlayerCharacterState
 		{
 			owner->SetAnimationSpeed(0.7f);
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_COMBO_THIRD, false, 0.2f);
+
+			
 		}
 		void AttackNormalState_3::Execute(float elapsedTime)
 		{

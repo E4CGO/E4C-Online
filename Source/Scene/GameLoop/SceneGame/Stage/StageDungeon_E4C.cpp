@@ -217,7 +217,6 @@ void StageDungeon_E4C::Initialize()
 	LightManager::Instance().SetAmbientColor({ 0.3f, 0.3f, 0.3f, 0.0f });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
-	dl->SetPosition({ 0, 20, 0 });
 	LightManager::Instance().Register(dl);
 
 	// プレイヤー
@@ -272,6 +271,9 @@ void StageDungeon_E4C::Initialize()
 	MAPTILES.CreateSpatialIndex(5, 7);
 
 	Console::Instance().Open();
+
+	// 影初期化
+	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
 }
 
 void StageDungeon_E4C::Finalize()
@@ -281,6 +283,7 @@ void StageDungeon_E4C::Finalize()
 
 	Console::Instance().Close();
 	GameObjectManager::Instance().Clear();
+	T_GRAPHICS.GetShadowRenderer()->Finalize();
 }
 
 void StageDungeon_E4C::Update(float elapsedTime)
@@ -328,11 +331,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 		T_INPUT.KeepCursorCenter();
 	}
 
-	for (auto& model : PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetModels())
-	{
-		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
-	}
-
+	// キャラクターの影登録
 	for (auto& model : PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetModels())
 	{
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
@@ -394,7 +393,7 @@ void StageDungeon_E4C::RenderDX12()
 		// シャドウマップ
 		{
 			// TODO: 影
-			//T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
+			T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
 			rc.shadowMap.shadow_srv_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSRV();
 			rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();
 		}

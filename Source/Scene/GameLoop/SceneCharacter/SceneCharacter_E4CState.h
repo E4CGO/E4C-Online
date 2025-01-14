@@ -13,6 +13,7 @@
 
 #include "UI/Widget/WidgetCharacterSelect.h"
 #include "UI/Widget/WidgetCharacterModify.h"
+#include "UI/Widget/WidgetInputString.h"
 
 
 namespace SceneCharacter_E4CState

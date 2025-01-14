@@ -103,7 +103,7 @@ PlayerCharacter::PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataI
 	RegisterCommonState();
 	stateMachine->SetState(static_cast<int>(STATE::WAITING));
 
-	mpCost[static_cast<int>(STATE::DODGE)] = 00.0f;
+	mpCost[static_cast<int>(STATE::DODGE)] = 0.0f;
 
 	// 衝突判定
 	SetMoveCollider({ { 0, radius, 0 }, radius }, Collider::COLLIDER_OBJ::PLAYER);
@@ -115,6 +115,7 @@ PlayerCharacter::PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataI
 	capsule.length = height - capsule.radius * 2;
 	SetCollider(COLLIDER_ID::COL_BODY, capsule, Collider::COLLIDER_OBJ::PLAYER, &transform);
 
+	this->m_name = dataInfo.name;
 	LoadAppearance(dataInfo.pattern);
 
 	// DebugPrimitive用
@@ -273,7 +274,7 @@ void PlayerCharacter::PositionAdjustment()
 
 void PlayerCharacter::UpdateColliders()
 {
-	if(IsPlayer())
+	if (IsPlayer())
 	{
 		if (m_pMoveCollider)
 		{
@@ -289,7 +290,7 @@ void PlayerCharacter::UpdateColliders()
 bool  PlayerCharacter::CollisionVsEnemies()
 {
 	bool isHit = false;
-	HitResult hit; 
+	HitResult hit;
 	for (Enemy*& enemy : ENEMIES.GetAll())
 	{
 		if (!enemy->GetMoveCollider()) continue;
@@ -579,26 +580,11 @@ void PlayerCharacter::Render(const RenderContext& rc)
 {
 	Character::Render(rc);
 
-	
-
 	DirectX::XMFLOAT3 front = CameraManager::Instance().GetCamera()->GetFront();
 	DirectX::XMFLOAT3 eye = CameraManager::Instance().GetCamera()->GetEye();
 	DirectX::XMFLOAT3 namePos = this->position + DirectX::XMFLOAT3{ 0, 2.2f, 0 };
 	float dot = XMFLOAT3Dot(front, namePos - eye);
 	if (dot < 0.0f) return;
-
-	// 名前表示
-	//DirectX::XMFLOAT3 pos = T_GRAPHICS.GetScreenPosition(namePos);
-	//T_TEXT.Render(
-	//	FONT_ID::HGpop,
-	//	m_name.c_str(),
-	//	pos.x, pos.y,
-	//	1.0f, 1.0f, 1.0f, 1.0f,
-	//	0.0f,
-	//	FONT_ALIGN::BOTTOM,
-	//	0.5f,
-	//	1
-	//);
 
 #ifdef _DEBUG
 	m_pColliders[COLLIDER_ID::COL_BODY]->DrawDebugPrimitive({0, 1, 0, 1});
@@ -780,7 +766,7 @@ void PlayerCharacter::OnDamage(const HitResult& hit, int damage)
 }
 
 bool PlayerCharacter::InputMove(float elapsedTime) {
-	
+
 
 	// 移動処理
 	Move(inputDirection.x, inputDirection.y, this->moveSpeed);
