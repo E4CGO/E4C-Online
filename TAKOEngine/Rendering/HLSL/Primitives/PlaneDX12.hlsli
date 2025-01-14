@@ -22,6 +22,13 @@ cbuffer CbScene : register(b0)
     SpotLightData spotLightData[SpotLightMax]; // スポットライト情報
     int pointLightCount; // 点光源数
     int spotLightCount; // スポットライト数
+    
+    float timerGlobal;
+    float timerTick;
+
+	// 影情報
+    float shadowBias;
+    float3 shadowColor;
 };
 
 #define ROOT_SIG "RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT), \

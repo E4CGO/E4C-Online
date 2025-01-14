@@ -95,6 +95,7 @@ void PlayerCharacterPatternSword::Execute(PlayerCharacter* chara)
 		stateMachine->RegisterSubState(static_cast<int>(PlayerCharacter::STATE::SKILL_1), ATTACK_CONTINUE, new Skill1ContinueStart(chara));
 		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::SKILL_2), new Skill2State(chara));
 	}
+	chara->SetEnergyType(PlayerCharacter::ENERGY_TYPE::STAMINA);
 }
 
 /**************************************************************************//**
@@ -133,4 +134,6 @@ void PlayerCharacterPatternRod::Execute(PlayerCharacter* chara)
 
 		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::ATTACK_SPECIAL), new AttackSpecialState(chara));
 	}
+
+	chara->SetEnergyType(PlayerCharacter::ENERGY_TYPE::MANA);
 }

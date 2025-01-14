@@ -110,8 +110,6 @@ void Graphics::FinishDX12()
 	{
 		dx12_modelshaders[i]->Finalize();
 	}
-
-	m_shadowMapRenderer->Finalize();
 }
 
 //******************************************************************
@@ -576,6 +574,7 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Skydome)] = std::make_unique<SkydomeShaderDX12>(m_d3d_device.Get());
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::shadowMap)] = std::make_unique<ShadowMapShaderDX12>(m_d3d_device.Get());
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Plane)] = std::make_unique<PlaneShaderDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::PortalSquare)] = std::make_unique<PortalSquareShaderDX12>(m_d3d_device.Get());
 
 		// スプライトシェーダー生成
 		spriteShaders[static_cast<int>(SpriteShaderId::Default)] = std::make_unique<DefaultSpriteShader>(device.Get());
@@ -606,7 +605,7 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 		m_skinning_pipeline = std::make_unique<SkinningPipeline>(m_d3d_device.Get());
 
 		// シャドウマップ
-		m_shadowMapRenderer = std::make_unique<ShadowMapRenderDX12>(m_d3d_device.Get());
+		m_shadowMapRenderer = std::make_unique<ShadowMapRenderDX12>();
 	}
 }
 
@@ -817,7 +816,7 @@ void Graphics::Execute()
 // @param[in] camera　カメラ
 // @return    const Descriptor*
 //******************************************************************
-const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera)
+const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera, float timerGlobalTime, float timerGlobalDeltaTime)
 {
 	LightManager& ligtManager = LightManager::Instance();
 
@@ -832,6 +831,9 @@ const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera)
 	// 影情報
 	cb_scene_data->shadowBias = 0.001f;
 	cb_scene_data->shadowColor = { 0.5f, 0.5f, 0.5f };
+
+	cb_scene_data->timerGlobal = timerGlobalTime;
+	cb_scene_data->timerTick = timerGlobalDeltaTime;
 
 	// ライト情報
 	cb_scene_data->ambientLightColor = ligtManager.GetAmbientColor();
@@ -856,7 +858,7 @@ const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera)
 
 				DirectX::XMVECTOR Eye = DirectX::XMVectorSubtract(Focus, DirectX::XMVectorScale(LightDirection, 50.0f));
 				DirectX::XMMATRIX View = DirectX::XMMatrixLookAtLH(Eye, Focus, Up);
-				DirectX::XMMATRIX Projection = DirectX::XMMatrixOrthographicLH(100, 100, 0.1f, 1000.0f);
+				DirectX::XMMATRIX Projection = DirectX::XMMatrixOrthographicLH(100, 100, 0.1f, 500.0f);
 				DirectX::XMMATRIX LightViewProjection = DirectX::XMMatrixMultiply(View, Projection);
 				DirectX::XMStoreFloat4x4(&cb_scene_data->light_view_projection, LightViewProjection);
 			}

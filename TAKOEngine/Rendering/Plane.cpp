@@ -279,6 +279,8 @@ PlaneDX12::PlaneDX12(const char* filename, float scaling, XMFLOAT3 centerPos, fl
 	const RenderStateDX12* renderState = graphics.GetRenderStateDX12();
 	ID3D12Device* d3d_device = graphics.GetDeviceDX12();
 
+	m_dx12_ShaderId = static_cast<ModelShaderDX12Id>(ModelShaderDX12Id::Plane);
+
 	// 頂点データー
 	std::vector <ModelResource::Vertex> vertices = {
 		{ { centerPos.x + plane_width, centerPos.y - plane_width, positionZ }, { 1.0f, 0.0f, 0.0f, 0.0f }, { 0, 0, 0, 0 }, { 0.0f, 0.0f }, { 0.5f, 0.5f, 0.5f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
@@ -442,10 +444,9 @@ PlaneDX12::PlaneDX12(const char* filename, float scaling, XMFLOAT3 centerPos, fl
 void PlaneDX12::RenderDX12(const RenderContextDX12& rc)
 {
 	ModelShaderDX12* shader = nullptr;
-	ModelShaderDX12Id shaderId = static_cast<ModelShaderDX12Id>(ModelShaderDX12Id::Plane);
 
 	// パイプライン設定
-	shader = T_GRAPHICS.GetModelShaderDX12(shaderId);
+	shader = T_GRAPHICS.GetModelShaderDX12(m_dx12_ShaderId);
 
 	m_Mesh.mesh = &mesh;
 	//描画

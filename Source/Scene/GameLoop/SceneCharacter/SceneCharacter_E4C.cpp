@@ -84,6 +84,9 @@ void SceneCharacter_E4C::Initialize()
 	stateMachine->RegisterState(STATE::CHARACTER_CREATION, new SceneCharacter_E4CState::CharacterCreationState(this));
 	stateMachine->RegisterState(STATE::START, new SceneCharacter_E4CState::StartState(this));
 	stateMachine->SetState(STATE::INIT);
+
+	// 影初期化
+	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
 }
 
 /**************************************************************************//**
@@ -101,6 +104,8 @@ void SceneCharacter_E4C::Finalize()
 	UI.Clear();
 	shadowMapRenderer->Clear();
 	CameraManager::Instance().Clear();
+
+	T_GRAPHICS.GetShadowRenderer()->Finalize();
 }
 
 /**************************************************************************//**
@@ -177,7 +182,7 @@ void SceneCharacter_E4C::RenderDX12()
 	{
 		// シーン用定数バッファ更新
 		const Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
-			CameraManager::Instance().GetCamera());
+			CameraManager::Instance().GetCamera(), 0, 0);
 
 		// レンダーコンテキスト設定
 		RenderContextDX12 rc;
@@ -221,6 +226,11 @@ void SceneCharacter_E4C::RenderDX12()
 			T_TEXT.EndDX12();
 		}
 	}
+#ifdef _DEBUG
+	DrawSceneGUI();
+	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
+#endif
+
 	TentacleLib::graphics.End();
 }
 
