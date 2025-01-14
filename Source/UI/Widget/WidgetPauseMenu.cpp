@@ -87,6 +87,7 @@ void WidgetPauseMenu::Update(float elapsedTime)
 			{
 				isSettingsActive = false;
 				m_settingsWindow->~WidgetSettingWindow();
+				delete m_settingsWindow;
 			}
 		}
 	}

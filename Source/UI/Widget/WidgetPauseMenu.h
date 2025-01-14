@@ -28,7 +28,14 @@ class WidgetPauseMenu : public Widget
 {
 public:
 	WidgetPauseMenu();
-	virtual~WidgetPauseMenu() = default;
+	~WidgetPauseMenu()
+	{
+		delete m_pauseButton;
+		delete m_resumeButton;
+		delete m_toTitleButton;
+		delete m_settingsButton;
+		delete m_exitButton;
+	};
 
 	void Update(float elapsedTime) override;
 	void Render(const RenderContext& rc)override;
