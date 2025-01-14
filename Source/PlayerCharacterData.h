@@ -58,7 +58,7 @@ public:
 		{
 			if (this != &other)
 			{
-				this->name = other.name;
+				this->name = other.name.c_str();
 				for (int i = 0; i < APPEARANCE_PATTERN::NUM; i++)
 				{
 					this->pattern[i] = other.pattern[i];

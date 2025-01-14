@@ -20,6 +20,7 @@
 #include "UI/Widget/WidgetCrosshair.h"
 #include "TAKOEngine/GUI/UIManager.h"
 #include "Source\PlayerCharacterData.h"
+#include "UI/Widget/WidgetCharacterName.h"
 
 void SceneGame_E4C::Initialize()
 {
@@ -37,7 +38,7 @@ void SceneGame_E4C::Initialize()
 
 	// 選択した自機
 	const PlayerCharacterData::CharacterInfo info = PlayerCharacterData::Instance().GetCurrentCharacter();
-	PlayerCharacter* player = PlayerCharacterManager::Instance().UpdatePlayerData(0, "", info.pattern);
+	PlayerCharacter* player = PlayerCharacterManager::Instance().UpdatePlayerData(0, info.name.c_str(), info.pattern);
 	player->Show();
 	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 
@@ -52,6 +53,7 @@ void SceneGame_E4C::Initialize()
 	CURSOR_OFF;
 
 	UI.Register(new WidgetCrosshair);
+	UI.Register(new WidgetCharacterName);
 }
 
 void SceneGame_E4C::Finalize()

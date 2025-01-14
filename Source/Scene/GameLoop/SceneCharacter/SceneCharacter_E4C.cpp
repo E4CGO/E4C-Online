@@ -225,6 +225,8 @@ void SceneCharacter_E4C::RenderDX12()
 
 			T_TEXT.EndDX12();
 		}
+
+		T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
 	}
 	TentacleLib::graphics.End();
 }
