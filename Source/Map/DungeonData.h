@@ -124,7 +124,7 @@ using namespace ns_RoomData;
 class DungeonData : public Singleton<DungeonData>
 {
 	friend class Singleton<DungeonData>;
-private:
+public:
 	DungeonData();
 	~DungeonData() {}
 
@@ -135,6 +135,7 @@ public:
 		int weight = 0;	// 重み、値が大きいほど生成確率が高くなる
 		AABB aabb {};	// AABB、部屋同士の当たり判定などに使用
 		DirectX::XMFLOAT3 portalPosition {};		// ポータル配置座標
+		std::vector<TILE_DATA> connectPointDatas;	// 接続点データ配列
 		std::vector<RoomType> placementCandidates;	// 配置候補の部屋タイプを保存する配列
 	};
 

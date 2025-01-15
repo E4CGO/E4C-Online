@@ -24,6 +24,11 @@ public:
 		std::vector<AABB>& roomAABBs,
 		std::vector<uint8_t>& roomOrder, int& orderIndex);
 
+	// コンストラクタ（当たり判定用、すぐ消す）
+	RoomBase(
+		RoomBase* parent, int pointIndex,
+		RoomType roomType);
+
 	// ですとら
 	virtual ~RoomBase()
 	{
@@ -68,8 +73,8 @@ public:
 				m_debugAABBs.at(i).radii.y * 2.0f,
 				m_debugAABBs.at(i).radii.z * 2.0f
 			};
-			//m_debugCubes.at(i)->SetCube(m_debugAABBs.at(i).position, diameter, { 1.0f, 0.0f, 0.0f, 1.0f });
-			//m_debugCubes.at(i)->Render(rc);
+			m_debugCubes.at(i)->SetCube(m_debugAABBs.at(i).position, diameter, { 1.0f, 0.0f, 0.0f, 1.0f });
+			m_debugCubes.at(i)->Render(rc);
 		}
 	}
 

@@ -38,7 +38,7 @@ void SceneRoomTest_E4C::Initialize()
 	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
 
 	// 光
-	LightManager::Instance().SetAmbientColor({ 0, 0, 0, 0 });
+	LightManager::Instance().SetAmbientColor({ 0.3f, 0.3f, 0.3f, 0 });
 	Light* dl = new Light(LightType::Directional);
 	dl->SetDirection({ 0.0f, -0.503f, -0.864f });
 	LightManager::Instance().Register(dl);
@@ -106,6 +106,9 @@ void SceneRoomTest_E4C::Initialize()
 	nodeDefaultNames.at(TileType::PORTAL) = "Portal";
 	nodeDefaultNames.at(TileType::SPAWNER) = "Spawner";
 	nodeDefaultNames.at(TileType::CONNECTPOINT) = "ConnectPoint";
+
+	testModel = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
+	testModel->SetPosition({ 0.0f, 0.0f, 0.0f });
 }
 
 void SceneRoomTest_E4C::Finalize()
@@ -122,10 +125,21 @@ void SceneRoomTest_E4C::Finalize()
 
 void SceneRoomTest_E4C::Update(float elapsedTime)
 {
-	m_cameraController->Update();
 	m_cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
+	m_cameraController->Update(elapsedTime);
 
 	NODES.Update(elapsedTime);
+
+	if (T_GRAPHICS.isDX12Active)
+	{
+		for (auto& it : NODES.GetAll())
+		{
+			T_GRAPHICS.GetShadowRenderer()->ModelRegister(it->GetModel().get());
+			//T_GRAPHICS.GetShadowRenderer()->ModelRegister(it->GetModel().get());
+		}
+
+		T_GRAPHICS.GetShadowRenderer()->ModelRegister(testModel->GetModel().get());
+	}
 }
 
 void SceneRoomTest_E4C::Render()
@@ -183,8 +197,17 @@ void SceneRoomTest_E4C::RenderDX12()
 		m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 		m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 
+		// シャドウマップ
+		{
+			T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
+			rc.shadowMap.shadow_srv_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSRV();
+			rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();
+		}
+
 		// モデル描画
 		NODES.RenderDX12(rc);
+
+		testModel->RenderDX12(rc);
 
 		// AABBの描画
 		// radiiは半径なので2倍して直径にしてから描画を行う
@@ -203,6 +226,9 @@ void SceneRoomTest_E4C::RenderDX12()
 	{
 		//postprocessingRenderer->Render(m_frameBuffer);
 	}
+
+	DrawDebugGUI();
+	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
 
 	T_GRAPHICS.End();
 }
@@ -315,34 +341,6 @@ void SceneRoomTest_E4C::LoadRoomData()
 		default:						AddTileNode(nodeDefaultNames.at(data.type), data.type, data.position, data.angle, data.scale);	break;
 		}
 	}
-}
-
-void SceneRoomTest_E4C::LoadTileNodeData(const auto& nodeData)
-{
-	//TileType tileType = nodeData["Type"];
-	//DirectX::XMFLOAT3 position = {
-	//	nodeData["Position"].at(0),
-	//	nodeData["Position"].at(1),
-	//	nodeData["Position"].at(2)
-	//};
-	//DirectX::XMFLOAT3 angle = {
-	//	nodeData["Angle"].at(0),
-	//	nodeData["Angle"].at(1),
-	//	nodeData["Angle"].at(2)
-	//};
-	//DirectX::XMFLOAT3 scale = {
-	//	nodeData["Scale"].at(0),
-	//	nodeData["Scale"].at(1),
-	//	nodeData["Scale"].at(2),
-	//};
-
-	//FILE_DATA importData = DungeonData::Instance().GetModelFileDatas(tileType).at(0);
-
-	//TileNode* newNode = new TileNode(NODES.GetUniqueName("NewNode"), tileType, importData.fileName.c_str(), importData.scale);
-	//newNode->SetPosition(position);
-	//newNode->SetAngle(angle);
-	//newNode->SetScale(scale);
-	//NODES.Register(newNode);
 }
 
 void SceneRoomTest_E4C::LoadSpawnerData(const auto& nodeData)
@@ -546,7 +544,7 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 					ImGui::PushID(index);
 
 					if (ImGui::TreeNodeEx(node->GetName().c_str(), nodeFlags)) {
-						if (ImGui::IsItemFocused()) selectionNode = node;
+						if (ImGui::IsItemFocused()) ChangeSelectedNode(node);
 					}
 					ImGui::PopID();
 				}
@@ -610,7 +608,8 @@ void SceneRoomTest_E4C::AddSpawner(
 	NODES.Register(newNode);
 
 	// 追加したノードを選択させる
-	selectionNode = newNode;
+	ChangeSelectedNode(newNode);
+	//selectionNode = newNode;
 }
 
 void SceneRoomTest_E4C::AddConnectPoint(
@@ -624,7 +623,8 @@ void SceneRoomTest_E4C::AddConnectPoint(
 	NODES.Register(newNode);
 
 	// 追加したノードを選択させる
-	selectionNode = newNode;
+	ChangeSelectedNode(newNode);
+	//selectionNode = newNode;
 }
 
 
@@ -639,7 +639,8 @@ void SceneRoomTest_E4C::DuplicateNode()
 		NODES.Register(newNode);
 
 		// 複製したノードを選択する
-		selectionNode = newNode;
+		ChangeSelectedNode(newNode);
+		//selectionNode = newNode;
 	}
 }
 
@@ -654,6 +655,16 @@ void SceneRoomTest_E4C::ClearNodes()
 {
 	NODES.Clear();
 	selectionNode = nullptr;
+}
+
+void SceneRoomTest_E4C::ChangeSelectedNode(Node* newNode)
+{
+	if (selectionNode != nullptr)
+	{
+		selectionNode->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+	}
+	selectionNode = newNode;
+	newNode->SetColor({ 1.3f, 1.3f, 1.3f, 1.0f });
 }
 
 void SceneRoomTest_E4C::CalcAABB()

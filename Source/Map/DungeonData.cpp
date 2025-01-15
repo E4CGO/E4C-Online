@@ -158,6 +158,27 @@ void DungeonData::InitRoomGenerateSettings()
 		if (ifs.is_open())
 		{
 			ifs >> loadFile;
+			// 接続点データの取り出し
+			for (const auto& nodeData : loadFile["NodeDatas"])
+			{
+				TileType tileType = nodeData["Type"];
+
+				if (tileType == CONNECTPOINT)
+				{
+					TILE_DATA newConnectPoint;
+					newConnectPoint.position = {
+						nodeData["Position"].at(0),
+						nodeData["Position"].at(1),
+						nodeData["Position"].at(2)
+					};
+					newConnectPoint.angle = {
+						nodeData["Angle"].at(0),
+						nodeData["Angle"].at(1),
+						nodeData["Angle"].at(2)
+					};
+					setting.connectPointDatas.emplace_back(newConnectPoint);
+				}
+			}
 			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
 			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
 			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
@@ -176,7 +197,7 @@ void DungeonData::InitRoomGenerateSettings()
 		setting.placementCandidates.emplace_back(RoomType::FIRST_I);
 		setting.placementCandidates.emplace_back(RoomType::FIRST_T);
 		setting.placementCandidates.emplace_back(RoomType::FIRST_SPAWNER);
-		setting.placementCandidates.emplace_back(RoomType::FIRST_END);
+		//setting.placementCandidates.emplace_back(RoomType::FIRST_END);
 
 		// ファイルロード
 		nlohmann::json loadFile;
@@ -184,6 +205,27 @@ void DungeonData::InitRoomGenerateSettings()
 		if (ifs.is_open())
 		{
 			ifs >> loadFile;
+			// 接続点データの取り出し
+			for (const auto& nodeData : loadFile["NodeDatas"])
+			{
+				TileType tileType = nodeData["Type"];
+
+				if (tileType == CONNECTPOINT)
+				{
+					TILE_DATA newConnectPoint;
+					newConnectPoint.position = {
+						nodeData["Position"].at(0),
+						nodeData["Position"].at(1),
+						nodeData["Position"].at(2)
+					};
+					newConnectPoint.angle = {
+						nodeData["Angle"].at(0),
+						nodeData["Angle"].at(1),
+						nodeData["Angle"].at(2)
+					};
+					setting.connectPointDatas.emplace_back(newConnectPoint);
+				}
+			}
 			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
 			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
 			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
@@ -202,7 +244,7 @@ void DungeonData::InitRoomGenerateSettings()
 		setting.placementCandidates.emplace_back(RoomType::FIRST_I);
 		setting.placementCandidates.emplace_back(RoomType::FIRST_T);
 		setting.placementCandidates.emplace_back(RoomType::FIRST_SPAWNER);
-		setting.placementCandidates.emplace_back(RoomType::FIRST_END);
+		//setting.placementCandidates.emplace_back(RoomType::FIRST_END);
 
 		// ファイルロード
 		nlohmann::json loadFile;
@@ -210,6 +252,27 @@ void DungeonData::InitRoomGenerateSettings()
 		if (ifs.is_open())
 		{
 			ifs >> loadFile;
+			// 接続点データの取り出し
+			for (const auto& nodeData : loadFile["NodeDatas"])
+			{
+				TileType tileType = nodeData["Type"];
+
+				if (tileType == CONNECTPOINT)
+				{
+					TILE_DATA newConnectPoint;
+					newConnectPoint.position = {
+						nodeData["Position"].at(0),
+						nodeData["Position"].at(1),
+						nodeData["Position"].at(2)
+					};
+					newConnectPoint.angle = {
+						nodeData["Angle"].at(0),
+						nodeData["Angle"].at(1),
+						nodeData["Angle"].at(2)
+					};
+					setting.connectPointDatas.emplace_back(newConnectPoint);
+				}
+			}
 			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
 			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
 			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
@@ -227,7 +290,7 @@ void DungeonData::InitRoomGenerateSettings()
 		setting.weight = 10;
 		setting.placementCandidates.emplace_back(RoomType::FIRST_I);
 		setting.placementCandidates.emplace_back(RoomType::FIRST_T);
-		setting.placementCandidates.emplace_back(RoomType::FIRST_END);
+		//setting.placementCandidates.emplace_back(RoomType::FIRST_END);
 
 		// ファイルロード
 		nlohmann::json loadFile;
@@ -235,6 +298,27 @@ void DungeonData::InitRoomGenerateSettings()
 		if (ifs.is_open())
 		{
 			ifs >> loadFile;
+			// 接続点データの取り出し
+			for (const auto& nodeData : loadFile["NodeDatas"])
+			{
+				TileType tileType = nodeData["Type"];
+
+				if (tileType == CONNECTPOINT)
+				{
+					TILE_DATA newConnectPoint;
+					newConnectPoint.position = {
+						nodeData["Position"].at(0),
+						nodeData["Position"].at(1),
+						nodeData["Position"].at(2)
+					};
+					newConnectPoint.angle = {
+						nodeData["Angle"].at(0),
+						nodeData["Angle"].at(1),
+						nodeData["Angle"].at(2)
+					};
+					setting.connectPointDatas.emplace_back(newConnectPoint);
+				}
+			}
 			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
 			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
 			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
@@ -460,7 +544,7 @@ void DungeonData::InitFileNames()
 	m_fileNames.resize(ROOMTYPE_COUNT);
 
 	m_fileNames.at(SIMPLE_ROOM_1) = (char*)("Data/RoomDatas/TestFloor_T.json");
-	m_fileNames.at(DEAD_END) = (char*)("Data/RoomDatas/TestFloor_End.json");
+	m_fileNames.at(DEAD_END) = (char*)("Data/RoomDatas/DeadEnd_A.json");
 
 	// 最初のフロア
 	m_fileNames.at(FIRST_START) = (char*)("Data/RoomDatas/FirstFloor_Start.json");
