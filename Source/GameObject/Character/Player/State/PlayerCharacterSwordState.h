@@ -22,6 +22,19 @@ namespace PlayerCharacterState
 			ATTACK_CONTINUE,
 		};
 
+		struct ATTACK_SPHERE
+		{
+			int power = 0;
+			uint8_t idx = 0;
+			Collider::COLLIDER_OBJ objType = Collider::COLLIDER_OBJ::HIT_ERR;
+			uint16_t hittableOBJ = 0;
+			float hitStartRate = 0.0f;
+			float hitEndRate = 1.0f;
+			Sphere sphere{};
+		};
+		
+		extern ATTACK_SPHERE sphereAttacks[3];
+
 		// 待機用ステートオブジェクト
 		class WaitState : public HierarchicalState<PlayerCharacter>
 		{
@@ -127,7 +140,7 @@ namespace PlayerCharacterState
 			// ステートで実行するメソッド
 			void Execute(float elapsedTime) override;
 			// ステートから出ていくときのメソッド
-			void Exit() override {};
+			void Exit() override;
 		};
 
 		// スキル_1 回レ

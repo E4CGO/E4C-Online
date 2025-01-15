@@ -108,12 +108,12 @@ PlayerCharacter::PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataI
 	// 衝突判定
 	SetMoveCollider({ { 0, radius, 0 }, radius }, Collider::COLLIDER_OBJ::PLAYER);
 	m_pColliders.clear();
-	Capsule capsule{};
-	capsule.radius = radius;
-	capsule.position = { 0, capsule.radius / scale.y, 0 };
-	capsule.direction = { 0.0f, 1.0f, 0.0f };
-	capsule.length = height - capsule.radius * 2;
-	SetCollider(COLLIDER_ID::COL_BODY, capsule, Collider::COLLIDER_OBJ::PLAYER, &transform);
+	//Capsule capsule{};
+	//capsule.radius = radius;
+	//capsule.position = { 0, capsule.radius / scale.y, 0 };
+	//capsule.direction = { 0.0f, 1.0f, 0.0f };
+	//capsule.length = height - capsule.radius * 2;
+	//SetCollider(COLLIDER_ID::COL_BODY, capsule, Collider::COLLIDER_OBJ::PLAYER, &transform);
 
 	this->m_name = dataInfo.name;
 	LoadAppearance(dataInfo.pattern);
@@ -294,14 +294,30 @@ bool  PlayerCharacter::CollisionVsEnemies()
 	for (Enemy*& enemy : ENEMIES.GetAll())
 	{
 		if (!enemy->GetMoveCollider()) continue;
-
+		
 		if (m_pMoveCollider->Collision(enemy->GetMoveCollider(), {}, hit))
 		{
+			hit.position.y = position.y;
+			hit.normal.y = 0.0f;
 			position = hit.position + hit.normal * radius;
 			m_pMoveCollider->SetPosition(position);
 
-			position.y -= radius;
+			//position.y -= radius;
 			isHit = true;
+		}
+
+		for (auto& col : enemy->GetColliders())
+		{
+			if (m_pMoveCollider->Collision(col.second, {}, hit))
+			{
+				hit.position.y = position.y;
+				hit.normal.y = 0.0f;
+				position = hit.position + hit.normal * radius;
+				m_pMoveCollider->SetPosition(position);
+
+				//position.y -= radius;
+				isHit = true;
+			}
 		}
 	}
 	return isHit;
@@ -591,43 +607,43 @@ void PlayerCharacter::Render(const RenderContext& rc)
 	m_pMoveCollider->DrawDebugPrimitive({ 1, 1, 1, 1 });
 	if (IsPlayer())
 	{
-		ImVec2 pos = ImGui::GetMainViewport()->Pos;
-		ImGui::SetNextWindowPos(ImVec2(pos.x + 10, pos.y + 10), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowSize(ImVec2(300, 450), ImGuiCond_FirstUseEver);
+		//ImVec2 pos = ImGui::GetMainViewport()->Pos;
+		//ImGui::SetNextWindowPos(ImVec2(pos.x + 10, pos.y + 10), ImGuiCond_FirstUseEver);
+		//ImGui::SetNextWindowSize(ImVec2(300, 450), ImGuiCond_FirstUseEver);
 
-		if (ImGui::Begin("AttackCollider", nullptr, ImGuiWindowFlags_None))
-		{
-			for (const std::pair<uint8_t, Collider*>& attackCollider : m_pColliders)
-			{
-				if (attackCollider.first == COLLIDER_ID::COL_BODY) continue;
+		//if (ImGui::Begin("AttackCollider", nullptr, ImGuiWindowFlags_None))
+		//{
+		//	for (const std::pair<uint8_t, Collider*>& attackCollider : m_pColliders)
+		//	{
+		//		if (attackCollider.first == COLLIDER_ID::COL_BODY) continue;
 
-				std::string name = "Attack" + std::to_string(attackCollider.first + 1);
-				if (ImGui::TreeNode(name.c_str()))
-				{
-					float radius = attackCollider.second->GetSphere().radius;
-					XMFLOAT3 offset = attackCollider.second->GetSphere().position * scale;
-					//float hitStartRate = attackCollider.second->GetHitStartRate() * 100.0f;	// %表示に
-					//float hitEndRate = attackCollider.second->GetHitEndRate() * 100.0f;		// %表示に
+		//		std::string name = "Attack" + std::to_string(attackCollider.first + 1);
+		//		if (ImGui::TreeNode(name.c_str()))
+		//		{
+		//			float radius = attackCollider.second->GetSphere().radius;
+		//			XMFLOAT3 offset = attackCollider.second->GetSphere().position * scale;
+		//			//float hitStartRate = attackCollider.second->GetHitStartRate() * 100.0f;	// %表示に
+		//			//float hitEndRate = attackCollider.second->GetHitEndRate() * 100.0f;		// %表示に
 
-					ImGui::InputFloat("radius", &radius);
-					ImGui::InputFloat3("offset", &offset.x);
-					//ImGui::InputFloat("hitStartRate(%)", &hitStartRate);
-					//if (hitStartRate < 0.0f)	hitStartRate = 0.0f;
-					//if (hitStartRate > hitEndRate)	hitStartRate = hitEndRate;
-					//ImGui::InputFloat("hitEndRate(%)", &hitEndRate);
-					//if (hitEndRate < hitStartRate)	hitEndRate = hitStartRate;
-					//if (hitEndRate > 100.0f)	hitEndRate = 100.0f;
+		//			ImGui::InputFloat("radius", &radius);
+		//			ImGui::InputFloat3("offset", &offset.x);
+		//			//ImGui::InputFloat("hitStartRate(%)", &hitStartRate);
+		//			//if (hitStartRate < 0.0f)	hitStartRate = 0.0f;
+		//			//if (hitStartRate > hitEndRate)	hitStartRate = hitEndRate;
+		//			//ImGui::InputFloat("hitEndRate(%)", &hitEndRate);
+		//			//if (hitEndRate < hitStartRate)	hitEndRate = hitStartRate;
+		//			//if (hitEndRate > 100.0f)	hitEndRate = 100.0f;
 
-					Sphere sphere(offset / scale, radius);
-					attackCollider.second->SetParam(sphere);
-					//attackCollider.second->SetHitStartRate(hitStartRate * 0.01f);
-					//attackCollider.second->SetHitEndRate(hitEndRate * 0.01f);
+		//			Sphere sphere(offset / scale, radius);
+		//			attackCollider.second->SetParam(sphere);
+		//			//attackCollider.second->SetHitStartRate(hitStartRate * 0.01f);
+		//			//attackCollider.second->SetHitEndRate(hitEndRate * 0.01f);
 
-					ImGui::TreePop();
-				}
-			}
-		}
-		ImGui::End();
+		//			ImGui::TreePop();
+		//		}
+		//	}
+		//}
+		//ImGui::End();
 
 		for (const std::pair<uint8_t, Collider*>& attackCollider : m_pColliders)
 		{
@@ -666,14 +682,15 @@ void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
 	if (dot < 0.0f) return;
 
 #ifdef _DEBUG
-	m_pColliders[COLLIDER_ID::COL_BODY]->DrawDebugPrimitive({ 0, 1, 0, 1 });
 	m_pMoveCollider->DrawDebugPrimitive({ 1, 1, 1, 1 });
-	if (IsPlayer())
+	if (IsPlayer()&& !m_pColliders.empty())
 	{
+		m_pColliders[COLLIDER_ID::COL_BODY]->DrawDebugPrimitive({ 0, 1, 0, 1 });
+
 		ImVec2 pos = ImGui::GetMainViewport()->Pos;
 		ImGui::SetNextWindowPos(ImVec2(pos.x + 10, pos.y + 10), ImGuiCond_FirstUseEver);
 		ImGui::SetNextWindowSize(ImVec2(300, 450), ImGuiCond_FirstUseEver);
-
+		
 		if (ImGui::Begin("AttackCollider", nullptr, ImGuiWindowFlags_None))
 		{
 			for (const std::pair<uint8_t, Collider*>& attackCollider : m_pColliders)
@@ -706,7 +723,7 @@ void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
 				}
 			}
 		}
-
+		ImGui::End();
 
 		for (const std::pair<uint8_t, Collider*>& attackCollider : m_pColliders)
 		{

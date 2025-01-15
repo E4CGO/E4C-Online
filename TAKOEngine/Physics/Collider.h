@@ -167,10 +167,10 @@ public:
 	//const int GetHitDamage() const { return m_hitDamage; }
 
 	virtual void SetCurrentRate(float currentRate){}
-	//void SetHitStartRate(float rate) { m_hitStartRate = rate; }
-	//const float GetHitStartRate() const { return m_hitStartRate; }
-	//void SetHitEndRate(float rate) { m_hitEndRate = rate; }
-	//const float GetHitEndRate() const { return m_hitEndRate; }
+	virtual void SetHitStartRate(float rate){}
+	virtual const float GetHitStartRate() const { return 0; }
+	virtual void SetHitEndRate(float rate){}
+	virtual const float GetHitEndRate() const{ return 0; }
 
 	bool IsEnable() const { return m_enable; }
 	void SetEnable(bool e) { m_enable = e; }

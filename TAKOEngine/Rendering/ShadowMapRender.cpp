@@ -414,7 +414,7 @@ void ShadowMapRenderDX12::Render(FrameBufferManager* frameBuffer)
 
 	// シーン用定数バッファ更新
 	const Descriptor* scene_cbv_descriptor = graphics.UpdateSceneConstantBuffer(
-		CameraManager::Instance().GetCamera());
+		CameraManager::Instance().GetCamera(), 0, 0);
 
 	RenderContextDX12 rc;
 	rc.d3d_command_list = frameBuffer->GetCommandList();

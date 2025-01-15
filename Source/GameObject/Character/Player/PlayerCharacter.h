@@ -136,6 +136,24 @@ public:
 		BLUE,
 		END
 	};
+
+	enum class WEAPON_TYPE {
+		SWORD_SIMPLE = 1,
+		SWORD_NORMAL,
+		SWORD_COMPLEX,
+		ROD_SIMPLE,
+		ROD_NORMAL,
+		ROD_COMPLEX,
+		ENUM_COUNT
+	};
+
+	enum class ENERGY_TYPE
+	{
+		STAMINA = 1,
+		MANA,
+		ENUM_COUNT
+	};
+
 	// 更新処理
 	virtual void Update(float elapsedTime) override;
 	// 描画処理
@@ -187,8 +205,15 @@ public:
 	// MP管理
 	void RecoverMp(float elapsedTime);
 	void ModifyMp(float mp);
+	void SetCurrentMp(float mp) { this->mp = mp; }
 	float GetMp() { return mp; }
 	float GetMaxMp() { return maxMp; }
+
+	void SetWeaponType(WEAPON_TYPE weapontype) { m_weaponType = static_cast<WEAPON_TYPE>(weapontype); }
+	void SetEnergyType(ENERGY_TYPE energytype) { m_energyType = static_cast<ENERGY_TYPE>(energytype); }
+
+	WEAPON_TYPE GetWeaponType() { return m_weaponType; }
+	ENERGY_TYPE GetEnergyType() { return m_energyType; }
 
 	// スキルタイマー
 	float GetSkillTimerTime(int idx);
@@ -264,6 +289,8 @@ protected:
 	float mpRecoverRate = 8.0f; // 毎秒回復量
 	int atk = 10;
 	std::string m_name;
+	WEAPON_TYPE m_weaponType;
+	ENERGY_TYPE m_energyType;
 
 	float moveSpeed = 0.0f;
 	float turnSpeed = 0.0f;

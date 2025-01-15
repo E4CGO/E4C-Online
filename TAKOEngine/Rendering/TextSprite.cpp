@@ -212,7 +212,13 @@ void TextSprite::RenderDX12(
 	D2D1_RECT_F textRect = D2D1::RectF(pos.x, pos.y, pos.x + size.x, pos.y + size.y);
 
 	T_GRAPHICS.GetD2D1DeviceContext()->BeginDraw();
-	T_GRAPHICS.GetD2D1DeviceContext()->SetTransform(D2D1::Matrix3x2F::Identity());
+
+	D2D1::Matrix3x2F scaleMatrix = D2D1::Matrix3x2F::Scale(
+		D2D1_SIZE_F{ scale, scale },  // Scaling factors for X and Y
+		D2D1_POINT_2F{ (textRect.right + textRect.left) * 0.5f, (textRect.top + textRect.bottom) * 0.5f } // Center of scaling
+	);
+
+	T_GRAPHICS.GetD2D1DeviceContext()->SetTransform(scaleMatrix);
 
 	T_GRAPHICS.GetD2D1DeviceContext()->DrawText(
 		text.c_str(),
@@ -221,6 +227,7 @@ void TextSprite::RenderDX12(
 		&textRect,
 		m_textBrush.Get()
 	);
+	T_GRAPHICS.GetD2D1DeviceContext()->SetTransform(D2D1::Matrix3x2F::Identity());
 
 	T_GRAPHICS.GetD2D1DeviceContext()->EndDraw();
 }

@@ -81,7 +81,7 @@ protected:
 class PlaneDX12 : public ModelObject
 {
 public:
-	PlaneDX12(const char* filename, float scaling, XMFLOAT3 positions, float positionZ, float plane_width);
+	PlaneDX12(const char* filename, float scaling, XMFLOAT3 centerPos, float positionZ, float plane_width);
 
 	virtual ~PlaneDX12()
 	{

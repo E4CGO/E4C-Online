@@ -16,6 +16,7 @@
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Tool/Timer.h"
 #include "TAKOEngine/Physics/CollisionManager.h"
+#include "TAKOEngine/Sound/Sound.h"
 
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
@@ -43,23 +44,57 @@ void StageOpenWorld_E4C::Initialize()
 		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
 	}
 
+	m_pCharacterGauge = new WidgetPlayerHP();
+	m_pPauseMenu = new WidgetPauseMenu();
+	UI.Register(m_pCharacterGauge);
+	UI.Register(m_pPauseMenu);
+
 	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
+	village_collision = new MapTile("Data/Model/Stage/Terrain_Village_Collision.glb", 1.f);
 	stage_collision->Update(0);
+	village_collision->Update(0);
 	stage_collision->SetMoveCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
+	village_collision->SetMoveCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
 
 	MAPTILES.Register(stage_collision);
+	MAPTILES.Register(village_collision);
 	MAPTILES.CreateSpatialIndex(5, 7);
 
 	if (T_GRAPHICS.isDX11Active)
 	{
-		models.emplace("map", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_TOON));
-		models.emplace("tower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_TOON));
+		models.emplace("map", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_PBR));
+		models.emplace("village", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Village.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_PBR));
+
+		models.emplace("bush", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Bush.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_PBR));
+		models.emplace("tree1t", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tree_1_Trunk.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_PBR));
+		models.emplace("tree1l", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tree_1_Leaf.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_PBR));
+		models.emplace("tree2t", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tree_2_Trunk.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_PBR));
+		models.emplace("tree2l", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tree_2_Leaf.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_PBR));
+		models.emplace("flower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Flower.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_PBR));
+
+		models.emplace("tower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_PBR));
+
+		models.emplace("target1", std::make_unique<ModelObject>("Data/Model/Object/BlockTarget.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_PBR));
+		models["target1"]->SetPosition({ -34.9f, 1.8f, 20.4f });
+		models["target1"]->SetAngle({ 0.0f, -0.84f, 0.0f });
+		models.emplace("target2", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget1.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_PBR));
+		models["target2"]->SetPosition({ -38.1, 1.80f, 16.2f });
+		models["target2"]->SetAngle({ 0.0f, -1.0f, 0.0f });
+		models.emplace("target3", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget2.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_PBR));
+		models["target3"]->SetPosition({ -32.0, 1.80f, 23.4f });
+		models["target3"]->SetAngle({ 0.0f, -1.0f, 0.0f });
+
+		models.emplace("boss", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMboss_1205.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_TOON));
+		models["boss"]->SetPosition({ 10.0, 0.0f, 10.0f });
+		models["boss"]->SetAnimation(0, true);
+
+		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 250.0f, ModelObject::RENDER_MODE::DX11);
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 70.0f, ModelObject::RENDER_MODE::DX11);
 		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
 
-		plane = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "Data/Sprites/gem.png", 1.0f, XMFLOAT3{ -15.0f,5.0f,5.0f }, 5.0f, 5.0f);
-		plane->SetShader(ModelShaderId::Plane);
+		portalSquare = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, XMFLOAT3{ 10.0f,5.0f,5.0f }, 5.0f, 5.0f);
+		portalSquare->SetShader(ModelShaderId::PortalSquare);
 
 		fireBall = std::make_unique<Fireball>(T_GRAPHICS.GetDevice(), "Data/Sprites/fire.png", 1.0f, XMFLOAT3{ -30.0f,5.0f,5.0f });
 		fireBall->SetShader(ModelShaderId::Fireball);
@@ -68,22 +103,37 @@ void StageOpenWorld_E4C::Initialize()
 	if (T_GRAPHICS.isDX12Active)
 	{
 		models.emplace("map", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
-		models.emplace("tower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		models.emplace("village", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Village.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+
+		models.emplace("bush", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Bush.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		models.emplace("tree1t", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tree_1_Trunk.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		models.emplace("tree1l", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tree_1_Leaf.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		models.emplace("tree2t", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tree_2_Trunk.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		models.emplace("portal", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Portal.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		models["portal"]->SetPosition({ -34.0f, 4.0f, -45.0f });
+		models["portal"]->SetAngle({ 0.0f, 1.5f, 0.0f });
+
+		models.emplace("target1", std::make_unique<ModelObject>("Data/Model/Object/BlockTarget.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		models["target1"]->SetPosition({ -34.9f, 1.8f, 20.4f });
+		models["target1"]->SetAngle({ 0.0f, -0.84f, 0.0f });
+		models.emplace("target2", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget1.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		models["target2"]->SetPosition({ -38.1, 1.80f, 16.2f });
+		models["target2"]->SetAngle({ 0.0f, -1.0f, 0.0f });
+		models.emplace("target3", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget2.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		models["target3"]->SetPosition({ -32.0, 1.80f, 23.4f });
+		models["target3"]->SetAngle({ 0.0f, -1.0f, 0.0f });
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 250.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
 		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
 		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
 
-		plane2 = std::make_unique<PlaneDX12>("Data/Sprites/gem.png", 1.0f, XMFLOAT3{ -15.0f,5.0f,5.0f }, 5.0f, 5.0f);
-		plane2->SetShader(ModelShaderId::Plane);
+		portalSquare2 = std::make_unique<PlaneDX12>("Data/Sprites/gear.png", 1.0f, XMFLOAT3{ -34.0f, 6.0f, 0.0f }, -43.5f, 1.5f);
+		portalSquare2->SetShaderDX12(ModelShaderDX12Id::PortalSquare);
 	}
 
 	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
-	teleporter->SetPosition({ 16, 8.5, -46 });
+	teleporter->SetPosition({ -34.0f, 4.0f, -45.0f });
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
-
-	portalSquare = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "", 1.0f, XMFLOAT3{ 10.0f,5.0f,5.0f }, 5.0f, 5.0f);
-	portalSquare->SetShader(ModelShaderId::PortalSquare);
 
 	// プレイヤーが走るときの土埃
 	runningDust1 = std::make_unique<RunningDust>(T_GRAPHICS.GetDevice(), "Data/Sprites/smoke.png", 100.0f,
@@ -126,6 +176,11 @@ void StageOpenWorld_E4C::Initialize()
 	cameraController->SetEnable(true);
 	cameraController->SetPlayer(player);
 	CURSOR_OFF;
+
+	Sound::Instance().Finalize();
+	Sound::Instance().InitAudio();
+	Sound::Instance().LoadAudio("Data/Sound/3-Dreamland(Overworld).mp3");
+	Sound::Instance().PlayAudio(0);
 
 	// 影初期化
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
@@ -186,13 +241,7 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 
 	SpawnerManager::Instance().Update(elapsedTime);
 
-	teleporter->Update(elapsedTime);
-
-	portalSquare->Update(elapsedTime);
 	runningDust1->Update(elapsedTime);
-
-	//plane2->Update(elapsedTime);
-
 	timer += elapsedTime;
 
 	for (auto& it : models)
@@ -205,7 +254,7 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
 	}
 
-	m_timer += elapsedTime;
+	timerTick = elapsedTime;
 }
 
 void StageOpenWorld_E4C::Render()
@@ -233,17 +282,11 @@ void StageOpenWorld_E4C::Render()
 		it.second->Render(rc);
 	}
 
-	teleporter->Render(rc);
-
 	SpawnerManager::Instance().Render(rc);
 
 	ENEMIES.Render(rc);
+
 	portalSquare->Render(rc);
-	runningDust1->Render(rc);
-
-	plane->Render(rc);
-
-	fireBall->Render(rc);
 
 	UI.Render(rc);
 
@@ -254,16 +297,9 @@ void StageOpenWorld_E4C::Render()
 
 void StageOpenWorld_E4C::RenderDX12()
 {
-	T_GRAPHICS.BeginRender();
-
-	// シーン用定数バッファ更新
-	const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
-		CameraManager::Instance().GetCamera());
-
-	// レンダーコンテキスト設定
 	RenderContextDX12 rc;
-	rc.d3d_command_list = m_frameBuffer->GetCommandList();
-	rc.scene_cbv_descriptor = scene_cbv_descriptor;
+
+	T_GRAPHICS.BeginRender();
 
 	// 3Dモデル描画
 	{
@@ -276,7 +312,15 @@ void StageOpenWorld_E4C::RenderDX12()
 			T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
 			rc.shadowMap.shadow_srv_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSRV();
 			rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();
-		}
+		}	
+		// シーン用定数バッファ更新
+		const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
+			CameraManager::Instance().GetCamera(), timer, timerTick);
+
+		// レンダーコンテキスト設定
+		rc.d3d_command_list = m_frameBuffer->GetCommandList();
+		rc.scene_cbv_descriptor = scene_cbv_descriptor;
+
 
 		// プレイヤー
 		PlayerCharacterManager::Instance().RenderDX12(rc);
@@ -289,9 +333,9 @@ void StageOpenWorld_E4C::RenderDX12()
 			it.second->RenderDX12(rc);
 		}
 
-		plane2->RenderDX12(rc);
-
 		SpawnerManager::Instance().RenderDX12(rc);
+		portalSquare2->RenderDX12(rc);
+
 		// skyBox
 		{
 			rc.skydomeData.skyTexture = m_sprites[1]->GetDescriptor();
@@ -315,6 +359,16 @@ void StageOpenWorld_E4C::RenderDX12()
 
 		T_TEXT.EndDX12();
 	}
-
+#ifdef _DEBUG
+	DrawSceneGUI();
+	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
+#endif
 	T_GRAPHICS.End();
+}
+
+void StageOpenWorld_E4C::DrawSceneGUI()
+{
+	ImVec2 pos = ImGui::GetMainViewport()->Pos;
+	ImGui::SetNextWindowPos(ImVec2(pos.x + 10, pos.y + 10), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
 }

@@ -337,6 +337,11 @@ void StageDungeon_E4C::Update(float elapsedTime)
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
 	}
 
+	for (auto& model : PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetModels())
+	{
+		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
+	}
+
 	m_timer += elapsedTime;
 }
 
@@ -377,7 +382,7 @@ void StageDungeon_E4C::RenderDX12()
 
 	// シーン用定数バッファ更新
 	const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
-		CameraManager::Instance().GetCamera());
+		CameraManager::Instance().GetCamera(), 0, 0);
 
 	// レンダーコンテキスト設定
 	RenderContextDX12 rc;

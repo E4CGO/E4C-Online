@@ -3,16 +3,18 @@
 // 頂点シェーダー出力データ
 struct VS_OUT
 {
-	float4 position : SV_POSITION;
-	float4 color	: COLOR;
-	float2 texcoord : TEXCOORD;
+    float4 position : SV_POSITION;
+    float4 color : COLOR;
+    float2 texcoord : TEXCOORD;
 };
 
 cbuffer CbScene : register(b0)
 {
+    row_major float4x4 View;
+    row_major float4x4 Projection;
     float4 cameraPosition;
-    row_major float4x4 ViewProjection;
-
+    row_major float4x4 lightViewProjection;
+    
     //ライト情報
     float4 ambientLightColor;
     DirectionalLightData directionalLightData;
@@ -23,7 +25,11 @@ cbuffer CbScene : register(b0)
     
     float timerGlobal;
     float timerTick;
-}
+
+	// 影情報
+    float shadowBias;
+    float3 shadowColor;
+};
 
 #define PI 3.14159265359
 #define TWO_PI 6.28318530718
@@ -146,3 +152,20 @@ float fbm3d(float3 x, const in int it)
     }
     return v;
 }
+
+#define ROOT_SIG "RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT), \
+                  DescriptorTable(CBV(b0), visibility=SHADER_VISIBILITY_ALL), \
+                  DescriptorTable(SRV(t0), visibility=SHADER_VISIBILITY_PIXEL), \
+                  StaticSampler(s0 ,\
+                  filter = FILTER_MIN_MAG_MIP_LINEAR,\
+                  addressU = TEXTURE_ADDRESS_WRAP,\
+                  addressV = TEXTURE_ADDRESS_WRAP,\
+                  addressW = TEXTURE_ADDRESS_WRAP,\
+                  mipLodBias = 0.0f,\
+                  maxAnisotropy = 0,\
+                  comparisonFunc  = COMPARISON_NEVER,\
+                  borderColor = STATIC_BORDER_COLOR_TRANSPARENT_BLACK,\
+                  minLOD = 0.0f,\
+                  maxLOD = 3.402823466e+38f,\
+                  space  =  0,\
+                  visibility = SHADER_VISIBILITY_PIXEL\)"

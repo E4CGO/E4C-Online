@@ -14,15 +14,17 @@ public:
 		: m_power(_power), SphereCollider(_objType, _transform), m_hitStartRate(_hitStartRate), m_hitEndRate(_hitEndRate) { m_enable = false; }
 	~AttackSphereCollider() = default;
 
-	void Update() override;
+	virtual void Update() override;
 
 	virtual void OnCollision(Collider* other) override;
 	int GetPower() { return m_power; }
 	
 	void SetCurrentRate(float currentRate) override { m_currentRate = currentRate; }
-	const float GetCurrentRate() const { return m_currentRate; }
-	const float GetHitStartRate() const { return m_hitStartRate; }
-	const float GetHitEndRate() const { return m_hitEndRate; }
+	//const float GetCurrentRate() const override { return m_currentRate; }
+	void SetHitStartRate(float rate) override { m_hitStartRate = rate; }
+	const float GetHitStartRate() const override { return m_hitStartRate; }
+	void SetHitEndRate(float rate) override { m_hitEndRate = rate; }
+	const float GetHitEndRate() const override { return m_hitEndRate; }
 
 protected:
 	int m_power = 0;			// 攻撃力

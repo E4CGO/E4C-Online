@@ -34,6 +34,7 @@ protected:
 
 	float m_portalTime = 3.0f;
 	float m_timer = 0.0f;
+	float m_interractionDistance = 5.0f;
 
 	DirectX::XMFLOAT2 m_textureSize = {};
 

@@ -48,7 +48,6 @@ void SceneCharacter_E4CState::InitState::Execute(float elapsedTime)
 *//***************************************************************************/
 void SceneCharacter_E4CState::InitState::Exit()
 {
-
 }
 
 /**************************************************************************//**
@@ -66,6 +65,9 @@ void SceneCharacter_E4CState::CharacterSelectionState::Enter()
 	m_cameraOriginPos = CameraManager::Instance().GetCamera()->GetEye();
 	m_cameraOriginFocus = CameraManager::Instance().GetCamera()->GetFocus();
 	m_cameraTimer = 0.0f;
+
+	m_pPauseMenu = new WidgetPauseMenu();
+	UI.Register(m_pPauseMenu);
 }
 /**************************************************************************//**
 	@brief		実行

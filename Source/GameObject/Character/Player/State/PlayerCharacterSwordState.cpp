@@ -8,6 +8,12 @@ namespace PlayerCharacterState
 {
 	namespace Sword
 	{
+		ATTACK_SPHERE sphereAttacks[3] = {
+		{10, PlayerCharacter::COLLIDER_ID::COL_ATTACK_1, Collider::COLLIDER_OBJ::PLAYER_ATTACK, Collider::COLLIDER_OBJ::ENEMY, 0.15f, 0.55f, {{0, 0.6f/0.005f, 0}, 0.5f}},
+		{20, PlayerCharacter::COLLIDER_ID::COL_ATTACK_2, Collider::COLLIDER_OBJ::PLAYER_ATTACK, Collider::COLLIDER_OBJ::ENEMY, 0.15f, 0.55f, {{0, 0.6f/0.005f, 0}, 0.5f}},
+		{30, PlayerCharacter::COLLIDER_ID::COL_ATTACK_3, Collider::COLLIDER_OBJ::PLAYER_ATTACK, Collider::COLLIDER_OBJ::ENEMY, 0.08f, 0.45f, {{0, 0.6f, 0}, 0.5f}}
+		};
+
 		// 待機用ステート
 		void WaitState::Enter()
 		{
@@ -104,35 +110,21 @@ namespace PlayerCharacterState
 				DirectX::XMFLOAT4X4* matrix = &owner->GetModel(0)->FindNode("JOT_C_Sword")->worldTransform;
 				Sphere attack1{ { 0, 0.6f / XMFLOAT3Length({matrix->_21, matrix->_22, matrix->_23}), 0} , 0.5f };
 
-				//owner->MakeAttackCollider(10, PlayerCharacter::COLLIDER_ID::COL_ATTACK_1, attack1, Collider::COLLIDER_OBJ::PLAYER_ATTACK, (Collider::COLLIDER_OBJ::ENEMY), matrix);
-				ModelObject::ATTACK_COLLIDER_DATA attack1Data;
-				attack1Data.power = 10;
-				attack1Data.idx = PlayerCharacter::COLLIDER_ID::COL_ATTACK_1;
-				attack1Data.objType = Collider::COLLIDER_OBJ::PLAYER_ATTACK;
-				attack1Data.hittableOBJ = Collider::COLLIDER_OBJ::ENEMY;
-				attack1Data.hitStartRate = 0.15f;
-				attack1Data.hitEndRate = 0.55f;
-				owner->MakeAttackCollider(attack1Data, attack1, matrix);
+				ModelObject::ATTACK_COLLIDER_DATA attackData;
+				attackData.power = sphereAttacks[0].power;
+				attackData.idx = sphereAttacks[0].idx;
+				attackData.objType = sphereAttacks[0].objType;
+				attackData.hittableOBJ = sphereAttacks[0].hittableOBJ;
+				attackData.hitStartRate = sphereAttacks[0].hitStartRate;
+				attackData.hitEndRate = sphereAttacks[0].hitEndRate;
+				owner->MakeAttackCollider(attackData, attack1, matrix);
 			}
 		}
 		void AttackNormalState_1::Execute(float elapsedTime)
 		{
-			
 			if (owner->IsPlayer())
 			{
 				owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_1)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
-				//if (!owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_1)->IsEnable())
-				//{
-				//	if (owner->GetModel()->GetAnimationRate() > owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_1)->GetHitStartRate())
-				//	{
-				//		owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_1)->SetEnable(true);
-				//	}
-				//}
-				//if (owner->GetModel()->GetAnimationRate() > owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_1)->GetHitEndRate())
-				//{
-				//	owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_1)->SetEnable(false);
-				//	owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_1)->ClearHitOthers();
-				//}
 
 				float time = owner->GetModel()->GetCurrentAnimationSeconds();
 				if (0.184f <= time && time <= 0.368f)
@@ -246,21 +238,27 @@ namespace PlayerCharacterState
 			owner->SetAnimationSpeed(0.7f);
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_COMBO_THIRD, false, 0.2f);
 
-			
+			if (owner->IsPlayer())
+			{
+				DirectX::XMFLOAT4X4* matrix = &owner->GetModel(0)->FindNode("JOT_C_Hip")->worldTransform;
+				Sphere attack3{ {0, 0, 0} , 1.5f };
+				//DirectX::XMFLOAT4X4* matrix = &owner->GetModel(0)->FindNode("JOT_C_Sword")->worldTransform;
+				//Sphere attack3{ { 0, 0.6f / XMFLOAT3Length({matrix->_21, matrix->_22, matrix->_23}), 0} , 0.5f };
+
+
+				ModelObject::ATTACK_COLLIDER_DATA attackData;
+				attackData.power = sphereAttacks[2].power;
+				attackData.idx = sphereAttacks[2].idx;
+				attackData.objType = sphereAttacks[2].objType;
+				attackData.hittableOBJ = sphereAttacks[2].hittableOBJ;
+				attackData.hitStartRate = sphereAttacks[2].hitStartRate;
+				attackData.hitEndRate = sphereAttacks[2].hitEndRate;
+				owner->MakeAttackCollider(attackData, attack3, matrix);
+			}
 		}
 		void AttackNormalState_3::Execute(float elapsedTime)
 		{
-			//if (!owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_3)->IsEnable())
-			//{
-			//	if (owner->GetModel()->GetAnimationRate() > owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_3)->GetHitStartRate())
-			//	{
-			//		owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_3)->SetEnable(true);
-			//	}
-			//}
-			//if (owner->GetModel()->GetAnimationRate() > owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_3)->GetHitEndRate())
-			//{
-			//	owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_3)->SetEnable(false);
-			//}
+			owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_3)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
 
 			float time = owner->GetModel()->GetCurrentAnimationSeconds();
 			if (owner->IsPlayer())
@@ -304,6 +302,10 @@ namespace PlayerCharacterState
 				}
 			}
 			if (!owner->IsPlayer()) return;
+		}
+		void AttackNormalState_3::Exit()
+		{
+			owner->DeleteAttackCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_3);
 		}
 
 		// スキル_1ステート

@@ -16,6 +16,8 @@
 #include "GameObject/Props/Teleporter.h"
 #include "GameObject/Props/Spawner.h"
 #include "GameObject/Character/Enemy/MouseMob.h"
+#include "Source/UI/Widget/WidgetPlayerHP.h"
+#include "Source/UI/Widget/WidgetPauseMenu.h"
 
 #include "TAKOEngine/Rendering/Shaders/PlaneShader.h"
 
@@ -54,11 +56,20 @@ public:
 	};
 
 private:
+	// シーンGUI描画
+	void DrawSceneGUI();
+
+private:
+
+	float timer = 0;
+	float timerTick = 0;
+
 	SceneGame_E4C* m_pScene;
 
 	std::unique_ptr<ThridPersonCameraController> cameraController;
 
 	MapTile* stage_collision = nullptr;
+	MapTile* village_collision = nullptr;
 
 	std::unique_ptr <Teleporter> teleporter;
 
@@ -68,6 +79,7 @@ private:
 	std::unique_ptr<SpriteDX12> m_sprites[8];
 
 	std::unique_ptr<Plane> portalSquare;
+	std::unique_ptr<PlaneDX12> portalSquare2;
 
 	std::unique_ptr<Fireball> fireBall;
 
@@ -90,6 +102,9 @@ private:
 	};
 
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
+
+	WidgetPlayerHP* m_pCharacterGauge;
+	WidgetPauseMenu* m_pPauseMenu;
 
 	float transitionTime = 0.0f;
 	float transitionDuration = 2.f;  // 5秒かけて移動
