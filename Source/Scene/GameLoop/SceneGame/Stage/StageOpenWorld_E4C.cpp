@@ -77,24 +77,18 @@ void StageOpenWorld_E4C::Initialize()
 		models.emplace("target1", std::make_unique<ModelObject>("Data/Model/Object/BlockTarget.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["target1"]->SetPosition({ -34.9f, 1.8f, 20.4f });
 		models["target1"]->SetAngle({ 0.0f, -0.84f, 0.0f });
-		models["target1"]->SetMoveCollider(Collider::COLLIDER_TYPE::OBB, Collider::COLLIDER_OBJ::ENEMY);
 		models.emplace("target2", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget1.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["target2"]->SetPosition({ -38.1, 1.80f, 16.2f });
 		models["target2"]->SetAngle({ 0.0f, -1.0f, 0.0f });
-		models["target2"]->SetMoveCollider(Collider::COLLIDER_TYPE::OBB, Collider::COLLIDER_OBJ::ENEMY);
 		models.emplace("target3", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget2.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["target3"]->SetPosition({ -32.0, 1.80f, 23.4f });
 		models["target3"]->SetAngle({ 0.0f, -1.0f, 0.0f });
-		models["target3"]->SetMoveCollider(Collider::COLLIDER_TYPE::OBB, Collider::COLLIDER_OBJ::ENEMY);
 
 		models.emplace("boss", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMboss_1205.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_TOON));
 		models["boss"]->SetPosition({ 10.0, 0.0f, 10.0f });
 		models["boss"]->SetAnimation(0, true);
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 250.0f, ModelObject::RENDER_MODE::DX11);
-		//mouse = std::make_unique<MouseMob>(.5f);
-		//mouse->SetPosition({ 20.0, 0.0f, 10.0f });
-		//mouse->SetSpawnPosition({ 20.0, 0.0f, 10.0f });
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 70.0f, ModelObject::RENDER_MODE::DX11);
 		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
@@ -122,23 +116,12 @@ void StageOpenWorld_E4C::Initialize()
 		models.emplace("target1", std::make_unique<ModelObject>("Data/Model/Object/BlockTarget.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["target1"]->SetPosition({ -34.9f, 1.8f, 20.4f });
 		models["target1"]->SetAngle({ 0.0f, -0.84f, 0.0f });
-		models["target1"]->SetMoveCollider(Collider::COLLIDER_TYPE::OBB, Collider::COLLIDER_OBJ::ENEMY);
 		models.emplace("target2", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget1.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["target2"]->SetPosition({ -38.1, 1.80f, 16.2f });
 		models["target2"]->SetAngle({ 0.0f, -1.0f, 0.0f });
-		models["target2"]->SetMoveCollider(Collider::COLLIDER_TYPE::OBB, Collider::COLLIDER_OBJ::ENEMY);
 		models.emplace("target3", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget2.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["target3"]->SetPosition({ -32.0, 1.80f, 23.4f });
 		models["target3"]->SetAngle({ 0.0f, -1.0f, 0.0f });
-		models["target3"]->SetMoveCollider(Collider::COLLIDER_TYPE::OBB, Collider::COLLIDER_OBJ::ENEMY);
-
-		models.emplace("boss", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMboss_1205.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON));
-		models["boss"]->SetPosition({ 10.0, 0.0f, 10.0f });
-		models["boss"]->SetAnimation(0, true);
-
-		//mouse = std::make_unique<MouseMob>(.5f, ModelObject::RENDER_MODE::DX12);
-		//mouse->SetPosition({ 20.0, 0.0f, 10.0f });
-		//mouse->SetSpawnPosition({ 20.0, 0.0f, 10.0f });
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 250.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
 		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
@@ -187,9 +170,6 @@ void StageOpenWorld_E4C::Initialize()
 	spawner->SetPosition({ 15.0f, 2.0f, 0.0f });
 	spawner->SetSearchRadius(10.0f);
 	SpawnerManager::Instance().Register(spawner);
-	//spawner = std::make_unique<Spawner>(0, 2, -1);
-	//spawner->SetPosition({ 0.0f, 5.0f, -5.0f });
-	//spawner->SetSpawnRadius(0.0f);
 
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(mainCamera);
@@ -261,14 +241,7 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 
 	SpawnerManager::Instance().Update(elapsedTime);
 
-	//mouse->Update(elapsedTime);
-
-	portalSquare->Update(elapsedTime);
 	runningDust1->Update(elapsedTime);
-	m_timer += elapsedTime;
-
-	PlayerCharacterManager::Instance().GetPlayerCharacterById(0)->SetCurrentMp(mpsp);
-
 	timer += elapsedTime;
 
 	for (auto& it : models)
@@ -306,95 +279,91 @@ void StageOpenWorld_E4C::Render()
 
 	for (auto& it : models)
 	{
-
-		SpawnerManager::Instance().Render(rc);
-
-		//mouse->Render(rc);
-
-		ENEMIES.Render(rc);
-		portalSquare->Render(rc);
-
-		UI.Render(rc);
-
-		// デバッグレンダラ描画実行
-
-		T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
+		it.second->Render(rc);
 	}
+
+	SpawnerManager::Instance().Render(rc);
+
+	ENEMIES.Render(rc);
+
+	portalSquare->Render(rc);
+
+	UI.Render(rc);
+
+	// デバッグレンダラ描画実行
+
+	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
 }
 
 void StageOpenWorld_E4C::RenderDX12()
 {
-		RenderContextDX12 rc;
+	RenderContextDX12 rc;
 
-		T_GRAPHICS.BeginRender();
+	T_GRAPHICS.BeginRender();
 
-		// 3Dモデル描画
+	// 3Dモデル描画
+	{
+		m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+
+		// シャドウマップ
 		{
-			m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
-			m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
-			m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+			T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
+			rc.shadowMap.shadow_srv_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSRV();
+			rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();
+		}	
+		// シーン用定数バッファ更新
+		const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
+			CameraManager::Instance().GetCamera(), timer, timerTick);
 
-			// シャドウマップ
-			{
-				T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
-				// シーン用定数バッファ更新
-				const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
-					CameraManager::Instance().GetCamera(), timer, timerTick);
-
-				// レンダーコンテキスト設定
-				rc.d3d_command_list = m_frameBuffer->GetCommandList();
-				rc.scene_cbv_descriptor = scene_cbv_descriptor;
-
-			}
-
-			//mouse->RenderDX12(rc);
-
-			// プレイヤー
-			PlayerCharacterManager::Instance().RenderDX12(rc);
-
-			ENEMIES.RenderDX12(rc);
-
-			// ステージ
-			for (auto& it : models)
-			{
-				it.second->RenderDX12(rc);
-			}
-
-			plane2->RenderDX12(rc);
+		// レンダーコンテキスト設定
+		rc.d3d_command_list = m_frameBuffer->GetCommandList();
+		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
 
-			SpawnerManager::Instance().RenderDX12(rc);
-			// skyBox
-			{
-				rc.skydomeData.skyTexture = m_sprites[1]->GetDescriptor();
-				sky->RenderDX12(rc);
-			}
+		// プレイヤー
+		PlayerCharacterManager::Instance().RenderDX12(rc);
 
-			// レンダーターゲットへの書き込み終了待ち
-			m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		ENEMIES.RenderDX12(rc);
+
+		// ステージ
+		for (auto& it : models)
+		{
+			it.second->RenderDX12(rc);
 		}
 
-		// ポストエフェクト描画
+		SpawnerManager::Instance().RenderDX12(rc);
+		portalSquare2->RenderDX12(rc);
+
+		// skyBox
 		{
-			postprocessingRenderer->Render(m_frameBuffer);
+			rc.skydomeData.skyTexture = m_sprites[1]->GetDescriptor();
+			sky->RenderDX12(rc);
 		}
 
-		// 2D描画
-		{
-			T_TEXT.BeginDX12();
+		// レンダーターゲットへの書き込み終了待ち
+		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+	}
 
-			UI.RenderDX12(rc);
-			DirectX::XMFLOAT3 test_position;
-			DirectX::XMFLOAT3 test_rotation;
-			DirectX::XMFLOAT3 test_scale;
+	// ポストエフェクト描画
+	{
+		postprocessingRenderer->Render(m_frameBuffer);
+	}
 
+	// 2D描画
+	{
+		T_TEXT.BeginDX12();
+
+		UI.RenderDX12(rc);
+
+		T_TEXT.EndDX12();
+	}
 #ifdef _DEBUG
-			DrawSceneGUI();
-			T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
+	DrawSceneGUI();
+	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
 #endif
-
-
-		}
+	T_GRAPHICS.End();
 }
 
 void StageOpenWorld_E4C::DrawSceneGUI()
@@ -402,15 +371,4 @@ void StageOpenWorld_E4C::DrawSceneGUI()
 	ImVec2 pos = ImGui::GetMainViewport()->Pos;
 	ImGui::SetNextWindowPos(ImVec2(pos.x + 10, pos.y + 10), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
-
-	if (ImGui::Begin("Scene##Debug", nullptr, ImGuiWindowFlags_None))
-	{
-		if (ImGui::CollapsingHeader("Object", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			// カメラ
-			ImGui::DragFloat("HP", &hp, 0.0f, 100.0f);
-			ImGui::DragFloat("MP", &mpsp, 0.0f, 100.0f);
-		}
-	}
-	ImGui::End();
 }

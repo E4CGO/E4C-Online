@@ -76,6 +76,6 @@ namespace U8Buffer {
 	*//***************************************************************************/
 	void InsertU8(std::vector<uint8_t>& buffer, const std::string& value)
 	{
-		buffer.insert(buffer.end(), value.begin(), value.end() - 1);
+		buffer.insert(buffer.end(), value.begin(), value.end());
 	}
 }
