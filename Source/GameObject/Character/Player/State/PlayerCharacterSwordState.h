@@ -125,7 +125,7 @@ namespace PlayerCharacterState
 			// ステートで実行するメソッド
 			void Execute(float elapsedTime) override;
 			// ステートから出ていくときのメソッド
-			void Exit() override {};
+			void Exit() override;
 		};
 		// 一般攻撃3
 		class AttackNormalState_3 : public HierarchicalState<PlayerCharacter>
