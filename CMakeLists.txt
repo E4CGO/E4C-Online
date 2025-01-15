@@ -201,6 +201,8 @@ source_group("Source\\GameObject\\Projectile" FILES ${Source__GameObject__Projec
 set(Source__GameObject__Props
     "Source/GameObject/Props/Spawner.cpp"
     "Source/GameObject/Props/Spawner.h"
+    "Source/GameObject/Props/StairToNextFloor.cpp"
+    "Source/GameObject/Props/StairToNextFloor.h"
     "Source/GameObject/Props/Teleporter.cpp"
     "Source/GameObject/Props/Teleporter.h"
 )
@@ -927,6 +929,7 @@ set(SHADER_NAMES
 
 # List of shader settings
 set(HLSL_SHADERS
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/DirectXTK12/Src/Shaders
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/DebugDX12PS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/DebugDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/DebugPS.hlsl,5.0,Pixel,main"

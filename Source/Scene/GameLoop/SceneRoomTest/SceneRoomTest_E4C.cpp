@@ -74,7 +74,6 @@ void SceneRoomTest_E4C::Initialize()
 	nodeDefaultNames.at(TileType::FLOOR_02A) = "Floor 02a";
 	nodeDefaultNames.at(TileType::FLOOR_03A) = "Floor 03a";
 	nodeDefaultNames.at(TileType::FLOOR_CLOUD_01A) = "FloorCloud 01a";
-
 	nodeDefaultNames.at(TileType::WALL_01A) = "Wall 01a";
 	nodeDefaultNames.at(TileType::WALL_01B) = "Wall 01b";
 	nodeDefaultNames.at(TileType::WALL_02A) = "Wall 02a";
@@ -82,14 +81,11 @@ void SceneRoomTest_E4C::Initialize()
 	nodeDefaultNames.at(TileType::WALL_03A) = "Wall 03a";
 	nodeDefaultNames.at(TileType::WALL_04A) = "Wall 04a";
 	nodeDefaultNames.at(TileType::WALL_CLOUD) = "WallCloud";
-
 	nodeDefaultNames.at(TileType::ARCH_01A) = "Arch 01a";
 	nodeDefaultNames.at(TileType::ARCH_ENTRANCE_01A) = "ArchEntrance 01a";
 	nodeDefaultNames.at(TileType::ARCH_FLOOR_01A) = "ArchFloor 01a";
-
 	nodeDefaultNames.at(TileType::STAIR_RAILING_01A) = "StairRailing 01a";
 	nodeDefaultNames.at(TileType::STAIR_STEP_01A) = "StairStep 01a";
-
 	nodeDefaultNames.at(TileType::CARAMEL_01) = "Caramel 01";
 	nodeDefaultNames.at(TileType::CARAMEL_02) = "Caramel 02";
 	nodeDefaultNames.at(TileType::CLOUD_01) = "Cloud 01";
@@ -101,14 +97,14 @@ void SceneRoomTest_E4C::Initialize()
 	nodeDefaultNames.at(TileType::LOLIPOP_02A) = "Lolipop 02a";
 	nodeDefaultNames.at(TileType::STAR) = "Star";
 	nodeDefaultNames.at(TileType::FIRE_HYDRANT) = "FireHydrant";
-	nodeDefaultNames.at(TileType::FOUNTAIN) = "Fountain";
-
 	nodeDefaultNames.at(TileType::PORTAL) = "Portal";
 	nodeDefaultNames.at(TileType::SPAWNER) = "Spawner";
 	nodeDefaultNames.at(TileType::CONNECTPOINT) = "ConnectPoint";
+	nodeDefaultNames.at(TileType::FOUNTAIN) = "Fountain";
+	nodeDefaultNames.at(TileType::STAIR_TO_NEXTFLOOR) = "StairToNextFloor";
 
-	testModel = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
-	testModel->SetPosition({ 0.0f, 0.0f, 0.0f });
+	//testModel = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
+	//testModel->SetPosition({ 0.0f, 0.0f, 0.0f });
 }
 
 void SceneRoomTest_E4C::Finalize()
@@ -207,7 +203,7 @@ void SceneRoomTest_E4C::RenderDX12()
 		// モデル描画
 		NODES.RenderDX12(rc);
 
-		testModel->RenderDX12(rc);
+		//testModel->RenderDX12(rc);
 
 		// AABBの描画
 		// radiiは半径なので2倍して直径にしてから描画を行う
@@ -494,6 +490,8 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 					if (ImGui::MenuItem("Star"))			AddTileNode(GetDefaultName(TileType::STAR),			TileType::STAR);
 					if (ImGui::MenuItem("FireHydrant"))		AddTileNode(GetDefaultName(TileType::FIRE_HYDRANT),	TileType::FIRE_HYDRANT);
 					if (ImGui::MenuItem("Fountain"))		AddTileNode(GetDefaultName(TileType::FOUNTAIN),		TileType::FOUNTAIN);
+
+					if (ImGui::MenuItem("StairToNextFloor"))	AddTileNode(GetDefaultName(TileType::STAIR_TO_NEXTFLOOR), TileType::STAIR_TO_NEXTFLOOR);
 
 					//if (ImGui::MenuItem("Portal"))			AddTileNode("Portal",		TileType::PORTAL);
 					//if (ImGui::MenuItem("ConnectPoint"))	AddTileNode("ConnectPoint",	TileType::CONNECTPOINT);

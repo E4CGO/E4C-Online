@@ -135,6 +135,16 @@ void StageDungeon_E4C::Initialize()
 	cameraController->SetPlayer(player);
 	CURSOR_OFF;
 
+	//m_roomOrder.emplace_back(RoomType::FIRST_START);
+	//m_roomOrder.emplace_back(RoomType::FIRST_T);
+	//m_roomOrder.emplace_back(RoomType::FIRST_T);
+	//m_roomOrder.emplace_back(RoomType::FIRST_SPAWNER);
+	//m_roomOrder.emplace_back(RoomType::DEAD_END);
+	//m_roomOrder.emplace_back(RoomType::FIRST_SPAWNER);
+	//m_roomOrder.emplace_back(RoomType::DEAD_END);
+	//m_roomOrder.emplace_back(RoomType::FIRST_SPAWNER);
+	//m_roomOrder.emplace_back(RoomType::DEAD_END);
+
 	//m_roomOrder.emplace_back(RoomType::TUTO_START);
 	//m_roomOrder.emplace_back(RoomType::TUTO_NOTHINGROOM);
 	//m_roomOrder.emplace_back(RoomType::TUTO_SPAWNERROOM);
@@ -164,6 +174,7 @@ void StageDungeon_E4C::Initialize()
 
 void StageDungeon_E4C::Finalize()
 {
+	GameObjectManager::Instance().Clear();
 	ENEMIES.Clear();
 	MAPTILES.Clear();
 

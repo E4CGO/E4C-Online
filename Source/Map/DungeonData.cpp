@@ -463,6 +463,7 @@ void DungeonData::InitRoomGenerateSettings()
 
 void DungeonData::InitDungeonGenerateSetting()
 {
+	m_dungeonGenerateSetting.maxFloor = 3;
 	m_dungeonGenerateSetting.maxDepth = 7;
 }
 
@@ -504,6 +505,7 @@ void DungeonData::InitModelFileDatas()
 	m_modelFileDatas.at(STAR).emplace_back("Data/Model/DungeonAssets/SM_Star.glb", 4.0f);
 	m_modelFileDatas.at(FIRE_HYDRANT).emplace_back("Data/Model/DungeonAssets/SM_Fire_Hydrant.glb", 4.0f);
 	m_modelFileDatas.at(FOUNTAIN).emplace_back("Data/Model/DungeonAssets/SM_Fountain_01.glb", 4.0f);
+	m_modelFileDatas.at(STAIR_TO_NEXTFLOOR).emplace_back("Data/Model/DungeonAssets/SM_Stairs_Steps_01a.glb", 4.0f);
 
 	// モデルない組～
 	m_modelFileDatas.at(PORTAL).emplace_back("", 0.0f);

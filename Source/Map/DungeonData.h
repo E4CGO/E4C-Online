@@ -77,6 +77,7 @@ namespace ns_RoomData
 		SPAWNER,
 		CONNECTPOINT,
 		FOUNTAIN,
+		STAIR_TO_NEXTFLOOR,
 
 		// enumCount
 		TILETYPE_COUNT,
@@ -142,7 +143,8 @@ public:
 	// ダンジョンの生成設定
 	struct DungeonGenerateSetting
 	{
-		int maxDepth;	// 最大深度、親からの距離（深度）がこの値以上になった場合、子の生成をキャンセルする
+		int maxFloor = 3;	// 最大階数　最上階には次の階への階段などは設置しない
+		int maxDepth;		// 最大深度　親からの距離（深度）がこの値以上になった場合、子の生成をキャンセルする
 	};
 
 	// 初期化
@@ -158,6 +160,10 @@ public:
 	RoomGenerateSetting GetRoomGenerateSetting(RoomType type) { return m_roomGenerateSettings.at(static_cast<int>(type)); }
 	// ダンジョンの生成設定を取得
 	DungeonGenerateSetting GetDungeonGenerateSetting() { return m_dungeonGenerateSetting; }
+	// 現在の階取得・設定
+	const int GetCurrentFloor() const { return m_currentFloor; }
+	void SetCurrentFloor(int floor) { m_currentFloor = floor; }
+
 	// ファイル読み込み用データの取得
 	const std::vector<FILE_DATA> GetModelFileDatas(TileType type) const {
 		int a = 0;
@@ -169,6 +175,7 @@ public:
 private:
 	std::vector<RoomGenerateSetting> m_roomGenerateSettings;	// 部屋の生成設定配列
 	DungeonGenerateSetting m_dungeonGenerateSetting;			// ダンジョンの生成設定
+	int m_currentFloor = 1;										// 現在の階
 	std::vector<std::vector<FILE_DATA>> m_modelFileDatas;		// 見た目用ファイル読み込み用データ配列
 	std::vector<std::vector<FILE_DATA>> m_collisionFileDatas;	// 当たり判定用ファイル読み込み用データ配列
 	std::vector<char*> m_fileNames;						// ファイル名配列

@@ -6,6 +6,7 @@
 
 #include "GameObject/GameObjectManager.h"
 #include "GameObject/Props/Spawner.h"
+#include "GameObject/Props/StairToNextFloor.h"
 #include "MapTile.h"
 #include "MapTileManager.h"
 
@@ -138,19 +139,6 @@ void RoomBase::UpdateTransform()
 
 		DirectX::XMStoreFloat4x4(&m_transform, LocalTransform);
 	}
-
-	//// 接続点データも更新
-	//for (CONNECTPOINT_DATA& data : m_connectPointDatas)
-	//{
-	//	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(m_scale.x, m_scale.y, m_scale.z);
-	//	DirectX::XMMATRIX R = AnglesToMatrix(data.angle);
-	//	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(data.position.x, data.position.y, data.position.z);
-
-	//	DirectX::XMMATRIX LocalTransform = S * R * T;
-	//	DirectX::XMMATRIX ParentTransform = DirectX::XMLoadFloat4x4(&m_transform);
-	//	DirectX::XMMATRIX GlobalTransform = LocalTransform * ParentTransform;
-	//	DirectX::XMStoreFloat4x4(&data.transform, GlobalTransform);
-	//}
 }
 
 DirectX::XMFLOAT3 RoomBase::GetCenterPos()
@@ -256,7 +244,7 @@ void RoomBase::GenerateNextRoomAutomatically(
 							isHit = true;
 
 							// 当たり判定に使用したAABBはデバッグ四角形描画のために保存しておく
-							m_debugAABBs.emplace_back(AABB(nextAABB.position, tmpNextRadii));
+							//m_debugAABBs.emplace_back(AABB(nextAABB.position, tmpNextRadii));
 
 							break;
 						}
@@ -369,7 +357,7 @@ void RoomBase::GenerateNextRoomAutomatically(
 								isHit = true;
 
 								// 当たり判定に使用したAABBはデバッグ四角形描画のために保存しておく
-								m_debugAABBs.emplace_back(AABB(nextAABB.position, tmpNextRadii));
+								//m_debugAABBs.emplace_back(AABB(nextAABB.position, tmpNextRadii));
 
 								break;
 							}
@@ -558,7 +546,7 @@ void RoomBase::GenerateNextRoomFromOrder(
 		// もしも配列のサイズを超えてしまうならreturn
 		if (orderIndex >= roomOrder.size()) return;
 
-		RoomBase* nextRoom = new RoomBase(this, i, (RoomType)(roomOrder.at(orderIndex)), roomAABBs, roomOrder, ++orderIndex);
+		RoomBase* nextRoom = new RoomBase(this, i, (RoomType)(roomOrder.at(orderIndex - 1)), roomAABBs, roomOrder, ++orderIndex);
 		AddRoom(nextRoom);
 	}
 }
@@ -717,9 +705,85 @@ void RoomBase::PlaceMapTile(bool isLeader)
 			for (const TILE_DATA& data : m_tileDatas.at(tileType))
 			{
 				Spawner* spawner = new Spawner(2, 2, -1);
-				spawner->SetPosition(m_position + data.position);
+
+				DirectX::XMFLOAT3 resultPos = data.position;
+				DirectX::XMFLOAT3 bufPos = resultPos;
+
+				float degree = DirectX::XMConvertToDegrees(m_angle.y);
+
+				// 360度以内に丸める
+				while (degree >= 360.0f) degree -= 360.0f;
+				while (degree < 0.0f) degree += 360.0f;
+
+				// 90度
+				if (degree > 89.9f && degree < 90.1f)
+				{
+					resultPos.x = bufPos.z;
+					resultPos.z = bufPos.x;
+				}
+
+				// 180度
+				if (degree > 179.9f && degree < 180.1f)
+				{
+					resultPos.z = -bufPos.z;
+				}
+
+				// 270度
+				if (degree > 269.9f && degree < 270.1f)
+				{
+					resultPos.x = -bufPos.z;
+					resultPos.z = bufPos.x;
+				}
+				resultPos += m_position;
+
+				spawner->SetPosition(resultPos);
 
 				GameObjectManager::Instance().Register(spawner);
+			}
+			continue;
+		}
+
+		// こいつも
+		if (tileType == TileType::STAIR_TO_NEXTFLOOR)
+		{
+			for (const TILE_DATA& data : m_tileDatas.at(tileType))
+			{
+				StairToNextFloor* stairToNextFloor = new StairToNextFloor();
+
+				DirectX::XMFLOAT3 resultPos = data.position;
+				DirectX::XMFLOAT3 bufPos = resultPos;
+
+				float degree = DirectX::XMConvertToDegrees(m_angle.y);
+
+				// 360度以内に丸める
+				while (degree >= 360.0f) degree -= 360.0f;
+				while (degree < 0.0f) degree += 360.0f;
+
+				// 90度
+				if (degree > 89.9f && degree < 90.1f)
+				{
+					resultPos.x = bufPos.z;
+					resultPos.z = bufPos.x;
+				}
+
+				// 180度
+				if (degree > 179.9f && degree < 180.1f)
+				{
+					resultPos.z = -bufPos.z;
+				}
+
+				// 270度
+				if (degree > 269.9f && degree < 270.1f)
+				{
+					resultPos.x = -bufPos.z;
+					resultPos.z = bufPos.x;
+				}
+				resultPos += m_position;
+
+				stairToNextFloor->SetPosition(resultPos);
+				stairToNextFloor->SetScale({ 4.0f, 4.0f, 4.0f });
+
+				GameObjectManager::Instance().Register(stairToNextFloor);
 			}
 			continue;
 		}
