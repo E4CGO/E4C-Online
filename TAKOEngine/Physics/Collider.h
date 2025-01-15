@@ -120,7 +120,7 @@ public:
 		return false;
 	}
 
-	void Update();
+	virtual void Update();
 
 	//virtual DirectX::XMFLOAT3 GetTop() { return {}; };
 
@@ -128,19 +128,19 @@ public:
 	virtual void DrawDebugGUI() {};
 
 	// Sphere用パラメータセット
-	virtual void SetParam(Sphere sphere) {}
+	virtual void SetParam(const Sphere& sphere) {}
 	// Sphere用パラメータゲット
 	virtual Sphere GetSphere() { return Sphere{}; }
 	// AABB用パラメータセット
-	virtual void SetParam(AABB aabb) {}
+	virtual void SetParam(const AABB& aabb) {}
 	// AABB用パラメータゲット
 	virtual AABB GetAABB() { return AABB{}; }
 	// OBB用パラメータセット
-	virtual void SetParam(OBB obb) {}
+	virtual void SetParam(const OBB& obb) {}
 	// OBB用パラメータゲット
 	virtual OBB GetOBB() { return OBB{}; }
 	// Capsule用パラメータセット
-	virtual void SetParam(Capsule capsule) {}
+	virtual void SetParam(const Capsule& capsule) {}
 	// Capsule用パラメータゲット
 	virtual Capsule GetCapsule() { return Capsule{}; }
 
@@ -159,14 +159,18 @@ public:
 	void SetHittableOBJ(uint16_t hit) { m_hittableOBJType = hit; }
 	const uint16_t GetHittableOBJ() const { return m_hittableOBJType; }
 
-	std::vector<GameObject*> GetHitOthers() { return m_hitOthers; }
-	void RegisterHitOthers(GameObject* other) { m_hitOthers.emplace_back(other); }
-	void ClearHitOthers() { m_hitOthers.clear(); }
+	//std::vector<GameObject*> GetHitOthers() { return m_hitOthers; }
+	//void RegisterHitOthers(GameObject* other) { m_hitOthers.emplace_back(other); }
+	//void ClearHitOthers() { m_hitOthers.clear(); }
 
-	void SetHitStartRate(float rate) { m_hitStartRate = rate; }
-	const float GetHitStartRate() const { return m_hitStartRate; }
-	void SetHitEndRate(float rate) { m_hitEndRate = rate; }
-	const float GetHitEndRate() const { return m_hitEndRate; }
+	//void SetHitDamage(int damage) { m_hitDamage = damage; }
+	//const int GetHitDamage() const { return m_hitDamage; }
+
+	virtual void SetCurrentRate(float currentRate){}
+	virtual void SetHitStartRate(float rate){}
+	virtual const float GetHitStartRate() const { return 0; }
+	virtual void SetHitEndRate(float rate){}
+	virtual const float GetHitEndRate() const{ return 0; }
 
 	bool IsEnable() const { return m_enable; }
 	void SetEnable(bool e) { m_enable = e; }
@@ -179,15 +183,15 @@ protected:
 	COLLIDER_TYPE m_shapeType = COLLIDER_TYPE::DEFAULT;
 	uint16_t m_OBJType = 0;
 	uint16_t m_hittableOBJType = 0;
-	std::vector<GameObject*> m_hitOthers;	// 攻撃が当たった相手を保存して複数回当たらないようにする
-	float m_hitStartRate = 0.0f;	// 攻撃判定が発生するタイミングのアニメーションレート(min0%)
-	float m_hitEndRate = 1.0f;	// 攻撃判定が消滅するタイミングのアニメーションレート(max100%)
+	//std::vector<GameObject*> m_hitOthers;	// 攻撃が当たった相手を保存して複数回当たらないようにする
+	//int m_hitDamage = 0;			// 与ダメージ
+	//float m_hitStartRate = 0.0f;	// 攻撃判定が発生するタイミングのアニメーションレート(min0%)
+	//float m_hitEndRate = 1.0f;	// 攻撃判定が消滅するタイミングのアニメーションレート(max100%)
 	bool m_enable = true;
 	
 
 	DirectX::XMFLOAT4X4* m_pTransform = nullptr;			// ワールド行列
 	DirectX::XMFLOAT3 m_position = { 0.0f, 0.0f, 0.0f };	// ワールド位置
-	DirectX::XMFLOAT3 m_prePosition = { 0.0f, 0.0f, 0.0f };	// 前フレームのワールド位置
 	DirectX::XMFLOAT3 m_offset = { 0.0f, 0.0f, 0.0f };		// ローカル空間での補正位置
 
 	std::function<void(Collider*, Collider*)> collisionFanction = nullptr;

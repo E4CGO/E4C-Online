@@ -16,29 +16,16 @@
 class MouseMob : public Enemy
 {
 public:
-	MouseMob(float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX12);
+	MouseMob(float scaling = 0.5f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX11);
 	~MouseMob() = default;
-private:
-	void UpdateColliders() override;
 public:
-	enum AttackCollider
+	enum COLLIDER_ID : uint8_t
 	{
-		BodyAtc
-	};
-
-	enum State
-	{
-		Search = EnemyState::ID::End,
-		Battle,
-		Recieve,
+		COL_ATTACK,
+		COL_BODY,
 	};
 
 protected:
-	enum HitCollider
-	{
-		BodyHit
-	};
-
 	void UpdateTarget();
 };
 

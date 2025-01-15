@@ -20,8 +20,9 @@ public:
 		HitResult& result
 	) override;
 
+
 	// OBB用パラメータセット
-	void SetParam(OBB obb) override;
+	void SetParam(const OBB& obb) override;
 
 	const DirectX::XMFLOAT3 GetRadii() const { return m_radii; }
 	const DirectX::XMFLOAT4 GetOrientation() const { return m_orientation; }

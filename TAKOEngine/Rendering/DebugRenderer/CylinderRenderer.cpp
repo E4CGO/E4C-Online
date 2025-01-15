@@ -10,6 +10,8 @@
 
 #include "CylinderRenderer.h"
 
+#include "TAKOEngine/Tool/XMFLOAT.h"
+
 //*******************************************************
 // @brief     コンストラクタ
 // @param[in] device  ID3D12Device*
@@ -143,8 +145,9 @@ void CylinderRenderer::Render(const RenderContextDX12& rc)
 
 	// ワールドビュープロジェクション行列作成
 	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(m_radius, m_height, m_radius);
+	DirectX::XMMATRIX R = DirectX::XMMatrixRotationQuaternion(QuaternionFromToRotation({ 0, 1, 0 }, m_direction));
 	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(m_position.x, m_position.y, m_position.z);
-	DirectX::XMMATRIX W = S * T;
+	DirectX::XMMATRIX W = S * R * T;
 	DirectX::XMMATRIX worldViewProjection = W * viewProjection;
 
 	DirectX::XMStoreFloat4x4(&frame_resource.cb_mesh_data->worldViewProjection, worldViewProjection);

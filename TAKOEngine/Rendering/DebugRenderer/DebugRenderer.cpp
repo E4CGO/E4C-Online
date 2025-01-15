@@ -10,6 +10,8 @@
 #include "TAKOEngine\Rendering\GpuResourceUtils.h"
 #include "DebugRenderer.h"
 
+#include "TAKOEngine/Tool/XMFLOAT.h"
+
 //*******************************************************
 // @brief     コンストラクタ
 // @param[in] device  ID3D11Device*
@@ -165,8 +167,9 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
 	{
 		// ワールドビュープロジェクション行列作成
 		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(cylinder.radius, cylinder.height, cylinder.radius);
+		DirectX::XMMATRIX R = DirectX::XMMatrixRotationQuaternion(QuaternionFromToRotation({0, 1, 0}, cylinder.direction));
 		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(cylinder.position.x, cylinder.position.y, cylinder.position.z);
-		DirectX::XMMATRIX W = S * T;
+		DirectX::XMMATRIX W = S * R * T;
 		DirectX::XMMATRIX WVP = W * VP;
 
 		// 定数バッファ更新
@@ -241,8 +244,23 @@ void DebugRenderer::SetSphere(const std::vector<DirectX::XMFLOAT3>& centers, flo
 //*******************************************************
 void DebugRenderer::DrawCylinder(const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color)
 {
+	DebugRenderer::DrawCylinder(position, { 0.0f, 1.0f, 0.0f }, radius, height, color);
+}
+
+//*******************************************************
+// @brief     円柱情報セット
+// @param[in] position   位置
+// @param[in] direction  方向
+// @param[in] radius     半径
+// @param[in] height     高さ
+// @param[in] color      色
+// @return    なし
+//*******************************************************
+void DebugRenderer::DrawCylinder(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT3& direction, float radius, float height, const DirectX::XMFLOAT4& color)
+{
 	Cylinder cylinder;
 	cylinder.position = position;
+	cylinder.direction = direction;
 	cylinder.radius = radius;
 	cylinder.height = height;
 	cylinder.color = color;
@@ -273,12 +291,11 @@ void DebugRenderer::DrawCube(const DirectX::XMFLOAT3& position, DirectX::XMFLOAT
 // @param[in] color      色
 // @return    なし
 //*******************************************************
-void DebugRenderer::DrawCapsule(const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color)
+void DebugRenderer::DrawCapsule(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT3& direction, float radius, float height, const DirectX::XMFLOAT4& color)
 {
-	DrawCylinder(position, radius, height, color);
+	DrawCylinder(position, direction, radius, height, color);
 	SetSphere(position, radius, color);
-	DirectX::XMFLOAT3 upPos = position;
-	upPos.y += height;
+	DirectX::XMFLOAT3 upPos = position + direction * height;
 	SetSphere(upPos, radius, color);
 }
 

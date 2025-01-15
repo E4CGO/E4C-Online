@@ -13,7 +13,6 @@
 #include <string>
 #include <algorithm>
 #include <fstream>
-#include <commdlg.h>
 
 #include "Scene/SceneManager.h"
 #include "SceneRoomTest_E4C.h"
@@ -180,7 +179,7 @@ void SceneRoomTest_E4C::RenderDX12()
 
 	// シーン用定数バッファ更新
 	const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
-		CameraManager::Instance().GetCamera());
+		CameraManager::Instance().GetCamera(), 0, 0);
 
 	// レンダーコンテキスト設定
 	RenderContextDX12 rc;
@@ -205,6 +204,8 @@ void SceneRoomTest_E4C::RenderDX12()
 
 		//testModel->RenderDX12(rc);
 
+		T_GRAPHICS.GetDebugRenderer()->DrawCylinder({ 0.0f, 0.0f, 0.0f }, 16.0f, 1.5f, { 1,0,0,1 });
+		//T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, spawnerData.searchRadius, 1.5f, { 1,0,1,1 });
 		// AABBの描画
 		// radiiは半径なので2倍して直径にしてから描画を行う
 		DirectX::XMFLOAT3 diameter = {
@@ -217,6 +218,11 @@ void SceneRoomTest_E4C::RenderDX12()
 		// レンダーターゲットへの書き込み終了待ち
 		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 	}
+
+	// デバッグ描画
+	{
+	}
+
 
 	// ポストエフェクト描画
 	{
@@ -456,7 +462,6 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 				ImGui::EndMenu();
 			}
 			if (ImGui::BeginMenu("New")) {
-				if (ImGui::BeginMenu("TileNode")) {
 					if (ImGui::MenuItem("Floor01a"))		AddTileNode(GetDefaultName(TileType::FLOOR_01A),		TileType::FLOOR_01A);
 					if (ImGui::MenuItem("Floor01b"))		AddTileNode(GetDefaultName(TileType::FLOOR_01B),		TileType::FLOOR_01B);
 					if (ImGui::MenuItem("Floor02a"))		AddTileNode(GetDefaultName(TileType::FLOOR_02A),		TileType::FLOOR_02A);
@@ -470,14 +475,14 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 					if (ImGui::MenuItem("Wall03a"))			AddTileNode(GetDefaultName(TileType::WALL_03A),		TileType::WALL_03A);
 					if (ImGui::MenuItem("Wall04a"))			AddTileNode(GetDefaultName(TileType::WALL_04A),		TileType::WALL_04A);
 					if (ImGui::MenuItem("WallCloud"))		AddTileNode(GetDefaultName(TileType::WALL_CLOUD),	TileType::WALL_CLOUD);
-
+					if (ImGui::MenuItem("FloorCloud01a"))	AddTileNode("FloorCloud",	TileType::FLOOR_CLOUD_01A);
 					if (ImGui::MenuItem("Arch01a"))			AddTileNode(GetDefaultName(TileType::ARCH_01A),				TileType::ARCH_01A);
 					if (ImGui::MenuItem("ArchEntrance01a"))	AddTileNode(GetDefaultName(TileType::ARCH_ENTRANCE_01A),	TileType::ARCH_ENTRANCE_01A);
 					if (ImGui::MenuItem("ArchFloor01a"))	AddTileNode(GetDefaultName(TileType::ARCH_FLOOR_01A),		TileType::ARCH_FLOOR_01A);
-
+					if (ImGui::MenuItem("WallCloud"))		AddTileNode("WallCloud",	TileType::WALL_CLOUD);
 					if (ImGui::MenuItem("StairRailing01a"))	AddTileNode(GetDefaultName(TileType::STAIR_RAILING_01A),	TileType::STAIR_RAILING_01A);
 					if (ImGui::MenuItem("StairStep01a"))	AddTileNode(GetDefaultName(TileType::STAIR_STEP_01A),		TileType::STAIR_STEP_01A);
-
+					if (ImGui::MenuItem("ArchFloor01a"))	AddTileNode("ArchFloor",	TileType::ARCH_FLOOR_01A);
 					if (ImGui::MenuItem("Caramel01"))		AddTileNode(GetDefaultName(TileType::CARAMEL_01),	TileType::CARAMEL_01);
 					if (ImGui::MenuItem("Caramel02"))		AddTileNode(GetDefaultName(TileType::CARAMEL_02),	TileType::CARAMEL_02);
 					if (ImGui::MenuItem("Cloud01"))			AddTileNode(GetDefaultName(TileType::CLOUD_01),		TileType::CLOUD_01);
@@ -490,8 +495,9 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 					if (ImGui::MenuItem("Star"))			AddTileNode(GetDefaultName(TileType::STAR),			TileType::STAR);
 					if (ImGui::MenuItem("FireHydrant"))		AddTileNode(GetDefaultName(TileType::FIRE_HYDRANT),	TileType::FIRE_HYDRANT);
 					if (ImGui::MenuItem("Fountain"))		AddTileNode(GetDefaultName(TileType::FOUNTAIN),		TileType::FOUNTAIN);
-
+					if (ImGui::MenuItem("StairStep01a"))	AddTileNode("StairStep",	TileType::STAIR_STEP_01A);
 					if (ImGui::MenuItem("StairToNextFloor"))	AddTileNode(GetDefaultName(TileType::STAIR_TO_NEXTFLOOR), TileType::STAIR_TO_NEXTFLOOR);
+					if (ImGui::MenuItem("FireHydrant"))		AddTileNode("FireHydrant",	TileType::FIRE_HYDRANT);
 
 					//if (ImGui::MenuItem("Portal"))			AddTileNode("Portal",		TileType::PORTAL);
 					//if (ImGui::MenuItem("ConnectPoint"))	AddTileNode("ConnectPoint",	TileType::CONNECTPOINT);
@@ -625,7 +631,6 @@ void SceneRoomTest_E4C::AddConnectPoint(
 	//selectionNode = newNode;
 }
 
-
 void SceneRoomTest_E4C::DuplicateNode()
 {
 	if (selectionNode != nullptr)
@@ -748,7 +753,7 @@ void TileNode::DrawDebugGUI()
 			name = NODES.GetUniqueName(newName);
 		}
 	}
-	
+
 	// pos
 	ImGui::DragFloat3("Position", &position.x, 0.1f);
 	// angle
@@ -810,7 +815,7 @@ void SpawnerNode::DrawDebugGUI()
 	}
 	// scale
 	ImGui::DragFloat3("Scale", &scale.x, 0.1f);
-	
+
 	// スポナーデータ
 	if (ImGui::TreeNodeEx("SpawnerData", ImGuiTreeNodeFlags_DefaultOpen)) {
 		// enemyType

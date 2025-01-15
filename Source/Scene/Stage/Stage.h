@@ -5,9 +5,6 @@
 #define __INCLUDED_STAGE_H__
 
 #include <DirectXMath.h>
-#include <vector>
-
-
 
 struct ENEMY_LIST_DATA
 {
@@ -36,31 +33,14 @@ public:
 
 	virtual void Update(float elapsedTime);
 
-	void Spawne();
-
 	virtual void Render() = 0;
 
 	virtual void RenderDX12() = 0;
 
-	void SetPhase(int phase);
-	void NextPhase();
-	int GetPhase() { return phase; }
-
-	void Finish() { finish = true; }
-	bool IsFinish() { return finish; }
-
 	bool IsReady() { return m_ready; }
 	void SetReady() { m_ready = true; }
 protected:
-	virtual void OnPhase() {}
-protected:
-	int phase;
-	float timer = 0.0f;
-	bool finish = false;
-
-	std::vector<ENEMY_LIST_DATA> enemyList;
-	int pointer = 0;
-
+	float m_timer = 0.0f;
 	bool m_ready = false;;
 
 };

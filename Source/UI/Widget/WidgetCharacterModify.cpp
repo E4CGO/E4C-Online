@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include "WidgetInputInt.h"
+#include "WidgetInputString.h"
 
 #include "Scene/GameLoop/SceneCharacter/SceneCharacter_E4C.h"
 /**************************************************************************//**
@@ -53,6 +54,10 @@ WidgetCharacterModify::WidgetCharacterModify(SceneCharacter_E4C* scene) : m_pSce
 			m_pWidgets.push_back(widget);
 		}
 	}
+
+	WidgetInputString* inputName = new WidgetInputString("##InputName", &m_info.name, 20);
+	inputName->SetPosition({ SCREEN_W * 0.5f - (inputName->GetSize().x * 0.5f), SCREEN_H * 0.80f });
+	m_pWidgets.push_back(inputName);
 }
 /**************************************************************************//**
 	@brief		更新処理
@@ -71,6 +76,11 @@ void WidgetCharacterModify::Update(float elapsedTime)
 			m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT] = 0;
 		m_pScene->GetSelectedCharacter()->LoadAppearance(m_info.pattern);
 		m_infoTemp = m_info;
+	}
+	if (m_infoTemp.name != m_info.name.c_str())
+	{
+		m_infoTemp = m_info;
+		m_pScene->GetSelectedCharacter()->SetName(m_info.name.c_str());
 	}
 }
 /**************************************************************************//**

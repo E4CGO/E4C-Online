@@ -1,4 +1,8 @@
-﻿#pragma once
+﻿//! @file StageDungeon_E4C.h
+//! @note 
+
+#ifndef __INCLUDED_STAGE_DUNGEON_E4C_H__
+#define __INCLUDED_STAGE_DUNGEON_E4C_H__
 
 #include <memory>
 #include <array>
@@ -58,8 +62,6 @@ public:
 
 	void RenderDX12() override;
 protected:
-	void OnPhase() override;
-protected:
 	SceneGame_E4C* m_pScene;
 
 	std::unique_ptr<ThridPersonCameraController> cameraController;
@@ -94,3 +96,5 @@ protected:
 
 	std::unique_ptr<ModelObject> instancingModel;
 };
+
+#endif // !__INCLUDED_STAGE_DUNGEON_E4C_H__

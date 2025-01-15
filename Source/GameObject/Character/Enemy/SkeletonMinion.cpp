@@ -11,76 +11,57 @@
 SkeletonMinion::SkeletonMinion(float scaling) : Enemy("Data/Model/Enemy/character_skeleton_minion.gltf", scaling)
 {
 	enemyType = ENEMY_TYPE::SKELETON_MINION;
+	radius = 0.6f;
 	maxHp = hp = 50;
 	atk = 10;
 	moveSpeed = 2.0f;
 	turnSpeed = DirectX::XMConvertToRadians(180);
+	m_SearchRange = 24.0f;
 
 	// 移動用Collider
-	SetCollider(Collider::COLLIDER_TYPE::SPHERE, Collider::COLLIDER_OBJ::ENEMY);
 	Sphere sphere({ 0, 0.6f / scaling, 0 }, 0.6f);
-	collider->SetParam(sphere);
-	//collider->setTransform(&m_pmodels[0]->FindNode("character_skeleton_minion_body")->worldTransform);
-	collider->SetOwner(this);
+	SetMoveCollider(sphere, Collider::COLLIDER_OBJ::ENEMY);
 
 	// 当たり判定
-	colliders[HitCollider::Body] = new SphereCollider(Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("character_skeleton_minion_body")->worldTransform);
-	colliders[HitCollider::Body]->SetParam(sphere);
-	colliders[HitCollider::Body]->SetOwner(this);
-	colliders[HitCollider::Body]->SetHittableOBJ(Collider::COLLIDER_OBJ::PLAYER_ATTACK | Collider::COLLIDER_OBJ::PLAYER_PROJECTILE);
-	COLLISIONS.Register(colliders[HitCollider::Body]);
+	SetCollider(COLLIDER_ID::COL_BODY, sphere, Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("character_skeleton_minion_body")->worldTransform);
+	m_pColliders[COLLIDER_ID::COL_BODY]->SetHittableOBJ(Collider::COLLIDER_OBJ::PLAYER_ATTACK | Collider::COLLIDER_OBJ::PLAYER_PROJECTILE);
 
-	colliders[HitCollider::Head] = new SphereCollider(Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("character_skeleton_minion_head")->worldTransform);
 	sphere.radius = 0.8f;
-	colliders[HitCollider::Head]->SetParam(sphere);
-	colliders[HitCollider::Head]->SetOwner(this);
-	colliders[HitCollider::Head]->SetHittableOBJ(Collider::COLLIDER_OBJ::PLAYER_ATTACK | Collider::COLLIDER_OBJ::PLAYER_PROJECTILE);
-	COLLISIONS.Register(colliders[HitCollider::Head]);
-	
+	SetCollider(COLLIDER_ID::COL_HEAD, sphere, Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("character_skeleton_minion_head")->worldTransform);
+	m_pColliders[COLLIDER_ID::COL_HEAD]->SetHittableOBJ(Collider::COLLIDER_OBJ::PLAYER_ATTACK | Collider::COLLIDER_OBJ::PLAYER_PROJECTILE);
+
 	// 攻撃判定
-	attackColliders[AttackCollider::LeftHand] = new SphereCollider(Collider::COLLIDER_OBJ::ENEMY_ATTACK, &m_pmodels[0]->FindNode("character_skeleton_minion_armLeft")->worldTransform);
 	sphere.radius = 0.3f;
 	sphere.position = { 0.25f, -0.45f, 0.0f };
-	attackColliders[AttackCollider::LeftHand]->SetParam(sphere);
-	attackColliders[AttackCollider::LeftHand]->SetOwner(this);
-	attackColliders[AttackCollider::LeftHand]->SetHittableOBJ(Collider::COLLIDER_OBJ::PLAYER);
-	COLLISIONS.Register(attackColliders[AttackCollider::LeftHand]);
+	SetCollider(COLLIDER_ID::COL_LEFT_HAND, sphere, Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("character_skeleton_minion_armLeft")->worldTransform);
+	m_pColliders[COLLIDER_ID::COL_LEFT_HAND]->SetHittableOBJ(Collider::COLLIDER_OBJ::PLAYER);
+	m_pColliders[COLLIDER_ID::COL_LEFT_HAND]->SetEnable(false);
 
-	attackColliders[AttackCollider::RightHand] = new SphereCollider(Collider::COLLIDER_OBJ::ENEMY_ATTACK, &m_pmodels[0]->FindNode("character_skeleton_minion_armRight")->worldTransform);
 	sphere.position = { -0.25f, -0.45f, 0.0f };
-	attackColliders[AttackCollider::RightHand]->SetParam(sphere);
-	attackColliders[AttackCollider::RightHand]->SetOwner(this);
-	attackColliders[AttackCollider::RightHand]->SetHittableOBJ(Collider::COLLIDER_OBJ::PLAYER);
-	COLLISIONS.Register(attackColliders[AttackCollider::RightHand]);
+	SetCollider(COLLIDER_ID::COL_RIGHT_HAND, sphere, Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("character_skeleton_minion_armRight")->worldTransform);
+	m_pColliders[COLLIDER_ID::COL_RIGHT_HAND]->SetHittableOBJ(Collider::COLLIDER_OBJ::PLAYER);
+	m_pColliders[COLLIDER_ID::COL_RIGHT_HAND]->SetEnable(false);
 
-	EnableAttackColliders(false);
+	stateMachine->RegisterState(Enemy::STATE::IDLE, new SkeletonMinionState::IdleState(this, 2.0f));
+	stateMachine->RegisterState(SkeletonMinion::STATE::TARGET_FOUND, new EnemyState::FollowState(this, 2.0f, SkeletonMinion::STATE::ATTACK));
+	stateMachine->RegisterState(SkeletonMinion::STATE::ATTACK, new SkeletonMinionState::AttackState(this));
+	stateMachine->SetState(Enemy::STATE::IDLE);
+}
 
-	stateMachine->RegisterState(EnemyState::ID::TargetFound, new EnemyState::FollowState(this, 2.0f, SkeletonMinion::State::Attack));
-	stateMachine->RegisterState(SkeletonMinion::State::Attack, new SkeletonMinionState::AttackState(this));
-	stateMachine->SetState(EnemyState::Idle);
+SkeletonMinion::~SkeletonMinion()
+{
+	for (const std::pair<uint8_t, Collider*>& collider : m_pColliders)
+	{
+		COLLISIONS.Remove(collider.second);
+	}
+	m_pColliders.clear();
 }
 
 // 一番近いプレイヤーをターゲット
 void SkeletonMinion::UpdateTarget()
 {
-	target = GetClosestPlayer(24.0f);
-}
-
-// 衝突判定更新
-void SkeletonMinion::UpdateColliders()
-{
-	if (collider)
-	{
-		collider->Update();
-		for (const std::pair<int, Collider*>& attackCollider : attackColliders)
-		{
-			attackCollider.second->Update();
-		}
-		for (const std::pair<int, Collider*>& hitCollider : colliders)
-		{
-			hitCollider.second->Update();
-		}
-	}
+	PlayerCharacter* player = GetClosestPlayer();
+	m_target = (player == nullptr) ? UINT32_MAX : player->GetClientId();
 }
 
 SkeletonMinionBoss::SkeletonMinionBoss() : SkeletonMinion(3.0f)
@@ -97,9 +78,9 @@ SkeletonMinionBoss::SkeletonMinionBoss() : SkeletonMinion(3.0f)
 	// スーパーアーマー
 	armorMaxHp = armorHp = 50;
 
-	stateMachine->RegisterState(EnemyState::ID::Idle, new EnemyState::IdleState(this, 1.0f));
-	stateMachine->RegisterState(EnemyState::ID::TargetFound, new EnemyState::FollowState(this, 3.0f, SkeletonMinion::State::Attack));
-	stateMachine->SetState(EnemyState::ID::Idle);
+	stateMachine->RegisterState(Enemy::STATE::IDLE, new EnemyState::IdleState(this, 1.0f));
+	stateMachine->RegisterState(SkeletonMinion::STATE::TARGET_FOUND, new EnemyState::FollowState(this, 3.0f, SkeletonMinion::STATE::ATTACK));
+	stateMachine->SetState(Enemy::STATE::IDLE);
 
 	// HPゲージ
 	UI.Register(new WidgetBossHp("スケルドン", this));
@@ -118,31 +99,34 @@ void SkeletonMinionBoss::Update(float elaspedTime)
 
 	Enemy::Update(elaspedTime);
 
-	
+
 }
 void SkeletonMinionBoss::OnDamage(const ENEMY_COLLISION& hit)
 {
-	hp -= hit.damage;
-
-	if (hp > 0)
+	if (IsMine())
 	{
-		if (armorHp <= 0) { // アーマーなし
-			stateMachine->ChangeState(EnemyState::ID::Hurt);
-			hp -= hit.damage / 10 * 2;		// ダウン追加ダメージ
-		}
-		else if (hit.colider_id == HitCollider::Head)	// ヘッドショット アーマーあり
+		hp -= hit.damage;
+
+		if (hp > 0)
 		{
-			armorHp -= hit.damage;
-			if (armorHp <= 0) {		// アーマー解除
-				armorHp = 0;
-				recoverArmorTimer = recoverArmorTime;	// アーマー回復タイマー
+			if (armorHp <= 0) { // アーマーなし
+				stateMachine->ChangeState(Enemy::STATE::HURT);
+				hp -= hit.damage / 10 * 2;		// ダウン追加ダメージ
 			}
+			else if (hit.colider_id == COLLIDER_ID::COL_HEAD)	// ヘッドショット アーマーあり
+			{
+				armorHp -= hit.damage;
+				if (armorHp <= 0) {		// アーマー解除
+					armorHp = 0;
+					recoverArmorTimer = recoverArmorTime;	// アーマー回復タイマー
+				}
+			}
+			velocity += hit.force * 0.1f;
 		}
-		velocity += hit.force * 0.1f;
-	}
 
-	if (hp <= 0)
-	{
-		stateMachine->ChangeState(EnemyState::ID::Death);
+		if (hp <= 0)
+		{
+			stateMachine->ChangeState(Enemy::STATE::DEATH);
+		}
 	}
 }

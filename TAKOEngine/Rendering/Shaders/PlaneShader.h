@@ -49,6 +49,18 @@ public:
 	PortalShader(ID3D11Device* device) : PlaneShader(device, "Data/Shader/PortalVS.cso", "Data/Shader/PortalPS.cso") {}
 	virtual ~PortalShader() override = default;
 };
+/**************************************************************************//**
+	@class	PortalShader
+	@brief	テレポートシェーダークラス
+	@par    [説明]
+		四角く区切って描画するバージョン
+*//***************************************************************************/
+class PortalSquareShader : public PlaneShader
+{
+public:
+	PortalSquareShader(ID3D11Device* device) : PlaneShader(device, "Data/Shader/PortalVS.cso", "Data/Shader/PortalSquarePS.cso") {}
+	virtual ~PortalSquareShader() override = default;
+};
 
 /**************************************************************************//**
 	@class	BillboardShader
@@ -61,6 +73,11 @@ class BillboardShader : public ModelShader
 public:
 	BillboardShader(ID3D11Device* device) : ModelShader(device, "Data/Shader/BillBoardVS.cso", "Data/Shader/BillBoardPS.cso")
 	{
+		GpuResourceUtils::CreateConstantBuffer(
+			device,
+			sizeof(DirectX::XMFLOAT4X4),
+			m_WorldMatrixBuffer.GetAddressOf());
+
 		GpuResourceUtils::LoadGeometryShader(
 			device,
 			GeometryShaderName,
@@ -69,6 +86,11 @@ public:
 
 	BillboardShader(ID3D11Device* device, const char* vs, const char* ps) : ModelShader(device, vs, ps)
 	{
+		GpuResourceUtils::CreateConstantBuffer(
+			device,
+			sizeof(DirectX::XMFLOAT4X4),
+			m_WorldMatrixBuffer.GetAddressOf());
+
 		GpuResourceUtils::LoadGeometryShader(
 			device,
 			GeometryShaderName,
@@ -95,6 +117,8 @@ protected:
 	void SetShaderResourceView(const ModelResource::Mesh& mesh, ID3D11DeviceContext*& dc) override;
 
 	Microsoft::WRL::ComPtr<ID3D11GeometryShader>		geometryShader;
+
+	Microsoft::WRL::ComPtr<ID3D11Buffer> m_WorldMatrixBuffer;
 };
 
 /**************************************************************************//**
@@ -107,6 +131,40 @@ class FireballShader : public BillboardShader
 {
 public:
 	FireballShader(ID3D11Device* device) : BillboardShader(device, "Data/Shader/BillboardVS.cso", "Data/Shader/FireballPS.cso") {}
+};
+
+class PlaneShaderDX12 : public ModelShaderDX12
+{
+public:
+	PlaneShaderDX12(ID3D12Device* device);
+	virtual ~PlaneShaderDX12() override = default;
+
+	void Finalize() override {};
+
+	void Render(const RenderContextDX12& rc, const ModelDX12::Mesh& mesh) override;
+
+private:
+	Microsoft::WRL::ComPtr<ID3D12PipelineState>		m_d3d_pipeline_state;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature>		m_d3d_root_signature;
+
+	SamplerManager* m_sampler = nullptr;
+};
+
+class PortalSquareShaderDX12 : public ModelShaderDX12
+{
+public:
+	PortalSquareShaderDX12(ID3D12Device* device);
+	virtual ~PortalSquareShaderDX12() override = default;
+
+	void Finalize() override {};
+
+	void Render(const RenderContextDX12& rc, const ModelDX12::Mesh& mesh) override;
+
+private:
+	Microsoft::WRL::ComPtr<ID3D12PipelineState>		m_d3d_pipeline_state;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature>		m_d3d_root_signature;
+
+	SamplerManager* m_sampler = nullptr;
 };
 
 #endif //!__INCLUDED_PLANE_SHADER_H__
