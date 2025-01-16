@@ -463,8 +463,6 @@ set(TAKOEngine__Rendering
     "TAKOEngine/Rendering/LineRenderer.h"
     "TAKOEngine/Rendering/Misc.h"
     "TAKOEngine/Rendering/MyRender.h"
-    "TAKOEngine/Rendering/ParticleRenderer.cpp"
-    "TAKOEngine/Rendering/ParticleRenderer.h"
     "TAKOEngine/Rendering/Plane.cpp"
     "TAKOEngine/Rendering/Plane.h"
     "TAKOEngine/Rendering/PostEffect.cpp"
@@ -573,6 +571,14 @@ set(TAKOEngine__Rendering__Model
 )
 source_group("TAKOEngine\\Rendering\\Model" FILES ${TAKOEngine__Rendering__Model})
 
+set(TAKOEngine__Rendering__ParticleRenderer
+    "TAKOEngine/Rendering/ParticleRenderer/HitParticleRenderer.cpp"
+    "TAKOEngine/Rendering/ParticleRenderer/HitParticleRenderer.h"
+    "TAKOEngine/Rendering/ParticleRenderer/ParticleRenderer.cpp"
+    "TAKOEngine/Rendering/ParticleRenderer/ParticleRenderer.h"
+)
+source_group("TAKOEngine\\Rendering\\ParticleRenderer" FILES ${TAKOEngine__Rendering__ParticleRenderer})
+
 set(TAKOEngine__Rendering__Shaders
     "TAKOEngine/Rendering/Shaders/ColorGradingShader.cpp"
     "TAKOEngine/Rendering/Shaders/ColorGradingShader.h"
@@ -584,6 +590,8 @@ set(TAKOEngine__Rendering__Shaders
     "TAKOEngine/Rendering/Shaders/FinalpassShader.h"
     "TAKOEngine/Rendering/Shaders/GaussianBlurShader.cpp"
     "TAKOEngine/Rendering/Shaders/GaussianBlurShader.h"
+    "TAKOEngine/Rendering/Shaders/HitParticleShader.cpp"
+    "TAKOEngine/Rendering/Shaders/HitParticleShader.h"
     "TAKOEngine/Rendering/Shaders/LambertShader.cpp"
     "TAKOEngine/Rendering/Shaders/LambertShader.h"
     "TAKOEngine/Rendering/Shaders/LuminanceExtractionShader.cpp"
@@ -691,6 +699,11 @@ set(TAKOEngine__Rendering__HLSL__Model
 source_group("TAKOEngine\\Rendering\\HLSL\\Model" FILES ${TAKOEngine__Rendering__HLSL__Model})
 
 set(TAKOEngine__Rendering__HLSL__Particle
+    "TAKOEngine/Rendering/HLSL/Particle/HitParticle.hlsli"
+    "TAKOEngine/Rendering/HLSL/Particle/HitParticleCS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Particle/HitParticleGS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Particle/HitParticlePS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Particle/HitParticleVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Particle/Particle.hlsli"
     "TAKOEngine/Rendering/HLSL/Particle/ParticleCS.hlsl"
     "TAKOEngine/Rendering/HLSL/Particle/ParticleGS.hlsl"
@@ -821,6 +834,7 @@ set(ALL_FILES
     ${TAKOEngine__Rendering__DebugRenderer}
     ${TAKOEngine__Rendering__HLSL}
     ${TAKOEngine__Rendering__Model}
+    ${TAKOEngine__Rendering__ParticleRenderer}
     ${TAKOEngine__Rendering__Shaders}
     ${TAKOEngine__Rendering__Texture}
     ${TAKOEngine__Rendering__HLSL__Common}
@@ -891,6 +905,10 @@ set(SHADER_NAMES
     "ToonInstancingVS.cso"
     "ToonPS.cso"
     "ToonVS.cso"
+    "HitParticleCS.cso"
+    "HitParticleGS.cso"
+    "HitParticlePS.cso"
+    "HitParticleVS.cso"
     "ParticleCS.cso"
     "ParticleGS.cso"
     "ParticlePS.cso"
@@ -967,6 +985,10 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/ToonInstancingVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/ToonPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/ToonVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Particle/HitParticleCS.hlsl,5.0,Compute,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Particle/HitParticleGS.hlsl,5.0,Geometry,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Particle/HitParticlePS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Particle/HitParticleVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Particle/ParticleCS.hlsl,5.0,Compute,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Particle/ParticleGS.hlsl,5.0,Geometry,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Particle/ParticlePS.hlsl,5.0,Pixel,main"

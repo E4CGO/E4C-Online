@@ -14,6 +14,7 @@
 #include "TAKOEngine/Rendering/Shaders/ShadowMapShader.h"
 #include "TAKOEngine/Rendering/Shaders//PlaneShader.h"
 #include "TAKOEngine/Rendering/Shaders/ParticleShader.h"
+#include "TAKOEngine/Rendering/Shaders/HitParticleShader.h"
 
 #include "TAKOEngine/Rendering/Shaders/UVScrollShader.h"
 #include "TAKOEngine/Rendering/Shaders/MaskShader.h"
@@ -591,14 +592,15 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 		dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::GaussianBlur)] = std::make_unique<GaussianBlurShaderDX12>(m_d3d_device.Get());
 		dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::ColorGrading)] = std::make_unique<ColorGradingShaderDX12>(m_d3d_device.Get());
 		dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::Finalpass)] = std::make_unique<FinalpassShaderDX12>(m_d3d_device.Get());
-		dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::Particle)] = std::make_unique<ParticleShader>(m_d3d_device.Get());
+		dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::InjectionParticle)] = std::make_unique<ParticleShader>(m_d3d_device.Get());
+		dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::HitParticle)] = std::make_unique<HitParticleShader>(m_d3d_device.Get());
 
 		// レンダラ
 		debugRenderer = std::make_unique<DebugRenderer>(device.Get());
 		lineRenderer = std::make_unique<LineRenderer>(device.Get(), 1024);
 
 		// パーティクル
-		m_compute = std::make_unique<ParticleCompute>(m_d3d_device.Get());
+		m_compute[static_cast<int>(ComputeShaderDX12Id::Injection)] = std::make_unique<ParticleCompute>(m_d3d_device.Get());
 
 		//スキニング
 		m_skinning_pipeline = std::make_unique<SkinningPipeline>(m_d3d_device.Get());
