@@ -116,6 +116,19 @@ public:
 		READY = 255,	// 待機 (準備完了)
 	};
 
+	enum COLLIDER_ID : uint8_t
+	{
+		COL_BODY,
+		COL_ATTACK_1,
+		COL_ATTACK_2,
+		COL_ATTACK_3,
+		COL_ATTACK_SPECIAL,
+		COL_SKILL_1,
+		COL_SKILL_2,
+		COL_SKILL_3,
+		COL_SKILL_4,
+	};
+
 	enum COLOR_PATTERN {
 		DEFAULT,
 		RED,
@@ -123,6 +136,24 @@ public:
 		BLUE,
 		END
 	};
+
+	enum class WEAPON_TYPE {
+		SWORD_SIMPLE = 1,
+		SWORD_NORMAL,
+		SWORD_COMPLEX,
+		ROD_SIMPLE,
+		ROD_NORMAL,
+		ROD_COMPLEX,
+		ENUM_COUNT
+	};
+
+	enum class ENERGY_TYPE
+	{
+		STAMINA = 1,
+		MANA,
+		ENUM_COUNT
+	};
+
 	// 更新処理
 	virtual void Update(float elapsedTime) override;
 	// 描画処理
@@ -174,8 +205,15 @@ public:
 	// MP管理
 	void RecoverMp(float elapsedTime);
 	void ModifyMp(float mp);
+	void SetCurrentMp(float mp) { this->mp = mp; }
 	float GetMp() { return mp; }
 	float GetMaxMp() { return maxMp; }
+
+	void SetWeaponType(WEAPON_TYPE weapontype) { m_weaponType = static_cast<WEAPON_TYPE>(weapontype); }
+	void SetEnergyType(ENERGY_TYPE energytype) { m_energyType = static_cast<ENERGY_TYPE>(energytype); }
+
+	WEAPON_TYPE GetWeaponType() { return m_weaponType; }
+	ENERGY_TYPE GetEnergyType() { return m_energyType; }
 
 	// スキルタイマー
 	float GetSkillTimerTime(int idx);
@@ -206,10 +244,6 @@ public:
 	// ステートマシンを取得
 	StateMachine<PlayerCharacter>* GetStateMachine() { return stateMachine; }
 
-	Collider* GetAttackCollider(int idx) { return m_pattackColliders[idx]; }
-	std::unordered_map<int, Collider*> GetAttackColliders() { return m_pattackColliders; }
-	void EnableAttackColliders(bool enable = true) { for (const std::pair<int, Collider*>& collider : m_pattackColliders) collider.second->SetEnable(enable); }
-
 	// 同期用データを取得
 	void GetSyncData(SYNC_DATA& data);
 	// 同期用データを計算
@@ -227,18 +261,18 @@ protected:
 
 	bool CollisionVsEnemies();
 
-	bool CollisionVsEnemyAttack(
-		Collider* collider,
-		int damage,
-		bool power = false,
-		float force = 0.0f,
-		int effectIdx = -1,
-		float effectScale = 1.0f
-	); // 汎用 敵との判定
+	//bool CollisionVsEnemyAttack(
+	//	Collider* collider,
+	//	int damage,
+	//	bool power = false,
+	//	float force = 0.0f,
+	//	int effectIdx = -1,
+	//	float effectScale = 1.0f
+	//); // 汎用 敵との判定
 
-	void AttackEnemy(Collider* attackCol, Collider* enemyCol);
+	//void AttackEnemy(Collider* attackCol, Collider* enemyCol);
 
-private:
+protected:
 	float radius = 0;	// 当たり判定半径
 
 	uint32_t m_client_id = 0;
@@ -255,6 +289,8 @@ private:
 	float mpRecoverRate = 8.0f; // 毎秒回復量
 	int atk = 10;
 	std::string m_name;
+	WEAPON_TYPE m_weaponType;
+	ENERGY_TYPE m_energyType;
 
 	float moveSpeed = 0.0f;
 	float turnSpeed = 0.0f;
@@ -288,8 +324,8 @@ protected:
 
 	StateMachine<PlayerCharacter>* stateMachine;
 
-	Collider* m_hitCollider;	// ヒット判定
-	std::unordered_map<int, Collider*> m_pattackColliders; // 攻撃判定
+	//Collider* m_hitCollider;	// ヒット判定
+	//std::unordered_map<int, Collider*> m_pattackColliders; // 攻撃判定
 
 	// 同期用
 	std::mutex m_mut;

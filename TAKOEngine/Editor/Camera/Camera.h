@@ -81,4 +81,6 @@ private:
 	std::vector<DirectX::XMFLOAT3> cameraFocusPoints;  // カメラの各ポイントの注視点
 	
 	int currentSegment = 0;
+
+
 };

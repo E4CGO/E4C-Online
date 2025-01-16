@@ -21,8 +21,8 @@ public:
 	~Teleporter();
 
 	virtual void Update(float elapsedTime) override;
-	void Render(const RenderContext& rc) override;
-	void RenderDX12(const RenderContextDX12& rc) override;
+	virtual void Render(const RenderContext& rc) override;
+	virtual void RenderDX12(const RenderContextDX12& rc) override;
 
 	void Teleport();
 
@@ -34,6 +34,7 @@ protected:
 
 	float m_portalTime = 3.0f;
 	float m_timer = 0.0f;
+	float m_interractionDistance = 5.0f;
 
 	DirectX::XMFLOAT2 m_textureSize = {};
 

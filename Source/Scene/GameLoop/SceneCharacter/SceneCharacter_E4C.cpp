@@ -182,7 +182,7 @@ void SceneCharacter_E4C::RenderDX12()
 	{
 		// シーン用定数バッファ更新
 		const Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
-			CameraManager::Instance().GetCamera());
+			CameraManager::Instance().GetCamera(), 0, 0);
 
 		// レンダーコンテキスト設定
 		RenderContextDX12 rc;
@@ -225,8 +225,13 @@ void SceneCharacter_E4C::RenderDX12()
 
 			T_TEXT.EndDX12();
 		}
+
 	}
-	TentacleLib::graphics.End();
+#ifdef _DEBUG
+	DrawSceneGUI();
+	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
+#endif
+	T_GRAPHICS.End();
 }
 
 /**************************************************************************//**

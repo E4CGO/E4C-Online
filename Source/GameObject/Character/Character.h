@@ -32,9 +32,6 @@ public:
 	// 向き
 	void Turn(float elapsedTime, float vx, float vz, float speed);
 
-	// 攻撃コリジョン
-	virtual void AttackCollision() {}
-
 	void FaceTo(const DirectX::XMFLOAT3 point)
 	{
 		angle.y = atan2(point.x - position.x, point.z - position.z);
@@ -93,6 +90,8 @@ public:
 
 	// 高さを取得
 	float GetHeight() { return height; }
+	// 半径を取得
+	float GetRadius() { return radius; }
 
 	// 地面判定
 	bool IsGround() const { return isGround; }
@@ -104,17 +103,19 @@ public:
 	int GetHp() { return hp; }
 	int GetMaxHp() { return maxHp; }
 	void ModifyHp(int hp);
+	void SetCurrentHp(int hp) { this->hp = hp; }
+
+	// 被ダメージコールバック
+	virtual void OnDamage(int damage) { hp -= damage; }
 
 	//物理計算フラグ
 	void SetKinematic(bool value) { this->isKinematic = value; }
 
 protected:
-	// コライダー更新処理
-	virtual void UpdateColliders() {};
-protected:
 	// レイキャスト用
 	float stepOffset = 0.5f;						// ステップ高さ
 	float height = 2.0f;							// 高さ
+	float radius = 0.5f;							// 半径
 
 	float gravity = -1.0f;							// 重力
 	DirectX::XMFLOAT3 velocity = { 0, 0, 0 };		// 速力
@@ -134,7 +135,7 @@ protected:
 	bool isKinematic = false;
 
 	// HP
-	int hp = 1;
-	int maxHp = 1;
+	int hp = 100;
+	int maxHp = 100;
 };
 #endif

@@ -1,77 +1,97 @@
-﻿#pragma once
+//! @file EnemyState.h
+//! @note 
+
+#ifndef __INCLUDE_ENEMY_STATE_H__
+#define __INCLUDE_ENEMY_STATE_H__
+
 
 #include "TAKOEngine/AI/BaseState.h"
 #include "GameObject/Character/Enemy/Enemy.h"
 
 namespace EnemyState
 {
-	enum ID {
-		Idle,
-		TargetFound,
+	void StateTransition(Enemy* enemy, uint8_t state);
 
-		Hurt,
-		Death,
-
-		End,
-	};
-
-	// 待機ステートオブジェクト
+	/**************************************************************************//**
+		@class	enemy::IdleState
+		@brief	待機ステート基底クラス
+		@par	[説明]
+				待機ステート基底クラス
+	*//***************************************************************************/
 	class IdleState : public HierarchicalState<Enemy>
 	{
 	public:
 		// コンストラクタ
-		IdleState(Enemy* enemy, float waitTime = 2.0f) : HierarchicalState<Enemy>(enemy), waitTime(waitTime) {};
+		IdleState(Enemy* enemy, float waitTime = 2.0f) : HierarchicalState<Enemy>(enemy), m_waitTime(waitTime) {};
 		// デストラクタ
 		~IdleState() {}
 		// ステートに入った時のメソッド
 		virtual void Enter() override;
 		// ステートで実行するメソッド
-		void Execute(float elapsedTime) override;
+		virtual void Execute(float elapsedTime) override;
 		// ステートから出ていくときのメソッド
-		void Exit() override;
-	private:
-		float waitTime;
-		float waitTimer = 0.0f;
+		virtual void Exit() override;
+	protected:
+		bool IsWaiting() { return m_waitTimer > 0.0f; }
+	protected:
+		float m_waitTime;
+		float m_waitTimer = 0.0f;
 	};
 
-	// 移動ステート
+	/**************************************************************************//**
+		@class	enemy::MoveState
+		@brief	移動ステート基底クラス
+		@par	[説明]
+				待機ステート基底クラス
+	*//***************************************************************************/
 	class MoveState : public HierarchicalState<Enemy>
 	{
 	public:
 		// コンストラクタ
-		MoveState(Enemy* enemy, DirectX::XMFLOAT3 position, int nextState = EnemyState::ID::Idle) : HierarchicalState<Enemy>(enemy), position(position), nextState(nextState) {};
+		MoveState(Enemy* enemy, int nextState = Enemy::STATE::IDLE) : HierarchicalState<Enemy>(enemy), m_nextState(nextState) {};
 		// デストラクタ
 		~MoveState() {}
 		// ステートに入った時のメソッド
 		virtual void Enter() override;
 		// ステートで実行するメソッド
-		void Execute(float elapsedTime) override;
+		virtual void Execute(float elapsedTime) override;
 		// ステートから出ていくときのメソッド
-		void Exit() override;
+		virtual void Exit() override;
 	private:
-		DirectX::XMFLOAT3 position;
-		int nextState;
+		int m_nextState;
 	};
 
-	// 追跡ステート
+	/**************************************************************************//**
+		@class	enemy::FollowState
+		@brief	追跡ステート基底クラス
+		@par	[説明]
+				追跡ステート基底クラス
+	*//***************************************************************************/
 	class FollowState : public HierarchicalState<Enemy>
 	{
 	public:
 		// コンストラクタ
-		FollowState(Enemy* enemy, float distance, int nextState = EnemyState::ID::Idle) : HierarchicalState<Enemy>(enemy), distance(distance), nextState(nextState) {};
+		FollowState(Enemy* enemy, float distance, int nextState = Enemy::STATE::IDLE) : HierarchicalState<Enemy>(enemy), m_distance(distance), m_nextState(nextState) {};
 		// デストラクタ
 		~FollowState() {}
 		// ステートに入った時のメソッド
 		virtual void Enter() override;
 		// ステートで実行するメソッド
-		void Execute(float elapsedTime) override;
+		virtual void Execute(float elapsedTime) override;
 		// ステートから出ていくときのメソッド
-		void Exit() override;
+		virtual void Exit() override;
 	private:
-		float distance;
-		int nextState;
+		float m_distance;
+		int m_nextState;
 	};
 
+
+	/**************************************************************************//**
+		@class	enemy::HurtState
+		@brief	ダメージステート基底クラス
+		@par	[説明]
+				ダメージステート基底クラス
+	*//***************************************************************************/
 	class HurtState : public HierarchicalState<Enemy>
 	{
 	public:
@@ -82,11 +102,18 @@ namespace EnemyState
 		// ステートに入った時のメソッド
 		virtual void Enter() override;
 		// ステートで実行するメソッド
-		void Execute(float elapsedTime) override;
+		virtual void Execute(float elapsedTime) override;
 		// ステートから出ていくときのメソッド
-		void Exit() override;
+		virtual void Exit() override;
 	};
 
+
+	/**************************************************************************//**
+		@class	enemy::DeathState
+		@brief	死亡ステート基底クラス
+		@par	[説明]
+				死亡ステート基底クラス
+	*//***************************************************************************/
 	class DeathState : public HierarchicalState<Enemy>
 	{
 	public:
@@ -97,8 +124,10 @@ namespace EnemyState
 		// ステートに入った時のメソッド
 		virtual void Enter() override;
 		// ステートで実行するメソッド
-		void Execute(float elapsedTime) override;
+		virtual void Execute(float elapsedTime) override;
 		// ステートから出ていくときのメソッド
-		void Exit() override;
+		virtual void Exit() override;
 	};
 }
+
+#endif // !__INCLUDE_ENEMY_STATE_H__

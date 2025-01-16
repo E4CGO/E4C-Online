@@ -172,37 +172,53 @@ void TextSprite::RenderDX12(
 	DirectX::XMFLOAT2 size;
 	DirectX::XMStoreFloat2(&size, fonts[static_cast<int>(font)]->MeasureString(text.c_str()));
 
-	D2D1_RECT_F textRect = D2D1::RectF(x, y, x + size.x, y + size.y);
-
 	m_textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
-
+	DirectX::XMFLOAT2 pos = { x, y };
 	switch (align)
 	{
 	case FONT_ALIGN::TOP_LEFT:
 		break;
 	case FONT_ALIGN::TOP:
+		pos.x -= size.x * 0.5f;
 		break;
 	case FONT_ALIGN::TOP_RIGHT:
+		pos.x -= size.x;
 		break;
 	case FONT_ALIGN::LEFT:
+		pos.y -= size.y * 0.5f;
 		break;
 	case FONT_ALIGN::CENTER:
-		m_textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+		pos.x -= size.x * 0.5f;
+		pos.y -= size.y * 0.5f;
 		break;
 	case FONT_ALIGN::RIGHT:
+		pos.x -= size.x;
+		pos.y -= size.y * 0.5f;
 		break;
 	case FONT_ALIGN::BOTTOM_LEFT:
+		pos.y -= size.y;
 		break;
 	case FONT_ALIGN::BOTTOM:
+		pos.x -= size.x * 0.5f;
+		pos.y -= size.y;
 		break;
 	case FONT_ALIGN::BOTTOM_RIGHT:
+		pos.x -= size.x;
+		pos.y -= size.y;
 		break;
 	default:
 		break;
 	}
+	D2D1_RECT_F textRect = D2D1::RectF(pos.x, pos.y, pos.x + size.x, pos.y + size.y);
 
 	T_GRAPHICS.GetD2D1DeviceContext()->BeginDraw();
-	T_GRAPHICS.GetD2D1DeviceContext()->SetTransform(D2D1::Matrix3x2F::Identity());
+
+	D2D1::Matrix3x2F scaleMatrix = D2D1::Matrix3x2F::Scale(
+		D2D1_SIZE_F{ scale, scale },  // Scaling factors for X and Y
+		D2D1_POINT_2F{ (textRect.right + textRect.left) * 0.5f, (textRect.top + textRect.bottom) * 0.5f } // Center of scaling
+	);
+
+	T_GRAPHICS.GetD2D1DeviceContext()->SetTransform(scaleMatrix);
 
 	T_GRAPHICS.GetD2D1DeviceContext()->DrawText(
 		text.c_str(),
@@ -211,6 +227,7 @@ void TextSprite::RenderDX12(
 		&textRect,
 		m_textBrush.Get()
 	);
+	T_GRAPHICS.GetD2D1DeviceContext()->SetTransform(D2D1::Matrix3x2F::Identity());
 
 	T_GRAPHICS.GetD2D1DeviceContext()->EndDraw();
 }

@@ -49,7 +49,7 @@ void MapTileManager::CalcMapArea(DirectX::XMFLOAT3& minPos, DirectX::XMFLOAT3& m
 
 	for (ModelObject*& item : items)
 	{
-		if (item->GetCollider() == nullptr) continue;
+		if (item->GetMoveCollider() == nullptr) continue;
 
 		const ModelResource* resource = item->GetModel()->GetResource();
 		for (const ModelResource::Mesh& mesh : resource->GetMeshes())

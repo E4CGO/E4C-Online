@@ -1,33 +1,58 @@
-﻿#include "SkeletonMinionState.h"
+﻿//! @file SkeletonMinionState.cpp
+//! @note 
 
-// 攻撃ステート
-void SkeletonMinionState::AttackState::Enter()
+#include "SkeletonMinionState.h"
+
+namespace SkeletonMinionState
 {
-	owner->GetModel()->PlayAnimation(Enemy::Animation::Attack_Combo, false);
-}
-void SkeletonMinionState::AttackState::Execute(float elapsedTime)
-{
-	if (owner->GetModel()->GetAnimationRate() <= 0.5f)
+	// 待機ステート
+	void IdleState::Enter()
 	{
-		owner->GetAttackColliders()[SkeletonMinion::AttackCollider::RightHand]->SetEnable(true);
-		owner->GetAttackColliders()[SkeletonMinion::AttackCollider::LeftHand]->SetEnable(false);
-	}
-	else
-	{
-		owner->GetAttackColliders()[SkeletonMinion::AttackCollider::RightHand]->SetEnable(false);
-		owner->GetAttackColliders()[SkeletonMinion::AttackCollider::LeftHand]->SetEnable(true);
+		EnemyState::IdleState::Enter();
+		owner->GetModel()->PlayAnimation(SkeletonMinion::Animation::Idle, false);
 	}
 
-	if (!owner->IsPlayAnimation())
+	void IdleState::Execute(float elapsedTime)
 	{
-		owner->GetStateMachine()->ChangeState(EnemyState::ID::Idle);
+		owner->UpdateTarget();
+		EnemyState::IdleState::Execute(elapsedTime);
+		PlayerCharacter* target = PlayerCharacterManager::Instance().GetPlayerCharacterById(owner->GetTarget());
+		if (target != nullptr)
+		{
+			owner->TurnTo(elapsedTime, target->GetPosition());
+			if (!IsWaiting())
+			{
+				owner->GetStateMachine()->ChangeState(SkeletonMinion::STATE::TARGET_FOUND);
+			}
+		}
 	}
-	//if (!owner->GetModel()->IsPlayAnimation())
-	//{
-	//	owner->GetStateMachine()->ChangeState(EnemyState::ID::Death);
-	//}
-}
-void SkeletonMinionState::AttackState::Exit()
-{
-	owner->EnableAttackColliders(false);
+
+	// 攻撃ステート
+	void AttackState::Enter()
+	{
+		owner->GetModel()->PlayAnimation(SkeletonMinion::Animation::Attack_Combo, false);
+	}
+	void AttackState::Execute(float elapsedTime)
+	{
+		if (owner->GetModel()->GetAnimationRate() <= 0.5f)
+		{
+			owner->GetCollider(SkeletonMinion::COLLIDER_ID::COL_RIGHT_HAND)->SetEnable(true);
+			owner->GetCollider(SkeletonMinion::COLLIDER_ID::COL_LEFT_HAND)->SetEnable(false);
+		}
+		else
+		{
+			owner->GetCollider(SkeletonMinion::COLLIDER_ID::COL_RIGHT_HAND)->SetEnable(false);
+			owner->GetCollider(SkeletonMinion::COLLIDER_ID::COL_LEFT_HAND)->SetEnable(true);
+		}
+
+		if (!owner->IsPlayAnimation())
+		{
+			owner->GetStateMachine()->ChangeState(Enemy::STATE::IDLE);
+		}
+	}
+	void AttackState::Exit()
+	{
+		owner->GetCollider(SkeletonMinion::COLLIDER_ID::COL_RIGHT_HAND)->SetEnable(false);
+		owner->GetCollider(SkeletonMinion::COLLIDER_ID::COL_LEFT_HAND)->SetEnable(false);
+	}
 }

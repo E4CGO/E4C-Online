@@ -1,3 +1,6 @@
+//! @file Character.cpp
+//! @note 
+
 #include "Character.h"
 #include <iostream>
 #include "Map/MapTileManager.h"
@@ -209,6 +212,7 @@ void Character::UpdateVerticalMove(float elapsedTime)
 		{
 			// 地面に接地している
 			position = hit.position;
+
 			// 回転
 			//angle.x += hit.rotation.x;
 			//angle.y += hit.rotation.y;
@@ -229,9 +233,9 @@ void Character::UpdateVerticalMove(float elapsedTime)
 		{
 			// 空中に浮いている
 			position.y += my;
-			if (collider)
+			if (m_pMoveCollider)
 			{
-				collider->SetPosition(collider->GetPosition() + XMFLOAT3{0, my, 0});
+				m_pMoveCollider->SetPosition(m_pMoveCollider->GetPosition() + XMFLOAT3{0, my, 0});
 			}
 			if (velocity.y < -10.0f)
 			{
@@ -262,9 +266,9 @@ void Character::UpdateVerticalMove(float elapsedTime)
 		}
 		else {
 			position.y += my;
-			if (collider)
+			if (m_pMoveCollider)
 			{
-				collider->SetPosition(collider->GetPosition() + XMFLOAT3{0, my, 0});
+				m_pMoveCollider->SetPosition(m_pMoveCollider->GetPosition() + XMFLOAT3{0, my, 0});
 			}
 		}
 	}
@@ -293,33 +297,11 @@ void Character::UpdateHorizontalMove(float elapsedTime)
 		float mz = velocity.z * elapsedTime;
 
 		// マップ
-		if (collider != nullptr) {
-			//collider->SetPosition(position + DirectX::XMFLOAT3{ 0, height * 0.5f, 0 } *scale + DirectX::XMFLOAT3{ velocity.x / velocityLengthXZ, 0, velocity.z / velocityLengthXZ } *scale);
-			//collider->SetPosition(position + DirectX::XMFLOAT3{ 0, 0.4f, 0 } + DirectX::XMFLOAT3{ velocity.x / velocityLengthXZ, 0, velocity.z / velocityLengthXZ });
-			//if (!collider->CollisionVsMap(true))
-			//{
-			//	isWall = false;
-				position.x += mx;
-				position.z += mz;
-			//}
-			//else
-			//{
-			//	//collider->SetPosition(position + DirectX::XMFLOAT3{ 0, height * 0.5f, 0 } *scale + DirectX::XMFLOAT3{ mx, 0, mz });
-			//	collider->SetPosition(position + DirectX::XMFLOAT3{ 0, 0.4f, 0 } + DirectX::XMFLOAT3{ mx, 0, mz });
-			//	if (!collider->CollisionVsMap(true))
-			//	{
-			//		position.x += mx;
-			//		position.z += mz;
-			//	}
-			//	else
-			//	{
-			//		if (!isWall)
-			//		{
-			//			OnWall();
-			//		}
-			//		isWall = true;
-			//	}
-			//}
+		if (m_pMoveCollider != nullptr) {
+			position.x += mx;
+			position.z += mz;
+			m_pMoveCollider->SetPosition(m_pMoveCollider->GetPosition() + XMFLOAT3{mx, 0, mz});
+			//m_pMoveCollider->SetPosition({ position.x, m_pMoveCollider->GetPosition().y, position.z });
 		}
 		else
 		{
@@ -388,14 +370,14 @@ void Character::UpdateHorizontalMove(float elapsedTime)
 *//***************************************************************************/
 void Character::PositionAdjustment()
 {
-	//if (collider)
+	//if (m_pMoveCollider)
 	//{
 	//	if (XMFLOAT3LengthSq(velocity) > 0.0f)
 	//	{
-	//		if (collider->CollisionVsMap())
+	//		if (m_pMoveCollider->CollisionVsMap())
 	//		{
-	//			position = collider->GetPosition();
-	//			position.y -= collider->GetSphere().radius;
+	//			position = m_pMoveCollider->GetPosition();
+	//			position.y -= radius;
 	//		}
 	//	}
 	//}
