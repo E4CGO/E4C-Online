@@ -203,6 +203,17 @@ struct ParticleData
 	float noisePower = 100.0f;
 };
 
+// ヒットパーティクル情報
+struct HitParticleData
+{
+	// コンスタントバッファ
+	const Descriptor* cbv_descriptor = nullptr;
+	const Descriptor* srv_descriptor = nullptr;
+
+	D3D12_VERTEX_BUFFER_VIEW d3d_vbv = {};
+	int maxParticle = 0;
+};
+
 struct RenderContext
 {
 	ID3D11DeviceContext* deviceContext;
@@ -260,6 +271,7 @@ struct RenderContextDX12
 
 	// パーティクル情報
 	ParticleData            particleData;
+	HitParticleData         hitParticleData;
 
 	// 影情報
 	ShadowMapDataDX12       shadowMap;

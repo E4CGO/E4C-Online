@@ -30,6 +30,8 @@
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
 #include "Source/GameObject/Props/Spawner.h"
 
+#include "TAKOEngine/Rendering/ParticleRenderer/HitParticleRenderer.h"
+
 using namespace DirectX;
 
 class SceneGame_E4C;
@@ -116,6 +118,8 @@ private:
 		{5,3,4},
 		{8,3,8}
 	};
+
+	std::unique_ptr<HitParticleRenderer> m_particle[2];
 
 	// フレームバッファマネージャー
 	FrameBufferManager* m_frameBuffer = nullptr;

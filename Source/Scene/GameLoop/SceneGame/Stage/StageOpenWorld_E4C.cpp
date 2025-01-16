@@ -153,6 +153,24 @@ void StageOpenWorld_E4C::Initialize()
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
 	player->SetPosition({ 15.0f, 15.0f, 5.0f });
 
+	//{
+	//	Enemy* enemy = Enemy::EnemyFactory(0);
+	//	enemy->SetPosition({ 0, 5, 0 });
+	//	ENEMIES.Register(enemy);
+	//}
+
+	//{
+	//	Enemy* enemy = Enemy::EnemyFactory(1);
+	//	enemy->SetPosition({ 0, 5, 0 });
+	//	ENEMIES.Register(enemy);
+	//}
+
+	// パーティクル
+	DirectX::XMFLOAT3 p_pos = { 0,3,0 };
+	m_particle[0] = std::make_unique<HitParticleRenderer>(p_pos);
+	p_pos = { 3,3,0 };
+	m_particle[1] = std::make_unique<HitParticleRenderer>(p_pos);
+
 	// カメラ設定
 	Camera* mainCamera = CameraManager::Instance().GetCamera();
 	mainCamera->SetPerspectiveFov(
@@ -347,6 +365,10 @@ void StageOpenWorld_E4C::RenderDX12()
 			rc.skydomeData.skyTexture = m_sprites[1]->GetDescriptor();
 			sky->RenderDX12(rc);
 		}
+
+		// パーティクル
+		m_particle[0]->Render(m_frameBuffer);
+		m_particle[1]->Render(m_frameBuffer);
 
 		// レンダーターゲットへの書き込み終了待ち
 		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));

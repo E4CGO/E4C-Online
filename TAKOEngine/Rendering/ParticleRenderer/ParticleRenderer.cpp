@@ -3,7 +3,7 @@
 
 #include "TAKOEngine\Runtime\tentacle_lib.h"
 #include "TAKOEngine\Rendering\Misc.h"
-#include "Graphics.h"
+#include "TAKOEngine\Rendering\Graphics.h"
 #include "ParticleRenderer.h"
 
 //**************************************************************
@@ -11,11 +11,8 @@
 // @param[in]   なし
 // @return      なし
 //**************************************************************
-ParticleRenderer::ParticleRenderer()
+InjectionParticleRenderer::InjectionParticleRenderer()
 {
-	Graphics&       graphics = Graphics::Instance();
-	ID3D12Device* d3d_device = graphics.GetDeviceDX12();
-
 	m_emitRate = 500;  //秒間500発
 	m_emitWork = 0;
 
@@ -32,15 +29,15 @@ ParticleRenderer::ParticleRenderer()
 // @param[in]   なし
 // @return      なし
 //***********************************************************
-ParticleRenderer::~ParticleRenderer()
+InjectionParticleRenderer::~InjectionParticleRenderer()
 {
-	if (T_GRAPHICS.GetParticleCompute()->uav_descriptor != nullptr)
+	if (T_GRAPHICS.GetParticleCompute(ComputeShaderDX12Id::Injection)->uav_descriptor != nullptr)
 	{
-		T_GRAPHICS.GetShaderResourceDescriptorHeap()->PushDescriptor(T_GRAPHICS.GetParticleCompute()->uav_descriptor);
+		T_GRAPHICS.GetShaderResourceDescriptorHeap()->PushDescriptor(T_GRAPHICS.GetParticleCompute(ComputeShaderDX12Id::Injection)->uav_descriptor);
 	}
 	if (cbv_descriptor != nullptr)
 	{
-		Graphics::Instance().GetShaderResourceDescriptorHeap()->PushDescriptor(cbv_descriptor);
+		T_GRAPHICS.GetShaderResourceDescriptorHeap()->PushDescriptor(cbv_descriptor);
 	}
 	if (cbv_data != nullptr)
 	{
@@ -54,7 +51,7 @@ ParticleRenderer::~ParticleRenderer()
 // @param[in]   framBuffer     フレームバッファ
 // @return      なし
 //***********************************************************
-void ParticleRenderer::Render(FrameBufferManager* framBuffer)
+void InjectionParticleRenderer::Render(FrameBufferManager* framBuffer)
 {
 	RenderContextDX12 rc;
 	rc.d3d_command_list = framBuffer->GetCommandList();
@@ -63,7 +60,7 @@ void ParticleRenderer::Render(FrameBufferManager* framBuffer)
 	rc.particleData.cbv_descriptor = UpdateSceneConstantBuffer(rc);
 	
 	// 計算
-	ParticleCompute* m_compute = T_GRAPHICS.GetParticleCompute();
+	ComputeShader* m_compute = T_GRAPHICS.GetParticleCompute(ComputeShaderDX12Id::Injection);
 	m_compute->Compute(rc, m_sprites[static_cast<int>(ParticleSprite::Noise)].get());
 
 	// 発生インデックス更新
@@ -74,7 +71,7 @@ void ParticleRenderer::Render(FrameBufferManager* framBuffer)
 	}
 
 	// シェーダー
-	SpriteShaderDX12* shader = T_GRAPHICS.GetSpriteShaderDX12(SpriteShaderDX12Id::Particle);
+	SpriteShaderDX12* shader = T_GRAPHICS.GetSpriteShaderDX12(SpriteShaderDX12Id::InjectionParticle);
 	shader->Render(rc, m_sprites[static_cast<int>(ParticleSprite::Anime)].get());
 }
 
@@ -83,7 +80,7 @@ void ParticleRenderer::Render(FrameBufferManager* framBuffer)
 // @param[in]   なし
 // @return      なし
 //*************************************************************
-void ParticleRenderer::CreateConstantBuffer()
+void InjectionParticleRenderer::CreateConstantBuffer()
 {
 	Graphics& graphics = Graphics::Instance();
 	ID3D12Device* d3d_device = graphics.GetDeviceDX12();
@@ -121,7 +118,7 @@ void ParticleRenderer::CreateConstantBuffer()
 		nullptr,
 		IID_PPV_ARGS(d3d_cbv_resource.GetAddressOf()));
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-	d3d_cbv_resource->SetName(L"ParticleConstatBuffer");
+	d3d_cbv_resource->SetName(L"InjectionParticleConstatBuffer");
 
 	// ディスクリプタ取得
 	cbv_descriptor = graphics.GetShaderResourceDescriptorHeap()->PopDescriptor();
@@ -144,7 +141,7 @@ void ParticleRenderer::CreateConstantBuffer()
 // @param[in]   rc レンダーコンテキスト
 // @return      const Descriptor*
 //*************************************************************
-const Descriptor* ParticleRenderer::UpdateSceneConstantBuffer(const RenderContextDX12& rc)
+const Descriptor* InjectionParticleRenderer::UpdateSceneConstantBuffer(const RenderContextDX12& rc)
 {
 	const Camera* camera = CameraManager::Instance().GetCamera();
 
