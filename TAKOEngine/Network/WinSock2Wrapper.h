@@ -1,3 +1,6 @@
+//! @file WinSock2Wrapper.h
+//! @note 
+
 #ifndef _WINSOCK_WRAPPER_H_
 #define _WINSOCK_WRAPPER_H_
 

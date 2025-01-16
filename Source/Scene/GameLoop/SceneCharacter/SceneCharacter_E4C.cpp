@@ -225,13 +225,13 @@ void SceneCharacter_E4C::RenderDX12()
 
 			T_TEXT.EndDX12();
 		}
+
 	}
 #ifdef _DEBUG
 	DrawSceneGUI();
 	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
 #endif
-
-	TentacleLib::graphics.End();
+	T_GRAPHICS.End();
 }
 
 /**************************************************************************//**

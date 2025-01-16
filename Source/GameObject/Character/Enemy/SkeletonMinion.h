@@ -7,27 +7,57 @@ class SkeletonMinion : public Enemy
 {
 public:
 	SkeletonMinion(float scaling = 1.5f);
-	~SkeletonMinion() = default;
-private:
-	void UpdateColliders() override;
+	virtual ~SkeletonMinion();
 public:
-	enum AttackCollider
+	enum Animation
 	{
-		LeftHand,
-		RightHand
-	};
-protected:
-	enum HitCollider
-	{
-		Body,
-		Head
-	};
-	enum State
-	{
-		Attack = EnemyState::ID::End,
+		Attack_1H,
+		Attack_Combo,
+		Attack_Spinning,
+		Base,
+		Block,
+		Cheer,
+		Climbing,
+		Dance,
+		Dash_Back,
+		Dash_Front,
+		Dash_Left,
+		Dash_Right,
+		Defeat,
+		Heavy_Attack,
+		Hop,
+		Idle,
+		Interact,
+		Jump,
+		Laying_Down_Idle,
+		Pick_Up,
+		Roll,
+		Run,
+		Shoot_1H,
+		Shoot_2H,
+		Shoot_Bow,
+		Shooting_1H,
+		Shooting_2H,
+		Throw,
+		Walk,
+		Wave
 	};
 
-	void UpdateTarget();
+	enum COLLIDER_ID : uint8_t
+	{
+		COL_BODY,
+		COL_HEAD,
+		COL_LEFT_HAND,
+		COL_RIGHT_HAND,
+	};
+
+	enum STATE
+	{
+		TARGET_FOUND = Enemy::STATE::END,
+		ATTACK
+	};
+protected:
+	void UpdateTarget() override;
 };
 
 class SkeletonMinionBoss : public SkeletonMinion

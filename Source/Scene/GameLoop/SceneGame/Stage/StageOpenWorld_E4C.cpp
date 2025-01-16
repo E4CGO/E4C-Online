@@ -1,3 +1,6 @@
+//! @file StageOpenWorld_E4C.cpp
+//! @note 
+
 #include "StageOpenWorld_E4C.h"
 
 #include "TAKOEngine/GUI/UIManager.h"
@@ -17,12 +20,17 @@
 
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
+#include "GameObject/Props/SpawnerManager.h"
+
+#include "Map/DungeonData.h"
 
 #include "Scene/GameLoop/SceneGame/Stage/StageDungeon_E4C.h"
 
 #include "Network/OnlineController.h"
 
 #include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
+
+static float timer = 0;
 
 void StageOpenWorld_E4C::Initialize()
 {
@@ -46,8 +54,8 @@ void StageOpenWorld_E4C::Initialize()
 	village_collision = new MapTile("Data/Model/Stage/Terrain_Village_Collision.glb", 1.f);
 	stage_collision->Update(0);
 	village_collision->Update(0);
-	stage_collision->SetCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
-	village_collision->SetCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
+	stage_collision->SetMoveCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
+	village_collision->SetMoveCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
 
 	MAPTILES.Register(stage_collision);
 	MAPTILES.Register(village_collision);
@@ -70,21 +78,19 @@ void StageOpenWorld_E4C::Initialize()
 		models.emplace("target1", std::make_unique<ModelObject>("Data/Model/Object/BlockTarget.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["target1"]->SetPosition({ -34.9f, 1.8f, 20.4f });
 		models["target1"]->SetAngle({ 0.0f, -0.84f, 0.0f });
-		models["target1"]->SetCollider(Collider::COLLIDER_TYPE::OBB, Collider::COLLIDER_OBJ::ENEMY);
 		models.emplace("target2", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget1.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["target2"]->SetPosition({ -38.1, 1.80f, 16.2f });
 		models["target2"]->SetAngle({ 0.0f, -1.0f, 0.0f });
-		models["target2"]->SetCollider(Collider::COLLIDER_TYPE::OBB, Collider::COLLIDER_OBJ::ENEMY);
 		models.emplace("target3", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget2.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["target3"]->SetPosition({ -32.0, 1.80f, 23.4f });
 		models["target3"]->SetAngle({ 0.0f, -1.0f, 0.0f });
-		models["target3"]->SetCollider(Collider::COLLIDER_TYPE::OBB, Collider::COLLIDER_OBJ::ENEMY);
 
 		models.emplace("boss", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMboss_1205.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_TOON));
 		models["boss"]->SetPosition({ 10.0, 0.0f, 10.0f });
 		models["boss"]->SetAnimation(0, true);
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 250.0f, ModelObject::RENDER_MODE::DX11);
+
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 70.0f, ModelObject::RENDER_MODE::DX11);
 		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
 
@@ -104,10 +110,6 @@ void StageOpenWorld_E4C::Initialize()
 		models.emplace("tree1t", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tree_1_Trunk.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models.emplace("tree1l", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tree_1_Leaf.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models.emplace("tree2t", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tree_2_Trunk.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
-		models.emplace("tree2l", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tree_2_Leaf.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
-		models.emplace("flower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Flower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
-
-		models.emplace("tower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models.emplace("portal", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Portal.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["portal"]->SetPosition({ -34.0f, 4.0f, -45.0f });
 		models["portal"]->SetAngle({ 0.0f, 1.5f, 0.0f });
@@ -115,19 +117,12 @@ void StageOpenWorld_E4C::Initialize()
 		models.emplace("target1", std::make_unique<ModelObject>("Data/Model/Object/BlockTarget.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["target1"]->SetPosition({ -34.9f, 1.8f, 20.4f });
 		models["target1"]->SetAngle({ 0.0f, -0.84f, 0.0f });
-		models["target1"]->SetCollider(Collider::COLLIDER_TYPE::OBB, Collider::COLLIDER_OBJ::ENEMY);
 		models.emplace("target2", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget1.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["target2"]->SetPosition({ -38.1, 1.80f, 16.2f });
 		models["target2"]->SetAngle({ 0.0f, -1.0f, 0.0f });
-		models["target2"]->SetCollider(Collider::COLLIDER_TYPE::OBB, Collider::COLLIDER_OBJ::ENEMY);
 		models.emplace("target3", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget2.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["target3"]->SetPosition({ -32.0, 1.80f, 23.4f });
 		models["target3"]->SetAngle({ 0.0f, -1.0f, 0.0f });
-		models["target3"]->SetCollider(Collider::COLLIDER_TYPE::OBB, Collider::COLLIDER_OBJ::ENEMY);
-
-		models.emplace("boss", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMboss_1205.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON));
-		models["boss"]->SetPosition({ 10.0, 0.0f, 10.0f });
-		models["boss"]->SetAnimation(0, true);
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 250.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
 		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
@@ -172,9 +167,10 @@ void StageOpenWorld_E4C::Initialize()
 		{ 0, 0.969f, -0.248f }	// 上ベクトル
 	);
 
-	spawner = std::make_unique<Spawner>(0, 2, -1);
-	spawner->SetPosition({ 0.0f, 5.0f, -5.0f });
-	spawner->SetSpawnRadius(0.0f);
+	Spawner* spawner = new Spawner(ENEMY_TYPE::BEAR_BOSS, 1, 1);
+	spawner->SetPosition({ 15.0f, 2.0f, 0.0f });
+	spawner->SetSearchRadius(10.0f);
+	SpawnerManager::Instance().Register(spawner);
 
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(mainCamera);
@@ -186,6 +182,10 @@ void StageOpenWorld_E4C::Initialize()
 	Sound::Instance().InitAudio();
 	Sound::Instance().LoadAudio("Data/Sound/3-Dreamland(Overworld).mp3");
 	Sound::Instance().PlayAudio(0);
+
+	// ダンジョンの生成設定の初期化
+	// 現在の階などを先にリセットしておく
+	DUNGEONDATA.InitDungeonGenerateSetting();
 
 	// 影初期化
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
@@ -243,16 +243,12 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	}
 
 	sky->Update(elapsedTime);
-
-	spawner->Update(elapsedTime);
-
 	teleporter->Update(elapsedTime);
-	portalSquare2->Update(elapsedTime);
+
+	SpawnerManager::Instance().Update(elapsedTime);
 
 	runningDust1->Update(elapsedTime);
-
-	PlayerCharacterManager::Instance().GetPlayerCharacterById(0)->SetCurrentHp(hp);
-	PlayerCharacterManager::Instance().GetPlayerCharacterById(0)->SetCurrentMp(mpsp);
+	timer += elapsedTime;
 
 	for (auto& it : models)
 	{
@@ -264,7 +260,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
 	}
 
-	timer += elapsedTime;
 	timerTick = elapsedTime;
 }
 
@@ -279,7 +274,7 @@ void StageOpenWorld_E4C::Render()
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
-	rc.timerGlobal = timer;
+	rc.timerGlobal = m_timer;
 	rc.timerTick = TentacleLib::Timer::Instance().Delta();
 
 	// ライトの情報を詰め込む
@@ -293,9 +288,10 @@ void StageOpenWorld_E4C::Render()
 		it.second->Render(rc);
 	}
 
+	SpawnerManager::Instance().Render(rc);
+
 	ENEMIES.Render(rc);
 
-	teleporter->Render(rc);
 	portalSquare->Render(rc);
 
 	UI.Render(rc);
@@ -322,8 +318,7 @@ void StageOpenWorld_E4C::RenderDX12()
 			T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
 			rc.shadowMap.shadow_srv_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSRV();
 			rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();
-		}
-
+		}	
 		// シーン用定数バッファ更新
 		const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
 			CameraManager::Instance().GetCamera(), timer, timerTick);
@@ -331,6 +326,7 @@ void StageOpenWorld_E4C::RenderDX12()
 		// レンダーコンテキスト設定
 		rc.d3d_command_list = m_frameBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
+
 
 		// プレイヤー
 		PlayerCharacterManager::Instance().RenderDX12(rc);
@@ -343,9 +339,7 @@ void StageOpenWorld_E4C::RenderDX12()
 			it.second->RenderDX12(rc);
 		}
 
-		// スポナー
-		spawner->RenderDX12(rc);
-
+		SpawnerManager::Instance().RenderDX12(rc);
 		portalSquare2->RenderDX12(rc);
 
 		// skyBox
@@ -371,21 +365,11 @@ void StageOpenWorld_E4C::RenderDX12()
 
 		T_TEXT.EndDX12();
 	}
-
-	DirectX::XMFLOAT3 test_position;
-	DirectX::XMFLOAT3 test_rotation;
-	DirectX::XMFLOAT3 test_scale;
-
 #ifdef _DEBUG
 	DrawSceneGUI();
 	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
 #endif
-
 	T_GRAPHICS.End();
-}
-
-void StageOpenWorld_E4C::OnPhase()
-{
 }
 
 void StageOpenWorld_E4C::DrawSceneGUI()
@@ -393,15 +377,4 @@ void StageOpenWorld_E4C::DrawSceneGUI()
 	ImVec2 pos = ImGui::GetMainViewport()->Pos;
 	ImGui::SetNextWindowPos(ImVec2(pos.x + 10, pos.y + 10), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
-
-	if (ImGui::Begin("Scene##Debug", nullptr, ImGuiWindowFlags_None))
-	{
-		if (ImGui::CollapsingHeader("Object", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			// カメラ
-			ImGui::DragFloat("HP", &hp, 0.0f, 100.0f);
-			ImGui::DragFloat("MP", &mpsp, 0.0f, 100.0f);
-		}
-	}
-	ImGui::End();
 }

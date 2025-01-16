@@ -1,7 +1,6 @@
 ﻿#include "Mathf.h"
 #include <stdlib.h>
 #include <math.h>
-#include "XMFLOAT.h"
 
 float Mathf::Lerp(float a, float b, float t)
 {
@@ -36,28 +35,8 @@ float Mathf::RandomRange(float max, float min)
 	return min + static_cast<float>(rand() * (max - min) / RAND_MAX);
 }
 
-float Mathf::CalcDistFloat3XZ(DirectX::XMFLOAT3 originPosition, DirectX::XMFLOAT3 targetPosition)
-{
-	float vx = targetPosition.x - originPosition.x;
-	float vz = targetPosition.z - originPosition.z;
-	return sqrtf(vx * vx + vz * vz);
-}
-
-float Mathf::CalcDistFloat3(DirectX::XMFLOAT3 originPosition, DirectX::XMFLOAT3 targetPosition)
-{
-	float vx = targetPosition.x - originPosition.x;
-	float vy = targetPosition.y - originPosition.y;
-	float vz = targetPosition.z - originPosition.z;
-	return sqrtf(vx * vx + vy * vy + vz * vz);
-}
-
 // 誤差比較
 bool Mathf::cmpf(float a, float b, float epsilon)
 {
 	return fabs(a - b) < epsilon;
-}
-
-bool Mathf::cmpfloat3(DirectX::XMFLOAT3 a, DirectX::XMFLOAT3 b, float epsilon)
-{
-	return XMFLOAT3Length(b - a) < epsilon;
 }

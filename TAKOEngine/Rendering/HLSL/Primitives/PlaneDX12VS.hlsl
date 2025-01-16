@@ -1,6 +1,6 @@
 #include "PlaneDX12.hlsli"
 
-// ’¸“_ƒVƒF[ƒ_[ƒGƒ“ƒgƒŠƒ|ƒCƒ“ƒg
+// é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚¨ãƒ³ãƒˆãƒªãƒã‚¤ãƒ³ãƒˆ
 [RootSignature(ROOT_SIG)]
 VS_OUT main(
 	float4 position		: POSITION,

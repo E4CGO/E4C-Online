@@ -201,12 +201,20 @@ source_group("Source\\GameObject\\Projectile" FILES ${Source__GameObject__Projec
 set(Source__GameObject__Props
     "Source/GameObject/Props/Spawner.cpp"
     "Source/GameObject/Props/Spawner.h"
+    "Source/GameObject/Props/SpawnerManager.cpp"
+    "Source/GameObject/Props/SpawnerManager.h"
+    "Source/GameObject/Props/StairToNextFloor.cpp"
+    "Source/GameObject/Props/StairToNextFloor.h"
     "Source/GameObject/Props/Teleporter.cpp"
     "Source/GameObject/Props/Teleporter.h"
 )
 source_group("Source\\GameObject\\Props" FILES ${Source__GameObject__Props})
 
 set(Source__GameObject__Character__Enemy
+    "Source/GameObject/Character/Enemy/BearBoss.cpp"
+    "Source/GameObject/Character/Enemy/BearBoss.h"
+    "Source/GameObject/Character/Enemy/BearBossState.cpp"
+    "Source/GameObject/Character/Enemy/BearBossState.h"
     "Source/GameObject/Character/Enemy/Enemy.cpp"
     "Source/GameObject/Character/Enemy/Enemy.h"
     "Source/GameObject/Character/Enemy/EnemyManager.cpp"
@@ -255,6 +263,8 @@ set(Source__Network__TCPCommand
     "Source/Network/TCPCommand/TCPClientData.h"
     "Source/Network/TCPCommand/TCPCommand.cpp"
     "Source/Network/TCPCommand/TCPCommand.h"
+    "Source/Network/TCPCommand/TCPEnemy.cpp"
+    "Source/Network/TCPCommand/TCPEnemy.h"
     "Source/Network/TCPCommand/TCPLogin.cpp"
     "Source/Network/TCPCommand/TCPLogin.h"
     "Source/Network/TCPCommand/TCPMatching.cpp"
@@ -331,6 +341,8 @@ set(Source__UI__Widget
     "Source/UI/Widget/WidgetButtonText.h"
     "Source/UI/Widget/WidgetCharacterModify.cpp"
     "Source/UI/Widget/WidgetCharacterModify.h"
+    "Source/UI/Widget/WidgetCharacterName.cpp"
+    "Source/UI/Widget/WidgetCharacterName.h"
     "Source/UI/Widget/WidgetCharacterSelect.cpp"
     "Source/UI/Widget/WidgetCharacterSelect.h"
     "Source/UI/Widget/WidgetCrosshair.cpp"
@@ -345,6 +357,8 @@ set(Source__UI__Widget
     "Source/UI/Widget/WidgetInputBool.h"
     "Source/UI/Widget/WidgetInputInt.cpp"
     "Source/UI/Widget/WidgetInputInt.h"
+    "Source/UI/Widget/WidgetInputString.cpp"
+    "Source/UI/Widget/WidgetInputString.h"
     "Source/UI/Widget/WidgetMatching.cpp"
     "Source/UI/Widget/WidgetMatching.h"
     "Source/UI/Widget/WidgetPauseMenu.cpp"
@@ -403,6 +417,8 @@ source_group("TAKOEngine\\Network" FILES ${TAKOEngine__Network})
 set(TAKOEngine__Physics
     "TAKOEngine/Physics/AABBCollider.cpp"
     "TAKOEngine/Physics/AABBCollider.h"
+    "TAKOEngine/Physics/AttackCollider.cpp"
+    "TAKOEngine/Physics/AttackCollider.h"
     "TAKOEngine/Physics/CapsuleCollider.cpp"
     "TAKOEngine/Physics/CapsuleCollider.h"
     "TAKOEngine/Physics/Collider.cpp"

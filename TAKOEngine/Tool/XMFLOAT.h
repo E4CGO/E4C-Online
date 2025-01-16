@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Mathf.h"
+
 using namespace DirectX;
 
 inline XMFLOAT3 operator+(XMFLOAT3 v1, XMFLOAT3 v2) { return XMFLOAT3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z); }
@@ -23,9 +25,11 @@ inline void operator/=(XMFLOAT3& v, const float& num) { v.x /= num; v.y /= num; 
 inline bool operator==(const XMFLOAT3& v1, const XMFLOAT3& v2) { return v1.x == v2.x && v1.y == v2.y && v1.z == v2.z; }
 inline bool operator!=(const XMFLOAT3& v1, const XMFLOAT3& v2) { return !(v1 == v2); }
 
-inline float XMFLOAT3Length(const XMFLOAT3 v) { return XMVectorGetX(XMVector3Length(XMLoadFloat3(&v))); }
-inline float XMFLOAT3LengthSq(const XMFLOAT3 v) { return XMVectorGetX(XMVector3LengthSq(XMLoadFloat3(&v))); }
-inline XMFLOAT3 XMFLOAT3Normalize(const XMFLOAT3 v)
+inline float XMFLOAT3Length(const XMFLOAT3& v) { return XMVectorGetX(XMVector3Length(XMLoadFloat3(&v))); }
+inline float XMFLOAT3LengthSq(const XMFLOAT3& v) { return XMVectorGetX(XMVector3LengthSq(XMLoadFloat3(&v))); }
+inline float XMFLOAT3HorizontalLength(XMFLOAT3 v) { v.y = 0.0f; return XMFLOAT3Length(v); }
+inline float XMFLOAT3HorizontalLengthSq(XMFLOAT3 v) { v.y = 0.0f; return XMFLOAT3LengthSq(v); }
+inline XMFLOAT3 XMFLOAT3Normalize(const XMFLOAT3& v)
 {
 	XMFLOAT3 n;
 	XMStoreFloat3(&n, XMVector3Normalize(XMLoadFloat3(&v)));
@@ -45,6 +49,13 @@ inline XMMATRIX AnglesToMatrix(XMFLOAT3 angle) {
 	DirectX::XMMATRIX Y = DirectX::XMMatrixRotationY(angle.y);
 	DirectX::XMMATRIX Z = DirectX::XMMatrixRotationZ(angle.z);
 	return Y * X * Z;
+}
+
+inline XMVECTOR QuaternionFromToRotation(const XMFLOAT3& v1, const XMFLOAT3& v2)
+{
+	float angle = AngleBetweenXMFLOAT3(v1, v2);
+	if (fabsf(angle) < 0.001f || 3.14f < fabsf(angle)) return XMQuaternionIdentity();
+	else return XMQuaternionRotationAxis(XMVector3Cross(XMLoadFloat3(&v1), XMLoadFloat3(&v2)), angle);
 }
 
 inline XMFLOAT3 MatrixToAngles(XMFLOAT4X4& m)
@@ -94,6 +105,17 @@ inline XMFLOAT3 MatrixToAngles(XMMATRIX& quaternion)
 	DirectX::XMFLOAT4X4 mat;
 	DirectX::XMStoreFloat4x4(&mat, quaternion);
 	return MatrixToAngles(mat);
+}
+
+inline XMFLOAT3 GetRandomPointInCircleArea(const XMFLOAT3& center, const float radius)
+{
+	XMFLOAT3 result = center;
+
+	float angle = Mathf::RandomRange(0.0f, DirectX::XM_2PI);
+	float distance = Mathf::RandomRange(0.0f, radius);
+	result += { cosf(angle) * distance, 0.0f, sinf(angle) * distance };
+
+	return result;
 }
 
 inline XMFLOAT2 operator+(XMFLOAT2 v1, XMFLOAT2 v2) { return XMFLOAT2(v1.x + v2.x, v1.y + v2.y); }

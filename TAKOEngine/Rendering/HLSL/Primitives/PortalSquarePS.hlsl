@@ -14,7 +14,7 @@ float4 main(VS_OUT pin) : SV_TARGET
 
     
     float t = timerGlobal * time_factor;
-    float2 uv = pin.texcoord.xy - float2(0.5, 0.5); // ƒIƒuƒWƒFƒNƒg‚ÌˆÊ’u‚ğŒvZ‚µ‚Äo—Í
+    float2 uv = pin.texcoord.xy - float2(0.5, 0.5); // ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½ç½®ã‚’è¨ˆç®—ã—ã¦å‡ºåŠ›
     
     float2 st = float2(length(uv) * 2.0, atan2(uv.x, uv.y));
     
@@ -31,9 +31,9 @@ float4 main(VS_OUT pin) : SV_TARGET
                           smoothstep(factor2.x, factor2.y, c),
                           smoothstep(factor3.x, factor3.y, c), 1.0);
     if (color.r <= 0.5 && color.g <= 0.5 && color.b <= 0.5)
-        discard; //•F‚Í–³‹‚·‚é 
+        discard; //é»’è‰²ã¯ç„¡è¦–ã™ã‚‹ 
     
-    // ƒ‚ƒmƒNƒ‚É‚·‚é
+    // ãƒ¢ãƒã‚¯ãƒ­ã«ã™ã‚‹
     color.rgb = (color.r + color.g + color.b) * 0.3333f;
     color.rgb *= color1;
 #if 1

@@ -45,7 +45,6 @@ namespace Online
 		std::string* message = static_cast<std::string*>(data);
 
 		std::vector<uint8_t> buffer;
-
 		CreateHeaderBuffer(buffer, m_cmd, static_cast<uint32_t>(message->size()));
 
 		// チャット内容
