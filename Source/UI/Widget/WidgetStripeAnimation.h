@@ -10,8 +10,8 @@
 #include "TAKOEngine/GUI/Widget.h"
 
 /**************************************************************************//**
-	@class	WidgetImage
-	@brief	画像描画用ウェジット
+	@class	WidgetStripeAnimation
+	@brief	画像アニメーション描画用ウェジット
 	@par	[説明]
 *//***************************************************************************/
 class WidgetStripeAnimation : public Widget

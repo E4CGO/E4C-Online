@@ -3,7 +3,7 @@
 Texture2D spriteTexture : register(t0);
 SamplerState spriteSampler : register(s0);
 
-// ƒsƒNƒZƒ‹ƒVƒF[ƒ_[ƒGƒ“ƒgƒŠƒ|ƒCƒ“ƒg
+// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚¨ãƒ³ãƒˆãƒªãƒã‚¤ãƒ³ãƒˆ
 float4 main(PSInput pin) : SV_TARGET
 {
     return spriteTexture.Sample(spriteSampler, pin.texcoord) * pin.color;

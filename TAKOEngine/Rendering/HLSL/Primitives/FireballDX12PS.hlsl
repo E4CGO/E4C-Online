@@ -27,7 +27,7 @@ float snoise(float3 uv, float res)	// by trisomie21
     return lerp(r0, r1, f.z) * 2.0 - 1.0;
 }
 
-// ƒsƒNƒZƒ‹ƒVƒF[ƒ_[ƒGƒ“ƒgƒŠƒ|ƒCƒ“ƒg
+// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚¨ãƒ³ãƒˆãƒªãƒã‚¤ãƒ³ãƒˆ
 float4 main(VS_OUT pin) : SV_TARGET
 {
     
@@ -39,7 +39,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     
     float time = timerGlobal * 0.1f;
     float aspect = 1.0;
-    float2 uv = pin.texcoord.xy; //texcoord‚É‚·‚é‚Æ^‚Á•‚É‚È‚éBB
+    float2 uv = pin.texcoord.xy; //texcoordã«ã™ã‚‹ã¨çœŸã£é»’ã«ãªã‚‹ã€‚ã€‚
     float2 p = -0.5 + uv;
     p.x *= aspect;
 
@@ -96,7 +96,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     //clip(fragColor.a - 0.3);
     
     if (fragColor.r <= 0.65 && fragColor.g <= 0.65 && fragColor.b <= 0.65)
-        discard; //•F‚Í–³‹‚·‚é 
+        discard; //é»’è‰²ã¯ç„¡è¦–ã™ã‚‹ 
 
     return fragColor;
 
