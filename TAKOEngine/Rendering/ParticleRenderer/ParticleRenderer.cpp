@@ -55,10 +55,10 @@ void InjectionParticleRenderer::Render(FrameBufferManager* framBuffer)
 {
 	RenderContextDX12 rc;
 	rc.d3d_command_list = framBuffer->GetCommandList();
-	
+
 	// コンスタントバッファ更新
 	rc.particleData.cbv_descriptor = UpdateSceneConstantBuffer(rc);
-	
+
 	// 計算
 	ComputeShader* m_compute = T_GRAPHICS.GetParticleCompute(ComputeShaderDX12Id::Injection);
 	m_compute->Compute(rc, m_sprites[static_cast<int>(ParticleSprite::Noise)].get());
@@ -89,25 +89,25 @@ void InjectionParticleRenderer::CreateConstantBuffer()
 
 	// ヒーププロパティの設定
 	D3D12_HEAP_PROPERTIES heap_props{};
-	heap_props.Type                 = D3D12_HEAP_TYPE_UPLOAD;
-	heap_props.CPUPageProperty      = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	heap_props.Type = D3D12_HEAP_TYPE_UPLOAD;
+	heap_props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
 	heap_props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-	heap_props.CreationNodeMask     = 1;
-	heap_props.VisibleNodeMask      = 1;
+	heap_props.CreationNodeMask = 1;
+	heap_props.VisibleNodeMask = 1;
 
 	// リソースの設定
 	D3D12_RESOURCE_DESC resource_desc{};
-	resource_desc.Dimension          = D3D12_RESOURCE_DIMENSION_BUFFER;
-	resource_desc.Alignment          = 0;
-	resource_desc.Width              = ((sizeof(CbScene)) + 255) & ~255;
-	resource_desc.Height             = 1;
-	resource_desc.DepthOrArraySize   = 1;
-	resource_desc.MipLevels          = 1;
-	resource_desc.Format             = DXGI_FORMAT_UNKNOWN;
-	resource_desc.SampleDesc.Count   = 1;
+	resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	resource_desc.Alignment = 0;
+	resource_desc.Width = ((sizeof(CbScene)) + 255) & ~255;
+	resource_desc.Height = 1;
+	resource_desc.DepthOrArraySize = 1;
+	resource_desc.MipLevels = 1;
+	resource_desc.Format = DXGI_FORMAT_UNKNOWN;
+	resource_desc.SampleDesc.Count = 1;
 	resource_desc.SampleDesc.Quality = 0;
-	resource_desc.Layout             = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-	resource_desc.Flags              = D3D12_RESOURCE_FLAG_NONE;
+	resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
 	// リソースの生成
 	hr = d3d_device->CreateCommittedResource(
@@ -126,7 +126,7 @@ void InjectionParticleRenderer::CreateConstantBuffer()
 	// コンスタントバッファビューの生成
 	D3D12_CONSTANT_BUFFER_VIEW_DESC cbv_desc{};
 	cbv_desc.BufferLocation = d3d_cbv_resource->GetGPUVirtualAddress();
-	cbv_desc.SizeInBytes    = static_cast<UINT>(resource_desc.Width);
+	cbv_desc.SizeInBytes = static_cast<UINT>(resource_desc.Width);
 
 	d3d_device->CreateConstantBufferView(
 		&cbv_desc,
@@ -145,21 +145,21 @@ const Descriptor* InjectionParticleRenderer::UpdateSceneConstantBuffer(const Ren
 {
 	const Camera* camera = CameraManager::Instance().GetCamera();
 
-	cbv_data->view       = camera->GetView();
+	cbv_data->view = camera->GetView();
 	cbv_data->projection = camera->GetProjection();
 
-	cbv_data->scale    = rc.particleData.scale;
+	cbv_data->scale = rc.particleData.scale;
 	cbv_data->lifetime = rc.particleData.lifetime;
 
 	// カラー
 	cbv_data->startColor = rc.particleData.startColor;
-	cbv_data->endColor   = rc.particleData.endColor;
+	cbv_data->endColor = rc.particleData.endColor;
 
 	// ノイズ
 	cbv_data->noiseSpeed = rc.particleData.noiseSpeed;
 	cbv_data->noisePower = rc.particleData.noisePower;
 
-	cbv_data->deltaTime    = T_TIMER.Delta();
+	cbv_data->deltaTime = T_TIMER.Delta();
 	cbv_data->elapsedTime += cbv_data->deltaTime;
 
 	// 発生管理

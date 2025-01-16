@@ -1,5 +1,5 @@
 ﻿//! @file StageDungeon_E4C.cpp
-//! @note 
+//! @note
 
 #include "StageDungeon_E4C.h"
 #include "StageOpenWorld_E4C.h"
@@ -374,6 +374,15 @@ void StageDungeon_E4C::RenderDX12()
 
 		T_TEXT.EndDX12();
 	}
+	DrawSceneGUI();
+	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
 
 	T_GRAPHICS.End();
+}
+
+void StageDungeon_E4C::DrawSceneGUI()
+{
+	ImVec2 pos = ImGui::GetMainViewport()->Pos;
+	ImGui::SetNextWindowPos(ImVec2(pos.x + 10, pos.y + 10), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
 }

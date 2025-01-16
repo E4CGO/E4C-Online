@@ -136,35 +136,61 @@ public:
 class PlaneShaderDX12 : public ModelShaderDX12
 {
 public:
-	PlaneShaderDX12(ID3D12Device* device);
+	PlaneShaderDX12(ID3D12Device* device, const char* vertexShaderName = "Data/Shader/PlaneDX12VS.cso", const char* pixelShaderName = "Data/Shader/PlaneDX12PS.cso");
 	virtual ~PlaneShaderDX12() override = default;
 
 	void Finalize() override {};
 
 	void Render(const RenderContextDX12& rc, const ModelDX12::Mesh& mesh) override;
 
-private:
+protected:
 	Microsoft::WRL::ComPtr<ID3D12PipelineState>		m_d3d_pipeline_state;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature>		m_d3d_root_signature;
 
 	SamplerManager* m_sampler = nullptr;
 };
 
-class PortalSquareShaderDX12 : public ModelShaderDX12
+class PortalSquareShaderDX12 : public PlaneShaderDX12
 {
 public:
-	PortalSquareShaderDX12(ID3D12Device* device);
+	PortalSquareShaderDX12(ID3D12Device* device) : PlaneShaderDX12(device, "Data/Shader/PlaneDX12VS.cso", "Data/Shader/PortalSquareDX12PS.cso") {}
 	virtual ~PortalSquareShaderDX12() override = default;
+};
+
+class BillBoardShaderDX12 : public ModelShaderDX12
+{
+public:
+	BillBoardShaderDX12(ID3D12Device* device, const char* vertexShaderName = "Data/Shader/BillboardDX12VS.cso",
+		const char* pixelShaderName = "Data/Shader/BillboardDX12PS.cso",
+		const char* geometryShaderName = "Data/Shader/BillboardDX12GS.cso");
+	virtual ~BillBoardShaderDX12() override = default;
 
 	void Finalize() override {};
 
 	void Render(const RenderContextDX12& rc, const ModelDX12::Mesh& mesh) override;
 
-private:
+protected:
 	Microsoft::WRL::ComPtr<ID3D12PipelineState>		m_d3d_pipeline_state;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature>		m_d3d_root_signature;
 
 	SamplerManager* m_sampler = nullptr;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cbv_resource;
+	const Descriptor* cbv_descriptor = nullptr;
+	DirectX::XMFLOAT4X4 worldmatrix = DirectX::XMFLOAT4X4(1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1);
+};
+
+class FireballShaderDX12 : public BillBoardShaderDX12
+{
+public:
+	FireballShaderDX12(ID3D12Device* device) : BillBoardShaderDX12(device, "Data/Shader/BillboardDX12VS.cso",
+		"Data/Shader/FireballDX12PS.cso",
+		"Data/Shader/BillboardDX12GS.cso") {
+	};
+	virtual ~FireballShaderDX12() override = default;
 };
 
 #endif //!__INCLUDED_PLANE_SHADER_H__

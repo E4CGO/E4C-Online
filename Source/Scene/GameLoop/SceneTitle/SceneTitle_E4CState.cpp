@@ -9,10 +9,21 @@
 *//***************************************************************************/
 void SceneTitle_E4CState::InitState::Enter()
 {
-	m_imgBackground = new WidgetImage("Data/Sprites/UI/Title/background.png");
-	m_imgBackground->SetPosition({ 0, 0 });
-	m_imgBackground->SetSize({ SCREEN_W, SCREEN_H });
-	UI.Register(m_imgBackground);
+	if (T_GRAPHICS.isDX11Active)
+	{
+		m_imgBackground = new WidgetImage("Data/Sprites/UI/Title/background.png");
+		m_imgBackground->SetPosition({ 0, 0 });
+		m_imgBackground->SetSize({ SCREEN_W, SCREEN_H });
+		UI.Register(m_imgBackground);
+	}
+	if (T_GRAPHICS.isDX12Active)
+	{
+		m_backgroundAnimation = new WidgetStripeAnimation("Data/Sprites/UI/Title/Title_Anim.png",
+			0, 0, SCREEN_W, SCREEN_H,
+			819, 0, 819, 434,
+			20, 0.1f);
+		UI.Register(m_backgroundAnimation);
+	}
 
 	m_imgLogo = new WidgetImage("Data/Sprites/UI/Title/title_logo.png");
 	m_imgLogo->SetPosition({ SCREEN_W * .64f,  SCREEN_H * .15f });

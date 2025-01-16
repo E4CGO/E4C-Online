@@ -212,7 +212,7 @@ void WidgetPlayerHP::RenderDX12(const RenderContextDX12& rc)
 	T_TEXT.RenderDX12(
 		FONT_ID::MsGothic,
 		Encode::string_to_wstring(mp),
-		0, m_position.y + m_size.y * 0.8f,
+		0, m_position.y + m_size.y * 1.5f,
 		1.0f, 1.0f, 1.0f, 1.0f,
 		0.0f,
 		FONT_ALIGN::LEFT,
@@ -270,7 +270,7 @@ void WidgetPlayerHP::RenderDX12(const RenderContextDX12& rc)
 	T_TEXT.RenderDX12(
 		FONT_ID::MsGothic,
 		Encode::string_to_wstring(hp),
-		0, m_position.y - m_size.y * 1.2f,
+		0, m_position.y - m_size.y * 0.5f,
 		1.0f, 1.0f, 1.0f, 1.0f,
 		0.0f,
 		FONT_ALIGN::LEFT,

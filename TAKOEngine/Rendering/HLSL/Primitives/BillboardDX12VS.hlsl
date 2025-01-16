@@ -1,7 +1,8 @@
-#include "Billboard.hlsli"
+#include "BillboardDX12.hlsli"
 
-// È†ÇÁÇπ„Ç∑„Çß„Éº„ÉÄ„Éº„Ç®„É≥„Éà„É™„Éù„Ç§„É≥„Éà
-GSInput main(
+// í∏ì_ÉVÉFÅ[É_Å[ÉGÉìÉgÉäÉ|ÉCÉìÉg
+[RootSignature(ROOT_SIG)]
+GS_INPUT main(
 	float4 position : POSITION,
 	float4 boneWeights : BONE_WEIGHTS,
 	uint4 boneIndices : BONE_INDICES,
@@ -9,11 +10,10 @@ GSInput main(
 	float4 color : COLOR,
 	float3 normal : NORMAL,
 	float3 tangent : TANGENT)
-
 {
-    GSInput output;
+    GS_INPUT output;
 	
-    output.Position = position;
+    output.Position = mul(position, WorldMatrix);
     output.texcoord = texcoord;
     output.Color = color;
 	
