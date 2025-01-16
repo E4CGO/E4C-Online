@@ -157,7 +157,8 @@ void StageOpenWorld_E4C::Initialize()
 	// プレイヤー
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
 	player->SetPosition({ 15.0f, 15.0f, 5.0f });
-
+	mpsp = PlayerCharacterManager::Instance().GetPlayerCharacterById(0)->GetMp();
+	hp= PlayerCharacterManager::Instance().GetPlayerCharacterById(0)->GetHp();
 	// カメラ設定
 	Camera* mainCamera = CameraManager::Instance().GetCamera();
 	mainCamera->SetPerspectiveFov(
@@ -250,9 +251,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	portalSquare2->Update(elapsedTime);
 
 	runningDust1->Update(elapsedTime);
-
-	PlayerCharacterManager::Instance().GetPlayerCharacterById(0)->SetCurrentHp(hp);
-	PlayerCharacterManager::Instance().GetPlayerCharacterById(0)->SetCurrentMp(mpsp);
 
 	for (auto& it : models)
 	{

@@ -33,10 +33,26 @@ namespace PlayerCharacterState
 			owner->InputMove(elapsedTime);
 			owner->Jump();
 
-			PlayerTransition(
-				owner,
-				flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2
-			);
+			if (owner->GetMp() > 50)
+			{
+				PlayerTransition(
+					owner,
+					flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2);
+			}
+			else if (owner->GetMp() > 30)
+			{
+				PlayerTransition(owner,
+					flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS|flag_Skill_1);
+			}
+			
+			else
+			{
+				PlayerTransition(
+					owner,
+					flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS);
+			}
+			
+			
 		}
 
 		void IdleState::Exit()
@@ -56,10 +72,24 @@ namespace PlayerCharacterState
 			owner->InputMove(elapsedTime);
 			owner->Jump();
 
-			PlayerTransition(
-				owner,
-				flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2
-			);
+			if (owner->GetMp() > 50)
+			{
+				PlayerTransition(owner,
+					flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1| flag_Skill_2);
+			}
+			else if (owner->GetMp() > 30)
+			{
+				PlayerTransition(
+					owner,
+					flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1);
+			}
+			else
+			{
+				PlayerTransition(
+					owner,
+					flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_AttackN | flag_AttackS);
+			}
+
 		}
 
 		void MoveState::Exit()
@@ -141,11 +171,11 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
 					}
-					else if (owner->InputSkill1())
+					else if (owner->InputSkill1() && owner->GetMp() > 30)
 					{
 						owner->GetStateMachine()->ChangeState(SKILL_1_STATE::ATTACK_START);
 					}
-					else if (owner->InputSkill2())
+					else if (owner->InputSkill2() && owner->GetMp() > 50)
 					{
 						owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_1)->ClearHitOthers();
 						owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_1)->SetEnable(false);
@@ -207,11 +237,11 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
 					}
-					else if (owner->InputSkill1())
+					else if (owner->InputSkill1()&&owner->GetMp()>30)
 					{
 						owner->GetStateMachine()->ChangeState(SKILL_1_STATE::ATTACK_START);
 					}
-					else if (owner->InputSkill2())
+					else if (owner->InputSkill2() && owner->GetMp() > 50)
 					{
 						owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_2)->ClearHitOthers();
 						owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_2)->SetEnable(false);
@@ -272,11 +302,11 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
 					}
-					else if (owner->InputSkill1())
+					else if (owner->InputSkill1()&&owner->GetMp() > 30)
 					{
 						owner->GetStateMachine()->ChangeState(SKILL_1_STATE::ATTACK_START);
 					}
-					else if (owner->InputSkill2())
+					else if (owner->InputSkill2() && owner->GetMp() > 50)
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
 					}
@@ -294,11 +324,13 @@ namespace PlayerCharacterState
 			}
 			if (!owner->IsPlayer()) return;
 		}
-
+		
 		// スキル_1ステート
 		void Skill1State::Enter()
 		{
+			
 			SetSubState(SKILL_1_STATE::ATTACK_START);
+			
 		}
 		void Skill1State::Execute(float elapsedTime)
 		{
@@ -331,9 +363,12 @@ namespace PlayerCharacterState
 			DirectX::XMFLOAT3 impulse;
 			DirectX::XMStoreFloat3(&impulse, DirectX::XMVectorScale(DirectX::XMLoadFloat3(&front), impulseSpeed));
 			owner->AddImpulse(impulse);
+			float mp=owner->GetMp();
+			owner->SetCurrentMp(mp-=30);
 		}
 		void Skill1ContinueStart::Execute(float elapsedTime)
 		{
+			
 			float time = owner->GetModel()->GetCurrentAnimationSeconds();
 			if (2.6f <= time)
 			{
@@ -358,6 +393,8 @@ namespace PlayerCharacterState
 		void Skill2State::Enter()
 		{
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_SPECIAL_SECOND, false, 0.1f);
+			float mp = owner->GetMp();
+			owner->SetCurrentMp(mp -= 50);
 		}
 		void Skill2State::Execute(float elapsedTime)
 		{

@@ -596,6 +596,7 @@ void PlayerCharacter::Update(float elapsedTime)
 
 		Character::Update(elapsedTime);
 	}
+
 	iModel::Node* node = this->GetModel()->FindNode("Mesh_0");
 }
 

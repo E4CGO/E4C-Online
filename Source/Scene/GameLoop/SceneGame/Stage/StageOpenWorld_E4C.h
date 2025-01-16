@@ -120,8 +120,8 @@ private:
 	// フレームバッファマネージャー
 	FrameBufferManager* m_frameBuffer = nullptr;
 
-	float hp = 100.0f;
-	float mpsp = 100.0f;
+	float hp=0.f;
+	float mpsp=0.f;
 
 	// ポストエフェクト
 	std::unique_ptr<PostprocessingRendererDX12>	postprocessingRenderer = std::make_unique<PostprocessingRendererDX12>();

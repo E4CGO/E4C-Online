@@ -179,6 +179,8 @@ namespace PlayerCharacterState
 			void Execute(float elapsedTime) override;
 			// ステートから出ていくときのメソッド
 			void Exit() override {};
+
+			
 		};
 
 		class Skill2State : public HierarchicalState<PlayerCharacter>
