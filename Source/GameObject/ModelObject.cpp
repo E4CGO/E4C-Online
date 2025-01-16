@@ -22,6 +22,18 @@ ModelObject::ModelObject(const char* filename, float scaling, ModelObject::RENDE
 }
 
 /**************************************************************************//**
+	@brief		デストラクタ
+*//***************************************************************************/
+ModelObject::~ModelObject()
+{
+	for (const std::pair<uint8_t, Collider*>& collider : m_pColliders)
+	{
+		COLLISIONS.Remove(collider.second);
+	}
+	m_pColliders.clear();
+}
+
+/**************************************************************************//**
 	@brief		モデル生成
 	@param[in]	filename	戻るファイルパス
 	@param[in]	scaling		モデルスケール

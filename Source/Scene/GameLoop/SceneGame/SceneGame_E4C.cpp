@@ -15,6 +15,7 @@
 #include "Scene/GameLoop/SceneGame/Stage/StageDungeon_E4C.h"
 
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
+#include "GameObject/Character/Enemy/EnemyManager.h"
 #include "TAKOEngine/Tool/Console.h"
 
 #include "UI/Widget/WidgetCrosshair.h"
@@ -67,8 +68,9 @@ void SceneGame_E4C::Finalize()
 	CameraManager::Instance().Clear();
 	STAGES.Clear();
 	MAPTILES.Clear();
-	SpawnerManager::Instance().Clear();
 	PlayerCharacterManager::Instance().Clear();
+	EnemyManager::Instance().Clear();
+	SpawnerManager::Instance().Clear();
 	COLLISIONS.Clear();
 	UI.Clear();
 }

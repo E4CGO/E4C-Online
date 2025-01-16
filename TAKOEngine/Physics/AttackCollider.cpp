@@ -6,7 +6,7 @@
 
 void AttackSphereCollider::Update()
 {
-	Collider::Update();
+	SphereCollider::Update();
 
 	if (!m_enable)
 	{
@@ -32,14 +32,18 @@ void AttackSphereCollider::OnCollision(Collider* other)
 		if (owner == other->GetOwner()) return;
 	}
 
-	Character* chara = static_cast<Character*>(other->GetOwner());
-	m_hitOthers.emplace_back(chara);
-	chara->OnDamage(m_power);
+	if (m_power > other->GetArmor())
+	{
+		uint16_t damage = m_power - other->GetArmor();
+		Character* chara = static_cast<Character*>(other->GetOwner());
+		m_hitOthers.emplace_back(chara);
+		chara->OnDamage(damage);
+	}
 }
 
 void AttackCapsuleCollider::Update()
 {
-	Collider::Update();
+	CapsuleCollider::Update();
 
 	if (!m_enable)
 	{
