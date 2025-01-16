@@ -28,6 +28,7 @@ namespace ns_RoomData
 		FIRST_T,		// 最初のフロア：Ｔ字の部屋
 		FIRST_SPAWNER,	// 最初のフロア：スポナーの部屋
 		FIRST_END,		// 最初のフロア：最後の部屋
+		FIRST_BOSS,		// 最初のフロア：ボス部屋
 
 		TEST_I,		// テスト：Ｉ字の部屋
 		TEST_T,		// テスト：Ｔ字の部屋
@@ -78,6 +79,7 @@ namespace ns_RoomData
 		CONNECTPOINT,
 		FOUNTAIN,
 		STAIR_TO_NEXTFLOOR,
+		BOSSROOM,
 
 		// enumCount
 		TILETYPE_COUNT,
@@ -145,6 +147,9 @@ public:
 	{
 		int maxFloor = 3;	// 最大階数　最上階には次の階への階段などは設置しない
 		int maxDepth;		// 最大深度　親からの距離（深度）がこの値以上になった場合、子の生成をキャンセルする
+
+		RoomType firstRoomType;		// 最初に生成する最初の部屋タイプ
+		RoomType topFloorRoomType;	// 最上階に生成する最初の部屋タイプ
 	};
 
 	// 初期化
@@ -160,9 +165,10 @@ public:
 	RoomGenerateSetting GetRoomGenerateSetting(RoomType type) { return m_roomGenerateSettings.at(static_cast<int>(type)); }
 	// ダンジョンの生成設定を取得
 	DungeonGenerateSetting GetDungeonGenerateSetting() { return m_dungeonGenerateSetting; }
-	// 現在の階取得・設定
+	// 現在の階取得・設定・次の階へ
 	const int GetCurrentFloor() const { return m_currentFloor; }
 	void SetCurrentFloor(int floor) { m_currentFloor = floor; }
+	void GoToNextFloor() { m_currentFloor++; }
 
 	// ファイル読み込み用データの取得
 	const std::vector<FILE_DATA> GetModelFileDatas(TileType type) const {

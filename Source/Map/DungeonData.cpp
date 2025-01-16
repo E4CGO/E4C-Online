@@ -352,6 +352,28 @@ void DungeonData::InitRoomGenerateSettings()
 		m_roomGenerateSettings.at(FIRST_END) = setting;
 	}
 
+	// FIRST_BOSS
+	{
+		RoomGenerateSetting setting;
+		setting.weight = 5;
+
+		// ファイルロード
+		nlohmann::json loadFile;
+		std::ifstream ifs(m_fileNames.at(FIRST_BOSS));
+		if (ifs.is_open())
+		{
+			ifs >> loadFile;
+			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
+			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
+			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
+			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
+			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
+			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
+			ifs.close();
+		}
+		m_roomGenerateSettings.at(FIRST_BOSS) = setting;
+	}
+
 	// TEST_I
 	{
 		RoomGenerateSetting setting;
@@ -463,8 +485,12 @@ void DungeonData::InitRoomGenerateSettings()
 
 void DungeonData::InitDungeonGenerateSetting()
 {
+	m_currentFloor = 1;
+
 	m_dungeonGenerateSetting.maxFloor = 3;
-	m_dungeonGenerateSetting.maxDepth = 7;
+	m_dungeonGenerateSetting.maxDepth = 2;
+	m_dungeonGenerateSetting.firstRoomType = RoomType::FIRST_START;
+	m_dungeonGenerateSetting.topFloorRoomType = RoomType::FIRST_BOSS;
 }
 
 void DungeonData::InitModelFileDatas()
@@ -506,6 +532,7 @@ void DungeonData::InitModelFileDatas()
 	m_modelFileDatas.at(FIRE_HYDRANT).emplace_back("Data/Model/DungeonAssets/SM_Fire_Hydrant.glb", 4.0f);
 	m_modelFileDatas.at(FOUNTAIN).emplace_back("Data/Model/DungeonAssets/SM_Fountain_01.glb", 4.0f);
 	m_modelFileDatas.at(STAIR_TO_NEXTFLOOR).emplace_back("Data/Model/DungeonAssets/SM_Stairs_Steps_01a.glb", 4.0f);
+	m_modelFileDatas.at(BOSSROOM).emplace_back("Data/Model/DungeonAssets/SM_BossRoom.glb", 4.0f);
 
 	// モデルない組～
 	m_modelFileDatas.at(PORTAL).emplace_back("", 0.0f);
@@ -538,6 +565,7 @@ void DungeonData::InitCollisionFileDatas()
 
 	//m_collisionFileDatas.at(STAIR_RAILING_01A).emplace_back("Data/Model/DungeonAssets/SM_Stairs_Railing_01a.glb", 4.0f);
 	//m_collisionFileDatas.at(STAIR_STEP_01A).emplace_back("Data/Model/DungeonAssets/SM_Stairs_Steps_01a.glb", 4.0f);
+	m_collisionFileDatas.at(BOSSROOM).emplace_back("Data/Model/DungeonAssets/SM_BossRoom.glb", 4.0f);
 }
 
 void DungeonData::InitFileNames()
@@ -554,6 +582,7 @@ void DungeonData::InitFileNames()
 	m_fileNames.at(FIRST_T) = (char*)("Data/RoomDatas/FirstFloor_T.json");
 	m_fileNames.at(FIRST_SPAWNER) = (char*)("Data/RoomDatas/FirstFloor_Spawner.json");
 	m_fileNames.at(FIRST_END) = (char*)("Data/RoomDatas/FirstFloor_End.json");
+	m_fileNames.at(FIRST_BOSS) = (char*)("Data/RoomDatas/FirstFloor_Boss.json");
 
 
 	// テストフロア

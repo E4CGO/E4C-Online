@@ -743,51 +743,6 @@ void RoomBase::PlaceMapTile(bool isLeader)
 			continue;
 		}
 
-		// こいつも
-		if (tileType == TileType::STAIR_TO_NEXTFLOOR)
-		{
-			for (const TILE_DATA& data : m_tileDatas.at(tileType))
-			{
-				StairToNextFloor* stairToNextFloor = new StairToNextFloor();
-
-				DirectX::XMFLOAT3 resultPos = data.position;
-				DirectX::XMFLOAT3 bufPos = resultPos;
-
-				float degree = DirectX::XMConvertToDegrees(m_angle.y);
-
-				// 360度以内に丸める
-				while (degree >= 360.0f) degree -= 360.0f;
-				while (degree < 0.0f) degree += 360.0f;
-
-				// 90度
-				if (degree > 89.9f && degree < 90.1f)
-				{
-					resultPos.x = bufPos.z;
-					resultPos.z = bufPos.x;
-				}
-
-				// 180度
-				if (degree > 179.9f && degree < 180.1f)
-				{
-					resultPos.z = -bufPos.z;
-				}
-
-				// 270度
-				if (degree > 269.9f && degree < 270.1f)
-				{
-					resultPos.x = -bufPos.z;
-					resultPos.z = bufPos.x;
-				}
-				resultPos += m_position;
-
-				stairToNextFloor->SetPosition(resultPos);
-				stairToNextFloor->SetScale({ 4.0f, 4.0f, 4.0f });
-
-				GameObjectManager::Instance().Register(stairToNextFloor);
-			}
-			continue;
-		}
-
 		// ConnectPointはコンストラクタで既に読込み済だからcontinue
 		if (tileType == TileType::CONNECTPOINT) continue;
 
@@ -947,6 +902,49 @@ void RoomBase::PlaceMapTile(bool isLeader)
 				MAPTILES.Register(colliderTile);
 			}
 		}
+	}
+}
+
+void RoomBase::PlaceTeleporterTile(Stage* stage, Online::OnlineController* onlineController)
+{
+	for (const TILE_DATA& data : m_tileDatas.at(TileType::STAIR_TO_NEXTFLOOR))
+	{
+		StairToNextFloor* stairToNextFloor = new StairToNextFloor(stage, onlineController);
+
+		DirectX::XMFLOAT3 resultPos = data.position;
+		DirectX::XMFLOAT3 bufPos = resultPos;
+
+		float degree = DirectX::XMConvertToDegrees(m_angle.y);
+
+		// 360度以内に丸める
+		while (degree >= 360.0f) degree -= 360.0f;
+		while (degree < 0.0f) degree += 360.0f;
+
+		// 90度
+		if (degree > 89.9f && degree < 90.1f)
+		{
+			resultPos.x = bufPos.z;
+			resultPos.z = bufPos.x;
+		}
+
+		// 180度
+		if (degree > 179.9f && degree < 180.1f)
+		{
+			resultPos.z = -bufPos.z;
+		}
+
+		// 270度
+		if (degree > 269.9f && degree < 270.1f)
+		{
+			resultPos.x = -bufPos.z;
+			resultPos.z = bufPos.x;
+		}
+		resultPos += m_position;
+
+		stairToNextFloor->SetPosition(resultPos);
+		//stairToNextFloor->SetScale({ 4.0f, 4.0f, 4.0f });
+
+		GameObjectManager::Instance().Register(stairToNextFloor);
 	}
 }
 

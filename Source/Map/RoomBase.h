@@ -2,6 +2,10 @@
 
 #include "TAKOEngine/Rendering/DebugRenderer/CubeRenderer.h"
 #include "Map/DungeonData.h"
+
+#include "Scene/Stage/Stage.h"
+#include "Network/OnlineController.h"
+
 #include <vector>
 
 using namespace ns_RoomData;
@@ -212,6 +216,9 @@ public:
 
 	// 部屋タイルを配置
 	void PlaceMapTile(bool isLeader = false);
+
+	// テレポーター関連の配置
+	void PlaceTeleporterTile(Stage* stage, Online::OnlineController* onlineController);
 
 	// 出口を配置
 	virtual void PlaceExit() {}

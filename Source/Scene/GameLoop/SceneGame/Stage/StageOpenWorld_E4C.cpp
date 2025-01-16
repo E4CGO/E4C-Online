@@ -20,14 +20,15 @@
 
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
+#include "GameObject/Props/SpawnerManager.h"
+
+#include "Map/DungeonData.h"
 
 #include "Scene/GameLoop/SceneGame/Stage/StageDungeon_E4C.h"
 
 #include "Network/OnlineController.h"
 
 #include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
-
-#include "GameObject/Props/SpawnerManager.h"
 
 static float timer = 0;
 
@@ -182,6 +183,10 @@ void StageOpenWorld_E4C::Initialize()
 	Sound::Instance().LoadAudio("Data/Sound/3-Dreamland(Overworld).mp3");
 	Sound::Instance().PlayAudio(0);
 
+	// ダンジョンの生成設定の初期化
+	// 現在の階などを先にリセットしておく
+	DUNGEONDATA.InitDungeonGenerateSetting();
+
 	// 影初期化
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
 }
@@ -238,6 +243,7 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	}
 
 	sky->Update(elapsedTime);
+	teleporter->Update(elapsedTime);
 
 	SpawnerManager::Instance().Update(elapsedTime);
 

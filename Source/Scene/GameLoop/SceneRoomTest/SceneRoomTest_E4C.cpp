@@ -101,6 +101,7 @@ void SceneRoomTest_E4C::Initialize()
 	nodeDefaultNames.at(TileType::CONNECTPOINT) = "ConnectPoint";
 	nodeDefaultNames.at(TileType::FOUNTAIN) = "Fountain";
 	nodeDefaultNames.at(TileType::STAIR_TO_NEXTFLOOR) = "StairToNextFloor";
+	nodeDefaultNames.at(TileType::BOSSROOM) = "BossRoom";
 
 	//testModel = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
 	//testModel->SetPosition({ 0.0f, 0.0f, 0.0f });
@@ -462,45 +463,43 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 				ImGui::EndMenu();
 			}
 			if (ImGui::BeginMenu("New")) {
-					if (ImGui::MenuItem("Floor01a"))		AddTileNode(GetDefaultName(TileType::FLOOR_01A),		TileType::FLOOR_01A);
-					if (ImGui::MenuItem("Floor01b"))		AddTileNode(GetDefaultName(TileType::FLOOR_01B),		TileType::FLOOR_01B);
-					if (ImGui::MenuItem("Floor02a"))		AddTileNode(GetDefaultName(TileType::FLOOR_02A),		TileType::FLOOR_02A);
-					if (ImGui::MenuItem("Floor03a"))		AddTileNode(GetDefaultName(TileType::FLOOR_03A),		TileType::FLOOR_03A);
-					if (ImGui::MenuItem("FloorCloud01a"))	AddTileNode(GetDefaultName(TileType::FLOOR_CLOUD_01A),	TileType::FLOOR_CLOUD_01A);
+				if (ImGui::BeginMenu("TileNode")) {
+					if (ImGui::MenuItem("Floor01a"))		AddTileNode(GetDefaultName(TileType::FLOOR_01A), TileType::FLOOR_01A);
+					if (ImGui::MenuItem("Floor01b"))		AddTileNode(GetDefaultName(TileType::FLOOR_01B), TileType::FLOOR_01B);
+					if (ImGui::MenuItem("Floor02a"))		AddTileNode(GetDefaultName(TileType::FLOOR_02A), TileType::FLOOR_02A);
+					if (ImGui::MenuItem("Floor03a"))		AddTileNode(GetDefaultName(TileType::FLOOR_03A), TileType::FLOOR_03A);
+					if (ImGui::MenuItem("FloorCloud01a"))	AddTileNode(GetDefaultName(TileType::FLOOR_CLOUD_01A), TileType::FLOOR_CLOUD_01A);
 
-					if (ImGui::MenuItem("Wall01a"))			AddTileNode(GetDefaultName(TileType::WALL_01A),		TileType::WALL_01A);
-					if (ImGui::MenuItem("Wall01b"))			AddTileNode(GetDefaultName(TileType::WALL_01B),		TileType::WALL_01B);
-					if (ImGui::MenuItem("Wall02a"))			AddTileNode(GetDefaultName(TileType::WALL_02A),		TileType::WALL_02A);
-					if (ImGui::MenuItem("Wall02b"))			AddTileNode(GetDefaultName(TileType::WALL_02B),		TileType::WALL_02B);
-					if (ImGui::MenuItem("Wall03a"))			AddTileNode(GetDefaultName(TileType::WALL_03A),		TileType::WALL_03A);
-					if (ImGui::MenuItem("Wall04a"))			AddTileNode(GetDefaultName(TileType::WALL_04A),		TileType::WALL_04A);
-					if (ImGui::MenuItem("WallCloud"))		AddTileNode(GetDefaultName(TileType::WALL_CLOUD),	TileType::WALL_CLOUD);
-					if (ImGui::MenuItem("FloorCloud01a"))	AddTileNode("FloorCloud",	TileType::FLOOR_CLOUD_01A);
-					if (ImGui::MenuItem("Arch01a"))			AddTileNode(GetDefaultName(TileType::ARCH_01A),				TileType::ARCH_01A);
-					if (ImGui::MenuItem("ArchEntrance01a"))	AddTileNode(GetDefaultName(TileType::ARCH_ENTRANCE_01A),	TileType::ARCH_ENTRANCE_01A);
-					if (ImGui::MenuItem("ArchFloor01a"))	AddTileNode(GetDefaultName(TileType::ARCH_FLOOR_01A),		TileType::ARCH_FLOOR_01A);
-					if (ImGui::MenuItem("WallCloud"))		AddTileNode("WallCloud",	TileType::WALL_CLOUD);
-					if (ImGui::MenuItem("StairRailing01a"))	AddTileNode(GetDefaultName(TileType::STAIR_RAILING_01A),	TileType::STAIR_RAILING_01A);
-					if (ImGui::MenuItem("StairStep01a"))	AddTileNode(GetDefaultName(TileType::STAIR_STEP_01A),		TileType::STAIR_STEP_01A);
-					if (ImGui::MenuItem("ArchFloor01a"))	AddTileNode("ArchFloor",	TileType::ARCH_FLOOR_01A);
-					if (ImGui::MenuItem("Caramel01"))		AddTileNode(GetDefaultName(TileType::CARAMEL_01),	TileType::CARAMEL_01);
-					if (ImGui::MenuItem("Caramel02"))		AddTileNode(GetDefaultName(TileType::CARAMEL_02),	TileType::CARAMEL_02);
-					if (ImGui::MenuItem("Cloud01"))			AddTileNode(GetDefaultName(TileType::CLOUD_01),		TileType::CLOUD_01);
-					if (ImGui::MenuItem("Cloud02"))			AddTileNode(GetDefaultName(TileType::CLOUD_02),		TileType::CLOUD_02);
-					if (ImGui::MenuItem("Cream01"))			AddTileNode(GetDefaultName(TileType::CREAM_01),		TileType::CREAM_01);
-					if (ImGui::MenuItem("Cream02"))			AddTileNode(GetDefaultName(TileType::CREAM_02),		TileType::CREAM_02);
-					if (ImGui::MenuItem("Lolipop01a"))		AddTileNode(GetDefaultName(TileType::LOLIPOP_01A),	TileType::LOLIPOP_01A);
-					if (ImGui::MenuItem("Lolipop01b"))		AddTileNode(GetDefaultName(TileType::LOLIPOP_01B),	TileType::LOLIPOP_01B);
-					if (ImGui::MenuItem("Lolipop02a"))		AddTileNode(GetDefaultName(TileType::LOLIPOP_02A),	TileType::LOLIPOP_02A);
-					if (ImGui::MenuItem("Star"))			AddTileNode(GetDefaultName(TileType::STAR),			TileType::STAR);
-					if (ImGui::MenuItem("FireHydrant"))		AddTileNode(GetDefaultName(TileType::FIRE_HYDRANT),	TileType::FIRE_HYDRANT);
-					if (ImGui::MenuItem("Fountain"))		AddTileNode(GetDefaultName(TileType::FOUNTAIN),		TileType::FOUNTAIN);
-					if (ImGui::MenuItem("StairStep01a"))	AddTileNode("StairStep",	TileType::STAIR_STEP_01A);
+					if (ImGui::MenuItem("Wall01a"))			AddTileNode(GetDefaultName(TileType::WALL_01A), TileType::WALL_01A);
+					if (ImGui::MenuItem("Wall01b"))			AddTileNode(GetDefaultName(TileType::WALL_01B), TileType::WALL_01B);
+					if (ImGui::MenuItem("Wall02a"))			AddTileNode(GetDefaultName(TileType::WALL_02A), TileType::WALL_02A);
+					if (ImGui::MenuItem("Wall02b"))			AddTileNode(GetDefaultName(TileType::WALL_02B), TileType::WALL_02B);
+					if (ImGui::MenuItem("Wall03a"))			AddTileNode(GetDefaultName(TileType::WALL_03A), TileType::WALL_03A);
+					if (ImGui::MenuItem("Wall04a"))			AddTileNode(GetDefaultName(TileType::WALL_04A), TileType::WALL_04A);
+					if (ImGui::MenuItem("WallCloud"))		AddTileNode(GetDefaultName(TileType::WALL_CLOUD), TileType::WALL_CLOUD);
+
+					if (ImGui::MenuItem("Arch01a"))			AddTileNode(GetDefaultName(TileType::ARCH_01A), TileType::ARCH_01A);
+					if (ImGui::MenuItem("ArchEntrance01a"))	AddTileNode(GetDefaultName(TileType::ARCH_ENTRANCE_01A), TileType::ARCH_ENTRANCE_01A);
+					if (ImGui::MenuItem("ArchFloor01a"))	AddTileNode(GetDefaultName(TileType::ARCH_FLOOR_01A), TileType::ARCH_FLOOR_01A);
+
+					if (ImGui::MenuItem("StairRailing01a"))	AddTileNode(GetDefaultName(TileType::STAIR_RAILING_01A), TileType::STAIR_RAILING_01A);
+					if (ImGui::MenuItem("StairStep01a"))	AddTileNode(GetDefaultName(TileType::STAIR_STEP_01A), TileType::STAIR_STEP_01A);
+
+					if (ImGui::MenuItem("Caramel01"))		AddTileNode(GetDefaultName(TileType::CARAMEL_01), TileType::CARAMEL_01);
+					if (ImGui::MenuItem("Caramel02"))		AddTileNode(GetDefaultName(TileType::CARAMEL_02), TileType::CARAMEL_02);
+					if (ImGui::MenuItem("Cloud01"))			AddTileNode(GetDefaultName(TileType::CLOUD_01), TileType::CLOUD_01);
+					if (ImGui::MenuItem("Cloud02"))			AddTileNode(GetDefaultName(TileType::CLOUD_02), TileType::CLOUD_02);
+					if (ImGui::MenuItem("Cream01"))			AddTileNode(GetDefaultName(TileType::CREAM_01), TileType::CREAM_01);
+					if (ImGui::MenuItem("Cream02"))			AddTileNode(GetDefaultName(TileType::CREAM_02), TileType::CREAM_02);
+					if (ImGui::MenuItem("Lolipop01a"))		AddTileNode(GetDefaultName(TileType::LOLIPOP_01A), TileType::LOLIPOP_01A);
+					if (ImGui::MenuItem("Lolipop01b"))		AddTileNode(GetDefaultName(TileType::LOLIPOP_01B), TileType::LOLIPOP_01B);
+					if (ImGui::MenuItem("Lolipop02a"))		AddTileNode(GetDefaultName(TileType::LOLIPOP_02A), TileType::LOLIPOP_02A);
+					if (ImGui::MenuItem("Star"))			AddTileNode(GetDefaultName(TileType::STAR), TileType::STAR);
+					if (ImGui::MenuItem("FireHydrant"))		AddTileNode(GetDefaultName(TileType::FIRE_HYDRANT), TileType::FIRE_HYDRANT);
+					if (ImGui::MenuItem("Fountain"))		AddTileNode(GetDefaultName(TileType::FOUNTAIN), TileType::FOUNTAIN);
+
 					if (ImGui::MenuItem("StairToNextFloor"))	AddTileNode(GetDefaultName(TileType::STAIR_TO_NEXTFLOOR), TileType::STAIR_TO_NEXTFLOOR);
-					if (ImGui::MenuItem("FireHydrant"))		AddTileNode("FireHydrant",	TileType::FIRE_HYDRANT);
-
-					//if (ImGui::MenuItem("Portal"))			AddTileNode("Portal",		TileType::PORTAL);
-					//if (ImGui::MenuItem("ConnectPoint"))	AddTileNode("ConnectPoint",	TileType::CONNECTPOINT);
+					if (ImGui::MenuItem("BossRoom"))			AddTileNode(GetDefaultName(TileType::BOSSROOM), TileType::BOSSROOM);
 					ImGui::EndMenu();
 				}
 				if (ImGui::BeginMenu("ObjectNode")) {
@@ -514,52 +513,51 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 				}
 				ImGui::EndMenu();
 			}
-			if (ImGui::MenuItem("Duplicate")) DuplicateNode();
-			if (ImGui::BeginMenu("Remove")) {
-				if (ImGui::MenuItem("Remove Selected Node")) RemoveSelectedNode();
-				if (ImGui::MenuItem("Clear All")) ClearNodes();
-				ImGui::EndMenu();
-			}
-			ImGui::EndMenuBar();
 		}
-
-		// 部屋の生成設定
-		if (ImGui::TreeNodeEx("RoomSetting", ImGuiTreeNodeFlags_DefaultOpen)) {
-			// Weight
-			ImGui::InputInt("Weight", &roomSetting.weight);
-			// AABB
-			ImGui::DragFloat3("AABB: Position", &roomSetting.aabb.position.x, 1.0f);
-			ImGui::DragFloat3("AABB: Radii", &roomSetting.aabb.radii.x, 1.0f);
-			// AABB算出
-			if (ImGui::Button("AABB calc")) CalcAABB();
-
-			ImGui::TreePop();
+		if (ImGui::MenuItem("Duplicate")) DuplicateNode();
+		if (ImGui::BeginMenu("Remove")) {
+			if (ImGui::MenuItem("Remove Selected Node")) RemoveSelectedNode();
+			if (ImGui::MenuItem("Clear All")) ClearNodes();
+			ImGui::EndMenu();
 		}
-
-		ImGui::Separator();
-
-		// ノード
-		if (ImGui::TreeNodeEx("Nodes", ImGuiTreeNodeFlags_DefaultOpen)) {
-			int index = 0;
-			for (Node* node : NODES.GetAll()) {
-				ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_Leaf;
-				if (selectionNode == node) nodeFlags |= ImGuiTreeNodeFlags_Selected;
-				if (node) {
-					ImGui::PushID(index);
-
-					if (ImGui::TreeNodeEx(node->GetName().c_str(), nodeFlags)) {
-						if (ImGui::IsItemFocused()) ChangeSelectedNode(node);
-					}
-					ImGui::PopID();
-				}
-				index++;
-				ImGui::TreePop();
-			}
-			ImGui::TreePop();
-		}
-
-		ImGui::Separator();
+		ImGui::EndMenuBar();
 	}
+
+	// 部屋の生成設定
+	if (ImGui::TreeNodeEx("RoomSetting", ImGuiTreeNodeFlags_DefaultOpen)) {
+		// Weight
+		ImGui::InputInt("Weight", &roomSetting.weight);
+		// AABB
+		ImGui::DragFloat3("AABB: Position", &roomSetting.aabb.position.x, 1.0f);
+		ImGui::DragFloat3("AABB: Radii", &roomSetting.aabb.radii.x, 1.0f);
+		// AABB算出
+		if (ImGui::Button("AABB calc")) CalcAABB();
+
+		ImGui::TreePop();
+	}
+
+	ImGui::Separator();
+
+	// ノード
+	if (ImGui::TreeNodeEx("Nodes", ImGuiTreeNodeFlags_DefaultOpen)) {
+		int index = 0;
+		for (Node* node : NODES.GetAll()) {
+			ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_Leaf;
+			if (selectionNode == node) nodeFlags |= ImGuiTreeNodeFlags_Selected;
+			if (node) {
+				ImGui::PushID(index);
+
+				if (ImGui::TreeNodeEx(node->GetName().c_str(), nodeFlags)) {
+					if (ImGui::IsItemFocused()) ChangeSelectedNode(node);
+				}
+				ImGui::PopID();
+			}
+			index++;
+			ImGui::TreePop();
+		}
+		ImGui::TreePop();
+	}
+	ImGui::Separator();
 	ImGui::End();
 
 	// 選択したノードのデバッグGUIを表示する

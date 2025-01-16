@@ -8,6 +8,8 @@
 #include "Scene/Stage/Stage.h"
 #include "UI/Widget/WidgetMatching.h"
 #include "Network/OnlineController.h"
+#include "Scene/GameLoop/SceneGame/Stage/StageDungeon_E4C.h"
+#include "TAKOEngine/Rendering/DebugRenderer/CylinderRenderer.h"
 
 /**************************************************************************//**
 	@class	StairToNextFloor
@@ -17,8 +19,16 @@
 class StairToNextFloor : public Teleporter
 {
 public:
-	StairToNextFloor() : Teleporter(nullptr, nullptr) {}
+	StairToNextFloor(Stage* stage, Online::OnlineController* onlineController);
+
+public:
 	virtual void Update(float elapsedTime) override;
+	void RenderDX12(const RenderContextDX12& rc) override;
+
+private:
+	void GoToNextFloor();
+
+	std::unique_ptr<CylinderRenderer> m_cylinderRenderer;
 };
 
 #endif // !__INCLUDE_STAIRTONEXTFLOOR__

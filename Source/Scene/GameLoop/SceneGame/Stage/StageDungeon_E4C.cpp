@@ -42,10 +42,17 @@ void StageDungeon_E4C::GenerateDungeon()
 
 		// ダンジョンの自動生成を行う
 		// 生成する部屋タイプを算出
-		RoomType firstRoomType = RoomType::FIRST_START;
+		//RoomType firstRoomType = RoomType::FIRST_START;
+		RoomType firstRoomType = DUNGEONDATA.GetDungeonGenerateSetting().firstRoomType;
+
+		// 最上階なら最上階用の部屋タイプを持ってくる
+		if (currentFloor >= DUNGEONDATA.GetDungeonGenerateSetting().maxFloor)
+		{
+			firstRoomType = DUNGEONDATA.GetDungeonGenerateSetting().topFloorRoomType;
+		}
 
 		std::vector<RoomType> placeableRooms;
-		placeableRooms.emplace_back(RoomType::FIRST_START);
+		placeableRooms.emplace_back(firstRoomType);
 
 		// 部屋候補が一つしかない場合
 		if (placeableRooms.size() == 1) firstRoomType = placeableRooms.at(0);
@@ -114,7 +121,7 @@ void StageDungeon_E4C::Initialize()
 
 	// プレイヤー
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
-	player->SetPosition({ 0.0f, 5.0f, 2.0f });
+	player->SetPosition({ 0.0f, 10.0f, 2.0f });
 	player->GetStateMachine()->ChangeState(PlayerCharacter::STATE::IDLE);
 
 	// カメラ設定
@@ -130,12 +137,19 @@ void StageDungeon_E4C::Initialize()
 		player->GetPosition(),			// 注視点
 		{ 0, 0.969f, -0.248f }	// 上ベクトル
 	);
-
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(mainCamera);
 	cameraController->SetEnable(true);
 	cameraController->SetPlayer(player);
 	CURSOR_OFF;
+
+	// 現在の階取得
+	currentFloor = DUNGEONDATA.GetCurrentFloor();
+
+	// テキスト設定
+	floorText = std::make_unique<WidgetText>();
+	floorText->SetText(("現在の階" + std::to_string(currentFloor)).c_str());
+	floorText->SetPosition({ 30.0f, 30.0f });
 
 	//m_roomOrder.emplace_back(RoomType::FIRST_START);
 	//m_roomOrder.emplace_back(RoomType::FIRST_T);
@@ -155,25 +169,35 @@ void StageDungeon_E4C::Initialize()
 
 	GenerateDungeon();
 
-	// 一番遠い部屋のうち、ランダムな一つを抽選しテレポーターを設置する
-	//RoomBase* lastRoom = rootRoom->GetFarthestChild().at(std::rand() % rootRoom->GetFarthestChild().size());
-
-	//TeleportToOpenworld* teleporter = new TeleportToOpenworld();
-	//teleporter->SetPosition(lastRoom->GetPosition() + DUNGEONDATA.GetRoomGenerateSetting(lastRoom->GetRoomType()).portalPosition);
-	//teleporter->SetAngle({ 90.0f * RADIAN1, 0.0f, 0.0f });
-	//teleporter->SetScale({ 10.0f, 10.0f, 1.0f });
-	//GameObjectManager::Instance().Register(teleporter);
-
 	// 部屋のモデルを配置
 	for (RoomBase* room : rootRoom->GetAll())
 	{
 		room->PlaceMapTile(isLeader);
+
+		// currentFloorが最大階でない場合は階段の行先はStageDungeon
+		if (currentFloor < DUNGEONDATA.GetDungeonGenerateSetting().maxFloor)
+		{
+			if (room->GetRoomType() == RoomType::FIRST_END ||
+				room->GetRoomType() == RoomType::FIRST_BOSS)
+			{
+				room->PlaceTeleporterTile(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
+			}
+		}
+		// 最大階以上なら階段の行先はStageOpenWorld
+		else
+		{
+			if (room->GetRoomType() == RoomType::FIRST_END ||
+				room->GetRoomType() == RoomType::FIRST_BOSS)
+			{
+				room->PlaceTeleporterTile(new StageOpenWorld_E4C(m_pScene), m_pScene->GetOnlineController());
+			}
+		}
 	}
 
 	// 部屋の当たり判定を設定
 	MAPTILES.CreateSpatialIndex(5, 7);
 
-	Console::Instance().Open();
+	//Console::Instance().Open();
 
 	// 影初期化
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
@@ -181,11 +205,10 @@ void StageDungeon_E4C::Initialize()
 
 void StageDungeon_E4C::Finalize()
 {
-	GameObjectManager::Instance().Clear();
 	ENEMIES.Clear();
 	MAPTILES.Clear();
-
 	GameObjectManager::Instance().Clear();
+
 	T_GRAPHICS.GetShadowRenderer()->Finalize();
 }
 
@@ -217,6 +240,8 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	GameObjectManager::Instance().Update(elapsedTime);
 	ENEMIES.Update(elapsedTime);
 	MAPTILES.Update(elapsedTime);
+
+	floorText->Update(elapsedTime);
 
 	if (T_INPUT.KeyDown(VK_MENU))
 	{
@@ -340,6 +365,14 @@ void StageDungeon_E4C::RenderDX12()
 
 	// 2D描画
 	{
+		//floorText->RenderDX12(rc);
+
+		T_TEXT.BeginDX12();
+
+		floorText->RenderDX12(rc);
+		UI.RenderDX12(rc);
+
+		T_TEXT.EndDX12();
 	}
 
 	T_GRAPHICS.End();
