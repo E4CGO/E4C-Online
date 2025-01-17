@@ -148,10 +148,10 @@ void StageDungeon_E4C::Initialize()
 	currentFloor = DUNGEONDATA.GetCurrentFloor();
 
 	// テキスト設定
-	floorText = std::make_unique<WidgetText>();
+	WidgetText* floorText = new WidgetText();
 	floorText->SetText((std::to_string(currentFloor) + "階").c_str());
 	floorText->SetPosition({ 30.0f, 30.0f });
-	UI.Register(floorText.get());
+	UI.Register(floorText);
 
 	//m_roomOrder.emplace_back(RoomType::FIRST_START);
 	//m_roomOrder.emplace_back(RoomType::FIRST_T);
@@ -172,15 +172,17 @@ void StageDungeon_E4C::Initialize()
 	GenerateDungeon();
 
 	// デバッグテキスト
-	debugText = std::make_unique<WidgetText>();
+	WidgetText* debugText = new WidgetText();
 	std::string roomOrderText = "生成配列：";
-	for (uint8_t type : m_roomOrder)
+	for (int i = 0; i < m_roomOrder.size(); i++)
 	{
-		roomOrderText += std::to_string(type);
+		roomOrderText += std::to_string(m_roomOrder.at(i));
+
+		if (i < m_roomOrder.size() - 1) roomOrderText += ",";
 	}
 	debugText->SetText(roomOrderText.c_str());
 	debugText->SetPosition({ 30.0f, 60.0f });
-	UI.Register(debugText.get());
+	UI.Register(debugText);
 
 	// 部屋のモデルを配置
 	for (RoomBase* room : rootRoom->GetAll())
@@ -220,6 +222,7 @@ void StageDungeon_E4C::Finalize()
 {
 	ENEMIES.Clear();
 	MAPTILES.Clear();
+	UI.Clear();
 	SpawnerManager::Instance().Clear();
 	GameObjectManager::Instance().Clear();
 
@@ -255,9 +258,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	SpawnerManager::Instance().Update(elapsedTime);
 	ENEMIES.Update(elapsedTime);
 	MAPTILES.Update(elapsedTime);
-
-	floorText->Update(elapsedTime);
-	debugText->Update(elapsedTime);
+	UI.Update(elapsedTime);
 
 	if (T_INPUT.KeyDown(VK_MENU))
 	{

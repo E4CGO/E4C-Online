@@ -89,10 +89,6 @@ protected:
 	int currentSegment = 0;
 	int currentFloor = 0;
 
-	// テキスト
-	std::unique_ptr<WidgetText> floorText;
-	std::unique_ptr<WidgetText> debugText;
-
 	// フレームバッファマネージャー
 	FrameBufferManager* m_frameBuffer;
 
