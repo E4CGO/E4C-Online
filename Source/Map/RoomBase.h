@@ -2,6 +2,10 @@
 
 #include "TAKOEngine/Rendering/DebugRenderer/CubeRenderer.h"
 #include "Map/DungeonData.h"
+
+#include "Scene/Stage/Stage.h"
+#include "Network/OnlineController.h"
+
 #include <vector>
 
 using namespace ns_RoomData;
@@ -10,20 +14,24 @@ using namespace ns_RoomData;
 class RoomBase
 {
 public:
-	// コンストラクタ
-	RoomBase(
-		RoomBase* parent, int pointIndex,
-		std::vector<AABB>& roomAABBs,
-		bool isAutoGeneration,
-		std::vector<uint8_t>& roomOrder, int& orderIndex);
-
-	// コンストラクタ
+	// コンストラクタ（自動生成）
 	RoomBase(
 		RoomBase* parent, int pointIndex,
 		RoomType roomType,
 		std::vector<AABB>& roomAABBs,
-		bool isAutoGeneration,
+		bool& isLastRoomGenerated);
+
+	// コンストラクタ（roomOrderに従う）
+	RoomBase(
+		RoomBase* parent, int pointIndex,
+		RoomType roomType,
+		std::vector<AABB>& roomAABBs,
 		std::vector<uint8_t>& roomOrder, int& orderIndex);
+
+	// コンストラクタ（当たり判定用、すぐ消す）
+	RoomBase(
+		RoomBase* parent, int pointIndex,
+		RoomType roomType);
 
 	// ですとら
 	virtual ~RoomBase()
@@ -48,27 +56,29 @@ public:
 
 	virtual void Render(const RenderContextDX12 rc)
 	{
+		// AABBの描画
+		// radiiは半径なので2倍して直径にしてからSetCubeを行う
+		// 自身のAABB
 		{
-			DirectX::XMFLOAT3 aabbDrawPos;
-			aabbDrawPos = {
-				m_aabb.position.x - (m_aabb.radii.x * 0.5f),
-				m_aabb.position.y - (m_aabb.radii.y * 0.5f),
-				m_aabb.position.z - (m_aabb.radii.z * 0.5f),
+			DirectX::XMFLOAT3 diameter = {
+				m_aabb.radii.x * 2.0f,
+				m_aabb.radii.y * 2.0f,
+				m_aabb.radii.z * 2.0f
 			};
-			m_debugCube->SetCube(aabbDrawPos, m_aabb.radii, { 1.0f, 1.0f, 1.0f, 1.0f });
-			//m_debugCube->Render(rc);
+			//m_aabbCube->SetCube(m_aabb.position, diameter, { 1.0f, 1.0f, 1.0f, 1.0f });
+			//m_aabbCube->Render(rc);
 		}
 
-		for (const AABB& d_aabb : m_debugAABBs)
+		// 子の部屋を生成する時のAABB
+		for (int i = 0; i < m_debugAABBs.size(); i++)
 		{
-			DirectX::XMFLOAT3 d_aabbPos;
-			d_aabbPos = {
-				d_aabb.position.x - (d_aabb.radii.x * 0.5f),
-				d_aabb.position.y - (d_aabb.radii.y * 0.5f),
-				d_aabb.position.z - (d_aabb.radii.z * 0.5f),
+			DirectX::XMFLOAT3 diameter = {
+				m_debugAABBs.at(i).radii.x * 2.0f,
+				m_debugAABBs.at(i).radii.y * 2.0f,
+				m_debugAABBs.at(i).radii.z * 2.0f
 			};
-			m_debugDebugCube->SetCube(d_aabbPos, d_aabb.radii, { 1.0f, 0.0f, 0.0f, 1.0f });
-			//m_debugDebugCube->Render(rc);
+			//m_debugCubes.at(i)->SetCube(m_debugAABBs.at(i).position, diameter, { 1.0f, 0.0f, 0.0f, 1.0f });
+			//m_debugCubes.at(i)->Render(rc);
 		}
 	}
 
@@ -79,10 +89,14 @@ public:
 	DirectX::XMFLOAT3 GetAngle() { return m_angle; }
 	DirectX::XMFLOAT3 GetScale() { return m_scale; }
 
-	// 次の部屋を生成する
-	void GenerateNextRoom(
+	// 次の部屋を生成する（自動生成）
+	void GenerateNextRoomAutomatically(
 		std::vector<AABB>& roomAABBs,
-		bool isAutoGeneration,
+		bool& isLastRoomGenerated);
+
+	// 次の部屋を生成する（roomOrderに従う）
+	void GenerateNextRoomFromOrder(
+		std::vector<AABB>& roomAABBs,
 		std::vector<uint8_t>& roomOrder, int& orderIndex);
 
 	// 自分の深度を取得する
@@ -203,6 +217,9 @@ public:
 	// 部屋タイルを配置
 	void PlaceMapTile(bool isLeader = false);
 
+	// テレポーター関連の配置
+	void PlaceTeleporterTile(Stage* stage, Online::OnlineController* onlineController);
+
 	// 出口を配置
 	virtual void PlaceExit() {}
 
@@ -222,9 +239,11 @@ protected:
 
 	std::vector<std::vector<TILE_DATA>> m_tileDatas;
 
-	std::unique_ptr<CubeRenderer> m_debugCube;
+	std::unique_ptr<CubeRenderer> m_aabbCube;
+	std::vector<std::unique_ptr<CubeRenderer>> m_debugCubes;
 
-	std::unique_ptr<CubeRenderer> m_debugDebugCube;
+	//std::unique_ptr<CubeRenderer> m_debugCube;
+	//std::unique_ptr<CubeRenderer> m_debugDebugCube;
 	std::vector<AABB> m_debugAABBs;
 
 	//std::vector<TILE_DATA> m_tileDatas;

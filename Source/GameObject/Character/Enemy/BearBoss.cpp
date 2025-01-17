@@ -19,7 +19,7 @@ BearBoss::BearBoss(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("
 	m_pColliders.clear();
 	// ヒット判定
 	SetCollider(COLLIDER_ID::COL_BODY, { {0, 0, 0}, radius } , Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("JOT_C_Spine2")->worldTransform);
-	uint16_t bodyArmor = 10.0f;
+	uint16_t bodyArmor = 10;
 	m_pColliders[COLLIDER_ID::COL_BODY]->SetArmor(bodyArmor);
 	SetCollider(COLLIDER_ID::COL_HEAD, { {0, 1.8f / 0.05f, 0}, 1.8f }, Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("JOT_C_Head")->worldTransform);
 	SetCollider(COLLIDER_ID::COL_BUTTON, { {-(radius - 0.5f) / 0.03f, -0.5f / 0.03f, 0}, 1.0f }, Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("JOT_C_Spine2")->worldTransform);

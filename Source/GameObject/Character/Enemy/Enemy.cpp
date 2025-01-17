@@ -40,7 +40,6 @@ bool Enemy::IsAlive()
 	return false;
 }
 
-
 void Enemy::TurnTo(float elapsedTime, const DirectX::XMFLOAT3& target)
 {
 	DirectX::XMFLOAT3 d = target - position;
@@ -149,10 +148,10 @@ Enemy* Enemy::EnemyFactory(uint8_t enemyType)
 {
 	switch (enemyType)
 	{
-	case ENEMY_TYPE::SKELETON_MINION: return new SkeletonMinion; break;
+	case ENEMY_TYPE::SKELETON_MINION: return new SkeletonMinion(1.0f); break;
 	case ENEMY_TYPE::SKELETON_MINION_BOSS: return new SkeletonMinionBoss; break;
-	case ENEMY_TYPE::MOUSE: return new MouseMob; break;
-	case ENEMY_TYPE::BEAR_BOSS: return new BearBoss; break;
+	case ENEMY_TYPE::MOUSE: return T_GRAPHICS.isDX11Active ? new MouseMob(0.5f, ModelObject::DX11) : new MouseMob(0.5f, ModelObject::DX12); break;
+	case ENEMY_TYPE::BEAR_BOSS: return T_GRAPHICS.isDX11Active ? new BearBoss(1.0f, ModelObject::DX11) : new BearBoss(1.0f, ModelObject::DX12); break;
 	}
 	return nullptr;
 }

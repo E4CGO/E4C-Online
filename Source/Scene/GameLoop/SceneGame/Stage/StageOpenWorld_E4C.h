@@ -1,5 +1,5 @@
 //! @file StageOpenWorld_E4C.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDED_STAGE_OPEN_WORLD_E4C_H__
 #define __INCLUDED_STAGE_OPEN_WORLD_E4C_H__
@@ -29,6 +29,8 @@
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
 #include "Source/GameObject/Props/Spawner.h"
+
+#include "TAKOEngine/Rendering/ParticleRenderer/HitParticleRenderer.h"
 
 using namespace DirectX;
 
@@ -82,6 +84,7 @@ private:
 	std::unique_ptr<PlaneDX12> portalSquare2;
 
 	std::unique_ptr<Fireball> fireBall;
+	std::unique_ptr<PlaneDX12> fireBall2;
 
 	std::unique_ptr<Plane> plane;
 	std::unique_ptr<PlaneDX12> plane2;
@@ -116,6 +119,8 @@ private:
 		{5,3,4},
 		{8,3,8}
 	};
+
+	std::unique_ptr<HitParticleRenderer> m_particle[2];
 
 	// フレームバッファマネージャー
 	FrameBufferManager* m_frameBuffer = nullptr;

@@ -193,7 +193,7 @@ void PlayerCharacter::UpdateHorizontalMove(float elapsedTime)
 						}
 					}
 					position = pos - XMFLOAT3{ 0, height * 0.5f, 0 };
-					m_pMoveCollider->SetPosition(position + XMFLOAT3{0, radius, 0});
+					m_pMoveCollider->SetPosition(position + XMFLOAT3{ 0, radius, 0 });
 				}
 				else
 				{
@@ -250,7 +250,7 @@ bool  PlayerCharacter::CollisionVsEnemies()
 	for (Enemy*& enemy : ENEMIES.GetAll())
 	{
 		if (!enemy->GetMoveCollider()) continue;
-		
+
 		if (m_pMoveCollider->Collision(enemy->GetMoveCollider(), {}, hit))
 		{
 			hit.position.y = position.y;
@@ -559,14 +559,14 @@ void PlayerCharacter::Render(const RenderContext& rc)
 	if (dot < 0.0f) return;
 
 #ifdef _DEBUG
-	m_pColliders[COLLIDER_ID::COL_BODY]->DrawDebugPrimitive({0, 1, 0, 1});
+	m_pColliders[COLLIDER_ID::COL_BODY]->DrawDebugPrimitive({ 0, 1, 0, 1 });
 	m_pMoveCollider->DrawDebugPrimitive({ 1, 1, 1, 1 });
 	if (IsPlayer())
 	{
 		for (const std::pair<uint8_t, Collider*>& attackCollider : m_pColliders)
 		{
 			if (attackCollider.first == COLLIDER_ID::COL_BODY) continue;
-			
+
 			DirectX::XMFLOAT4 color = { 1, 0, 0, 1 };
 			HitResult hit;
 			for (Enemy*& enemy : ENEMIES.GetAll())
@@ -602,14 +602,14 @@ void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
 
 #ifdef _DEBUG
 	m_pMoveCollider->DrawDebugPrimitive({ 1, 1, 1, 1 });
-	if (IsPlayer()&& !m_pColliders.empty())
+	if (IsPlayer() && !m_pColliders.empty())
 	{
 		m_pColliders[COLLIDER_ID::COL_BODY]->DrawDebugPrimitive({ 0, 1, 0, 1 });
 
 		ImVec2 pos = ImGui::GetMainViewport()->Pos;
 		ImGui::SetNextWindowPos(ImVec2(pos.x + 10, pos.y + 10), ImGuiCond_FirstUseEver);
 		ImGui::SetNextWindowSize(ImVec2(300, 450), ImGuiCond_FirstUseEver);
-		
+
 		if (ImGui::Begin("AttackCollider", nullptr, ImGuiWindowFlags_None))
 		{
 			for (int i = 0; i < 3; i++)
@@ -721,7 +721,7 @@ void PlayerCharacter::OnDamage(const HitResult& hit, int damage)
 }
 
 bool PlayerCharacter::InputMove(float elapsedTime) {
-
+	
 
 	// 移動処理
 	Move(inputDirection.x, inputDirection.y, this->moveSpeed);

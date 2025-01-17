@@ -35,8 +35,8 @@ void AttackSphereCollider::OnCollision(Collider* other)
 	if (m_power > other->GetArmor())
 	{
 		uint16_t damage = m_power - other->GetArmor();
-		Character* chara = static_cast<Character*>(other->GetOwner());
-		m_hitOthers.emplace_back(chara);
+	Character* chara = static_cast<Character*>(other->GetOwner());
+	m_hitOthers.emplace_back(chara);
 		chara->OnDamage(damage);
 	}
 }
@@ -69,7 +69,11 @@ void AttackCapsuleCollider::OnCollision(Collider* other)
 		if (owner == other->GetOwner()) return;
 	}
 
-	Character* chara = static_cast<Character*>(other->GetOwner());
-	m_hitOthers.emplace_back(chara);
-	chara->OnDamage(m_power);
+	if (m_power > other->GetArmor())
+	{
+		uint16_t damage = m_power - other->GetArmor();
+		Character* chara = static_cast<Character*>(other->GetOwner());
+		m_hitOthers.emplace_back(chara);
+		chara->OnDamage(damage);
+	}
 }

@@ -14,6 +14,7 @@
 #include "TAKOEngine/Rendering/Shaders/ShadowMapShader.h"
 #include "TAKOEngine/Rendering/Shaders//PlaneShader.h"
 #include "TAKOEngine/Rendering/Shaders/ParticleShader.h"
+#include "TAKOEngine/Rendering/Shaders/HitParticleShader.h"
 
 #include "TAKOEngine/Rendering/Shaders/UVScrollShader.h"
 #include "TAKOEngine/Rendering/Shaders/MaskShader.h"
@@ -575,6 +576,8 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::shadowMap)] = std::make_unique<ShadowMapShaderDX12>(m_d3d_device.Get());
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Plane)] = std::make_unique<PlaneShaderDX12>(m_d3d_device.Get());
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::PortalSquare)] = std::make_unique<PortalSquareShaderDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Billboard)] = std::make_unique<BillBoardShaderDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Fireball)] = std::make_unique<FireballShaderDX12>(m_d3d_device.Get());
 
 		// スプライトシェーダー生成
 		spriteShaders[static_cast<int>(SpriteShaderId::Default)] = std::make_unique<DefaultSpriteShader>(device.Get());
@@ -592,14 +595,15 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 		dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::GaussianBlur)] = std::make_unique<GaussianBlurShaderDX12>(m_d3d_device.Get());
 		dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::ColorGrading)] = std::make_unique<ColorGradingShaderDX12>(m_d3d_device.Get());
 		dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::Finalpass)] = std::make_unique<FinalpassShaderDX12>(m_d3d_device.Get());
-		dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::Particle)] = std::make_unique<ParticleShader>(m_d3d_device.Get());
+		dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::InjectionParticle)] = std::make_unique<ParticleShader>(m_d3d_device.Get());
+		dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::HitParticle)] = std::make_unique<HitParticleShader>(m_d3d_device.Get());
 
 		// レンダラ
 		debugRenderer = std::make_unique<DebugRenderer>(device.Get());
 		lineRenderer = std::make_unique<LineRenderer>(device.Get(), 1024);
 
 		// パーティクル
-		m_compute = std::make_unique<ParticleCompute>(m_d3d_device.Get());
+		m_compute[static_cast<int>(ComputeShaderDX12Id::Injection)] = std::make_unique<ParticleCompute>(m_d3d_device.Get());
 
 		//スキニング
 		m_skinning_pipeline = std::make_unique<SkinningPipeline>(m_d3d_device.Get());
@@ -852,15 +856,105 @@ const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera, floa
 
 			// ライトビュープロジェクション
 			{
-				DirectX::XMVECTOR LightDirection = DirectX::XMVector3Normalize(DirectX::XMVectorSet(light->GetDirection().x, light->GetDirection().y, light->GetDirection().z, 0));
-				DirectX::XMVECTOR Up = DirectX::XMVectorSet(0, 1, 0, 0);
-				DirectX::XMVECTOR Focus = DirectX::XMVectorZero();
+				DirectX::XMVECTOR cameraPosition = DirectX::XMVectorSet(camera->GetEye().x, camera->GetEye().y, camera->GetEye().z, 1.0f);
+				DirectX::XMVECTOR cameraUp = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera->GetUp()));
+				DirectX::XMVECTOR cameraFront = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera->GetFront()));
+				DirectX::XMVECTOR cameraRight = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera->GetRight()));
 
-				DirectX::XMVECTOR Eye = DirectX::XMVectorSubtract(Focus, DirectX::XMVectorScale(LightDirection, 50.0f));
-				DirectX::XMMATRIX View = DirectX::XMMatrixLookAtLH(Eye, Focus, Up);
+				//平行光源からカメラ位置を作成し、そこから原点の位置を見るように視線行列を生成
+				DirectX::XMVECTOR LightDirection = DirectX::XMVectorSet(light->GetDirection().x, light->GetDirection().y, light->GetDirection().z, 0);
+				LightDirection = DirectX::XMVectorScale(LightDirection, -250);
+				DirectX::XMMATRIX LightView = DirectX::XMMatrixLookAtLH(
+					LightDirection,          
+					DirectX::XMVectorZero(), 
+					DirectX::XMVectorSet(0, 1, 0, 0));
+
+				//シャドウマップに描画したい範囲の射影行列を生成
 				DirectX::XMMATRIX Projection = DirectX::XMMatrixOrthographicLH(100, 100, 0.1f, 500.0f);
-				DirectX::XMMATRIX LightViewProjection = DirectX::XMMatrixMultiply(View, Projection);
-				DirectX::XMStoreFloat4x4(&cb_scene_data->light_view_projection, LightViewProjection);
+				DirectX::XMMATRIX ViewProjection = LightView * Projection;
+
+				//エリアを内容する試錐台の８頂点を算出する
+				DirectX::XMVECTOR vertex[8];
+				{
+					//エリアの近平面の中心からの上面までの距離を求める
+					float nearY = tanf(camera->GetFovY() / 2.0f) * camera->GetNearZ();
+
+					//エリアの近平面の中心からの右面までの距離を求める
+					float nearX = nearY * camera->GetAspect();
+
+					//エリアの遠平面の中心からの上面までの距離を求める
+					float farY = tanf(camera->GetFovY() / 2.0f) * 100;
+
+					//エリアの遠平面の中心からの右面までの距離を求める
+					float farX = farY * camera->GetAspect();
+
+					//エリアの近平面の中心座標を求める
+					DirectX::XMVECTOR nearPosition = DirectX::XMVectorAdd(cameraPosition, DirectX::XMVectorScale(cameraFront, camera->GetNearZ()));
+
+					//エリアの遠平面の中心座標を求める
+					DirectX::XMVECTOR farPosition = DirectX::XMVectorAdd(cameraPosition, DirectX::XMVectorScale(cameraFront, 100));
+
+					//8頂点を求める
+					{
+						//近平面の右上
+						vertex[0] = DirectX::XMVectorAdd(nearPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, nearY), DirectX::XMVectorScale(cameraRight, nearX)));
+
+						//近平面の左上
+						vertex[1] = DirectX::XMVectorAdd(nearPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, nearY), DirectX::XMVectorScale(cameraRight, -nearX)));
+
+						//近平面の右下
+						vertex[2] = DirectX::XMVectorAdd(nearPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, -nearY), DirectX::XMVectorScale(cameraRight, nearX)));
+
+						//近平面の左下
+						vertex[3] = DirectX::XMVectorAdd(nearPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, -nearY), DirectX::XMVectorScale(cameraRight, -nearX)));
+
+
+						//遠平面の右上
+						vertex[4] = DirectX::XMVectorAdd(farPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, farY), DirectX::XMVectorScale(cameraRight, farX)));
+
+						//遠平面の左上
+						vertex[5] = DirectX::XMVectorAdd(farPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, farY), DirectX::XMVectorScale(cameraRight, -farX)));
+
+						//遠平面の右下
+						vertex[6] = DirectX::XMVectorAdd(farPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, -farY), DirectX::XMVectorScale(cameraRight, farX)));
+
+						//遠平面の左下
+						vertex[7] = DirectX::XMVectorAdd(farPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, -farY), DirectX::XMVectorScale(cameraRight, -farX)));
+					}
+				}
+				
+				//8頂点をライトビュープロジェクション空間にして、最大値、最小値を求める
+				DirectX::XMFLOAT3 vertexMin(FLT_MAX, FLT_MAX, FLT_MAX), vertexMax(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+				for (auto& it : vertex)
+				{
+					DirectX::XMFLOAT3 p;
+					DirectX::XMStoreFloat3(&p, DirectX::XMVector3TransformCoord(it, ViewProjection));
+					vertexMin.x = min(p.x, vertexMin.x);
+					vertexMin.y = min(p.y, vertexMin.y);
+					vertexMin.z = min(p.z, vertexMin.z);
+					vertexMax.x = max(p.x, vertexMax.x);
+					vertexMax.y = max(p.y, vertexMax.y);
+					vertexMax.z = max(p.z, vertexMax.z);
+				}
+
+				//クロップ行列を求める
+				float xScale = 2.0f / (vertexMax.x - vertexMin.x);
+				float yScale = 2.0f / (vertexMax.y - vertexMin.y);
+
+				// 中心座標から正しいオフセットを計算
+				float xOffset = -(vertexMin.x + vertexMax.x) * 0.25f * xScale;
+				float yOffset = -(vertexMin.y + vertexMax.y) * 0.25f * yScale;
+
+				DirectX::XMMATRIX clopMatrix = DirectX::XMMatrixSet
+				(
+					xScale, 0, 0, 0,
+					0, yScale, 0, 0,
+					0, 0, 1, 0,
+					xOffset, yOffset, 0, 1
+				);
+
+				// ライトビュープロジェクション行列
+				DirectX::XMStoreFloat4x4(&cb_scene_data->light_view_projection, ViewProjection * clopMatrix);
 			}
 			break;
 		}
