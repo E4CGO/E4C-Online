@@ -1,5 +1,5 @@
 ﻿//! @file StageDungeon_E4C.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDED_STAGE_DUNGEON_E4C_H__
 #define __INCLUDED_STAGE_DUNGEON_E4C_H__
@@ -61,6 +61,11 @@ public:
 	void Render() override;
 
 	void RenderDX12() override;
+
+private:
+	// シーンGUI描画
+	void DrawSceneGUI();
+
 protected:
 	SceneGame_E4C* m_pScene;
 

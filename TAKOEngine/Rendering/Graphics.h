@@ -60,6 +60,8 @@ enum class ModelShaderDX12Id
 	shadowMap,
 	Plane,
 	PortalSquare,
+	Billboard,
+	Fireball,
 
 	EnumCount
 };

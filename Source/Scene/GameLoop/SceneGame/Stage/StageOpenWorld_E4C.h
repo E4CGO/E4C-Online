@@ -1,5 +1,5 @@
 //! @file StageOpenWorld_E4C.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDED_STAGE_OPEN_WORLD_E4C_H__
 #define __INCLUDED_STAGE_OPEN_WORLD_E4C_H__
@@ -84,6 +84,7 @@ private:
 	std::unique_ptr<PlaneDX12> portalSquare2;
 
 	std::unique_ptr<Fireball> fireBall;
+	std::unique_ptr<PlaneDX12> fireBall2;
 
 	std::unique_ptr<Plane> plane;
 	std::unique_ptr<PlaneDX12> plane2;
