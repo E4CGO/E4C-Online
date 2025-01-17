@@ -1,4 +1,5 @@
 #include "../Lighting/Light.hlsli"
+#include "../Lighting/ShadowmapFunctions.hlsli"
 #include "Constants.hlsli"
 
 struct VS_OUT
@@ -10,6 +11,7 @@ struct VS_OUT
 	float3 tangent	: TANGENT;
     float3 binormal : BINORMAL;
     float4 color    : COLOR;
+    float3 shadow   : SHADOW;
 };
 
 cbuffer CbScene : register(b0)
@@ -17,14 +19,22 @@ cbuffer CbScene : register(b0)
     row_major float4x4 view;
     row_major float4x4 Projection;
     float4             cameraPosition;
+    row_major float4x4 lightViewProjection;
     
-    //ライト情報
+    //繝ｩ繧､繝域ュ蝣ｱ
     float4               ambientLightColor;
     DirectionalLightData directionalLightData;
-    PointLightData       pointLightData[PointLightMax]; 	// 点光源情報
-    SpotLightData        spotLightData[SpotLightMax];   	// スポットライト情報
-    int                  pointLightCount;              		// 点光源数
-    int                  spotLightCount;                	// スポットライト数
+    PointLightData       pointLightData[PointLightMax]; 	// 轤ｹ蜈画ｺ先ュ蝣ｱ
+    SpotLightData        spotLightData[SpotLightMax];   	// 繧ｹ繝昴ャ繝医Λ繧､繝域ュ蝣ｱ
+    int                  pointLightCount;              		// 轤ｹ蜈画ｺ先焚
+    int                  spotLightCount;                	// 繧ｹ繝昴ャ繝医Λ繧､繝域焚
+    
+    float timerGlobal;
+    float timerTick;
+
+	// 蠖ｱ諠�蝣ｱ
+    float shadowBias;
+    float3 shadowColor;
 };
 
 cbuffer CbMesh : register(b1)
@@ -44,4 +54,6 @@ cbuffer CbMaterial : register(b2)
                   DescriptorTable(CBV(b1), visibility=SHADER_VISIBILITY_VERTEX), \
                   DescriptorTable(CBV(b2), visibility=SHADER_VISIBILITY_ALL), \
                   DescriptorTable(SRV(t0), visibility=SHADER_VISIBILITY_PIXEL), \
-                  DescriptorTable(Sampler(s0), visibility=SHADER_VISIBILITY_PIXEL)"
+                  DescriptorTable(Sampler(s0), visibility=SHADER_VISIBILITY_PIXEL), \
+                  DescriptorTable(SRV(t1), visibility=SHADER_VISIBILITY_PIXEL), \
+                  DescriptorTable(Sampler(s1), visibility=SHADER_VISIBILITY_PIXEL)"

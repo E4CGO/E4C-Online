@@ -48,7 +48,6 @@ void SceneCharacter_E4CState::InitState::Execute(float elapsedTime)
 *//***************************************************************************/
 void SceneCharacter_E4CState::InitState::Exit()
 {
-
 }
 
 /**************************************************************************//**
@@ -66,6 +65,9 @@ void SceneCharacter_E4CState::CharacterSelectionState::Enter()
 	m_cameraOriginPos = CameraManager::Instance().GetCamera()->GetEye();
 	m_cameraOriginFocus = CameraManager::Instance().GetCamera()->GetFocus();
 	m_cameraTimer = 0.0f;
+
+	m_pPauseMenu = new WidgetPauseMenu();
+	UI.Register(m_pPauseMenu);
 }
 /**************************************************************************//**
 	@brief		実行
@@ -132,7 +134,7 @@ void SceneCharacter_E4CState::CharacterCreationState::Enter()
 		PLAYER_CHARACTER_DATA.SetCurrentCharacter(owner->GetSelectedCharacterIdx());
 		owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::START);
 		});
-	m_pStartBtn->SetPosition({ SCREEN_W * 0.5f - (m_pStartBtn->GetSize().x * 0.5f), SCREEN_H * 0.8f });
+	m_pStartBtn->SetPosition({ SCREEN_W * 0.5f - (m_pStartBtn->GetSize().x * 0.5f), SCREEN_H * 0.85f });
 	UI.Register(m_pStartBtn);
 
 	m_pWidgetCharacterModify = new WidgetCharacterModify(owner);

@@ -11,8 +11,16 @@
 *//***************************************************************************/
 WidgetImage::WidgetImage(const char* filename)
 {
-	if (T_GRAPHICS.isDX11Active) m_pSprite = RESOURCE.LoadSpriteResource(filename);
-	else m_pSpriteDX12 = RESOURCE.LoadSpriteResourceDX12(filename);
+	if (T_GRAPHICS.isDX11Active)
+	{
+		m_pSprite = RESOURCE.LoadSpriteResource(filename);
+		m_size = m_pSprite->GetTextureSize();
+	}
+	else
+	{
+		m_pSpriteDX12 = RESOURCE.LoadSpriteResourceDX12(filename);
+		m_size = m_pSpriteDX12->GetTextureSize();
+	}
 }
 
 /**************************************************************************//**

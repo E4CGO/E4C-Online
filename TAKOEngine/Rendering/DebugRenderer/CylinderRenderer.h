@@ -28,11 +28,12 @@ public:
 	void Render(const RenderContextDX12& rc);
 
 	// 円柱情報セット
-	void SetCylinder(const DirectX::XMFLOAT3 position, float radius, float height, const DirectX::XMFLOAT4 color)
+	void SetCylinder(const DirectX::XMFLOAT3 position, const DirectX::XMFLOAT3 direction, float radius, float height, const DirectX::XMFLOAT4 color)
 	{
 		m_index = 0;
 
 		m_position = position;
+		m_direction = direction;
 		m_radius = radius;
 		m_height = height;
 		m_color = color;
@@ -77,6 +78,7 @@ private:
 	UINT	vertexCount = 0;
 
 	DirectX::XMFLOAT3 m_position = { 0,0,0 };
+	DirectX::XMFLOAT3 m_direction = { 0,0,0 };
 	float m_radius = 0;
 	float m_height = 0;
 	DirectX::XMFLOAT4 m_color = { 1,1,1,1 };

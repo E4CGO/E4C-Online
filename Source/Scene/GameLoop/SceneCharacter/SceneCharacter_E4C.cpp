@@ -32,6 +32,14 @@ void SceneCharacter_E4C::Initialize()
 			modelPreLoad.insert(RESOURCE.LoadModelResource(filename));
 		}
 	}
+	else
+	{
+		// Model Resource Preload
+		for (auto& filename : modelList)
+		{
+			modelPreLoad.insert(RESOURCE.LoadModelDX12Resource(filename));
+		}
+	}
 
 	//シャドウマップレンダラ
 	shadowMapRenderer->Initialize();
@@ -77,6 +85,8 @@ void SceneCharacter_E4C::Initialize()
 	stateMachine->RegisterState(STATE::START, new SceneCharacter_E4CState::StartState(this));
 	stateMachine->SetState(STATE::INIT);
 
+	// 影初期化
+	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
 }
 
 /**************************************************************************//**
@@ -94,6 +104,8 @@ void SceneCharacter_E4C::Finalize()
 	UI.Clear();
 	shadowMapRenderer->Clear();
 	CameraManager::Instance().Clear();
+
+	T_GRAPHICS.GetShadowRenderer()->Finalize();
 }
 
 /**************************************************************************//**
@@ -115,7 +127,6 @@ void SceneCharacter_E4C::Update(float elapsedTime)
 	// カメラ更新
 	cameraController->Update();
 	cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
-
 
 	//CameraManager::Instance().GetCamera()->Move2PointToCamera(CameraManager::Instance().GetCamera()->GetEye(), { 6.f,2.f,9.f }, CameraManager::Instance().GetCamera()->GetFocus(), { -3.0f, 0.0, 0.0f }, transitiontime, 2.f, elapsedTime);
 #endif // _DEBUG
@@ -171,7 +182,7 @@ void SceneCharacter_E4C::RenderDX12()
 	{
 		// シーン用定数バッファ更新
 		const Descriptor* scene_cbv_descriptor = TentacleLib::graphics.UpdateSceneConstantBuffer(
-			CameraManager::Instance().GetCamera());
+			CameraManager::Instance().GetCamera(), 0, 0);
 
 		// レンダーコンテキスト設定
 		RenderContextDX12 rc;
@@ -184,10 +195,17 @@ void SceneCharacter_E4C::RenderDX12()
 			m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 			m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
 
+			// シャドウマップ
+			{
+				T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
+				rc.shadowMap.shadow_srv_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSRV();
+				rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();
+			}
+
 			for (auto& it : m_previewCharacters)
 			{
 				if (it != nullptr) {
-						it->RenderDX12(rc);
+					it->RenderDX12(rc);
 				}
 			}
 			// レンダーターゲットへの書き込み終了待ち
@@ -201,10 +219,19 @@ void SceneCharacter_E4C::RenderDX12()
 
 		// 2D描画
 		{
+			T_TEXT.BeginDX12();
+
 			UI.RenderDX12(rc);
+
+			T_TEXT.EndDX12();
 		}
+
 	}
-	TentacleLib::graphics.End();
+#ifdef _DEBUG
+	DrawSceneGUI();
+	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
+#endif
+	T_GRAPHICS.End();
 }
 
 /**************************************************************************//**

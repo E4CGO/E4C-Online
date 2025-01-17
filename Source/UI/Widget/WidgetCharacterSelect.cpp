@@ -1,9 +1,10 @@
-﻿//! @file WidgetCharacterSelect.cpp
+//! @file WidgetCharacterSelect.cpp
 //! @note
 
 #include "WidgetCharacterSelect.h"
 #include "Scene/GameLoop/SceneCharacter/SceneCharacter_E4C.h"
 #include "PlayerCharacterData.h"
+#include "TAKOEngine/Tool/Encode.h"
 
 /**************************************************************************//**
 	@brief	コンストラクタ
@@ -39,10 +40,12 @@ void WidgetCharacterSelect::Update(float elapsedTime)
 	for (int i = 0; i < characters.size(); i++)
 	{
 		DirectX::XMFLOAT3 position = characters.at(i)->GetScreenPosition();
+
 		m_pCharacterButtons[i]->SetPosition({ position.x - m_pCharacterButtons[i]->GetSize().x * 0.5f, SCREEN_H * 0.1f });
 		posX -= 3.5;
 	}
 	posX = T_GRAPHICS.GetScreenPosition({ posX, 0.0f, 5.0f }).x;
+
 	m_pCharacterButtons[characters.size()]->SetPosition({ posX - m_pCharacterButtons[characters.size()]->GetSize().x * 0.5f, SCREEN_H * 0.1f });
 
 	for (WidgetCharacter* button : m_pCharacterButtons)
@@ -119,6 +122,40 @@ WidgetCharacter::WidgetCharacter(SceneCharacter_E4C* scene, int idx, PlayerChara
 	})
 {
 	m_color = { 0.0f, 0.0f, 0.0f, 0.5f };
+}
+
+/**************************************************************************//**
+	@brief		描画処理
+	@param[in]	rc	レンダーコンテンツ
+*//***************************************************************************/
+void WidgetCharacter::Render(const RenderContext& rc)
+{
+	WidgetButtonImage::Render(rc);
+	if (m_pCharacter != nullptr)
+	{
+		T_TEXT.Render(
+			FONT_ID::HGpop,
+			m_pCharacter->GetName().c_str(),
+			m_position.x, m_position.y
+		);
+	}
+}
+/**************************************************************************//**
+	@brief		DX12描画処理
+	@param[in]	rc	レンダーコンテンツ
+*//***************************************************************************/
+void WidgetCharacter::RenderDX12(const RenderContextDX12& rc)
+{
+	WidgetButtonImage::RenderDX12(rc);
+
+	if (m_pCharacter != nullptr && m_pCharacter->GetName().length() > 0)
+	{
+		T_TEXT.RenderDX12(
+			FONT_ID::HGpop,
+			Encode::string_to_wstring(m_pCharacter->GetName()),
+			m_position.x + 5.0f , m_position.y + 5.0f
+		);
+	}
 }
 
 /**************************************************************************//**

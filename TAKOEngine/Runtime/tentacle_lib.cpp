@@ -57,8 +57,8 @@ namespace TentacleLib
 
 		setting.title = APPLICATION_NAME;
 
-		graphics.SetDX12Render(false);
-		graphics.SetDX11Render(true);
+		graphics.SetDX12Render(true);
+		graphics.SetDX11Render(false);
 
 		input.Init(hWnd);
 		timer.Init();
@@ -71,7 +71,6 @@ namespace TentacleLib
 
 	void Finalize()
 	{
-		//SDL_Quit();
 	}
 
 	void SetSyncInterval(UINT syncInterval)

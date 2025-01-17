@@ -5,11 +5,13 @@
 #define __GRAHICS_GRAHICS_H__
 
 #include <wrl.h>
-#include <memory>
 #include <mutex>
+#include <d2d1_3.h>
+#include <dwrite.h>
+#include <d3d11on12.h>
+#include <dxgi1_6.h>
 #include <d3d11.h>
 #include <d3d12.h>
-#include <dxgi1_6.h>
 
 #include "TAKOEngine/Rendering/FrameBuffer.h"
 #include "TAKOEngine/Rendering/FrameBufferManager.h"
@@ -25,8 +27,8 @@
 #include "TAKOEngine/Rendering/ConstantBuffer.h"
 #include "TAKOEngine/Tool/ImGuiRenderer.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
-#include "TAKOEngine/Rendering/ParticleRenderer.h"
-#include "TAKOEngine/Rendering/PrimitiveRenderer.h"
+#include "TAKOEngine/Rendering/ParticleRenderer/ParticleRenderer.h"
+#include "TAKOEngine/Rendering/ShadowMapRender.h"
 
 #define MAX_BUFFER_COUNT (2)
 
@@ -38,6 +40,7 @@ enum class ModelShaderId
 	ShadowMap,
 	Plane,
 	Portal,
+	PortalSquare,
 	Billboard,
 	Fireball,
 	Lambert,
@@ -54,6 +57,11 @@ enum class ModelShaderDX12Id
 	Toon,
 	ToonInstancing,
 	Skydome,
+	shadowMap,
+	Plane,
+	PortalSquare,
+	Billboard,
+	Fireball,
 
 	EnumCount
 };
@@ -79,7 +87,15 @@ enum class SpriteShaderDX12Id
 	GaussianBlur,
 	ColorGrading,
 	Finalpass,
-	Particle,
+	InjectionParticle,
+	HitParticle,
+
+	EnumCount
+};
+
+enum class ComputeShaderDX12Id
+{
+	Injection, // 噴射
 
 	EnumCount
 };
@@ -166,6 +182,16 @@ public:
 	// DX12のフレームバッファマネージャー
 	FrameBufferManager* GetFrameBufferManager() { return m_framebufferManager.get(); }
 
+	IDWriteFactory* GetDWriteFactory() { return m_dWriteFactory.Get(); }
+	ID3D11On12Device* GetD3D11On12Device() { return m_d3d11On12Device.Get(); }
+	ID2D1DeviceContext2* GetD2D1DeviceContext() { return m_d2dDeviceContext.Get(); }
+	ID3D11DeviceContext* GetD3D112DDeviceContext() { return m_d3d11DeviceContext.Get(); }
+	Microsoft::WRL::ComPtr<ID3D11Resource> GetD3D11BackBuffer(int i) { return m_wrappedBackBuffers[i]; }
+	ID2D1Bitmap1* GetD2D1RenderTargets(int i) { return m_d2dRenderTargets[i].Get(); }
+
+	// シャドウマップ取得
+	ShadowMapRenderDX12* GetShadowRenderer() { return m_shadowMapRenderer.get(); }
+
 	// レンダーステート取得
 	RenderState* GetRenderState() { return renderState.get(); }
 	//DX12のレンダーステート
@@ -186,13 +212,12 @@ public:
 	DebugRenderer* GetDebugRenderer() const { return debugRenderer.get(); }
 	// ラインレンダラ取得
 	LineRenderer* GetLineRenderer() const { return lineRenderer.get(); }
-	//プリミティブレンダラ取得
-	PrimitiveRenderer* GetPrimitiveRenderer()const { return primitiveRenderer.get(); }
+
 	//スキニング取得
 	SkinningPipeline* GetSkinningPipeline() const { return m_skinning_pipeline.get(); }
 
 	// パーティクル取得
-	ParticleCompute* GetParticleCompute() const { return m_compute.get(); }
+	ComputeShader* GetParticleCompute(ComputeShaderDX12Id shaderId) const { return m_compute[static_cast<int>(shaderId)].get(); }
 
 	// ImGUIンレンダラ取得
 	ImGuiRenderer* GetImGUIRenderer() const { return m_imgui_renderer.get(); }
@@ -243,7 +268,7 @@ public:
 
 	void FinishDX12();
 
-	const Descriptor* UpdateSceneConstantBuffer(const Camera* camera);
+	const Descriptor* UpdateSceneConstantBuffer(const Camera* camera, float timerGlobalTime, float timerGlobalDeltaTime);
 
 	// テクスチャ読み込み
 	HRESULT LoadTexture(const char* filename, ID3D12Resource** d3d_resource);
@@ -274,7 +299,7 @@ public:
 	}
 
 	// ビューポートを取得
-	D3D12_VIEWPORT GetViwePort()
+	D3D12_VIEWPORT GetViewPort()
 	{
 		return m_viewport;
 	}
@@ -324,12 +349,13 @@ private:
 
 	std::unique_ptr<DebugRenderer>					debugRenderer;
 	std::unique_ptr<LineRenderer>					lineRenderer;
-	std::unique_ptr<PrimitiveRenderer>              primitiveRenderer;
 	//スキニング
 	std::unique_ptr<SkinningPipeline>	m_skinning_pipeline;
 
 	// パーティクル
-	std::unique_ptr<ParticleCompute> m_compute;
+	std::unique_ptr<ComputeShader> m_compute[static_cast<int>(ComputeShaderDX12Id::EnumCount)];
+
+	std::unique_ptr<ShadowMapRenderDX12> m_shadowMapRenderer;
 
 	std::mutex mutex;	// ミューテックス
 
@@ -369,6 +395,25 @@ private:
 	float m_screen_height;
 
 	std::unique_ptr<ImGuiRenderer>						m_imgui_renderer;
+
+	// DWrite ファクトリー
+	Microsoft::WRL::ComPtr<IDWriteFactory> m_dWriteFactory;
+	// D2D ファクトリー
+	Microsoft::WRL::ComPtr<ID2D1Factory3> m_d2dFactory;
+	// D2D デバイス
+	Microsoft::WRL::ComPtr<ID2D1Device2> m_d2dDevice;
+	// D2Dのために D11デバイス
+	Microsoft::WRL::ComPtr<ID3D11On12Device> m_d3d11On12Device;
+	// D2Dのデバイスコンテクスト
+	Microsoft::WRL::ComPtr<ID2D1DeviceContext2> m_d2dDeviceContext;
+	// D2DのためにD11デバイスコンテクスト
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_d3d11DeviceContext;
+	// 画像バファー
+	Microsoft::WRL::ComPtr<ID3D11Resource> m_wrappedBackBuffers[MAX_BUFFER_COUNT];
+	// 画面バファー
+	Microsoft::WRL::ComPtr<ID2D1Bitmap1> m_d2dRenderTargets[MAX_BUFFER_COUNT];
+	// 画像バファ設定
+	D2D1_BITMAP_PROPERTIES1 bitmapProperties;
 };
 
 #endif // !__GRAHICS_GRAHICS_H__

@@ -13,7 +13,7 @@ OBBCollider::OBBCollider(uint16_t _objType, DirectX::XMFLOAT4X4* _transform) : C
 }
 
 // OBB用パラメータセット
-void OBBCollider::SetParam(OBB obb)
+void OBBCollider::SetParam(const OBB& obb)
 {
 	m_offset = obb.position;
 	m_orientation = obb.orientation;

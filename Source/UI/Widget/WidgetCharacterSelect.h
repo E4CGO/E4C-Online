@@ -15,6 +15,10 @@ public:
 	WidgetCharacter(SceneCharacter_E4C* scene);
 	WidgetCharacter(SceneCharacter_E4C* scene, int idx, PlayerCharacter* character);
 	~WidgetCharacter();
+
+	// 描画処理
+	void Render(const RenderContext& rc);
+	void RenderDX12(const RenderContextDX12& rc);
 private:
 	int m_idx = -1;
 	SceneCharacter_E4C* m_pScene;
@@ -36,7 +40,6 @@ public:
 	void Update(float elapsedTime);
 	// 描画処理
 	void Render(const RenderContext& rc);
-
 	void RenderDX12(const RenderContextDX12& rc);
 private:
 	SceneCharacter_E4C* m_pScene;

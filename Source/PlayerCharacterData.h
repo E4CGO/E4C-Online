@@ -58,7 +58,7 @@ public:
 		{
 			if (this != &other)
 			{
-				this->name = other.name;
+				this->name = other.name.c_str();
 				for (int i = 0; i < APPEARANCE_PATTERN::NUM; i++)
 				{
 					this->pattern[i] = other.pattern[i];
@@ -163,18 +163,19 @@ public:
 		return false;
 	}
 
-
 	const size_t GetAppearancePatternSize(uint8_t idx) { return m_pAppearancePatterns[idx].size(); }
-private:
+
 	// 外見パターンをクリア
 	void ClearAppearancePatterns();
+
+	void SetMalePatterns();
+	void SetFemalePatterns();
 
 private:
 	int m_CurrentSaveState = 0;
 
 	std::unordered_map<uint8_t, std::vector<PlayerCharacterPattern*>> m_pAppearancePatterns;
 	std::vector<CharacterInfo> m_CharaterInfosData;
-
 };
 
 #define PLAYER_CHARACTER_DATA PlayerCharacterData::Instance()

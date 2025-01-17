@@ -1,106 +1,121 @@
-﻿#include "EnemyState.h"
-#include "GameObject/Character/Player/PlayerCharacterManager.h"
-// 待機ステート
-void EnemyState::IdleState::Enter()
-{
-	owner->GetModel()->PlayAnimation(Enemy::Animation::Idle, true);
-	waitTimer = waitTime;
-}
-void EnemyState::IdleState::Execute(float elapsedTime)
-{
-	owner->UpdateTarget();
-	waitTimer -= elapsedTime;
+﻿//! @file EnemyState.cpp
+//! @note 
 
-	if (owner->GetTarget() != nullptr)
+#include "EnemyState.h"
+#include "GameObject/Character/Player/PlayerCharacterManager.h"
+
+#include "Network/OnlineController.h"
+#include "GameObject/Character/Enemy/EnemyManager.h"
+
+namespace EnemyState
+{
+	/**************************************************************************//**
+	 	@brief		エネミーステート変更関数・自動同期
+		@param[in]	enemy	エネミー参照ポインタ
+		@param[in]	state	ステート
+	*//***************************************************************************/
+	void StateTransition(Enemy* enemy, uint8_t state)
 	{
-		owner->TurnTo(elapsedTime, owner->GetTarget()->GetPosition());
-		if (waitTimer <= 0.0f)
+		if (!enemy->IsMine())
 		{
-			owner->GetStateMachine()->ChangeState(EnemyState::ID::TargetFound);
+			enemy->GetStateMachine()->ChangeState(Enemy::STATE::IDLE); // デフォルトステート
+			return;
+		}
+		enemy->GetStateMachine()->ChangeState(state);
+
+		if (ONLINE_CONTROLLER->GetState() != Online::Controller::STATE::OFFLINE)
+		{
+			// TODO
+			ENEMIES.RegisterSync(enemy->GetEnemyId());
 		}
 	}
-}
-void EnemyState::IdleState::Exit()
-{
-}
 
-// 移動ステート
-void EnemyState::MoveState::Enter()
-{
-	owner->GetModel()->PlayAnimation(Enemy::Animation::Walk, true);
-}
-void EnemyState::MoveState::Execute(float elapsedTime)
-{
-	if (owner->MoveTo(elapsedTime, position))
+	// 待機ステート
+	void IdleState::Enter()
 	{
-		owner->GetStateMachine()->ChangeState(nextState);
+		m_waitTimer = m_waitTime;
 	}
-}
-void EnemyState::MoveState::Exit()
-{
-}
-
-// 追跡ステート
-void EnemyState::FollowState::Enter()
-{
-	owner->GetModel()->PlayAnimation(Enemy::Animation::Walk, true);
-}
-void EnemyState::FollowState::Execute(float elapsedTime)
-{
-	
-	
-
-	PlayerCharacter* target = owner->GetTarget();
-	if (!target)
+	void IdleState::Execute(float elapsedTime)
 	{
-		owner->GetStateMachine()->ChangeState(EnemyState::ID::Idle);
-		return;
+		if (m_waitTimer == 0.0f) return;
+
+		m_waitTimer -= elapsedTime;
+		if (m_waitTimer <= 0.0f)
+		{
+			m_waitTimer = 0.0f;
+		}
+	}
+	void IdleState::Exit()
+	{
 	}
 
-	owner->MoveTo(elapsedTime, owner->GetTarget()->GetPosition());
-
-	DirectX::XMFLOAT3 diff = owner->GetTarget()->GetPosition() - owner->GetPosition();
-	diff.y = 0; // Y軸無視
-	if (XMFLOAT3LengthSq(diff) < distance * distance)
+	// 移動ステート
+	void MoveState::Enter()
 	{
-		owner->GetStateMachine()->ChangeState(nextState);
 	}
-}
-void EnemyState::FollowState::Exit()
-{
-}
-
-// 怪我ステート
-void EnemyState::HurtState::Enter()
-{
-	owner->SetAnimationSpeed(3.0f);
-	owner->GetModel()->PlayAnimation(Enemy::Animation::Dash_Back, false);
-}
-void EnemyState::HurtState::Execute(float elapsedTime)
-{
-	if (!owner->GetModel()->IsPlayAnimation())
+	void MoveState::Execute(float elapsedTime)
 	{
-		owner->GetStateMachine()->ChangeState(EnemyState::ID::Idle);
+		if (owner->MoveTo(elapsedTime, owner->GetTargetPosition()))
+		{
+			StateTransition(owner, static_cast<uint8_t>(m_nextState));
+		}
 	}
-}
-void EnemyState::HurtState::Exit()
-{
-	owner->SetAnimationSpeed(1.0f);
-}
-
-// 死亡ステート
-void EnemyState::DeathState::Enter()
-{
-	owner->GetModel()->PlayAnimation(Enemy::Animation::Defeat, false);
-	for (std::pair<int, Collider*> collider : owner->GetColliders()) collider.second->SetEnable(false);
-}
-void EnemyState::DeathState::Execute(float elapsedTime)
-{
-	if (!owner->GetModel()->IsPlayAnimation())
+	void MoveState::Exit()
 	{
-		owner->OnDeath();
 	}
-}
-void EnemyState::DeathState::Exit()
-{
+
+	// 追跡ステート
+	void FollowState::Enter()
+	{
+	}
+	void FollowState::Execute(float elapsedTime)
+	{
+		PlayerCharacter* target = PlayerCharacterManager::Instance().GetPlayerCharacterById(owner->GetTarget());
+		if (target == nullptr)
+		{
+			StateTransition(owner, Enemy::STATE::IDLE);
+			return;
+		}
+
+		owner->MoveTo(elapsedTime, target->GetPosition());
+
+		if (XMFLOAT3HorizontalLength(target->GetPosition() - owner->GetPosition()) < m_distance * m_distance)
+		{
+			StateTransition(owner, static_cast<uint8_t>(m_nextState));
+		}
+	}
+	void FollowState::Exit()
+	{
+	}
+
+	// 怪我ステート
+	void HurtState::Enter()
+	{
+	}
+	void HurtState::Execute(float elapsedTime)
+	{
+		if (!owner->GetModel()->IsPlayAnimation())
+		{
+			StateTransition(owner, Enemy::STATE::IDLE);
+		}
+	}
+	void HurtState::Exit()
+	{
+	}
+
+	// 死亡ステート
+	void DeathState::Enter()
+	{
+		for (std::pair<int, Collider*> collider : owner->GetColliders()) collider.second->SetEnable(false);
+	}
+	void DeathState::Execute(float elapsedTime)
+	{
+		if (!owner->GetModel()->IsPlayAnimation())
+		{
+			owner->OnDeath();
+		}
+	}
+	void DeathState::Exit()
+	{
+	}
 }

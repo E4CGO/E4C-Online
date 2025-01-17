@@ -5,6 +5,7 @@
 
 #include "TAKOEngine/Runtime/tentacle_lib.h"
 #include "TAKOEngine/Rendering/ResourceManager.h"
+#include "TAKOEngine/Tool/Encode.h"
 
 /**************************************************************************//**
 	@brief		コンストラクタ
@@ -71,7 +72,7 @@ void WidgetDragBar::RenderDX12(const RenderContextDX12& rc)
 
 	m_scrollBtnDX12->Begin(rc);
 	m_scrollBtnDX12->Draw(
-		m_position.x - m_size.x * 0.025f + m_size.x * m_rate, m_position.y, 
+		m_position.x - m_size.x * 0.025f + m_size.x * m_rate, m_position.y,
 		m_size.x * 0.05f, m_size.y,
 		0,
 		1, 1, 1, 1);
@@ -147,5 +148,14 @@ void WidgetDragFloat::Render(const RenderContext& rc)
 *//***************************************************************************/
 void WidgetDragFloat::RenderDX12(const RenderContextDX12& rc)
 {
+	T_TEXT.RenderDX12(
+		FONT_ID::HGpop,
+		Encode::string_to_wstring(m_label),
+		m_position.x, m_position.y,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		0.0f,
+		FONT_ALIGN::TOP_LEFT,
+		0.5f,
+		1);
 	m_pBar->RenderDX12(rc);
 }

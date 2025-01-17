@@ -143,7 +143,7 @@ void ParticleShader::Render(const RenderContextDX12& rc, SpriteDX12* sprite)
 	rc.d3d_command_list->SetPipelineState(m_d3d_pipeline_state.Get());
 
 	// 頂点バッファ設定
-	rc.d3d_command_list->IASetVertexBuffers(0, 1, &graphics.GetParticleCompute()->d3d_vbv);
+	rc.d3d_command_list->IASetVertexBuffers(0, 1, &graphics.GetParticleCompute(ComputeShaderDX12Id::Injection)->d3d_vbv);
 	rc.d3d_command_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_POINTLIST);
 
 	// ディスクリプタ設定
@@ -151,7 +151,7 @@ void ParticleShader::Render(const RenderContextDX12& rc, SpriteDX12* sprite)
 	rc.d3d_command_list->SetGraphicsRootDescriptorTable(1, rc.particleData.cbv_descriptor->GetGpuHandle());
 
 	// 描画
-	rc.d3d_command_list->DrawInstanced(graphics.GetParticleCompute()->GetMaxParticle(), 1, 0, 0);
+	rc.d3d_command_list->DrawInstanced(graphics.GetParticleCompute(ComputeShaderDX12Id::Injection)->GetMaxParticle(), 1, 0, 0);
 }
 
 //*************************************************************

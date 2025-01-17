@@ -25,17 +25,21 @@ void PlayerCharacterPatternGender::Execute(PlayerCharacter* chara)
 		{
 			chara->LoadModel("Data/Model/Character/PlayerModels/MDL_PLAYER_BODY_ANIMATION.glb", 1.0f, ModelObject::RENDER_MODE::DX11);
 		}
+
+		PLAYER_CHARACTER_DATA.SetMalePatterns();
 	}
 	else //FEMALE
 	{
 		if (T_GRAPHICS.isDX12Active)
 		{
-			chara->LoadModel("Data/Model/Character/PlayerModels/MDL_PLAYER_BODY_ANIMATION.glb", 1.0f, ModelObject::RENDER_MODE::DX12);
+			chara->LoadModel("Data/Model/Character/PlayerModels/MDL_PLAYER_F_BODY_ANIMATION.glb", 1.0f, ModelObject::RENDER_MODE::DX12);
 		}
 		if (T_GRAPHICS.isDX11Active)
 		{
-			chara->LoadModel("Data/Model/Character/PlayerModels/MDL_PLAYER_BODY_ANIMATION.glb", 1.0f, ModelObject::RENDER_MODE::DX11);
+			chara->LoadModel("Data/Model/Character/PlayerModels/MDL_PLAYER_F_BODY_ANIMATION.glb", 1.0f, ModelObject::RENDER_MODE::DX11);
 		}
+
+		PLAYER_CHARACTER_DATA.SetFemalePatterns();
 	}
 
 	StateMachine<PlayerCharacter>* stateMachine = chara->GetStateMachine();
@@ -81,7 +85,7 @@ void PlayerCharacterPatternSword::Execute(PlayerCharacter* chara)
 
 	{
 		using namespace PlayerCharacterState::Sword;
-		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::WAITING), new MoveState(chara));
+		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::WAITING), new WaitState(chara));
 		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::IDLE), new IdleState(chara));
 		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::MOVE), new MoveState(chara));
 
@@ -95,6 +99,7 @@ void PlayerCharacterPatternSword::Execute(PlayerCharacter* chara)
 		stateMachine->RegisterSubState(static_cast<int>(PlayerCharacter::STATE::SKILL_1), ATTACK_CONTINUE, new Skill1ContinueStart(chara));
 		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::SKILL_2), new Skill2State(chara));
 	}
+	chara->SetEnergyType(PlayerCharacter::ENERGY_TYPE::STAMINA);
 }
 
 /**************************************************************************//**
@@ -122,7 +127,7 @@ void PlayerCharacterPatternRod::Execute(PlayerCharacter* chara)
 
 	{
 		using namespace PlayerCharacterState::Rod;
-		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::WAITING), new MoveState(chara));
+		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::WAITING), new WaitState(chara));
 		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::IDLE), new IdleState(chara));
 		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::MOVE), new MoveState(chara));
 
@@ -133,4 +138,6 @@ void PlayerCharacterPatternRod::Execute(PlayerCharacter* chara)
 
 		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::ATTACK_SPECIAL), new AttackSpecialState(chara));
 	}
+
+	chara->SetEnergyType(PlayerCharacter::ENERGY_TYPE::MANA);
 }
