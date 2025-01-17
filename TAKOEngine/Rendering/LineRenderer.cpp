@@ -104,7 +104,7 @@ LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
 	}
 
 	//GpuResourceUtils::LoadTexture(device, "Data/Sprites/20160517231910.png", texture.ReleaseAndGetAddressOf(), &textureDesc);
-	GpuResourceUtils::LoadTexture(device, "Data/Sprites/trail2.png", texture.ReleaseAndGetAddressOf(), &textureDesc);
+	GpuResourceUtils::LoadTexture(device, "Data/Sprites/trail.png", texture.ReleaseAndGetAddressOf(), &textureDesc);
 }
 
 // 描画開始
