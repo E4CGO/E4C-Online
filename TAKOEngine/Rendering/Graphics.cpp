@@ -856,15 +856,105 @@ const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera, floa
 
 			// ライトビュープロジェクション
 			{
-				DirectX::XMVECTOR LightDirection = DirectX::XMVector3Normalize(DirectX::XMVectorSet(light->GetDirection().x, light->GetDirection().y, light->GetDirection().z, 0));
-				DirectX::XMVECTOR Up = DirectX::XMVectorSet(0, 1, 0, 0);
-				DirectX::XMVECTOR Focus = DirectX::XMVectorZero();
+				DirectX::XMVECTOR cameraPosition = DirectX::XMVectorSet(camera->GetEye().x, camera->GetEye().y, camera->GetEye().z, 1.0f);
+				DirectX::XMVECTOR cameraUp = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera->GetUp()));
+				DirectX::XMVECTOR cameraFront = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera->GetFront()));
+				DirectX::XMVECTOR cameraRight = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera->GetRight()));
 
-				DirectX::XMVECTOR Eye = DirectX::XMVectorSubtract(Focus, DirectX::XMVectorScale(LightDirection, 50.0f));
-				DirectX::XMMATRIX View = DirectX::XMMatrixLookAtLH(Eye, Focus, Up);
+				//平行光源からカメラ位置を作成し、そこから原点の位置を見るように視線行列を生成
+				DirectX::XMVECTOR LightDirection = DirectX::XMVectorSet(light->GetDirection().x, light->GetDirection().y, light->GetDirection().z, 0);
+				LightDirection = DirectX::XMVectorScale(LightDirection, -250);
+				DirectX::XMMATRIX LightView = DirectX::XMMatrixLookAtLH(
+					LightDirection,          
+					DirectX::XMVectorZero(), 
+					DirectX::XMVectorSet(0, 1, 0, 0));
+
+				//シャドウマップに描画したい範囲の射影行列を生成
 				DirectX::XMMATRIX Projection = DirectX::XMMatrixOrthographicLH(100, 100, 0.1f, 500.0f);
-				DirectX::XMMATRIX LightViewProjection = DirectX::XMMatrixMultiply(View, Projection);
-				DirectX::XMStoreFloat4x4(&cb_scene_data->light_view_projection, LightViewProjection);
+				DirectX::XMMATRIX ViewProjection = LightView * Projection;
+
+				//エリアを内容する試錐台の８頂点を算出する
+				DirectX::XMVECTOR vertex[8];
+				{
+					//エリアの近平面の中心からの上面までの距離を求める
+					float nearY = tanf(camera->GetFovY() / 2.0f) * camera->GetNearZ();
+
+					//エリアの近平面の中心からの右面までの距離を求める
+					float nearX = nearY * camera->GetAspect();
+
+					//エリアの遠平面の中心からの上面までの距離を求める
+					float farY = tanf(camera->GetFovY() / 2.0f) * 100;
+
+					//エリアの遠平面の中心からの右面までの距離を求める
+					float farX = farY * camera->GetAspect();
+
+					//エリアの近平面の中心座標を求める
+					DirectX::XMVECTOR nearPosition = DirectX::XMVectorAdd(cameraPosition, DirectX::XMVectorScale(cameraFront, camera->GetNearZ()));
+
+					//エリアの遠平面の中心座標を求める
+					DirectX::XMVECTOR farPosition = DirectX::XMVectorAdd(cameraPosition, DirectX::XMVectorScale(cameraFront, 100));
+
+					//8頂点を求める
+					{
+						//近平面の右上
+						vertex[0] = DirectX::XMVectorAdd(nearPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, nearY), DirectX::XMVectorScale(cameraRight, nearX)));
+
+						//近平面の左上
+						vertex[1] = DirectX::XMVectorAdd(nearPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, nearY), DirectX::XMVectorScale(cameraRight, -nearX)));
+
+						//近平面の右下
+						vertex[2] = DirectX::XMVectorAdd(nearPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, -nearY), DirectX::XMVectorScale(cameraRight, nearX)));
+
+						//近平面の左下
+						vertex[3] = DirectX::XMVectorAdd(nearPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, -nearY), DirectX::XMVectorScale(cameraRight, -nearX)));
+
+
+						//遠平面の右上
+						vertex[4] = DirectX::XMVectorAdd(farPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, farY), DirectX::XMVectorScale(cameraRight, farX)));
+
+						//遠平面の左上
+						vertex[5] = DirectX::XMVectorAdd(farPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, farY), DirectX::XMVectorScale(cameraRight, -farX)));
+
+						//遠平面の右下
+						vertex[6] = DirectX::XMVectorAdd(farPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, -farY), DirectX::XMVectorScale(cameraRight, farX)));
+
+						//遠平面の左下
+						vertex[7] = DirectX::XMVectorAdd(farPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, -farY), DirectX::XMVectorScale(cameraRight, -farX)));
+					}
+				}
+				
+				//8頂点をライトビュープロジェクション空間にして、最大値、最小値を求める
+				DirectX::XMFLOAT3 vertexMin(FLT_MAX, FLT_MAX, FLT_MAX), vertexMax(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+				for (auto& it : vertex)
+				{
+					DirectX::XMFLOAT3 p;
+					DirectX::XMStoreFloat3(&p, DirectX::XMVector3TransformCoord(it, ViewProjection));
+					vertexMin.x = min(p.x, vertexMin.x);
+					vertexMin.y = min(p.y, vertexMin.y);
+					vertexMin.z = min(p.z, vertexMin.z);
+					vertexMax.x = max(p.x, vertexMax.x);
+					vertexMax.y = max(p.y, vertexMax.y);
+					vertexMax.z = max(p.z, vertexMax.z);
+				}
+
+				//クロップ行列を求める
+				float xScale = 2.0f / (vertexMax.x - vertexMin.x);
+				float yScale = 2.0f / (vertexMax.y - vertexMin.y);
+
+				// 中心座標から正しいオフセットを計算
+				float xOffset = -(vertexMin.x + vertexMax.x) * 0.25f * xScale;
+				float yOffset = -(vertexMin.y + vertexMax.y) * 0.25f * yScale;
+
+				DirectX::XMMATRIX clopMatrix = DirectX::XMMatrixSet
+				(
+					xScale, 0, 0, 0,
+					0, yScale, 0, 0,
+					0, 0, 1, 0,
+					xOffset, yOffset, 0, 1
+				);
+
+				// ライトビュープロジェクション行列
+				DirectX::XMStoreFloat4x4(&cb_scene_data->light_view_projection, ViewProjection * clopMatrix);
 			}
 			break;
 		}
