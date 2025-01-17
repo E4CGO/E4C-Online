@@ -91,6 +91,7 @@ protected:
 
 	// テキスト
 	std::unique_ptr<WidgetText> floorText;
+	std::unique_ptr<WidgetText> debugText;
 
 	// フレームバッファマネージャー
 	FrameBufferManager* m_frameBuffer;

@@ -22,6 +22,7 @@
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Props/Spawner.h"
+#include "GameObject/Props/SpawnerManager.h"
 #include "GameObject/Props/Teleporter.h"
 
 #include "Network/OnlineController.h"
@@ -148,8 +149,9 @@ void StageDungeon_E4C::Initialize()
 
 	// テキスト設定
 	floorText = std::make_unique<WidgetText>();
-	floorText->SetText(("現在の階" + std::to_string(currentFloor)).c_str());
+	floorText->SetText((std::to_string(currentFloor) + "階").c_str());
 	floorText->SetPosition({ 30.0f, 30.0f });
+	UI.Register(floorText.get());
 
 	//m_roomOrder.emplace_back(RoomType::FIRST_START);
 	//m_roomOrder.emplace_back(RoomType::FIRST_T);
@@ -168,6 +170,17 @@ void StageDungeon_E4C::Initialize()
 	//m_roomOrder.emplace_back(RoomType::TUTO_END);
 
 	GenerateDungeon();
+
+	// デバッグテキスト
+	debugText = std::make_unique<WidgetText>();
+	std::string roomOrderText = "生成配列：";
+	for (uint8_t type : m_roomOrder)
+	{
+		roomOrderText += std::to_string(type);
+	}
+	debugText->SetText(roomOrderText.c_str());
+	debugText->SetPosition({ 30.0f, 60.0f });
+	UI.Register(debugText.get());
 
 	// 部屋のモデルを配置
 	for (RoomBase* room : rootRoom->GetAll())
@@ -207,6 +220,7 @@ void StageDungeon_E4C::Finalize()
 {
 	ENEMIES.Clear();
 	MAPTILES.Clear();
+	SpawnerManager::Instance().Clear();
 	GameObjectManager::Instance().Clear();
 
 	T_GRAPHICS.GetShadowRenderer()->Finalize();
@@ -238,10 +252,12 @@ void StageDungeon_E4C::Update(float elapsedTime)
 
 	PlayerCharacterManager::Instance().Update(elapsedTime);
 	GameObjectManager::Instance().Update(elapsedTime);
+	SpawnerManager::Instance().Update(elapsedTime);
 	ENEMIES.Update(elapsedTime);
 	MAPTILES.Update(elapsedTime);
 
 	floorText->Update(elapsedTime);
+	debugText->Update(elapsedTime);
 
 	if (T_INPUT.KeyDown(VK_MENU))
 	{
@@ -313,16 +329,9 @@ void StageDungeon_E4C::Render()
 
 void StageDungeon_E4C::RenderDX12()
 {
-	T_GRAPHICS.BeginRender();
-
-	// シーン用定数バッファ更新
-	const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
-		CameraManager::Instance().GetCamera(), 0, 0);
-
-	// レンダーコンテキスト設定
 	RenderContextDX12 rc;
-	rc.d3d_command_list = m_frameBuffer->GetCommandList();
-	rc.scene_cbv_descriptor = scene_cbv_descriptor;
+
+	T_GRAPHICS.BeginRender();
 
 	// 3Dモデル描画
 	{
@@ -332,27 +341,25 @@ void StageDungeon_E4C::RenderDX12()
 
 		// シャドウマップ
 		{
-			// TODO: 影
 			T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
 			rc.shadowMap.shadow_srv_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSRV();
 			rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();
 		}
+		// シーン用定数バッファ更新
+		const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
+			CameraManager::Instance().GetCamera(), timer, 0);
 
-		// モデル描画
+		// レンダーコンテキスト設定
+		rc.d3d_command_list = m_frameBuffer->GetCommandList();
+		rc.scene_cbv_descriptor = scene_cbv_descriptor;
+
+
+		// プレイヤー
 		PlayerCharacterManager::Instance().RenderDX12(rc);
 		GameObjectManager::Instance().RenderDX12(rc);
+		SpawnerManager::Instance().RenderDX12(rc);
 		ENEMIES.RenderDX12(rc);
 		MAPTILES.RenderDX12(rc);
-
-		for (RoomBase* room : rootRoom->GetAll())
-		{
-			room->Render(rc);
-
-			DirectX::XMFLOAT3 p = { 0, 0, 0 };
-			DirectX::XMFLOAT3 s = { 5, 5, 5 };
-
-			//T_GRAPHICS.GetDebugRenderer()->DrawCube(p, s, {1.0f, 1.0f, 1.0f, 1.0f});
-		}
 
 		// レンダーターゲットへの書き込み終了待ち
 		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
@@ -365,15 +372,78 @@ void StageDungeon_E4C::RenderDX12()
 
 	// 2D描画
 	{
-		//floorText->RenderDX12(rc);
-
 		T_TEXT.BeginDX12();
 
-		floorText->RenderDX12(rc);
 		UI.RenderDX12(rc);
 
 		T_TEXT.EndDX12();
 	}
-
+#ifdef _DEBUG
+	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
+#endif
 	T_GRAPHICS.End();
+
+	//T_GRAPHICS.BeginRender();
+
+	//// シーン用定数バッファ更新
+	//const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
+	//	CameraManager::Instance().GetCamera(), 0, 0);
+
+	//// レンダーコンテキスト設定
+	//RenderContextDX12 rc;
+	//rc.d3d_command_list = m_frameBuffer->GetCommandList();
+	//rc.scene_cbv_descriptor = scene_cbv_descriptor;
+
+	//// 3Dモデル描画
+	//{
+	//	m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+	//	m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+	//	m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+
+	//	// シャドウマップ
+	//	{
+	//		// TODO: 影
+	//		T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
+	//		rc.shadowMap.shadow_srv_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSRV();
+	//		rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();
+	//	}
+
+	//	// モデル描画
+	//	PlayerCharacterManager::Instance().RenderDX12(rc);
+	//	GameObjectManager::Instance().RenderDX12(rc);
+	//	ENEMIES.RenderDX12(rc);
+	//	MAPTILES.RenderDX12(rc);
+
+	//	for (RoomBase* room : rootRoom->GetAll())
+	//	{
+	//		room->Render(rc);
+
+	//		DirectX::XMFLOAT3 p = { 0, 0, 0 };
+	//		DirectX::XMFLOAT3 s = { 5, 5, 5 };
+
+	//		//T_GRAPHICS.GetDebugRenderer()->DrawCube(p, s, {1.0f, 1.0f, 1.0f, 1.0f});
+	//	}
+
+	//	// レンダーターゲットへの書き込み終了待ち
+	//	m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+	//}
+
+	//// ポストエフェクト描画
+	//{
+	//	postprocessingRenderer->Render(m_frameBuffer);
+	//}
+
+	//// 2D描画
+	//{
+	//	//floorText->RenderDX12(rc);
+
+	//	T_TEXT.BeginDX12();
+
+	//	floorText->RenderDX12(rc);
+	//	UI.RenderDX12(rc);
+
+	//	T_TEXT.EndDX12();
+	//}
+
+	//T_GRAPHICS.End();
 }

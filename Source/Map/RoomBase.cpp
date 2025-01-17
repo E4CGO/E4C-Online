@@ -6,6 +6,7 @@
 
 #include "GameObject/GameObjectManager.h"
 #include "GameObject/Props/Spawner.h"
+#include "GameObject/Props/SpawnerManager.h"
 #include "GameObject/Props/StairToNextFloor.h"
 #include "MapTile.h"
 #include "MapTileManager.h"
@@ -704,7 +705,7 @@ void RoomBase::PlaceMapTile(bool isLeader)
 		{
 			for (const TILE_DATA& data : m_tileDatas.at(tileType))
 			{
-				Spawner* spawner = new Spawner(2, 2, -1);
+				Spawner* spawner = new Spawner(ENEMY_TYPE::BEAR_BOSS, 2, -1);
 
 				DirectX::XMFLOAT3 resultPos = data.position;
 				DirectX::XMFLOAT3 bufPos = resultPos;
@@ -738,7 +739,8 @@ void RoomBase::PlaceMapTile(bool isLeader)
 
 				spawner->SetPosition(resultPos);
 
-				GameObjectManager::Instance().Register(spawner);
+				SpawnerManager::Instance().Register(spawner);
+				//GameObjectManager::Instance().Register(spawner);
 			}
 			continue;
 		}

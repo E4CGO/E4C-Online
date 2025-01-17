@@ -156,7 +156,7 @@ bool Collision::IntersectRayVsModel(
 				materialIndex = subset.materialIndex;
 			}
 		}
-		if (materialIndex >= 0)
+		//if (materialIndex >= 0)
 		{
 			// ローカル空間からワールド空間へ変換
 			DirectX::XMVECTOR WorldPosition = DirectX::XMVector3TransformCoord(HitPosition, WorldTransform);

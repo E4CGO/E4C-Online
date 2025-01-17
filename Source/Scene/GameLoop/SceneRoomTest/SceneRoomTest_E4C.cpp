@@ -124,7 +124,11 @@ void SceneRoomTest_E4C::Update(float elapsedTime)
 	m_cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
 	m_cameraController->Update(elapsedTime);
 
+	Camera* camera = CameraManager::Instance().GetCamera();
+
 	NODES.Update(elapsedTime);
+
+	CameraManager::Instance().GetCamera()->GetFocus();
 
 	if (T_GRAPHICS.isDX12Active)
 	{
@@ -135,6 +139,54 @@ void SceneRoomTest_E4C::Update(float elapsedTime)
 		}
 
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(testModel->GetModel().get());
+	}
+
+	// RayCast
+	{
+		// マウスカーソルの座標を取得
+		DirectX::XMFLOAT3 screenPosition;
+		screenPosition.x = Input::Instance().GetMousePos().x;
+		screenPosition.y = Input::Instance().GetMousePos().y;
+
+		T_GRAPHICS.GetDeviceContext();
+		
+		// レイの始点
+		DirectX::XMFLOAT3 start;
+		screenPosition.z = 0.0f;
+		DirectX::XMStoreFloat3(&start, DirectX::XMVector3Unproject(
+			DirectX::XMLoadFloat3(&screenPosition),
+			T_GRAPHICS.GetViewPort().TopLeftX,
+			T_GRAPHICS.GetViewPort().TopLeftY,
+			T_GRAPHICS.GetViewPort().Width,
+			T_GRAPHICS.GetViewPort().Height,
+			0.0f,
+			1.0f,
+			DirectX::XMLoadFloat4x4(&camera->GetProjection()),
+			DirectX::XMLoadFloat4x4(&camera->GetView()),
+			DirectX::XMMatrixIdentity()));
+
+		// レイの終点
+		DirectX::XMFLOAT3 end;
+		screenPosition.z = 1.0f;
+		DirectX::XMStoreFloat3(&end, DirectX::XMVector3Unproject(
+			DirectX::XMLoadFloat3(&screenPosition),
+			T_GRAPHICS.GetViewPort().TopLeftX,
+			T_GRAPHICS.GetViewPort().TopLeftY,
+			T_GRAPHICS.GetViewPort().Width,
+			T_GRAPHICS.GetViewPort().Height,
+			0.0f,
+			1.0f,
+			DirectX::XMLoadFloat4x4(&camera->GetProjection()),
+			DirectX::XMLoadFloat4x4(&camera->GetView()),
+			DirectX::XMMatrixIdentity()));
+
+		// レイキャスト
+		Node* hitNode = NODES.RayCast(start, end);
+
+		if (hitNode != nullptr)
+		{
+			ChangeSelectedNode(hitNode);
+		}
 	}
 }
 
@@ -920,6 +972,21 @@ std::string NodeManager::GetUniqueName(std::string name)
 
 	// 数字をカッコで囲んで返す
 	return name + "(" + std::to_string(nextNumber) + ")";
+}
+
+Node* NodeManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3 end)
+{
+	for (Node* node : items)
+	{
+		if (node->GetModels().size() == 0) continue;
+
+		HitResultVector hit;
+		if (Collision::IntersectRayVsModel(start, end, node->GetModel().get(), hit))
+		{
+			return node;
+		}
+	}
+	return nullptr;
 }
 
 void ConnectPointNode::Render(const RenderContext& rc)
