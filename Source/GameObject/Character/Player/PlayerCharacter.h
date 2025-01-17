@@ -140,9 +140,9 @@ public:
 	void SwordTrail();
 
 	bool IsTrail() { return m_isTrail; }
-
 	void SetTrail(bool trail) { m_isTrail = trail; }
 
+	
 
 	//剣の軌跡ノード取得
 	const iModel::Node* GetSwordTrailNode();
@@ -251,7 +251,10 @@ protected:
 private:
 	float radius = 0;	// 当たり判定半径
 
+
 	uint32_t m_client_id = 0;
+
+	
 
 	uint32_t input = 0;						// キー入力
 	DirectX::XMFLOAT2 inputDirection = {};	// 移動方向
@@ -275,6 +278,9 @@ private:
 	static const int MAX_POLYGON = 12;
 	XMFLOAT3 trailPosition[2][MAX_POLYGON];
 	XMFLOAT4 trailColor{ 1.f,0.f,0.f,0.2f };
+
+	DirectX::XMFLOAT3 rootFloat3;
+	DirectX::XMFLOAT3 tipFloat3;
 	// MP消費
 	std::unordered_map<int, float> mpCost;
 
@@ -322,6 +328,6 @@ protected:
 	} m_tempData;
 
 	bool m_isTrail = false;
+	
 };
-
 #endif // __INCLUDED_PLAYER_CHARACTER_H__

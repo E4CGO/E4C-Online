@@ -852,6 +852,7 @@ endfunction()
 
 #List of HLSL shaders
 set(SHADER_NAMES
+    "GenerateMips.cso"
     "DebugDX12PS.cso"
     "DebugDX12VS.cso"
     "DebugPS.cso"

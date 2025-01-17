@@ -95,10 +95,11 @@ namespace PlayerCharacterState
 		{
 			owner->SetAnimationSpeed(1.0f);
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_COMBO_FIRST, false, 0.1f);
+
 		}
 		void AttackNormalState_1::Execute(float elapsedTime)
 		{
-			owner->SetTrail(true);
+			
 			if (owner->IsPlayer())
 			{
 				if (!owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_1)->IsEnable())
@@ -106,12 +107,15 @@ namespace PlayerCharacterState
 					if (owner->GetModel()->GetAnimationRate() > owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_1)->GetHitStartRate())
 					{
 						owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_1)->SetEnable(true);
+					
 					}
 				}
 				if (owner->GetModel()->GetAnimationRate() > owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_1)->GetHitEndRate())
 				{
 					owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_1)->SetEnable(false);
 					owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_1)->ClearHitOthers();
+				
+					
 				}
 
 				float time = owner->GetModel()->GetCurrentAnimationSeconds();
@@ -148,6 +152,15 @@ namespace PlayerCharacterState
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
 					}
 				}
+
+				if (0.05f <= time && time <= 0.115f)
+				{
+					owner->SetTrail(true);
+				}
+				else
+				{
+					owner->SetTrail(false);
+				}
 			}
 			else
 			{
@@ -164,7 +177,7 @@ namespace PlayerCharacterState
 		void AttackNormalState_2::Execute(float elapsedTime)
 		{
 			float time = owner->GetModel()->GetCurrentAnimationSeconds();
-			owner->SetTrail(true);
+			
 			if (owner->IsPlayer())
 			{
 				if (!owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_2)->IsEnable())
@@ -172,11 +185,13 @@ namespace PlayerCharacterState
 					if (owner->GetModel()->GetAnimationRate() > owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_2)->GetHitStartRate())
 					{
 						owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_2)->SetEnable(true);
+					
 					}
 				}
 				if (owner->GetModel()->GetAnimationRate() > owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_2)->GetHitEndRate())
 				{
 					owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_2)->SetEnable(false);
+					
 				}
 
 				if (0.185f <= time && time <= 0.418f)
@@ -212,6 +227,15 @@ namespace PlayerCharacterState
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
 					}
 				}
+
+				if (0.05f <= time && time <= 0.4f)
+				{
+					owner->SetTrail(true);
+				}
+				else
+				{
+					owner->SetTrail(false);
+				}
 			}
 			else
 			{
@@ -228,17 +252,19 @@ namespace PlayerCharacterState
 		void AttackNormalState_3::Execute(float elapsedTime)
 			
 		{
-			owner->SetTrail(true);
+			
 			if (!owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_3)->IsEnable())
 			{
 				if (owner->GetModel()->GetAnimationRate() > owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_3)->GetHitStartRate())
 				{
 					owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_3)->SetEnable(true);
+					
 				}
 			}
 			if (owner->GetModel()->GetAnimationRate() > owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_3)->GetHitEndRate())
 			{
 				owner->GetAttackCollider(NORMAL_ATTACK_STATE::ATTACK_3)->SetEnable(false);
+				
 			}
 
 			float time = owner->GetModel()->GetCurrentAnimationSeconds();
@@ -273,6 +299,14 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
 					}
+				}
+				if (0.05f <= time && time <= 0.7f)
+				{
+					owner->SetTrail(true);
+				}
+				else
+				{
+					owner->SetTrail(false);
 				}
 			}
 			else
@@ -342,6 +376,14 @@ namespace PlayerCharacterState
 				{
 					owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
 				}
+			}
+			if (0.65f <= time && time <= 1.5f)
+			{
+				owner->SetTrail(true);
+			}
+			else
+			{
+				owner->SetTrail(false);
 			}
 
 			if (!owner->IsPlayAnimation())

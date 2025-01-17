@@ -25,6 +25,8 @@
 #include "TAKOEngine/Tool/Mathf.h"
 #include "TAKOEngine/Rendering/LineRenderer.h"
 
+
+
 PlayerCharacter::PlayerCharacter(uint32_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]) : Character()
 {
 	scale = { 0.5f, 0.5f, 0.5f };
@@ -557,70 +559,59 @@ void PlayerCharacter::UpdateSkillTimers(float elapsedTime)
 }
 void PlayerCharacter::SwordTrail()
 {
-	const iModel::Node* swordnode1 =GetSwordTrailNode();
+	
+	const iModel::Node* swordnode1 = GetSwordTrailNode();
 	LineRenderer* sword = Graphics::Instance().GetLineRenderer();
-	if (IsTrail())
+	
+	// トレイルデータをシフト
+	for (int i = 0; i < 2; ++i)
 	{
+		for (int j = MAX_POLYGON - 1; j > 0; --j)
 		{
-			{
-				for (int i = 0; i < 2; ++i)
-				{
-					for (int j = MAX_POLYGON - 1; j > 0; --j)
-					{
-						trailPosition[i][j] = trailPosition[i][j - 1];
-					}
-				}
-			}
-			{
-				// 剣の原点から根本と先端までのオフセット値
-				DirectX::XMVECTOR RootOffset = DirectX::XMVectorSet(0, 150.f, 0, 0);
-				DirectX::XMVECTOR TipOffset = DirectX::XMVectorSet(0, -30.f, 0, 0);
-
-				DirectX::XMMATRIX W = DirectX::XMLoadFloat4x4(&swordnode1->worldTransform);
-				DirectX::XMVECTOR Root = DirectX::XMVector3Transform(RootOffset, W);
-				DirectX::XMVECTOR Tip = DirectX::XMVector3Transform(TipOffset, W);
-				DirectX::XMStoreFloat3(&trailPosition[0][0], Root);
-				DirectX::XMStoreFloat3(&trailPosition[1][0], Tip);
-			}
-
-			{
-
-				const int division = 10;
-				for (int i = 0; i < MAX_POLYGON - 3; ++i)
-				{
-					DirectX::XMVECTOR Root0 = DirectX::XMLoadFloat3(&trailPosition[0][i + 0]);
-					DirectX::XMVECTOR Root1 = DirectX::XMLoadFloat3(&trailPosition[0][i + 1]);
-					DirectX::XMVECTOR Root2 = DirectX::XMLoadFloat3(&trailPosition[0][i + 2]);
-					DirectX::XMVECTOR Root3 = DirectX::XMLoadFloat3(&trailPosition[0][i + 3]);
-
-					DirectX::XMVECTOR Tips0 = DirectX::XMLoadFloat3(&trailPosition[1][i + 0]);
-					DirectX::XMVECTOR Tips1 = DirectX::XMLoadFloat3(&trailPosition[1][i + 1]);
-					DirectX::XMVECTOR Tips2 = DirectX::XMLoadFloat3(&trailPosition[1][i + 2]);
-					DirectX::XMVECTOR Tips3 = DirectX::XMLoadFloat3(&trailPosition[1][i + 3]);
-
-					for (int j = 0; j < division; ++j)
-					{
-						float t = j / static_cast<float>(division - 1); // division - 1で割ることで、tの値が0から1になるように調整
-						float texcoordV = i / static_cast<float>(MAX_POLYGON - 3); // 軌跡全体に沿ったV座標を計算
-						DirectX::XMVECTOR Root = DirectX::XMVectorCatmullRom(Root0, Root1, Root2, Root3, t);
-						DirectX::XMVECTOR Tip = DirectX::XMVectorCatmullRom(Tips0, Tips1, Tips2, Tips3, t);
-
-						DirectX::XMFLOAT3 rootFloat3;
-						DirectX::XMFLOAT3 tipFloat3;
-						DirectX::XMStoreFloat3(&rootFloat3, Root);
-						DirectX::XMStoreFloat3(&tipFloat3, Tip);
-
-
-						sword->AddVertex(rootFloat3, {1,1,1,1},{0,texcoordV});
-						sword->AddVertex(tipFloat3, { 1,1,1,1 }, {1,texcoordV});
-
-					}
-				}
-			}
+			trailPosition[i][j] = trailPosition[i][j - 1];
 		}
 	}
-}
+	// 剣の原点から根本と先端までのオフセット値
+	DirectX::XMVECTOR RootOffset = DirectX::XMVectorSet(0, 150.f, 0, 0);
+	DirectX::XMVECTOR TipOffset = DirectX::XMVectorSet(0, -30.f, 0, 0);
+	DirectX::XMMATRIX W = DirectX::XMLoadFloat4x4(&swordnode1->worldTransform);
+	DirectX::XMVECTOR Root = DirectX::XMVector3Transform(RootOffset, W);
+	DirectX::XMVECTOR Tip = DirectX::XMVector3Transform(TipOffset, W);
+	DirectX::XMStoreFloat3(&trailPosition[0][0], Root);
+	DirectX::XMStoreFloat3(&trailPosition[1][0], Tip);
+	if (IsTrail())
+	{
+			const int division = 10;
+			for (int i = 0; i < MAX_POLYGON - 3; ++i)
+			{
+				DirectX::XMVECTOR Root0 = DirectX::XMLoadFloat3(&trailPosition[0][i + 0]);
+				DirectX::XMVECTOR Root1 = DirectX::XMLoadFloat3(&trailPosition[0][i + 1]);
+				DirectX::XMVECTOR Root2 = DirectX::XMLoadFloat3(&trailPosition[0][i + 2]);
+				DirectX::XMVECTOR Root3 = DirectX::XMLoadFloat3(&trailPosition[0][i + 3]);
 
+				DirectX::XMVECTOR Tips0 = DirectX::XMLoadFloat3(&trailPosition[1][i + 0]);
+				DirectX::XMVECTOR Tips1 = DirectX::XMLoadFloat3(&trailPosition[1][i + 1]);
+				DirectX::XMVECTOR Tips2 = DirectX::XMLoadFloat3(&trailPosition[1][i + 2]);
+				DirectX::XMVECTOR Tips3 = DirectX::XMLoadFloat3(&trailPosition[1][i + 3]);
+
+				for (int j = 0; j < division; ++j)
+				{
+					float t = j / static_cast<float>(division - 1); // division - 1で割ることで、tの値が0から1になるように調整
+					float texcoordV = i / static_cast<float>(MAX_POLYGON - 3); // 軌跡全体に沿ったV座標を計算
+					DirectX::XMVECTOR Root = DirectX::XMVectorCatmullRom(Root0, Root1, Root2, Root3, t);
+					DirectX::XMVECTOR Tip = DirectX::XMVectorCatmullRom(Tips0, Tips1, Tips2, Tips3, t);
+
+					DirectX::XMFLOAT3 rootFloat3, tipFloat3;
+					DirectX::XMStoreFloat3(&rootFloat3, Root);
+					DirectX::XMStoreFloat3(&tipFloat3, Tip);
+
+					sword->AddVertex(rootFloat3, { 1, 1, 1, 1 }, { 0, texcoordV });
+					sword->AddVertex(tipFloat3, { 1, 1, 1, 1 }, { 1, texcoordV });
+				}
+			}
+	}
+	
+}
 //剣の軌跡ノード取得
 const iModel::Node* PlayerCharacter::GetSwordTrailNode()
 {
@@ -633,7 +624,7 @@ void PlayerCharacter::Update(float elapsedTime)
 {
 	
 	
-	   SwordTrail();
+	SwordTrail();
 	
 	std::lock_guard<std::mutex> lock(m_mut);
 	{
