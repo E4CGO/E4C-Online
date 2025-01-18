@@ -1,6 +1,3 @@
-//! @file StageOpenWorld_E4C.cpp
-//! @note
-
 #include "StageOpenWorld_E4C.h"
 
 #include "TAKOEngine/GUI/UIManager.h"
@@ -29,8 +26,6 @@
 #include "Network/OnlineController.h"
 
 #include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
-
-static float timer = 0;
 
 void StageOpenWorld_E4C::Initialize()
 {
@@ -231,6 +226,8 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	PlayerCharacterManager::Instance().Update(elapsedTime);
 
 	COLLISIONS.Contacts();
+
+	sky->Update(elapsedTime);
 
 	teleporter->Update(elapsedTime);
 
