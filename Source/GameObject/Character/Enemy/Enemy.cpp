@@ -24,12 +24,6 @@ Enemy::~Enemy()
 	{
 		m_pSpawner->EnemyDestoryCallBack(this);
 	}
-
-	for (const std::pair<uint8_t, Collider*>& collider : m_pColliders)
-	{
-		COLLISIONS.Remove(collider.second);
-	}
-	m_pColliders.clear();
 }
 
 bool Enemy::MoveTo(float elapsedTime, const DirectX::XMFLOAT3& target)
@@ -101,6 +95,23 @@ void Enemy::OnDamage(int damage)
 			EnemyState::StateTransition(this, STATE::DEATH);
 		}
 	}
+
+}
+void Enemy::OnDamage(uint16_t damage)
+{
+	if (IsMine())
+	{
+		hp -= damage;
+		if (hp > 0)
+		{
+			//EnemyState::StateTransition(this, STATE::HURT);
+		}
+		else
+		{
+			EnemyState::StateTransition(this, STATE::DEATH);
+		}
+	}
+
 }
 void Enemy::OnDamage(const ENEMY_COLLISION& hit)
 {

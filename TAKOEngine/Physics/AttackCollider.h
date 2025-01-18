@@ -10,7 +10,7 @@
 class AttackSphereCollider : public SphereCollider
 {
 public:
-	AttackSphereCollider(int _power, uint16_t _objType, DirectX::XMFLOAT4X4* _transform, float _hitStartRate = 0.0f, float _hitEndRate = 1.0f)
+	AttackSphereCollider(uint16_t _power, uint16_t _objType, DirectX::XMFLOAT4X4* _transform, float _hitStartRate = 0.0f, float _hitEndRate = 1.0f)
 		: m_power(_power), SphereCollider(_objType, _transform), m_hitStartRate(_hitStartRate), m_hitEndRate(_hitEndRate) { m_enable = false; }
 	~AttackSphereCollider() = default;
 
@@ -27,7 +27,7 @@ public:
 	const float GetHitEndRate() const override { return m_hitEndRate; }
 
 protected:
-	int m_power = 0;			// 攻撃力
+	uint16_t m_power = 0;			// 攻撃力
 	std::vector<GameObject*> m_hitOthers;	// 攻撃が当たった相手を保存して複数回当たらないようにする
 	float m_currentRate = 0.0f;	// 現在のアニメーションレート
 	float m_hitStartRate = 0.0f;	// 攻撃判定が発生するタイミングのアニメーションレート(min0%)
@@ -37,7 +37,7 @@ protected:
 class AttackCapsuleCollider : public CapsuleCollider
 {
 public:
-	AttackCapsuleCollider(int _power, uint16_t _objType, DirectX::XMFLOAT4X4* _transform, float _hitStartRate = 0.0f, float _hitEndRate = 1.0f)
+	AttackCapsuleCollider(uint16_t _power, uint16_t _objType, DirectX::XMFLOAT4X4* _transform, float _hitStartRate = 0.0f, float _hitEndRate = 1.0f)
 		: m_power(_power), CapsuleCollider(_objType, _transform), m_hitStartRate(_hitStartRate), m_hitEndRate(_hitEndRate) { m_enable = false; }
 	~AttackCapsuleCollider() = default;
 
@@ -52,7 +52,7 @@ public:
 	const float GetHitEndRate() const { return m_hitEndRate; }
 
 protected:
-	int m_power = 0;			// 攻撃力
+	uint16_t m_power = 0;			// 攻撃力
 	std::vector<GameObject*> m_hitOthers;	// 攻撃が当たった相手を保存して複数回当たらないようにする
 	float m_currentRate = 0.0f;	// 現在のアニメーションレート
 	float m_hitStartRate = 0.0f;	// 攻撃判定が発生するタイミングのアニメーションレート(min0%)

@@ -8,10 +8,11 @@ namespace PlayerCharacterState
 {
 	namespace Sword
 	{
-		ATTACK_SPHERE sphereAttacks[3] = {
-		{10, PlayerCharacter::COLLIDER_ID::COL_ATTACK_1, Collider::COLLIDER_OBJ::PLAYER_ATTACK, Collider::COLLIDER_OBJ::ENEMY, 0.15f, 0.55f, {{0, 0.6f/0.005f, 0}, 0.5f}},
-		{20, PlayerCharacter::COLLIDER_ID::COL_ATTACK_2, Collider::COLLIDER_OBJ::PLAYER_ATTACK, Collider::COLLIDER_OBJ::ENEMY, 0.15f, 0.55f, {{0, 0.6f/0.005f, 0}, 0.5f}},
-		{30, PlayerCharacter::COLLIDER_ID::COL_ATTACK_3, Collider::COLLIDER_OBJ::PLAYER_ATTACK, Collider::COLLIDER_OBJ::ENEMY, 0.08f, 0.45f, {{0, 0.6f, 0}, 0.5f}}
+		ATTACK_SPHERE sphereAttacks[4] = {
+		{10, PlayerCharacter::COLLIDER_ID::COL_ATTACK_1, Collider::COLLIDER_OBJ::PLAYER_ATTACK, Collider::COLLIDER_OBJ::ENEMY, 0.15f, 0.55f, {{  0, 1.5f, 2.0f} , 0.5f}},
+		{20, PlayerCharacter::COLLIDER_ID::COL_ATTACK_2, Collider::COLLIDER_OBJ::PLAYER_ATTACK, Collider::COLLIDER_OBJ::ENEMY, 0.05f, 0.9f, {{  0, 1.5f, 2.0f} , 0.5f}},
+		{30, PlayerCharacter::COLLIDER_ID::COL_ATTACK_3, Collider::COLLIDER_OBJ::PLAYER_ATTACK, Collider::COLLIDER_OBJ::ENEMY, 0.08f, 0.45f, {{0, 0, 0} , 1.5f}},
+		{30, PlayerCharacter::COLLIDER_ID::COL_SKILL_1, Collider::COLLIDER_OBJ::PLAYER_ATTACK, Collider::COLLIDER_OBJ::ENEMY, 0.08f, 0.45f, {{0, 0, 0} , 1.5f}}
 		};
 
 		// 待機用ステート
@@ -107,8 +108,7 @@ namespace PlayerCharacterState
 			
 			if (owner->IsPlayer())
 			{
-				DirectX::XMFLOAT4X4* matrix = &owner->GetModel(0)->FindNode("JOT_C_Sword")->worldTransform;
-				Sphere attack1{ { 0, 0.6f / XMFLOAT3Length({matrix->_21, matrix->_22, matrix->_23}), 0} , 0.5f };
+				XMFLOAT4X4* matrix = owner->GetTransformAdress();
 
 				ModelObject::ATTACK_COLLIDER_DATA attackData;
 				attackData.power = sphereAttacks[0].power;
@@ -117,7 +117,7 @@ namespace PlayerCharacterState
 				attackData.hittableOBJ = sphereAttacks[0].hittableOBJ;
 				attackData.hitStartRate = sphereAttacks[0].hitStartRate;
 				attackData.hitEndRate = sphereAttacks[0].hitEndRate;
-				owner->MakeAttackCollider(attackData, attack1, matrix);
+				owner->MakeAttackCollider(attackData, sphereAttacks[0].sphere, matrix);
 			}
 		}
 		void AttackNormalState_1::Execute(float elapsedTime)
@@ -167,7 +167,10 @@ namespace PlayerCharacterState
 		}
 		void AttackNormalState_1::Exit()
 		{
-			owner->DeleteAttackCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_1);
+			if (owner->IsPlayer())
+			{
+				owner->DeleteAttackCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_1);
+			}
 		}
 		//  一般攻撃2
 		void AttackNormalState_2::Enter()
@@ -175,24 +178,27 @@ namespace PlayerCharacterState
 			owner->SetAnimationSpeed(1.0f);
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_COMBO_SECOND, false, 0.2f);
 
-		
+			if (owner->IsPlayer())
+			{
+				XMFLOAT4X4* matrix = owner->GetTransformAdress();
+				Sphere attack2{ {  0, 1.5f, 2.0f} , 0.5f };
+
+				ModelObject::ATTACK_COLLIDER_DATA attackData;
+				attackData.power = sphereAttacks[1].power;
+				attackData.idx = sphereAttacks[1].idx;
+				attackData.objType = sphereAttacks[1].objType;
+				attackData.hittableOBJ = sphereAttacks[1].hittableOBJ;
+				attackData.hitStartRate = sphereAttacks[1].hitStartRate;
+				attackData.hitEndRate = sphereAttacks[1].hitEndRate;
+				owner->MakeAttackCollider(attackData, sphereAttacks[1].sphere, matrix);
+			}
 		}
 		void AttackNormalState_2::Execute(float elapsedTime)
 		{
 			float time = owner->GetModel()->GetCurrentAnimationSeconds();
 			if (owner->IsPlayer())
 			{
-				//if (!owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_2)->IsEnable())
-				//{
-				//	if (owner->GetModel()->GetAnimationRate() > owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_2)->GetHitStartRate())
-				//	{
-				//		owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_2)->SetEnable(true);
-				//	}
-				//}
-				//if (owner->GetModel()->GetAnimationRate() > owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_2)->GetHitEndRate())
-				//{
-				//	owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_2)->SetEnable(false);
-				//}
+				owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_2)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
 
 				if (0.185f <= time && time <= 0.418f)
 				{
@@ -232,6 +238,13 @@ namespace PlayerCharacterState
 					owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_3);
 			}
 		}
+		void AttackNormalState_2::Exit()
+		{
+			if (owner->IsPlayer())
+			{
+				owner->DeleteAttackCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_2);
+			}
+		}
 		//  一般攻撃3
 		void AttackNormalState_3::Enter()
 		{
@@ -240,11 +253,7 @@ namespace PlayerCharacterState
 
 			if (owner->IsPlayer())
 			{
-				DirectX::XMFLOAT4X4* matrix = &owner->GetModel(0)->FindNode("JOT_C_Hip")->worldTransform;
-				Sphere attack3{ {0, 0, 0} , 1.5f };
-				//DirectX::XMFLOAT4X4* matrix = &owner->GetModel(0)->FindNode("JOT_C_Sword")->worldTransform;
-				//Sphere attack3{ { 0, 0.6f / XMFLOAT3Length({matrix->_21, matrix->_22, matrix->_23}), 0} , 0.5f };
-
+				XMFLOAT4X4* matrix = &owner->GetModel(0)->FindNode("JOT_C_Hip")->worldTransform;
 
 				ModelObject::ATTACK_COLLIDER_DATA attackData;
 				attackData.power = sphereAttacks[2].power;
@@ -253,16 +262,16 @@ namespace PlayerCharacterState
 				attackData.hittableOBJ = sphereAttacks[2].hittableOBJ;
 				attackData.hitStartRate = sphereAttacks[2].hitStartRate;
 				attackData.hitEndRate = sphereAttacks[2].hitEndRate;
-				owner->MakeAttackCollider(attackData, attack3, matrix);
+				owner->MakeAttackCollider(attackData, sphereAttacks[2].sphere, matrix);
 			}
 		}
 		void AttackNormalState_3::Execute(float elapsedTime)
 		{
-			owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_3)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
-
 			float time = owner->GetModel()->GetCurrentAnimationSeconds();
 			if (owner->IsPlayer())
 			{
+				owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_3)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
+
 				if (0.5f <= time && time <= 0.753f)
 				{
 					if (owner->InputAttackNormal())
@@ -305,7 +314,10 @@ namespace PlayerCharacterState
 		}
 		void AttackNormalState_3::Exit()
 		{
-			owner->DeleteAttackCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_3);
+			if (owner->IsPlayer())
+			{
+				owner->DeleteAttackCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_3);
+			}
 		}
 
 		// スキル_1ステート
@@ -320,6 +332,7 @@ namespace PlayerCharacterState
 		void Skill1State::Exit()
 		{
 			owner->SetAnimationSpeed(1.0f);
+			subState->Exit();
 		}
 
 		void Skill1StateStart::Enter()
@@ -344,9 +357,28 @@ namespace PlayerCharacterState
 			DirectX::XMFLOAT3 impulse;
 			DirectX::XMStoreFloat3(&impulse, DirectX::XMVectorScale(DirectX::XMLoadFloat3(&front), impulseSpeed));
 			owner->AddImpulse(impulse);
+
+			if (owner->IsPlayer())
+			{
+				XMFLOAT4X4* matrix = &owner->GetModel(0)->FindNode("JOT_C_Hip")->worldTransform;
+
+				ModelObject::ATTACK_COLLIDER_DATA attackData;
+				attackData.power = sphereAttacks[3].power;
+				attackData.idx = sphereAttacks[3].idx;
+				attackData.objType = sphereAttacks[3].objType;
+				attackData.hittableOBJ = sphereAttacks[3].hittableOBJ;
+				attackData.hitStartRate = sphereAttacks[3].hitStartRate;
+				attackData.hitEndRate = sphereAttacks[3].hitEndRate;
+				owner->MakeAttackCollider(attackData, sphereAttacks[3].sphere, matrix);
+			}
 		}
 		void Skill1ContinueStart::Execute(float elapsedTime)
 		{
+			if (owner->IsPlayer())
+			{
+				owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_SKILL_1)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
+			}
+
 			float time = owner->GetModel()->GetCurrentAnimationSeconds();
 			if (2.6f <= time)
 			{
@@ -366,6 +398,13 @@ namespace PlayerCharacterState
 
 			if (!owner->IsPlayAnimation())
 				owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::IDLE);
+		}
+		void Skill1ContinueStart::Exit()
+		{
+			if (owner->IsPlayer())
+			{
+				owner->DeleteAttackCollider(PlayerCharacter::COLLIDER_ID::COL_SKILL_1);
+			}
 		}
 
 		void Skill2State::Enter()

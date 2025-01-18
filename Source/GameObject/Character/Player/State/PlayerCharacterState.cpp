@@ -169,6 +169,12 @@ namespace PlayerCharacterState
 		owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_MOVE_CONTINUE, false, 0.0f);
 		owner->SetHurtCoolTime(0.2f);
 
+		// 判定消去
+		if (owner->IsPlayer())
+		{
+			owner->GetColliders()[PlayerCharacter::COLLIDER_ID::COL_BODY]->SetEnable(false);
+		}
+
 		// MP消費
 		owner->ModifyMp(-owner->GetMpCost(static_cast<int>(PlayerCharacter::STATE::DODGE)));
 	}
@@ -182,6 +188,10 @@ namespace PlayerCharacterState
 	}
 	void DodgeState::Exit()
 	{
+		if (owner->IsPlayer())
+		{
+			owner->GetColliders()[PlayerCharacter::COLLIDER_ID::COL_BODY]->SetEnable(true);
+		}
 	}
 
 	// 怪我

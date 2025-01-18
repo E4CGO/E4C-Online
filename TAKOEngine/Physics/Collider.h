@@ -175,6 +175,9 @@ public:
 	bool IsEnable() const { return m_enable; }
 	void SetEnable(bool e) { m_enable = e; }
 
+	uint16_t GetArmor() const { return m_armor; }
+	void SetArmor(uint16_t armor) { m_armor = armor; }
+
 	virtual void OnCollision(Collider* other) { if (collisionFanction) collisionFanction(this, other); }
 	void SetCollisionFunction(std::function<void(Collider*, Collider*)> f) { collisionFanction = f; }
 
@@ -188,7 +191,7 @@ protected:
 	//float m_hitStartRate = 0.0f;	// 攻撃判定が発生するタイミングのアニメーションレート(min0%)
 	//float m_hitEndRate = 1.0f;	// 攻撃判定が消滅するタイミングのアニメーションレート(max100%)
 	bool m_enable = true;
-	
+	uint16_t m_armor = 0;
 
 	DirectX::XMFLOAT4X4* m_pTransform = nullptr;			// ワールド行列
 	DirectX::XMFLOAT3 m_position = { 0.0f, 0.0f, 0.0f };	// ワールド位置

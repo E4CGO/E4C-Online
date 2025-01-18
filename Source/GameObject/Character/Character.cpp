@@ -370,17 +370,17 @@ void Character::UpdateHorizontalMove(float elapsedTime)
 *//***************************************************************************/
 void Character::PositionAdjustment()
 {
-	//if (m_pMoveCollider)
-	//{
-	//	if (XMFLOAT3LengthSq(velocity) > 0.0f)
-	//	{
-	//		if (m_pMoveCollider->CollisionVsMap())
-	//		{
-	//			position = m_pMoveCollider->GetPosition();
-	//			position.y -= radius;
-	//		}
-	//	}
-	//}
+	if (m_pMoveCollider)
+	{
+		if (XMFLOAT3LengthSq(velocity) > 0.0f)
+		{
+			if (m_pMoveCollider->CollisionVsMap())
+			{
+				position = m_pMoveCollider->GetPosition();
+				position.y -= radius;
+			}
+		}
+	}
 }
 
 void Character::ModifyHp(int hp)

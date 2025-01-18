@@ -50,38 +50,6 @@ PlayerCharacter::PlayerCharacter(uint32_t id, const char* name, const uint8_t ap
 	capsule.length = height - capsule.radius * 2;
 	SetCollider(COLLIDER_ID::COL_BODY, capsule, Collider::COLLIDER_OBJ::PLAYER, &transform);
 
-	//// 攻撃判定
-	//Sphere attackSphere{};
-	//attackSphere.radius = 0.6f;
-	//attackSphere.position = { 0, 0.5f / scale.y, 0.8f / scale.z };
-	//SetCollider(COLLIDER_ID::COL_ATTACK_1, attackSphere, Collider::COLLIDER_OBJ::PLAYER_ATTACK, &transform);
-	//m_pColliders[COLLIDER_ID::COL_ATTACK_1]->SetHittableOBJ(Collider::ENEMY);
-	//m_pColliders[COLLIDER_ID::COL_ATTACK_1]->SetHitDamage(10);
-	//m_pColliders[COLLIDER_ID::COL_ATTACK_1]->SetHitStartRate(0.25f);
-	//m_pColliders[COLLIDER_ID::COL_ATTACK_1]->SetHitEndRate(0.7f);
-	//m_pColliders[COLLIDER_ID::COL_ATTACK_1]->SetEnable(false);
-	//m_pColliders[COLLIDER_ID::COL_ATTACK_1]->SetCollisionFunction([&](Collider* attackCol, Collider* enemyCol) { AttackEnemy(attackCol, enemyCol); });
-
-	//attackSphere.radius = 0.8f;
-	//attackSphere.position = { 0, 0.5f / scale.y, 0.8f / scale.z };
-	//SetCollider(COLLIDER_ID::COL_ATTACK_2, attackSphere, Collider::COLLIDER_OBJ::PLAYER_ATTACK, &transform);
-	//m_pColliders[COLLIDER_ID::COL_ATTACK_2]->SetHittableOBJ(Collider::ENEMY);
-	//m_pColliders[COLLIDER_ID::COL_ATTACK_2]->SetHitDamage(15);
-	//m_pColliders[COLLIDER_ID::COL_ATTACK_2]->SetHitStartRate(0.25f);
-	//m_pColliders[COLLIDER_ID::COL_ATTACK_2]->SetHitEndRate(0.7f);
-	//m_pColliders[COLLIDER_ID::COL_ATTACK_2]->SetEnable(false);
-	//m_pColliders[COLLIDER_ID::COL_ATTACK_2]->SetCollisionFunction([&](Collider* attackCol, Collider* enemyCol) { AttackEnemy(attackCol, enemyCol); });
-
-	//attackSphere.radius = 1.2f;
-	//attackSphere.position = { 0, 0.5f / scale.y, 0 };
-	//SetCollider(COLLIDER_ID::COL_ATTACK_3, attackSphere, Collider::COLLIDER_OBJ::PLAYER_ATTACK, &transform);
-	//m_pColliders[COLLIDER_ID::COL_ATTACK_3]->SetHittableOBJ(Collider::ENEMY);
-	//m_pColliders[COLLIDER_ID::COL_ATTACK_3]->SetHitDamage(20);
-	//m_pColliders[COLLIDER_ID::COL_ATTACK_3]->SetHitStartRate(0.25f);
-	//m_pColliders[COLLIDER_ID::COL_ATTACK_3]->SetHitEndRate(0.7f);
-	//m_pColliders[COLLIDER_ID::COL_ATTACK_3]->SetEnable(false);
-	//m_pColliders[COLLIDER_ID::COL_ATTACK_3]->SetCollisionFunction([&](Collider* attackCol, Collider* enemyCol) { AttackEnemy(attackCol, enemyCol); });
-
 	m_client_id = id;
 	this->m_name = name;
 
@@ -108,12 +76,6 @@ PlayerCharacter::PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataI
 	// 衝突判定
 	SetMoveCollider({ { 0, radius, 0 }, radius }, Collider::COLLIDER_OBJ::PLAYER);
 	m_pColliders.clear();
-	//Capsule capsule{};
-	//capsule.radius = radius;
-	//capsule.position = { 0, capsule.radius / scale.y, 0 };
-	//capsule.direction = { 0.0f, 1.0f, 0.0f };
-	//capsule.length = height - capsule.radius * 2;
-	//SetCollider(COLLIDER_ID::COL_BODY, capsule, Collider::COLLIDER_OBJ::PLAYER, &transform);
 
 	this->m_name = dataInfo.name;
 	LoadAppearance(dataInfo.pattern);
@@ -142,12 +104,6 @@ void PlayerCharacter::LoadAppearance(const uint8_t appearance[PlayerCharacterDat
 PlayerCharacter::~PlayerCharacter()
 {
 	delete stateMachine;
-
-	for (const std::pair<uint8_t, Collider*>& collider : m_pColliders)
-	{
-		COLLISIONS.Remove(collider.second);
-	}
-	m_pColliders.clear();
 }
 
 void PlayerCharacter::RegisterCommonState()
@@ -603,48 +559,10 @@ void PlayerCharacter::Render(const RenderContext& rc)
 	if (dot < 0.0f) return;
 
 #ifdef _DEBUG
+	m_pColliders[COLLIDER_ID::COL_BODY]->DrawDebugPrimitive({ 0, 1, 0, 1 });
 	m_pMoveCollider->DrawDebugPrimitive({ 1, 1, 1, 1 });
-	if (IsPlayer() && !m_pColliders.empty())
+	if (IsPlayer())
 	{
-		m_pColliders[COLLIDER_ID::COL_BODY]->DrawDebugPrimitive({ 0, 1, 0, 1 });
-		//ImVec2 pos = ImGui::GetMainViewport()->Pos;
-		//ImGui::SetNextWindowPos(ImVec2(pos.x + 10, pos.y + 10), ImGuiCond_FirstUseEver);
-		//ImGui::SetNextWindowSize(ImVec2(300, 450), ImGuiCond_FirstUseEver);
-
-		//if (ImGui::Begin("AttackCollider", nullptr, ImGuiWindowFlags_None))
-		//{
-		//	for (const std::pair<uint8_t, Collider*>& attackCollider : m_pColliders)
-		//	{
-		//		if (attackCollider.first == COLLIDER_ID::COL_BODY) continue;
-
-		//		std::string name = "Attack" + std::to_string(attackCollider.first + 1);
-		//		if (ImGui::TreeNode(name.c_str()))
-		//		{
-		//			float radius = attackCollider.second->GetSphere().radius;
-		//			XMFLOAT3 offset = attackCollider.second->GetSphere().position * scale;
-		//			//float hitStartRate = attackCollider.second->GetHitStartRate() * 100.0f;	// %表示に
-		//			//float hitEndRate = attackCollider.second->GetHitEndRate() * 100.0f;		// %表示に
-
-		//			ImGui::InputFloat("radius", &radius);
-		//			ImGui::InputFloat3("offset", &offset.x);
-		//			//ImGui::InputFloat("hitStartRate(%)", &hitStartRate);
-		//			//if (hitStartRate < 0.0f)	hitStartRate = 0.0f;
-		//			//if (hitStartRate > hitEndRate)	hitStartRate = hitEndRate;
-		//			//ImGui::InputFloat("hitEndRate(%)", &hitEndRate);
-		//			//if (hitEndRate < hitStartRate)	hitEndRate = hitStartRate;
-		//			//if (hitEndRate > 100.0f)	hitEndRate = 100.0f;
-
-		//			Sphere sphere(offset / scale, radius);
-		//			attackCollider.second->SetParam(sphere);
-		//			//attackCollider.second->SetHitStartRate(hitStartRate * 0.01f);
-		//			//attackCollider.second->SetHitEndRate(hitEndRate * 0.01f);
-
-		//			ImGui::TreePop();
-		//		}
-		//	}
-		//}
-		//ImGui::End();
-
 		for (const std::pair<uint8_t, Collider*>& attackCollider : m_pColliders)
 		{
 			if (attackCollider.first == COLLIDER_ID::COL_BODY) continue;
@@ -671,6 +589,7 @@ void PlayerCharacter::Render(const RenderContext& rc)
 #endif // _DEBUG
 }
 
+#include "Source/GameObject/Character/Player/State/PlayerCharacterSwordState.h"
 void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
 {
 	Character::RenderDX12(rc);
@@ -693,34 +612,53 @@ void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
 
 		if (ImGui::Begin("AttackCollider", nullptr, ImGuiWindowFlags_None))
 		{
-			for (const std::pair<uint8_t, Collider*>& attackCollider : m_pColliders)
+			for (int i = 0; i < 3; i++)
 			{
-				if (attackCollider.first == COLLIDER_ID::COL_BODY) continue;
-
-				std::string name = "Attack" + std::to_string(attackCollider.first + 1);
+				std::string name = "Attack" + std::to_string(i + 1);
 				if (ImGui::TreeNode(name.c_str()))
 				{
-					float radius = attackCollider.second->GetSphere().radius;
-					XMFLOAT3 offset = attackCollider.second->GetSphere().position * scale;
-					//float hitStartRate = attackCollider.second->GetHitStartRate() * 100.0f;	// %表示に
-					//float hitEndRate = attackCollider.second->GetHitEndRate() * 100.0f;		// %表示に
+					float radius = PlayerCharacterState::Sword::sphereAttacks[i].sphere.radius;
+					XMFLOAT3 offset = PlayerCharacterState::Sword::sphereAttacks[i].sphere.position;
+					float hitStartRate = PlayerCharacterState::Sword::sphereAttacks[i].hitStartRate * 100.0f;	// %表示に
+					float hitEndRate = PlayerCharacterState::Sword::sphereAttacks[i].hitEndRate * 100.0f;		// %表示に
 
 					ImGui::InputFloat("radius", &radius);
 					ImGui::InputFloat3("offset", &offset.x);
-					//ImGui::InputFloat("hitStartRate(%)", &hitStartRate);
-					//if (hitStartRate < 0.0f)	hitStartRate = 0.0f;
-					//if (hitStartRate > hitEndRate)	hitStartRate = hitEndRate;
-					//ImGui::InputFloat("hitEndRate(%)", &hitEndRate);
-					//if (hitEndRate < hitStartRate)	hitEndRate = hitStartRate;
-					//if (hitEndRate > 100.0f)	hitEndRate = 100.0f;
+					ImGui::InputFloat("hitStartRate(%)", &hitStartRate);
+					if (hitStartRate < 0.0f)	hitStartRate = 0.0f;
+					if (hitStartRate > hitEndRate)	hitStartRate = hitEndRate;
+					ImGui::InputFloat("hitEndRate(%)", &hitEndRate);
+					if (hitEndRate < hitStartRate)	hitEndRate = hitStartRate;
+					if (hitEndRate > 100.0f)	hitEndRate = 100.0f;
 
-					Sphere sphere(offset / scale, radius);
-					attackCollider.second->SetParam(sphere);
-					//attackCollider.second->SetHitStartRate(hitStartRate * 0.01f);
-					//attackCollider.second->SetHitEndRate(hitEndRate * 0.01f);
-
+					PlayerCharacterState::Sword::sphereAttacks[i].sphere.radius = radius;
+					PlayerCharacterState::Sword::sphereAttacks[i].sphere.position = offset;
+					PlayerCharacterState::Sword::sphereAttacks[i].hitStartRate = hitStartRate * 0.01f;
+					PlayerCharacterState::Sword::sphereAttacks[i].hitEndRate = hitEndRate * 0.01f;
 					ImGui::TreePop();
 				}
+			}
+			if (ImGui::TreeNode("SkillAttack1"))
+			{
+				float radius = PlayerCharacterState::Sword::sphereAttacks[3].sphere.radius;
+				XMFLOAT3 offset = PlayerCharacterState::Sword::sphereAttacks[3].sphere.position;
+				float hitStartRate = PlayerCharacterState::Sword::sphereAttacks[3].hitStartRate * 100.0f;	// %表示に
+				float hitEndRate = PlayerCharacterState::Sword::sphereAttacks[3].hitEndRate * 100.0f;		// %表示に
+
+				ImGui::InputFloat("radius", &radius);
+				ImGui::InputFloat3("offset", &offset.x);
+				ImGui::InputFloat("hitStartRate(%)", &hitStartRate);
+				if (hitStartRate < 0.0f)	hitStartRate = 0.0f;
+				if (hitStartRate > hitEndRate)	hitStartRate = hitEndRate;
+				ImGui::InputFloat("hitEndRate(%)", &hitEndRate);
+				if (hitEndRate < hitStartRate)	hitEndRate = hitStartRate;
+				if (hitEndRate > 100.0f)	hitEndRate = 100.0f;
+
+				PlayerCharacterState::Sword::sphereAttacks[3].sphere.radius = radius;
+				PlayerCharacterState::Sword::sphereAttacks[3].sphere.position = offset;
+				PlayerCharacterState::Sword::sphereAttacks[3].hitStartRate = hitStartRate * 0.01f;
+				PlayerCharacterState::Sword::sphereAttacks[3].hitEndRate = hitEndRate * 0.01f;
+				ImGui::TreePop();
 			}
 		}
 		ImGui::End();
@@ -783,6 +721,8 @@ void PlayerCharacter::OnDamage(const HitResult& hit, int damage)
 }
 
 bool PlayerCharacter::InputMove(float elapsedTime) {
+	
+
 	// 移動処理
 	Move(inputDirection.x, inputDirection.y, this->moveSpeed);
 	// 旋回処理

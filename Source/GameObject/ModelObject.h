@@ -46,7 +46,7 @@ public:
 	ModelObject(void) {};
 	// コンストラクタ（引数付き）
 	ModelObject(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::DX11, ModelObject::MODEL_TYPE modelType = ModelObject::MODEL_TYPE::LHS_TOON);
-	virtual ~ModelObject() = default;
+	virtual ~ModelObject();
 
 	// モデルを読み取り
 	void LoadModel(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE modelType = ModelObject::MODEL_TYPE::LHS_TOON);

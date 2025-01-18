@@ -40,7 +40,7 @@ class Enemy : public Character
 {
 public:
 	Enemy(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX11);
-	~Enemy();
+	virtual ~Enemy();
 
 public:
 	enum STATE : uint8_t
@@ -73,6 +73,7 @@ public:
 	void SetSpawnPosition(const DirectX::XMFLOAT3& position) { this->m_SpawnPosition = position; }
 
 	virtual void OnDamage(int damage) override;
+	virtual void OnDamage(uint16_t damage) override;
 	virtual void OnDamage(const ENEMY_COLLISION& hit);
 	virtual void OnDamage(const ATTACK_DATA& hit);
 	virtual void OnDeath();
