@@ -524,6 +524,54 @@ void ModelResource::BuildModel(const char* dirname, const char* filename)
 			}
 		}
 
+		// エミッシブマップ
+		{
+			char filename[256];
+			::_makepath_s(filename, 256, nullptr, dirname, material.emissiveTextureFileName.c_str(), nullptr);
+
+			// マルチバイト文字からワイド文字へ変換
+			wchar_t wfilename[256];
+			::MultiByteToWideChar(CP_ACP, 0, filename, -1, wfilename, 256);
+
+			// テクスチャ読み込み
+			if (material.emissiveTextureFileName.empty())
+			{
+				hr = graphics.CreateDummyTexture(material.d3d_emissive_srv_resource.GetAddressOf(), 0x00);
+				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+			}
+			else
+			{
+				hr = graphics.LoadTexture(filename, material.d3d_emissive_srv_resource.GetAddressOf());
+				if (FAILED(hr))
+				{
+					// 読み込み失敗したらダミーテクスチャを作る
+					LOG("load failed : %s\n", filename);
+				}
+			}
+
+			// シェーダーリソースビューの生成
+			{
+				D3D12_RESOURCE_DESC d3d_resource_desc = material.d3d_emissive_srv_resource->GetDesc();
+
+				// シェーダーリソースビューの設定
+				D3D12_SHADER_RESOURCE_VIEW_DESC d3d_srv_desc = {};
+				d3d_srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+				d3d_srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+				d3d_srv_desc.Format = d3d_resource_desc.Format;
+				d3d_srv_desc.Texture2D.MipLevels = d3d_resource_desc.MipLevels;
+				d3d_srv_desc.Texture2D.MostDetailedMip = 0;
+
+				// ディスクリプタ取得
+				material.srv_emissive_descriptor = graphics.GetShaderResourceDescriptorHeap()->PopDescriptor();
+
+				// シェーダリソースビューを生成.
+				d3d_device->CreateShaderResourceView(
+					material.d3d_emissive_srv_resource.Get(),
+					&d3d_srv_desc,
+					material.srv_emissive_descriptor->GetCpuHandle());
+			}
+		}
+
 		// 定数バッファの生成
 		{
 			// ヒーププロパティの設定

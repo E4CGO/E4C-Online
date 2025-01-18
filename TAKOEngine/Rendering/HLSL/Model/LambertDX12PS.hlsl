@@ -1,7 +1,8 @@
 #include "LambertDX12.hlsli"
 
-Texture2D texture0 : register(t0);
-Texture2D shadowMap : register(t1);
+Texture2D texture0    : register(t0);
+Texture2D emissionMap : register(t1);
+Texture2D shadowMap   : register(t2);
 
 SamplerState sampler0 : register(s0);
 SamplerState shadow_sampler : register(s1);
@@ -9,6 +10,7 @@ SamplerState shadow_sampler : register(s1);
 float4 main(VS_OUT pin) : SV_TARGET
 {
     float4 diffuseColor = texture0.Sample(sampler0, pin.texcoord) * pin.color;
+    float4 emissionColor = emissionMap.Sample(sampler0, pin.texcoord);
     
     float3 N = normalize(pin.normal);
     float3 L = normalize(directionalLightData.direction.xyz);
@@ -103,6 +105,9 @@ float4 main(VS_OUT pin) : SV_TARGET
     float4 color = diffuseColor;
     color.rgb *= ambient + (directionalDiffuse + pointDiffuse + spotDiffuse);
     color.rgb += directionalSpecular + pointSpecular + spotSpecular;
+    
+    // エミッションを最終色に加算
+    color.rgb += emissionColor.rgb;
     
     return color;
 }
