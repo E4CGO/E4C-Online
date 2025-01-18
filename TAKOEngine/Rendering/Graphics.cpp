@@ -1306,12 +1306,12 @@ HRESULT Graphics::CreateTexture(const BYTE* pixels, UINT width, UINT height, DXG
 // @param[in] d3d_resource    ID3D12Resource**
 // @return    HRESULT
 //******************************************************************
-HRESULT Graphics::CreateDummyTexture(ID3D12Resource** d3d_resource)
+HRESULT Graphics::CreateDummyTexture(ID3D12Resource** d3d_resource, int color)
 {
 	const UINT width = 8;
 	const UINT height = 8;
 	UINT pixels[width * height];
-	::memset(pixels, 0xFF, sizeof(pixels));
+	::memset(pixels, color, sizeof(pixels));
 
 	// ヒーププロパティの設定
 	D3D12_HEAP_PROPERTIES d3d_heap_props = {};

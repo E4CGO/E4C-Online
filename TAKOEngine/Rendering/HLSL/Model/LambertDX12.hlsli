@@ -54,6 +54,7 @@ cbuffer CbMaterial : register(b2)
                   DescriptorTable(CBV(b1), visibility=SHADER_VISIBILITY_VERTEX), \
                   DescriptorTable(CBV(b2), visibility=SHADER_VISIBILITY_ALL), \
                   DescriptorTable(SRV(t0), visibility=SHADER_VISIBILITY_PIXEL), \
-                  DescriptorTable(Sampler(s0), visibility=SHADER_VISIBILITY_PIXEL), \
                   DescriptorTable(SRV(t1), visibility=SHADER_VISIBILITY_PIXEL), \
+                  DescriptorTable(Sampler(s0), visibility=SHADER_VISIBILITY_PIXEL), \
+                  DescriptorTable(SRV(t2), visibility=SHADER_VISIBILITY_PIXEL), \
                   DescriptorTable(Sampler(s1), visibility=SHADER_VISIBILITY_PIXEL)"
