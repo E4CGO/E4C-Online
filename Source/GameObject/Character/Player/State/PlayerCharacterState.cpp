@@ -197,7 +197,7 @@ namespace PlayerCharacterState
 	// 怪我
 	void HurtState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::ANIM_HURT, false, 0.1f);
+		owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_HURT, false, 0.1f);
 	}
 	void HurtState::Execute(float elapsedTime)
 	{
@@ -212,7 +212,7 @@ namespace PlayerCharacterState
 	// 死亡
 	void DeathState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::ANIM_DEATH, false, 0.1f);
+		owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_DEATH, false, 0.1f);
 	}
 	void DeathState::Execute(float elapsedTime)
 	{

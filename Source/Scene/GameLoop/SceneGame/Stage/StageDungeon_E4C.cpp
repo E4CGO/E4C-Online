@@ -153,22 +153,6 @@ void StageDungeon_E4C::Initialize()
 	floorText->SetPosition({ 30.0f, 30.0f });
 	UI.Register(floorText);
 
-	//m_roomOrder.emplace_back(RoomType::FIRST_START);
-	//m_roomOrder.emplace_back(RoomType::FIRST_T);
-	//m_roomOrder.emplace_back(RoomType::FIRST_T);
-	//m_roomOrder.emplace_back(RoomType::FIRST_SPAWNER);
-	//m_roomOrder.emplace_back(RoomType::DEAD_END);
-	//m_roomOrder.emplace_back(RoomType::FIRST_SPAWNER);
-	//m_roomOrder.emplace_back(RoomType::DEAD_END);
-	//m_roomOrder.emplace_back(RoomType::FIRST_SPAWNER);
-	//m_roomOrder.emplace_back(RoomType::DEAD_END);
-
-	//m_roomOrder.emplace_back(RoomType::TUTO_START);
-	//m_roomOrder.emplace_back(RoomType::TUTO_NOTHINGROOM);
-	//m_roomOrder.emplace_back(RoomType::TUTO_SPAWNERROOM);
-	//m_roomOrder.emplace_back(RoomType::TUTO_NOTHINGROOM);
-	//m_roomOrder.emplace_back(RoomType::TUTO_END);
-
 	GenerateDungeon();
 
 	// デバッグテキスト
@@ -261,8 +245,6 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	ENEMIES.Update(elapsedTime);
 	MAPTILES.Update(elapsedTime);
 	UI.Update(elapsedTime);
-
-	floorText->Update(elapsedTime);
 
 	if (T_INPUT.KeyDown(VK_MENU))
 	{
@@ -358,7 +340,6 @@ void StageDungeon_E4C::RenderDX12()
 		rc.d3d_command_list = m_frameBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
-
 		// プレイヤー
 		PlayerCharacterManager::Instance().RenderDX12(rc);
 		GameObjectManager::Instance().RenderDX12(rc);
@@ -377,11 +358,8 @@ void StageDungeon_E4C::RenderDX12()
 
 	// 2D描画
 	{
-		//floorText->RenderDX12(rc);
-
 		T_TEXT.BeginDX12();
 
-		floorText->RenderDX12(rc);
 		UI.RenderDX12(rc);
 
 		T_TEXT.EndDX12();
@@ -390,6 +368,7 @@ void StageDungeon_E4C::RenderDX12()
 	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
 
 	T_GRAPHICS.End();
+}
 
 void StageDungeon_E4C::DrawSceneGUI()
 {

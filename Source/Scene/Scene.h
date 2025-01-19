@@ -11,6 +11,8 @@
 #include "TAKOEngine/Rendering/PostprocessingRenderer.h"
 #include "TAKOEngine/Rendering/ShadowMapRender.h"
 
+#include "TAKOEngine/Rendering/Plane.h"
+
 class Scene
 {
 public:
@@ -98,4 +100,11 @@ private:
 private:
 	Scene* nextScene = nullptr;
 	std::thread* thread = nullptr;
+
+	FrameBufferManager* m_frameBuffer = nullptr;
+	std::unique_ptr<PostprocessingRendererDX12>	postprocessingRenderer = std::make_unique<PostprocessingRendererDX12>();
+
+	float m_timer = 0;
+	std::unique_ptr<PlaneDX12> m_loadingPlane;
+	Camera* mainCamera;
 };

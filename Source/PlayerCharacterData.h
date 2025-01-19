@@ -48,6 +48,24 @@ public:
 		NUM						// カウント
 	};
 
+	enum WEAPON_PATTERN_MAIN : uint8_t
+	{
+		SWORD_WEAK = 0,
+		ROD_WEAK,
+		SWORD_NORMAL,
+		ROD_NORMAL,
+		SWORD_STRONG,
+		ROD_STRONG,
+	};
+
+	enum WEAPON_PATTERN_OFFHAND : uint8_t
+	{
+		NO_SHIELD = 0,
+		SHIELD_WEAK,
+		SHIELD_NORMAL,
+		SHIELD_STRONG,
+	};
+
 	// キャラクター情報
 	struct CharacterInfo
 	{

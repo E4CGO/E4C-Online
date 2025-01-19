@@ -324,7 +324,7 @@ PlaneShaderDX12::PlaneShaderDX12(ID3D12Device* device, const char* vertexShaderN
 		d3d_graphics_pipeline_state_desc.DepthStencilState = renderState->GetDepthState(DepthState::TestAndWrite);
 
 		// ラスタライザーステート
-		d3d_graphics_pipeline_state_desc.RasterizerState = renderState->GetRasterizer(RasterizerState::SolidCullBack);
+		d3d_graphics_pipeline_state_desc.RasterizerState = renderState->GetRasterizer(RasterizerState::SolidCullNone);
 
 		// プリミティブトポロジー
 		d3d_graphics_pipeline_state_desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;

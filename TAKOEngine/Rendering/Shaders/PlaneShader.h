@@ -157,6 +157,13 @@ public:
 	virtual ~PortalSquareShaderDX12() override = default;
 };
 
+class LoadingShaderDX12 : public PlaneShaderDX12
+{
+public:
+	LoadingShaderDX12(ID3D12Device* device) : PlaneShaderDX12(device, "Data/Shader/PlaneDX12VS.cso", "Data/Shader/LoadingDX12PS.cso") {}
+	virtual ~LoadingShaderDX12() override = default;
+};
+
 class BillBoardShaderDX12 : public ModelShaderDX12
 {
 public:
