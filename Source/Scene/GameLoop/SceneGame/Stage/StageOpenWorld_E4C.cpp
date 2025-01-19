@@ -1,3 +1,6 @@
+//! @file StageOpenWorld_E4C.cpp
+//! @note 
+
 #include "StageOpenWorld_E4C.h"
 
 #include "TAKOEngine/GUI/UIManager.h"
@@ -26,6 +29,8 @@
 #include "Network/OnlineController.h"
 
 #include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
+
+static float timer = 0;
 
 void StageOpenWorld_E4C::Initialize()
 {
@@ -244,7 +249,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
 	}
 
-	timer += elapsedTime;
 	timerTick = elapsedTime;
 }
 
@@ -311,6 +315,7 @@ void StageOpenWorld_E4C::RenderDX12()
 		// レンダーコンテキスト設定
 		rc.d3d_command_list = m_frameBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
+
 
 		// プレイヤー
 		PlayerCharacterManager::Instance().RenderDX12(rc);

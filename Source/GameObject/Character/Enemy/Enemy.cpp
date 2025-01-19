@@ -1,4 +1,4 @@
-﻿#include "TAKOEngine/Tool/Mathf.h"
+#include "TAKOEngine/Tool/Mathf.h"
 #include "TAKOEngine/Physics/CollisionManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Character/Enemy/Enemy.h"

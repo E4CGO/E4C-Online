@@ -1,4 +1,4 @@
-﻿//! @file StageDungeon_E4C.h
+//! @file StageDungeon_E4C.h
 //! @note
 
 #ifndef __INCLUDED_STAGE_DUNGEON_E4C_H__

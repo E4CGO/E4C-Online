@@ -1,4 +1,4 @@
-﻿//! @file DungeonData.h
+//! @file DungeonData.h
 //! @note
 
 //#pragma once
@@ -26,6 +26,7 @@ namespace ns_RoomData
 		FIRST_START,	// 最初のフロア：最初の部屋
 		FIRST_I,		// 最初のフロア：Ｉ字の部屋
 		FIRST_T,		// 最初のフロア：Ｔ字の部屋
+		FIRST_FOUNTAIN,	// 最初のフロア：噴水の部屋
 		FIRST_SPAWNER,	// 最初のフロア：スポナーの部屋
 		FIRST_END,		// 最初のフロア：最後の部屋
 		FIRST_BOSS,		// 最初のフロア：ボス部屋

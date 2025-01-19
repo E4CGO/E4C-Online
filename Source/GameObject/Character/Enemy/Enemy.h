@@ -1,4 +1,4 @@
-﻿//! @file Enemy.h
+//! @file Enemy.h
 //! @note
 
 #ifndef __INCLUDED_ENEMY_H__

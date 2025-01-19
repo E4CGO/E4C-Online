@@ -1,4 +1,4 @@
-﻿//! @file BearBoss.cpp
+//! @file BearBoss.cpp
 //! @note 
 
 #include "BearBoss.h"

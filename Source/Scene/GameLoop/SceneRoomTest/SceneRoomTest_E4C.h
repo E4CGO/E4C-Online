@@ -64,6 +64,8 @@ class NodeManager : public ObjectManager<Node>, public Singleton<NodeManager>
 public:
 	// 正規表現を用いて重複しない名前を探す
 	std::string GetUniqueName(std::string name);
+	// レイキャスト
+	Node* RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3 end);
 };
 #define NODES NodeManager::Instance()
 
