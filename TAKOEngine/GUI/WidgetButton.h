@@ -1,10 +1,10 @@
 ﻿//! @file WidgetButton.h
 //! @note 
 
-#ifndef __INCLUDE_WIDGET_BUTTON__
-#define __INCLUDE_WIDGET_BUTTON__
+#ifndef __INCLUDE_WIDGET_BUTTON_H__
+#define __INCLUDE_WIDGET_BUTTON_H__
 
-#include "TAKOEngine/GUI/Widget.h"
+#include "Widget.h"
 
 #include <functional>
 
@@ -58,4 +58,4 @@ protected:
 	// 推し続けイベントラムダ
 	std::function<void(WidgetButton*)> pressFunction = nullptr;
 };
-#endif // !__INCLUDE_WIDGET_BUTTON__
+#endif // !__INCLUDE_WIDGET_BUTTON_H__

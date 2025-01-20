@@ -331,8 +331,6 @@ source_group("Source\\Scene\\GameLoop\\SceneGame\\Stage" FILES ${Source__Scene__
 set(Source__UI__Widget
     "Source/UI/Widget/WidgetBossHp.cpp"
     "Source/UI/Widget/WidgetBossHp.h"
-    "Source/UI/Widget/WidgetButton.cpp"
-    "Source/UI/Widget/WidgetButton.h"
     "Source/UI/Widget/WidgetButtonImage.cpp"
     "Source/UI/Widget/WidgetButtonImage.h"
     "Source/UI/Widget/WidgetButtonText.cpp"
@@ -394,6 +392,8 @@ set(TAKOEngine__GUI
     "TAKOEngine/GUI/UIManager.cpp"
     "TAKOEngine/GUI/UIManager.h"
     "TAKOEngine/GUI/Widget.h"
+    "TAKOEngine/GUI/WidgetButton.cpp"
+    "TAKOEngine/GUI/WidgetButton.h"
 )
 source_group("TAKOEngine\\GUI" FILES ${TAKOEngine__GUI})
 

@@ -1,8 +1,8 @@
 ﻿//! @file Widget.h
 //! @note
 
-#ifndef __INCLUDED_UI_WIDGET__
-#define __INCLUDED_UI_WIDGET__
+#ifndef __INCLUDED_UI_WIDGET_H__
+#define __INCLUDED_UI_WIDGET_H__
 
 #include <DirectXMath.h>
 #include "TAKOEngine/Rendering/SpriteDX12.h"
@@ -38,4 +38,4 @@ protected:
 	DirectX::XMFLOAT2 m_size = {};
 };
 
-#endif // !__INCLUDED_UI_WIDGET__
+#endif // !__INCLUDED_UI_WIDGET_H__

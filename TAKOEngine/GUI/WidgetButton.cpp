@@ -3,7 +3,7 @@
 
 #include "WidgetButton.h"
 #include "TAKOEngine/Runtime/tentacle_lib.h"
-#include "TAKOEngine/GUI/UIManager.h"
+#include "UIManager.h"
 
 
 /**************************************************************************//**
@@ -43,11 +43,13 @@ void WidgetButton::Update(float elapsedTime)
 	{
 		if (T_INPUT.KeyPress(VK_LBUTTON))
 		{
-			OnPress();
+			//OnPress();
+			UI.SetPressedWidget(this);
 		}
 		if (T_INPUT.KeyDown(VK_LBUTTON))
 		{
-			OnClick();
+			//OnClick();
+			UI.SetClickedWidget(this);
 		}
 	}
 }
