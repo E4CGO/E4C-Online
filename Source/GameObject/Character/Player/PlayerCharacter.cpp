@@ -76,15 +76,6 @@ PlayerCharacter::PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataI
 	// 衝突判定
 	SetMoveCollider({ { 0, radius, 0 }, radius }, Collider::COLLIDER_OBJ::PLAYER);
 	m_pColliders.clear();
-<<<<<<< HEAD
-	//Capsule capsule{};
-	//capsule.radius = radius;
-	//capsule.position = { 0, capsule.radius / scale.y, 0 };
-	//capsule.direction = { 0.0f, 1.0f, 0.0f };
-	//capsule.length = height - capsule.radius * 2;
-	//SetCollider(COLLIDER_ID::COL_BODY, capsule, Collider::COLLIDER_OBJ::PLAYER, &transform);
-=======
->>>>>>> main
 
 	this->m_name = dataInfo.name;
 	LoadAppearance(dataInfo.pattern);
@@ -504,7 +495,7 @@ void PlayerCharacter::ResetSkillTimer(int idx)
 	skillTimer[idx].currentTimer = skillTimer[idx].time;
 }
 void PlayerCharacter::UpdateSkillTimers(float elapsedTime)
-{f
+{
 	for (std::pair<int, SkillTimer> timer : skillTimer)
 	{
 		skillTimer[timer.first].currentTimer -= elapsedTime;
@@ -576,7 +567,6 @@ void PlayerCharacter::Render(const RenderContext& rc)
 		{
 			if (attackCollider.first == COLLIDER_ID::COL_BODY) continue;
 
-=
 			DirectX::XMFLOAT4 color = { 1, 0, 0, 1 };
 			HitResult hit;
 			for (Enemy*& enemy : ENEMIES.GetAll())
