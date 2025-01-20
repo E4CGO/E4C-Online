@@ -1,3 +1,6 @@
+//! @file StageOpenWorld_E4C.cpp
+//! @note
+
 #include "StageOpenWorld_E4C.h"
 
 #include "TAKOEngine/GUI/UIManager.h"
@@ -57,10 +60,11 @@ void StageOpenWorld_E4C::Initialize()
 	MAPTILES.CreateSpatialIndex(5, 7);
 
 	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
-	teleporter->SetPosition({ -34.0f, 4.0f, -45.0f });
+	teleporter->SetPosition({ -34.0f, 6.0f, -43.5f });
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
+	teleporter->SetVisibility(true);
 
-	Spawner* spawner = new Spawner(ENEMY_TYPE::BEAR_BOSS, 1, 1);
+	Spawner* spawner = new Spawner(ENEMY_TYPE::MOUSE, 1, 1);
 	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
 	spawner->SetSearchRadius(10.0f);
 	SpawnerManager::Instance().Register(spawner);
@@ -86,9 +90,6 @@ void StageOpenWorld_E4C::Initialize()
 		models.emplace("target3", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget2.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_Phong));
 		models["target3"]->SetPosition({ -32.0f, 1.80f, 23.4f });
 		models["target3"]->SetAngle({ 0.0f, -1.0f, 0.0f });
-
-		portalSquare = std::make_unique<Plane>(T_GRAPHICS.GetDevice(), "Data/Sprites/gear.png", 1.0f, XMFLOAT3{ -34.0f, 6.0f, 0.0f }, -43.5f, 1.5f);
-		portalSquare->SetShader(ModelShaderId::PortalSquare);
 
 		// プレイヤーが走るときの土埃
 		runningDust1 = std::make_unique<RunningDust>(T_GRAPHICS.GetDevice(), "Data/Sprites/smoke.png", 100.0f,
@@ -127,9 +128,6 @@ void StageOpenWorld_E4C::Initialize()
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 250.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
 		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
 		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
-
-		portalSquare2 = std::make_unique<PlaneDX12>("Data/Sprites/gear.png", 1.0f, XMFLOAT3{ -34.0f, 6.0f, 0.0f }, -43.5f, 1.5f);
-		portalSquare2->SetShaderDX12(ModelShaderDX12Id::PortalSquare);
 
 		// パーティクル
 		//DirectX::XMFLOAT3 p_pos = { 0,3,0 };
@@ -244,8 +242,8 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
 	}
 
-	timer += elapsedTime;
-	timerTick = elapsedTime;
+	m_sceneTickTimer = elapsedTime;
+	m_sceneGlobalTimer += elapsedTime;
 }
 
 void StageOpenWorld_E4C::Render()
@@ -259,7 +257,7 @@ void StageOpenWorld_E4C::Render()
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
-	rc.timerGlobal = m_timer;
+	rc.timerGlobal = m_sceneGlobalTimer;
 	rc.timerTick = TentacleLib::Timer::Instance().Delta();
 
 	// ライトの情報を詰め込む
@@ -275,9 +273,9 @@ void StageOpenWorld_E4C::Render()
 
 	SpawnerManager::Instance().Render(rc);
 
-	ENEMIES.Render(rc);
+	teleporter->Render(rc);
 
-	portalSquare->Render(rc);
+	ENEMIES.Render(rc);
 
 	UI.Render(rc);
 
@@ -294,9 +292,9 @@ void StageOpenWorld_E4C::RenderDX12()
 
 	// 3Dモデル描画
 	{
-		m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
-		m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
-		m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->Clear(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
 
 		// シャドウマップ
 		{
@@ -306,7 +304,7 @@ void StageOpenWorld_E4C::RenderDX12()
 		}
 		// シーン用定数バッファ更新
 		const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
-			CameraManager::Instance().GetCamera(), timer, timerTick);
+			CameraManager::Instance().GetCamera(), m_sceneGlobalTimer, m_sceneTickTimer);
 
 		// レンダーコンテキスト設定
 		rc.d3d_command_list = m_frameBuffer->GetCommandList();
@@ -317,6 +315,8 @@ void StageOpenWorld_E4C::RenderDX12()
 
 		ENEMIES.RenderDX12(rc);
 
+		teleporter->RenderDX12(rc);
+
 		// ステージ
 		for (auto& it : models)
 		{
@@ -324,8 +324,6 @@ void StageOpenWorld_E4C::RenderDX12()
 		}
 
 		SpawnerManager::Instance().RenderDX12(rc);
-
-		portalSquare2->RenderDX12(rc);
 
 		// skyBox
 		{
@@ -338,7 +336,7 @@ void StageOpenWorld_E4C::RenderDX12()
 		//m_particle[1]->Render(m_frameBuffer);
 
 		// レンダーターゲットへの書き込み終了待ち
-		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
 	}
 
 	// ポストエフェクト描画

@@ -62,6 +62,9 @@ enum class ModelShaderDX12Id
 	PortalSquare,
 	Billboard,
 	Fireball,
+	Loading,
+	Zone,
+	Electric,
 
 	EnumCount
 };
@@ -178,7 +181,7 @@ public:
 	// フレームバッファ取得
 	FrameBuffer* GetFrameBuffer(FrameBufferId frameBufferId) { return frameBuffers[static_cast<int>(frameBufferId)].get(); }
 	// DX12のフレームバッファ取得
-	FrameBufferDX12* GetFramBufferDX12(FrameBufferDX12Id frameBufferId) { return dx12_frameBuffers[static_cast<int>(frameBufferId)].get(); }
+	FrameBufferDX12* GetFrameBufferDX12(FrameBufferDX12Id frameBufferId) { return dx12_frameBuffers[static_cast<int>(frameBufferId)].get(); }
 	// DX12のフレームバッファマネージャー
 	FrameBufferManager* GetFrameBufferManager() { return m_framebufferManager.get(); }
 

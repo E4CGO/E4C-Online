@@ -440,7 +440,7 @@ void ShadowMapRenderDX12::Render(FrameBufferManager* frameBuffer)
 	}
 
 	// レンダーターゲットを元に戻す
-	frameBuffer->SetRenderTarget(graphics.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+	frameBuffer->SetRenderTarget(graphics.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
 }
 
 //********************************************************

@@ -133,6 +133,12 @@ public:
 	FireballShader(ID3D11Device* device) : BillboardShader(device, "Data/Shader/BillboardVS.cso", "Data/Shader/FireballPS.cso") {}
 };
 
+/**************************************************************************//**
+	@class	PlaneShaderDX12
+	@brief　板シェーダークラス
+	@par    [説明]
+		板描画管理
+*//***************************************************************************/
 class PlaneShaderDX12 : public ModelShaderDX12
 {
 public:
@@ -148,8 +154,21 @@ protected:
 	Microsoft::WRL::ComPtr<ID3D12RootSignature>		m_d3d_root_signature;
 
 	SamplerManager* m_sampler = nullptr;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cbv_resource;
+	const Descriptor* cbv_descriptor = nullptr;
+	DirectX::XMFLOAT4X4 worldmatrix = DirectX::XMFLOAT4X4(1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1);
 };
 
+/**************************************************************************//**
+	@class	PortalSquareShaderDX12
+	@brief	テレポートシェーダークラス
+	@par    [説明]
+		四角く区切って描画するバージョン
+*//***************************************************************************/
 class PortalSquareShaderDX12 : public PlaneShaderDX12
 {
 public:
@@ -157,6 +176,25 @@ public:
 	virtual ~PortalSquareShaderDX12() override = default;
 };
 
+/**************************************************************************//**
+	@class	LoadingShaderDX12
+	@brief	画廊切り替え効果クラス
+	@par    [説明]
+		四角く区切って描画するバージョン
+*//***************************************************************************/
+class LoadingShaderDX12 : public PlaneShaderDX12
+{
+public:
+	LoadingShaderDX12(ID3D12Device* device) : PlaneShaderDX12(device, "Data/Shader/PlaneSpriteDX12VS.cso", "Data/Shader/LoadingDX12PS.cso") {}
+	virtual ~LoadingShaderDX12() override = default;
+};
+
+/**************************************************************************//**
+	@class	BillboardShaderDX12
+	@brief	看板シェーダークラス
+	@par    [説明]
+		看板描画管理
+*//***************************************************************************/
 class BillBoardShaderDX12 : public ModelShaderDX12
 {
 public:
@@ -183,6 +221,12 @@ protected:
 		0, 0, 0, 1);
 };
 
+/**************************************************************************//**
+	@class	FireballShaderDX12
+	@brief	火球シェーダークラス
+	@par    [説明]
+		火球描画管理
+*//***************************************************************************/
 class FireballShaderDX12 : public BillBoardShaderDX12
 {
 public:

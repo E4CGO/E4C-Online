@@ -721,7 +721,7 @@ void PlayerCharacter::OnDamage(const HitResult& hit, int damage)
 }
 
 bool PlayerCharacter::InputMove(float elapsedTime) {
-	
+
 
 	// 移動処理
 	Move(inputDirection.x, inputDirection.y, this->moveSpeed);

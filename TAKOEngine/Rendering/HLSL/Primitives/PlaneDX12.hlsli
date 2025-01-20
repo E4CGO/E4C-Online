@@ -31,8 +31,14 @@ cbuffer CbScene : register(b0)
     float3 shadowColor;
 };
 
+cbuffer CbWorldMatrix : register(b1)
+{
+    row_major float4x4 WorldMatrix;
+}
+
 #define ROOT_SIG "RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT), \
                   DescriptorTable(CBV(b0), visibility=SHADER_VISIBILITY_ALL), \
+                  DescriptorTable(CBV(b1), visibility=SHADER_VISIBILITY_ALL), \
                   DescriptorTable(SRV(t0), visibility=SHADER_VISIBILITY_PIXEL), \
                   StaticSampler(s0 ,\
                   filter = FILTER_MIN_MAG_MIP_LINEAR,\
