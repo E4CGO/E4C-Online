@@ -13,6 +13,7 @@
 #include "TCPCommand/TCPMatching.h"
 
 #include "UDPCommand/UDPSync.h"
+#include "UDPCommand/UDPHit.h"
 #include "GameObject/Props/Teleporter.h"
 #include "Scene/GameLoop/SceneGame/Stage/StageDungeon_E4C.h"	
 
@@ -47,7 +48,7 @@ namespace Online
 
 		m_tcpCommands[TCP_CMD::ENEMY_NEW] = new TCPEnemyNew(this, TCP_CMD::ENEMY_NEW);
 		m_tcpCommands[TCP_CMD::ENEMY_SYNC] = new TCPEnemySync(this, TCP_CMD::ENEMY_SYNC);
-		m_tcpCommands[TCP_CMD::ENEMY_OWNER] = new TCPEnemyOwner (this, TCP_CMD::ENEMY_OWNER);
+		m_tcpCommands[TCP_CMD::ENEMY_OWNER] = new TCPEnemyOwner(this, TCP_CMD::ENEMY_OWNER);
 		//m_tcpCommands[TCP_CMD::ENEMY_DESTROY] = new (this, TCP_CMD::ENEMY_DESTROY);
 
 
@@ -55,9 +56,10 @@ namespace Online
 		m_tcpCommands[TCP_CMD::PING] = new TCPNone(this, TCP_CMD::PING);
 
 
-
 		// UDP処理
 		m_udpCommands[UDP_CMD::SYNC] = new UDPSync(this, UDP_CMD::SYNC);
+		m_udpCommands[UDP_CMD::HIT_SEND] = new UDPHitSend(this, UDP_CMD::HIT_SEND);
+		m_udpCommands[UDP_CMD::HIT_ACCEPT] = new UDPHitAccept(this, UDP_CMD::HIT_ACCEPT);
 	}
 
 	/**************************************************************************//**
@@ -182,14 +184,29 @@ namespace Online
 	*//***************************************************************************/
 	void OnlineController::UDPSendThread()
 	{
-		clock_t last = clock();
-		const float frequency = 0.25f;
+		clock_t playerLastSync = clock();
+		const float playerSyncFrequency = 0.25f;
+
+		clock_t hitLastSync = clock();
+		const float hitSyncFrequency = 0.10f;
+
 		while (m_udpFlag)
 		{
-			if ((static_cast<float>(clock() - last) / CLOCKS_PER_SEC) > frequency)
+			if ((static_cast<float>(clock() - playerLastSync) / CLOCKS_PER_SEC) > playerSyncFrequency)
 			{
-				last = clock();
+				playerLastSync = clock();
 				m_udpCommands[UDP_CMD::SYNC]->Send(nullptr);
+			}
+			if ((static_cast<float>(clock() - hitLastSync) / CLOCKS_PER_SEC) > hitSyncFrequency)
+			{
+				hitLastSync = clock();
+
+				m_hit_mtx.lock();
+				if (!m_hitList.empty())
+				{
+					m_udpCommands[UDP_CMD::HIT_SEND]->Send(&m_hitList);
+				}
+				m_hit_mtx.unlock();
 			}
 		}
 	}
@@ -315,7 +332,7 @@ namespace Online
 	*//***************************************************************************/
 	void OnlineController::NewEnemy(const uint8_t enemyType, uint8_t spawnerId, uint8_t count)
 	{
-		TCPEnemyNew::SEND_DATA data {
+		TCPEnemyNew::SEND_DATA data{
 			spawnerId,
 			enemyType,
 			count,
@@ -324,7 +341,7 @@ namespace Online
 	}
 
 	/**************************************************************************//**
-	 	@brief		エネミーの同期送信
+		@brief		エネミーの同期送信
 		@param[in]	data
 	*//***************************************************************************/
 	void OnlineController::SyncEnemy(std::vector<Enemy::SYNC_DATA>& data)

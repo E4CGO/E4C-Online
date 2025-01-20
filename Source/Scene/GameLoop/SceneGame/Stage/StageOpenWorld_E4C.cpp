@@ -166,7 +166,7 @@ void StageOpenWorld_E4C::Initialize()
 		{ 0, 0.969f, -0.248f }	// 上ベクトル
 	);
 
-	Spawner* spawner = new Spawner(ENEMY_TYPE::BEAR_BOSS, 1, 1);
+	Spawner* spawner = new Spawner(ENEMY_TYPE::BEAR_BOSS, 1, -1);
 	spawner->SetPosition({ 15.0f, 2.0f, 0.0f });
 	spawner->SetSearchRadius(10.0f);
 	SpawnerManager::Instance().Register(spawner);
@@ -240,6 +240,8 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	sky->Update(elapsedTime);
 
 	SpawnerManager::Instance().Update(elapsedTime);
+
+	teleporter->Update(elapsedTime);
 
 	runningDust1->Update(elapsedTime);
 	timer += elapsedTime;

@@ -106,7 +106,7 @@ public:
 	void SetCurrentHp(int hp) { this->hp = hp; }
 
 	// 被ダメージコールバック
-	virtual void OnDamage(int damage) { hp -= damage; }
+	virtual void OnDamage(const uint16_t& damage) { hp -= damage; }
 
 	//物理計算フラグ
 	void SetKinematic(bool value) { this->isKinematic = value; }

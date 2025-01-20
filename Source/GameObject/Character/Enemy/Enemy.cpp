@@ -6,11 +6,10 @@
 #include "GameObject/Character/Enemy/MouseMob.h"
 #include "GameObject/Character/Enemy/BearBoss.h"
 #include "GameObject/Props/Spawner.h"
+#include "Network/OnlineController.h"
 
 Enemy::Enemy(const char* filename, float scaling, ModelObject::RENDER_MODE renderMode) : Character(filename, scaling, renderMode)
 {
-	//SetCollider(Collider::COLLIDER_TYPE::MODEL);
-
 	stateMachine = new StateMachine<Enemy>;
 	stateMachine->RegisterState(Enemy::STATE::HURT, new EnemyState::HurtState(this));
 	stateMachine->RegisterState(Enemy::STATE::DEATH, new EnemyState::DeathState(this));
@@ -88,48 +87,27 @@ void Enemy::Render(const RenderContext& rc)
 	}
 #endif // DEBUG
 }
-void Enemy::OnDamage(int damage)
+void Enemy::OnDamage(const uint16_t& damage)
 {
-	if (IsMine())
+	if (IsMine() || ONLINE_CONTROLLER->GetState() != Online::State::SYNC)
 	{
 		hp -= damage;
 		if (hp > 0)
 		{
-			//EnemyState::StateTransition(this, STATE::HURT);
+			EnemyState::StateTransition(this, STATE::HURT);
 		}
 		else
 		{
 			EnemyState::StateTransition(this, STATE::DEATH);
 		}
 	}
+	else
+	{
+		// 同期
+		ONLINE_CONTROLLER->RegisterHit(enemy_id, damage);
+	}
+}
 
-}
-void Enemy::OnDamage(const ENEMY_COLLISION& hit)
-{
-	hp -= hit.damage;
-	if (hp > 0)
-	{
-		if (hit.power) stateMachine->ChangeState(Enemy::STATE::HURT);
-		velocity += hit.force;
-	}
-	else
-	{
-		stateMachine->ChangeState(Enemy::STATE::DEATH);
-	}
-}
-void Enemy::OnDamage(const ATTACK_DATA& hit)
-{
-	hp -= hit.damage;
-	if (hp > 0)
-	{
-		if (hit.power) stateMachine->ChangeState(Enemy::STATE::HURT);
-		velocity += hit.force;
-	}
-	else
-	{
-		stateMachine->ChangeState(Enemy::STATE::DEATH);
-	}
-}
 void Enemy::OnDeath()
 {
 	ENEMIES.Remove(this);

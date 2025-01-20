@@ -277,6 +277,8 @@ source_group("Source\\Network\\TCPCommand" FILES ${Source__Network__TCPCommand})
 set(Source__Network__UDPCommand
     "Source/Network/UDPCommand/UDPCommand.cpp"
     "Source/Network/UDPCommand/UDPCommand.h"
+    "Source/Network/UDPCommand/UDPHit.cpp"
+    "Source/Network/UDPCommand/UDPHit.h"
     "Source/Network/UDPCommand/UDPSync.cpp"
     "Source/Network/UDPCommand/UDPSync.h"
 )
