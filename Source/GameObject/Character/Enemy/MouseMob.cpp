@@ -11,7 +11,7 @@
 	@param[in]    scaling	スケール
 	@param[in]    renderMode	レンダリング設定
 *//***************************************************************************/
-MouseMob::MouseMob(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("Data/Model/Enemy/MDL_ENMmouth_1203.glb", scaling, renderMode)
+MouseMob::MouseMob(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("Data/Model/Enemy/MDLANM_ENMmouse_0117.glb", scaling, renderMode)
 {
 	// 敵の基本パラメーター
 	enemyType = ENEMY_TYPE::MOUSE;
