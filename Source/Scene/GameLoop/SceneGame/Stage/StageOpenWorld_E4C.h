@@ -78,18 +78,7 @@ private:
 	std::unordered_map<std::string, std::unique_ptr<ModelObject>> models;
 
 	std::unique_ptr<ModelObject> sky;
-	std::unique_ptr<ModelObject> zone;
-	std::unique_ptr<ModelObject> choker;
 	std::unique_ptr<SpriteDX12> m_sprites[8];
-
-	std::unique_ptr<Plane> portalSquare;
-	std::unique_ptr<PlaneDX12> portalSquare2;
-
-	std::unique_ptr<Fireball> fireBall;
-	std::unique_ptr<PlaneDX12> fireBall2;
-
-	std::unique_ptr<Plane> plane;
-	std::unique_ptr<PlaneDX12> plane2;
 
 	std::unique_ptr<RunningDust> runningDust1;
 	std::deque<RunningDust> runningDust;

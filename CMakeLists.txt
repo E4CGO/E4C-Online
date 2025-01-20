@@ -225,10 +225,6 @@ set(Source__GameObject__Character__Enemy
     "Source/GameObject/Character/Enemy/MouseMob.h"
     "Source/GameObject/Character/Enemy/MouseMobState.cpp"
     "Source/GameObject/Character/Enemy/MouseMobState.h"
-    "Source/GameObject/Character/Enemy/SkeletonMinion.cpp"
-    "Source/GameObject/Character/Enemy/SkeletonMinion.h"
-    "Source/GameObject/Character/Enemy/SkeletonMinionState.cpp"
-    "Source/GameObject/Character/Enemy/SkeletonMinionState.h"
 )
 source_group("Source\\GameObject\\Character\\Enemy" FILES ${Source__GameObject__Character__Enemy})
 
@@ -789,6 +785,7 @@ set(TAKOEngine__Rendering__HLSL__Primitives
     "TAKOEngine/Rendering/HLSL/Primitives/PlaneDX12PS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/PlaneDX12VS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/PlanePS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/PlaneSpriteDX12VS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/PlaneVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/Portal.hlsli"
     "TAKOEngine/Rendering/HLSL/Primitives/PortalDX12.hlsli"
@@ -978,6 +975,7 @@ set(SHADER_NAMES
     "PlaneDX12PS.cso"
     "PlaneDX12VS.cso"
     "PlanePS.cso"
+    "PlaneSpriteDX12VS.cso"
     "PlaneVS.cso"
     "PortalPS.cso"
     "PortalSquareDX12PS.cso"
@@ -1067,6 +1065,7 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlaneDX12PS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlaneDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlanePS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlaneSpriteDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlaneVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PortalPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PortalSquareDX12PS.hlsl,5.0,Pixel,main"

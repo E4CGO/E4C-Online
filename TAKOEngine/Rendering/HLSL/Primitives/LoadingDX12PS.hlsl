@@ -8,7 +8,7 @@ static float timeMulti = 0.2f;
 static float alpha = 5.7;
 static bool ready = false;
 
-// ƒsƒNƒZƒ‹ƒVƒF[ƒ_[ƒGƒ“ƒgƒŠƒ|ƒCƒ“ƒg
+// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚¨ãƒ³ãƒˆãƒªãƒã‚¤ãƒ³ãƒˆ
 // Modified From: https://www.shadertoy.com/view/WtfXRj
 float rand(float2 p)
 {
@@ -86,23 +86,23 @@ float4 main(VS_OUT pin) : SV_TARGET
         v = Update(uv);
         
         v = v * 3.0 - 0.6;
-        // –¾–Å‚³‚¹‚é
-        v = lerp(0.0, v, 0.8 * smoothstep(0.0, 0.1, dot(uv, uv))) * lerp(-cos(rotate * 2.5), 0.2, 2) /*–¾–Å*/;
+        // æ˜æ»…ã•ã›ã‚‹
+        v = lerp(0.0, v, 0.8 * smoothstep(0.0, 0.1, dot(uv, uv))) * lerp(-cos(rotate * 2.5), 0.2, 2) /*æ˜æ»…*/;
     }
     else
     {
         v = v * 2.5 - 1.4;
-        // –¾–Å‚³‚¹‚È‚¢
+        // æ˜æ»…ã•ã›ãªã„
         v = lerp(0.0, v, 0.8 * smoothstep(0.0, 0.1, dot(uv, uv)));
     }
     
     float4 color = float4(colorize(v), alpha);
     
-// imgui(material_color) ‚ÌF‚ğ”½‰f‚·‚é
+// imgui(material_color) ã®è‰²ã‚’åæ˜ ã™ã‚‹
 #if 0
-    // ƒ‚ƒmƒNƒ‚É‚·‚é
+    // ãƒ¢ãƒã‚¯ãƒ­ã«ã™ã‚‹
     color.rgb = (color.r + color.g + color.b) * 0.3333f;
-    // F‚ğ”½‰f
+    // è‰²ã‚’åæ˜ 
     color = color * pin.color;
 #endif
     

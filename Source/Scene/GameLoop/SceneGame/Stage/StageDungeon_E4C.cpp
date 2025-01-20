@@ -1,4 +1,4 @@
-//! @file StageDungeon_E4C.cpp
+﻿//! @file StageDungeon_E4C.cpp
 //! @note
 
 #include "StageDungeon_E4C.h"
@@ -168,8 +168,6 @@ void StageDungeon_E4C::Initialize()
 	debugText->SetPosition({ 30.0f, 60.0f });
 	UI.Register(debugText);
 
-	GenerateDungeon();
-
 	// 部屋のモデルを配置
 	for (RoomBase* room : rootRoom->GetAll())
 	{
@@ -322,9 +320,9 @@ void StageDungeon_E4C::RenderDX12()
 
 	// 3Dモデル描画
 	{
-		m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
-		m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
-		m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->Clear(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
 
 		// シャドウマップ
 		{
@@ -348,7 +346,7 @@ void StageDungeon_E4C::RenderDX12()
 		MAPTILES.RenderDX12(rc);
 
 		// レンダーターゲットへの書き込み終了待ち
-		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
 	}
 
 	// ポストエフェクト描画
@@ -364,9 +362,8 @@ void StageDungeon_E4C::RenderDX12()
 
 		T_TEXT.EndDX12();
 	}
-	DrawSceneGUI();
-	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
 
+	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
 	T_GRAPHICS.End();
 }
 

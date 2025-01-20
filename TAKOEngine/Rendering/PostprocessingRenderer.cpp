@@ -191,9 +191,9 @@ void PostprocessingRenderer::DrawDebugGUI()
 //******************************************************************
 PostprocessingRendererDX12::PostprocessingRendererDX12()
 {
-	renderSprite[static_cast<int>(RenderTarget::Luminance)] = std::make_unique<SpriteDX12>(1, T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene)->GetRenderTargetTexture());
-	renderSprite[static_cast<int>(RenderTarget::GaussianBlur)] = std::make_unique<SpriteDX12>(1, T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance)->GetRenderTargetTexture());
-	renderSprite[static_cast<int>(RenderTarget::Finalpass)] = std::make_unique<SpriteDX12>(1, T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene)->GetRenderTargetTexture());
+	renderSprite[static_cast<int>(RenderTarget::Luminance)] = std::make_unique<SpriteDX12>(1, T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene)->GetRenderTargetTexture());
+	renderSprite[static_cast<int>(RenderTarget::GaussianBlur)] = std::make_unique<SpriteDX12>(1, T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Luminance)->GetRenderTargetTexture());
+	renderSprite[static_cast<int>(RenderTarget::Finalpass)] = std::make_unique<SpriteDX12>(1, T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene)->GetRenderTargetTexture());
 
 	bloomData.gaussianFilterData.textureSize.x = static_cast<float>(renderSprite[static_cast<int>(RenderTarget::GaussianBlur)]->GetTextureWidth());
 	bloomData.gaussianFilterData.textureSize.y = static_cast<float>(renderSprite[static_cast<int>(RenderTarget::GaussianBlur)]->GetTextureHeight());
@@ -222,17 +222,17 @@ void PostprocessingRendererDX12::Render(FrameBufferManager* framBuffer)
 
 	// 高輝度抽出用バッファに描画先を変更して高輝度抽出
 	{
-		framBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance));
-		framBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance));
-		framBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance));
+		framBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Luminance));
+		framBuffer->SetRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Luminance));
+		framBuffer->Clear(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Luminance));
 
 		// 高輝度抽出処理
 		SpriteShaderDX12* shader = T_GRAPHICS.GetSpriteShaderDX12(SpriteShaderDX12Id::LuminanceExtraction);
 		renderSprite[static_cast<int>(RenderTarget::Luminance)]->Begin(rc);
 		renderSprite[static_cast<int>(RenderTarget::Luminance)]->Draw(
 			0, 0,
-			T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance)->GetWidth(),
-			T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance)->GetHeight(),
+			T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Luminance)->GetWidth(),
+			T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Luminance)->GetHeight(),
 			0, 0,
 			T_GRAPHICS.GetScreenWidth(),
 			T_GRAPHICS.GetScreenHeight(),
@@ -241,29 +241,29 @@ void PostprocessingRendererDX12::Render(FrameBufferManager* framBuffer)
 
 		shader->Render(rc, renderSprite[static_cast<int>(RenderTarget::Luminance)].get());
 
-		framBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance));
+		framBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Luminance));
 	}
 
 	// 抽出した高輝度描画対象を暈して書き込む
 	{
-		framBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::GaussianBlur));
-		framBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::GaussianBlur));
-		framBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::GaussianBlur));
+		framBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::GaussianBlur));
+		framBuffer->SetRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::GaussianBlur));
+		framBuffer->Clear(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::GaussianBlur));
 
 		SpriteShaderDX12* shader = T_GRAPHICS.GetSpriteShaderDX12(SpriteShaderDX12Id::GaussianBlur);
 		renderSprite[static_cast<int>(RenderTarget::GaussianBlur)]->Begin(rc);
 		renderSprite[static_cast<int>(RenderTarget::GaussianBlur)]->Draw(
 			0, 0,
-			T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::GaussianBlur)->GetWidth(),
-			T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::GaussianBlur)->GetHeight(),
+			T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::GaussianBlur)->GetWidth(),
+			T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::GaussianBlur)->GetHeight(),
 			0, 0,
-			T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance)->GetWidth(),
-			T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Luminance)->GetHeight(),
+			T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Luminance)->GetWidth(),
+			T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Luminance)->GetHeight(),
 			0,
 			1, 1, 1, 1);
 		shader->Render(rc, renderSprite[static_cast<int>(RenderTarget::GaussianBlur)].get());
 
-		framBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::GaussianBlur));
+		framBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::GaussianBlur));
 	}
 
 	// 元のバッファに戻す

@@ -2,7 +2,6 @@
 #include "TAKOEngine/Physics/CollisionManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Character/Enemy/Enemy.h"
-#include "GameObject/Character/Enemy/SkeletonMinion.h"
 #include "GameObject/Character/Enemy/MouseMob.h"
 #include "GameObject/Character/Enemy/BearBoss.h"
 #include "GameObject/Props/Spawner.h"
@@ -95,7 +94,6 @@ void Enemy::OnDamage(int damage)
 			EnemyState::StateTransition(this, STATE::DEATH);
 		}
 	}
-
 }
 void Enemy::OnDamage(uint16_t damage)
 {
@@ -111,7 +109,6 @@ void Enemy::OnDamage(uint16_t damage)
 			EnemyState::StateTransition(this, STATE::DEATH);
 		}
 	}
-
 }
 void Enemy::OnDamage(const ENEMY_COLLISION& hit)
 {
@@ -148,8 +145,6 @@ Enemy* Enemy::EnemyFactory(uint8_t enemyType)
 {
 	switch (enemyType)
 	{
-	case ENEMY_TYPE::SKELETON_MINION: return new SkeletonMinion(1.0f); break;
-	case ENEMY_TYPE::SKELETON_MINION_BOSS: return new SkeletonMinionBoss; break;
 	case ENEMY_TYPE::MOUSE: return T_GRAPHICS.isDX11Active ? new MouseMob(0.5f, ModelObject::DX11) : new MouseMob(0.5f, ModelObject::DX12); break;
 	case ENEMY_TYPE::BEAR_BOSS: return T_GRAPHICS.isDX11Active ? new BearBoss(1.0f, ModelObject::DX11) : new BearBoss(1.0f, ModelObject::DX12); break;
 	}

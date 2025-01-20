@@ -1,4 +1,4 @@
-//! @file StageDungeon_E4C.h
+﻿//! @file StageDungeon_E4C.h
 //! @note
 
 #ifndef __INCLUDED_STAGE_DUNGEON_E4C_H__
@@ -61,7 +61,6 @@ public:
 	void Render() override;
 
 	void RenderDX12() override;
-
 private:
 	// シーンGUI描画
 	void DrawSceneGUI();
@@ -93,9 +92,6 @@ protected:
 	float transitionDuration = 2.f;  // 5秒かけて移動
 	int currentSegment = 0;
 	int currentFloor = 0;
-
-	// テキスト
-	std::unique_ptr<WidgetText> floorText;
 
 	// フレームバッファマネージャー
 	FrameBufferManager* m_frameBuffer;

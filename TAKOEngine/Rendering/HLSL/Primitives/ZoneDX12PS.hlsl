@@ -52,7 +52,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     
     float4 fragColor = float4(colour, 0.5);
     
-    // ƒuƒ‹[ƒ€‚ª•K—v‚Èê‡  (static_mesh_ps.hlsl ‚æ‚è@”²ˆ)
+    // ãƒ–ãƒ«ãƒ¼ãƒ ãŒå¿…è¦ãªå ´åˆ  (static_mesh_ps.hlsl ã‚ˆã‚Šã€€æŠœç²‹)
 
     float3 diffuse = 0;
     float3 specular = 0;

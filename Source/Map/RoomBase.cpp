@@ -1,4 +1,4 @@
-#include "Source/Map/RoomBase.h"
+﻿#include "Source/Map/RoomBase.h"
 
 #include <TAKOEngine\Tool\XMFLOAT.h>
 #include <filesystem>
@@ -164,7 +164,6 @@ DirectX::XMFLOAT3 RoomBase::GetCenterPos()
 	// 90度
 	if (degree > 89.9f && degree < 90.1f)
 	{
-
 	}
 
 	// 180度
@@ -552,8 +551,6 @@ void RoomBase::GenerateNextRoomFromOrder(
 	}
 }
 
-
-
 AABB RoomBase::CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const
 {
 	// 360度以内に丸める
@@ -705,7 +702,7 @@ void RoomBase::PlaceMapTile(bool isLeader)
 		{
 			for (const TILE_DATA& data : m_tileDatas.at(tileType))
 			{
-				Spawner* spawner = new Spawner(ENEMY_TYPE::BEAR_BOSS, 2, -1);
+				Spawner* spawner = new Spawner(ENEMY_TYPE::MOUSE, 2, -1);
 
 				DirectX::XMFLOAT3 resultPos = data.position;
 				DirectX::XMFLOAT3 bufPos = resultPos;
@@ -831,7 +828,7 @@ void RoomBase::PlaceMapTile(bool isLeader)
 			//		instancingModel->GetModel()->UpdateTransform(id, tm);
 			//	}
 			//	MAPTILES.Register(instancingModel);
-				
+
 			//  // ステージの影登録
 			//	//T_GRAPHICS.GetShadowRenderer()->ModelRegister(instancingModel->GetModel(0).get());
 			//}

@@ -78,46 +78,12 @@ Teleporter::Teleporter(Stage* stage, Online::OnlineController* onlineController)
 			static_cast<float>(desc.Height)
 		};
 	}
-	//else
-	//{
-	//	ID3D12Device* device = T_GRAPHICS.GetDeviceDX12();
 
-	//	HRESULT hr = S_OK;
-
-	//	m_mesh.vertices = m_defaultVertices;
-
-	//	// ヒーププロパティの設定
-	//	D3D12_HEAP_PROPERTIES d3d_head_props{};
-	//	d3d_head_props.Type                 = D3D12_HEAP_TYPE_UPLOAD;
-	//	d3d_head_props.CPUPageProperty      = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-	//	d3d_head_props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-	//	d3d_head_props.CreationNodeMask     = 1;
-	//	d3d_head_props.VisibleNodeMask      = 1;
-
-	//	// リソースの設定
-	//	D3D12_RESOURCE_DESC d3d_resource_desc{};
-	//	d3d_resource_desc.Dimension          = D3D12_RESOURCE_DIMENSION_BUFFER;
-	//	d3d_resource_desc.Alignment          = 0;
-	//	d3d_resource_desc.Width              = sizeof(ModelResource::Vertex) * 4; // 4頂点
-	//	d3d_resource_desc.Height             = 1;
-	//	d3d_resource_desc.DepthOrArraySize   = 1;
-	//	d3d_resource_desc.MipLevels          = 1;
-	//	d3d_resource_desc.Format             = DXGI_FORMAT_UNKNOWN;
-	//	d3d_resource_desc.SampleDesc.Count   = 1;
-	//	d3d_resource_desc.SampleDesc.Quality = 0;
-	//	d3d_resource_desc.Layout             = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-	//	d3d_resource_desc.Flags              = D3D12_RESOURCE_FLAG_NONE;
-
-	//	// バッファ生成
-	//	/*hr = device->CreateCommittedResource(
-	//		&d3d_head_props,
-	//		D3D12_HEAP_FLAG_NONE,
-	//		&d3d_resource_desc,
-	//		D3D12_RESOURCE_STATE_GENERIC_READ,
-	//		nullptr,
-	//		IID_PPV_ARGS()
-	//	)*/
-	//}
+	if (T_GRAPHICS.isDX12Active)
+	{
+		m_portalFrame = std::make_unique<PlaneDX12>("Data/Sprites/gear.png", 1.0f, XMFLOAT3{ 0.0f, 0.0f, 0.0f }, 0.0f, 1.0f);
+		m_portalFrame->SetShaderDX12(ModelShaderDX12Id::PortalSquare);
+	}
 }
 
 /**************************************************************************//**
@@ -129,7 +95,7 @@ void Teleporter::Update(float elapsedTime)
 {
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
 	const float radius = m_interractionDistance * scale.x;
-	if (player != nullptr && XMFLOAT3LengthSq(player->GetPosition() - (position - DirectX::XMFLOAT3{ 0.0f, 0.5f * scale.y, 0.0f })) < radius* radius)
+	if (player != nullptr && XMFLOAT3LengthSq(player->GetPosition() - (position - DirectX::XMFLOAT3{ 0.0f, 0.5f * scale.y, 0.0f })) < radius * radius)
 	{
 		m_timer += elapsedTime;
 		if (m_timer >= m_portalTime)
@@ -159,6 +125,12 @@ void Teleporter::Update(float elapsedTime)
 	{
 		ModelResource::Vertex& vertice = m_mesh.vertices[i];
 		DirectX::XMStoreFloat3(&vertice.position, DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&m_defaultVertices[i].position), Transform));
+	}
+
+	if (T_GRAPHICS.isDX12Active)
+	{
+		m_portalFrame->SetPosition(position);
+		m_portalFrame->Update(elapsedTime);
 	}
 }
 
@@ -196,11 +168,14 @@ void Teleporter::Render(const RenderContext& rc)
 *//***************************************************************************/
 void Teleporter::RenderDX12(const RenderContextDX12& rc)
 {
-
+	if (m_isVisible)
+	{
+		m_portalFrame->RenderDX12(rc);
+	}
 }
 
 /**************************************************************************//**
- 	@brief		転送開始
+	@brief		転送開始
 	@param[in]	なし
 	@return		なし
 *//***************************************************************************/

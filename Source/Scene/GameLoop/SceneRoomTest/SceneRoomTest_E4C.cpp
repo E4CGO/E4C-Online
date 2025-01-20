@@ -1,4 +1,4 @@
-#include "TAKOEngine/Runtime/tentacle_lib.h"
+﻿#include "TAKOEngine/Runtime/tentacle_lib.h"
 #include "TAKOEngine/Network/HttpRequest.h"
 #include "TAKOEngine/Rendering/ResourceManager.h"
 #include "TAKOEngine/GUI/UIManager.h"
@@ -245,9 +245,9 @@ void SceneRoomTest_E4C::RenderDX12()
 
 	// 3Dモデル描画
 	{
-		m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
-		m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
-		m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->Clear(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
 
 		// シャドウマップ
 		{
@@ -273,13 +273,12 @@ void SceneRoomTest_E4C::RenderDX12()
 		T_GRAPHICS.GetDebugRenderer()->DrawCube(roomSetting.aabb.position, diameter, { 1.0f, 1.0f, 1.0f, 1.0f });
 
 		// レンダーターゲットへの書き込み終了待ち
-		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
 	}
 
 	// デバッグ描画
 	{
 	}
-
 
 	// ポストエフェクト描画
 	{

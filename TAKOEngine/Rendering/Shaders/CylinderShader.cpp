@@ -23,6 +23,12 @@ void CylinderShader::End(const RenderContext& rc)
 {
 }
 
+/**************************************************************************//**
+	@brief    DX12パラメーター設定
+	@param[in]    device	DX12のデバイス
+	@param[in]    vertexShaderName	頂点シェーダパス
+	@param[in]    pixelShaderName	ピクセルシェーダパス
+*//***************************************************************************/
 ZoneShaderDX12::ZoneShaderDX12(ID3D12Device* device, const char* vertexShaderName, const char* pixelShaderName)
 {
 	Graphics& graphics = Graphics::Instance();
@@ -113,6 +119,11 @@ ZoneShaderDX12::ZoneShaderDX12(ID3D12Device* device, const char* vertexShaderNam
 	m_sampler = graphics.GetSampler(SamplerState::AnisotropicWrap);
 }
 
+/**************************************************************************//**
+	@brief	DX12で描画
+	@param[in]    rc	レンダリングコンテクスト
+	@param[in]    mesh	メッシュ
+*//***************************************************************************/
 void ZoneShaderDX12::Render(const RenderContextDX12& rc, const ModelDX12::Mesh& mesh)
 {
 	Graphics& graphics = Graphics::Instance();

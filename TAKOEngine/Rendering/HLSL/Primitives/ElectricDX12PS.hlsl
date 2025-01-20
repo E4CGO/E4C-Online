@@ -125,7 +125,7 @@ float4 main(VS_OUT pin) : SV_TARGET
                           
     float t = clamp((uv.x * -uv.x * 0.16) + 0.15, 0., 1.);
         
-    // ƒGƒtƒFƒNƒg‚Ì•ûŒü
+    // ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®æ–¹å‘
     //float effect_direction = abs(intensity * -t + uv.x);
     float effect_direction = abs(intensity * -t + uv.y);
     
@@ -140,12 +140,12 @@ float4 main(VS_OUT pin) : SV_TARGET
     //float anim = sin(test_TIME * 12.0) * 0.1 + 1.0;
     //color *= happy_star(uv, anim);
     if (color.r <= 0.9 && color.g <= 0.9 && color.b <= 0.9)
-        discard; //•F‚Í–³‹‚·‚é 
+        discard; //é»’è‰²ã¯ç„¡è¦–ã™ã‚‹ 
 
     color = pow(saturate(color), 32);
     
 #if 1
-    // ƒuƒ‹[ƒ€‚ª•K—v‚Èê‡  (static_mesh_ps.hlsl ‚æ‚è@”²ˆ)
+    // ãƒ–ãƒ«ãƒ¼ãƒ ãŒå¿…è¦ãªå ´åˆ  (static_mesh_ps.hlsl ã‚ˆã‚Šã€€æŠœç²‹)
 
     float3 diffuse = 0;
     float3 specular = 0;

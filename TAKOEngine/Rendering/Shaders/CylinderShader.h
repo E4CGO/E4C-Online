@@ -1,4 +1,8 @@
-﻿#pragma once
+﻿//! @file CylinderShader.h
+//! @note
+
+#ifndef __INCLUDED_CYLINDER_SHADER_H__
+#define __INCLUDED_CYLINDER_SHADER_H__
 
 #include "TAKOEngine/Rendering/Cylinder.h"
 #include "TAKOEngine/Rendering/Shaders/ModelShader.h"
@@ -49,6 +53,12 @@ private:
 	SamplerManager* m_sampler = nullptr;
 };
 
+/**************************************************************************//**
+	@class    ElectricShaderDX12
+	@brief	ElectricShaderDX12のパラーメータ設定クラス
+	@par    [説明]
+		ボスの電気効果を描画する
+*//***************************************************************************/
 class ElectricShaderDX12 : public ZoneShaderDX12
 {
 public:
@@ -56,3 +66,5 @@ public:
 
 	virtual ~ElectricShaderDX12() override = default;
 };
+
+#endif //!__INCLUDED_CYLINDER_SHADER_H__
