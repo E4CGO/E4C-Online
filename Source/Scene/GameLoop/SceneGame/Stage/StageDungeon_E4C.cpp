@@ -281,9 +281,6 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	m_timer += elapsedTime;
 }
 
-	m_timer += elapsedTime;
-}
-
 void StageDungeon_E4C::Render()
 {
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->Clear(T_GRAPHICS.GetDeviceContext(), 0.2f, 0.2f, 0.2f, 1);
