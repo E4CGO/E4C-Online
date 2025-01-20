@@ -30,8 +30,6 @@
 
 #include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
 
-static float timer = 0;
-
 void StageOpenWorld_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
@@ -244,8 +242,8 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
 	}
 
-	timerTick = elapsedTime;
-	timer += elapsedTime;
+	m_sceneTickTimer = elapsedTime;
+	m_sceneGlobalTimer += elapsedTime;
 }
 
 void StageOpenWorld_E4C::Render()
@@ -259,7 +257,7 @@ void StageOpenWorld_E4C::Render()
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
 
-	rc.timerGlobal = m_timer;
+	rc.timerGlobal = m_sceneGlobalTimer;
 	rc.timerTick = TentacleLib::Timer::Instance().Delta();
 
 	// ライトの情報を詰め込む
@@ -306,7 +304,7 @@ void StageOpenWorld_E4C::RenderDX12()
 		}
 		// シーン用定数バッファ更新
 		const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
-			CameraManager::Instance().GetCamera(), timer, timerTick);
+			CameraManager::Instance().GetCamera(), m_sceneGlobalTimer, m_sceneTickTimer);
 
 		// レンダーコンテキスト設定
 		rc.d3d_command_list = m_frameBuffer->GetCommandList();

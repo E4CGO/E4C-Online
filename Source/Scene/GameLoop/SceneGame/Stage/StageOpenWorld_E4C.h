@@ -63,9 +63,6 @@ private:
 
 private:
 
-	float timer = 0;
-	float timerTick = 0;
-
 	SceneGame_E4C* m_pScene;
 
 	std::unique_ptr<ThridPersonCameraController> cameraController;
@@ -118,6 +115,9 @@ private:
 
 	// ポストエフェクト
 	std::unique_ptr<PostprocessingRendererDX12>	postprocessingRenderer = std::make_unique<PostprocessingRendererDX12>();
+
+	float m_sceneGlobalTimer = 0;
+	float m_sceneTickTimer = 0;
 };
 
 #endif // !__INCLUDED_STAGE_OPEN_WORLD_E4C_H__
