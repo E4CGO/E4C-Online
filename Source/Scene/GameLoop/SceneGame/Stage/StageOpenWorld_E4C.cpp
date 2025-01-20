@@ -30,10 +30,6 @@
 
 #include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
 
-#include "GameObject/Props/SpawnerManager.h"
-
-static float timer = 0;
-
 void StageOpenWorld_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
@@ -115,7 +111,6 @@ void StageOpenWorld_E4C::Initialize()
 		models.emplace("tree2l", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tree_2_Leaf.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models.emplace("flower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Flower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 
-		models.emplace("tower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models.emplace("portal", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Portal.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["portal"]->SetPosition({ -34.0f, 4.0f, -45.0f });
 		models["portal"]->SetAngle({ 0.0f, 1.5f, 0.0f });
@@ -128,7 +123,7 @@ void StageOpenWorld_E4C::Initialize()
 		models["target2"]->SetAngle({ 0.0f, -1.0f, 0.0f });
 		models.emplace("target3", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget2.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["target3"]->SetPosition({ -32.0, 1.80f, 23.4f });
-
+		models["target3"]->SetAngle({ 0.0f, -1.0f, 0.0f });
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 250.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
 		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
@@ -233,8 +228,8 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	sky->Update(elapsedTime);
 
 	teleporter->Update(elapsedTime);
-	SpawnerManager::Instance().Update(elapsedTime);
 
+	SpawnerManager::Instance().Update(elapsedTime);
 
 	for (auto& it : models)
 	{
@@ -246,6 +241,7 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	{
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
 	}
+
 	m_sceneTickTimer = elapsedTime;
 	m_sceneGlobalTimer += elapsedTime;
 }
@@ -260,8 +256,8 @@ void StageOpenWorld_E4C::Render()
 	rc.camera = CameraManager::Instance().GetCamera();
 	rc.deviceContext = T_GRAPHICS.GetDeviceContext();
 	rc.renderState = T_GRAPHICS.GetRenderState();
+
 	rc.timerGlobal = m_sceneGlobalTimer;
-	rc.timerGlobal = timer;
 	rc.timerTick = TentacleLib::Timer::Instance().Delta();
 
 	// ライトの情報を詰め込む
@@ -274,8 +270,9 @@ void StageOpenWorld_E4C::Render()
 	{
 		it.second->Render(rc);
 	}
+
 	SpawnerManager::Instance().Render(rc);
-	ENEMIES.Render(rc);
+
 	teleporter->Render(rc);
 
 	ENEMIES.Render(rc);
@@ -303,8 +300,8 @@ void StageOpenWorld_E4C::RenderDX12()
 		{
 			T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
 			rc.shadowMap.shadow_srv_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSRV();
+			rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();
 		}
-
 		// シーン用定数バッファ更新
 		const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
 			CameraManager::Instance().GetCamera(), m_sceneGlobalTimer, m_sceneTickTimer);
@@ -312,7 +309,6 @@ void StageOpenWorld_E4C::RenderDX12()
 		// レンダーコンテキスト設定
 		rc.d3d_command_list = m_frameBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
-
 
 		// プレイヤー
 		PlayerCharacterManager::Instance().RenderDX12(rc);
@@ -326,7 +322,9 @@ void StageOpenWorld_E4C::RenderDX12()
 		{
 			it.second->RenderDX12(rc);
 		}
+
 		SpawnerManager::Instance().RenderDX12(rc);
+
 		// skyBox
 		{
 			rc.skydomeData.skyTexture = m_sprites[1]->GetDescriptor();
@@ -355,6 +353,7 @@ void StageOpenWorld_E4C::RenderDX12()
 		T_TEXT.EndDX12();
 	}
 	DrawSceneGUI();
+	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
 
 	T_GRAPHICS.End();
 }
