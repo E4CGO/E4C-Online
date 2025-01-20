@@ -1,5 +1,5 @@
 ﻿//! @file StageDungeon_E4C.cpp
-//! @note 
+//! @note
 
 #include "StageDungeon_E4C.h"
 #include "StageOpenWorld_E4C.h"
@@ -22,6 +22,7 @@
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Props/Spawner.h"
+#include "GameObject/Props/SpawnerManager.h"
 #include "GameObject/Props/Teleporter.h"
 
 #include "Network/OnlineController.h"
@@ -41,91 +42,49 @@ void StageDungeon_E4C::GenerateDungeon()
 		isLeader = true;
 
 		// ダンジョンの自動生成を行う
-		std::vector<RoomType> placeableRooms;
-		placeableRooms.emplace_back(RoomType::SIMPLE_ROOM_1);
-		//placeableRooms.emplace_back(RoomType::CROSS_ROOM_1);
+		// 生成する部屋タイプを算出
+		//RoomType firstRoomType = RoomType::FIRST_START;
+		RoomType firstRoomType = DUNGEONDATA.GetDungeonGenerateSetting().firstRoomType;
 
-		// 生成可能な部屋の重みの合計
-		int totalWeight = 0;
-		for (RoomType type : placeableRooms)
+		// 最上階なら最上階用の部屋タイプを持ってくる
+		if (currentFloor >= DUNGEONDATA.GetDungeonGenerateSetting().maxFloor)
 		{
-			totalWeight += dungeonData.GetRoomGenerateSetting(type).weight;
+			firstRoomType = DUNGEONDATA.GetDungeonGenerateSetting().topFloorRoomType;
 		}
 
-		int randomValue = std::rand() % totalWeight;
-		for (RoomType type : placeableRooms)
+		std::vector<RoomType> placeableRooms;
+		placeableRooms.emplace_back(firstRoomType);
+
+		// 部屋候補が一つしかない場合
+		if (placeableRooms.size() == 1) firstRoomType = placeableRooms.at(0);
+		// 複数候補があるならランダムで一つ
+		else
 		{
-			randomValue -= dungeonData.GetRoomGenerateSetting(type).weight;
-
-			if (randomValue < 0)
+			// 生成可能な部屋の重みの合計
+			int totalWeight = 0;
+			for (RoomType type : placeableRooms)
 			{
-				int orderIndex = 0;
+				totalWeight += dungeonData.GetRoomGenerateSetting(type).weight;
+			}
 
-				rootRoom = std::make_unique<RoomBase>(
-					nullptr, -1,
-					type,
-					m_roomAABBs,
-					true,
-					m_roomOrder, orderIndex);
+			int randomValue = std::rand() % totalWeight;
+			for (RoomType type : placeableRooms)
+			{
+				randomValue -= dungeonData.GetRoomGenerateSetting(type).weight;
 
-				//switch (type)
-				//{
-				//case RoomType::SIMPLE_ROOM_1:
-				//	rootRoom = std::make_unique<RoomBase>(
-				//		nullptr, -1,
-				//		RoomType::SIMPLE_ROOM_1,
-				//		m_roomAABBs,
-				//		true,
-				//		m_roomOrder, orderIndex);
-				//	break;
-
-				//case RoomType::END_ROOM:
-				//	rootRoom = std::make_unique<RoomBase>(
-				//		nullptr, -1,
-				//		RoomType::END_ROOM,
-				//		m_roomAABBs,
-				//		true,
-				//		m_roomOrder, orderIndex);
-				//	break;
-
-				//case RoomType::CROSS_ROOM_1:
-				//	rootRoom = std::make_unique<RoomBase>(
-				//		nullptr, -1,
-				//		RoomType::CROSS_ROOM_1,
-				//		m_roomAABBs,
-				//		true,
-				//		m_roomOrder, orderIndex);
-				//	break;
-
-				//case RoomType::CROSS_ROOM_2:
-				//	rootRoom = std::make_unique<RoomBase>(
-				//		nullptr, -1,
-				//		RoomType::CROSS_ROOM_2,
-				//		m_roomAABBs,
-				//		true,
-				//		m_roomOrder, orderIndex);
-				//	break;
-
-				//case RoomType::PASSAGE_1:
-				//	rootRoom = std::make_unique<RoomBase>(
-				//		nullptr, -1,
-				//		RoomType::PASSAGE_1,
-				//		m_roomAABBs,
-				//		true,
-				//		m_roomOrder, orderIndex);
-				//	break;
-
-				//case RoomType::DEAD_END:
-				//	rootRoom = std::make_unique<RoomBase>(
-				//		nullptr, -1,
-				//		RoomType::DEAD_END,
-				//		m_roomAABBs,
-				//		true,
-				//		m_roomOrder, orderIndex);
-				//	break;
-				//}
+				if (randomValue < 0) firstRoomType = type;
 			}
 		}
+
+		bool isLastRoomGenerated = false;
+
+		// 部屋の生成を開始する（再帰）
+		rootRoom = std::make_unique<RoomBase>(
+			nullptr, -1,
+			firstRoomType,
+			m_roomAABBs,
+			isLastRoomGenerated);
+
 		// 生成順番に登録する
 		for (RoomBase* room : rootRoom->GetAll())
 		{
@@ -142,67 +101,9 @@ void StageDungeon_E4C::GenerateDungeon()
 
 		rootRoom = std::make_unique<RoomBase>(
 			nullptr, -1,
-			static_cast<ns_RoomData::RoomType>(m_roomOrder.front()),
+			(RoomType)(m_roomOrder.at(0)),
 			m_roomAABBs,
-			false,
 			m_roomOrder, orderIndex);
-
-		//switch (m_roomOrder.front())
-		//{
-		//case RoomType::SIMPLE_ROOM_1:
-		//	rootRoom = std::make_unique<RoomBase>(
-		//		nullptr, -1,
-		//		RoomType::SIMPLE_ROOM_1,
-		//		m_roomAABBs,
-		//		false,
-		//		m_roomOrder, orderIndex);
-		//	break;
-
-		//case RoomType::END_ROOM:
-		//	rootRoom = std::make_unique<RoomBase>(
-		//		nullptr, -1,
-		//		RoomType::END_ROOM,
-		//		m_roomAABBs,
-		//		false,
-		//		m_roomOrder, orderIndex);
-		//	break;
-
-		//case RoomType::CROSS_ROOM_1:
-		//	rootRoom = std::make_unique<RoomBase>(
-		//		nullptr, -1,
-		//		RoomType::CROSS_ROOM_1,
-		//		m_roomAABBs,
-		//		false,
-		//		m_roomOrder, orderIndex);
-		//	break;
-
-		//case RoomType::CROSS_ROOM_2:
-		//	rootRoom = std::make_unique<RoomBase>(
-		//		nullptr, -1,
-		//		RoomType::CROSS_ROOM_2,
-		//		m_roomAABBs,
-		//		false,
-		//		m_roomOrder, orderIndex);
-		//	break;
-
-		//case RoomType::PASSAGE_1:
-		//	rootRoom = std::make_unique<RoomBase>(
-		//		nullptr, -1,
-		//		RoomType::PASSAGE_1,
-		//		m_roomAABBs,
-		//		false,
-		//		m_roomOrder, orderIndex);
-		//	break;
-
-		//case RoomType::DEAD_END:
-		//	rootRoom = std::make_unique<RoomBase>(
-		//		nullptr, -1,
-		//		RoomType::DEAD_END,
-		//		m_roomAABBs,
-		//		false,
-		//		m_roomOrder, orderIndex);
-		//	break;
-		//}
 	}
 }
 
@@ -221,7 +122,7 @@ void StageDungeon_E4C::Initialize()
 
 	// プレイヤー
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
-	player->SetPosition({ 0.0f, 5.0f, 2.0f });
+	player->SetPosition({ 0.0f, 10.0f, 2.0f });
 	player->GetStateMachine()->ChangeState(PlayerCharacter::STATE::IDLE);
 
 	// カメラ設定
@@ -237,40 +138,65 @@ void StageDungeon_E4C::Initialize()
 		player->GetPosition(),			// 注視点
 		{ 0, 0.969f, -0.248f }	// 上ベクトル
 	);
-
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(mainCamera);
 	cameraController->SetEnable(true);
 	cameraController->SetPlayer(player);
 	CURSOR_OFF;
 
-	m_roomOrder.emplace_back(RoomType::TUTO_START);
-	m_roomOrder.emplace_back(RoomType::TUTO_NOTHINGROOM);
-	m_roomOrder.emplace_back(RoomType::TUTO_SPAWNERROOM);
-	m_roomOrder.emplace_back(RoomType::TUTO_NOTHINGROOM);
-	m_roomOrder.emplace_back(RoomType::TUTO_END);
+	// 現在の階取得
+	currentFloor = DUNGEONDATA.GetCurrentFloor();
+
+	// テキスト設定
+	WidgetText* floorText = new WidgetText();
+	floorText->SetText((std::to_string(currentFloor) + "階").c_str());
+	floorText->SetPosition({ 30.0f, 30.0f });
+	UI.Register(floorText);
 
 	GenerateDungeon();
 
-	// 一番遠い部屋のうち、ランダムな一つを抽選しテレポーターを設置する
-	RoomBase* lastRoom = rootRoom->GetFarthestChild().at(std::rand() % rootRoom->GetFarthestChild().size());
+	// デバッグテキスト
+	WidgetText* debugText = new WidgetText();
+	std::string roomOrderText = "生成配列：";
+	for (int i = 0; i < m_roomOrder.size(); i++)
+	{
+		roomOrderText += std::to_string(m_roomOrder.at(i));
 
-	TeleportToOpenworld* teleporter = new TeleportToOpenworld();
-	teleporter->SetPosition(lastRoom->GetPosition() + DUNGEONDATA.GetRoomGenerateSetting(lastRoom->GetRoomType()).portalPosition);
-	teleporter->SetAngle({ 90.0f * RADIAN1, 0.0f, 0.0f });
-	teleporter->SetScale({ 10.0f, 10.0f, 1.0f });
-	GameObjectManager::Instance().Register(teleporter);
+		if (i < m_roomOrder.size() - 1) roomOrderText += ",";
+	}
+	debugText->SetText(roomOrderText.c_str());
+	debugText->SetPosition({ 30.0f, 60.0f });
+	UI.Register(debugText);
 
 	// 部屋のモデルを配置
 	for (RoomBase* room : rootRoom->GetAll())
 	{
 		room->PlaceMapTile(isLeader);
+
+		// currentFloorが最大階でない場合は階段の行先はStageDungeon
+		if (currentFloor < DUNGEONDATA.GetDungeonGenerateSetting().maxFloor)
+		{
+			if (room->GetRoomType() == RoomType::FIRST_END ||
+				room->GetRoomType() == RoomType::FIRST_BOSS)
+			{
+				room->PlaceTeleporterTile(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
+			}
+		}
+		// 最大階以上なら階段の行先はStageOpenWorld
+		else
+		{
+			if (room->GetRoomType() == RoomType::FIRST_END ||
+				room->GetRoomType() == RoomType::FIRST_BOSS)
+			{
+				room->PlaceTeleporterTile(new StageOpenWorld_E4C(m_pScene), m_pScene->GetOnlineController());
+			}
+		}
 	}
 
 	// 部屋の当たり判定を設定
 	MAPTILES.CreateSpatialIndex(5, 7);
 
-	Console::Instance().Open();
+	//Console::Instance().Open();
 
 	// 影初期化
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
@@ -280,9 +206,10 @@ void StageDungeon_E4C::Finalize()
 {
 	ENEMIES.Clear();
 	MAPTILES.Clear();
-
-	Console::Instance().Close();
+	UI.Clear();
+	SpawnerManager::Instance().Clear();
 	GameObjectManager::Instance().Clear();
+
 	T_GRAPHICS.GetShadowRenderer()->Finalize();
 }
 
@@ -296,6 +223,13 @@ void StageDungeon_E4C::Update(float elapsedTime)
 		onlineController->BeginSync();
 	}
 
+	// プレイヤーのYが-30.0fより下なら初期位置付近に戻す
+	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
+	if (player->GetPosition().y < -30.0f)
+	{
+		player->SetPosition({ 0.0f, 1.0f, 1.0f });
+	}
+
 	// ゲームループ内で
 	cameraController->SyncContrllerToCamera(camera);
 	cameraController->Update(elapsedTime);
@@ -305,8 +239,10 @@ void StageDungeon_E4C::Update(float elapsedTime)
 
 	PlayerCharacterManager::Instance().Update(elapsedTime);
 	GameObjectManager::Instance().Update(elapsedTime);
+	SpawnerManager::Instance().Update(elapsedTime);
 	ENEMIES.Update(elapsedTime);
 	MAPTILES.Update(elapsedTime);
+	UI.Update(elapsedTime);
 
 	if (T_INPUT.KeyDown(VK_MENU))
 	{
@@ -345,6 +281,9 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	m_timer += elapsedTime;
 }
 
+	m_timer += elapsedTime;
+}
+
 void StageDungeon_E4C::Render()
 {
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->Clear(T_GRAPHICS.GetDeviceContext(), 0.2f, 0.2f, 0.2f, 1);
@@ -378,49 +317,39 @@ void StageDungeon_E4C::Render()
 
 void StageDungeon_E4C::RenderDX12()
 {
-	T_GRAPHICS.BeginRender();
-
-	// シーン用定数バッファ更新
-	const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
-		CameraManager::Instance().GetCamera(), 0, 0);
-
-	// レンダーコンテキスト設定
 	RenderContextDX12 rc;
-	rc.d3d_command_list = m_frameBuffer->GetCommandList();
-	rc.scene_cbv_descriptor = scene_cbv_descriptor;
+
+	T_GRAPHICS.BeginRender();
 
 	// 3Dモデル描画
 	{
-		m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
-		m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
-		m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->Clear(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
 
 		// シャドウマップ
 		{
-			// TODO: 影
 			T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
 			rc.shadowMap.shadow_srv_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSRV();
 			rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();
 		}
+		// シーン用定数バッファ更新
+		const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
+			CameraManager::Instance().GetCamera(), timer, 0);
 
-		// モデル描画
+		// レンダーコンテキスト設定
+		rc.d3d_command_list = m_frameBuffer->GetCommandList();
+		rc.scene_cbv_descriptor = scene_cbv_descriptor;
+
+		// プレイヤー
 		PlayerCharacterManager::Instance().RenderDX12(rc);
 		GameObjectManager::Instance().RenderDX12(rc);
+		SpawnerManager::Instance().RenderDX12(rc);
 		ENEMIES.RenderDX12(rc);
 		MAPTILES.RenderDX12(rc);
 
-		for (RoomBase* room : rootRoom->GetAll())
-		{
-			room->Render(rc);
-
-			DirectX::XMFLOAT3 p = { 0, 0, 0 };
-			DirectX::XMFLOAT3 s = { 5, 5, 5 };
-
-			//T_GRAPHICS.GetDebugRenderer()->DrawCube(p, s, {1.0f, 1.0f, 1.0f, 1.0f});
-		}
-
 		// レンダーターゲットへの書き込み終了待ち
-		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
 	}
 
 	// ポストエフェクト描画
@@ -430,7 +359,20 @@ void StageDungeon_E4C::RenderDX12()
 
 	// 2D描画
 	{
+		T_TEXT.BeginDX12();
+
+		UI.RenderDX12(rc);
+
+		T_TEXT.EndDX12();
 	}
 
+	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
 	T_GRAPHICS.End();
+}
+
+void StageDungeon_E4C::DrawSceneGUI()
+{
+	ImVec2 pos = ImGui::GetMainViewport()->Pos;
+	ImGui::SetNextWindowPos(ImVec2(pos.x + 10, pos.y + 10), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
 }

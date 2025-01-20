@@ -48,6 +48,24 @@ public:
 		NUM						// カウント
 	};
 
+	enum WEAPON_PATTERN_MAIN : uint8_t
+	{
+		WEAPON_MAIN_SWORD = 0,
+		WEAPON_MAIN_ROD,
+		WEAPON_MAIN_SWORD2,
+		WEAPON_MAIN_ROD2,
+		WEAPON_MAIN_SWORD3,
+		WEAPON_MAIN_ROD3,
+	};
+
+	enum WEAPON_PATTERN_OFFHAND : uint8_t
+	{
+		WEAPON_OFFHAND_NONE = 0,
+		WEAPON_OFFHAND_SHIELD1,
+		WEAPON_OFFHAND_SHIELD2,
+		WEAPON_OFFHAND_SHIELD3,
+	};
+
 	// キャラクター情報
 	struct CharacterInfo
 	{
@@ -163,18 +181,19 @@ public:
 		return false;
 	}
 
-
 	const size_t GetAppearancePatternSize(uint8_t idx) { return m_pAppearancePatterns[idx].size(); }
-private:
+
 	// 外見パターンをクリア
 	void ClearAppearancePatterns();
+
+	void SetMalePatterns();
+	void SetFemalePatterns();
 
 private:
 	int m_CurrentSaveState = 0;
 
 	std::unordered_map<uint8_t, std::vector<PlayerCharacterPattern*>> m_pAppearancePatterns;
 	std::vector<CharacterInfo> m_CharaterInfosData;
-
 };
 
 #define PLAYER_CHARACTER_DATA PlayerCharacterData::Instance()

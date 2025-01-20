@@ -1,23 +1,24 @@
 ﻿#include "Source/Map/RoomBase.h"
 
 #include <TAKOEngine\Tool\XMFLOAT.h>
+#include <filesystem>
 #include <imgui.h>
 
 #include "GameObject/GameObjectManager.h"
+#include "GameObject/Props/Spawner.h"
+#include "GameObject/Props/SpawnerManager.h"
+#include "GameObject/Props/StairToNextFloor.h"
 #include "MapTile.h"
 #include "MapTileManager.h"
-#include "InstancingModelManager.h"
-
-#include "GameObject/Props/Spawner.h"
-
-#include <filesystem>
 
 RoomBase::RoomBase(
 	RoomBase* parent, int pointIndex,
+	RoomType roomType,
 	std::vector<AABB>& roomAABBs,
-	bool isAutoGeneration,
-	std::vector<uint8_t>& roomOrder, int& orderIndex)
+	bool& isLastRoomGenerated)
 {
+	this->roomType = roomType;
+
 	// タイルデータのリサイズ
 	m_tileDatas.resize(TileType::TILETYPE_COUNT);
 
@@ -32,21 +33,34 @@ RoomBase::RoomBase(
 		this->m_angle = parent->GetConnectPointData(pointIndex).angle;
 	}
 
-	m_debugCube = std::make_unique<CubeRenderer>(T_GRAPHICS.GetDeviceDX12());
-	m_debugDebugCube = std::make_unique<CubeRenderer>(T_GRAPHICS.GetDeviceDX12());
+	// AABB描画用
+	m_aabbCube = std::make_unique<CubeRenderer>(T_GRAPHICS.GetDeviceDX12());
+	m_debugCubes.resize(16);
+	for (std::unique_ptr<CubeRenderer>& cubeRenderer : m_debugCubes)
+	{
+		cubeRenderer = std::make_unique<CubeRenderer>(T_GRAPHICS.GetDeviceDX12());
+	}
 
 	// 深度を取得
 	depth = GetDepth();
 
 	// 後の接続点データ設定、部屋モデル配置のために行列更新処理を行う
 	UpdateTransform();
+
+	// 部屋データのロード
+	LoadMapData();
+
+	if (m_connectPointDatas.size() > 0)
+	{
+		// 次の部屋の生成を行う
+		GenerateNextRoomAutomatically(roomAABBs, isLastRoomGenerated);
+	}
 }
 
 RoomBase::RoomBase(
 	RoomBase* parent, int pointIndex,
 	RoomType roomType,
 	std::vector<AABB>& roomAABBs,
-	bool isAutoGeneration,
 	std::vector<uint8_t>& roomOrder, int& orderIndex)
 {
 	this->roomType = roomType;
@@ -65,8 +79,13 @@ RoomBase::RoomBase(
 		this->m_angle = parent->GetConnectPointData(pointIndex).angle;
 	}
 
-	m_debugCube = std::make_unique<CubeRenderer>(T_GRAPHICS.GetDeviceDX12());
-	m_debugDebugCube = std::make_unique<CubeRenderer>(T_GRAPHICS.GetDeviceDX12());
+	// AABB描画用
+	m_aabbCube = std::make_unique<CubeRenderer>(T_GRAPHICS.GetDeviceDX12());
+	m_debugCubes.resize(16);
+	for (std::unique_ptr<CubeRenderer>& cubeRenderer : m_debugCubes)
+	{
+		cubeRenderer = std::make_unique<CubeRenderer>(T_GRAPHICS.GetDeviceDX12());
+	}
 
 	// 深度を取得
 	depth = GetDepth();
@@ -78,10 +97,36 @@ RoomBase::RoomBase(
 	//LoadMapData();
 
 	// 次の部屋の生成を行う
-	GenerateNextRoom(
-		roomAABBs,
-		isAutoGeneration,
-		roomOrder, orderIndex);
+	GenerateNextRoomFromOrder(roomAABBs, roomOrder, orderIndex);
+}
+
+RoomBase::RoomBase(
+	RoomBase* parent, int pointIndex,
+	RoomType roomType)
+{
+	this->roomType = roomType;
+
+	// タイルデータのリサイズ
+	m_tileDatas.resize(TileType::TILETYPE_COUNT);
+
+	// 親と接続点番号を代入
+	this->parent = parent;
+	this->parentConnectPointIndex = pointIndex;
+
+	// 親の接続点データから座標の補正を行う
+	if (this->parent != nullptr)
+	{
+		this->m_position = parent->GetConnectPointData(pointIndex).position;
+		this->m_angle = parent->GetConnectPointData(pointIndex).angle;
+	}
+
+	// 当たり判定として使えるように行列更新処理を行う
+	UpdateTransform();
+
+	// 部屋データのロード
+	LoadMapData();
+
+	// 部屋の生成は行わない
 }
 
 void RoomBase::UpdateTransform()
@@ -95,19 +140,6 @@ void RoomBase::UpdateTransform()
 
 		DirectX::XMStoreFloat4x4(&m_transform, LocalTransform);
 	}
-
-	//// 接続点データも更新
-	//for (CONNECTPOINT_DATA& data : m_connectPointDatas)
-	//{
-	//	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(m_scale.x, m_scale.y, m_scale.z);
-	//	DirectX::XMMATRIX R = AnglesToMatrix(data.angle);
-	//	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(data.position.x, data.position.y, data.position.z);
-
-	//	DirectX::XMMATRIX LocalTransform = S * R * T;
-	//	DirectX::XMMATRIX ParentTransform = DirectX::XMLoadFloat4x4(&m_transform);
-	//	DirectX::XMMATRIX GlobalTransform = LocalTransform * ParentTransform;
-	//	DirectX::XMStoreFloat4x4(&data.transform, GlobalTransform);
-	//}
 }
 
 DirectX::XMFLOAT3 RoomBase::GetCenterPos()
@@ -132,7 +164,6 @@ DirectX::XMFLOAT3 RoomBase::GetCenterPos()
 	// 90度
 	if (degree > 89.9f && degree < 90.1f)
 	{
-
 	}
 
 	// 180度
@@ -157,60 +188,19 @@ DirectX::XMFLOAT3 RoomBase::GetCenterPos()
 	return m_position + placePos;
 }
 
-void RoomBase::GenerateNextRoom(
+void RoomBase::GenerateNextRoomAutomatically(
 	std::vector<AABB>& roomAABBs,
-	bool isAutoGeneration,
-	std::vector<uint8_t>& roomOrder, int& orderIndex)
+	bool& isLastRoomGenerated)
 {
-	DungeonData& dungeonData = DungeonData::Instance();
-
-	// 部屋データのロード（接続点データ設定もここで行う）
-	LoadMapData();
-
-	// 親がない＝最初の部屋ならば入口を塞いでおく
-	if (parent == nullptr)
-	{
-		//m_tileDatas.at(TileType::WALL_01A).emplace_back(TILE_DATA(
-		//	{ -2.0f, 0.0f, -2.0f },
-		//	{ 0.0f, DirectX::XMConvertToRadians(270.0f), 0.0f },
-		//	{ 1.0f, 1.0f, 1.0f }));
-		//m_tileDatas.at(TileType::WALL_01A).emplace_back(TILE_DATA(
-		//	{ -2.0f, 3.0f, -2.0f },
-		//	{ 0.0f, DirectX::XMConvertToRadians(270.0f), 0.0f },
-		//	{ 1.0f, 1.0f, 1.0f }));
-
-		//m_tileDatas.at(TileType::PILLAR).emplace_back(TILE_DATA(
-		//	{ -2.0f, 0.0f, -2.0f },
-		//	{ 0.0f, 0.0f, 0.0f },
-		//	{ 1.0f, 1.0f, 1.0f }));
-		//m_tileDatas.at(TileType::PILLAR).emplace_back(TILE_DATA(
-		//	{ -2.0f, 3.0f, -2.0f },
-		//	{ 0.0f, 0.0f, 0.0f },
-		//	{ 1.0f, 1.0f, 1.0f }));
-		//m_tileDatas.at(TileType::PILLAR).emplace_back(TILE_DATA(
-		//	{ 2.0f, 0.0f, -2.0f },
-		//	{ 0.0f, 0.0f, 0.0f },
-		//	{ 1.0f, 1.0f, 1.0f }));
-		//m_tileDatas.at(TileType::PILLAR).emplace_back(TILE_DATA(
-		//	{ 2.0f, 3.0f, -2.0f },
-		//	{ 0.0f, 0.0f, 0.0f },
-		//	{ 1.0f, 1.0f, 1.0f }));
-	}
-
 	// 自身のAABBを算出
-	m_aabb = CalcAABB(dungeonData.GetRoomGenerateSetting(roomType).aabb,
+	m_aabb = CalcAABB(DUNGEONDATA.GetRoomGenerateSetting(roomType).aabb,
 		m_position, DirectX::XMConvertToDegrees(m_angle.y));
 
-	// AABB配列に保存
-	roomAABBs.emplace_back(m_aabb);
-
-
-
-	// 自動生成を行う
-	if (isAutoGeneration)
+	// 最後の部屋が既に生成されているなら通常の生成を行う
+	if (isLastRoomGenerated)
 	{
 		// 最大深度が設定値より浅いなら次の部屋を生成する
-		if (depth < dungeonData.GetDungeonGenerateSetting().maxDepth)
+		if (depth < DUNGEONDATA.GetDungeonGenerateSetting().maxDepth)
 		{
 			// 配置時に他の部屋と重ならない部屋のみを配列に保存する
 			std::vector<std::vector<RoomType>> placeableRooms;
@@ -219,45 +209,44 @@ void RoomBase::GenerateNextRoom(
 			// 接続点の数だけ当たり判定を行い、生成を行う
 			for (int i = 0; i < m_connectPointDatas.size(); i++)
 			{
-				for (RoomType type : dungeonData.GetRoomGenerateSetting(roomType).placementCandidates)
+				for (RoomType type : DUNGEONDATA.GetRoomGenerateSetting(roomType).placementCandidates)
 				{
-					AABB nextRoomAABB = CalcAABB(dungeonData.GetRoomGenerateSetting(type).aabb,
+					// 新規生成する子のAABBを算出
+					AABB nextAABB = CalcAABB(DUNGEONDATA.GetRoomGenerateSetting(type).aabb,
 						m_connectPointDatas.at(i).position, DirectX::XMConvertToDegrees(m_connectPointDatas.at(i).angle.y));
 
-					m_debugAABBs.emplace_back(nextRoomAABB);
-
+					// 新規生成する子のAABBと他のAABB（この部屋のAABBは除く）との衝突判定を行う
+					// 子のAABBはちょっと大きくして部屋が干渉するのを防ぐ
 					bool isHit = false;
-
-					// 自分以外のAABBとの当たり判定を行う
-					for (const AABB& anotherRoomAABB : roomAABBs)
+					for (const AABB& anotherAABB : roomAABBs)
 					{
+						// AABBの位置が同じ==自分のAABBと判定して処理をスキップする
+						if (Mathf::cmpf(anotherAABB.position.x, m_aabb.position.x) &&
+							Mathf::cmpf(anotherAABB.position.y, m_aabb.position.y) &&
+							Mathf::cmpf(anotherAABB.position.z, m_aabb.position.z)) continue;
+
 						IntersectionResult result;
-
-						// 部屋同士の当たり判定時のみ半径を少しだけ伸ばすことで、複数の部屋が隣接し、一つの部屋のように生成されてしまうのを防ぐ
-						DirectX::XMFLOAT3 temp_NextRadii =
-						{
-							nextRoomAABB.radii.x + 0.0f,
-							nextRoomAABB.radii.y + 0.0f,
-							nextRoomAABB.radii.z + 0.0f,
+						DirectX::XMFLOAT3 tmpNextRadii = {
+							nextAABB.radii.x + 4.0f,
+							nextAABB.radii.y,
+							nextAABB.radii.z + 4.0f
 						};
-
-						DirectX::XMFLOAT3 temp_AnotherRadii =
-						{
-							anotherRoomAABB.radii.x + 0.0f,
-							anotherRoomAABB.radii.y + 0.0f,
-							anotherRoomAABB.radii.z + 0.0f,
-						};
+						DirectX::XMFLOAT3 tmpAnotherRadii = anotherAABB.radii;
 
 						if (Collision::IntersectAABBVsAABB(
-							DirectX::XMLoadFloat3(&nextRoomAABB.position),
-							DirectX::XMLoadFloat3(&temp_NextRadii),
-							DirectX::XMLoadFloat3(&anotherRoomAABB.position),
-							DirectX::XMLoadFloat3(&temp_AnotherRadii),
+							DirectX::XMLoadFloat3(&nextAABB.position),
+							DirectX::XMLoadFloat3(&tmpNextRadii),
+							DirectX::XMLoadFloat3(&anotherAABB.position),
+							DirectX::XMLoadFloat3(&tmpAnotherRadii),
 							&result))
 						{
 							// AABBと衝突するなら配列に保存しない
-							//isHit = true;
-							//break;
+							isHit = true;
+
+							// 当たり判定に使用したAABBはデバッグ四角形描画のために保存しておく
+							//m_debugAABBs.emplace_back(AABB(nextAABB.position, tmpNextRadii));
+
+							break;
 						}
 					}
 					// 衝突しなかった場合は配列に保存する
@@ -267,6 +256,10 @@ void RoomBase::GenerateNextRoom(
 					}
 				}
 
+				// 当たり判定が終わったところで
+				// 自身のAABBを配列に保存
+				roomAABBs.emplace_back(m_aabb);
+
 				// 子の部屋を生成する
 				// 他の部屋と重ならない部屋があるならば生成を開始する
 				if (placeableRooms.at(i).size() > 0)
@@ -275,63 +268,26 @@ void RoomBase::GenerateNextRoom(
 					int totalWeight = 0;
 					for (RoomType type : placeableRooms.at(i))
 					{
-						totalWeight += dungeonData.GetRoomGenerateSetting(type).weight;
+						totalWeight += DUNGEONDATA.GetRoomGenerateSetting(type).weight;
 					}
 
 					int randomValue = std::rand() % totalWeight;
 					for (RoomType type : placeableRooms.at(i))
 					{
-						randomValue -= dungeonData.GetRoomGenerateSetting(type).weight;
+						randomValue -= DUNGEONDATA.GetRoomGenerateSetting(type).weight;
 
 						if (randomValue < 0)
 						{
-							RoomBase* nextRoom = new RoomBase(this, i, type, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+							RoomBase* nextRoom = new RoomBase(this, i, type, roomAABBs, isLastRoomGenerated);
 							AddRoom(nextRoom);
-
-							//RoomBase* nextRoom = nullptr;
-
-							//switch (type)
-							//{
-							//case RoomType::SIMPLE_ROOM_1:
-							//	//nextRoom = new SimpleRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-							//	nextRoom = new RoomBase(this, i, ns_RoomData::SIMPLE_ROOM_1, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-							//	break;
-
-							//case RoomType::END_ROOM:
-							//	//nextRoom = new EndRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-							//	nextRoom = new RoomBase(this, i, ns_RoomData::END_ROOM, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-							//	break;
-
-							//case RoomType::CROSS_ROOM_1:
-							//	//nextRoom = new CrossRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-							//	nextRoom = new RoomBase(this, i, ns_RoomData::CROSS_ROOM_1, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-							//	break;
-
-							//case RoomType::CROSS_ROOM_2:
-							//	//nextRoom = new CrossRoom2(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-							//	nextRoom = new RoomBase(this, i, ns_RoomData::CROSS_ROOM_2, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-							//	break;
-
-							//case RoomType::PASSAGE_1:
-							//	//nextRoom = new Passage1(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-							//	nextRoom = new RoomBase(this, i, ns_RoomData::PASSAGE_1, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-							//	break;
-
-							//default:
-							//	break;
-							//}
-							//AddRoom(nextRoom);
-							//break;
+							break;
 						}
 					}
 				}
 				// 何も生成できないならば行き止まり用の部屋を生成する
 				else
 				{
-					//EndRoom1* end = new EndRoom1(this, i);
-					//AddRoom(end);
-					//DeadEndRoom* deadEnd = new DeadEndRoom(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-					RoomBase* deadEnd = new RoomBase(this, i, RoomType::DEAD_END, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+					RoomBase* deadEnd = new RoomBase(this, i, RoomType::DEAD_END, roomAABBs, isLastRoomGenerated);
 					AddRoom(deadEnd);
 				}
 			}
@@ -339,66 +295,261 @@ void RoomBase::GenerateNextRoom(
 		// 一定の深度を超えた場合は行き止まり用の部屋を生成する
 		else
 		{
+			// 自身のAABBを配列に保存
+			roomAABBs.emplace_back(m_aabb);
+
 			// 接続点の数だけ行き止まり用の部屋を生成する
 			for (int i = 0; i < m_connectPointDatas.size(); i++)
 			{
-				//DeadEndRoom* deadEnd = new DeadEndRoom(this, i, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-				RoomBase* deadEnd = new RoomBase(this, i, RoomType::DEAD_END, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
+				RoomBase* deadEnd = new RoomBase(this, i, RoomType::DEAD_END, roomAABBs, isLastRoomGenerated);
 				AddRoom(deadEnd);
 			}
 		}
 	}
-	// 自動生成は行わず、生成順（roomOrder）で生成を行う
+	// 最後の部屋が生成されていないなら最初のブランチの生成を行う
 	else
 	{
-		// 接続点の数だけ子を生成する
-		for (int i = 0; i < m_connectPointDatas.size(); i++)
+		// 最大深度が設定値より浅いなら次の部屋を生成する
+		if (depth < DUNGEONDATA.GetDungeonGenerateSetting().maxDepth)
 		{
-			// もしも配列のサイズを超えてしまうならreturn
-			if (orderIndex >= roomOrder.size()) return;
+			// 配置時に他の部屋と重ならず、
+			// 接続点の先に最後の部屋を生成できるスペースがある部屋を配列に保存する
+			std::vector<std::vector<RoomType>> placeableRooms;
+			placeableRooms.resize(m_connectPointDatas.size());
 
-			RoomType nextRoomType = static_cast<RoomType>(roomOrder.at(orderIndex));
+			// 接続点の数だけ当たり判定を行い、生成を行う
+			for (int i = 0; i < m_connectPointDatas.size(); i++)
+			{
+				if (!isLastRoomGenerated)
+				{
+					for (RoomType type : DUNGEONDATA.GetRoomGenerateSetting(roomType).placementCandidates)
+					{
+						// 子のAABBを算出
+						AABB nextAABB = CalcAABB(DUNGEONDATA.GetRoomGenerateSetting(type).aabb,
+							m_connectPointDatas.at(i).position, DirectX::XMConvertToDegrees(m_connectPointDatas.at(i).angle.y));
 
-			RoomBase* nextRoom = new RoomBase(this, i, nextRoomType, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
-			AddRoom(nextRoom);
+						// 子のAABBと他のAABB（自分のAABBは除く）との衝突判定を行う
+						// 子のAABBはちょっと大きくして部屋が干渉するのを防ぐ
+						bool isHit = false;
+						for (const AABB& anotherAABB : roomAABBs)
+						{
+							// AABBの位置が同じ==自分のAABBと判定して処理をスキップする
+							if (Mathf::cmpf(anotherAABB.position.x, m_aabb.position.x) &&
+								Mathf::cmpf(anotherAABB.position.y, m_aabb.position.y) &&
+								Mathf::cmpf(anotherAABB.position.z, m_aabb.position.z)) continue;
 
-			//switch (nextRoomType)
-			//{
-			//case RoomType::SIMPLE_ROOM_1:
-			//	//nextRoom = new SimpleRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
-			//	nextRoom = new RoomBase(this, i, ns_RoomData::SIMPLE_ROOM_1, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-			//	break;
+							IntersectionResult result;
+							DirectX::XMFLOAT3 tmpNextRadii = {
+								nextAABB.radii.x + 4.0f,
+								nextAABB.radii.y,
+								nextAABB.radii.z + 4.0f
+							};
+							DirectX::XMFLOAT3 tmpAnotherRadii = anotherAABB.radii;
 
-			//case RoomType::END_ROOM:
-			//	//nextRoom = new EndRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
-			//	nextRoom = new RoomBase(this, i, ns_RoomData::END_ROOM, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-			//	break;
+							if (Collision::IntersectAABBVsAABB(
+								DirectX::XMLoadFloat3(&nextAABB.position),
+								DirectX::XMLoadFloat3(&tmpNextRadii),
+								DirectX::XMLoadFloat3(&anotherAABB.position),
+								DirectX::XMLoadFloat3(&tmpAnotherRadii),
+								&result))
+							{
+								// AABBと衝突するなら配列に保存しない
+								isHit = true;
 
-			//case RoomType::CROSS_ROOM_1:
-			//	//nextRoom = new CrossRoom1(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
-			//	nextRoom = new RoomBase(this, i, ns_RoomData::CROSS_ROOM_1, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-			//	break;
+								// 当たり判定に使用したAABBはデバッグ四角形描画のために保存しておく
+								//m_debugAABBs.emplace_back(AABB(nextAABB.position, tmpNextRadii));
 
-			//case RoomType::CROSS_ROOM_2:
-			//	//nextRoom = new CrossRoom2(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
-			//	nextRoom = new RoomBase(this, i, ns_RoomData::CROSS_ROOM_2, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-			//	break;
+								break;
+							}
+						}
+						// 一度も衝突がなかったら接続点の先に最後の部屋が生成できるかを判定する
+						if (!isHit)
+						{
+							// 自身のAABBを登録した一次的な配列を用意する
+							std::vector<AABB> tempRoomAABBs;
+							tempRoomAABBs = roomAABBs;
+							tempRoomAABBs.emplace_back(m_aabb);
 
-			//case RoomType::PASSAGE_1:
-			//	//nextRoom = new Passage1(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
-			//	nextRoom = new RoomBase(this, i, ns_RoomData::PASSAGE_1, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-			//	break;
+							// 当たり判定用に最後の部屋を生成する
+							RoomBase endRoom(this, i, RoomType::FIRST_END);
 
-			//case RoomType::DEAD_END:
-			//	//nextRoom = new DeadEndRoom(this, i, roomAABBs, isAutoGeneration, roomOrder, ++orderIndex);
-			//	nextRoom = new RoomBase(this, i, ns_RoomData::DEAD_END, roomAABBs, isAutoGeneration, roomOrder, orderIndex);
-			//	break;
-			//}
-			//AddRoom(nextRoom);
+							// 最後の部屋のAABBと他のAABB（子のAABBは除く）との衝突判定を行う
+							// 最後の部屋のAABBはちょっと大きくして部屋が干渉するのを防ぐ
+							for (const AABB& tempAnotherAABB : tempRoomAABBs)
+							{
+								// AABBの位置が同じ==子のAABBと判定して処理をスキップする
+								if (Mathf::cmpf(tempAnotherAABB.position.x, nextAABB.position.x) &&
+									Mathf::cmpf(tempAnotherAABB.position.y, nextAABB.position.y) &&
+									Mathf::cmpf(tempAnotherAABB.position.z, nextAABB.position.z)) continue;
+
+								IntersectionResult result;
+								DirectX::XMFLOAT3 tempEndPos = endRoom.GetPosition();
+								DirectX::XMFLOAT3 tempEndAABB = {
+									endRoom.GetAABB().radii.x + 4.0f,
+									endRoom.GetAABB().radii.y,
+									endRoom.GetAABB().radii.z + 4.0f
+								};
+								DirectX::XMFLOAT3 tempAnotherRadii = tempAnotherAABB.radii;
+
+								if (Collision::IntersectAABBVsAABB(
+									DirectX::XMLoadFloat3(&tempEndPos),
+									DirectX::XMLoadFloat3(&tempEndAABB),
+									DirectX::XMLoadFloat3(&tempAnotherAABB.position),
+									DirectX::XMLoadFloat3(&tempAnotherRadii),
+									&result))
+								{
+									// AABBと衝突するなら配列に保存しない
+									isHit = true;
+
+									//break;
+
+									// 当たり判定に使用したAABBはデバッグ四角形描画のために保存しておく
+									//m_debugAABBs.emplace_back(AABB(tempEndPos, tempEndAABB));
+
+									break;
+								}
+
+								if (!isHit)
+								{
+									// 最後の部屋も生成できるからなんか登録する
+									placeableRooms.at(i).emplace_back(type);
+								}
+							}
+						}
+					}
+				}
+				else
+				{
+					for (RoomType type : DUNGEONDATA.GetRoomGenerateSetting(roomType).placementCandidates)
+					{
+						// 新規生成する子のAABBを算出
+						AABB nextAABB = CalcAABB(DUNGEONDATA.GetRoomGenerateSetting(type).aabb,
+							m_connectPointDatas.at(i).position, DirectX::XMConvertToDegrees(m_connectPointDatas.at(i).angle.y));
+
+						// 新規生成する子のAABBと他のAABB（この部屋のAABBは除く）との衝突判定を行う
+						// 子のAABBはちょっと大きくして部屋が干渉するのを防ぐ
+						bool isHit = false;
+						for (const AABB& anotherAABB : roomAABBs)
+						{
+							// AABBの位置が同じ==自分のAABBと判定して処理をスキップする
+							if (Mathf::cmpf(anotherAABB.position.x, m_aabb.position.x) &&
+								Mathf::cmpf(anotherAABB.position.y, m_aabb.position.y) &&
+								Mathf::cmpf(anotherAABB.position.z, m_aabb.position.z)) continue;
+
+							IntersectionResult result;
+							DirectX::XMFLOAT3 tmpNextRadii = {
+								nextAABB.radii.x + 4.0f,
+								nextAABB.radii.y,
+								nextAABB.radii.z + 4.0f
+							};
+							DirectX::XMFLOAT3 tmpAnotherRadii = anotherAABB.radii;
+
+							if (Collision::IntersectAABBVsAABB(
+								DirectX::XMLoadFloat3(&nextAABB.position),
+								DirectX::XMLoadFloat3(&tmpNextRadii),
+								DirectX::XMLoadFloat3(&anotherAABB.position),
+								DirectX::XMLoadFloat3(&tmpAnotherRadii),
+								&result))
+							{
+								// AABBと衝突するなら配列に保存しない
+								isHit = true;
+
+								// 当たり判定に使用したAABBはデバッグ四角形描画のために保存しておく
+								//m_debugAABBs.emplace_back(AABB(nextAABB.position, tmpNextRadii));
+
+								break;
+							}
+						}
+						// 衝突しなかった場合は配列に保存する
+						if (!isHit)
+						{
+							placeableRooms.at(i).emplace_back(type);
+						}
+					}
+				}
+
+				// 当たり判定が終わったところで
+				// 自身のAABBを配列に保存
+				roomAABBs.emplace_back(m_aabb);
+
+				// 子の部屋を生成する
+				// 他の部屋と重ならない部屋があるならば生成を開始する
+				if (placeableRooms.at(i).size() > 0)
+				{
+					// 生成可能な部屋の重みの合計
+					int totalWeight = 0;
+					for (RoomType type : placeableRooms.at(i))
+					{
+						totalWeight += DUNGEONDATA.GetRoomGenerateSetting(type).weight;
+					}
+
+					int randomValue = std::rand() % totalWeight;
+					for (RoomType type : placeableRooms.at(i))
+					{
+						randomValue -= DUNGEONDATA.GetRoomGenerateSetting(type).weight;
+
+						if (randomValue < 0)
+						{
+							RoomBase* nextRoom = new RoomBase(this, i, type, roomAABBs, isLastRoomGenerated);
+							AddRoom(nextRoom);
+							break;
+						}
+					}
+				}
+				// 何も生成できないならば行き止まり用の部屋を生成する
+				else
+				{
+					RoomBase* deadEnd = new RoomBase(this, i, RoomType::DEAD_END, roomAABBs, isLastRoomGenerated);
+					AddRoom(deadEnd);
+				}
+			}
+		}
+		// 一定の深度を超えた場合は最後の部屋を生成する
+		else
+		{
+			// 自身のAABBを配列に保存
+			roomAABBs.emplace_back(m_aabb);
+
+			isLastRoomGenerated = true;
+
+			RoomBase* endRoom = new RoomBase(this, 0, RoomType::FIRST_END, roomAABBs, isLastRoomGenerated);
+			AddRoom(endRoom);
+
+			// 他に接続点があれば行き止まり用の部屋を生成する
+			if (m_connectPointDatas.size() > 1)
+			{
+				for (int i = 1; i < m_connectPointDatas.size(); i++)
+				{
+					RoomBase* deadEnd = new RoomBase(this, i, RoomType::DEAD_END, roomAABBs, isLastRoomGenerated);
+					AddRoom(deadEnd);
+				}
+			}
 		}
 	}
 }
 
+void RoomBase::GenerateNextRoomFromOrder(
+	std::vector<AABB>& roomAABBs,
+	std::vector<uint8_t>& roomOrder,
+	int& orderIndex)
+{
+	// 自身のAABBを算出
+	m_aabb = CalcAABB(DUNGEONDATA.GetRoomGenerateSetting(roomType).aabb,
+		m_position, DirectX::XMConvertToDegrees(m_angle.y));
+
+	// AABB配列に保存
+	roomAABBs.emplace_back(m_aabb);
+
+	// 接続点の数だけ子を生成する
+	for (int i = 0; i < m_connectPointDatas.size(); i++)
+	{
+		// もしも配列のサイズを超えてしまうならreturn
+		if (orderIndex >= roomOrder.size()) return;
+
+		RoomBase* nextRoom = new RoomBase(this, i, (RoomType)(roomOrder.at(orderIndex - 1)), roomAABBs, roomOrder, ++orderIndex);
+		AddRoom(nextRoom);
+	}
+}
 
 AABB RoomBase::CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const
 {
@@ -406,55 +557,35 @@ AABB RoomBase::CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const
 	while (degree >= 360.0f) degree -= 360.0f;
 	while (degree < 0.0f) degree += 360.0f;
 
-	// 角度によって補正を行う
-	// 90度か270度ならxとzを逆転させる
-	if ((degree > 89.9f && degree < 90.1f) || (degree > 269.9f && degree < 270.1f))
-	{
-		AABB buf = aabb;
-
-		aabb.radii.x = buf.radii.z;
-		aabb.radii.z = buf.radii.x;
-
-		//aabb.position.x = aabb.position.z;
-		//aabb.position.z = buf.position.x;
-		//aabb.radii.x = aabb.radii.z;
-		//aabb.radii.z = buf.radii.x;
-	}
+	AABB buf = aabb;
 
 	// 90度
 	if (degree > 89.9f && degree < 90.1f)
 	{
-		// 位置補正
-		//aabb.position.x += tileScale;
+		aabb.radii.x = buf.radii.z;
+		aabb.radii.z = buf.radii.x;
+
+		aabb.position.x = buf.position.z;
+		aabb.position.z = buf.position.x;
 	}
 
 	// 180度
 	if (degree > 179.9f && degree < 180.1f)
 	{
-		// zを反転
-		//aabb.position.z = -aabb.position.z;
-
-		// 位置補正
-		//aabb.position.x += tileScale;
-		//aabb.position.z += tileScale + tileScale + (tileScale * 0.5f);
+		aabb.position.z = -buf.position.z;
 	}
 
 	// 270度
 	if (degree > 269.9f && degree < 270.1f)
 	{
-		// xを反転
-		//aabb.position.x = -aabb.position.x;
+		aabb.radii.x = buf.radii.z;
+		aabb.radii.z = buf.radii.x;
 
-		// 位置補正
-		//aabb.position.x += tileScale;
+		aabb.position.x = -buf.position.z;
+		aabb.position.z = buf.position.x;
 	}
 
 	aabb.position += pos;
-
-	//aabb.radii.x *= 0.2f;
-	//aabb.radii.z *= 0.9f;
-
-	//aabb.radii *= 0.2f;
 
 	return aabb;
 }
@@ -462,7 +593,6 @@ AABB RoomBase::CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const
 void RoomBase::LoadMapData()
 {
 	nlohmann::json loadFile;
-	//std::ifstream ifs("Data/RoomDatas/TutoFloor_Start.json");
 	std::ifstream ifs(DUNGEONDATA.GetFileName(roomType));
 
 	if (ifs.is_open())
@@ -477,7 +607,36 @@ void RoomBase::LoadMapData()
 			switch (tileType)
 			{
 			case ns_RoomData::PORTAL: continue;
-			//case ns_RoomData::SPAWNER: continue;
+
+			case ns_RoomData::SPAWNER:
+			{
+				DirectX::XMFLOAT3 position = {
+					nodeData["Position"].at(0),
+					nodeData["Position"].at(1),
+					nodeData["Position"].at(2)
+				};
+				DirectX::XMFLOAT3 angle = {
+					nodeData["Angle"].at(0),
+					nodeData["Angle"].at(1),
+					nodeData["Angle"].at(2)
+				};
+
+				TILE_DATA newData;
+				newData.position = DirectX::XMFLOAT3(position);
+				newData.angle = m_angle + angle;
+
+				// ワールド座標に変換し保存
+				DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&m_transform);
+				DirectX::XMVECTOR PointPos = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&newData.position), WorldTransform);
+				DirectX::XMStoreFloat3(&newData.position, PointPos);
+				m_tileDatas.at(tileType).emplace_back(TILE_DATA(
+					position,
+					angle,
+					{ 1.0f, 1.0f, 1.0f })
+				);
+			}
+			continue;
+
 			case ns_RoomData::CONNECTPOINT:
 			{
 				DirectX::XMFLOAT3 position = {
@@ -543,10 +702,42 @@ void RoomBase::PlaceMapTile(bool isLeader)
 		{
 			for (const TILE_DATA& data : m_tileDatas.at(tileType))
 			{
-				Spawner* spawner = new Spawner(2, 2, -1);
-				spawner->SetPosition(m_position + data.position);
+				Spawner* spawner = new Spawner(ENEMY_TYPE::MOUSE, 2, -1);
 
-				GameObjectManager::Instance().Register(spawner);
+				DirectX::XMFLOAT3 resultPos = data.position;
+				DirectX::XMFLOAT3 bufPos = resultPos;
+
+				float degree = DirectX::XMConvertToDegrees(m_angle.y);
+
+				// 360度以内に丸める
+				while (degree >= 360.0f) degree -= 360.0f;
+				while (degree < 0.0f) degree += 360.0f;
+
+				// 90度
+				if (degree > 89.9f && degree < 90.1f)
+				{
+					resultPos.x = bufPos.z;
+					resultPos.z = bufPos.x;
+				}
+
+				// 180度
+				if (degree > 179.9f && degree < 180.1f)
+				{
+					resultPos.z = -bufPos.z;
+				}
+
+				// 270度
+				if (degree > 269.9f && degree < 270.1f)
+				{
+					resultPos.x = -bufPos.z;
+					resultPos.z = bufPos.x;
+				}
+				resultPos += m_position;
+
+				spawner->SetPosition(resultPos);
+
+				SpawnerManager::Instance().Register(spawner);
+				//GameObjectManager::Instance().Register(spawner);
 			}
 			continue;
 		}
@@ -569,7 +760,6 @@ void RoomBase::PlaceMapTile(bool isLeader)
 			modelFileDatas.emplace_back(DUNGEONDATA.GetModelFileDatas((TileType)tileType).at(0));
 		}
 
-		// 先に描画用モデルの読込を行う
 		// 描画用データがあるなら
 		if (modelFileDatas.size() > 0)
 		{
@@ -638,7 +828,7 @@ void RoomBase::PlaceMapTile(bool isLeader)
 			//		instancingModel->GetModel()->UpdateTransform(id, tm);
 			//	}
 			//	MAPTILES.Register(instancingModel);
-				
+
 			//  // ステージの影登録
 			//	//T_GRAPHICS.GetShadowRenderer()->ModelRegister(instancingModel->GetModel(0).get());
 			//}
@@ -665,10 +855,19 @@ void RoomBase::PlaceMapTile(bool isLeader)
 					modelTile->SetAngle(tileData.angle);
 					modelTile->SetScale(tileData.scale);
 					modelTile->Update(0);
-					MAPTILES.Register(modelTile);
-					
+
 					// ステージの影登録
 					T_GRAPHICS.GetShadowRenderer()->ModelRegister(modelTile->GetModel(0).get());
+
+					// 当たり判定データが無い場合は当たり判定としても使う
+					if (collisionFileDatas.size() <= 0)
+					{
+						MAPTILES.Register(modelTile);
+					}
+					else
+					{
+						GameObjectManager::Instance().Register(modelTile);
+					}
 				}
 			}
 		}
@@ -702,6 +901,49 @@ void RoomBase::PlaceMapTile(bool isLeader)
 				MAPTILES.Register(colliderTile);
 			}
 		}
+	}
+}
+
+void RoomBase::PlaceTeleporterTile(Stage* stage, Online::OnlineController* onlineController)
+{
+	for (const TILE_DATA& data : m_tileDatas.at(TileType::STAIR_TO_NEXTFLOOR))
+	{
+		StairToNextFloor* stairToNextFloor = new StairToNextFloor(stage, onlineController);
+
+		DirectX::XMFLOAT3 resultPos = data.position;
+		DirectX::XMFLOAT3 bufPos = resultPos;
+
+		float degree = DirectX::XMConvertToDegrees(m_angle.y);
+
+		// 360度以内に丸める
+		while (degree >= 360.0f) degree -= 360.0f;
+		while (degree < 0.0f) degree += 360.0f;
+
+		// 90度
+		if (degree > 89.9f && degree < 90.1f)
+		{
+			resultPos.x = bufPos.z;
+			resultPos.z = bufPos.x;
+		}
+
+		// 180度
+		if (degree > 179.9f && degree < 180.1f)
+		{
+			resultPos.z = -bufPos.z;
+		}
+
+		// 270度
+		if (degree > 269.9f && degree < 270.1f)
+		{
+			resultPos.x = -bufPos.z;
+			resultPos.z = bufPos.x;
+		}
+		resultPos += m_position;
+
+		stairToNextFloor->SetPosition(resultPos);
+		//stairToNextFloor->SetScale({ 4.0f, 4.0f, 4.0f });
+
+		GameObjectManager::Instance().Register(stairToNextFloor);
 	}
 }
 

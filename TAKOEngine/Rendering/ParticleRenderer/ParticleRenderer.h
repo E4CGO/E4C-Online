@@ -7,15 +7,16 @@
 #include "TAKOEngine\Rendering\Shaders\ParticleShader.h"
 
 //***************************************************
-// @class ParticleRenderer
+// @class InjectionParticleRenderer
 // @brief パーティクルの描画
 // @par   [説明]
+// @par   噴射パーティクル
 //***************************************************
-class ParticleRenderer
+class InjectionParticleRenderer
 {
 public:
-	ParticleRenderer();
-	~ParticleRenderer();
+	InjectionParticleRenderer();
+	~InjectionParticleRenderer();
 
 	void Render(FrameBufferManager* framBuffer);
 

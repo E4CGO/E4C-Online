@@ -65,7 +65,10 @@ namespace EnemyState
 				EnemyState::StateTransition(owner, Enemy::STATE::IDLE);
 			}
 		}
-		void AttackState::Exit() {}
+		void AttackState::Exit()
+		{
+			subState->Exit();
+		}
 
 		// 攻撃追跡ステート
 		void AttackFollowState::Enter()

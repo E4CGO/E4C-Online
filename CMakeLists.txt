@@ -203,6 +203,8 @@ set(Source__GameObject__Props
     "Source/GameObject/Props/Spawner.h"
     "Source/GameObject/Props/SpawnerManager.cpp"
     "Source/GameObject/Props/SpawnerManager.h"
+    "Source/GameObject/Props/StairToNextFloor.cpp"
+    "Source/GameObject/Props/StairToNextFloor.h"
     "Source/GameObject/Props/Teleporter.cpp"
     "Source/GameObject/Props/Teleporter.h"
 )
@@ -223,10 +225,6 @@ set(Source__GameObject__Character__Enemy
     "Source/GameObject/Character/Enemy/MouseMob.h"
     "Source/GameObject/Character/Enemy/MouseMobState.cpp"
     "Source/GameObject/Character/Enemy/MouseMobState.h"
-    "Source/GameObject/Character/Enemy/SkeletonMinion.cpp"
-    "Source/GameObject/Character/Enemy/SkeletonMinion.h"
-    "Source/GameObject/Character/Enemy/SkeletonMinionState.cpp"
-    "Source/GameObject/Character/Enemy/SkeletonMinionState.h"
 )
 source_group("Source\\GameObject\\Character\\Enemy" FILES ${Source__GameObject__Character__Enemy})
 
@@ -367,6 +365,8 @@ set(Source__UI__Widget
     "Source/UI/Widget/WidgetPlayerHP.h"
     "Source/UI/Widget/WidgetSettingWindow.cpp"
     "Source/UI/Widget/WidgetSettingWindow.h"
+    "Source/UI/Widget/WidgetStripeAnimation.cpp"
+    "Source/UI/Widget/WidgetStripeAnimation.h"
     "Source/UI/Widget/WidgetText.cpp"
     "Source/UI/Widget/WidgetText.h"
     "Source/UI/Widget/WidgetUpDown.cpp"
@@ -483,8 +483,6 @@ set(TAKOEngine__Rendering
     "TAKOEngine/Rendering/LineRenderer.h"
     "TAKOEngine/Rendering/Misc.h"
     "TAKOEngine/Rendering/MyRender.h"
-    "TAKOEngine/Rendering/ParticleRenderer.cpp"
-    "TAKOEngine/Rendering/ParticleRenderer.h"
     "TAKOEngine/Rendering/Plane.cpp"
     "TAKOEngine/Rendering/Plane.h"
     "TAKOEngine/Rendering/PostEffect.cpp"
@@ -595,6 +593,14 @@ set(TAKOEngine__Rendering__Model
 )
 source_group("TAKOEngine\\Rendering\\Model" FILES ${TAKOEngine__Rendering__Model})
 
+set(TAKOEngine__Rendering__ParticleRenderer
+    "TAKOEngine/Rendering/ParticleRenderer/HitParticleRenderer.cpp"
+    "TAKOEngine/Rendering/ParticleRenderer/HitParticleRenderer.h"
+    "TAKOEngine/Rendering/ParticleRenderer/ParticleRenderer.cpp"
+    "TAKOEngine/Rendering/ParticleRenderer/ParticleRenderer.h"
+)
+source_group("TAKOEngine\\Rendering\\ParticleRenderer" FILES ${TAKOEngine__Rendering__ParticleRenderer})
+
 set(TAKOEngine__Rendering__Shaders
     "TAKOEngine/Rendering/Shaders/ColorGradingShader.cpp"
     "TAKOEngine/Rendering/Shaders/ColorGradingShader.h"
@@ -606,6 +612,8 @@ set(TAKOEngine__Rendering__Shaders
     "TAKOEngine/Rendering/Shaders/FinalpassShader.h"
     "TAKOEngine/Rendering/Shaders/GaussianBlurShader.cpp"
     "TAKOEngine/Rendering/Shaders/GaussianBlurShader.h"
+    "TAKOEngine/Rendering/Shaders/HitParticleShader.cpp"
+    "TAKOEngine/Rendering/Shaders/HitParticleShader.h"
     "TAKOEngine/Rendering/Shaders/LambertShader.cpp"
     "TAKOEngine/Rendering/Shaders/LambertShader.h"
     "TAKOEngine/Rendering/Shaders/LuminanceExtractionShader.cpp"
@@ -713,6 +721,11 @@ set(TAKOEngine__Rendering__HLSL__Model
 source_group("TAKOEngine\\Rendering\\HLSL\\Model" FILES ${TAKOEngine__Rendering__HLSL__Model})
 
 set(TAKOEngine__Rendering__HLSL__Particle
+    "TAKOEngine/Rendering/HLSL/Particle/HitParticle.hlsli"
+    "TAKOEngine/Rendering/HLSL/Particle/HitParticleCS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Particle/HitParticleGS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Particle/HitParticlePS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Particle/HitParticleVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Particle/Particle.hlsli"
     "TAKOEngine/Rendering/HLSL/Particle/ParticleCS.hlsl"
     "TAKOEngine/Rendering/HLSL/Particle/ParticleGS.hlsl"
@@ -755,17 +768,26 @@ source_group("TAKOEngine\\Rendering\\HLSL\\PostEffect" FILES ${TAKOEngine__Rende
 
 set(TAKOEngine__Rendering__HLSL__Primitives
     "TAKOEngine/Rendering/HLSL/Primitives/Billboard.hlsli"
+    "TAKOEngine/Rendering/HLSL/Primitives/BillboardDX12.hlsli"
+    "TAKOEngine/Rendering/HLSL/Primitives/BillboardDX12GS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/BillboardDX12PS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/BillboardDX12VS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/BillboardGS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/BillboardPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/BillboardVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/ElectricDX12PS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/Fireball.hlsli"
+    "TAKOEngine/Rendering/HLSL/Primitives/FireballDX12PS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/FireballPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/FireballVS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/LoadingDX12PS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/LoadingPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/Plane.hlsli"
     "TAKOEngine/Rendering/HLSL/Primitives/PlaneDX12.hlsli"
     "TAKOEngine/Rendering/HLSL/Primitives/PlaneDX12PS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/PlaneDX12VS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/PlanePS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/PlaneSpriteDX12VS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/PlaneVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/Portal.hlsli"
     "TAKOEngine/Rendering/HLSL/Primitives/PortalDX12.hlsli"
@@ -777,6 +799,7 @@ set(TAKOEngine__Rendering__HLSL__Primitives
     "TAKOEngine/Rendering/HLSL/Primitives/PrimitiveRendererPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/PrimitiveRendererVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Primitives/RunningDustPS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Primitives/ZoneDX12PS.hlsl"
 )
 source_group("TAKOEngine\\Rendering\\HLSL\\Primitives" FILES ${TAKOEngine__Rendering__HLSL__Primitives})
 
@@ -845,6 +868,7 @@ set(ALL_FILES
     ${TAKOEngine__Rendering__DebugRenderer}
     ${TAKOEngine__Rendering__HLSL}
     ${TAKOEngine__Rendering__Model}
+    ${TAKOEngine__Rendering__ParticleRenderer}
     ${TAKOEngine__Rendering__Shaders}
     ${TAKOEngine__Rendering__Texture}
     ${TAKOEngine__Rendering__HLSL__Common}
@@ -915,6 +939,10 @@ set(SHADER_NAMES
     "ToonInstancingVS.cso"
     "ToonPS.cso"
     "ToonVS.cso"
+    "HitParticleCS.cso"
+    "HitParticleGS.cso"
+    "HitParticlePS.cso"
+    "HitParticleVS.cso"
     "ParticleCS.cso"
     "ParticleGS.cso"
     "ParticlePS.cso"
@@ -934,14 +962,22 @@ set(SHADER_NAMES
     "LuminanceExtractionDX12VS.cso"
     "LuminanceExtractionPS.cso"
     "MaskPS.cso"
+    "BillboardDX12GS.cso"
+    "BillboardDX12PS.cso"
+    "BillboardDX12VS.cso"
     "BillboardGS.cso"
     "BillboardPS.cso"
     "BillboardVS.cso"
+    "ElectricDX12PS.cso"
+    "FireballDX12PS.cso"
     "FireballPS.cso"
     "FireballVS.cso"
+    "LoadingDX12PS.cso"
+    "LoadingPS.cso"
     "PlaneDX12PS.cso"
     "PlaneDX12VS.cso"
     "PlanePS.cso"
+    "PlaneSpriteDX12VS.cso"
     "PlaneVS.cso"
     "PortalPS.cso"
     "PortalSquareDX12PS.cso"
@@ -950,6 +986,7 @@ set(SHADER_NAMES
     "PrimitiveRendererPS.cso"
     "PrimitiveRendererVS.cso"
     "RunningDustPS.cso"
+    "ZoneDX12PS.cso"
     "SkyBoxDX12PS.cso"
     "SkyBoxDX12VS.cso"
     "SkydomePS.cso"
@@ -992,6 +1029,10 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/ToonInstancingVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/ToonPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Model/ToonVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Particle/HitParticleCS.hlsl,5.0,Compute,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Particle/HitParticleGS.hlsl,5.0,Geometry,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Particle/HitParticlePS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Particle/HitParticleVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Particle/ParticleCS.hlsl,5.0,Compute,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Particle/ParticleGS.hlsl,5.0,Geometry,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Particle/ParticlePS.hlsl,5.0,Pixel,main"
@@ -1011,14 +1052,22 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/LuminanceExtractionDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/LuminanceExtractionPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/PostEffect/MaskPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/BillboardDX12GS.hlsl,5.0,Geometry,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/BillboardDX12PS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/BillboardDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/BillboardGS.hlsl,5.0,Geometry,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/BillboardPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/BillboardVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/ElectricDX12PS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/FireballDX12PS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/FireballPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/FireballVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/LoadingDX12PS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/LoadingPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlaneDX12PS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlaneDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlanePS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlaneSpriteDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PlaneVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PortalPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PortalSquareDX12PS.hlsl,5.0,Pixel,main"
@@ -1027,6 +1076,7 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PrimitiveRendererPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/PrimitiveRendererVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/RunningDustPS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Primitives/ZoneDX12PS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Skydome/SkyBoxDX12PS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Skydome/SkyBoxDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Skydome/SkydomePS.hlsl,5.0,Pixel,main"

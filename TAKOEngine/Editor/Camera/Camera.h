@@ -39,16 +39,16 @@ public:
 	const DirectX::XMFLOAT3& GetRight() const { return right; }
 
 	//視野角取得
-	const float& GetFovY() { return fovY; }
+	const float& GetFovY() const { return fovY; }
 
 	//アスペクト比取得
-	const float& GetAspect() { return aspect; }
+	const float& GetAspect() const { return aspect; }
 
 	//遠平面までの距離を取得
-	const float& GetFarZ() { return farZ; }
+	const float& GetFarZ() const { return farZ; }
 
 	//近平面までの距離を取得
-	const float& GetNearZ() { return nearZ; }
+	const float& GetNearZ() const { return nearZ; }
 
 	//インデックス取得
 	int& GetSegment() { return currentSegment; }

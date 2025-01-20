@@ -45,4 +45,32 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12RootSignature>		m_d3d_root_signature;
 };
 
+//****************************************************
+// @class ComputeShader
+// @brief コンピュートシェーダーの基底クラス
+// @par   
+//****************************************************
+class ComputeShader
+{
+protected:
+	int MaxParticles = 0;
+
+public:
+	ComputeShader() {};
+	virtual ~ComputeShader() = default;
+
+	// 計算
+	virtual void Compute(const RenderContextDX12& rc) = 0;
+	virtual void Compute(const RenderContextDX12& rc, SpriteDX12* sprite) = 0;
+
+	// 最大パーティクル数取得
+	int GetMaxParticle() { return MaxParticles; }
+
+public:
+	Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_vbv_uav_resource;
+	D3D12_VERTEX_BUFFER_VIEW				d3d_vbv = {};
+	const Descriptor* uav_descriptor = nullptr;
+	const Descriptor* srv_descriptor = nullptr;
+};
+
 #endif // !__GRAHICS_SPRITE_SHADER_DX12_H__

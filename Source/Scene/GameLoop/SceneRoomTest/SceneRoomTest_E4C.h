@@ -25,7 +25,19 @@ class Node : public ModelObject
 {
 public:
 	Node(std::string name, TileType type, const char* fileName = "", float scaling = 1.0f) :
-		ModelObject(fileName, scaling), name(name), type(type) {}
+		ModelObject(fileName, scaling, RENDER_MODE::DX11), name(name), type(type)
+	{
+		if (T_GRAPHICS.isDX12Active)
+		{
+			SetShader(fileName, ModelShaderDX12Id::Toon);
+		}
+		else
+		{
+
+		}
+
+		UpdateTransform();
+	}
 	~Node() = default;
 
 	// 名前
@@ -52,6 +64,8 @@ class NodeManager : public ObjectManager<Node>, public Singleton<NodeManager>
 public:
 	// 正規表現を用いて重複しない名前を探す
 	std::string GetUniqueName(std::string name);
+	// レイキャスト
+	Node* RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3 end);
 };
 #define NODES NodeManager::Instance()
 
@@ -135,8 +149,6 @@ public:
 
 	// 部屋データを指定したjsonからロードする
 	void LoadRoomData();
-	// タイルノードのロード
-	void LoadTileNodeData(const auto& nodeData);
 	// スポナーのロード
 	void LoadSpawnerData(const auto& nodeData);
 
@@ -167,6 +179,8 @@ public:
 	void RemoveSelectedNode();
 	// ノード全削除
 	void ClearNodes();
+	// 選択ノードを変更する
+	void ChangeSelectedNode(Node* newNode);
 
 	// ノードの座標からAABBを算出する
 	void CalcAABB();
@@ -174,6 +188,8 @@ public:
 	// テンプレート
 	// 3x3 Floor
 	void AddTemplate3x3Floor();
+
+	const std::string GetDefaultName(int index) const { return nodeDefaultNames.at(index); }
 
 private:
 	std::unique_ptr<myRenderer::shadow::ShadowMapRender> m_shadowMapRenderer = std::make_unique<myRenderer::shadow::ShadowMapRender>();
@@ -191,4 +207,8 @@ private:
 		"Data/Sprites/UI/exit.png"
 	};
 	std::unordered_set<std::shared_ptr<Sprite>> m_spritePreLoad;
+
+	std::vector<std::string> nodeDefaultNames;
+
+	std::unique_ptr<ModelObject> testModel;
 };

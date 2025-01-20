@@ -1,8 +1,7 @@
-﻿#include "TAKOEngine/Tool/Mathf.h"
+#include "TAKOEngine/Tool/Mathf.h"
 #include "TAKOEngine/Physics/CollisionManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Character/Enemy/Enemy.h"
-#include "GameObject/Character/Enemy/SkeletonMinion.h"
 #include "GameObject/Character/Enemy/MouseMob.h"
 #include "GameObject/Character/Enemy/BearBoss.h"
 #include "GameObject/Props/Spawner.h"
@@ -23,12 +22,6 @@ Enemy::~Enemy()
 	{
 		m_pSpawner->EnemyDestoryCallBack(this);
 	}
-
-	for (const std::pair<uint8_t, Collider*>& collider : m_pColliders)
-	{
-		COLLISIONS.Remove(collider.second);
-	}
-	m_pColliders.clear();
 }
 
 bool Enemy::MoveTo(float elapsedTime, const DirectX::XMFLOAT3& target)
@@ -44,7 +37,6 @@ bool Enemy::IsAlive()
 	}
 	return false;
 }
-
 
 void Enemy::TurnTo(float elapsedTime, const DirectX::XMFLOAT3& target)
 {
@@ -117,10 +109,8 @@ Enemy* Enemy::EnemyFactory(uint8_t enemyType)
 {
 	switch (enemyType)
 	{
-	case ENEMY_TYPE::SKELETON_MINION: return new SkeletonMinion; break;
-	case ENEMY_TYPE::SKELETON_MINION_BOSS: return new SkeletonMinionBoss; break;
-	case ENEMY_TYPE::MOUSE: return new MouseMob; break;
-	case ENEMY_TYPE::BEAR_BOSS: return new BearBoss; break;
+	case ENEMY_TYPE::MOUSE: return T_GRAPHICS.isDX11Active ? new MouseMob(0.5f, ModelObject::DX11) : new MouseMob(0.5f, ModelObject::DX12); break;
+	case ENEMY_TYPE::BEAR_BOSS: return T_GRAPHICS.isDX11Active ? new BearBoss(1.0f, ModelObject::DX11) : new BearBoss(1.0f, ModelObject::DX12); break;
 	}
 	return nullptr;
 }

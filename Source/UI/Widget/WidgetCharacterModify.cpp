@@ -72,8 +72,19 @@ void WidgetCharacterModify::Update(float elapsedTime)
 
 	if (std::memcmp(m_info.pattern, m_infoTemp.pattern, sizeof(m_info.pattern)) != 0) // 更新あり
 	{
-		if (m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT] == 1)
-			m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT] = 0;
+		if (m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::GENDER] != m_infoTemp.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::GENDER])
+		{
+			for (size_t i = 1; i < (PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::NUM); i++)
+			{
+				if (i != PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::GENDER)
+				{
+					m_info.pattern[i] = 0;
+				}
+			}
+		}
+
+		if (m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT] == PLAYER_CHARACTER_DATA.WEAPON_PATTERN_MAIN::ROD)
+			m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT] = PLAYER_CHARACTER_DATA.WEAPON_PATTERN_OFFHAND::NO_SHIELD;
 		m_pScene->GetSelectedCharacter()->LoadAppearance(m_info.pattern);
 		m_infoTemp = m_info;
 	}
