@@ -18,7 +18,7 @@ BearBoss::BearBoss(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("
 	SetMoveCollider({ { 0, radius, 0 }, radius }, Collider::COLLIDER_OBJ::ENEMY);
 	m_pColliders.clear();
 	// ヒット判定
-	SetCollider(COLLIDER_ID::COL_BODY, { {0, 0, 0}, radius } , Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("JOT_C_Spine2")->worldTransform);
+	SetCollider(COLLIDER_ID::COL_BODY, { {0, 0, 0}, radius }, Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("JOT_C_Spine2")->worldTransform);
 	uint16_t bodyArmor = 10;
 	m_pColliders[COLLIDER_ID::COL_BODY]->SetArmor(bodyArmor);
 	SetCollider(COLLIDER_ID::COL_HEAD, { {0, 1.8f / 0.05f, 0}, 1.8f }, Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("JOT_C_Head")->worldTransform);
@@ -39,16 +39,13 @@ BearBoss::BearBoss(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("
 		//stateMachine->RegisterState(::Enemy::STATE::DEATH, nullptr);
 
 		stateMachine->RegisterState(STATE::WANDER, new EnemyState::BearBoss::MoveState(this));
-		
+
 		stateMachine->RegisterState(STATE::ATTACK, new AttackState(this));
 		stateMachine->RegisterSubState(STATE::ATTACK, ATTACK_STATE::FOLLOW, new AttackFollowState(this));
 		stateMachine->RegisterSubState(STATE::ATTACK, ATTACK_STATE::PUNCH, new AttackPunchState(this));
-	
 	}
 }
 
-
 void BearBoss::UpdateTarget()
 {
-
 }
