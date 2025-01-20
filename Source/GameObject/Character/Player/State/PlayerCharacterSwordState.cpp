@@ -158,12 +158,21 @@ namespace PlayerCharacterState
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
 					}
 				}
+				if (0.05f <= time && time <= 0.115f)
+				{
+					owner->SetTrail(true);
+				}
+				else
+				{
+					owner->SetTrail(false);
+				}
 			}
 			else
 			{
 				if (!owner->IsPlayAnimation())
 					owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_2);
 			}
+			
 		}
 		void AttackNormalState_1::Exit()
 		{
@@ -224,6 +233,14 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
 					}
+				}
+				if (0.05f <= time && time <= 0.4f)
+				{
+					owner->SetTrail(true);
+				}
+				else
+				{
+					owner->SetTrail(false);
 				}
 			}
 			else
@@ -292,6 +309,14 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
 					}
+				}
+				if (0.05f <= time && time <= 0.7f)
+				{
+					owner->SetTrail(true);
+				}
+				else
+				{
+					owner->SetTrail(false);
 				}
 			}
 			else
@@ -363,7 +388,14 @@ namespace PlayerCharacterState
 					owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
 				}
 			}
-
+			if (0.65f <= time && time <= 1.5f)
+			{
+				owner->SetTrail(true);
+			}
+			else
+			{
+				owner->SetTrail(false);
+			}
 			if (!owner->IsPlayAnimation())
 				owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::IDLE);
 		}
