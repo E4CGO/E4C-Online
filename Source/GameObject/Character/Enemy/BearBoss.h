@@ -1,4 +1,4 @@
-//! @file BearBoss.h
+﻿//! @file BearBoss.h
 //! @note 
 
 #ifndef __INCLUDED_BEAR_BOSS_H__

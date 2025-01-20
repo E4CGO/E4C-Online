@@ -1,4 +1,4 @@
-//! @file BearBoss.cpp
+﻿//! @file BearBoss.cpp
 //! @note 
 
 #include "BearBoss.h"
@@ -34,6 +34,9 @@ BearBoss::BearBoss(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("
 		using namespace EnemyState::BearBoss;
 		stateMachine->RegisterState(Enemy::STATE::IDLE, new EnemyState::BearBoss::IdleState(this));
 		stateMachine->SetState(Enemy::STATE::IDLE);
+
+		stateMachine->RegisterState(::Enemy::STATE::HURT, nullptr);
+		//stateMachine->RegisterState(::Enemy::STATE::DEATH, nullptr);
 
 		stateMachine->RegisterState(STATE::WANDER, new EnemyState::BearBoss::MoveState(this));
 

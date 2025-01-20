@@ -16,6 +16,8 @@ namespace EnemyState
 	*//***************************************************************************/
 	void StateTransition(Enemy* enemy, uint8_t state)
 	{
+		if (enemy->GetStateMachine()->GetState(state) == nullptr) return;
+
 		if (!enemy->IsMine())
 		{
 			enemy->GetStateMachine()->ChangeState(Enemy::STATE::IDLE); // デフォルトステート
@@ -106,6 +108,7 @@ namespace EnemyState
 	// 死亡ステート
 	void DeathState::Enter()
 	{
+		owner->SetAnimation(0, false);
 		for (std::pair<int, Collider*> collider : owner->GetColliders()) collider.second->SetEnable(false);
 	}
 	void DeathState::Execute(float elapsedTime)

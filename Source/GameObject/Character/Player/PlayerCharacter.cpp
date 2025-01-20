@@ -1,4 +1,4 @@
-//! @file PlayerCharacter.cpp
+	//! @file PlayerCharacter.cpp
 //! @note
 
 #include "PlayerCharacter.h"
@@ -193,8 +193,7 @@ void PlayerCharacter::UpdateHorizontalMove(float elapsedTime)
 						}
 					}
 					position = pos - XMFLOAT3{ 0, height * 0.5f, 0 };
-					m_pMoveCollider->SetPosition(position + XMFLOAT3{ 0, radius, 0 });
-				}
+					m_pMoveCollider->SetPosition(position + XMFLOAT3{ 0, radius, 0 });}
 				else
 				{
 					position.x += mx;
@@ -250,7 +249,8 @@ bool  PlayerCharacter::CollisionVsEnemies()
 	for (Enemy*& enemy : ENEMIES.GetAll())
 	{
 		if (!enemy->GetMoveCollider()) continue;
-
+ 
+ 
 		if (m_pMoveCollider->Collision(enemy->GetMoveCollider(), {}, hit))
 		{
 			hit.position.y = position.y;
@@ -602,6 +602,7 @@ void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
 
 #ifdef _DEBUG
 	m_pMoveCollider->DrawDebugPrimitive({ 1, 1, 1, 1 });
+
 	if (IsPlayer() && !m_pColliders.empty())
 	{
 		m_pColliders[COLLIDER_ID::COL_BODY]->DrawDebugPrimitive({ 0, 1, 0, 1 });

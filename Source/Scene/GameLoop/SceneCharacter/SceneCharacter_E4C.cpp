@@ -225,6 +225,7 @@ void SceneCharacter_E4C::RenderDX12()
 
 			T_TEXT.EndDX12();
 		}
+
 	}
 #ifdef _DEBUG
 	DrawSceneGUI();
