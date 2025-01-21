@@ -13,21 +13,25 @@ namespace EnemyState
 			SEARCH = Enemy::STATE::END,
 			BATTLE,
 			RECIEVE,
+			STATE_END,
 		};
 
-		// 移動
+		// 探索
 		enum SEARCH_STATE
 		{
-			WANDER,
+			WANDER = mouseMob::STATE::STATE_END,
 			IDLE,
+			SEARCH_STATE_END,
 		};
 
-		// 攻撃
+		// 戦闘
 		enum BATTLE_STATE
 		{
+			ENCOUNTER = mouseMob::SEARCH_STATE::SEARCH_STATE_END,
 			PURSUIT,
 			ATTACK,
 			STANDBY,
+			BATTLE_STATE_END,
 		};
 
 		/**************************************************************************//**
@@ -101,12 +105,13 @@ namespace EnemyState
 			@par    [説明]
 				待機の状態
 		*//***************************************************************************/
-		class IdleState : public HierarchicalState<Enemy>
+		class IdleState : public EnemyState::IdleState
 		{
 		public:
 			// コンストラクタ
-			IdleState(Enemy* enemy, float minWaitingTime = 3.0f, float maxWaitingTime = 5.0f) :
-				HierarchicalState<Enemy>(enemy), m_MinWaitingTime(minWaitingTime), m_MaxWaitingTime(maxWaitingTime) {};
+			//IdleState(Enemy* enemy, float minWaitingTime = 3.0f, float maxWaitingTime = 5.0f) :
+			//	HierarchicalState<Enemy>(enemy), m_MinWaitingTime(minWaitingTime), m_MaxWaitingTime(maxWaitingTime) {};
+			IdleState(Enemy* enemy, float waitTime = 3.0f) : EnemyState::IdleState(enemy, waitTime) {};
 			// デストラクタ
 			~IdleState() {}
 			// ステートに入った時のメソッド
@@ -115,10 +120,31 @@ namespace EnemyState
 			void Execute(float elapsedTime) override;
 			// ステートから出ていくときのメソッド
 			void Exit() override;
-		private:
-			float m_StateTimer = 0.0f;
-			float m_MinWaitingTime;
-			float m_MaxWaitingTime;
+		//private:
+		//	float m_StateTimer = 0.0f;
+		//	float m_MinWaitingTime;
+		//	float m_MaxWaitingTime;
+		};
+
+		/**************************************************************************//**
+			@class	EncounterState
+			@brief	エンカウントステート
+			@par    [説明]
+				プレイヤーを発見したリアクションをとる
+		*//***************************************************************************/
+		class EncounterState : public HierarchicalState<Enemy>
+		{
+		public:
+			// コンストラクタ
+			EncounterState(Enemy* enemy) : HierarchicalState<Enemy>(enemy){};
+			// デストラクタ
+			~EncounterState() {}
+			// ステートに入った時のメソッド
+			virtual void Enter() override;
+			// ステートで実行するメソッド
+			void Execute(float elapsedTime) override;
+			// ステートから出ていくときのメソッド
+			void Exit() override;
 		};
 
 		/**************************************************************************//**
@@ -176,6 +202,48 @@ namespace EnemyState
 		private:
 			float m_WaitTimer;
 			float m_AnimationTimer;
+		};
+
+		/**************************************************************************//**
+			@class	HurtState
+			@brief	ダメージステート
+			@par    [説明]
+				ダメージステート
+		*//***************************************************************************/
+		class HurtState : public EnemyState::HurtState
+		{
+		public:
+			// コンストラクタ
+			HurtState(Enemy* enemy) : EnemyState::HurtState(enemy) {};
+			// デストラクタ
+			~HurtState() {}
+			// ステートに入った時のメソッド
+			void Enter() override;
+			// ステートで実行するメソッド
+			void Execute(float elapsedTime) override;
+			// ステートから出ていくときのメソッド
+			void Exit() override;
+		};
+
+		/**************************************************************************//**
+			@class	DeathState
+			@brief	死亡ステート
+			@par    [説明]
+				死亡ステート
+		*//***************************************************************************/
+		class DeathState : public EnemyState::DeathState
+		{
+		public:
+			// コンストラクタ
+			DeathState(Enemy* enemy) : EnemyState::DeathState(enemy) {};
+			// デストラクタ
+			~DeathState() {}
+			// ステートに入った時のメソッド
+			void Enter() override;
+			// ステートで実行するメソッド
+			void Execute(float elapsedTime) override;
+			// ステートから出ていくときのメソッド
+			void Exit() override;
 		};
 	}
 }

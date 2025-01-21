@@ -25,6 +25,18 @@ public:
 		COL_BODY,
 	};
 
+	enum ANIMATION : uint8_t
+	{
+		ANIM_IDLE,
+		ANIM_MOVE,
+		ANIM_ATTACK,
+		ANIM_ENCOUNTER,
+		ANIM_DAMAGE,
+		ANIM_DIE,
+	};
+
+	void OnDamage(uint16_t damage) override;
+
 protected:
 	void UpdateTarget();
 };

@@ -60,7 +60,8 @@ void StageOpenWorld_E4C::Initialize()
 	teleporter->SetPosition({ -34.0f, 4.0f, -45.0f });
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
 
-	Spawner* spawner = new Spawner(ENEMY_TYPE::BEAR_BOSS, 1, 1);
+	//Spawner* spawner = new Spawner(ENEMY_TYPE::BEAR_BOSS, 1, 1);
+	Spawner* spawner = new Spawner(ENEMY_TYPE::MOUSE, 3, -1);
 	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
 	spawner->SetSearchRadius(10.0f);
 	SpawnerManager::Instance().Register(spawner);
