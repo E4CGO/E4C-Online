@@ -168,19 +168,6 @@ void StageDungeon_E4C::Initialize()
 	debugText->SetPosition({ 30.0f, 60.0f });
 	UI.Register(debugText);
 
-	// デバッグテキスト
-	WidgetText* debugText = new WidgetText();
-	std::string roomOrderText = "生成配列：";
-	for (int i = 0; i < m_roomOrder.size(); i++)
-	{
-		roomOrderText += std::to_string(m_roomOrder.at(i));
-
-		if (i < m_roomOrder.size() - 1) roomOrderText += ",";
-	}
-	debugText->SetText(roomOrderText.c_str());
-	debugText->SetPosition({ 30.0f, 60.0f });
-	UI.Register(debugText);
-
 	// 部屋のモデルを配置
 	for (RoomBase* room : rootRoom->GetAll())
 	{
@@ -375,10 +362,6 @@ void StageDungeon_E4C::RenderDX12()
 
 		T_TEXT.EndDX12();
 	}
-#ifdef _DEBUG
-	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
-#endif
-	T_GRAPHICS.End();
 
 	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
 	T_GRAPHICS.End();
