@@ -3,6 +3,7 @@
 
 #include <DirectXMath.h>
 #include <vector>
+
 // カメラ
 
 class Camera
@@ -61,6 +62,8 @@ public:
 	void MoveByPoints(const std::vector<DirectX::XMFLOAT3>& positions, const std::vector<DirectX::XMFLOAT3>& focusPoints,float transitionTime, float transitionDuration);
 	//始点、終点のポイントを経由して移動するカメラ
 	void Move2PointToCamera(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const DirectX::XMFLOAT3& startFocus, const DirectX::XMFLOAT3& endFocus, float transitionTime, float transitionDuration);
+
+	void CameraShake(float elapsedTime);
 private:
 	DirectX::XMFLOAT4X4 view;
 	DirectX::XMFLOAT4X4 projection;
@@ -83,4 +86,12 @@ private:
 	int currentSegment = 0;
 
 
+	DirectX::XMFLOAT3 shakeOffset{};
+	DirectX::XMFLOAT3 shakenTarget{};
+	float shakeAmplitude; // シェイクの振幅
+	DirectX::XMFLOAT3 shakeFrequency; // シェイクの周波数
+	// カメラシェイク用の時間
+	float shakeTime = 0.0f;
+
+	bool shake = false;
 };

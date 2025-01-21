@@ -187,6 +187,7 @@ void StageOpenWorld_E4C::Finalize()
 void StageOpenWorld_E4C::Update(float elapsedTime)
 {
 	Camera* camera = CameraManager::Instance().GetCamera();
+	camera->CameraShake(elapsedTime);
 	Online::OnlineController* onlineController = m_pScene->GetOnlineController();
 	if (onlineController->GetState() == Online::OnlineController::STATE::LOGINED)
 	{

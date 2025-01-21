@@ -1,6 +1,8 @@
 ﻿#include "Camera.h"
 #include "TAKOEngine/Tool/Mathf.h"
 #include <stdlib.h>
+#include "TAKOEngine/Tool/PerlinNoise.h"
+#include "GameObject/Character/Character.h"
 // 指定方向を向く
 void Camera::SetLookAt(const DirectX::XMFLOAT3& eye, const DirectX::XMFLOAT3& focus, const DirectX::XMFLOAT3& up)
 {
@@ -71,11 +73,51 @@ void Camera::MoveTo(const DirectX::XMFLOAT3& eye, const DirectX::XMFLOAT3& focus
 	interpolatedFocus.z = Mathf::Lerp(this->GetFocus().z, focus.z, t);
 
 
+	
+
 
 	// 補間結果をカメラに設定
 	this->SetLookAt(interpolatedEye, interpolatedFocus, { 0.0f, 1.0f, 0.0f });
 }
+void Camera::CameraShake(float elapsedTime)
+{
+	//試しに上矢印キーでフラグがtrueになるようにしている、本来は攻撃が的に当たった時のみtrueにする
+	if (GetAsyncKeyState(VK_UP) & 0x01)
+	{
+		shake = true;
+	}
 
+	//後にマジックナンバーは全て変数にする
+	shakeAmplitude = 0.1f;
+
+	// 時間に応じてシェイク量を減少
+	if (shakeTime < 0.2f) {
+		shakeAmplitude = 1.f * (0.2 - shakeTime);
+	}
+	else {
+		shakeAmplitude = 0.f;
+	}
+
+	if (shake)
+	{
+		shakeTime += elapsedTime;
+
+		shakeOffset.x = (NoiseGenerator::PerlinNoise({ shakeTime * 10.f, 0.0f, 0.f }, 1) - 0.5f) * shakeAmplitude;
+		shakeOffset.y = (NoiseGenerator::PerlinNoise({ 0.0f, shakeTime * 10.f, 0.0f }, 1) - 0.5f) * shakeAmplitude;
+
+
+	}
+	if (shakeTime > 0.2f)
+	{
+		shake = false;
+		shakeTime = 0;
+	}
+
+
+	shakenTarget = { focus.x + shakeOffset.x, focus.y + shakeOffset.y, focus.z + shakeOffset.z };
+	this->SetLookAt(eye, shakenTarget, DirectX::XMFLOAT3(0, 1, 0));
+
+}
 void Camera::RotateTo(const DirectX::XMFLOAT3& target, float& angle, float radius, float speed, float elapsedTime)
 {
 
@@ -112,7 +154,7 @@ void Camera::Move2PointToCamera(const DirectX::XMFLOAT3& start, const DirectX::X
 
 	// 補間係数を計算（0.0〜1.0の範囲でクランプ）
 	float t = transitionTime / transitionDuration;
-	t = std::min(t, 1.0f);
+	t = min(t, 1.0f);
 
 	// カメラの位置と注視点を補間
 	DirectX::XMFLOAT3 interpolatedEye{};
