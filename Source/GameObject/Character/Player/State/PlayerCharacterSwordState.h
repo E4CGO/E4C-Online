@@ -1,4 +1,4 @@
-﻿//! @file PlayerCharacterState.h
+//! @file PlayerCharacterState.h
 //! @note
 
 #ifndef __INCLUDED_PLAYER_CHARACTER_SWORD_STATE_H__

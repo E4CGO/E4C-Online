@@ -13,8 +13,9 @@ VS_OUT main(
 {
     VS_OUT vout;
     float4x4 viewProjection = mul(View, Projection);
-	
-    vout.position = mul(position, viewProjection);
+    float4 worldPosition = mul(position, WorldMatrix);
+    
+    vout.position = mul(worldPosition, viewProjection);
     vout.color = color;
     vout.texcoord = texcoord;
 

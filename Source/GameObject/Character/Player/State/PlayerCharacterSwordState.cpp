@@ -108,6 +108,7 @@ namespace PlayerCharacterState
 			
 			if (owner->IsPlayer())
 			{
+
 				XMFLOAT4X4* matrix = owner->GetTransformAdress();
 
 				ModelObject::ATTACK_COLLIDER_DATA attackData;
@@ -117,6 +118,7 @@ namespace PlayerCharacterState
 				attackData.hittableOBJ = sphereAttacks[0].hittableOBJ;
 				attackData.hitStartRate = sphereAttacks[0].hitStartRate;
 				attackData.hitEndRate = sphereAttacks[0].hitEndRate;
+
 				owner->MakeAttackCollider(attackData, sphereAttacks[0].sphere, matrix);
 			}
 		}
@@ -180,6 +182,7 @@ namespace PlayerCharacterState
 
 			if (owner->IsPlayer())
 			{
+
 				XMFLOAT4X4* matrix = owner->GetTransformAdress();
 				Sphere attack2{ {  0, 1.5f, 2.0f} , 0.5f };
 
@@ -190,6 +193,7 @@ namespace PlayerCharacterState
 				attackData.hittableOBJ = sphereAttacks[1].hittableOBJ;
 				attackData.hitStartRate = sphereAttacks[1].hitStartRate;
 				attackData.hitEndRate = sphereAttacks[1].hitEndRate;
+
 				owner->MakeAttackCollider(attackData, sphereAttacks[1].sphere, matrix);
 			}
 		}
@@ -253,6 +257,7 @@ namespace PlayerCharacterState
 
 			if (owner->IsPlayer())
 			{
+
 				XMFLOAT4X4* matrix = &owner->GetModel(0)->FindNode("JOT_C_Hip")->worldTransform;
 
 				ModelObject::ATTACK_COLLIDER_DATA attackData;
@@ -262,6 +267,7 @@ namespace PlayerCharacterState
 				attackData.hittableOBJ = sphereAttacks[2].hittableOBJ;
 				attackData.hitStartRate = sphereAttacks[2].hitStartRate;
 				attackData.hitEndRate = sphereAttacks[2].hitEndRate;
+
 				owner->MakeAttackCollider(attackData, sphereAttacks[2].sphere, matrix);
 			}
 		}

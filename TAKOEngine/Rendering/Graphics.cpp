@@ -15,6 +15,7 @@
 #include "TAKOEngine/Rendering/Shaders//PlaneShader.h"
 #include "TAKOEngine/Rendering/Shaders/ParticleShader.h"
 #include "TAKOEngine/Rendering/Shaders/HitParticleShader.h"
+#include "TAKOEngine/Rendering/Shaders/CylinderShader.h"
 
 #include "TAKOEngine/Rendering/Shaders/UVScrollShader.h"
 #include "TAKOEngine/Rendering/Shaders/MaskShader.h"
@@ -578,6 +579,9 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::PortalSquare)] = std::make_unique<PortalSquareShaderDX12>(m_d3d_device.Get());
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Billboard)] = std::make_unique<BillBoardShaderDX12>(m_d3d_device.Get());
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Fireball)] = std::make_unique<FireballShaderDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Loading)] = std::make_unique<LoadingShaderDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Zone)] = std::make_unique<ZoneShaderDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Electric)] = std::make_unique<ElectricShaderDX12>(m_d3d_device.Get());
 
 		// スプライトシェーダー生成
 		spriteShaders[static_cast<int>(SpriteShaderId::Default)] = std::make_unique<DefaultSpriteShader>(device.Get());
@@ -865,8 +869,8 @@ const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera, floa
 				DirectX::XMVECTOR LightDirection = DirectX::XMVectorSet(light->GetDirection().x, light->GetDirection().y, light->GetDirection().z, 0);
 				LightDirection = DirectX::XMVectorScale(LightDirection, -250);
 				DirectX::XMMATRIX LightView = DirectX::XMMatrixLookAtLH(
-					LightDirection,          
-					DirectX::XMVectorZero(), 
+					LightDirection,
+					DirectX::XMVectorZero(),
 					DirectX::XMVectorSet(0, 1, 0, 0));
 
 				//シャドウマップに描画したい範囲の射影行列を生成
@@ -908,7 +912,6 @@ const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera, floa
 						//近平面の左下
 						vertex[3] = DirectX::XMVectorAdd(nearPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, -nearY), DirectX::XMVectorScale(cameraRight, -nearX)));
 
-
 						//遠平面の右上
 						vertex[4] = DirectX::XMVectorAdd(farPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, farY), DirectX::XMVectorScale(cameraRight, farX)));
 
@@ -922,7 +925,7 @@ const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera, floa
 						vertex[7] = DirectX::XMVectorAdd(farPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, -farY), DirectX::XMVectorScale(cameraRight, -farX)));
 					}
 				}
-				
+
 				//8頂点をライトビュープロジェクション空間にして、最大値、最小値を求める
 				DirectX::XMFLOAT3 vertexMin(FLT_MAX, FLT_MAX, FLT_MAX), vertexMax(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 				for (auto& it : vertex)
@@ -1306,12 +1309,12 @@ HRESULT Graphics::CreateTexture(const BYTE* pixels, UINT width, UINT height, DXG
 // @param[in] d3d_resource    ID3D12Resource**
 // @return    HRESULT
 //******************************************************************
-HRESULT Graphics::CreateDummyTexture(ID3D12Resource** d3d_resource)
+HRESULT Graphics::CreateDummyTexture(ID3D12Resource** d3d_resource, int color)
 {
 	const UINT width = 8;
 	const UINT height = 8;
 	UINT pixels[width * height];
-	::memset(pixels, 0xFF, sizeof(pixels));
+	::memset(pixels, color, sizeof(pixels));
 
 	// ヒーププロパティの設定
 	D3D12_HEAP_PROPERTIES d3d_heap_props = {};

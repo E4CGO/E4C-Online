@@ -1,10 +1,11 @@
 ﻿//! @file Teleporter.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDE_TELEPORTER_H__
 #define __INCLUDE_TELEPORTER_H__
 
 #include "GameObject/ModelObject.h"
+#include "TAKOEngine/Rendering/Plane.h"
 #include "Scene/Stage/Stage.h"
 #include "UI/Widget/WidgetMatching.h"
 #include "Network/OnlineController.h"
@@ -24,12 +25,14 @@ public:
 	virtual void Render(const RenderContext& rc) override;
 	virtual void RenderDX12(const RenderContextDX12& rc) override;
 
+	void SetVisibility(bool isVisible) { this->m_isVisible = isVisible; }
+
 	void Teleport();
 
 	Stage* GetStage() { return m_pStage; }
 protected:
 	Stage* m_pStage;
-	
+
 	ModelResource::Mesh m_mesh;
 
 	float m_portalTime = 3.0f;
@@ -48,8 +51,10 @@ protected:
 
 	WidgetMatching* m_pWidgetMatching = nullptr;
 
-};
+	std::unique_ptr<PlaneDX12> m_portalFrame;
 
+	bool m_isVisible = false;
+};
 
 class TeleportToOpenworld : public Teleporter
 {

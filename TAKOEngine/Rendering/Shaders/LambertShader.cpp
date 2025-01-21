@@ -400,8 +400,8 @@ void LambertShaderDX12::Render(const RenderContextDX12& rc, const ModelDX12::Mes
 	rc.d3d_command_list->SetGraphicsRootDescriptorTable(0, rc.scene_cbv_descriptor->GetGpuHandle());
 
 	// シャドウマップ設定
-	rc.d3d_command_list->SetGraphicsRootDescriptorTable(5, rc.shadowMap.shadow_srv_descriptor->GetGpuHandle());
-	rc.d3d_command_list->SetGraphicsRootDescriptorTable(6, rc.shadowMap.shadow_sampler_descriptor->GetGpuHandle());
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(6, rc.shadowMap.shadow_srv_descriptor->GetGpuHandle());
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(7, rc.shadowMap.shadow_sampler_descriptor->GetGpuHandle());
 
 	const ModelResource::Mesh* res_mesh = mesh.mesh;
 	const ModelDX12::Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
@@ -422,9 +422,10 @@ void LambertShaderDX12::Render(const RenderContextDX12& rc, const ModelDX12::Mes
 
 	// シェーダーリソースビュー設定
 	rc.d3d_command_list->SetGraphicsRootDescriptorTable(3, material->srv_descriptor->GetGpuHandle());
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(4, material->srv_emissive_descriptor->GetGpuHandle());
 
 	//サンプラーステート設定
-	rc.d3d_command_list->SetGraphicsRootDescriptorTable(4, m_sampler->GetDescriptor()->GetGpuHandle());
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(5, m_sampler->GetDescriptor()->GetGpuHandle());
 
 	// 描画
 	if (frame_resource.instancingCount == 0)

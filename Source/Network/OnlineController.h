@@ -22,7 +22,6 @@ namespace Online
 
 #ifdef _DEBUG
 	const static char* SV_IP = "127.0.0.1";
-	//const static char* SV_IP = "10.22.10.55";
 #else
 	const static char* SV_IP = "34.82.222.201";
 #endif // _DEBUG
@@ -68,7 +67,8 @@ namespace Online
 	enum UDP_CMD : uint8_t
 	{
 		SYNC = 0,		/*!< 基本同期通信 */
-		DAMAGE			/*!< ダメージ判定 */
+		HIT_SEND,		/*!< クライアントダメージ判定送信 */
+		HIT_ACCEPT,		/*!< ホストダメージ判定承認 */
 	};
 
 	class TCPCommand;
@@ -109,6 +109,14 @@ namespace Online
 		struct DATA_HEADER {
 			uint8_t cmd;
 			uint32_t size;
+		};
+
+		// 攻撃同期
+		struct HIT_DATA
+		{
+			uint32_t hit_id;
+			uint32_t enemy_id;
+			uint16_t damage;
 		};
 #pragma pack(pop)
 		// インスタンス取得
@@ -166,6 +174,25 @@ namespace Online
 		// エネミーの同期送信
 		void SyncEnemy(std::vector<Enemy::SYNC_DATA>& data);
 
+		void RegisterHit(const uint32_t& enemy_id, const uint16_t& damage) {
+			std::lock_guard<std::mutex> lock(m_hit_mtx);
+			m_hitList.push_back({
+				++m_hitDataCount,
+				enemy_id,
+				damage
+			});
+		}
+		void RemoveHit(const uint32_t& hit_id)
+		{
+			std::lock_guard<std::mutex> lock(m_hit_mtx);
+			std::erase_if(m_hitList, [&](const HIT_DATA& hit) { return hit.hit_id == hit_id; });
+		}
+		void RemoveHit(const std::vector<uint32_t>& hit_ids)
+		{
+			std::lock_guard<std::mutex> lock(m_hit_mtx);
+			std::erase_if(m_hitList, [&](const HIT_DATA& hit) { return std::find(hit_ids.begin(), hit_ids.end(), hit.hit_id) != hit_ids.end(); });
+		}
+
 		// 同期開始
 		void BeginSync()
 		{
@@ -221,9 +248,13 @@ namespace Online
 		std::unordered_map<uint8_t, TCPCommand*> m_tcpCommands;	// TCP処理
 		std::unordered_map<uint8_t, UDPCommand*> m_udpCommands;	// UDP処理
 
-		std::mutex m_client_mtx; //	クライアント用ミューテックス
+		//std::mutex m_client_mtx; //	クライアント用ミューテックス
 
 		WidgetMatching* m_pMatchingUI = nullptr;
+		
+		std::vector<HIT_DATA> m_hitList;	// 同期待ちのヒットデータ
+		uint32_t m_hitDataCount = 0;		// ヒットデータ
+		std::mutex m_hit_mtx;				// ヒット用ミューテックス
 	};
 
 	typedef OnlineController Controller;

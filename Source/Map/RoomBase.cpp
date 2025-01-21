@@ -6,6 +6,7 @@
 
 #include "GameObject/GameObjectManager.h"
 #include "GameObject/Props/Spawner.h"
+#include "GameObject/Props/SpawnerManager.h"
 #include "GameObject/Props/StairToNextFloor.h"
 #include "MapTile.h"
 #include "MapTileManager.h"
@@ -93,7 +94,7 @@ RoomBase::RoomBase(
 	UpdateTransform();
 
 	// 部屋データのロード
-	//LoadMapData();
+	LoadMapData();
 
 	// 次の部屋の生成を行う
 	GenerateNextRoomFromOrder(roomAABBs, roomOrder, orderIndex);
@@ -163,7 +164,6 @@ DirectX::XMFLOAT3 RoomBase::GetCenterPos()
 	// 90度
 	if (degree > 89.9f && degree < 90.1f)
 	{
-
 	}
 
 	// 180度
@@ -551,8 +551,6 @@ void RoomBase::GenerateNextRoomFromOrder(
 	}
 }
 
-
-
 AABB RoomBase::CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const
 {
 	// 360度以内に丸める
@@ -704,7 +702,7 @@ void RoomBase::PlaceMapTile(bool isLeader)
 		{
 			for (const TILE_DATA& data : m_tileDatas.at(tileType))
 			{
-				Spawner* spawner = new Spawner(2, 2, -1);
+				Spawner* spawner = new Spawner(ENEMY_TYPE::MOUSE, 2, -1);
 
 				DirectX::XMFLOAT3 resultPos = data.position;
 				DirectX::XMFLOAT3 bufPos = resultPos;
@@ -738,7 +736,8 @@ void RoomBase::PlaceMapTile(bool isLeader)
 
 				spawner->SetPosition(resultPos);
 
-				GameObjectManager::Instance().Register(spawner);
+				SpawnerManager::Instance().Register(spawner);
+				//GameObjectManager::Instance().Register(spawner);
 			}
 			continue;
 		}
@@ -829,7 +828,7 @@ void RoomBase::PlaceMapTile(bool isLeader)
 			//		instancingModel->GetModel()->UpdateTransform(id, tm);
 			//	}
 			//	MAPTILES.Register(instancingModel);
-				
+
 			//  // ステージの影登録
 			//	//T_GRAPHICS.GetShadowRenderer()->ModelRegister(instancingModel->GetModel(0).get());
 			//}
