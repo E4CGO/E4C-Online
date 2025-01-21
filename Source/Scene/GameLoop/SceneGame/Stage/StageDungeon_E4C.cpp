@@ -1,4 +1,4 @@
-﻿//! @file StageDungeon_E4C.cpp
+//! @file StageDungeon_E4C.cpp
 //! @note
 
 #include "StageDungeon_E4C.h"
@@ -154,6 +154,19 @@ void StageDungeon_E4C::Initialize()
 	UI.Register(floorText);
 
 	GenerateDungeon();
+
+	// デバッグテキスト
+	WidgetText* debugText = new WidgetText();
+	std::string roomOrderText = "生成配列：";
+	for (int i = 0; i < m_roomOrder.size(); i++)
+	{
+		roomOrderText += std::to_string(m_roomOrder.at(i));
+
+		if (i < m_roomOrder.size() - 1) roomOrderText += ",";
+	}
+	debugText->SetText(roomOrderText.c_str());
+	debugText->SetPosition({ 30.0f, 60.0f });
+	UI.Register(debugText);
 
 	// デバッグテキスト
 	WidgetText* debugText = new WidgetText();
@@ -362,6 +375,10 @@ void StageDungeon_E4C::RenderDX12()
 
 		T_TEXT.EndDX12();
 	}
+#ifdef _DEBUG
+	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
+#endif
+	T_GRAPHICS.End();
 
 	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
 	T_GRAPHICS.End();

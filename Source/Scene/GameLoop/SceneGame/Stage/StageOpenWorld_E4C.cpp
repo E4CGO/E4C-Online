@@ -226,6 +226,7 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	COLLISIONS.Contacts();
 
 	sky->Update(elapsedTime);
+	teleporter->Update(elapsedTime);
 
 	teleporter->Update(elapsedTime);
 

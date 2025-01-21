@@ -1,4 +1,4 @@
-﻿#include "Source/Map/RoomBase.h"
+#include "Source/Map/RoomBase.h"
 
 #include <TAKOEngine\Tool\XMFLOAT.h>
 #include <filesystem>
@@ -202,12 +202,7 @@ void RoomBase::GenerateNextRoomAutomatically(
 		// 最大深度が設定値より浅いなら次の部屋を生成する
 		if (depth < DUNGEONDATA.GetDungeonGenerateSetting().maxDepth)
 		{
-			// 配置時に他の部屋と重ならない部屋のみを配列に保存する
-			std::vector<std::vector<RoomType>> placeableRooms;
-			placeableRooms.resize(m_connectPointDatas.size());
-
-			// 接続点の数だけ当たり判定を行い、生成を行う
-			for (int i = 0; i < m_connectPointDatas.size(); i++)
+			for (RoomType type : DUNGEONDATA.GetRoomGenerateSetting(roomType).placementCandidates)
 			{
 				for (RoomType type : DUNGEONDATA.GetRoomGenerateSetting(roomType).placementCandidates)
 				{
@@ -249,10 +244,179 @@ void RoomBase::GenerateNextRoomAutomatically(
 							break;
 						}
 					}
-					// 衝突しなかった場合は配列に保存する
-					if (!isHit)
+
+					int randomValue = std::rand() % totalWeight;
+					for (RoomType type : placeableRooms.at(i))
 					{
-						placeableRooms.at(i).emplace_back(type);
+						randomValue -= DUNGEONDATA.GetRoomGenerateSetting(type).weight;
+
+						if (randomValue < 0)
+						{
+							RoomBase* nextRoom = new RoomBase(this, i, type, roomAABBs, isLastRoomGenerated);
+							AddRoom(nextRoom);
+							break;
+						}
+					}
+				}
+				// 何も生成できないならば行き止まり用の部屋を生成する
+				else
+				{
+					RoomBase* deadEnd = new RoomBase(this, i, RoomType::DEAD_END, roomAABBs, isLastRoomGenerated);
+					AddRoom(deadEnd);
+				}
+			}
+
+				// 当たり判定が終わったところで
+				// 自身のAABBを配列に保存
+				roomAABBs.emplace_back(m_aabb);
+
+				// 子の部屋を生成する
+				// 他の部屋と重ならない部屋があるならば生成を開始する
+				if (placeableRooms.at(i).size() > 0)
+				{
+					for (RoomType type : DUNGEONDATA.GetRoomGenerateSetting(roomType).placementCandidates)
+					{
+						// 子のAABBを算出
+						AABB nextAABB = CalcAABB(DUNGEONDATA.GetRoomGenerateSetting(type).aabb,
+							m_connectPointDatas.at(i).position, DirectX::XMConvertToDegrees(m_connectPointDatas.at(i).angle.y));
+
+						// 子のAABBと他のAABB（自分のAABBは除く）との衝突判定を行う
+						// 子のAABBはちょっと大きくして部屋が干渉するのを防ぐ
+						bool isHit = false;
+						for (const AABB& anotherAABB : roomAABBs)
+						{
+							// AABBの位置が同じ==自分のAABBと判定して処理をスキップする
+							if (Mathf::cmpf(anotherAABB.position.x, m_aabb.position.x) &&
+								Mathf::cmpf(anotherAABB.position.y, m_aabb.position.y) &&
+								Mathf::cmpf(anotherAABB.position.z, m_aabb.position.z)) continue;
+
+							IntersectionResult result;
+							DirectX::XMFLOAT3 tmpNextRadii = {
+								nextAABB.radii.x + 4.0f,
+								nextAABB.radii.y,
+								nextAABB.radii.z + 4.0f
+							};
+							DirectX::XMFLOAT3 tmpAnotherRadii = anotherAABB.radii;
+
+							if (Collision::IntersectAABBVsAABB(
+								DirectX::XMLoadFloat3(&nextAABB.position),
+								DirectX::XMLoadFloat3(&tmpNextRadii),
+								DirectX::XMLoadFloat3(&anotherAABB.position),
+								DirectX::XMLoadFloat3(&tmpAnotherRadii),
+								&result))
+							{
+								// AABBと衝突するなら配列に保存しない
+								isHit = true;
+
+								// 当たり判定に使用したAABBはデバッグ四角形描画のために保存しておく
+								m_debugAABBs.emplace_back(AABB(nextAABB.position, tmpNextRadii));
+
+								break;
+							}
+						}
+						// 一度も衝突がなかったら接続点の先に最後の部屋が生成できるかを判定する
+						if (!isHit)
+						{
+							// 自身のAABBを登録した一次的な配列を用意する
+							std::vector<AABB> tempRoomAABBs;
+							tempRoomAABBs = roomAABBs;
+							tempRoomAABBs.emplace_back(m_aabb);
+
+							// 当たり判定用に最後の部屋を生成する
+							RoomBase endRoom(this, i, RoomType::FIRST_END);
+
+							// 最後の部屋のAABBと他のAABB（子のAABBは除く）との衝突判定を行う
+							// 最後の部屋のAABBはちょっと大きくして部屋が干渉するのを防ぐ
+							for (const AABB& tempAnotherAABB : tempRoomAABBs)
+							{
+								// AABBの位置が同じ==子のAABBと判定して処理をスキップする
+								if (Mathf::cmpf(tempAnotherAABB.position.x, nextAABB.position.x) &&
+									Mathf::cmpf(tempAnotherAABB.position.y, nextAABB.position.y) &&
+									Mathf::cmpf(tempAnotherAABB.position.z, nextAABB.position.z)) continue;
+
+								IntersectionResult result;
+								DirectX::XMFLOAT3 tempEndPos = endRoom.GetPosition();
+								DirectX::XMFLOAT3 tempEndAABB = {
+									endRoom.GetAABB().radii.x + 4.0f,
+									endRoom.GetAABB().radii.y,
+									endRoom.GetAABB().radii.z + 4.0f
+								};
+								DirectX::XMFLOAT3 tempAnotherRadii = tempAnotherAABB.radii;
+
+								if (Collision::IntersectAABBVsAABB(
+									DirectX::XMLoadFloat3(&tempEndPos),
+									DirectX::XMLoadFloat3(&tempEndAABB),
+									DirectX::XMLoadFloat3(&tempAnotherAABB.position),
+									DirectX::XMLoadFloat3(&tempAnotherRadii),
+									&result))
+								{
+									// AABBと衝突するなら配列に保存しない
+									isHit = true;
+
+									//break;
+
+									// 当たり判定に使用したAABBはデバッグ四角形描画のために保存しておく
+									//m_debugAABBs.emplace_back(AABB(tempEndPos, tempEndAABB));
+
+									break;
+								}
+
+								if (!isHit)
+								{
+									// 最後の部屋も生成できるからなんか登録する
+									placeableRooms.at(i).emplace_back(type);
+								}
+							}
+						}
+					}
+				}
+				else
+				{
+					for (RoomType type : DUNGEONDATA.GetRoomGenerateSetting(roomType).placementCandidates)
+					{
+						// 新規生成する子のAABBを算出
+						AABB nextAABB = CalcAABB(DUNGEONDATA.GetRoomGenerateSetting(type).aabb,
+							m_connectPointDatas.at(i).position, DirectX::XMConvertToDegrees(m_connectPointDatas.at(i).angle.y));
+
+						// 新規生成する子のAABBと他のAABB（この部屋のAABBは除く）との衝突判定を行う
+						// 子のAABBはちょっと大きくして部屋が干渉するのを防ぐ
+						bool isHit = false;
+						for (const AABB& anotherAABB : roomAABBs)
+						{
+							// AABBの位置が同じ==自分のAABBと判定して処理をスキップする
+							if (Mathf::cmpf(anotherAABB.position.x, m_aabb.position.x) &&
+								Mathf::cmpf(anotherAABB.position.y, m_aabb.position.y) &&
+								Mathf::cmpf(anotherAABB.position.z, m_aabb.position.z)) continue;
+
+							IntersectionResult result;
+							DirectX::XMFLOAT3 tmpNextRadii = {
+								nextAABB.radii.x + 4.0f,
+								nextAABB.radii.y,
+								nextAABB.radii.z + 4.0f
+							};
+							DirectX::XMFLOAT3 tmpAnotherRadii = anotherAABB.radii;
+
+							if (Collision::IntersectAABBVsAABB(
+								DirectX::XMLoadFloat3(&nextAABB.position),
+								DirectX::XMLoadFloat3(&tmpNextRadii),
+								DirectX::XMLoadFloat3(&anotherAABB.position),
+								DirectX::XMLoadFloat3(&tmpAnotherRadii),
+								&result))
+							{
+								// AABBと衝突するなら配列に保存しない
+								isHit = true;
+
+								// 当たり判定に使用したAABBはデバッグ四角形描画のために保存しておく
+								//m_debugAABBs.emplace_back(AABB(nextAABB.position, tmpNextRadii));
+
+								break;
+							}
+						}
+						// 衝突しなかった場合は配列に保存する
+						if (!isHit)
+						{
+							placeableRooms.at(i).emplace_back(type);
+						}
 					}
 				}
 
@@ -292,7 +456,30 @@ void RoomBase::GenerateNextRoomAutomatically(
 				}
 			}
 		}
-		// 一定の深度を超えた場合は行き止まり用の部屋を生成する
+		// 一定の深度を超えた場合は最後の部屋を生成する
+		else
+		{
+			// 自身のAABBを配列に保存
+			roomAABBs.emplace_back(m_aabb);
+
+			isLastRoomGenerated = true;
+
+						if (randomValue < 0)
+						{
+							RoomBase* nextRoom = new RoomBase(this, i, type, roomAABBs, isLastRoomGenerated);
+							AddRoom(nextRoom);
+							break;
+						}
+					}
+				}
+				// 何も生成できないならば行き止まり用の部屋を生成する
+				else
+				{
+					RoomBase* deadEnd = new RoomBase(this, i, RoomType::DEAD_END, roomAABBs, isLastRoomGenerated);
+					AddRoom(deadEnd);
+				}
+			}
+		}
 		else
 		{
 			// 自身のAABBを配列に保存
@@ -301,8 +488,11 @@ void RoomBase::GenerateNextRoomAutomatically(
 			// 接続点の数だけ行き止まり用の部屋を生成する
 			for (int i = 0; i < m_connectPointDatas.size(); i++)
 			{
-				RoomBase* deadEnd = new RoomBase(this, i, RoomType::DEAD_END, roomAABBs, isLastRoomGenerated);
-				AddRoom(deadEnd);
+				for (int i = 1; i < m_connectPointDatas.size(); i++)
+				{
+					RoomBase* deadEnd = new RoomBase(this, i, RoomType::DEAD_END, roomAABBs, isLastRoomGenerated);
+					AddRoom(deadEnd);
+				}
 			}
 		}
 	}
