@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include "WidgetInputInt.h"
+#include "WidgetInputString.h"
 
 #include "Scene/GameLoop/SceneCharacter/SceneCharacter_E4C.h"
 /**************************************************************************//**
@@ -53,6 +54,10 @@ WidgetCharacterModify::WidgetCharacterModify(SceneCharacter_E4C* scene) : m_pSce
 			m_pWidgets.push_back(widget);
 		}
 	}
+
+	WidgetInputString* inputName = new WidgetInputString("##InputName", &m_info.name, 20);
+	inputName->SetPosition({ SCREEN_W * 0.5f - (inputName->GetSize().x * 0.5f), SCREEN_H * 0.80f });
+	m_pWidgets.push_back(inputName);
 }
 /**************************************************************************//**
 	@brief		更新処理
@@ -67,10 +72,26 @@ void WidgetCharacterModify::Update(float elapsedTime)
 
 	if (std::memcmp(m_info.pattern, m_infoTemp.pattern, sizeof(m_info.pattern)) != 0) // 更新あり
 	{
-		if (m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT] == 1)
-			m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT] = 0;
+		if (m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::GENDER] != m_infoTemp.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::GENDER])
+		{
+			for (size_t i = 1; i < (PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::NUM); i++)
+			{
+				if (i != PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::GENDER)
+				{
+					m_info.pattern[i] = 0;
+				}
+			}
+		}
+
+		if (m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT] == PLAYER_CHARACTER_DATA.WEAPON_PATTERN_MAIN::WEAPON_MAIN_ROD)
+			m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT] = PLAYER_CHARACTER_DATA.WEAPON_PATTERN_OFFHAND::WEAPON_OFFHAND_NONE;
 		m_pScene->GetSelectedCharacter()->LoadAppearance(m_info.pattern);
 		m_infoTemp = m_info;
+	}
+	if (m_infoTemp.name != m_info.name.c_str())
+	{
+		m_infoTemp = m_info;
+		m_pScene->GetSelectedCharacter()->SetName(m_info.name.c_str());
 	}
 }
 /**************************************************************************//**

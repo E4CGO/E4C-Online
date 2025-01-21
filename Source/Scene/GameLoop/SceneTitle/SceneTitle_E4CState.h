@@ -12,6 +12,7 @@
 #include "Source/UI/Widget/WidgetButtonImage.h"
 #include "Source/UI/Widget/WidgetButtonText.h"
 #include "Source/UI/Widget/WidgetSettingWindow.h"
+#include "Source/UI/Widget/WidgetStripeAnimation.h"
 
 #include "Scene/GameLoop/SceneTitle/SceneTitle_E4C.h"
 
@@ -53,6 +54,8 @@ namespace SceneTitle_E4CState
 		WidgetButtonImage* m_btnOption = nullptr;
 		WidgetButtonImage* m_btnCredits = nullptr;
 		WidgetButtonImage* m_btnExit = nullptr;
+
+		WidgetStripeAnimation* m_backgroundAnimation;
 
 		float timer = 0.0f;
 	};

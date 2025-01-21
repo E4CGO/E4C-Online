@@ -76,8 +76,6 @@ private:
 	};
 
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
-
-	static float time;
 };
 
 #endif // __INCLUDED_SCENE_TITLE_E4C_H__

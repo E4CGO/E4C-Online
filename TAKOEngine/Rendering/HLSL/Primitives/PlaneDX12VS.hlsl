@@ -1,6 +1,6 @@
 #include "PlaneDX12.hlsli"
 
-// í∏ì_ÉVÉFÅ[É_Å[ÉGÉìÉgÉäÉ|ÉCÉìÉg
+// È†ÇÁÇπ„Ç∑„Çß„Éº„ÉÄ„Éº„Ç®„É≥„Éà„É™„Éù„Ç§„É≥„Éà
 [RootSignature(ROOT_SIG)]
 VS_OUT main(
 	float4 position		: POSITION,
@@ -13,8 +13,9 @@ VS_OUT main(
 {
     VS_OUT vout;
     float4x4 viewProjection = mul(View, Projection);
-	
-    vout.position = mul(position, viewProjection);
+    float4 worldPosition = mul(position, WorldMatrix);
+    
+    vout.position = mul(worldPosition, viewProjection);
     vout.color = color;
     vout.texcoord = texcoord;
 

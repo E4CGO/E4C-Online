@@ -169,6 +169,12 @@ namespace PlayerCharacterState
 		owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_MOVE_CONTINUE, false, 0.0f);
 		owner->SetHurtCoolTime(0.2f);
 
+		// 判定消去
+		if (owner->IsPlayer())
+		{
+			owner->GetColliders()[PlayerCharacter::COLLIDER_ID::COL_BODY]->SetEnable(false);
+		}
+
 		// MP消費
 		owner->ModifyMp(-owner->GetMpCost(static_cast<int>(PlayerCharacter::STATE::DODGE)));
 	}
@@ -182,13 +188,16 @@ namespace PlayerCharacterState
 	}
 	void DodgeState::Exit()
 	{
-		owner->GetCollider()->SetEnable(true);
+		if (owner->IsPlayer())
+		{
+			owner->GetColliders()[PlayerCharacter::COLLIDER_ID::COL_BODY]->SetEnable(true);
+		}
 	}
 
 	// 怪我
 	void HurtState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::ANIM_HURT, false, 0.1f);
+		owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_HURT, false, 0.1f);
 	}
 	void HurtState::Execute(float elapsedTime)
 	{
@@ -203,8 +212,7 @@ namespace PlayerCharacterState
 	// 死亡
 	void DeathState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::ANIM_DEATH, false, 0.1f);
-		owner->GetCollider()->SetEnable(false);
+		owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_DEATH, false, 0.1f);
 	}
 	void DeathState::Execute(float elapsedTime)
 	{

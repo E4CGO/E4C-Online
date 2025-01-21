@@ -27,7 +27,7 @@
 #include "TAKOEngine/Rendering/ConstantBuffer.h"
 #include "TAKOEngine/Tool/ImGuiRenderer.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
-#include "TAKOEngine/Rendering/ParticleRenderer.h"
+#include "TAKOEngine/Rendering/ParticleRenderer/ParticleRenderer.h"
 #include "TAKOEngine/Rendering/ShadowMapRender.h"
 
 #define MAX_BUFFER_COUNT (2)
@@ -60,6 +60,11 @@ enum class ModelShaderDX12Id
 	shadowMap,
 	Plane,
 	PortalSquare,
+	Billboard,
+	Fireball,
+	Loading,
+	Zone,
+	Electric,
 
 	EnumCount
 };
@@ -85,7 +90,15 @@ enum class SpriteShaderDX12Id
 	GaussianBlur,
 	ColorGrading,
 	Finalpass,
-	Particle,
+	InjectionParticle,
+	HitParticle,
+
+	EnumCount
+};
+
+enum class ComputeShaderDX12Id
+{
+	Injection, // 噴射
 
 	EnumCount
 };
@@ -168,7 +181,7 @@ public:
 	// フレームバッファ取得
 	FrameBuffer* GetFrameBuffer(FrameBufferId frameBufferId) { return frameBuffers[static_cast<int>(frameBufferId)].get(); }
 	// DX12のフレームバッファ取得
-	FrameBufferDX12* GetFramBufferDX12(FrameBufferDX12Id frameBufferId) { return dx12_frameBuffers[static_cast<int>(frameBufferId)].get(); }
+	FrameBufferDX12* GetFrameBufferDX12(FrameBufferDX12Id frameBufferId) { return dx12_frameBuffers[static_cast<int>(frameBufferId)].get(); }
 	// DX12のフレームバッファマネージャー
 	FrameBufferManager* GetFrameBufferManager() { return m_framebufferManager.get(); }
 
@@ -207,7 +220,7 @@ public:
 	SkinningPipeline* GetSkinningPipeline() const { return m_skinning_pipeline.get(); }
 
 	// パーティクル取得
-	ParticleCompute* GetParticleCompute() const { return m_compute.get(); }
+	ComputeShader* GetParticleCompute(ComputeShaderDX12Id shaderId) const { return m_compute[static_cast<int>(shaderId)].get(); }
 
 	// ImGUIンレンダラ取得
 	ImGuiRenderer* GetImGUIRenderer() const { return m_imgui_renderer.get(); }
@@ -268,7 +281,7 @@ public:
 	HRESULT CreateTexture(const BYTE* pixels, UINT width, UINT height, DXGI_FORMAT format, ID3D12Resource** d3d_resource);
 
 	// ダミーテクスチャ生成
-	HRESULT CreateDummyTexture(ID3D12Resource** d3d_resource);
+	HRESULT CreateDummyTexture(ID3D12Resource** d3d_resource, int color = 0xFF);
 
 	// バッファコピー
 	HRESULT CopyBuffer(ID3D12Resource* d3d_src_resource, ID3D12Resource* d3d_dst_resource);
@@ -343,7 +356,7 @@ private:
 	std::unique_ptr<SkinningPipeline>	m_skinning_pipeline;
 
 	// パーティクル
-	std::unique_ptr<ParticleCompute> m_compute;
+	std::unique_ptr<ComputeShader> m_compute[static_cast<int>(ComputeShaderDX12Id::EnumCount)];
 
 	std::unique_ptr<ShadowMapRenderDX12> m_shadowMapRenderer;
 

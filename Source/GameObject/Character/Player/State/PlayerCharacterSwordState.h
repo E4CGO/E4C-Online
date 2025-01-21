@@ -1,4 +1,4 @@
-﻿//! @file PlayerCharacterState.h
+//! @file PlayerCharacterState.h
 //! @note
 
 #ifndef __INCLUDED_PLAYER_CHARACTER_SWORD_STATE_H__
@@ -21,6 +21,19 @@ namespace PlayerCharacterState
 			ATTACK_START,
 			ATTACK_CONTINUE,
 		};
+
+		struct ATTACK_SPHERE
+		{
+			uint16_t power = 0;
+			uint8_t idx = 0;
+			Collider::COLLIDER_OBJ objType = Collider::COLLIDER_OBJ::HIT_ERR;
+			uint16_t hittableOBJ = 0;
+			float hitStartRate = 0.0f;
+			float hitEndRate = 1.0f;
+			Sphere sphere{};
+		};
+		
+		extern ATTACK_SPHERE sphereAttacks[4];
 
 		// 待機用ステートオブジェクト
 		class WaitState : public HierarchicalState<PlayerCharacter>
@@ -97,7 +110,7 @@ namespace PlayerCharacterState
 			// ステートで実行するメソッド
 			void Execute(float elapsedTime) override;
 			// ステートから出ていくときのメソッド
-			void Exit() override {};
+			void Exit() override;
 		};
 		// 一般攻撃2
 		class AttackNormalState_2 : public HierarchicalState<PlayerCharacter>
@@ -112,7 +125,7 @@ namespace PlayerCharacterState
 			// ステートで実行するメソッド
 			void Execute(float elapsedTime) override;
 			// ステートから出ていくときのメソッド
-			void Exit() override {};
+			void Exit() override;
 		};
 		// 一般攻撃3
 		class AttackNormalState_3 : public HierarchicalState<PlayerCharacter>
@@ -127,7 +140,7 @@ namespace PlayerCharacterState
 			// ステートで実行するメソッド
 			void Execute(float elapsedTime) override;
 			// ステートから出ていくときのメソッド
-			void Exit() override {};
+			void Exit() override;
 		};
 
 		// スキル_1 回レ
@@ -178,9 +191,7 @@ namespace PlayerCharacterState
 			// ステートで実行するメソッド
 			void Execute(float elapsedTime) override;
 			// ステートから出ていくときのメソッド
-			void Exit() override {};
-
-			
+			void Exit() override;
 		};
 
 		class Skill2State : public HierarchicalState<PlayerCharacter>

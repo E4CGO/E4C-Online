@@ -25,7 +25,7 @@ namespace Online
 		return true;
 	}
 	/**************************************************************************//**
-		@brief		ログイン受信関数
+		@brief		ログイン送信関数
 		@param[in]	data データ参照ポインタ
 		@return		成功判断
 	*//***************************************************************************/
@@ -39,7 +39,7 @@ namespace Online
 		// 外見データ
 		buffer.insert(buffer.end(), loginData->appearance, loginData->appearance + sizeof(loginData->appearance));
 		// 名前データ
-		U8Buffer::InsertU8(buffer, loginData->name);
+		U8Buffer::Insert(buffer, loginData->name);
 
 		bool result = m_pcontroller->GetTcpSocket()->Send(buffer.data(), buffer.size()) >= 0;
 
@@ -54,7 +54,6 @@ namespace Online
 		}
 		return result;
 	}
-
 
 	/**************************************************************************//**
 		@brief		ログイン待ちスレッド

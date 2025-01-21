@@ -5,7 +5,7 @@
 #define __INCLUDED_WIDGET_BUTTON_TEXT__
 
 #include <string>
-#include "WidgetButton.h"
+#include "TAKOEngine/GUI/WidgetButton.h"
 
 /**************************************************************************//**
 	@class	WidgetButtonText

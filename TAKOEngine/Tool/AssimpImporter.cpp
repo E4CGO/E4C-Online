@@ -137,6 +137,9 @@ void AssimpImporter::LoadMaterials(MaterialList& materials)
 
 		// ノーマルマップ
 		loadTexture(aiTextureType_NORMALS, material.normalTextureFileName);
+
+		// エミッシブマップ
+		loadTexture(aiTextureType_EMISSIVE, material.emissiveTextureFileName);
 	}
 }
 

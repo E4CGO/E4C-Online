@@ -81,82 +81,156 @@ bool Collision::IntersectRayVsModel(
 		DirectX::XMVECTOR HitPosition;
 		DirectX::XMVECTOR HitNormal;
 		DirectX::XMVECTOR HitVerts[3] = {};
-		for (const ModelResource::Subset& subset : mesh.subsets)
+
+		for (UINT i = 0; i < mesh.indices.size(); i += 3)
 		{
-			for (UINT i = 0; i < subset.indexCount; i += 3)
-			{
-				UINT index = subset.startIndex + i;
+			UINT index = i;
 
-				// 三角形の頂点を抽出
-				const ModelResource::Vertex& a = vertices.at(indices.at(index));
-				const ModelResource::Vertex& b = vertices.at(indices.at(index + 1));
-				const ModelResource::Vertex& c = vertices.at(indices.at(index + 2));
+			// 三角形の頂点を抽出
+			const ModelResource::Vertex& a = vertices.at(indices.at(index));
+			const ModelResource::Vertex& b = vertices.at(indices.at(index + 1));
+			const ModelResource::Vertex& c = vertices.at(indices.at(index + 2));
 
-				DirectX::XMVECTOR A = DirectX::XMLoadFloat3(&a.position);
-				DirectX::XMVECTOR B = DirectX::XMLoadFloat3(&b.position);
-				DirectX::XMVECTOR C = DirectX::XMLoadFloat3(&c.position);
+			DirectX::XMVECTOR C = DirectX::XMLoadFloat3(&a.position);
+			DirectX::XMVECTOR B = DirectX::XMLoadFloat3(&b.position);
+			DirectX::XMVECTOR A = DirectX::XMLoadFloat3(&c.position);
 
-				// 三角形の三辺ベクトルを算出
-				DirectX::XMVECTOR AB = DirectX::XMVectorSubtract(B, A);
-				DirectX::XMVECTOR BC = DirectX::XMVectorSubtract(C, B);
-				DirectX::XMVECTOR CA = DirectX::XMVectorSubtract(A, C);
+			// 三角形の三辺ベクトルを算出
+			DirectX::XMVECTOR AB = DirectX::XMVectorSubtract(B, A);
+			DirectX::XMVECTOR BC = DirectX::XMVectorSubtract(C, B);
+			DirectX::XMVECTOR CA = DirectX::XMVectorSubtract(A, C);
 
-				// 三角形の法線ベクトルを算出		
-				DirectX::XMVECTOR N = DirectX::XMVector3Cross(AB, BC);
+			// 三角形の法線ベクトルを算出		
+			DirectX::XMVECTOR N = DirectX::XMVector3Cross(AB, BC);
 
-				// 内積の結果がプラスならば裏向き
-				DirectX::XMVECTOR Dot = DirectX::XMVector3Dot(V, N);
-				float d;
-				DirectX::XMStoreFloat(&d, Dot);
-				if (d >= 0) continue;
+			// 内積の結果がプラスならば裏向き
+			DirectX::XMVECTOR Dot = DirectX::XMVector3Dot(V, N);
+			float d;
+			DirectX::XMStoreFloat(&d, Dot);
+			if (d >= 0) continue;
 
-				// レイと平面の交点を算出
-				DirectX::XMVECTOR SA = DirectX::XMVectorSubtract(A, S);
-				DirectX::XMVECTOR X = DirectX::XMVectorDivide(DirectX::XMVector3Dot(N, SA), Dot);
-				float x;
-				DirectX::XMStoreFloat(&x, X);
-				if (x < .0f || x > neart) continue;	// 交点までの距離が今までに計算した最近距離より
-				// 大きい時はスキップ
-				DirectX::XMVECTOR P = DirectX::XMVectorAdd(DirectX::XMVectorMultiply(V, X), S);
+			// レイと平面の交点を算出
+			DirectX::XMVECTOR SA = DirectX::XMVectorSubtract(A, S);
+			DirectX::XMVECTOR X = DirectX::XMVectorDivide(DirectX::XMVector3Dot(N, SA), Dot);
+			float x;
+			DirectX::XMStoreFloat(&x, X);
+			if (x < .0f || x > neart) continue;	// 交点までの距離が今までに計算した最近距離より
+			// 大きい時はスキップ
+			DirectX::XMVECTOR P = DirectX::XMVectorAdd(DirectX::XMVectorMultiply(V, X), S);
 
-				// 交点が三角形の内側にあるか判定
-				// １つめ
-				DirectX::XMVECTOR PA = DirectX::XMVectorSubtract(A, P);
-				DirectX::XMVECTOR Cross1 = DirectX::XMVector3Cross(PA, AB);
-				DirectX::XMVECTOR Dot1 = DirectX::XMVector3Dot(Cross1, N);
-				float dot1;
-				DirectX::XMStoreFloat(&dot1, Dot1);
-				if (dot1 < 0.0f) continue;
-				// ２つめ
-				DirectX::XMVECTOR PB = DirectX::XMVectorSubtract(B, P);
-				DirectX::XMVECTOR Cross2 = DirectX::XMVector3Cross(PB, BC);
-				DirectX::XMVECTOR Dot2 = DirectX::XMVector3Dot(Cross2, N);
-				float dot2;
-				DirectX::XMStoreFloat(&dot2, Dot2);
-				if (dot2 < 0.0f) continue;
-				// ３つめ
-				DirectX::XMVECTOR PC = DirectX::XMVectorSubtract(C, P);
-				DirectX::XMVECTOR Cross3 = DirectX::XMVector3Cross(PC, CA);
-				DirectX::XMVECTOR Dot3 = DirectX::XMVector3Dot(Cross3, N);
-				float dot3;
-				DirectX::XMStoreFloat(&dot3, Dot3);
-				if (dot3 < 0.0f) continue;
+			// 交点が三角形の内側にあるか判定
+			// １つめ
+			DirectX::XMVECTOR PA = DirectX::XMVectorSubtract(A, P);
+			DirectX::XMVECTOR Cross1 = DirectX::XMVector3Cross(PA, AB);
+			DirectX::XMVECTOR Dot1 = DirectX::XMVector3Dot(Cross1, N);
+			float dot1;
+			DirectX::XMStoreFloat(&dot1, Dot1);
+			if (dot1 < 0.0f) continue;
+			// ２つめ
+			DirectX::XMVECTOR PB = DirectX::XMVectorSubtract(B, P);
+			DirectX::XMVECTOR Cross2 = DirectX::XMVector3Cross(PB, BC);
+			DirectX::XMVECTOR Dot2 = DirectX::XMVector3Dot(Cross2, N);
+			float dot2;
+			DirectX::XMStoreFloat(&dot2, Dot2);
+			if (dot2 < 0.0f) continue;
+			// ３つめ
+			DirectX::XMVECTOR PC = DirectX::XMVectorSubtract(C, P);
+			DirectX::XMVECTOR Cross3 = DirectX::XMVector3Cross(PC, CA);
+			DirectX::XMVECTOR Dot3 = DirectX::XMVector3Dot(Cross3, N);
+			float dot3;
+			DirectX::XMStoreFloat(&dot3, Dot3);
+			if (dot3 < 0.0f) continue;
 
-				// 三角形頂点を更新
-				HitVerts[0] = A;
-				HitVerts[1] = B;
-				HitVerts[2] = C;
+			// 三角形頂点を更新
+			HitVerts[0] = A;
+			HitVerts[1] = B;
+			HitVerts[2] = C;
 
-				// 最近距離を更新
-				neart = x;
+			// 最近距離を更新
+			neart = x;
 
-				// 交点と法線を更新
-				HitPosition = P;
-				HitNormal = N;
-				materialIndex = subset.materialIndex;
-			}
+			// 交点と法線を更新
+			HitPosition = P;
+			HitNormal = N;
+			//materialIndex = subset.materialIndex;
 		}
-		if (materialIndex >= 0)
+
+		//for (const ModelResource::Subset& subset : mesh.subsets)
+		//{
+		//	for (UINT i = 0; i < subset.indexCount; i += 3)
+		//	{
+		//		UINT index = subset.startIndex + i;
+
+		//		// 三角形の頂点を抽出
+		//		const ModelResource::Vertex& a = vertices.at(indices.at(index));
+		//		const ModelResource::Vertex& b = vertices.at(indices.at(index + 1));
+		//		const ModelResource::Vertex& c = vertices.at(indices.at(index + 2));
+
+		//		DirectX::XMVECTOR A = DirectX::XMLoadFloat3(&a.position);
+		//		DirectX::XMVECTOR B = DirectX::XMLoadFloat3(&b.position);
+		//		DirectX::XMVECTOR C = DirectX::XMLoadFloat3(&c.position);
+
+		//		// 三角形の三辺ベクトルを算出
+		//		DirectX::XMVECTOR AB = DirectX::XMVectorSubtract(B, A);
+		//		DirectX::XMVECTOR BC = DirectX::XMVectorSubtract(C, B);
+		//		DirectX::XMVECTOR CA = DirectX::XMVectorSubtract(A, C);
+
+		//		// 三角形の法線ベクトルを算出		
+		//		DirectX::XMVECTOR N = DirectX::XMVector3Cross(AB, BC);
+
+		//		// 内積の結果がプラスならば裏向き
+		//		DirectX::XMVECTOR Dot = DirectX::XMVector3Dot(V, N);
+		//		float d;
+		//		DirectX::XMStoreFloat(&d, Dot);
+		//		if (d >= 0) continue;
+
+		//		// レイと平面の交点を算出
+		//		DirectX::XMVECTOR SA = DirectX::XMVectorSubtract(A, S);
+		//		DirectX::XMVECTOR X = DirectX::XMVectorDivide(DirectX::XMVector3Dot(N, SA), Dot);
+		//		float x;
+		//		DirectX::XMStoreFloat(&x, X);
+		//		if (x < .0f || x > neart) continue;	// 交点までの距離が今までに計算した最近距離より
+		//		// 大きい時はスキップ
+		//		DirectX::XMVECTOR P = DirectX::XMVectorAdd(DirectX::XMVectorMultiply(V, X), S);
+
+		//		// 交点が三角形の内側にあるか判定
+		//		// １つめ
+		//		DirectX::XMVECTOR PA = DirectX::XMVectorSubtract(A, P);
+		//		DirectX::XMVECTOR Cross1 = DirectX::XMVector3Cross(PA, AB);
+		//		DirectX::XMVECTOR Dot1 = DirectX::XMVector3Dot(Cross1, N);
+		//		float dot1;
+		//		DirectX::XMStoreFloat(&dot1, Dot1);
+		//		if (dot1 < 0.0f) continue;
+		//		// ２つめ
+		//		DirectX::XMVECTOR PB = DirectX::XMVectorSubtract(B, P);
+		//		DirectX::XMVECTOR Cross2 = DirectX::XMVector3Cross(PB, BC);
+		//		DirectX::XMVECTOR Dot2 = DirectX::XMVector3Dot(Cross2, N);
+		//		float dot2;
+		//		DirectX::XMStoreFloat(&dot2, Dot2);
+		//		if (dot2 < 0.0f) continue;
+		//		// ３つめ
+		//		DirectX::XMVECTOR PC = DirectX::XMVectorSubtract(C, P);
+		//		DirectX::XMVECTOR Cross3 = DirectX::XMVector3Cross(PC, CA);
+		//		DirectX::XMVECTOR Dot3 = DirectX::XMVector3Dot(Cross3, N);
+		//		float dot3;
+		//		DirectX::XMStoreFloat(&dot3, Dot3);
+		//		if (dot3 < 0.0f) continue;
+
+		//		// 三角形頂点を更新
+		//		HitVerts[0] = A;
+		//		HitVerts[1] = B;
+		//		HitVerts[2] = C;
+
+		//		// 最近距離を更新
+		//		neart = x;
+
+		//		// 交点と法線を更新
+		//		HitPosition = P;
+		//		HitNormal = N;
+		//		materialIndex = subset.materialIndex;
+		//	}
+		//}
+		//if (materialIndex >= 0)
 		{
 			// ローカル空間からワールド空間へ変換
 			DirectX::XMVECTOR WorldPosition = DirectX::XMVector3TransformCoord(HitPosition, WorldTransform);

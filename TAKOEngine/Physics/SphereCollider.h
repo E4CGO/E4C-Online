@@ -40,7 +40,7 @@ public:
 	) override;
 
 	// Sphere用パラメータセット
-	void SetParam(Sphere sphere) override;
+	void SetParam(const Sphere& sphere) override;
 	// Sphere用パラメータゲット
 	Sphere GetSphere() override { return Sphere(m_offset, m_radius); }
 
@@ -48,7 +48,7 @@ public:
 
 	void DrawDebugPrimitive(DirectX::XMFLOAT4 color = { 1, 1, 1, 1 }) override;
 
-private:
+protected:
 	float m_radius = 0.0f;
 
 	std::unique_ptr<SphereRenderer> m_sphere;

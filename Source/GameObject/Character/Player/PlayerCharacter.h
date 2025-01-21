@@ -78,6 +78,11 @@ public:
 		ANIM_ROD_ATTACK_COMBO_FIRST,
 		ANIM_ROD_ATTACK_COMBO_SECOND,
 		ANIM_ROD_ATTACK_COMBO_THIRD,
+		ANIM_ROD_CHARGE_END,
+		ANIM_ROD_ATTACK_SPECIAL_FIRST,
+		ANIM_ROD_ATTACK_SPECIAL_SECOND,
+		ANIM_ROD_HURT,
+		ANIM_ROD_DEATH,
 		ANIM_SWORD_IDLE,
 		ANIM_SWORD_MOVE_START,
 		ANIM_SWORD_MOVE_CONTINUE,
@@ -90,8 +95,8 @@ public:
 		ANIM_SHIELD_GUARD_CONTINUE,
 		ANIM_SHIELD_GUARD_KNOCKBACK_CONTINUE,
 		ANIM_SHIELD_GUARD_FINISH,
-		ANIM_HURT,
-		ANIM_DEATH
+		ANIM_SWORD_HURT,
+		ANIM_SWORD_DEATH
 	};
 
 	enum STATE : uint8_t
@@ -114,6 +119,19 @@ public:
 
 		WAITING = 254,	// 待機
 		READY = 255,	// 待機 (準備完了)
+	};
+
+	enum COLLIDER_ID : uint8_t
+	{
+		COL_BODY,
+		COL_ATTACK_1,
+		COL_ATTACK_2,
+		COL_ATTACK_3,
+		COL_ATTACK_SPECIAL,
+		COL_SKILL_1,
+		COL_SKILL_2,
+		COL_SKILL_3,
+		COL_SKILL_4,
 	};
 
 	enum COLOR_PATTERN {
@@ -231,10 +249,6 @@ public:
 	// ステートマシンを取得
 	StateMachine<PlayerCharacter>* GetStateMachine() { return stateMachine; }
 
-	Collider* GetAttackCollider(int idx) { return m_pattackColliders[idx]; }
-	std::unordered_map<int, Collider*> GetAttackColliders() { return m_pattackColliders; }
-	void EnableAttackColliders(bool enable = true) { for (const std::pair<int, Collider*>& collider : m_pattackColliders) collider.second->SetEnable(enable); }
-
 	// 同期用データを取得
 	void GetSyncData(SYNC_DATA& data);
 	// 同期用データを計算
@@ -252,18 +266,18 @@ protected:
 
 	bool CollisionVsEnemies();
 
-	bool CollisionVsEnemyAttack(
-		Collider* collider,
-		int damage,
-		bool power = false,
-		float force = 0.0f,
-		int effectIdx = -1,
-		float effectScale = 1.0f
-	); // 汎用 敵との判定
+	//bool CollisionVsEnemyAttack(
+	//	Collider* collider,
+	//	int damage,
+	//	bool power = false,
+	//	float force = 0.0f,
+	//	int effectIdx = -1,
+	//	float effectScale = 1.0f
+	//); // 汎用 敵との判定
 
-	void AttackEnemy(Collider* attackCol, Collider* enemyCol);
+	//void AttackEnemy(Collider* attackCol, Collider* enemyCol);
 
-private:
+protected:
 	float radius = 0;	// 当たり判定半径
 
 	uint32_t m_client_id = 0;
@@ -315,8 +329,8 @@ protected:
 
 	StateMachine<PlayerCharacter>* stateMachine;
 
-	Collider* m_hitCollider;	// ヒット判定
-	std::unordered_map<int, Collider*> m_pattackColliders; // 攻撃判定
+	//Collider* m_hitCollider;	// ヒット判定
+	//std::unordered_map<int, Collider*> m_pattackColliders; // 攻撃判定
 
 	// 同期用
 	std::mutex m_mut;

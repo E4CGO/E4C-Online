@@ -25,17 +25,21 @@ void PlayerCharacterPatternGender::Execute(PlayerCharacter* chara)
 		{
 			chara->LoadModel("Data/Model/Character/PlayerModels/MDL_PLAYER_BODY_ANIMATION.glb", 1.0f, ModelObject::RENDER_MODE::DX11);
 		}
+
+		PLAYER_CHARACTER_DATA.SetMalePatterns();
 	}
 	else //FEMALE
 	{
 		if (T_GRAPHICS.isDX12Active)
 		{
-			chara->LoadModel("Data/Model/Character/PlayerModels/MDL_PLAYER_BODY_ANIMATION.glb", 1.0f, ModelObject::RENDER_MODE::DX12);
+			chara->LoadModel("Data/Model/Character/PlayerModels/MDL_PLAYER_F_BODY_ANIMATION.glb", 1.0f, ModelObject::RENDER_MODE::DX12);
 		}
 		if (T_GRAPHICS.isDX11Active)
 		{
-			chara->LoadModel("Data/Model/Character/PlayerModels/MDL_PLAYER_BODY_ANIMATION.glb", 1.0f, ModelObject::RENDER_MODE::DX11);
+			chara->LoadModel("Data/Model/Character/PlayerModels/MDL_PLAYER_F_BODY_ANIMATION.glb", 1.0f, ModelObject::RENDER_MODE::DX11);
 		}
+
+		PLAYER_CHARACTER_DATA.SetFemalePatterns();
 	}
 
 	StateMachine<PlayerCharacter>* stateMachine = chara->GetStateMachine();

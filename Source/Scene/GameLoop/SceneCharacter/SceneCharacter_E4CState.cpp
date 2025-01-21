@@ -134,7 +134,7 @@ void SceneCharacter_E4CState::CharacterCreationState::Enter()
 		PLAYER_CHARACTER_DATA.SetCurrentCharacter(owner->GetSelectedCharacterIdx());
 		owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::START);
 		});
-	m_pStartBtn->SetPosition({ SCREEN_W * 0.5f - (m_pStartBtn->GetSize().x * 0.5f), SCREEN_H * 0.8f });
+	m_pStartBtn->SetPosition({ SCREEN_W * 0.5f - (m_pStartBtn->GetSize().x * 0.5f), SCREEN_H * 0.85f });
 	UI.Register(m_pStartBtn);
 
 	m_pWidgetCharacterModify = new WidgetCharacterModify(owner);

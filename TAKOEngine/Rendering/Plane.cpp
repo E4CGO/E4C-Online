@@ -333,7 +333,6 @@ PlaneDX12::PlaneDX12(const char* filename, float scaling, XMFLOAT3 centerPos, fl
 		mesh.d3d_vbv.StrideInBytes = sizeof(ModelResource::Vertex);
 
 		// マップする
-
 		void* mappedData = nullptr;
 		hr = mesh.d3d_vb_resource->Map(0, nullptr, &mappedData);
 		memcpy(mappedData, vertices.data(), vertices.size() * sizeof(ModelResource::Vertex));
@@ -396,6 +395,8 @@ PlaneDX12::PlaneDX12(const char* filename, float scaling, XMFLOAT3 centerPos, fl
 		mesh.d3d_ib_resource->Unmap(0, nullptr);
 	}
 
+	mesh.offsetTransforms.resize(1);
+
 	mesh.material = new ModelResource::Material;
 
 	// テクスチャの生成
@@ -448,6 +449,7 @@ void PlaneDX12::RenderDX12(const RenderContextDX12& rc)
 	// パイプライン設定
 	shader = T_GRAPHICS.GetModelShaderDX12(m_dx12_ShaderId);
 
+	mesh.offsetTransforms[0] = transform;
 	m_Mesh.mesh = &mesh;
 	//描画
 	shader->Render(rc, m_Mesh);

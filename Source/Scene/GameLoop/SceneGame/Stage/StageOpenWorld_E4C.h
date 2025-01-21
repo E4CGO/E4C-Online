@@ -1,4 +1,8 @@
-#pragma once
+//! @file StageOpenWorld_E4C.h
+//! @note
+
+#ifndef __INCLUDED_STAGE_OPEN_WORLD_E4C_H__
+#define __INCLUDED_STAGE_OPEN_WORLD_E4C_H__
 
 #include <unordered_set>
 #include <memory>
@@ -26,6 +30,8 @@
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
 #include "Source/GameObject/Props/Spawner.h"
 
+#include "TAKOEngine/Rendering/ParticleRenderer/HitParticleRenderer.h"
+
 using namespace DirectX;
 
 class SceneGame_E4C;
@@ -45,8 +51,6 @@ public:
 	void Render() override;
 
 	void RenderDX12() override;
-protected:
-	void OnPhase() override;
 public:
 	enum PHASE
 	{
@@ -59,9 +63,6 @@ private:
 
 private:
 
-	float timer = 0;
-	float timerTick = 0;
-
 	SceneGame_E4C* m_pScene;
 
 	std::unique_ptr<ThridPersonCameraController> cameraController;
@@ -72,19 +73,9 @@ private:
 	std::unique_ptr <Teleporter> teleporter;
 
 	std::unordered_map<std::string, std::unique_ptr<ModelObject>> models;
-	std::unique_ptr<Spawner> spawner;
 
 	std::unique_ptr<ModelObject> sky;
-	std::unique_ptr<MouseMob> mouse;
-	std::unique_ptr<SpriteDX12>			m_sprites[8];
-
-	std::unique_ptr<Plane> portalSquare;
-	std::unique_ptr<PlaneDX12> portalSquare2;
-
-	std::unique_ptr<Fireball> fireBall;
-
-	std::unique_ptr<Plane> plane;
-	std::unique_ptr<PlaneDX12> plane2;
+	std::unique_ptr<SpriteDX12> m_sprites[8];
 
 	std::unique_ptr<RunningDust> runningDust1;
 	std::deque<RunningDust> runningDust;
@@ -117,12 +108,16 @@ private:
 		{8,3,8}
 	};
 
+	std::unique_ptr<HitParticleRenderer> m_particle[2];
+
 	// フレームバッファマネージャー
 	FrameBufferManager* m_frameBuffer = nullptr;
 
-	float hp=0.f;
-	float mpsp=0.f;
-
 	// ポストエフェクト
 	std::unique_ptr<PostprocessingRendererDX12>	postprocessingRenderer = std::make_unique<PostprocessingRendererDX12>();
+
+	float m_sceneGlobalTimer = 0;
+	float m_sceneTickTimer = 0;
 };
+
+#endif // !__INCLUDED_STAGE_OPEN_WORLD_E4C_H__

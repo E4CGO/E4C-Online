@@ -78,6 +78,7 @@ public:
 
 	// ステート取得
 	HierarchicalState<T>* GetState() { return currentState; }
+	HierarchicalState<T>* GetState(int index) { return (statePool.find(index) == statePool.end()) ? nullptr : statePool[index]; }
 private:
 	// 現在のステート
 	HierarchicalState<T>* currentState = nullptr;

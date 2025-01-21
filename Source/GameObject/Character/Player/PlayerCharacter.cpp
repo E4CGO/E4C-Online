@@ -1,4 +1,4 @@
-//! @file PlayerCharacter.cpp
+	//! @file PlayerCharacter.cpp
 //! @note
 
 #include "PlayerCharacter.h"
@@ -39,64 +39,16 @@ PlayerCharacter::PlayerCharacter(uint32_t id, const char* name, const uint8_t ap
 	mpCost[static_cast<int>(STATE::DODGE)] = 0.0f;
 
 	// 衝突判定
-	SetCollider(Collider::COLLIDER_TYPE::SPHERE, Collider::COLLIDER_OBJ::PLAYER);
-	Sphere colSphere({ 0, radius / scale.y, 0 }, radius);
-	collider->SetParam(colSphere);
-	//SetCollider(Collider::COLLIDER_TYPE::CAPSULE, Collider::COLLIDER_OBJ::PLAYER);
-	//Capsule capsule{};
-	//capsule.radius = radius;
-	//capsule.position = { 0, capsule.radius / scale.y, 0 };
-	//capsule.direction = { 0, 1.0f, 0 };
-	//capsule.length = height - capsule.radius * 2;
-	//collider->SetParam(capsule);
-	collider->SetOwner(this);
+	SetMoveCollider({ { 0, radius / scale.y, 0 }, radius }, Collider::COLLIDER_OBJ::PLAYER);
 
+	m_pColliders.clear();
 	// ヒット判定
 	Capsule capsule{};
 	capsule.radius = radius;
 	capsule.position = { 0, capsule.radius / scale.y, 0 };
-	capsule.direction = { 0, 1.0f, 0 };
+	capsule.direction = { 0.0f, 1.0f, 0.0f };
 	capsule.length = height - capsule.radius * 2;
-	m_hitCollider = new CapsuleCollider(Collider::COLLIDER_OBJ::PLAYER, &transform);
-	m_hitCollider->SetParam(capsule);
-	m_hitCollider->SetOwner(this);
-	COLLISIONS.Register(m_hitCollider);
-
-	// 攻撃判定
-	Sphere sphere{};
-	sphere.radius = 0.6f;
-	sphere.position = { 0, 0.5f / scale.y, 0.8f / scale.z };
-	m_pattackColliders[0] = new SphereCollider(Collider::COLLIDER_OBJ::PLAYER_ATTACK, &transform);
-	m_pattackColliders[0]->SetParam(sphere);
-	m_pattackColliders[0]->SetOwner(this);
-	m_pattackColliders[0]->SetHittableOBJ(Collider::ENEMY);
-	m_pattackColliders[0]->SetHitStartRate(0.25f);
-	m_pattackColliders[0]->SetHitEndRate(0.7f);
-	m_pattackColliders[0]->SetEnable(false);
-	m_pattackColliders[0]->SetCollisionFunction([&](Collider* attackCol, Collider* enemyCol) { AttackEnemy(attackCol, enemyCol); });
-	COLLISIONS.Register(m_pattackColliders[0]);
-
-	sphere.radius = 0.8f;
-	sphere.position = { 0, 0.5f / scale.y, 0.8f / scale.z };
-	m_pattackColliders[1] = new SphereCollider(Collider::COLLIDER_OBJ::PLAYER_ATTACK, &transform);
-	m_pattackColliders[1]->SetParam(sphere);
-	m_pattackColliders[1]->SetOwner(this);
-	m_pattackColliders[1]->SetHittableOBJ(Collider::ENEMY);
-	m_pattackColliders[1]->SetHitStartRate(0.25f);
-	m_pattackColliders[1]->SetHitEndRate(0.7f);
-	m_pattackColliders[1]->SetEnable(false);
-	COLLISIONS.Register(m_pattackColliders[1]);
-
-	sphere.radius = 1.2f;
-	sphere.position = { 0, 0.5f / scale.y, 0.8f / scale.z };
-	m_pattackColliders[2] = new SphereCollider(Collider::COLLIDER_OBJ::PLAYER_ATTACK, &transform);
-	m_pattackColliders[2]->SetParam(sphere);
-	m_pattackColliders[2]->SetOwner(this);
-	m_pattackColliders[2]->SetHittableOBJ(Collider::ENEMY);
-	m_pattackColliders[2]->SetHitStartRate(0.25f);
-	m_pattackColliders[2]->SetHitEndRate(0.7f);
-	m_pattackColliders[2]->SetEnable(false);
-	COLLISIONS.Register(m_pattackColliders[2]);
+	SetCollider(COLLIDER_ID::COL_BODY, capsule, Collider::COLLIDER_OBJ::PLAYER, &transform);
 
 	m_client_id = id;
 	this->m_name = name;
@@ -119,13 +71,13 @@ PlayerCharacter::PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataI
 	RegisterCommonState();
 	stateMachine->SetState(static_cast<int>(STATE::WAITING));
 
-	mpCost[static_cast<int>(STATE::DODGE)] = 00.0f;
+	mpCost[static_cast<int>(STATE::DODGE)] = 0.0f;
 
 	// 衝突判定
-	SetCollider(Collider::COLLIDER_TYPE::CAPSULE, Collider::COLLIDER_OBJ::PLAYER);
-	m_hitCollider = new CapsuleCollider(Collider::COLLIDER_OBJ::PLAYER, &transform);
-	COLLISIONS.Register(m_hitCollider);
+	SetMoveCollider({ { 0, radius, 0 }, radius }, Collider::COLLIDER_OBJ::PLAYER);
+	m_pColliders.clear();
 
+	this->m_name = dataInfo.name;
 	LoadAppearance(dataInfo.pattern);
 
 	// DebugPrimitive用
@@ -152,16 +104,6 @@ void PlayerCharacter::LoadAppearance(const uint8_t appearance[PlayerCharacterDat
 PlayerCharacter::~PlayerCharacter()
 {
 	delete stateMachine;
-
-	COLLISIONS.Remove(m_hitCollider);
-	//delete m_hitCollider;
-
-	for (const std::pair<int, Collider*>& collider : m_pattackColliders)
-	{
-		COLLISIONS.Remove(collider.second);
-		//delete collider.second;
-	}
-	m_pattackColliders.clear();
 }
 
 void PlayerCharacter::RegisterCommonState()
@@ -209,7 +151,7 @@ void PlayerCharacter::UpdateHorizontalMove(float elapsedTime)
 			float mz = velocity.z * elapsedTime;
 
 			// マップ
-			if (collider != nullptr) {
+			if (m_pMoveCollider != nullptr) {
 				if (IsPlayer())
 				{
 					// 重いときにスフィアキャストを分割して行う
@@ -251,8 +193,7 @@ void PlayerCharacter::UpdateHorizontalMove(float elapsedTime)
 						}
 					}
 					position = pos - XMFLOAT3{ 0, height * 0.5f, 0 };
-					collider->SetPosition(position + XMFLOAT3{0, radius, 0});
-				}
+					m_pMoveCollider->SetPosition(position + XMFLOAT3{ 0, radius, 0 });}
 				else
 				{
 					position.x += mx;
@@ -272,40 +213,30 @@ void PlayerCharacter::PositionAdjustment()
 {
 	if (IsPlayer())
 	{
-		if (collider)
+		if (m_pMoveCollider)
 		{
 			if (CollisionVsEnemies() || (XMFLOAT3LengthSq(velocity) > 0.0f))
 			{
-				if (collider->CollisionVsMap())
+				if (m_pMoveCollider->CollisionVsMap())
 				{
-					position = collider->GetPosition();
+					position = m_pMoveCollider->GetPosition();
 					position.y -= radius;
 				}
 			}
-
-			//if (XMFLOAT3LengthSq(velocity) > 0.0f)
-			//{
-			//	if (collider->CollisionVsMap())
-			//	{
-			//		position = collider->GetPosition();
-			//		position.y -= radius;
-			//	}
-			//}
 		}
 	}
 }
 
 void PlayerCharacter::UpdateColliders()
 {
-	if(IsPlayer())
+	if (IsPlayer())
 	{
-		if (collider)
+		if (m_pMoveCollider)
 		{
-			collider->Update();
-			m_hitCollider->Update();
-			for (const std::pair<int, Collider*>& attackCollider : m_pattackColliders)
+			m_pMoveCollider->Update();
+			for (const std::pair<uint8_t, Collider*>& collider : m_pColliders)
 			{
-				attackCollider.second->Update();
+				collider.second->Update();
 			}
 		}
 	}
@@ -314,62 +245,80 @@ void PlayerCharacter::UpdateColliders()
 bool  PlayerCharacter::CollisionVsEnemies()
 {
 	bool isHit = false;
-	HitResult hit; 
+	HitResult hit;
 	for (Enemy*& enemy : ENEMIES.GetAll())
 	{
-		if (!enemy->GetCollider()) continue;
-
-		if (collider->Collision(enemy->GetCollider(), {}, hit))
+		if (!enemy->GetMoveCollider()) continue;
+ 
+ 
+		if (m_pMoveCollider->Collision(enemy->GetMoveCollider(), {}, hit))
 		{
+			hit.position.y = position.y;
+			hit.normal.y = 0.0f;
 			position = hit.position + hit.normal * radius;
-			collider->SetPosition(position);
+			m_pMoveCollider->SetPosition(position);
 
-			position.y -= radius;
+			//position.y -= radius;
 			isHit = true;
 		}
-	}
-	return isHit;
-}
 
-bool  PlayerCharacter::CollisionVsEnemyAttack(Collider* collider, int damage, bool power, float force, int effectIdx, float effectScale)
-{
-	bool isHit = false;
-	for (Enemy*& enemy : ENEMIES.GetAll())
-	{
-		if (enemy->GetHurtCoolTime() > 0.0f) continue; // 無敵時間
-		for (std::pair<int, Collider*>enemyCollider : enemy->GetColliders())
+		for (auto& col : enemy->GetColliders())
 		{
-			HitResult hit;
-			if (collider->Collision(enemyCollider.second, {}, hit))
+			if (m_pMoveCollider->Collision(col.second, {}, hit))
 			{
-				ENEMYCOLLISIONS.Register(enemy, enemyCollider.first, damage, power, hit.normal * -force);
-				if (effectIdx > -1)
-				{
-					EFFECTS.GetEffect(effectIdx)->Play(hit.position, effectScale);
-				}
+				hit.position.y = position.y;
+				hit.normal.y = 0.0f;
+				position = hit.position + hit.normal * radius;
+				m_pMoveCollider->SetPosition(position);
 
-				enemy->SetHurtCoolTime(0.4f);
+				//position.y -= radius;
 				isHit = true;
-				std::cout << "Hit enemy_id: " << enemy->GetEnemyId() << std::endl;
-				break;
 			}
 		}
 	}
 	return isHit;
 }
 
-void PlayerCharacter::AttackEnemy(Collider* attackCol, Collider* enemyCol)
-{
-	for (GameObject* enemy : attackCol->GetHitOthers())
-	{
-		if (enemy == enemyCol->GetOwner()) return;
-	}
+//bool  PlayerCharacter::CollisionVsEnemyAttack(Collider* collider, int damage, bool power, float force, int effectIdx, float effectScale)
+//{
+//	bool isHit = false;
+//	for (Enemy*& enemy : ENEMIES.GetAll())
+//	{
+//		if (enemy->GetHurtCoolTime() > 0.0f) continue; // 無敵時間
+//		for (std::pair<int, Collider*>enemyCollider : enemy->GetColliders())
+//		{
+//			HitResult hit;
+//			if (collider->Collision(enemyCollider.second, {}, hit))
+//			{
+//				ENEMYCOLLISIONS.Register(enemy, enemyCollider.first, damage, power, hit.normal * -force);
+//				if (effectIdx > -1)
+//				{
+//					EFFECTS.GetEffect(effectIdx)->Play(hit.position, effectScale);
+//				}
+//
+//				enemy->SetHurtCoolTime(0.4f);
+//				isHit = true;
+//				std::cout << "Hit enemy_id: " << enemy->GetEnemyId() << std::endl;
+//				break;
+//			}
+//		}
+//	}
+//	return isHit;
+//}
 
-	Enemy* enemy = static_cast<Enemy*>(enemyCol->GetOwner());
-	attackCol->RegisterHitOthers(enemy);
-	ATTACK_DATA attack(10, {}, false);
-	enemy->OnDamage(attack);
-}
+//void PlayerCharacter::AttackEnemy(Collider* attackCol, Collider* enemyCol)
+//{
+//	for (GameObject* enemy : attackCol->GetHitOthers())
+//	{
+//		// 既にヒットした敵には当たらない
+//		if (enemy == enemyCol->GetOwner()) return;
+//	}
+//
+//	Enemy* enemy = static_cast<Enemy*>(enemyCol->GetOwner());
+//	attackCol->RegisterHitOthers(enemy);
+//	ATTACK_DATA attack(attackCol->GetHitDamage(), {}, false);
+//	enemy->OnDamage(attack);
+//}
 
 void PlayerCharacter::UpdateInput()
 {
@@ -604,74 +553,26 @@ void PlayerCharacter::Render(const RenderContext& rc)
 {
 	Character::Render(rc);
 
-	
-
 	DirectX::XMFLOAT3 front = CameraManager::Instance().GetCamera()->GetFront();
 	DirectX::XMFLOAT3 eye = CameraManager::Instance().GetCamera()->GetEye();
 	DirectX::XMFLOAT3 namePos = this->position + DirectX::XMFLOAT3{ 0, 2.2f, 0 };
 	float dot = XMFLOAT3Dot(front, namePos - eye);
 	if (dot < 0.0f) return;
 
-	// 名前表示
-	//DirectX::XMFLOAT3 pos = T_GRAPHICS.GetScreenPosition(namePos);
-	//T_TEXT.Render(
-	//	FONT_ID::HGpop,
-	//	m_name.c_str(),
-	//	pos.x, pos.y,
-	//	1.0f, 1.0f, 1.0f, 1.0f,
-	//	0.0f,
-	//	FONT_ALIGN::BOTTOM,
-	//	0.5f,
-	//	1
-	//);
-
 #ifdef _DEBUG
-	collider->DrawDebugPrimitive({ 1, 1, 1, 1 });
+	m_pColliders[COLLIDER_ID::COL_BODY]->DrawDebugPrimitive({ 0, 1, 0, 1 });
+	m_pMoveCollider->DrawDebugPrimitive({ 1, 1, 1, 1 });
 	if (IsPlayer())
 	{
-		ImVec2 pos = ImGui::GetMainViewport()->Pos;
-		ImGui::SetNextWindowPos(ImVec2(pos.x + 10, pos.y + 10), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowSize(ImVec2(300, 450), ImGuiCond_FirstUseEver);
-
-		if (ImGui::Begin("AttackCollider", nullptr, ImGuiWindowFlags_None))
+		for (const std::pair<uint8_t, Collider*>& attackCollider : m_pColliders)
 		{
-			for (const std::pair<int, Collider*>& attackCollider : m_pattackColliders)
-			{
-				std::string name = "Attack" + std::to_string(attackCollider.first + 1);
-				if (ImGui::TreeNode(name.c_str()))
-				{
-					float radius = attackCollider.second->GetSphere().radius;
-					XMFLOAT3 offset = attackCollider.second->GetSphere().position * scale;
-					float hitStartRate = attackCollider.second->GetHitStartRate() * 100.0f;	// %表示に
-					float hitEndRate = attackCollider.second->GetHitEndRate() * 100.0f;		// %表示に
+			if (attackCollider.first == COLLIDER_ID::COL_BODY) continue;
 
-					ImGui::InputFloat("radius", &radius);
-					ImGui::InputFloat3("offset", &offset.x);
-					ImGui::InputFloat("hitStartRate(%)", &hitStartRate);
-					if (hitStartRate < 0.0f)	hitStartRate = 0.0f;
-					if (hitStartRate > hitEndRate)	hitStartRate = hitEndRate;
-					ImGui::InputFloat("hitEndRate(%)", &hitEndRate);
-					if (hitEndRate < hitStartRate)	hitEndRate = hitStartRate;
-					if (hitEndRate > 100.0f)	hitEndRate = 100.0f;
-
-					Sphere sphere(offset / scale, radius);
-					attackCollider.second->SetParam(sphere);
-					attackCollider.second->SetHitStartRate(hitStartRate * 0.01f);
-					attackCollider.second->SetHitEndRate(hitEndRate * 0.01f);
-
-					ImGui::TreePop();
-				}
-			}
-		}
-		ImGui::End();
-
-		for (const std::pair<int, Collider*>& attackCollider : m_pattackColliders)
-		{
 			DirectX::XMFLOAT4 color = { 1, 0, 0, 1 };
 			HitResult hit;
 			for (Enemy*& enemy : ENEMIES.GetAll())
 			{
-				for (std::pair<int, Collider*> enemyCollider : enemy->GetColliders())
+				for (std::pair<uint8_t, Collider*> enemyCollider : enemy->GetColliders())
 				{
 					if (attackCollider.second->Collision(enemyCollider.second, {}, hit))
 					{
@@ -689,6 +590,7 @@ void PlayerCharacter::Render(const RenderContext& rc)
 #endif // _DEBUG
 }
 
+#include "Source/GameObject/Character/Player/State/PlayerCharacterSwordState.h"
 void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
 {
 	Character::RenderDX12(rc);
@@ -700,16 +602,78 @@ void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
 	if (dot < 0.0f) return;
 
 #ifdef _DEBUG
-	collider->DrawDebugPrimitive({ 1, 1, 1, 1 });
-	if (IsPlayer())
+	m_pMoveCollider->DrawDebugPrimitive({ 1, 1, 1, 1 });
+
+	if (IsPlayer() && !m_pColliders.empty())
 	{
-		for (const std::pair<int, Collider*>& attackCollider : m_pattackColliders)
+		m_pColliders[COLLIDER_ID::COL_BODY]->DrawDebugPrimitive({ 0, 1, 0, 1 });
+
+		ImVec2 pos = ImGui::GetMainViewport()->Pos;
+		ImGui::SetNextWindowPos(ImVec2(pos.x + 10, pos.y + 10), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(300, 450), ImGuiCond_FirstUseEver);
+
+		if (ImGui::Begin("AttackCollider", nullptr, ImGuiWindowFlags_None))
 		{
+			for (int i = 0; i < 3; i++)
+			{
+				std::string name = "Attack" + std::to_string(i + 1);
+				if (ImGui::TreeNode(name.c_str()))
+				{
+					float radius = PlayerCharacterState::Sword::sphereAttacks[i].sphere.radius;
+					XMFLOAT3 offset = PlayerCharacterState::Sword::sphereAttacks[i].sphere.position;
+					float hitStartRate = PlayerCharacterState::Sword::sphereAttacks[i].hitStartRate * 100.0f;	// %表示に
+					float hitEndRate = PlayerCharacterState::Sword::sphereAttacks[i].hitEndRate * 100.0f;		// %表示に
+
+					ImGui::InputFloat("radius", &radius);
+					ImGui::InputFloat3("offset", &offset.x);
+					ImGui::InputFloat("hitStartRate(%)", &hitStartRate);
+					if (hitStartRate < 0.0f)	hitStartRate = 0.0f;
+					if (hitStartRate > hitEndRate)	hitStartRate = hitEndRate;
+					ImGui::InputFloat("hitEndRate(%)", &hitEndRate);
+					if (hitEndRate < hitStartRate)	hitEndRate = hitStartRate;
+					if (hitEndRate > 100.0f)	hitEndRate = 100.0f;
+
+					PlayerCharacterState::Sword::sphereAttacks[i].sphere.radius = radius;
+					PlayerCharacterState::Sword::sphereAttacks[i].sphere.position = offset;
+					PlayerCharacterState::Sword::sphereAttacks[i].hitStartRate = hitStartRate * 0.01f;
+					PlayerCharacterState::Sword::sphereAttacks[i].hitEndRate = hitEndRate * 0.01f;
+					ImGui::TreePop();
+				}
+			}
+			if (ImGui::TreeNode("SkillAttack1"))
+			{
+				float radius = PlayerCharacterState::Sword::sphereAttacks[3].sphere.radius;
+				XMFLOAT3 offset = PlayerCharacterState::Sword::sphereAttacks[3].sphere.position;
+				float hitStartRate = PlayerCharacterState::Sword::sphereAttacks[3].hitStartRate * 100.0f;	// %表示に
+				float hitEndRate = PlayerCharacterState::Sword::sphereAttacks[3].hitEndRate * 100.0f;		// %表示に
+
+				ImGui::InputFloat("radius", &radius);
+				ImGui::InputFloat3("offset", &offset.x);
+				ImGui::InputFloat("hitStartRate(%)", &hitStartRate);
+				if (hitStartRate < 0.0f)	hitStartRate = 0.0f;
+				if (hitStartRate > hitEndRate)	hitStartRate = hitEndRate;
+				ImGui::InputFloat("hitEndRate(%)", &hitEndRate);
+				if (hitEndRate < hitStartRate)	hitEndRate = hitStartRate;
+				if (hitEndRate > 100.0f)	hitEndRate = 100.0f;
+
+				PlayerCharacterState::Sword::sphereAttacks[3].sphere.radius = radius;
+				PlayerCharacterState::Sword::sphereAttacks[3].sphere.position = offset;
+				PlayerCharacterState::Sword::sphereAttacks[3].hitStartRate = hitStartRate * 0.01f;
+				PlayerCharacterState::Sword::sphereAttacks[3].hitEndRate = hitEndRate * 0.01f;
+				ImGui::TreePop();
+			}
+		}
+		ImGui::End();
+
+		for (const std::pair<uint8_t, Collider*>& attackCollider : m_pColliders)
+		{
+			if (attackCollider.first == COLLIDER_ID::COL_BODY) continue;
+
 			DirectX::XMFLOAT4 color = { 1, 0, 0, 1 };
 			HitResult hit;
 			for (Enemy*& enemy : ENEMIES.GetAll())
 			{
-				for (std::pair<int, Collider*> enemyCollider : enemy->GetColliders())
+				for (std::pair<uint8_t, Collider*> enemyCollider : enemy->GetColliders())
 				{
 					if (attackCollider.second->Collision(enemyCollider.second, {}, hit))
 					{
@@ -759,7 +723,7 @@ void PlayerCharacter::OnDamage(const HitResult& hit, int damage)
 }
 
 bool PlayerCharacter::InputMove(float elapsedTime) {
-	
+
 
 	// 移動処理
 	Move(inputDirection.x, inputDirection.y, this->moveSpeed);

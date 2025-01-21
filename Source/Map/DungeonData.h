@@ -23,6 +23,19 @@ namespace ns_RoomData
 		PASSAGE_1,
 		DEAD_END,
 
+		FIRST_START,	// 最初のフロア：最初の部屋
+		FIRST_I,		// 最初のフロア：Ｉ字の部屋
+		FIRST_T,		// 最初のフロア：Ｔ字の部屋
+		FIRST_FOUNTAIN,	// 最初のフロア：噴水の部屋
+		FIRST_SPAWNER,	// 最初のフロア：スポナーの部屋
+		FIRST_END,		// 最初のフロア：最後の部屋
+		FIRST_BOSS,		// 最初のフロア：ボス部屋
+
+		TEST_I,		// テスト：Ｉ字の部屋
+		TEST_T,		// テスト：Ｔ字の部屋
+		TEST_X,		// テスト：十字の部屋
+		TEST_END,	// テスト：最後の部屋
+
 		TUTO_START,			// チュートリアル：最初の部屋
 		TUTO_NOTHINGROOM,	// チュートリアル：何もない部屋
 		TUTO_SPAWNERROOM,	// チュートリアル：スポナーのある部屋
@@ -34,14 +47,11 @@ namespace ns_RoomData
 	// タイルタイプ
 	enum TileType : uint8_t
 	{
-		// 床タイル
 		FLOOR_01A = 0,
 		FLOOR_01B,
 		FLOOR_02A,
 		FLOOR_03A,
 		FLOOR_CLOUD_01A,
-
-		// 壁タイル
 		WALL_01A,
 		WALL_01B,
 		WALL_02A,
@@ -49,17 +59,11 @@ namespace ns_RoomData
 		WALL_03A,
 		WALL_04A,
 		WALL_CLOUD,
-
-		// アーチタイル
 		ARCH_01A,
 		ARCH_ENTRANCE_01A,
 		ARCH_FLOOR_01A,
-
-		// 階段タイル
 		STAIR_RAILING_01A,
 		STAIR_STEP_01A,
-
-		// 小物タイル
 		CARAMEL_01,
 		CARAMEL_02,
 		CLOUD_01,
@@ -71,11 +75,12 @@ namespace ns_RoomData
 		LOLIPOP_02A,
 		STAR,
 		FIRE_HYDRANT,
-
-		// ゲームオブジェクトタイル
 		PORTAL,
 		SPAWNER,
 		CONNECTPOINT,
+		FOUNTAIN,
+		STAIR_TO_NEXTFLOOR,
+		BOSSROOM,
 
 		// enumCount
 		TILETYPE_COUNT,
@@ -123,7 +128,7 @@ using namespace ns_RoomData;
 class DungeonData : public Singleton<DungeonData>
 {
 	friend class Singleton<DungeonData>;
-private:
+public:
 	DungeonData();
 	~DungeonData() {}
 
@@ -134,13 +139,18 @@ public:
 		int weight = 0;	// 重み、値が大きいほど生成確率が高くなる
 		AABB aabb {};	// AABB、部屋同士の当たり判定などに使用
 		DirectX::XMFLOAT3 portalPosition {};		// ポータル配置座標
+		std::vector<TILE_DATA> connectPointDatas;	// 接続点データ配列
 		std::vector<RoomType> placementCandidates;	// 配置候補の部屋タイプを保存する配列
 	};
 
 	// ダンジョンの生成設定
 	struct DungeonGenerateSetting
 	{
-		int maxDepth;	// 最大深度、親からの距離（深度）がこの値以上になった場合、子の生成をキャンセルする
+		int maxFloor = 3;	// 最大階数　最上階には次の階への階段などは設置しない
+		int maxDepth;		// 最大深度　親からの距離（深度）がこの値以上になった場合、子の生成をキャンセルする
+
+		RoomType firstRoomType;		// 最初に生成する最初の部屋タイプ
+		RoomType topFloorRoomType;	// 最上階に生成する最初の部屋タイプ
 	};
 
 	// 初期化
@@ -156,6 +166,11 @@ public:
 	RoomGenerateSetting GetRoomGenerateSetting(RoomType type) { return m_roomGenerateSettings.at(static_cast<int>(type)); }
 	// ダンジョンの生成設定を取得
 	DungeonGenerateSetting GetDungeonGenerateSetting() { return m_dungeonGenerateSetting; }
+	// 現在の階取得・設定・次の階へ
+	const int GetCurrentFloor() const { return m_currentFloor; }
+	void SetCurrentFloor(int floor) { m_currentFloor = floor; }
+	void GoToNextFloor() { m_currentFloor++; }
+
 	// ファイル読み込み用データの取得
 	const std::vector<FILE_DATA> GetModelFileDatas(TileType type) const {
 		int a = 0;
@@ -167,6 +182,7 @@ public:
 private:
 	std::vector<RoomGenerateSetting> m_roomGenerateSettings;	// 部屋の生成設定配列
 	DungeonGenerateSetting m_dungeonGenerateSetting;			// ダンジョンの生成設定
+	int m_currentFloor = 1;										// 現在の階
 	std::vector<std::vector<FILE_DATA>> m_modelFileDatas;		// 見た目用ファイル読み込み用データ配列
 	std::vector<std::vector<FILE_DATA>> m_collisionFileDatas;	// 当たり判定用ファイル読み込み用データ配列
 	std::vector<char*> m_fileNames;						// ファイル名配列

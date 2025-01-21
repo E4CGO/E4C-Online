@@ -4,6 +4,7 @@
 #include "WidgetCharacterSelect.h"
 #include "Scene/GameLoop/SceneCharacter/SceneCharacter_E4C.h"
 #include "PlayerCharacterData.h"
+#include "TAKOEngine/Tool/Encode.h"
 
 /**************************************************************************//**
 	@brief	コンストラクタ
@@ -121,6 +122,40 @@ WidgetCharacter::WidgetCharacter(SceneCharacter_E4C* scene, int idx, PlayerChara
 	})
 {
 	m_color = { 0.0f, 0.0f, 0.0f, 0.5f };
+}
+
+/**************************************************************************//**
+	@brief		描画処理
+	@param[in]	rc	レンダーコンテンツ
+*//***************************************************************************/
+void WidgetCharacter::Render(const RenderContext& rc)
+{
+	WidgetButtonImage::Render(rc);
+	if (m_pCharacter != nullptr)
+	{
+		T_TEXT.Render(
+			FONT_ID::HGpop,
+			m_pCharacter->GetName().c_str(),
+			m_position.x, m_position.y
+		);
+	}
+}
+/**************************************************************************//**
+	@brief		DX12描画処理
+	@param[in]	rc	レンダーコンテンツ
+*//***************************************************************************/
+void WidgetCharacter::RenderDX12(const RenderContextDX12& rc)
+{
+	WidgetButtonImage::RenderDX12(rc);
+
+	if (m_pCharacter != nullptr && m_pCharacter->GetName().length() > 0)
+	{
+		T_TEXT.RenderDX12(
+			FONT_ID::HGpop,
+			Encode::string_to_wstring(m_pCharacter->GetName()),
+			m_position.x + 5.0f , m_position.y + 5.0f
+		);
+	}
 }
 
 /**************************************************************************//**
