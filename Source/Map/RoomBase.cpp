@@ -94,7 +94,7 @@ RoomBase::RoomBase(
 	UpdateTransform();
 
 	// 部屋データのロード
-	//LoadMapData();
+	LoadMapData();
 
 	// 次の部屋の生成を行う
 	GenerateNextRoomFromOrder(roomAABBs, roomOrder, orderIndex);
