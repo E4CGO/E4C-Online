@@ -264,15 +264,18 @@ bool  PlayerCharacter::CollisionVsEnemies()
 
 		for (auto& col : enemy->GetColliders())
 		{
-			if (m_pMoveCollider->Collision(col.second, {}, hit))
+			if (col.second->GetOBJType() & Collider::COLLIDER_OBJ::ENEMY)
 			{
-				hit.position.y = position.y;
-				hit.normal.y = 0.0f;
-				position = hit.position + hit.normal * radius;
-				m_pMoveCollider->SetPosition(position);
+				if (m_pMoveCollider->Collision(col.second, {}, hit))
+				{
+					hit.position.y = position.y;
+					hit.normal.y = 0.0f;
+					position = hit.position + hit.normal * radius;
+					m_pMoveCollider->SetPosition(position);
 
-				//position.y -= radius;
-				isHit = true;
+					//position.y -= radius;
+					isHit = true;
+				}
 			}
 		}
 	}
@@ -699,7 +702,7 @@ void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
 #endif // _DEBUG
 }
 
-void PlayerCharacter::OnDamage(const HitResult& hit, int damage)
+void PlayerCharacter::OnDamage(const uint16_t& damage)
 {
 	if (hurtCoolTime > 0.0f) return;
 	hp -= damage;
@@ -707,9 +710,9 @@ void PlayerCharacter::OnDamage(const HitResult& hit, int damage)
 
 	TPSCamera.Shake(0.2f, 0.5f);
 
-	float vx = hit.position.x - position.x;
-	float vz = hit.position.z - position.z;
-	Turn(1.0f, vx, vz, DirectX::XMConvertToRadians(360));
+	//float vx = hit.position.x - position.x;
+	//float vz = hit.position.z - position.z;
+	//Turn(1.0f, vx, vz, DirectX::XMConvertToRadians(360));
 	if (hp <= 0)
 	{
 		hp = 0;
@@ -717,6 +720,7 @@ void PlayerCharacter::OnDamage(const HitResult& hit, int damage)
 	}
 	else
 	{
+		if(!superArmor)
 		stateMachine->ChangeState(static_cast<int>(STATE::HURT));
 	}
 }

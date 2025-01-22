@@ -35,8 +35,6 @@ public:
 		ANIM_DIE,
 	};
 
-	void OnDamage(uint16_t damage) override;
-
 protected:
 	void UpdateTarget();
 };

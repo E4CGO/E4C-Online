@@ -38,7 +38,7 @@ namespace EnemyState
 		*//***************************************************************************/
 		void BattleState::Enter()
 		{
-			SetSubState(BATTLE_STATE::ENCOUNTER);
+			SetSubState(BATTLE_STATE::PURSUIT);
 		}
 
 		/**************************************************************************//**
@@ -188,7 +188,7 @@ namespace EnemyState
 		{
 			if (!owner->IsPlayAnimation())
 			{
-				owner->GetStateMachine()->ChangeSubState(BATTLE_STATE::PURSUIT);
+				EnemyState::StateTransition(owner, STATE::BATTLE);
 			}
 		}
 
@@ -205,7 +205,7 @@ namespace EnemyState
 		void PursuitState::Enter()
 		{
 			m_StateTimer = Mathf::RandomRange(m_MinWaitingTime, m_MaxWaitingTime);
-			m_AttackTimer = m_AttackCooldown;
+			//m_AttackTimer = m_AttackCooldown;
 
 			owner->SetAnimation(MouseMob::ANIMATION::ANIM_MOVE, true, 0.1f);
 		}
@@ -241,6 +241,7 @@ namespace EnemyState
 			{
 				if (m_AttackTimer <= 0.f)
 				{
+					m_AttackTimer = m_AttackCooldown;
 					owner->GetStateMachine()->ChangeSubState(BATTLE_STATE::ATTACK);
 				}
 			}
@@ -257,7 +258,7 @@ namespace EnemyState
 		*//***************************************************************************/
 		void PursuitState::Exit()
 		{
-			m_AttackTimer = m_AttackCooldown;
+			//m_AttackTimer = m_AttackCooldown;
 		}
 
 		/**************************************************************************//**
@@ -267,7 +268,17 @@ namespace EnemyState
 		{
 			m_AnimationTimer = m_WaitTimer;
 
+			owner->OnSuperArmor();
 			owner->SetAnimation(MouseMob::ANIMATION::ANIM_ATTACK, false, 0.1f);
+
+			ModelObject::ATTACK_COLLIDER_DATA attackData;
+			attackData.power = mouseAttack.power;
+			attackData.idx = mouseAttack.idx;
+			attackData.objType = mouseAttack.objType;
+			attackData.hittableOBJ = mouseAttack.hittableOBJ;
+			attackData.hitStartRate = mouseAttack.hitStartRate;
+			attackData.hitEndRate = mouseAttack.hitEndRate;
+			owner->MakeAttackCollider(attackData, mouseAttack.capsule, &owner->GetModel(0)->FindNode("JOT_C_Body")->worldTransform);
 		}
 
 		/**************************************************************************//**
@@ -276,6 +287,8 @@ namespace EnemyState
 		*//***************************************************************************/
 		void AttackState::Execute(float elapsedTime)
 		{
+			owner->GetCollider(mouseAttack.idx)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
+
 			m_AnimationTimer -= elapsedTime;
 			//if (m_AnimationTimer <= 0)
 			if (!owner->IsPlayAnimation())
@@ -285,6 +298,8 @@ namespace EnemyState
 		}
 		void AttackState::Exit()
 		{
+			owner->DeleteAttackCollider(mouseAttack.idx);
+			owner->OffSuperArmor();
 		}
 
 		/**************************************************************************//**
@@ -298,7 +313,7 @@ namespace EnemyState
 		{
 			if (!owner->IsPlayAnimation())
 			{
-				StateTransition(owner, mouseMob::SEARCH);
+				StateTransition(owner, mouseMob::BATTLE);
 			}
 		}
 		void HurtState::Exit()
@@ -311,7 +326,7 @@ namespace EnemyState
 		void DeathState::Enter()
 		{
 			EnemyState::DeathState::Enter();
-			owner->SetAnimation(MouseMob::ANIMATION::ANIM_DAMAGE, false, 0.1f);
+			owner->SetAnimation(MouseMob::ANIMATION::ANIM_DIE, false, 0.1f);
 		}
 		void DeathState::Execute(float elapsedTime)
 		{

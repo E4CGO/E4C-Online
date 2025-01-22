@@ -15,14 +15,14 @@ MouseMob::MouseMob(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("
 {
 	// 敵の基本パラメーター
 	enemyType = ENEMY_TYPE::MOUSE;
-	radius = 1.0f;
+	radius = 0.6f;
 	maxHp = hp = 50;
 	atk = 10;
 	moveSpeed = 2.0f;
 	turnSpeed = DirectX::XMConvertToRadians(360);
 	m_SearchRange = 24.0f;
 	//m_AttackRange = 1.25f;
-	m_AttackRange = 3.0f;
+	m_AttackRange = 1.8f;
 
 	// 当たり判定
 	//m_pColliders[HitCollider::BodyHit] = new SphereCollider(scaling * 1.2f);
@@ -38,6 +38,9 @@ MouseMob::MouseMob(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("
 		// 基本ステート
 		stateMachine->RegisterState(mouseMob::STATE::SEARCH, new mouseMob::SearchState(this));
 		stateMachine->RegisterState(mouseMob::STATE::BATTLE, new mouseMob::BattleState(this));
+		stateMachine->RegisterState(mouseMob::STATE::ENCOUNTER, new mouseMob::EncounterState(this));
+		stateMachine->RegisterState(STATE::HURT, new mouseMob::HurtState(this));
+		stateMachine->RegisterState(STATE::DEATH, new mouseMob::DeathState(this));
 
 		// 移動サブステート
 		stateMachine->RegisterSubState(mouseMob::STATE::SEARCH, mouseMob::SEARCH_STATE::WANDER, new mouseMob::WanderState(this, 1.0f));
@@ -45,34 +48,12 @@ MouseMob::MouseMob(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("
 		stateMachine->RegisterSubState(mouseMob::STATE::SEARCH, mouseMob::SEARCH_STATE::IDLE, new mouseMob::IdleState(this, 3.0f));
 
 		// 攻撃ステート
-		stateMachine->RegisterSubState(mouseMob::STATE::BATTLE, mouseMob::BATTLE_STATE::ENCOUNTER, new mouseMob::EncounterState(this));
 		stateMachine->RegisterSubState(mouseMob::STATE::BATTLE, mouseMob::BATTLE_STATE::PURSUIT, new mouseMob::PursuitState(this, 0.5f, m_AttackRange, 3.0f, 5.0f));
 		stateMachine->RegisterSubState(mouseMob::STATE::BATTLE, mouseMob::BATTLE_STATE::ATTACK, new mouseMob::AttackState(this, 0.5f));
 
 		stateMachine->SetState(mouseMob::STATE::SEARCH);
 	}
 }
-
-void MouseMob::OnDamage(uint16_t damage)
-{
-	if (IsMine())
-	{
-		hp -= damage;
-		if (hp > 0)
-		{
-			// AttackStateとHurtStateの時はHurtStateへ変わらない
-			if (stateMachine->GetState()->GetSubStateIndex() == EnemyState::mouseMob::BATTLE_STATE::ATTACK) return;
-			if (stateMachine->GetStateIndex() == Enemy::STATE::HURT) return;
-
-			EnemyState::StateTransition(this, STATE::HURT);
-		}
-		else
-		{
-			EnemyState::StateTransition(this, STATE::DEATH);
-		}
-	}
-}
-
 
 // 一番近いプレイヤーをターゲット
 void MouseMob::UpdateTarget()

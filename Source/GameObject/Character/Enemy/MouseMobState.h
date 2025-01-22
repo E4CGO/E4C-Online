@@ -11,6 +11,7 @@ namespace EnemyState
 		enum STATE
 		{
 			SEARCH = Enemy::STATE::END,
+			ENCOUNTER,
 			BATTLE,
 			RECIEVE,
 			STATE_END,
@@ -27,8 +28,7 @@ namespace EnemyState
 		// 戦闘
 		enum BATTLE_STATE
 		{
-			ENCOUNTER = mouseMob::SEARCH_STATE::SEARCH_STATE_END,
-			PURSUIT,
+			PURSUIT = mouseMob::SEARCH_STATE::SEARCH_STATE_END,
 			ATTACK,
 			STANDBY,
 			BATTLE_STATE_END,
@@ -120,10 +120,6 @@ namespace EnemyState
 			void Execute(float elapsedTime) override;
 			// ステートから出ていくときのメソッド
 			void Exit() override;
-		//private:
-		//	float m_StateTimer = 0.0f;
-		//	float m_MinWaitingTime;
-		//	float m_MaxWaitingTime;
 		};
 
 		/**************************************************************************//**
@@ -199,7 +195,20 @@ namespace EnemyState
 			void Execute(float elapsedTime);
 			// ステートから出ていくときのメソッド
 			void Exit() override;
+
+			struct MOUSE_ATTACK
+			{
+				int power = 5;
+				uint8_t idx = MouseMob::COLLIDER_ID::COL_ATTACK;
+				Collider::COLLIDER_OBJ objType = Collider::COLLIDER_OBJ::ENEMY_ATTACK;
+				uint16_t hittableOBJ = Collider::COLLIDER_OBJ::PLAYER;
+				float hitStartRate = 7.0f / 17.0f;
+				float hitEndRate = 73.0f / 170.0f;
+				Capsule capsule{ {120.0f, 0, 0}, {0, 1, 0}, 1.0f, 0.6f };
+			};
+
 		private:
+			MOUSE_ATTACK mouseAttack;
 			float m_WaitTimer;
 			float m_AnimationTimer;
 		};
