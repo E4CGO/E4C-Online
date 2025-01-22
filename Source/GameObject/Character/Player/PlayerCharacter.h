@@ -78,6 +78,11 @@ public:
 		ANIM_ROD_ATTACK_COMBO_FIRST,
 		ANIM_ROD_ATTACK_COMBO_SECOND,
 		ANIM_ROD_ATTACK_COMBO_THIRD,
+		ANIM_ROD_CHARGE_END,
+		ANIM_ROD_ATTACK_SPECIAL_FIRST,
+		ANIM_ROD_ATTACK_SPECIAL_SECOND,
+		ANIM_ROD_HURT,
+		ANIM_ROD_DEATH,
 		ANIM_SWORD_IDLE,
 		ANIM_SWORD_MOVE_START,
 		ANIM_SWORD_MOVE_CONTINUE,
@@ -90,8 +95,8 @@ public:
 		ANIM_SHIELD_GUARD_CONTINUE,
 		ANIM_SHIELD_GUARD_KNOCKBACK_CONTINUE,
 		ANIM_SHIELD_GUARD_FINISH,
-		ANIM_HURT,
-		ANIM_DEATH
+		ANIM_SWORD_HURT,
+		ANIM_SWORD_DEATH
 	};
 
 	enum STATE : uint8_t
@@ -228,6 +233,15 @@ public:
 
 	float GetMpCost(int idx);
 
+
+	//剣ノード取得
+	const iModel::Node* GetSwordTrailNode();
+
+
+	void SwordTrail();
+	bool IsTrail() { return m_isTrail; }
+	void SetTrail(bool trail) { trail=m_isTrail; }
+
 	// 自機判定
 	bool IsPlayer() { return GAME_DATA.GetClientId() == m_client_id; };
 
@@ -338,6 +352,12 @@ protected:
 		uint32_t old_sync_count = 0;
 		SYNC_DATA sync_data = {};
 	} m_tempData;
+
+	//ポリゴンの最大数
+	static const int MAX_POLYGON = 12;
+	DirectX::XMFLOAT3 trailPosition[2][MAX_POLYGON];
+
+	bool m_isTrail = false;
 };
 
 #endif // __INCLUDED_PLAYER_CHARACTER_H__

@@ -1,4 +1,4 @@
-﻿//! @file PlayerCharacterState.h
+//! @file PlayerCharacterState.h
 //! @note
 
 #ifndef __INCLUDED_PLAYER_CHARACTER_SWORD_STATE_H__
@@ -10,7 +10,7 @@ namespace PlayerCharacterState
 {
 	namespace Sword
 	{
-		enum NORMAL_ATTACK_STATE {
+		enum  NORMAL_ATTACK_STATE {
 			ATTACK_1,
 			ATTACK_2,
 			ATTACK_3,

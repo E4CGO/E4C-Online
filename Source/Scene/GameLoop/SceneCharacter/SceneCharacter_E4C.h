@@ -114,6 +114,14 @@ private:
 		"Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD1_ANIMATION.glb",
 		"Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD2_ANIMATION.glb",
 		"Data/Model/Character/PlayerModels/MDL_PLAYER_ROD_ANIMATION.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_F_BODY_ANIMATION.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_F_BOTTOM_ANIMATION.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_F_TOP_ANIMATION.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_F_HAIR_ANIMATION.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_F_SWORD_ANIMATION.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_F_SHIELD1_ANIMATION.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_F_SHIELD2_ANIMATION.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_F_ROD_ANIMATION.glb",
 	};
 	std::unordered_set<std::shared_ptr<ModelResource>> modelPreLoad;
 

@@ -63,9 +63,6 @@ private:
 
 private:
 
-	float timer = 0;
-	float timerTick = 0;
-
 	SceneGame_E4C* m_pScene;
 
 	std::unique_ptr<ThridPersonCameraController> cameraController;
@@ -79,15 +76,6 @@ private:
 
 	std::unique_ptr<ModelObject> sky;
 	std::unique_ptr<SpriteDX12> m_sprites[8];
-
-	std::unique_ptr<Plane> portalSquare;
-	std::unique_ptr<PlaneDX12> portalSquare2;
-
-	std::unique_ptr<Fireball> fireBall;
-	std::unique_ptr<PlaneDX12> fireBall2;
-
-	std::unique_ptr<Plane> plane;
-	std::unique_ptr<PlaneDX12> plane2;
 
 	std::unique_ptr<RunningDust> runningDust1;
 	std::deque<RunningDust> runningDust;
@@ -127,6 +115,9 @@ private:
 
 	// ポストエフェクト
 	std::unique_ptr<PostprocessingRendererDX12>	postprocessingRenderer = std::make_unique<PostprocessingRendererDX12>();
+
+	float m_sceneGlobalTimer = 0;
+	float m_sceneTickTimer = 0;
 };
 
 #endif // !__INCLUDED_STAGE_OPEN_WORLD_E4C_H__

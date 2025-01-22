@@ -10,7 +10,7 @@
 #include "TAKOEngine/Rendering/Sprite.h"
 #include "TAKOEngine/GUI/Widget.h"
 
-#include "UI/Widget/WidgetButton.h"
+#include "TAKOEngine/GUI/WidgetButton.h"
 #include "UI/Widget/WidgetImage.h"
 #include "UI/Widget/WidgetText.h"
 #include "UI/Widget/WidgetButtonImage.h"

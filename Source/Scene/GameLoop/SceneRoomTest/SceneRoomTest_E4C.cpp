@@ -124,7 +124,11 @@ void SceneRoomTest_E4C::Update(float elapsedTime)
 	m_cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
 	m_cameraController->Update(elapsedTime);
 
+	Camera* camera = CameraManager::Instance().GetCamera();
+
 	NODES.Update(elapsedTime);
+
+	CameraManager::Instance().GetCamera()->GetFocus();
 
 	if (T_GRAPHICS.isDX12Active)
 	{
@@ -135,6 +139,59 @@ void SceneRoomTest_E4C::Update(float elapsedTime)
 		}
 
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(testModel->GetModel().get());
+	}
+
+	// RayCast
+	{
+		// ImGUIウィンドウ上にマウスがある場合はキャストを行わない
+		if (T_INPUT.KeyDown(VK_LBUTTON) &&
+			!ImGui::IsWindowHovered(ImGuiFocusedFlags_AnyWindow))
+		{
+			// マウスカーソルの座標を取得
+			DirectX::XMFLOAT3 screenPosition;
+			screenPosition.x = T_INPUT.GetMouseWinPos().x;
+			screenPosition.y = T_INPUT.GetMouseWinPos().y;
+
+			T_GRAPHICS.GetDeviceContext();
+
+			// レイの始点
+			DirectX::XMFLOAT3 start;
+			screenPosition.z = 0.0f;
+			DirectX::XMStoreFloat3(&start, DirectX::XMVector3Unproject(
+				DirectX::XMLoadFloat3(&screenPosition),
+				T_GRAPHICS.GetViewPort().TopLeftX,
+				T_GRAPHICS.GetViewPort().TopLeftY,
+				T_GRAPHICS.GetViewPort().Width,
+				T_GRAPHICS.GetViewPort().Height,
+				0.0f,
+				1.0f,
+				DirectX::XMLoadFloat4x4(&camera->GetProjection()),
+				DirectX::XMLoadFloat4x4(&camera->GetView()),
+				DirectX::XMMatrixIdentity()));
+
+			// レイの終点
+			DirectX::XMFLOAT3 end;
+			screenPosition.z = 1.0f;
+			DirectX::XMStoreFloat3(&end, DirectX::XMVector3Unproject(
+				DirectX::XMLoadFloat3(&screenPosition),
+				T_GRAPHICS.GetViewPort().TopLeftX,
+				T_GRAPHICS.GetViewPort().TopLeftY,
+				T_GRAPHICS.GetViewPort().Width,
+				T_GRAPHICS.GetViewPort().Height,
+				0.0f,
+				1.0f,
+				DirectX::XMLoadFloat4x4(&camera->GetProjection()),
+				DirectX::XMLoadFloat4x4(&camera->GetView()),
+				DirectX::XMMatrixIdentity()));
+
+			// レイキャスト
+			Node* hitNode = NODES.RayCast(start, end);
+
+			if (hitNode != nullptr)
+			{
+				ChangeSelectedNode(hitNode);
+			}
+		}
 	}
 }
 
@@ -189,9 +246,9 @@ void SceneRoomTest_E4C::RenderDX12()
 
 	// 3Dモデル描画
 	{
-		m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
-		m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
-		m_frameBuffer->Clear(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->Clear(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
 
 		// シャドウマップ
 		{
@@ -217,13 +274,12 @@ void SceneRoomTest_E4C::RenderDX12()
 		T_GRAPHICS.GetDebugRenderer()->DrawCube(roomSetting.aabb.position, diameter, { 1.0f, 1.0f, 1.0f, 1.0f });
 
 		// レンダーターゲットへの書き込み終了待ち
-		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFramBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
 	}
 
 	// デバッグ描画
 	{
 	}
-
 
 	// ポストエフェクト描画
 	{
@@ -391,12 +447,12 @@ void SceneRoomTest_E4C::SaveRoomData()
 	ZeroMemory(&ofn, sizeof(OPENFILENAMEA));
 	ofn.lStructSize = sizeof(OPENFILENAMEA);
 	ofn.hwndOwner = NULL;
-	ofn.lpstrFilter = "JSONファイル(*.json)\0*.json\0";
+	ofn.lpstrFilter = "json file(*.json)\0*.json\0";
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFile = filePath;
 	ofn.nMaxFile = sizeof(filePath);
 	ofn.lpstrFileTitle = NULL;
-	ofn.lpstrTitle = "ファイルを保存する";
+	ofn.lpstrTitle = "Save File";
 	ofn.lpstrInitialDir = NULL;
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_CREATEPROMPT;
 	ofn.lpstrDefExt = "json";
@@ -453,17 +509,17 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 	//ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
 
 	// ひえらるき～
-	if (ImGui::Begin("Hierarchy", nullptr, ImGuiWindowFlags_MenuBar))
+	if (ImGui::Begin("SceneRoomTest_E4C", nullptr, ImGuiWindowFlags_MenuBar))
 	{
 		// メニュー
 		if (ImGui::BeginMenuBar()) {
-			if (ImGui::BeginMenu("File")) {
-				if (ImGui::MenuItem("Load File")) LoadRoomData();
-				if (ImGui::MenuItem("Save File")) SaveRoomData();
+			if (ImGui::BeginMenu("ファイル")) {
+				if (ImGui::MenuItem("json読み込み")) LoadRoomData();
+				if (ImGui::MenuItem("json保存")) SaveRoomData();
 				ImGui::EndMenu();
 			}
-			if (ImGui::BeginMenu("New")) {
-				if (ImGui::BeginMenu("TileNode")) {
+			if (ImGui::BeginMenu("ノード作成")) {
+				if (ImGui::BeginMenu("タイルノード")) {
 					if (ImGui::MenuItem("Floor01a"))		AddTileNode(GetDefaultName(TileType::FLOOR_01A), TileType::FLOOR_01A);
 					if (ImGui::MenuItem("Floor01b"))		AddTileNode(GetDefaultName(TileType::FLOOR_01B), TileType::FLOOR_01B);
 					if (ImGui::MenuItem("Floor02a"))		AddTileNode(GetDefaultName(TileType::FLOOR_02A), TileType::FLOOR_02A);
@@ -502,36 +558,34 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 					if (ImGui::MenuItem("BossRoom"))			AddTileNode(GetDefaultName(TileType::BOSSROOM), TileType::BOSSROOM);
 					ImGui::EndMenu();
 				}
-				if (ImGui::BeginMenu("ObjectNode")) {
+				if (ImGui::BeginMenu("オブジェクトノード")) {
 					if (ImGui::MenuItem("Spawner"))	AddSpawner();
 					if (ImGui::MenuItem("ConnectPoint")) AddConnectPoint();
 					ImGui::EndMenu();
 				}
-				if (ImGui::BeginMenu("Template")) {
-					if (ImGui::MenuItem("3x3 Floor")) AddTemplate3x3Floor();
-					ImGui::EndMenu();
-				}
+				//if (ImGui::BeginMenu("テンプレート")) {
+				//	if (ImGui::MenuItem("3x3 Floor")) AddTemplate3x3Floor();
+				//	ImGui::EndMenu();
+				//}
 				ImGui::EndMenu();
 			}
 		}
-		if (ImGui::MenuItem("Duplicate")) DuplicateNode();
-		if (ImGui::BeginMenu("Remove")) {
-			if (ImGui::MenuItem("Remove Selected Node")) RemoveSelectedNode();
-			if (ImGui::MenuItem("Clear All")) ClearNodes();
+		if (ImGui::MenuItem("ノード複製")) DuplicateNode();
+		if (ImGui::BeginMenu("ノード削除")) {
+			if (ImGui::MenuItem("選択中のノードを削除")) RemoveSelectedNode();
+			if (ImGui::MenuItem("全てのノードを削除")) ClearNodes();
 			ImGui::EndMenu();
 		}
 		ImGui::EndMenuBar();
 	}
 
 	// 部屋の生成設定
-	if (ImGui::TreeNodeEx("RoomSetting", ImGuiTreeNodeFlags_DefaultOpen)) {
+	if (ImGui::TreeNodeEx("部屋の生成設定", ImGuiTreeNodeFlags_DefaultOpen)) {
 		// Weight
-		ImGui::InputInt("Weight", &roomSetting.weight);
+		ImGui::InputInt("重み", &roomSetting.weight);
 		// AABB
 		ImGui::DragFloat3("AABB: Position", &roomSetting.aabb.position.x, 1.0f);
 		ImGui::DragFloat3("AABB: Radii", &roomSetting.aabb.radii.x, 1.0f);
-		// AABB算出
-		if (ImGui::Button("AABB calc")) CalcAABB();
 
 		ImGui::TreePop();
 	}
@@ -539,7 +593,7 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 	ImGui::Separator();
 
 	// ノード
-	if (ImGui::TreeNodeEx("Nodes", ImGuiTreeNodeFlags_DefaultOpen)) {
+	if (ImGui::TreeNodeEx("ノード", ImGuiTreeNodeFlags_DefaultOpen)) {
 		int index = 0;
 		for (Node* node : NODES.GetAll()) {
 			ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_Leaf;
@@ -548,7 +602,24 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 				ImGui::PushID(index);
 
 				if (ImGui::TreeNodeEx(node->GetName().c_str(), nodeFlags)) {
-					if (ImGui::IsItemFocused()) ChangeSelectedNode(node);
+					if (ImGui::IsItemClicked()) ChangeSelectedNode(node);
+					if (ImGui::BeginPopupContextItem())
+					{
+						ImGui::SeparatorText("ノードメニュー");
+						if (ImGui::Button("複製"))
+						{
+							DuplicateNode();
+							ImGui::CloseCurrentPopup();
+						}
+						ImGui::SameLine();
+						if (ImGui::Button("削除"))
+						{
+							ChangeSelectedNode(nullptr);
+							NODES.Remove(node);
+							ImGui::CloseCurrentPopup();
+						}
+						ImGui::EndPopup();
+					}
 				}
 				ImGui::PopID();
 			}
@@ -568,11 +639,35 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 		ImGui::SetNextWindowPos(ImVec2((screenSize.x - windowSize.x - 32.0f), 32.0f), ImGuiCond_Once);
 		ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
 
-		if (ImGui::Begin("SelectedNode", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::Begin("選択中のノード", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			selectionNode->DrawDebugGUI();
 		}
 		ImGui::End();
+	}
+
+	{
+		ImGui::SetNextWindowPos(ImVec2(T_INPUT.GetMousePos().x, T_INPUT.GetMousePos().y), ImGuiCond_Once);
+		ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+
+		if (ImGui::BeginPopupContextVoid())
+		{
+			ImGui::SeparatorText("ノードメニュー");
+			if (ImGui::Button("複製"))
+			{
+				DuplicateNode();
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("削除"))
+			{
+				Node* removeNode = selectionNode;
+				ChangeSelectedNode(nullptr);
+				NODES.Remove(removeNode);
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
 	}
 }
 
@@ -598,7 +693,7 @@ void SceneRoomTest_E4C::AddTileNode(
 	NODES.Register(newNode);
 
 	// 追加したノードを選択
-	selectionNode = newNode;
+	ChangeSelectedNode(newNode);
 }
 
 void SceneRoomTest_E4C::AddSpawner(
@@ -611,7 +706,6 @@ void SceneRoomTest_E4C::AddSpawner(
 
 	// 追加したノードを選択させる
 	ChangeSelectedNode(newNode);
-	//selectionNode = newNode;
 }
 
 void SceneRoomTest_E4C::AddConnectPoint(
@@ -626,7 +720,6 @@ void SceneRoomTest_E4C::AddConnectPoint(
 
 	// 追加したノードを選択させる
 	ChangeSelectedNode(newNode);
-	//selectionNode = newNode;
 }
 
 void SceneRoomTest_E4C::DuplicateNode()
@@ -641,7 +734,6 @@ void SceneRoomTest_E4C::DuplicateNode()
 
 		// 複製したノードを選択する
 		ChangeSelectedNode(newNode);
-		//selectionNode = newNode;
 	}
 }
 
@@ -665,7 +757,10 @@ void SceneRoomTest_E4C::ChangeSelectedNode(Node* newNode)
 		selectionNode->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 	}
 	selectionNode = newNode;
-	newNode->SetColor({ 1.3f, 1.3f, 1.3f, 1.0f });
+	if (newNode != nullptr)
+	{
+		newNode->SetColor({ 1.2f, 1.2f, 1.2f, 1.0f });
+	}
 }
 
 void SceneRoomTest_E4C::CalcAABB()
@@ -697,7 +792,7 @@ void SceneRoomTest_E4C::CalcAABB()
 	float widthY = fabsf(maxY - minY) + 4.0f;
 	float widthZ = fabsf(maxZ - minZ) + 4.0f;
 
-	roomSetting.aabb.position = { (widthX * 0.5f) - 2.0f, (widthY * 0.5f), (widthZ * 0.5f) + 2.0f };
+	roomSetting.aabb.position = { (widthX * 0.5f), (widthY * 0.5f), (widthZ * 0.5f) };
 	roomSetting.aabb.radii = { widthX, widthY, widthZ };
 }
 
@@ -724,22 +819,6 @@ Node* TileNode::Duplicate()
 
 void TileNode::DrawDebugGUI()
 {
-	// type
-	{
-		std::string typeText = "Type: ";
-
-		switch (type)
-		{
-		case TileType::FLOOR_01A:		typeText += "FLOOR_01A";		break;
-		case TileType::WALL_01A:		typeText += "WALL_01A";			break;
-		case TileType::STAIR_STEP_01A:	typeText += "STAIR_STEP_01A";	break;
-		case TileType::PORTAL:			typeText += "PORTAL";			break;
-		case TileType::CONNECTPOINT:	typeText += "CONNECTPOINT";		break;
-		}
-
-		ImGui::Text(typeText.c_str());
-	}
-
 	// name
 	{
 		std::string inputName = name;
@@ -753,12 +832,16 @@ void TileNode::DrawDebugGUI()
 	}
 
 	// pos
+	if (ImGui::Button("Reset##1")) position = { 0.0f, 0.0f, 0.0f };
+	ImGui::SameLine();
 	ImGui::DragFloat3("Position", &position.x, 0.1f);
 	// angle
 	DirectX::XMFLOAT3 debugAngle = angle;
 	debugAngle.x = DirectX::XMConvertToDegrees(debugAngle.x);
 	debugAngle.y = DirectX::XMConvertToDegrees(debugAngle.y);
 	debugAngle.z = DirectX::XMConvertToDegrees(debugAngle.z);
+	if (ImGui::Button("Reset##2")) debugAngle = { 0.0f, 0.0f, 0.0f };
+	ImGui::SameLine();
 	if (ImGui::DragFloat3("Angle", &debugAngle.x, 1.0f))
 	{
 		angle.x = DirectX::XMConvertToRadians(debugAngle.x);
@@ -766,6 +849,8 @@ void TileNode::DrawDebugGUI()
 		angle.z = DirectX::XMConvertToRadians(debugAngle.z);
 	}
 	// scale
+	if (ImGui::Button("Reset##3")) scale = { 1.0f, 1.0f, 1.0f };
+	ImGui::SameLine();
 	ImGui::DragFloat3("Scale", &scale.x, 0.1f);
 }
 
@@ -920,6 +1005,21 @@ std::string NodeManager::GetUniqueName(std::string name)
 
 	// 数字をカッコで囲んで返す
 	return name + "(" + std::to_string(nextNumber) + ")";
+}
+
+Node* NodeManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3 end)
+{
+	for (Node* node : items)
+	{
+		if (node->GetModels().size() == 0) continue;
+
+		HitResultVector hit;
+		if (Collision::IntersectRayVsModel(start, end, node->GetModel().get(), hit))
+		{
+			return node;
+		}
+	}
+	return nullptr;
 }
 
 void ConnectPointNode::Render(const RenderContext& rc)

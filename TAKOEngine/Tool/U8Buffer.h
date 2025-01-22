@@ -9,6 +9,7 @@
 
 namespace U8Buffer {
 	void Insert(std::vector<uint8_t>& buffer, uint8_t value);
+	void Insert(std::vector<uint8_t>& buffer, uint16_t value);
 	void Insert(std::vector<uint8_t>& buffer, uint32_t value);
 	void Insert(std::vector<uint8_t>& buffer, uint64_t value);
 	void Insert(std::vector<uint8_t>& buffer, float value);

@@ -108,6 +108,7 @@ namespace PlayerCharacterState
 			
 			if (owner->IsPlayer())
 			{
+
 				XMFLOAT4X4* matrix = owner->GetTransformAdress();
 
 				ModelObject::ATTACK_COLLIDER_DATA attackData;
@@ -117,6 +118,7 @@ namespace PlayerCharacterState
 				attackData.hittableOBJ = sphereAttacks[0].hittableOBJ;
 				attackData.hitStartRate = sphereAttacks[0].hitStartRate;
 				attackData.hitEndRate = sphereAttacks[0].hitEndRate;
+
 				owner->MakeAttackCollider(attackData, sphereAttacks[0].sphere, matrix);
 			}
 		}
@@ -158,12 +160,21 @@ namespace PlayerCharacterState
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
 					}
 				}
+				if (0.05f <= time && time <= 0.115f)
+				{
+					owner->SetTrail(true);
+				}
+				else
+				{
+					owner->SetTrail(false);
+				}
 			}
 			else
 			{
 				if (!owner->IsPlayAnimation())
 					owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_2);
 			}
+			
 		}
 		void AttackNormalState_1::Exit()
 		{
@@ -180,6 +191,7 @@ namespace PlayerCharacterState
 
 			if (owner->IsPlayer())
 			{
+
 				XMFLOAT4X4* matrix = owner->GetTransformAdress();
 				Sphere attack2{ {  0, 1.5f, 2.0f} , 0.5f };
 
@@ -190,6 +202,7 @@ namespace PlayerCharacterState
 				attackData.hittableOBJ = sphereAttacks[1].hittableOBJ;
 				attackData.hitStartRate = sphereAttacks[1].hitStartRate;
 				attackData.hitEndRate = sphereAttacks[1].hitEndRate;
+
 				owner->MakeAttackCollider(attackData, sphereAttacks[1].sphere, matrix);
 			}
 		}
@@ -231,6 +244,14 @@ namespace PlayerCharacterState
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
 					}
 				}
+				if (0.05f <= time && time <= 0.4f)
+				{
+					owner->SetTrail(true);
+				}
+				else
+				{
+					owner->SetTrail(false);
+				}
 			}
 			else
 			{
@@ -253,6 +274,7 @@ namespace PlayerCharacterState
 
 			if (owner->IsPlayer())
 			{
+
 				XMFLOAT4X4* matrix = &owner->GetModel(0)->FindNode("JOT_C_Hip")->worldTransform;
 
 				ModelObject::ATTACK_COLLIDER_DATA attackData;
@@ -262,6 +284,7 @@ namespace PlayerCharacterState
 				attackData.hittableOBJ = sphereAttacks[2].hittableOBJ;
 				attackData.hitStartRate = sphereAttacks[2].hitStartRate;
 				attackData.hitEndRate = sphereAttacks[2].hitEndRate;
+
 				owner->MakeAttackCollider(attackData, sphereAttacks[2].sphere, matrix);
 			}
 		}
@@ -301,6 +324,14 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
 					}
+				}
+				if (0.05f <= time && time <= 0.7f)
+				{
+					owner->SetTrail(true);
+				}
+				else
+				{
+					owner->SetTrail(false);
 				}
 			}
 			else
@@ -395,7 +426,14 @@ namespace PlayerCharacterState
 					owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
 				}
 			}
-
+			if (0.65f <= time && time <= 1.5f)
+			{
+				owner->SetTrail(true);
+			}
+			else
+			{
+				owner->SetTrail(false);
+			}
 			if (!owner->IsPlayAnimation())
 				owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::IDLE);
 		}

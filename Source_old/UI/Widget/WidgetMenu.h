@@ -10,7 +10,7 @@
 #include "TAKOEngine/Rendering/Sprite.h"
 
 #include "UI/Widget/WidgetSettingWindow.h"
-#include "UI/Widget/WidgetButton.h"
+#include "TAKOEngine/GUI/WidgetButton.h"
 
 /**************************************************************************//**
 	@class	WidgetMenu

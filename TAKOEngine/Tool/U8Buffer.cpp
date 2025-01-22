@@ -17,6 +17,17 @@ namespace U8Buffer {
 		buffer.push_back(value);
 	}
 	/**************************************************************************//**
+		@brief		u16データをu8バッファに挿入
+		@param[in]	buffer	参照型u8バッファ
+		@param[in]	value	u16データ
+		@return		なし
+	*//***************************************************************************/
+	void Insert(std::vector<uint8_t>& buffer, uint16_t value)
+	{
+		buffer.push_back(static_cast<uint8_t>((value >> 8) & 0xFF));  // 上位バイト
+		buffer.push_back(static_cast<uint8_t>(value & 0xFF));         // 下位バイト
+	}
+	/**************************************************************************//**
 		@brief		u32データをu8バッファに挿入
 		@param[in]	buffer	参照型u8バッファ
 		@param[in]	value	u32データ
