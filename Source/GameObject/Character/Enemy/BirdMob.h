@@ -43,6 +43,12 @@ public:
 		ATTACK_LAND,
 	};
 
+	enum COLLIDER_ID : uint8_t
+	{
+		COL_ATTACK,
+		COL_BODY,
+	};
+
 protected:
 	void UpdateTarget();
 };

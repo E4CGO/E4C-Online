@@ -7,8 +7,8 @@
 BirdMob::BirdMob(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("Data/Model/Enemy/MDLANM_ENMbird_0120.glb", scaling, renderMode)
 {
 	enemyType = ENEMY_TYPE::BIRD;
-	radius = 1.0f;
-	maxHp = hp = 100;
+	radius = 0.5f;
+	maxHp = hp = 20;
 	atk = 10;
 	moveSpeed = 1.0f;
 	turnSpeed = DirectX::XMConvertToRadians(90);
@@ -18,6 +18,12 @@ BirdMob::BirdMob(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("Da
 	SetSearchRange(10.0f);
 
 	// 衝突判定
+	SetMoveCollider({ { 0, radius / scale.y, 0 }, radius }, Collider::COLLIDER_OBJ::ENEMY);
+
+	m_pColliders.clear();
+	// ヒット判定
+	Sphere sphere{ { 0, radius / 0.0075f, 0 }, radius };
+	SetCollider(COLLIDER_ID::COL_BODY, sphere, Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("JOT_C_Body")->worldTransform);
 
 	// ステート
 	{
