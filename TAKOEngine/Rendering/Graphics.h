@@ -65,6 +65,7 @@ enum class ModelShaderDX12Id
 	Loading,
 	Zone,
 	Electric,
+	Foliage,
 
 	EnumCount
 };

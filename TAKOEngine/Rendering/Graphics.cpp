@@ -16,6 +16,7 @@
 #include "TAKOEngine/Rendering/Shaders/ParticleShader.h"
 #include "TAKOEngine/Rendering/Shaders/HitParticleShader.h"
 #include "TAKOEngine/Rendering/Shaders/CylinderShader.h"
+#include "TAKOEngine/Rendering/Shaders/FoliageShader.h"
 
 #include "TAKOEngine/Rendering/Shaders/UVScrollShader.h"
 #include "TAKOEngine/Rendering/Shaders/MaskShader.h"
@@ -582,6 +583,7 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Loading)] = std::make_unique<LoadingShaderDX12>(m_d3d_device.Get());
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Zone)] = std::make_unique<ZoneShaderDX12>(m_d3d_device.Get());
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Electric)] = std::make_unique<ElectricShaderDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Foliage)] = std::make_unique<FoliageShader>(m_d3d_device.Get());
 
 		// スプライトシェーダー生成
 		spriteShaders[static_cast<int>(SpriteShaderId::Default)] = std::make_unique<DefaultSpriteShader>(device.Get());
