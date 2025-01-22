@@ -6,11 +6,12 @@
 class Projectile : public ModelObject
 {
 public:
-	Projectile(const char* filename, float scaling = 1.0f, Character* owner = nullptr) : ModelObject(filename, scaling), owner(owner) {}
+	Projectile(const char* filename, float scaling = 1.0f, PlayerCharacter* owner = nullptr) : ModelObject(filename, scaling, ModelObject::DX12), owner(owner) {}
 	~Projectile() = default;
 
 	void Update(float elapsedTime) override;
 	void Render(const RenderContext& rc) override;
+	void RenderDX12(const RenderContextDX12& rc) override;
 
 	virtual void UpdateColliders() {};
 
@@ -19,8 +20,8 @@ public:
 	void SetDirection(DirectX::XMFLOAT3 direction) { this->direction = direction; };
 	void SetSpeed(float speed) { this->speed = speed; };
 	void SetGravity(float gravity) { this->gravity = gravity; }
-	Character* GetOwner() { return owner; }
-	void SetOwner(Character* character) { owner = character; }
+	PlayerCharacter* GetOwner() { return owner; }
+	void SetOwner(PlayerCharacter* character) { owner = character; }
 
 	virtual void Collision();
 protected:
@@ -53,7 +54,7 @@ protected:
 	float speed = 0.0f;
 	float gravity = -1.0f;
 
-	Character* owner = nullptr;
+	PlayerCharacter* owner = nullptr;
 
 	int atk = 1;
 };

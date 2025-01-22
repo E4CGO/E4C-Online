@@ -30,6 +30,11 @@ void Projectile::Render(const RenderContext& rc)
 #endif // _DEBUG
 }
 
+void Projectile::RenderDX12(const RenderContextDX12& rc)
+{
+	ModelObject::RenderDX12(rc);
+}
+
 void Projectile::PointTo(const DirectX::XMFLOAT3& target)
 {
 	DirectX::XMFLOAT3 targetDirect = XMFLOAT3Normalize(target - position);

@@ -21,6 +21,7 @@
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Props/SpawnerManager.h"
+#include "GameObject/Projectile/ProjectileManager.h"
 
 #include "Map/DungeonData.h"
 
@@ -129,12 +130,6 @@ void StageOpenWorld_E4C::Initialize()
 		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
 		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
 
-		// パーティクル
-		//DirectX::XMFLOAT3 p_pos = { 0,3,0 };
-		//m_particle[0] = std::make_unique<HitParticleRenderer>(p_pos);
-		//p_pos = { 3,3,0 };
-		//m_particle[1] = std::make_unique<HitParticleRenderer>(p_pos);
-
 		runningDust1 = std::make_unique<RunningDustDX12>("Data/Sprites/smoke.png", 100.0f,
 			DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),	// position
 			1.0f,			// alpha
@@ -229,11 +224,11 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	sky->Update(elapsedTime);
 	teleporter->Update(elapsedTime);
 
-	teleporter->Update(elapsedTime);
-
 	ENEMIES.Update(elapsedTime);
 
 	SpawnerManager::Instance().Update(elapsedTime);
+
+	PROJECTILES.Update(elapsedTime);
 
 	PlayerCharacterManager::Instance().Update(elapsedTime);
 
@@ -280,6 +275,8 @@ void StageOpenWorld_E4C::Render()
 	teleporter->Render(rc);
 
 	ENEMIES.Render(rc);
+
+	PROJECTILES.Render(rc);
 
 	UI.Render(rc);
 
@@ -334,12 +331,10 @@ void StageOpenWorld_E4C::RenderDX12()
 
 		SpawnerManager::Instance().RenderDX12(rc);
 
+		PROJECTILES.RenderDX12(rc);
+
 		// プレイヤー
 		PlayerCharacterManager::Instance().RenderDX12(rc);
-
-		// パーティクル
-		//m_particle[0]->Render(m_frameBuffer);
-		//m_particle[1]->Render(m_frameBuffer);
 
 		// レンダーターゲットへの書き込み終了待ち
 		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
