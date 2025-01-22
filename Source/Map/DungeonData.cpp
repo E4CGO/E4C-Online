@@ -582,6 +582,25 @@ void DungeonData::InitModelFileDatas()
 	m_modelFileDatas.at(STAIR_TO_NEXTFLOOR).emplace_back("Data/Model/DungeonAssets/SM_Stairs_Steps_01a.glb", 4.0f);
 	m_modelFileDatas.at(BOSSROOM).emplace_back("Data/Model/DungeonAssets/SM_BossRoom.glb", 4.0f);
 
+	m_modelFileDatas.at(BARREL).emplace_back("Data/Model/DungeonAssets/SM_Barrel.glb", 4.0f);
+	m_modelFileDatas.at(WALL_BRICK_01A).emplace_back("Data/Model/DungeonAssets/SM_Brick_Wall_01a.glb", 4.0f);
+	m_modelFileDatas.at(CHANDELIER).emplace_back("Data/Model/DungeonAssets/SM_Chandelier.glb", 4.0f);
+	m_modelFileDatas.at(FLOOR_BROWN).emplace_back("Data/Model/DungeonAssets/SM_Floor_Brown.glb", 4.0f);
+	m_modelFileDatas.at(FLOOR_CHECK).emplace_back("Data/Model/DungeonAssets/SM_Floor_Check_Board.glb", 4.0f);
+	m_modelFileDatas.at(FLOOR_GRAY).emplace_back("Data/Model/DungeonAssets/SM_Floor_Gray.glb", 4.0f);
+	m_modelFileDatas.at(HEART_ARCH).emplace_back("Data/Model/DungeonAssets/SM_Heart_Arch_01a.glb", 4.0f);
+	m_modelFileDatas.at(PLASTIC_FLOWER).emplace_back("Data/Model/DungeonAssets/SM_Plastic_Flower.glb", 4.0f);
+	m_modelFileDatas.at(SET_01A).emplace_back("Data/Model/DungeonAssets/SM_Set_01a.glb", 4.0f);
+	m_modelFileDatas.at(SET_01B).emplace_back("Data/Model/DungeonAssets/SM_Set_01b.glb", 4.0f);
+	m_modelFileDatas.at(SET_01C).emplace_back("Data/Model/DungeonAssets/SM_Set_01c.glb", 4.0f);
+	m_modelFileDatas.at(STAIR_STEP_01B).emplace_back("Data/Model/DungeonAssets/SM_Stairs_Steps_01b.glb", 4.0f);
+	m_modelFileDatas.at(TOY_ARCH_01A).emplace_back("Data/Model/DungeonAssets/SM_Toy_Arch_01a.glb", 4.0f);
+	m_modelFileDatas.at(TOY_ARCH_SUPPORT_01A).emplace_back("Data/Model/DungeonAssets/SM_Toy_Arch_Support_01a.glb", 4.0f);
+	m_modelFileDatas.at(TOY_ARCH_TOP_01A).emplace_back("Data/Model/DungeonAssets/SM_Toy_Arch_Top_01a.glb", 4.0f);
+	m_modelFileDatas.at(WALL_PAPER).emplace_back("Data/Model/DungeonAssets/SM_Wall_Paper.glb", 4.0f);
+	m_modelFileDatas.at(WALL_SQUARES).emplace_back("Data/Model/DungeonAssets/SM_Wall_Squares.glb", 4.0f);
+	m_modelFileDatas.at(WELL).emplace_back("Data/Model/DungeonAssets/SM_Well_01a.glb", 4.0f);
+
 	// モデルない組～
 	m_modelFileDatas.at(PORTAL).emplace_back("", 0.0f);
 	m_modelFileDatas.at(SPAWNER).emplace_back("", 0.0f);
