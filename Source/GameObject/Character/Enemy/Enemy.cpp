@@ -3,6 +3,7 @@
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Character/Enemy/Enemy.h"
 #include "GameObject/Character/Enemy/MouseMob.h"
+#include "GameObject/Character/Enemy/BirdMob.h"
 #include "GameObject/Character/Enemy/BearBoss.h"
 #include "GameObject/Props/Spawner.h"
 #include "Network/OnlineController.h"
@@ -84,6 +85,7 @@ void Enemy::OnDamage(const uint16_t& damage)
 	if (IsMine() || ONLINE_CONTROLLER->GetState() != Online::State::SYNC)
 	{
 		hp -= damage;
+		AddHate(PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetClientId(), damage);
 		if (hp > 0)
 		{
 			if (!superArmor)
@@ -108,10 +110,12 @@ void Enemy::OnDeath()
 
 Enemy* Enemy::EnemyFactory(uint8_t enemyType)
 {
+	ModelObject::RENDER_MODE render_mode = (T_GRAPHICS.isDX11Active) ? ModelObject::DX11 : ModelObject::DX12;
 	switch (enemyType)
 	{
-	case ENEMY_TYPE::MOUSE: return T_GRAPHICS.isDX11Active ? new MouseMob(0.5f, ModelObject::DX11) : new MouseMob(0.5f, ModelObject::DX12); break;
-	case ENEMY_TYPE::BEAR_BOSS: return T_GRAPHICS.isDX11Active ? new BearBoss(1.0f, ModelObject::DX11) : new BearBoss(1.0f, ModelObject::DX12); break;
+	case ENEMY_TYPE::MOUSE: return  new MouseMob(0.5f, render_mode); break;
+	case ENEMY_TYPE::BEAR_BOSS: return  new BearBoss(1.0f, render_mode); break;
+	case ENEMY_TYPE::BIRD: return  new BirdMob(0.5f, render_mode); break;
 	}
 	return nullptr;
 }
