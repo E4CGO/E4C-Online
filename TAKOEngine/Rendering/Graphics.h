@@ -66,6 +66,9 @@ enum class ModelShaderDX12Id
 	Zone,
 	Electric,
 	Foliage,
+	Charge,
+	HealCylinder,
+	HealCircle,
 
 	EnumCount
 };

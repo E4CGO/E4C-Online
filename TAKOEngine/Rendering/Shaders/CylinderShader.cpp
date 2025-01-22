@@ -81,7 +81,7 @@ ZoneShaderDX12::ZoneShaderDX12(ID3D12Device* device, const char* vertexShaderNam
 		pipeline_state_desc.InputLayout.NumElements = _countof(inputElementDescs);
 
 		//ブレンドステート
-		pipeline_state_desc.BlendState = renderState->GetBlendState(BlendState::Opaque);
+		pipeline_state_desc.BlendState = renderState->GetBlendState(BlendState::Additive);
 
 		//深度ステンシルステート
 		pipeline_state_desc.DepthStencilState = renderState->GetDepthState(DepthState::TestAndWrite);
