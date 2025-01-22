@@ -76,6 +76,9 @@ void ModelObject::LoadModel(const char* filename, float scaling, ModelObject::RE
 	case ModelObject::LHS_Phong_Instancing:
 		m_dx12_ShaderId = ModelShaderDX12Id::PhongInstancing;
 		break;
+	case ModelObject::Foliage:
+		m_dx12_ShaderId = ModelShaderDX12Id::Foliage;
+		break;
 	default:
 		break;
 	}

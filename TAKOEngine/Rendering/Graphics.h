@@ -62,6 +62,7 @@ enum class ModelShaderDX12Id
 	PortalSquare,
 	Billboard,
 	Fireball,
+	Foliage,
 
 	EnumCount
 };
