@@ -25,6 +25,16 @@ public:
 		COL_BODY,
 	};
 
+	enum ANIMATION : uint8_t
+	{
+		ANIM_IDLE,
+		ANIM_MOVE,
+		ANIM_ATTACK,
+		ANIM_ENCOUNTER,
+		ANIM_DAMAGE,
+		ANIM_DIE,
+	};
+
 protected:
 	void UpdateTarget();
 };

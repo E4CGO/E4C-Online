@@ -108,6 +108,11 @@ public:
 
 	// 被ダメージコールバック
 	virtual void OnDamage(const uint16_t& damage) { hp -= damage; }
+	
+	// スーパーアーマー
+	bool GetSuperArmorFlag() { return superArmor; }
+	void OnSuperArmor() { superArmor = true; }
+	void OffSuperArmor() { superArmor = false; }
 
 	//物理計算フラグ
 	void SetKinematic(bool value) { this->isKinematic = value; }
@@ -134,6 +139,7 @@ protected:
 	float airControl = 0.1f;						// 空気抵抗
 
 	float hurtCoolTime = 0.0f;						// 無敵時間
+	bool superArmor = false;						// スーパーアーマーフラグ
 
 	bool isKinematic = false;
 

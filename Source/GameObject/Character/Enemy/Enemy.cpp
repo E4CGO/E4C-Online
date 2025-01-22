@@ -88,6 +88,7 @@ void Enemy::OnDamage(const uint16_t& damage)
 		AddHate(PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetClientId(), damage);
 		if (hp > 0)
 		{
+			if (!superArmor)
 			EnemyState::StateTransition(this, STATE::HURT);
 		}
 		else

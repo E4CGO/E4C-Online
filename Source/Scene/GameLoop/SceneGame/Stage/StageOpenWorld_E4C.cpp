@@ -64,7 +64,7 @@ void StageOpenWorld_E4C::Initialize()
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
 	teleporter->SetVisibility(true);
 
-	Spawner* spawner = new Spawner(ENEMY_TYPE::BIRD, 5, -1);
+	Spawner* spawner = new Spawner(ENEMY_TYPE::MOUSE, 5, -1);
 	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
 	spawner->SetSearchRadius(10.0f);
 	SpawnerManager::Instance().Register(spawner);
@@ -263,8 +263,7 @@ void StageOpenWorld_E4C::Render()
 	// ライトの情報を詰め込む
 	LightManager::Instance().PushRenderContext(rc);
 
-	// 描画
-	PlayerCharacterManager::Instance().Render(rc);
+	
 
 	for (auto& it : models)
 	{
@@ -279,6 +278,8 @@ void StageOpenWorld_E4C::Render()
 
 	UI.Render(rc);
 
+	// 描画
+	PlayerCharacterManager::Instance().Render(rc);
 	// デバッグレンダラ描画実行
 
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());

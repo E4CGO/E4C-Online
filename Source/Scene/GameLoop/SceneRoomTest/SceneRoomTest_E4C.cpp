@@ -143,13 +143,14 @@ void SceneRoomTest_E4C::Update(float elapsedTime)
 
 	// RayCast
 	{
+		// ImGUIウィンドウ上にマウスがある場合はキャストを行わない
 		if (T_INPUT.KeyDown(VK_LBUTTON) &&
-			!ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow))
+			!ImGui::IsWindowHovered(ImGuiFocusedFlags_AnyWindow))
 		{
 			// マウスカーソルの座標を取得
 			DirectX::XMFLOAT3 screenPosition;
-			screenPosition.x = Input::Instance().GetMousePos().x;
-			screenPosition.y = Input::Instance().GetMousePos().y;
+			screenPosition.x = T_INPUT.GetMouseWinPos().x;
+			screenPosition.y = T_INPUT.GetMouseWinPos().y;
 
 			T_GRAPHICS.GetDeviceContext();
 
@@ -446,12 +447,12 @@ void SceneRoomTest_E4C::SaveRoomData()
 	ZeroMemory(&ofn, sizeof(OPENFILENAMEA));
 	ofn.lStructSize = sizeof(OPENFILENAMEA);
 	ofn.hwndOwner = NULL;
-	ofn.lpstrFilter = "JSONファイル(*.json)\0*.json\0";
+	ofn.lpstrFilter = "json file(*.json)\0*.json\0";
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFile = filePath;
 	ofn.nMaxFile = sizeof(filePath);
 	ofn.lpstrFileTitle = NULL;
-	ofn.lpstrTitle = "ファイルを保存する";
+	ofn.lpstrTitle = "Save File";
 	ofn.lpstrInitialDir = NULL;
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_CREATEPROMPT;
 	ofn.lpstrDefExt = "json";
@@ -585,8 +586,6 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 		// AABB
 		ImGui::DragFloat3("AABB: Position", &roomSetting.aabb.position.x, 1.0f);
 		ImGui::DragFloat3("AABB: Radii", &roomSetting.aabb.radii.x, 1.0f);
-		// AABB算出
-		if (ImGui::Button("AABB 算出")) CalcAABB();
 
 		ImGui::TreePop();
 	}
@@ -610,14 +609,14 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 						if (ImGui::Button("複製"))
 						{
 							DuplicateNode();
-							ImGui::EndPopup();
+							ImGui::CloseCurrentPopup();
 						}
 						ImGui::SameLine();
 						if (ImGui::Button("削除"))
 						{
 							ChangeSelectedNode(nullptr);
 							NODES.Remove(node);
-							ImGui::EndPopup();
+							ImGui::CloseCurrentPopup();
 						}
 						ImGui::EndPopup();
 					}
@@ -657,15 +656,15 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 			if (ImGui::Button("複製"))
 			{
 				DuplicateNode();
-				ImGui::EndPopup();
+				ImGui::CloseCurrentPopup();
 			}
 			ImGui::SameLine();
 			if (ImGui::Button("削除"))
 			{
 				Node* removeNode = selectionNode;
 				ChangeSelectedNode(nullptr);
-				NODES.Remove(selectionNode);
-				ImGui::EndPopup();
+				NODES.Remove(removeNode);
+				ImGui::CloseCurrentPopup();
 			}
 			ImGui::EndPopup();
 		}
@@ -833,12 +832,16 @@ void TileNode::DrawDebugGUI()
 	}
 
 	// pos
+	if (ImGui::Button("Reset##1")) position = { 0.0f, 0.0f, 0.0f };
+	ImGui::SameLine();
 	ImGui::DragFloat3("Position", &position.x, 0.1f);
 	// angle
 	DirectX::XMFLOAT3 debugAngle = angle;
 	debugAngle.x = DirectX::XMConvertToDegrees(debugAngle.x);
 	debugAngle.y = DirectX::XMConvertToDegrees(debugAngle.y);
 	debugAngle.z = DirectX::XMConvertToDegrees(debugAngle.z);
+	if (ImGui::Button("Reset##2")) debugAngle = { 0.0f, 0.0f, 0.0f };
+	ImGui::SameLine();
 	if (ImGui::DragFloat3("Angle", &debugAngle.x, 1.0f))
 	{
 		angle.x = DirectX::XMConvertToRadians(debugAngle.x);
@@ -846,6 +849,8 @@ void TileNode::DrawDebugGUI()
 		angle.z = DirectX::XMConvertToRadians(debugAngle.z);
 	}
 	// scale
+	if (ImGui::Button("Reset##3")) scale = { 1.0f, 1.0f, 1.0f };
+	ImGui::SameLine();
 	ImGui::DragFloat3("Scale", &scale.x, 0.1f);
 }
 
