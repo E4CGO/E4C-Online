@@ -63,6 +63,8 @@ namespace EnemyState
 		void WanderState::Enter()
 		{
 			owner->SetRandomMoveTargetPosition();
+		
+			owner->SetAnimation(MouseMob::ANIMATION::ANIM_MOVE, true, 0.1f);
 		}
 
 		/**************************************************************************//**
@@ -89,7 +91,7 @@ namespace EnemyState
 			// プレイヤー索敵
 			if (owner->SearchPlayer())
 			{
-				owner->GetStateMachine()->ChangeState(STATE::BATTLE);
+				EnemyState::StateTransition(owner, STATE::BATTLE);
 			}
 		}
 
@@ -105,7 +107,9 @@ namespace EnemyState
 		*//***************************************************************************/
 		void IdleState::Enter()
 		{
-			m_StateTimer = Mathf::RandomRange(m_MinWaitingTime, m_MaxWaitingTime);
+			//m_StateTimer = Mathf::RandomRange(m_MinWaitingTime, m_MaxWaitingTime);
+
+			owner->SetAnimation(MouseMob::ANIMATION::ANIM_IDLE, true, 0.1f);
 		}
 
 		/**************************************************************************//**
@@ -114,21 +118,50 @@ namespace EnemyState
 		*//***************************************************************************/
 		void IdleState::Execute(float elapsedTime)
 		{
-			owner->UpdateTarget();
+			//owner->UpdateTarget();
 
-			// タイマー処理
-			m_StateTimer -= elapsedTime;
+			//// タイマー処理
+			//m_StateTimer -= elapsedTime;
 
-			// 待機時間が経過したとき徘徊ステートへ遷移
-			if (m_StateTimer <= 0.f)
+			//// 待機時間が経過したとき徘徊ステートへ遷移
+			//if (m_StateTimer <= 0.f)
+			//{
+			//	owner->GetStateMachine()->ChangeSubState(SEARCH_STATE::WANDER);
+			//}
+
+			//// プレイヤーが見つかったときバトルステートへ遷移
+			//if (owner->SearchPlayer())
+			//{
+			//	owner->GetStateMachine()->ChangeState(mouseMob::STATE::BATTLE);
+			//}
+
+			if (!owner->IsMine()) return;
+			EnemyState::IdleState::Execute(elapsedTime);
+
+			if (!IsWaiting()) // 待機時間終わり
 			{
-				owner->GetStateMachine()->ChangeSubState(SEARCH_STATE::WANDER);
-			}
+				for (PlayerCharacter* player : PlayerCharacterManager::Instance().GetAll())
+				{
+					if (XMFLOAT3HorizontalLengthSq(player->GetPosition() - owner->GetPosition()) < 10.0f * 10.0f)
+					{
+						owner->AddHate(player->GetClientId(), 1);
+					}
+				}
 
-			// プレイヤーが見つかったときバトルステートへ遷移
-			if (owner->SearchPlayer())
-			{
-				owner->GetStateMachine()->ChangeState(mouseMob::STATE::BATTLE);
+
+				PlayerCharacter* player = owner->GetHighestHateClient();
+				if (player != nullptr)
+				{
+					owner->SetTarget(player);
+					EnemyState::StateTransition(owner, STATE::BATTLE);
+				}
+				else
+				{
+
+					owner->SetTarget(nullptr);
+					owner->SetTargetPosition(GetRandomPointInCircleArea(owner->GetPosition(), 10.0f));
+					owner->GetStateMachine()->ChangeSubState(SEARCH_STATE::WANDER);
+				}
 			}
 		}
 
@@ -140,12 +173,41 @@ namespace EnemyState
 		}
 
 		/**************************************************************************//**
+			@brief	エンカウントステートに入れる
+		*//***************************************************************************/
+		void EncounterState::Enter()
+		{
+			owner->SetAnimation(MouseMob::ANIMATION::ANIM_ENCOUNTER, false, 0.1f);
+		}
+
+		/**************************************************************************//**
+			@brief	エンカウントステートで実行する
+			@param[in]    elapsedTime	経過時間
+		*//***************************************************************************/
+		void EncounterState::Execute(float elapsedTime)
+		{
+			if (!owner->IsPlayAnimation())
+			{
+				EnemyState::StateTransition(owner, STATE::BATTLE);
+			}
+		}
+
+		/**************************************************************************//**
+			@brief	エンカウントステートから出る
+		*//***************************************************************************/
+		void EncounterState::Exit()
+		{
+		}
+
+		/**************************************************************************//**
 			@brief	追いかけるステートに入れる
 		*//***************************************************************************/
 		void PursuitState::Enter()
 		{
 			m_StateTimer = Mathf::RandomRange(m_MinWaitingTime, m_MaxWaitingTime);
-			m_AttackTimer = m_AttackCooldown;
+			//m_AttackTimer = m_AttackCooldown;
+
+			owner->SetAnimation(MouseMob::ANIMATION::ANIM_MOVE, true, 0.1f);
 		}
 
 		/**************************************************************************//**
@@ -179,6 +241,7 @@ namespace EnemyState
 			{
 				if (m_AttackTimer <= 0.f)
 				{
+					m_AttackTimer = m_AttackCooldown;
 					owner->GetStateMachine()->ChangeSubState(BATTLE_STATE::ATTACK);
 				}
 			}
@@ -186,7 +249,7 @@ namespace EnemyState
 			// 追跡時間が経過したとき探しステートへ遷移
 			if (m_StateTimer <= 0.f)
 			{
-				owner->GetStateMachine()->ChangeState(mouseMob::STATE::SEARCH);
+				EnemyState::StateTransition(owner, STATE::SEARCH);
 			}
 		}
 
@@ -195,16 +258,27 @@ namespace EnemyState
 		*//***************************************************************************/
 		void PursuitState::Exit()
 		{
-			m_AttackTimer = m_AttackCooldown;
+			//m_AttackTimer = m_AttackCooldown;
 		}
 
 		/**************************************************************************//**
 			@brief	攻撃ステートに入れる
 		*//***************************************************************************/
-		// 攻撃ステート
 		void AttackState::Enter()
 		{
 			m_AnimationTimer = m_WaitTimer;
+
+			owner->OnSuperArmor();
+			owner->SetAnimation(MouseMob::ANIMATION::ANIM_ATTACK, false, 0.1f);
+
+			ModelObject::ATTACK_COLLIDER_DATA attackData;
+			attackData.power = mouseAttack.power;
+			attackData.idx = mouseAttack.idx;
+			attackData.objType = mouseAttack.objType;
+			attackData.hittableOBJ = mouseAttack.hittableOBJ;
+			attackData.hitStartRate = mouseAttack.hitStartRate;
+			attackData.hitEndRate = mouseAttack.hitEndRate;
+			owner->MakeAttackCollider(attackData, mouseAttack.capsule, &owner->GetModel(0)->FindNode("JOT_C_Body")->worldTransform);
 		}
 
 		/**************************************************************************//**
@@ -213,14 +287,52 @@ namespace EnemyState
 		*//***************************************************************************/
 		void AttackState::Execute(float elapsedTime)
 		{
+			owner->GetCollider(mouseAttack.idx)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
+
 			m_AnimationTimer -= elapsedTime;
-			if (m_AnimationTimer <= 0)
+			//if (m_AnimationTimer <= 0)
+			if (!owner->IsPlayAnimation())
 			{
 				owner->GetStateMachine()->ChangeSubState(BATTLE_STATE::PURSUIT);
 			}
 		}
-
 		void AttackState::Exit()
+		{
+			owner->DeleteAttackCollider(mouseAttack.idx);
+			owner->OffSuperArmor();
+		}
+
+		/**************************************************************************//**
+			@brief	ダメージステート
+		*//***************************************************************************/
+		void HurtState::Enter()
+		{
+			owner->SetAnimation(MouseMob::ANIMATION::ANIM_DAMAGE, false, 0.1f);
+		}
+		void HurtState::Execute(float elapsedTime)
+		{
+			if (!owner->IsPlayAnimation())
+			{
+				StateTransition(owner, mouseMob::BATTLE);
+			}
+		}
+		void HurtState::Exit()
+		{
+		}
+		
+		/**************************************************************************//**
+			@brief	死亡ステート
+		*//***************************************************************************/
+		void DeathState::Enter()
+		{
+			EnemyState::DeathState::Enter();
+			owner->SetAnimation(MouseMob::ANIMATION::ANIM_DIE, false, 0.1f);
+		}
+		void DeathState::Execute(float elapsedTime)
+		{
+			EnemyState::DeathState::Execute(elapsedTime);
+		}
+		void DeathState::Exit()
 		{
 		}
 	}

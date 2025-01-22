@@ -20,6 +20,12 @@ public:
 		HitResult& result
 	) override;
 
+	bool CollisionVsCapsule(
+		CapsuleCollider* other,
+		DirectX::XMFLOAT3& direction,
+		HitResult& result
+	) override;
+
 	bool CollisionVsMap() override;
 
 	bool RayCast(

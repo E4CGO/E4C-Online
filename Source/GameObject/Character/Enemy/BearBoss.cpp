@@ -30,6 +30,8 @@ BearBoss::BearBoss(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("
 	SetCollider(COLLIDER_ID::COL_LEFT_HAND, { {0, 0, 0}, {1, 0, 0}, 2.0f, 1.4f }, Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("JOT_L_Elbow")->worldTransform);
 	SetCollider(COLLIDER_ID::COL_RIGHT_HAND, { {0, 0, 0}, {-1, 0, 0}, 2.0f, 1.4f }, Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("JOT_R_Elbow")->worldTransform);
 
+	OnSuperArmor();
+
 	{
 		using namespace EnemyState::BearBoss;
 		stateMachine->RegisterState(Enemy::STATE::IDLE, new EnemyState::BearBoss::IdleState(this));

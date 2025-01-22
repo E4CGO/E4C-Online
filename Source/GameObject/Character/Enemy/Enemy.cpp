@@ -86,6 +86,7 @@ void Enemy::OnDamage(const uint16_t& damage)
 		hp -= damage;
 		if (hp > 0)
 		{
+			if (!superArmor)
 			EnemyState::StateTransition(this, STATE::HURT);
 		}
 		else

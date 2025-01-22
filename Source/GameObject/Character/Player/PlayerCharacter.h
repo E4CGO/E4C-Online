@@ -246,7 +246,8 @@ public:
 	bool IsPlayer() { return GAME_DATA.GetClientId() == m_client_id; };
 
 	// ダメージコールバック
-	virtual void OnDamage(const HitResult& hit, int damage);
+	//virtual void OnDamage(const HitResult& hit, int damage);
+	virtual void OnDamage(const uint16_t& damage) override;
 
 	// ターゲットを取得
 	DirectX::XMFLOAT3 GetTarget() { return target; }
