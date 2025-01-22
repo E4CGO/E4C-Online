@@ -58,6 +58,9 @@ void SceneGame_E4C::Initialize()
 
 	UI.Register(new WidgetCrosshair);
 	UI.Register(new WidgetCharacterName);
+
+	// STAGE初期化
+	STAGES.Update(0);
 }
 
 void SceneGame_E4C::Finalize()

@@ -10,7 +10,7 @@ namespace PlayerCharacterState
 {
 	namespace Sword
 	{
-		enum NORMAL_ATTACK_STATE {
+		enum  NORMAL_ATTACK_STATE {
 			ATTACK_1,
 			ATTACK_2,
 			ATTACK_3,

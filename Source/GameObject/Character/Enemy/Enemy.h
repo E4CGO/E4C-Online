@@ -31,6 +31,9 @@ enum ENEMY_TYPE : uint8_t
 
 	MOUSE,									// ネズミ
 	BEAR_BOSS,								// 熊ボス
+	BIRD,									// 鳥
+	PIG,									// 豚
+	CROC,									// 鰐
 	END,
 };
 
@@ -103,6 +106,7 @@ public:
 	void SetRandomMoveTargetPosition();
 	bool SearchPlayer();
 
+	void SetSearchRange(const float range) { m_SearchRange = range; m_SearchRangeSq = range * range; }
 	const float GetSearchRange() const { return m_SearchRange; }
 
 	DirectX::XMFLOAT3 GetTargetPosition() { return m_TargetPosition; }
@@ -163,6 +167,7 @@ protected:
 
 	DirectX::XMFLOAT3 m_SpawnPosition;
 	float m_SearchRange;
+	float m_SearchRangeSq;
 	float m_AttackRange;
 
 	StateMachine<Enemy>* stateMachine;

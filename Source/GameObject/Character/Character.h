@@ -38,12 +38,21 @@ public:
 		while (angle.y > DirectX::XM_PI) angle.y -= DirectX::XM_2PI;
 		while (angle.y < -DirectX::XM_PI) angle.y += DirectX::XM_2PI;
 	}
+	// 跳躍
+	void Jump(float speed);
+	// ベクトルを与える
+	void AddImpulse(const DirectX::XMFLOAT3& impulse)
+	{
+		velocity.x += impulse.x;
+		velocity.y += impulse.y;
+		velocity.z += impulse.z;
+	}
+
+	// 視界に存在
+	bool InSight(const DirectX::XMFLOAT3 point, float angle = 60.0f);
 protected:
 	// 移動
 	void Move(float vx, float vz, float speed);
-	// 跳躍
-	void Jump(float speed);
-
 	// 速力
 	virtual void UpdateVelocity(float elapsedTime);
 	// 垂直速力更新処理
@@ -62,14 +71,6 @@ protected:
 	// 壁衝突コールバック
 	virtual void OnWall() {};
 public:
-	// ベクトルを与える
-	void AddImpulse(const DirectX::XMFLOAT3& impulse)
-	{
-		velocity.x += impulse.x;
-		velocity.y += impulse.y;
-		velocity.z += impulse.z;
-	}
-
 	// アクセサ
 	// 位置取得
 	const DirectX::XMFLOAT3& GetPosition() const { return position; }
@@ -107,10 +108,17 @@ public:
 
 	// 被ダメージコールバック
 	virtual void OnDamage(const uint16_t& damage) { hp -= damage; }
+	
+	// スーパーアーマー
+	bool GetSuperArmorFlag() { return superArmor; }
+	void OnSuperArmor() { superArmor = true; }
+	void OffSuperArmor() { superArmor = false; }
 
 	//物理計算フラグ
 	void SetKinematic(bool value) { this->isKinematic = value; }
 
+	const float GetGravity() const { return gravity;  }
+	void SetGravity(float gravity) { this->gravity = gravity; }
 protected:
 	// レイキャスト用
 	float stepOffset = 0.5f;						// ステップ高さ
@@ -131,6 +139,7 @@ protected:
 	float airControl = 0.1f;						// 空気抵抗
 
 	float hurtCoolTime = 0.0f;						// 無敵時間
+	bool superArmor = false;						// スーパーアーマーフラグ
 
 	bool isKinematic = false;
 
