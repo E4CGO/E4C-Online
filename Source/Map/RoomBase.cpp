@@ -142,65 +142,19 @@ void RoomBase::UpdateTransform()
 	}
 }
 
-DirectX::XMFLOAT3 RoomBase::GetCenterPos()
-{
-	DirectX::XMFLOAT3 placePos = DungeonData::Instance().GetRoomGenerateSetting(roomType).portalPosition;
-
-	float degree = DirectX::XMConvertToDegrees(m_angle.y);
-
-	// 360度以内に丸める
-	while (degree >= 360.0f) degree -= 360.0f;
-	while (degree < 0.0f) degree += 360.0f;
-
-	// 角度によって補正を行う
-	// 90度か270度ならxとzを逆転させる
-	if ((degree > 89.9f && degree < 90.1f) || (degree > 269.9f && degree < 270.1f))
-	{
-		DirectX::XMFLOAT3 buf = placePos;
-		placePos.x = placePos.z;
-		placePos.z = buf.x;
-	}
-
-	// 90度
-	if (degree > 89.9f && degree < 90.1f)
-	{
-	}
-
-	// 180度
-	if (degree > 179.9f && degree < 180.1f)
-	{
-		// 位置補正
-		//placePos += tileScale;
-
-		// zを反転
-		placePos.z = -placePos.z;
-	}
-
-	// 270度
-	if (degree > 269.9f && degree < 270.1f)
-	{
-		// xを反転
-		placePos.x = -placePos.x;
-
-		// 位置補正
-		//placePos.x += tileScale;
-	}
-	return m_position + placePos;
-}
-
 void RoomBase::GenerateNextRoomAutomatically(
 	std::vector<AABB>& roomAABBs,
 	bool& isLastRoomGenerated)
 {
 	// 自身のAABBを算出
-	m_aabb = CalcAABB(DUNGEONDATA.GetRoomGenerateSetting(roomType).aabb,
+	m_aabb = CalcAABB(DUNGEONDATA.GetRoomGenSetting(roomType).aabb,
 		m_position, DirectX::XMConvertToDegrees(m_angle.y));
 
 	// 最後の部屋が既に生成されているなら通常の生成を行う
 	if (isLastRoomGenerated)
 	{
 		// 最大深度が設定値より浅いなら次の部屋を生成する
-		if (depth < DUNGEONDATA.GetDungeonGenerateSetting().maxDepth)
+		if (depth < DUNGEONDATA.GetCurrentFloorGenSetting().maxDepth)
 		{
 			// 配置時に他の部屋と重ならない部屋のみを配列に保存する
 			std::vector<std::vector<RoomType>> placeableRooms;
@@ -209,10 +163,10 @@ void RoomBase::GenerateNextRoomAutomatically(
 			// 接続点の数だけ当たり判定を行い、生成を行う
 			for (int i = 0; i < m_connectPointDatas.size(); i++)
 			{
-				for (RoomType type : DUNGEONDATA.GetRoomGenerateSetting(roomType).placementCandidates)
+				for (RoomType type : DUNGEONDATA.GetRoomGenSetting(roomType).placementCandidates)
 				{
 					// 新規生成する子のAABBを算出
-					AABB nextAABB = CalcAABB(DUNGEONDATA.GetRoomGenerateSetting(type).aabb,
+					AABB nextAABB = CalcAABB(DUNGEONDATA.GetRoomGenSetting(type).aabb,
 						m_connectPointDatas.at(i).position, DirectX::XMConvertToDegrees(m_connectPointDatas.at(i).angle.y));
 
 					// 新規生成する子のAABBと他のAABB（この部屋のAABBは除く）との衝突判定を行う
@@ -268,13 +222,13 @@ void RoomBase::GenerateNextRoomAutomatically(
 					int totalWeight = 0;
 					for (RoomType type : placeableRooms.at(i))
 					{
-						totalWeight += DUNGEONDATA.GetRoomGenerateSetting(type).weight;
+						totalWeight += DUNGEONDATA.GetRoomGenSetting(type).weight;
 					}
 
 					int randomValue = std::rand() % totalWeight;
 					for (RoomType type : placeableRooms.at(i))
 					{
-						randomValue -= DUNGEONDATA.GetRoomGenerateSetting(type).weight;
+						randomValue -= DUNGEONDATA.GetRoomGenSetting(type).weight;
 
 						if (randomValue < 0)
 						{
@@ -310,7 +264,7 @@ void RoomBase::GenerateNextRoomAutomatically(
 	else
 	{
 		// 最大深度が設定値より浅いなら次の部屋を生成する
-		if (depth < DUNGEONDATA.GetDungeonGenerateSetting().maxDepth)
+		if (depth < DUNGEONDATA.GetCurrentFloorGenSetting().maxDepth)
 		{
 			// 配置時に他の部屋と重ならず、
 			// 接続点の先に最後の部屋を生成できるスペースがある部屋を配列に保存する
@@ -322,10 +276,10 @@ void RoomBase::GenerateNextRoomAutomatically(
 			{
 				if (!isLastRoomGenerated)
 				{
-					for (RoomType type : DUNGEONDATA.GetRoomGenerateSetting(roomType).placementCandidates)
+					for (RoomType type : DUNGEONDATA.GetRoomGenSetting(roomType).placementCandidates)
 					{
 						// 子のAABBを算出
-						AABB nextAABB = CalcAABB(DUNGEONDATA.GetRoomGenerateSetting(type).aabb,
+						AABB nextAABB = CalcAABB(DUNGEONDATA.GetRoomGenSetting(type).aabb,
 							m_connectPointDatas.at(i).position, DirectX::XMConvertToDegrees(m_connectPointDatas.at(i).angle.y));
 
 						// 子のAABBと他のAABB（自分のAABBは除く）との衝突判定を行う
@@ -420,10 +374,10 @@ void RoomBase::GenerateNextRoomAutomatically(
 				}
 				else
 				{
-					for (RoomType type : DUNGEONDATA.GetRoomGenerateSetting(roomType).placementCandidates)
+					for (RoomType type : DUNGEONDATA.GetRoomGenSetting(roomType).placementCandidates)
 					{
 						// 新規生成する子のAABBを算出
-						AABB nextAABB = CalcAABB(DUNGEONDATA.GetRoomGenerateSetting(type).aabb,
+						AABB nextAABB = CalcAABB(DUNGEONDATA.GetRoomGenSetting(type).aabb,
 							m_connectPointDatas.at(i).position, DirectX::XMConvertToDegrees(m_connectPointDatas.at(i).angle.y));
 
 						// 新規生成する子のAABBと他のAABB（この部屋のAABBは除く）との衝突判定を行う
@@ -480,13 +434,13 @@ void RoomBase::GenerateNextRoomAutomatically(
 					int totalWeight = 0;
 					for (RoomType type : placeableRooms.at(i))
 					{
-						totalWeight += DUNGEONDATA.GetRoomGenerateSetting(type).weight;
+						totalWeight += DUNGEONDATA.GetRoomGenSetting(type).weight;
 					}
 
 					int randomValue = std::rand() % totalWeight;
 					for (RoomType type : placeableRooms.at(i))
 					{
-						randomValue -= DUNGEONDATA.GetRoomGenerateSetting(type).weight;
+						randomValue -= DUNGEONDATA.GetRoomGenSetting(type).weight;
 
 						if (randomValue < 0)
 						{
@@ -534,7 +488,7 @@ void RoomBase::GenerateNextRoomFromOrder(
 	int& orderIndex)
 {
 	// 自身のAABBを算出
-	m_aabb = CalcAABB(DUNGEONDATA.GetRoomGenerateSetting(roomType).aabb,
+	m_aabb = CalcAABB(DUNGEONDATA.GetRoomGenSetting(roomType).aabb,
 		m_position, DirectX::XMConvertToDegrees(m_angle.y));
 
 	// AABB配列に保存
@@ -950,15 +904,6 @@ void RoomBase::PlaceTeleporterTile(Stage* stage, Online::OnlineController* onlin
 int RoomBase::DrawDebugGUI(int i)
 {
 	std::string nameStr = "";
-
-	switch (roomType)
-	{
-	case RoomType::SIMPLE_ROOM_1:	nameStr = "SimpleRoom1";	break;
-	case RoomType::END_ROOM:		nameStr = "EndRoom";		break;
-	case RoomType::CROSS_ROOM_1:	nameStr = "CrossRoom1";		break;
-	case RoomType::PASSAGE_1:		nameStr = "Passage1";		break;
-	case RoomType::DEAD_END:		nameStr = "DeadEnd";		break;
-	}
 
 	if (ImGui::TreeNode((nameStr + "(" + std::to_string(i) + ")").c_str()))
 	{

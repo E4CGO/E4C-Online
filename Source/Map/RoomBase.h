@@ -85,7 +85,6 @@ public:
 	void UpdateTransform();
 
 	DirectX::XMFLOAT3 GetPosition() { return m_position; }
-	DirectX::XMFLOAT3 GetCenterPos();
 	DirectX::XMFLOAT3 GetAngle() { return m_angle; }
 	DirectX::XMFLOAT3 GetScale() { return m_scale; }
 
@@ -255,7 +254,7 @@ protected:
 	int depth = 0;
 	AABB m_aabb = {};		// 当たり判定
 
-	RoomType roomType = RoomType::END_ROOM;
+	RoomType roomType = RoomType::DEAD_END;
 
 	RoomBase* parent = nullptr;		// 親
 	std::vector<RoomBase*> childs;	// 子

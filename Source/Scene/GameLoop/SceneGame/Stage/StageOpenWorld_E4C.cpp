@@ -171,9 +171,9 @@ void StageOpenWorld_E4C::Initialize()
 	Sound::Instance().LoadAudio("Data/Sound/3-Dreamland(Overworld).mp3");
 	Sound::Instance().PlayAudio(0);
 
-	// ダンジョンの生成設定の初期化
-	// 現在の階などを先にリセットしておく
-	DUNGEONDATA.InitDungeonGenerateSetting();
+	// ダンジョンの階の再設定
+	// 1階から始める
+	DUNGEONDATA.SetCurrentFloor(1);
 
 	// 影初期化
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
