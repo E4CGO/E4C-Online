@@ -133,91 +133,91 @@ void Light::DrawDebugGUI()
 //***********************************************************
 void Light::DrawDebugPrimitive()
 {
-	DebugRenderer* debugRenderer = Graphics::Instance().GetDebugRenderer();
-	LineRenderer* lineRenderer = Graphics::Instance().GetLineRenderer();
+	//DebugRenderer* debugRenderer = Graphics::Instance().GetDebugRenderer();
+	//LineRenderer* lineRenderer = Graphics::Instance().GetLineRenderer();
 
-	switch (lightType)
-	{
-	case LightType::Directional:
-	{
-		//	平行光源は表示しない。
-		break;
-	}
-	case LightType::Point:
-	{
-		//	点光源は全方位に光を放射する光源なので球体を描画する。
-		if (Graphics::Instance().isDX11Active) debugRenderer->SetSphere(position, range, color);
-		else
-		{
-			// レンダーコンテキスト設定
-			RenderContextDX12 rc;
-			rc.d3d_command_list = Graphics::Instance().GetFrameBufferManager()->GetCommandList();
+	//switch (lightType)
+	//{
+	//case LightType::Directional:
+	//{
+	//	//	平行光源は表示しない。
+	//	break;
+	//}
+	//case LightType::Point:
+	//{
+	//	//	点光源は全方位に光を放射する光源なので球体を描画する。
+	//	if (Graphics::Instance().isDX11Active) debugRenderer->SetSphere(position, range, color);
+	//	else
+	//	{
+	//		// レンダーコンテキスト設定
+	//		RenderContextDX12 rc;
+	//		rc.d3d_command_list = Graphics::Instance().GetFrameBufferManager()->GetCommandList();
 
-			// 描画
-			m_sphere->SetSphere(position, range, color);
-			m_sphere->Render(rc);
-		}
+	//		// 描画
+	//		m_sphere->SetSphere(position, range, color);
+	//		m_sphere->Render(rc);
+	//	}
 
-		break;
-	}
-	case LightType::Spot:
-	{
-		DirectX::XMVECTOR	Direction = DirectX::XMLoadFloat3(&direction);
-		float len;
-		DirectX::XMStoreFloat(&len, DirectX::XMVector3Length(Direction));
-		if (len <= 0.00001f)
-			break;
-		Direction = DirectX::XMVector3Normalize(Direction);
-		//	軸算出
-		DirectX::XMFLOAT3 dir;
-		DirectX::XMStoreFloat3(&dir, Direction);
-		DirectX::XMVECTOR Work = fabs(dir.y) == 1 ? DirectX::XMVectorSet(1, 0, 0, 0)
-			: DirectX::XMVectorSet(0, 1, 0, 0);
-		DirectX::XMVECTOR	XAxis = DirectX::XMVector3Cross(Direction, Work);
-		DirectX::XMVECTOR	YAxis = DirectX::XMVector3Cross(XAxis, Direction);
-		XAxis = DirectX::XMVector3Cross(Direction, YAxis);
+	//	break;
+	//}
+	//case LightType::Spot:
+	//{
+	//	DirectX::XMVECTOR	Direction = DirectX::XMLoadFloat3(&direction);
+	//	float len;
+	//	DirectX::XMStoreFloat(&len, DirectX::XMVector3Length(Direction));
+	//	if (len <= 0.00001f)
+	//		break;
+	//	Direction = DirectX::XMVector3Normalize(Direction);
+	//	//	軸算出
+	//	DirectX::XMFLOAT3 dir;
+	//	DirectX::XMStoreFloat3(&dir, Direction);
+	//	DirectX::XMVECTOR Work = fabs(dir.y) == 1 ? DirectX::XMVectorSet(1, 0, 0, 0)
+	//		: DirectX::XMVectorSet(0, 1, 0, 0);
+	//	DirectX::XMVECTOR	XAxis = DirectX::XMVector3Cross(Direction, Work);
+	//	DirectX::XMVECTOR	YAxis = DirectX::XMVector3Cross(XAxis, Direction);
+	//	XAxis = DirectX::XMVector3Cross(Direction, YAxis);
 
-		static constexpr int SplitCount = 16;
-		for (int u = 0; u < SplitCount; u++)
-		{
-			float s = static_cast<float>(u) / static_cast<float>(SplitCount);
-			float r = -DirectX::XM_PI + DirectX::XM_2PI * s;
-			// 回転行列算出
-			DirectX::XMMATRIX	RotationZ = DirectX::XMMatrixRotationAxis(Direction, r);
-			// 線を算出
-			DirectX::XMFLOAT3	OldPoint;
-			{
-				DirectX::XMVECTOR	Point = Direction;
-				DirectX::XMMATRIX	Rotation = DirectX::XMMatrixRotationAxis(XAxis, acosf(outerCorn))
-					* RotationZ;
-				Point = DirectX::XMVectorMultiply(Point, DirectX::XMVectorSet(range, range, range, 0));
-				Point = DirectX::XMVector3TransformCoord(Point, Rotation);
-				Point = DirectX::XMVectorAdd(Point, DirectX::XMLoadFloat3(&position));
-				DirectX::XMFLOAT3	pos;
-				DirectX::XMStoreFloat3(&pos, Point);
-				lineRenderer->AddVertex(position, color);
-				lineRenderer->AddVertex(pos, color);
-				OldPoint = pos;
-			}
-			// 球面を算出
-			for (int v = 0; v <= SplitCount; ++v)
-			{
-				float s = static_cast<float>(v) / static_cast<float>(SplitCount);
-				float a = outerCorn + (1.0f - outerCorn) * s;
-				DirectX::XMVECTOR	Point = Direction;
-				DirectX::XMMATRIX	Rotation = DirectX::XMMatrixRotationAxis(XAxis, acosf(a))
-					* RotationZ;
-				Point = DirectX::XMVectorMultiply(Point, DirectX::XMVectorSet(range, range, range, 0));
-				Point = DirectX::XMVector3TransformCoord(Point, Rotation);
-				Point = DirectX::XMVectorAdd(Point, DirectX::XMLoadFloat3(&position));
-				DirectX::XMFLOAT3	pos;
-				DirectX::XMStoreFloat3(&pos, Point);
-				lineRenderer->AddVertex(OldPoint, color);
-				lineRenderer->AddVertex(pos, color);
-				OldPoint = pos;
-			}
-		}
-		break;
-	}
-	}
+	//	static constexpr int SplitCount = 16;
+	//	for (int u = 0; u < SplitCount; u++)
+	//	{
+	//		float s = static_cast<float>(u) / static_cast<float>(SplitCount);
+	//		float r = -DirectX::XM_PI + DirectX::XM_2PI * s;
+	//		// 回転行列算出
+	//		DirectX::XMMATRIX	RotationZ = DirectX::XMMatrixRotationAxis(Direction, r);
+	//		// 線を算出
+	//		DirectX::XMFLOAT3	OldPoint;
+	//		{
+	//			DirectX::XMVECTOR	Point = Direction;
+	//			DirectX::XMMATRIX	Rotation = DirectX::XMMatrixRotationAxis(XAxis, acosf(outerCorn))
+	//				* RotationZ;
+	//			Point = DirectX::XMVectorMultiply(Point, DirectX::XMVectorSet(range, range, range, 0));
+	//			Point = DirectX::XMVector3TransformCoord(Point, Rotation);
+	//			Point = DirectX::XMVectorAdd(Point, DirectX::XMLoadFloat3(&position));
+	//			DirectX::XMFLOAT3	pos;
+	//			DirectX::XMStoreFloat3(&pos, Point);
+	//			lineRenderer->AddVertex(position, color);
+	//			lineRenderer->AddVertex(pos, color);
+	//			OldPoint = pos;
+	//		}
+	//		// 球面を算出
+	//		for (int v = 0; v <= SplitCount; ++v)
+	//		{
+	//			float s = static_cast<float>(v) / static_cast<float>(SplitCount);
+	//			float a = outerCorn + (1.0f - outerCorn) * s;
+	//			DirectX::XMVECTOR	Point = Direction;
+	//			DirectX::XMMATRIX	Rotation = DirectX::XMMatrixRotationAxis(XAxis, acosf(a))
+	//				* RotationZ;
+	//			Point = DirectX::XMVectorMultiply(Point, DirectX::XMVectorSet(range, range, range, 0));
+	//			Point = DirectX::XMVector3TransformCoord(Point, Rotation);
+	//			Point = DirectX::XMVectorAdd(Point, DirectX::XMLoadFloat3(&position));
+	//			DirectX::XMFLOAT3	pos;
+	//			DirectX::XMStoreFloat3(&pos, Point);
+	//			lineRenderer->AddVertex(OldPoint, color);
+	//			lineRenderer->AddVertex(pos, color);
+	//			OldPoint = pos;
+	//		}
+	//	}
+	//	break;
+	//}
+	//}
 }
