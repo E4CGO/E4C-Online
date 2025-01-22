@@ -233,6 +233,15 @@ public:
 
 	float GetMpCost(int idx);
 
+
+	//剣ノード取得
+	const iModel::Node* GetSwordTrailNode();
+
+
+	void SwordTrail();
+	bool IsTrail() { return m_isTrail; }
+	void SetTrail(bool trail) { trail=m_isTrail; }
+
 	// 自機判定
 	bool IsPlayer() { return GAME_DATA.GetClientId() == m_client_id; };
 
@@ -343,6 +352,12 @@ protected:
 		uint32_t old_sync_count = 0;
 		SYNC_DATA sync_data = {};
 	} m_tempData;
+
+	//ポリゴンの最大数
+	static const int MAX_POLYGON = 12;
+	DirectX::XMFLOAT3 trailPosition[2][MAX_POLYGON];
+
+	bool m_isTrail = false;
 };
 
 #endif // __INCLUDED_PLAYER_CHARACTER_H__

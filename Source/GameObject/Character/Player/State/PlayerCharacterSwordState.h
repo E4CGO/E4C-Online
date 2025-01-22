@@ -10,14 +10,7 @@ namespace PlayerCharacterState
 {
 	namespace Sword
 	{
-
-
-		
-		extern int  skill1UseStamina ;
-		extern int  skill2UseStamina ;
-		
-		
-		enum NORMAL_ATTACK_STATE {
+		enum  NORMAL_ATTACK_STATE {
 			ATTACK_1,
 			ATTACK_2,
 			ATTACK_3,
