@@ -20,7 +20,7 @@ MouseMob::MouseMob(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("
 	atk = 10;
 	moveSpeed = 2.0f;
 	turnSpeed = DirectX::XMConvertToRadians(180);
-	m_SearchRange = 24.0f;
+	SetSearchRange(24.0f);
 	m_AttackRange = 1.25f;
 
 	// 当たり判定
