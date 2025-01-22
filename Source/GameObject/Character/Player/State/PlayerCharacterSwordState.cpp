@@ -4,6 +4,7 @@
 #include "PlayerCharacterSwordState.h"
 #include "PlayerCharacterState.h"
 
+
 namespace PlayerCharacterState
 {
 	namespace Sword
@@ -14,6 +15,9 @@ namespace PlayerCharacterState
 		{30, PlayerCharacter::COLLIDER_ID::COL_ATTACK_3, Collider::COLLIDER_OBJ::PLAYER_ATTACK, Collider::COLLIDER_OBJ::ENEMY, 0.08f, 0.45f, {{0, 0, 0} , 1.5f}},
 		{30, PlayerCharacter::COLLIDER_ID::COL_SKILL_1, Collider::COLLIDER_OBJ::PLAYER_ATTACK, Collider::COLLIDER_OBJ::ENEMY, 0.08f, 0.45f, {{0, 0, 0} , 1.5f}}
 		};
+
+		int skill1UseStamina = 30; // ここで変数を定義
+		int skill2UseStamina = 50; // ここで変数を定義
 
 		// 待機用ステート
 		void WaitState::Enter()
@@ -40,10 +44,23 @@ namespace PlayerCharacterState
 			owner->InputMove(elapsedTime);
 			owner->Jump();
 
-			PlayerTransition(
-				owner,
-				flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2
-			);
+			if (owner->GetMp() > skill2UseStamina)
+			{
+				PlayerTransition(owner,
+					flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2);
+			}
+			else if (owner->GetMp() >skill1UseStamina)
+			{
+				PlayerTransition(owner,
+					flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1);
+			}
+			else
+			{
+				PlayerTransition(owner,
+                flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS);
+			}
+
+
 		}
 
 		void IdleState::Exit()
@@ -63,10 +80,23 @@ namespace PlayerCharacterState
 			owner->InputMove(elapsedTime);
 			owner->Jump();
 
-			PlayerTransition(
-				owner,
-				flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2
-			);
+			if (owner->GetMp() >skill2UseStamina)
+			{
+				PlayerTransition(owner,
+					flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2);
+			}
+			else if (owner->GetMp() >skill1UseStamina)
+			{
+				PlayerTransition(
+					owner,
+					flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1);
+			}
+			else
+			{
+				PlayerTransition(
+					owner,
+					flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_AttackN | flag_AttackS);
+			}
 		}
 
 		void MoveState::Exit()
@@ -151,11 +181,11 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
 					}
-					else if (owner->InputSkill1())
+					else if (owner->InputSkill1() && owner->GetMp() > skill1UseStamina)
 					{
 						owner->GetStateMachine()->ChangeState(SKILL_1_STATE::ATTACK_START);
 					}
-					else if (owner->InputSkill2())
+					else if (owner->InputSkill2()&& owner->GetMp() > skill2UseStamina)
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
 					}
@@ -226,11 +256,11 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
 					}
-					else if (owner->InputSkill1())
+					else if (owner->InputSkill1() && owner->GetMp() > skill1UseStamina)
 					{
 						owner->GetStateMachine()->ChangeState(SKILL_1_STATE::ATTACK_START);
 					}
-					else if (owner->InputSkill2())
+					else if (owner->InputSkill2() && owner->GetMp() > skill2UseStamina)
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
 					}
@@ -299,11 +329,11 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
 					}
-					else if (owner->InputSkill1())
+					else if (owner->InputSkill1() && owner->GetMp() > skill1UseStamina)
 					{
 						owner->GetStateMachine()->ChangeState(SKILL_1_STATE::ATTACK_START);
 					}
-					else if (owner->InputSkill2())
+					else if (owner->InputSkill2() && owner->GetMp() > skill2UseStamina)
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
 					}
@@ -377,9 +407,12 @@ namespace PlayerCharacterState
 				attackData.hitEndRate = sphereAttacks[3].hitEndRate;
 				owner->MakeAttackCollider(attackData, sphereAttacks[3].sphere, matrix);
 			}
+			float mp = owner->GetMp();
+			owner->SetCurrentMp(mp -= Sword::skill1UseStamina);
 		}
 		void Skill1ContinueStart::Execute(float elapsedTime)
 		{
+			
 			if (owner->IsPlayer())
 			{
 				owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_SKILL_1)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
@@ -416,6 +449,9 @@ namespace PlayerCharacterState
 		void Skill2State::Enter()
 		{
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_SPECIAL_SECOND, false, 0.1f);
+
+			float mp = owner->GetMp();
+			owner->SetCurrentMp(mp -= skill2UseStamina);
 		}
 		void Skill2State::Execute(float elapsedTime)
 		{
