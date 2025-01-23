@@ -212,13 +212,6 @@ protected:
 	Microsoft::WRL::ComPtr<ID3D12RootSignature>		m_d3d_root_signature;
 
 	SamplerManager* m_sampler = nullptr;
-
-	Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cbv_resource;
-	const Descriptor* cbv_descriptor = nullptr;
-	DirectX::XMFLOAT4X4 worldmatrix = DirectX::XMFLOAT4X4(1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1);
 };
 
 /**************************************************************************//**
