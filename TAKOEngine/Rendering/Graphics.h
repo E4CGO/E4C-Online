@@ -219,7 +219,7 @@ public:
 	DebugRenderer* GetDebugRenderer() const { return debugRenderer.get(); }
 	// ラインレンダラ取得
 	LineRenderer* GetLineRenderer() const { return lineRenderer.get(); }
-
+	LineRendererDX12* GetLineRendererDX12() const { return dx12_lineRenderer.get(); }
 	//スキニング取得
 	SkinningPipeline* GetSkinningPipeline() const { return m_skinning_pipeline.get(); }
 
@@ -356,6 +356,7 @@ private:
 
 	std::unique_ptr<DebugRenderer>					debugRenderer;
 	std::unique_ptr<LineRenderer>					lineRenderer;
+	std::unique_ptr<LineRendererDX12>				dx12_lineRenderer;
 	//スキニング
 	std::unique_ptr<SkinningPipeline>	m_skinning_pipeline;
 

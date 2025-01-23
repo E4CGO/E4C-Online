@@ -113,6 +113,8 @@ void Graphics::FinishDX12()
 	{
 		dx12_modelshaders[i]->Finalize();
 	}
+
+	dx12_lineRenderer->Finalize();
 }
 
 //******************************************************************
@@ -610,6 +612,7 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 		// レンダラ
 		debugRenderer = std::make_unique<DebugRenderer>(device.Get());
 		lineRenderer = std::make_unique<LineRenderer>(device.Get(), 1024);
+		dx12_lineRenderer = std::make_unique<LineRendererDX12>(m_d3d_device.Get(), 1024);
 
 		// パーティクル
 		m_compute[static_cast<int>(ComputeShaderDX12Id::Injection)] = std::make_unique<ParticleCompute>(m_d3d_device.Get());

@@ -676,6 +676,7 @@ set(TAKOEngine__Rendering__HLSL__Debug
     "TAKOEngine/Rendering/HLSL/Debug/GizmosPS.hlsl"
     "TAKOEngine/Rendering/HLSL/Debug/GizmosVS.hlsl"
     "TAKOEngine/Rendering/HLSL/Debug/Line.hlsli"
+    "TAKOEngine/Rendering/HLSL/Debug/LineDX12VS.hlsl"
     "TAKOEngine/Rendering/HLSL/Debug/LinePS.hlsl"
     "TAKOEngine/Rendering/HLSL/Debug/LineVS.hlsl"
 )
@@ -934,6 +935,7 @@ set(SHADER_NAMES
     "DebugVS.cso"
     "GizmosPS.cso"
     "GizmosVS.cso"
+    "LineDX12VS.cso"
     "LinePS.cso"
     "LineVS.cso"
     "ChargeDX12PS.cso"
@@ -1031,6 +1033,7 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/DebugVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/GizmosPS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/GizmosVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/LineDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/LinePS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/LineVS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Effects/ChargeDX12PS.hlsl,5.0,Pixel,main"
