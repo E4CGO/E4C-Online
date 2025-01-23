@@ -58,6 +58,8 @@ void SceneGame_E4C::Initialize()
 
 	UI.Register(new WidgetCrosshair);
 	UI.Register(new WidgetCharacterName);
+
+	STAGES.Update(0);
 }
 
 void SceneGame_E4C::Finalize()
@@ -82,6 +84,7 @@ void SceneGame_E4C::Update(float elapsedTime)
 {
 	STAGES.Update(elapsedTime);
 	UI.Update(elapsedTime);
+	COLLISIONS.Contacts();
 	stateMachine->Update(elapsedTime);
 }
 

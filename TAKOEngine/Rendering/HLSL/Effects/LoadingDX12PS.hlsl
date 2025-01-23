@@ -1,4 +1,4 @@
-#include "Plane.hlsli"
+#include "../Primitives/PlaneDX12.hlsli"
 
 Texture2D spriteTexture : register(t0);
 SamplerState spriteSampler : register(s0);

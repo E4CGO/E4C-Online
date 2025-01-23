@@ -19,7 +19,7 @@ public:
 	HitParticleRenderer(DirectX::XMFLOAT3 pos);
 	~HitParticleRenderer();
 
-	void Render(FrameBufferManager* framBuffer);
+	void Render(const RenderContextDX12& rc);
 
 private:
 	void CreateConstantBuffer();

@@ -1,4 +1,4 @@
-#include "../Model/PhongDX12.hlsli"
+#include "../Primitives/PrimitiveDX12.hlsli"
 
 Texture2D texture0 : register(t0);
 Texture2D normalMap : register(t1);

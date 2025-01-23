@@ -8,6 +8,8 @@ namespace PlayerCharacterState
 {
 	namespace Rod
 	{
+		bool m_isShot = false;
+
 		// 待機用ステート
 		void WaitState::Enter()
 		{
@@ -69,6 +71,7 @@ namespace PlayerCharacterState
 		// 一般攻撃ステート
 		void AttackNormalState::Enter()
 		{
+			m_isShot = false;
 			owner->SetAnimationSpeed(1.f);
 
 			SetSubState(NORMAL_ATTACK_STATE::ATTACK_1);
@@ -101,6 +104,21 @@ namespace PlayerCharacterState
 			if (owner->IsPlayer())
 			{
 				float time = owner->GetModel()->GetCurrentAnimationSeconds();
+
+				if (0.3f <= time)
+				{
+					if (!m_isShot)
+					{
+						Projectile* arrow = PROJECTILES.Register(new FireballObject(owner));
+						arrow->SetPosition({ owner->GetShotPosition().x, owner->GetShotPosition().y * 2, owner->GetShotPosition().z });
+						arrow->PointTo(owner->GetShotPosition() + owner->GetFront());
+						arrow->SetDirection(owner->GetFront());
+						arrow->SetOwner(owner);
+
+						m_isShot = true;
+					}
+				}
+
 				if (0.95f <= time)
 				{
 					if (owner->InputAttackNormal())
@@ -218,6 +236,9 @@ namespace PlayerCharacterState
 			owner->SetAnimationSpeed(1.0f);
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_CHARGE_START, false, 0.05f);
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_CHARGE_CONTINUE, true);
+
+			m_particle = PROJECTILES.Register(new ParticleObject(owner));
+			m_particle->SetOwner(owner);
 		}
 		void AttackSpecialState::Execute(float elapsedTime)
 		{
@@ -232,6 +253,42 @@ namespace PlayerCharacterState
 		{
 			owner->SetAnimationSpeed(1.0f);
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_IDLE, false, 0.05f);
+			PROJECTILES.Remove(m_particle);
+		}
+
+		// スキル_1ステート
+		void Skill1State::Enter()
+		{
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_ATTACK_SPECIAL_FIRST, false, 0.1f);
+		}
+		void Skill1State::Execute(float elapsedTime)
+		{
+			float time = owner->GetModel()->GetCurrentAnimationSeconds();
+			// 反重力
+			owner->StopFall();
+			owner->StopMove();
+
+			if (!owner->IsPlayAnimation()) // 攻撃モーション終わり
+			{
+				owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
+			}
+		}
+
+		void Skill2State::Enter()
+		{
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_ATTACK_SPECIAL_SECOND, false, 0.1f);
+		}
+		void Skill2State::Execute(float elapsedTime)
+		{
+			float time = owner->GetModel()->GetCurrentAnimationSeconds();
+			// 反重力
+			owner->StopFall();
+			owner->StopMove();
+
+			if (!owner->IsPlayAnimation()) // 攻撃モーション終わり
+			{
+				owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
+			}
 		}
 	}
 }

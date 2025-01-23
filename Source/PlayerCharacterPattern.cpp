@@ -137,6 +137,8 @@ void PlayerCharacterPatternRod::Execute(PlayerCharacter* chara)
 		stateMachine->RegisterSubState(static_cast<int>(PlayerCharacter::STATE::ATTACK_NORMAL), ATTACK_3, new AttackNormalState_3(chara));
 
 		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::ATTACK_SPECIAL), new AttackSpecialState(chara));
+		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::SKILL_1), new Skill1State(chara));
+		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::SKILL_2), new Skill2State(chara));
 	}
 
 	chara->SetEnergyType(PlayerCharacter::ENERGY_TYPE::MANA);
