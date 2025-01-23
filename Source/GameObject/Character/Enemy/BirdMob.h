@@ -49,8 +49,6 @@ public:
 		COL_BODY,
 	};
 
-protected:
-	void UpdateTarget();
 };
 
 #endif // !__INCLUDE_BIRD_MOB_H__

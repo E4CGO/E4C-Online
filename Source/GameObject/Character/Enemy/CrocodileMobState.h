@@ -1,13 +1,14 @@
-﻿//! @file MouseMobState.h
-//! @note ネズミ敵ステート
+﻿//! @file CrocodileMobState.h
+//! @note 鰐敵ステート
 
-#ifndef __INCLUDED_MOUSE_MOB_STATE_H__
-#define __INCLUDED_MOUSE_MOB_STATE_H__
+#ifndef __INCLUDED_CROCODILE_MOB_STATE_H__
+#define __INCLUDED_CROCODILE_MOB_STATE_H__
 
-#include "MouseMob.h"
+#include "CrocodileMob.h"
+
 namespace EnemyState
 {
-	namespace MouseMob
+	namespace CrocodileMob
 	{
 		/**************************************************************************//**
 			@class	IdleState
@@ -48,27 +49,6 @@ namespace EnemyState
 		};
 
 		/**************************************************************************//**
-			@class	EncounterState
-			@brief	エンカウントステート
-			@par    [説明]
-				プレイヤーを発見したリアクションをとる
-		*//***************************************************************************/
-		class EncounterState : public HierarchicalState<Enemy>
-		{
-		public:
-			// コンストラクタ
-			EncounterState(Enemy* enemy) : HierarchicalState<Enemy>(enemy){};
-			// デストラクタ
-			~EncounterState() {}
-			// ステートに入った時のメソッド
-			virtual void Enter() override;
-			// ステートで実行するメソッド
-			void Execute(float elapsedTime) override;
-			// ステートから出ていくときのメソッド
-			void Exit() override {};
-		};
-
-		/**************************************************************************//**
 			@class	AttackState
 			@brief	攻撃ステート
 			@par    [説明]
@@ -88,10 +68,10 @@ namespace EnemyState
 			// ステートから出ていくときのメソッド
 			void Exit() override;
 
-			struct MOUSE_ATTACK
+			struct CROC_ATTACK
 			{
 				int power = 5;
-				uint8_t idx = ::MouseMob::COLLIDER_ID::COL_ATTACK;
+				uint8_t idx = ::CrocodileMob::COLLIDER_ID::COL_ATTACK;
 				Collider::COLLIDER_OBJ objType = Collider::COLLIDER_OBJ::ENEMY_ATTACK;
 				uint16_t hittableOBJ = Collider::COLLIDER_OBJ::PLAYER;
 				float hitStartRate = 7.0f / 17.0f;
@@ -100,7 +80,7 @@ namespace EnemyState
 			};
 
 		private:
-			MOUSE_ATTACK mouseAttack;
+			CROC_ATTACK crocodileAttack;
 		};
 
 		/**************************************************************************//**
@@ -139,4 +119,4 @@ namespace EnemyState
 	}
 }
 
-#endif //!__INCLUDED_MOUSE_MOB_STATE_H__
+#endif //!__INCLUDED_CROCODILE_MOB_STATE_H__
