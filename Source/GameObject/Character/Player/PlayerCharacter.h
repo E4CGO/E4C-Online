@@ -240,7 +240,7 @@ public:
 
 	void SwordTrail();
 	bool IsTrail() { return m_isTrail; }
-	void SetTrail(bool trail) { trail=m_isTrail; }
+	void SetTrail(bool trail) { m_isTrail = trail; }
 
 	// 自機判定
 	bool IsPlayer() { return GAME_DATA.GetClientId() == m_client_id; };
@@ -328,6 +328,8 @@ protected:
 	std::unordered_map<int, SkillTimer> skillTimer;
 
 	std::unique_ptr<SphereRenderer> m_sphere;
+
+	std::unique_ptr<SpriteDX12> m_swordSprite = std::make_unique<SpriteDX12>(1, "Data/Sprites/trail.png");
 protected:
 
 	static inline DirectX::XMFLOAT4 colorSet[COLOR_PATTERN::END] = {
