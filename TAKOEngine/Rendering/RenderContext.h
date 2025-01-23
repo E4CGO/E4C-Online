@@ -275,6 +275,9 @@ struct RenderContextDX12
 
 	// 影情報
 	ShadowMapDataDX12       shadowMap;
+
+	// 板のコンスタントバッファ
+	const Descriptor* plane_cbv_descriptor = nullptr;
 };
 
 #endif // !__INCLUDE_RENDER_CONTEXT_H__
