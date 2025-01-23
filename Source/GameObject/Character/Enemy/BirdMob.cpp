@@ -39,26 +39,3 @@ BirdMob::BirdMob(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("Da
 		stateMachine->RegisterState(STATE::ENCOUNTER, new EncounterState(this));
 	}
 }
-
-void BirdMob::UpdateTarget()
-{
-	PlayerCharacter* player = GetHighestHateClient();
-	if (player != nullptr)
-	{
-		m_target = player->GetClientId();
-	}
-	else
-	{
-		for (PlayerCharacter* player : PlayerCharacterManager::Instance().GetAll())
-		{
-			if (XMFLOAT3LengthSq(player->GetPosition() - position) <= m_SearchRangeSq)
-			{
-				if (InSight(player->GetPosition(), 60.0f))
-				{
-					AddHate(player->GetClientId(), 1);
-					m_target = player->GetClientId();
-				}
-			}
-		}
-	}
-}

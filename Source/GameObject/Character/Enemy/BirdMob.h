@@ -42,9 +42,6 @@ public:
 		ATTACK_DIVE,
 		ATTACK_LAND,
 	};
-
-protected:
-	void UpdateTarget();
 };
 
 #endif // !__INCLUDE_BIRD_MOB_H__

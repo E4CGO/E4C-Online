@@ -7,98 +7,8 @@
 #include "MouseMob.h"
 namespace EnemyState
 {
-	namespace mouseMob {
-		enum STATE
-		{
-			SEARCH = Enemy::STATE::END,
-			ENCOUNTER,
-			BATTLE,
-			RECIEVE,
-			STATE_END,
-		};
-
-		// 探索
-		enum SEARCH_STATE
-		{
-			WANDER = mouseMob::STATE::STATE_END,
-			IDLE,
-			SEARCH_STATE_END,
-		};
-
-		// 戦闘
-		enum BATTLE_STATE
-		{
-			PURSUIT = mouseMob::SEARCH_STATE::SEARCH_STATE_END,
-			ATTACK,
-			STANDBY,
-			BATTLE_STATE_END,
-		};
-
-		/**************************************************************************//**
-			@class	SearchState
-			@brief	探しステート
-			@par    [説明]
-				待機、移動管理
-		*//***************************************************************************/
-		class SearchState : public HierarchicalState<Enemy>
-		{
-		public:
-			// コンストラクタ
-			SearchState(Enemy* enemy) : HierarchicalState<Enemy>(enemy) {};
-			// デストラクタ
-			~SearchState() {}
-			// ステートに入った時のメソッド
-			virtual void Enter() override;
-			// ステートで実行するメソッド
-			void Execute(float elapsedTime) override;
-			// ステートから出ていくときのメソッド
-			void Exit() override;
-		};
-
-		/**************************************************************************//**
-			@class	BattleState
-			@brief	バトルステート
-			@par    [説明]
-				バトル管理
-		*//***************************************************************************/
-		class BattleState : public HierarchicalState<Enemy>
-		{
-		public:
-			// コンストラクタ
-			BattleState(Enemy* enemy) : HierarchicalState<Enemy>(enemy) {};
-			// デストラクタ
-			~BattleState() {}
-			// ステートに入った時のメソッド
-			virtual void Enter() override;
-			// ステートで実行するメソッド
-			void Execute(float elapsedTime) override;
-			// ステートから出ていくときのメソッド
-			void Exit() override;
-		};
-
-		/**************************************************************************//**
-			@class	WanderState
-			@brief	移動ステート
-			@par    [説明]
-				ランダム位置に移動
-		*//***************************************************************************/
-		class WanderState : public HierarchicalState<Enemy>
-		{
-		public:
-			// コンストラクタ
-			WanderState(Enemy* enemy, float arrivedRadius = 1.0f) : HierarchicalState<Enemy>(enemy), m_ArrivedRadius(arrivedRadius) {};
-			// デストラクタ
-			~WanderState() {}
-			// ステートに入った時のメソッド
-			virtual void Enter() override;
-			// ステートで実行するメソッド
-			void Execute(float elapsedTime) override;
-			// ステートから出ていくときのメソッド
-			void Exit() override;
-		private:
-			float m_ArrivedRadius = 1.0f;
-		};
-
+	namespace MouseMob
+	{
 		/**************************************************************************//**
 			@class	IdleState
 			@brief	待機ステート
@@ -118,8 +28,25 @@ namespace EnemyState
 			virtual void Enter() override;
 			// ステートで実行するメソッド
 			void Execute(float elapsedTime) override;
-			// ステートから出ていくときのメソッド
-			void Exit() override;
+		};
+
+		/**************************************************************************//**
+			@class	MoveState
+			@brief	徘徊ステート
+			@par    [説明]
+				徘徊
+		*//***************************************************************************/
+		class MoveState : public EnemyState::MoveState
+		{
+		public:
+			// コンストラクタ
+			MoveState(Enemy* enemy, int nextState = Enemy::STATE::IDLE) : EnemyState::MoveState(enemy, nextState) {};
+			// デストラクタ
+			~MoveState() {}
+			// ステートに入った時のメソッド
+			void Enter() override;
+			// ステートで実行するメソッド
+			void Execute(float elapsedTime) override;
 		};
 
 		/**************************************************************************//**
@@ -140,40 +67,7 @@ namespace EnemyState
 			// ステートで実行するメソッド
 			void Execute(float elapsedTime) override;
 			// ステートから出ていくときのメソッド
-			void Exit() override;
-		};
-
-		/**************************************************************************//**
-			@class	PursuitState
-			@brief	プレイヤーを追いかけるステート
-			@par    [説明]
-				プレイヤーに近ずき攻撃を準備
-		*//***************************************************************************/
-		class PursuitState : public HierarchicalState<Enemy>
-		{
-		public:
-			// コンストラクタ
-			PursuitState(Enemy* enemy,
-				float AttackCooldown = 2.0f, float attackRange = 1.25f,
-				float minWaitingTime = 3.0f, float maxWaitingTime = 5.0f
-			) : HierarchicalState<Enemy>(enemy), m_AttackCooldown(AttackCooldown), m_AttackRange(attackRange),
-				m_MinWaitingTime(minWaitingTime), m_MaxWaitingTime(maxWaitingTime) {
-			};
-			// デストラクタ
-			~PursuitState() {}
-			// ステートに入った時のメソッド
-			virtual void Enter() override;
-			// ステートで実行するメソッド
-			void Execute(float elapsedTime) override;
-			// ステートから出ていくときのメソッド
-			void Exit() override;
-		private:
-			float m_AttackCooldown;
-			float m_AttackTimer;
-			float m_AttackRange;
-			float m_StateTimer;
-			float m_MinWaitingTime;
-			float m_MaxWaitingTime;
+			void Exit() override {};
 		};
 
 		/**************************************************************************//**
@@ -186,7 +80,7 @@ namespace EnemyState
 		{
 		public:
 			// コンストラクタ
-			AttackState(Enemy* enemy, float waitTimer = .5f) : HierarchicalState<Enemy>(enemy), m_WaitTimer(waitTimer) {};
+			AttackState(Enemy* enemy) : HierarchicalState<Enemy>(enemy) {};
 			// デストラクタ
 			~AttackState() {}
 			// ステートに入った時のメソッド
@@ -199,7 +93,7 @@ namespace EnemyState
 			struct MOUSE_ATTACK
 			{
 				int power = 5;
-				uint8_t idx = MouseMob::COLLIDER_ID::COL_ATTACK;
+				uint8_t idx = ::MouseMob::COLLIDER_ID::COL_ATTACK;
 				Collider::COLLIDER_OBJ objType = Collider::COLLIDER_OBJ::ENEMY_ATTACK;
 				uint16_t hittableOBJ = Collider::COLLIDER_OBJ::PLAYER;
 				float hitStartRate = 7.0f / 17.0f;
@@ -209,8 +103,6 @@ namespace EnemyState
 
 		private:
 			MOUSE_ATTACK mouseAttack;
-			float m_WaitTimer;
-			float m_AnimationTimer;
 		};
 
 		/**************************************************************************//**
@@ -228,10 +120,6 @@ namespace EnemyState
 			~HurtState() {}
 			// ステートに入った時のメソッド
 			void Enter() override;
-			// ステートで実行するメソッド
-			void Execute(float elapsedTime) override;
-			// ステートから出ていくときのメソッド
-			void Exit() override;
 		};
 
 		/**************************************************************************//**
@@ -249,10 +137,6 @@ namespace EnemyState
 			~DeathState() {}
 			// ステートに入った時のメソッド
 			void Enter() override;
-			// ステートで実行するメソッド
-			void Execute(float elapsedTime) override;
-			// ステートから出ていくときのメソッド
-			void Exit() override;
 		};
 	}
 }

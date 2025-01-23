@@ -68,6 +68,10 @@ void StageOpenWorld_E4C::Initialize()
 	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
 	spawner->SetSearchRadius(10.0f);
 	SpawnerManager::Instance().Register(spawner);
+	spawner = new Spawner(ENEMY_TYPE::BIRD, 5, -1);
+	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
+	spawner->SetSearchRadius(10.0f);
+	SpawnerManager::Instance().Register(spawner);
 
 	if (T_GRAPHICS.isDX11Active)
 	{

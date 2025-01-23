@@ -26,9 +26,6 @@ struct ENEMY_COLLISION
 
 enum ENEMY_TYPE : uint8_t
 {
-	SKELETON_MINION,						// デフォルト骨
-	SKELETON_MINION_BOSS,					// デフォルト骨ボス
-
 	MOUSE,									// ネズミ
 	BEAR_BOSS,								// 熊ボス
 	BIRD,									// 鳥
@@ -91,7 +88,7 @@ public:
 	void TurnTo(float elapsedTime, const DirectX::XMFLOAT3& target);
 
 	PlayerCharacter* GetClosestPlayer(float limit = FLT_MAX);
-	virtual void UpdateTarget() { m_target = UINT32_MAX; }
+	virtual void UpdateTarget();
 
 	int GetState() { return stateMachine->GetStateIndex(); }
 	StateMachine<Enemy>* GetStateMachine() { return stateMachine; }

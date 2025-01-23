@@ -34,30 +34,17 @@ MouseMob::MouseMob(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("
 	Sphere sphere{ { 0, radius / scale.y, 0 }, radius };
 	SetCollider(COLLIDER_ID::COL_BODY, sphere, Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("JOT_C_Body")->worldTransform);
 	{
-		using namespace EnemyState;
-		// 基本ステート
-		stateMachine->RegisterState(mouseMob::STATE::SEARCH, new mouseMob::SearchState(this));
-		stateMachine->RegisterState(mouseMob::STATE::BATTLE, new mouseMob::BattleState(this));
-		stateMachine->RegisterState(mouseMob::STATE::ENCOUNTER, new mouseMob::EncounterState(this));
-		stateMachine->RegisterState(STATE::HURT, new mouseMob::HurtState(this));
-		stateMachine->RegisterState(STATE::DEATH, new mouseMob::DeathState(this));
+		using namespace EnemyState::MouseMob;
+		stateMachine->RegisterState(Enemy::STATE::IDLE, new IdleState(this));
+		stateMachine->SetState(Enemy::STATE::IDLE);
 
-		// 移動サブステート
-		stateMachine->RegisterSubState(mouseMob::STATE::SEARCH, mouseMob::SEARCH_STATE::WANDER, new mouseMob::WanderState(this, 1.0f));
-		//stateMachine->RegisterSubState(mouseMob::STATE::SEARCH, mouseMob::SEARCH_STATE::IDLE, new mouseMob::IdleState(this, 3.0f, 5.0f));
-		stateMachine->RegisterSubState(mouseMob::STATE::SEARCH, mouseMob::SEARCH_STATE::IDLE, new mouseMob::IdleState(this, 3.0f));
+		stateMachine->RegisterState(::Enemy::STATE::HURT, new HurtState(this));
+		stateMachine->RegisterState(::Enemy::STATE::DEATH, new DeathState(this));
 
-		// 攻撃ステート
-		stateMachine->RegisterSubState(mouseMob::STATE::BATTLE, mouseMob::BATTLE_STATE::PURSUIT, new mouseMob::PursuitState(this, 0.5f, m_AttackRange, 3.0f, 5.0f));
-		stateMachine->RegisterSubState(mouseMob::STATE::BATTLE, mouseMob::BATTLE_STATE::ATTACK, new mouseMob::AttackState(this, 0.5f));
+		stateMachine->RegisterState(STATE::WANDER, new MoveState(this));
+		stateMachine->RegisterState(STATE::FOLLOW, new EnemyState::FollowState(this, 1.8f, STATE::ATTACK));
 
-		stateMachine->SetState(mouseMob::STATE::SEARCH);
+		stateMachine->RegisterState(STATE::ATTACK, new AttackState(this));
+		stateMachine->RegisterState(STATE::ENCOUNTER, new EncounterState(this));
 	}
-}
-
-// 一番近いプレイヤーをターゲット
-void MouseMob::UpdateTarget()
-{
-	PlayerCharacter* player = GetClosestPlayer(m_SearchRange);
-	m_target = (player == nullptr) ? UINT32_MAX : player->GetClientId();
 }

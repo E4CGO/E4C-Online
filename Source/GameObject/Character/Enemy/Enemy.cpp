@@ -182,11 +182,38 @@ void Enemy::Sync(const Enemy::SYNC_DATA& data)
 	angle.y = data.rotate;
 	stateMachine->ChangeState(data.state);
 }
-
+/**************************************************************************//**
+ 	@brief	ランダム目標座標を設定
+*//***************************************************************************/
 void Enemy::SetRandomMoveTargetPosition()
 {
 	float theta = Mathf::RandomRange(-DirectX::XM_PI, DirectX::XM_PI);
 	float range = Mathf::RandomRange(0.0f, m_SearchRange);
 	m_TargetPosition.x = this->m_SpawnPosition.x + sinf(theta) * range;
 	m_TargetPosition.z = this->m_SpawnPosition.z + cosf(theta) * range;
+}
+/**************************************************************************//**
+ 	@brief	ターゲットを更新
+*//***************************************************************************/
+void Enemy::UpdateTarget()
+{
+	PlayerCharacter* player = GetHighestHateClient();
+	if (player != nullptr)
+	{
+		m_target = player->GetClientId();
+	}
+	else
+	{
+		for (PlayerCharacter* player : PlayerCharacterManager::Instance().GetAll())
+		{
+			if (XMFLOAT3LengthSq(player->GetPosition() - position) <= m_SearchRangeSq)
+			{
+				if (InSight(player->GetPosition(), 60.0f))
+				{
+					AddHate(player->GetClientId(), 1);
+					m_target = player->GetClientId();
+				}
+			}
+		}
+	}
 }
