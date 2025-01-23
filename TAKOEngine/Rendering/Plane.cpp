@@ -271,6 +271,14 @@ void Plane::Render(const RenderContext& rc)
 	shader->End(rc);
 }
 
+/**************************************************************************//**
+	@brief		板のパラメーター設定
+	@param[in]    filename	ファイルパス
+	@param[in]    scaling	大きさ
+	@param[in]    centerPos	中心の位置
+	@param[in]    positionZ	深度
+	@param[in]    plane_width	広さ
+*//***************************************************************************/
 PlaneDX12::PlaneDX12(const char* filename, float scaling, XMFLOAT3 centerPos, float positionZ, float plane_width)
 {
 	HRESULT hr = S_OK;
@@ -440,8 +448,14 @@ PlaneDX12::PlaneDX12(const char* filename, float scaling, XMFLOAT3 centerPos, fl
 		textureSize.x = static_cast<int>(d3d_resource_desc.Width);
 		textureSize.y = static_cast<int>(d3d_resource_desc.Height);
 	}
+
+	CreateConstantBuffer();
 }
 
+/**************************************************************************//**
+	@brief		レンダリング
+	@param[in]    rc	レンダリングコンテクスト
+*//***************************************************************************/
 void PlaneDX12::RenderDX12(const RenderContextDX12& rc)
 {
 	ModelShaderDX12* shader = nullptr;
@@ -451,10 +465,86 @@ void PlaneDX12::RenderDX12(const RenderContextDX12& rc)
 
 	mesh.offsetTransforms[0] = transform;
 	m_Mesh.mesh = &mesh;
+
+	// 更新
+	void* mappedData = nullptr;
+	d3d_cbv_resource->Map(0, nullptr, &mappedData);
+	memcpy(mappedData, &mesh.offsetTransforms[0], sizeof(DirectX::XMFLOAT4X4));
+	d3d_cbv_resource->Unmap(0, nullptr);
+
+	RenderContextDX12 dst_rc = rc;
+	dst_rc.plane_cbv_descriptor = cbv_descriptor;
+
 	//描画
-	shader->Render(rc, m_Mesh);
+	shader->Render(dst_rc, m_Mesh);
 }
 
+/**************************************************************************//**
+	@brief		コンスタントバッファ生成
+	@param[in]  なし
+*//***************************************************************************/
+void PlaneDX12::CreateConstantBuffer()
+{
+	Graphics& graphics = Graphics::Instance();
+	ID3D12Device* d3d_device = graphics.GetDeviceDX12();
+
+	HRESULT hr = S_OK;
+
+	// ヒーププロパティの設定
+	D3D12_HEAP_PROPERTIES heap_props{};
+	heap_props.Type = D3D12_HEAP_TYPE_UPLOAD;
+	heap_props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	heap_props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	heap_props.CreationNodeMask = 1;
+	heap_props.VisibleNodeMask = 1;
+
+	// リソースの設定
+	D3D12_RESOURCE_DESC resource_desc{};
+	resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	resource_desc.Alignment = 0;
+	resource_desc.Width = ((sizeof(DirectX::XMFLOAT4X4)) + 255) & ~255;
+	resource_desc.Height = 1;
+	resource_desc.DepthOrArraySize = 1;
+	resource_desc.MipLevels = 1;
+	resource_desc.Format = DXGI_FORMAT_UNKNOWN;
+	resource_desc.SampleDesc.Count = 1;
+	resource_desc.SampleDesc.Quality = 0;
+	resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	// リソースの生成
+	hr = d3d_device->CreateCommittedResource(
+		&heap_props,
+		D3D12_HEAP_FLAG_NONE,
+		&resource_desc,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(d3d_cbv_resource.GetAddressOf()));
+	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+	d3d_cbv_resource->SetName(L"BillboardConstatBuffer");
+
+	// ディスクリプタ取得
+	cbv_descriptor = graphics.GetShaderResourceDescriptorHeap()->PopDescriptor();
+
+	// コンスタントバッファビューの生成
+	D3D12_CONSTANT_BUFFER_VIEW_DESC cbv_desc{};
+	cbv_desc.BufferLocation = d3d_cbv_resource->GetGPUVirtualAddress();
+	cbv_desc.SizeInBytes = static_cast<UINT>(resource_desc.Width);
+
+	d3d_device->CreateConstantBufferView(
+		&cbv_desc,
+		cbv_descriptor->GetCpuHandle());
+
+	void* mappedData = nullptr;
+	hr = d3d_cbv_resource->Map(0, nullptr, &mappedData);
+	memcpy(mappedData, &worldmatrix, sizeof(DirectX::XMFLOAT4X4));
+	d3d_cbv_resource->Unmap(0, nullptr);
+}
+
+/**************************************************************************//**
+	@brief		更新
+	@param[in]    elapsedTime	アップデートタイマー
+*//***************************************************************************/
 void PlaneDX12::Update(float elapsedTime)
 {
 	// スケール行列生成
@@ -638,7 +728,50 @@ RunningDust::RunningDust(ID3D11Device* device, const char* filename, float scali
 	SetShader(ModelShaderId::Billboard);
 }
 
+/**************************************************************************//**
+	@brief		更新
+	@param[in]    elapsedTime	アップデートタイマー
+*//***************************************************************************/
 void RunningDust::Update(float elapsedTime)
+{
+	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
+
+	//mesh.vertices[0].position = player->GetPosition();
+
+	// スケール行列生成
+	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
+	// 回転行列生成
+	DirectX::XMMATRIX R = AnglesToMatrix(angle);
+	// 位置行列生成
+	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z);
+
+	DirectX::XMMATRIX W = S * R * T;
+
+	DirectX::XMStoreFloat4x4(&transform, W);
+}
+
+/**************************************************************************//**
+	@brief
+	@param[in]    filename
+	@param[in]    scaling
+	@param[in]    centerPos
+	@param[in]    positionZ
+	@param[in]    plane_width
+	@param[in]    alpha
+	@param[in]    model_id
+	@param[in]    age
+*//***************************************************************************/
+RunningDustDX12::RunningDustDX12(const char* filename, float scaling, XMFLOAT3 centerPos, float positionZ, float plane_width, float alpha, int model_id, int age)
+	: PlaneDX12(filename, scaling, centerPos, positionZ, plane_width)
+{
+	SetShaderDX12(ModelShaderDX12Id::Billboard);
+}
+
+/**************************************************************************//**
+	@brief		更新
+	@param[in]    elapsedTime	アップデートタイマー
+*//***************************************************************************/
+void RunningDustDX12::Update(float elapsedTime)
 {
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
 

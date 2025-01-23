@@ -5,6 +5,9 @@
 #define __INCLUDED_PLAYER_CHARACTER_ROD_STATE_H__
 
 #include "GameObject/Character/Player/PlayerCharacter.h"
+#include "Source/GameObject/Projectile/ProjectileManager.h"
+#include "Source/GameObject/Projectile/FireballObject.h"
+#include "Source/GameObject/Projectile/ParticleObject.h"
 
 namespace PlayerCharacterState
 {
@@ -15,6 +18,8 @@ namespace PlayerCharacterState
 			ATTACK_2,
 			ATTACK_3,
 		};
+
+		extern bool m_IsShot;
 
 		// 待機用ステートオブジェクト
 		class WaitState : public HierarchicalState<PlayerCharacter>
@@ -137,6 +142,39 @@ namespace PlayerCharacterState
 			void Execute(float elapsedTime) override;
 			// ステートから出ていくときのメソッド
 			void Exit() override;
+
+			Projectile* m_particle = nullptr;
+		};
+
+		// スキル_1 回レ
+		class Skill1State : public HierarchicalState<PlayerCharacter>
+		{
+		public:
+			// コンストラクタ
+			Skill1State(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
+			// デストラクタ
+			~Skill1State() {}
+			// ステートに入った時のメソッド
+			void Enter() override;
+			// ステートで実行するメソッド
+			void Execute(float elapsedTime) override;
+			// ステートから出ていくときのメソッド
+			void Exit() override {};
+		};
+
+		class Skill2State : public HierarchicalState<PlayerCharacter>
+		{
+		public:
+			// コンストラクタ
+			Skill2State(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
+			// デストラクタ
+			~Skill2State() {}
+			// ステートに入った時のメソッド
+			void Enter() override;
+			// ステートで実行するメソッド
+			void Execute(float elapsedTime) override;
+			// ステートから出ていくときのメソッド
+			void Exit() override {};
 		};
 	}
 }

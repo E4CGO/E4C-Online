@@ -3,7 +3,6 @@
 SamplerState sampler_states[2] : register(s0);
 Texture2D iChannel0 : register(t10);
 
-// Ql
 //https://www.shadertoy.com/view/WtGGRt  
 
 float4 main(VS_OUT pin) : SV_TARGET

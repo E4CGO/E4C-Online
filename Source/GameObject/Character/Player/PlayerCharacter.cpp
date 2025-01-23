@@ -517,7 +517,8 @@ void PlayerCharacter::SwordTrail()
 	
 	const iModel::Node* swordnode1 = GetSwordTrailNode();
 	LineRenderer* sword = Graphics::Instance().GetLineRenderer();
-	
+	LineRendererDX12* dx12_sword = Graphics::Instance().GetLineRendererDX12();
+
 	// トレイルデータをシフト
 	for (int i = 0; i < 2; ++i)
 	{
@@ -536,34 +537,42 @@ void PlayerCharacter::SwordTrail()
 	DirectX::XMStoreFloat3(&trailPosition[1][0], Tip);
 	if (IsTrail())
 	{
-			const int division = 10;
-			for (int i = 0; i < MAX_POLYGON - 3; ++i)
+		const int division = 10;
+		for (int i = 0; i < MAX_POLYGON - 3; ++i)
+		{
+			DirectX::XMVECTOR Root0 = DirectX::XMLoadFloat3(&trailPosition[0][i + 0]);
+			DirectX::XMVECTOR Root1 = DirectX::XMLoadFloat3(&trailPosition[0][i + 1]);
+			DirectX::XMVECTOR Root2 = DirectX::XMLoadFloat3(&trailPosition[0][i + 2]);
+			DirectX::XMVECTOR Root3 = DirectX::XMLoadFloat3(&trailPosition[0][i + 3]);
+
+			DirectX::XMVECTOR Tips0 = DirectX::XMLoadFloat3(&trailPosition[1][i + 0]);
+			DirectX::XMVECTOR Tips1 = DirectX::XMLoadFloat3(&trailPosition[1][i + 1]);
+			DirectX::XMVECTOR Tips2 = DirectX::XMLoadFloat3(&trailPosition[1][i + 2]);
+			DirectX::XMVECTOR Tips3 = DirectX::XMLoadFloat3(&trailPosition[1][i + 3]);
+
+			for (int j = 0; j < division; ++j)
 			{
-				DirectX::XMVECTOR Root0 = DirectX::XMLoadFloat3(&trailPosition[0][i + 0]);
-				DirectX::XMVECTOR Root1 = DirectX::XMLoadFloat3(&trailPosition[0][i + 1]);
-				DirectX::XMVECTOR Root2 = DirectX::XMLoadFloat3(&trailPosition[0][i + 2]);
-				DirectX::XMVECTOR Root3 = DirectX::XMLoadFloat3(&trailPosition[0][i + 3]);
+				float t = j / static_cast<float>(division - 1); // division - 1で割ることで、tの値が0から1になるように調整
+				float texcoordV = i / static_cast<float>(MAX_POLYGON - 3); // 軌跡全体に沿ったV座標を計算
+				DirectX::XMVECTOR Root = DirectX::XMVectorCatmullRom(Root0, Root1, Root2, Root3, t);
+				DirectX::XMVECTOR Tip = DirectX::XMVectorCatmullRom(Tips0, Tips1, Tips2, Tips3, t);
 
-				DirectX::XMVECTOR Tips0 = DirectX::XMLoadFloat3(&trailPosition[1][i + 0]);
-				DirectX::XMVECTOR Tips1 = DirectX::XMLoadFloat3(&trailPosition[1][i + 1]);
-				DirectX::XMVECTOR Tips2 = DirectX::XMLoadFloat3(&trailPosition[1][i + 2]);
-				DirectX::XMVECTOR Tips3 = DirectX::XMLoadFloat3(&trailPosition[1][i + 3]);
+				DirectX::XMFLOAT3 rootFloat3, tipFloat3;
+				DirectX::XMStoreFloat3(&rootFloat3, Root);
+				DirectX::XMStoreFloat3(&tipFloat3, Tip);
 
-				for (int j = 0; j < division; ++j)
+				if (T_GRAPHICS.isDX11Active)
 				{
-					float t = j / static_cast<float>(division - 1); // division - 1で割ることで、tの値が0から1になるように調整
-					float texcoordV = i / static_cast<float>(MAX_POLYGON - 3); // 軌跡全体に沿ったV座標を計算
-					DirectX::XMVECTOR Root = DirectX::XMVectorCatmullRom(Root0, Root1, Root2, Root3, t);
-					DirectX::XMVECTOR Tip = DirectX::XMVectorCatmullRom(Tips0, Tips1, Tips2, Tips3, t);
-
-					DirectX::XMFLOAT3 rootFloat3, tipFloat3;
-					DirectX::XMStoreFloat3(&rootFloat3, Root);
-					DirectX::XMStoreFloat3(&tipFloat3, Tip);
-
 					sword->AddVertex(rootFloat3, { 1, 1, 1, 1 }, { 0, texcoordV });
 					sword->AddVertex(tipFloat3, { 1, 1, 1, 1 }, { 1, texcoordV });
 				}
+				else
+				{
+					dx12_sword->AddVertex(rootFloat3, { 1, 1, 1, 1 }, { 0, texcoordV });
+					dx12_sword->AddVertex(tipFloat3, { 1, 1, 1, 1 }, { 1, texcoordV });
+				}
 			}
+		}
 	}
 	
 }
@@ -577,8 +586,6 @@ const iModel::Node* PlayerCharacter::GetSwordTrailNode()
 }
 void PlayerCharacter::Update(float elapsedTime)
 {
-	
-	
 	SwordTrail();
 	
 	std::lock_guard<std::mutex> lock(m_mut);
@@ -628,7 +635,6 @@ void PlayerCharacter::Render(const RenderContext& rc)
 {
 	Character::Render(rc);
 	
-
 	DirectX::XMFLOAT3 front = CameraManager::Instance().GetCamera()->GetFront();
 	DirectX::XMFLOAT3 eye = CameraManager::Instance().GetCamera()->GetEye();
 	DirectX::XMFLOAT3 namePos = this->position + DirectX::XMFLOAT3{ 0, 2.2f, 0 };
@@ -674,15 +680,13 @@ void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
 {
 	Character::RenderDX12(rc);
 
-	
-
 	DirectX::XMFLOAT3 front = CameraManager::Instance().GetCamera()->GetFront();
 	DirectX::XMFLOAT3 eye = CameraManager::Instance().GetCamera()->GetEye();
 	DirectX::XMFLOAT3 namePos = this->position + DirectX::XMFLOAT3{ 0, 2.2f, 0 };
 	float dot = XMFLOAT3Dot(front, namePos - eye);
 
-	/*LineRenderer* sword = Graphics::Instance().GetLineRenderer();
-	sword->Render(T_GRAPHICS.GetDeviceContext(), rc.view, rc.projection);*/
+	LineRendererDX12* dx12_sword = Graphics::Instance().GetLineRendererDX12();
+	dx12_sword->Render(rc.d3d_command_list, m_swordSprite.get());
 	if (dot < 0.0f) return;
 
 #ifdef _DEBUG
