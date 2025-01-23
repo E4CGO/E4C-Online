@@ -102,6 +102,8 @@ public:
 
 	virtual void RenderDX12(const RenderContextDX12& rc) override;
 
+	void CreateConstantBuffer();
+
 public:
 
 	// アクセサ
@@ -118,6 +120,12 @@ public:
 	// スケール設定
 	void SetScale(const DirectX::XMFLOAT3& scale) { this->scale = scale; }
 protected:
+	Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cbv_resource;
+	const Descriptor* cbv_descriptor = nullptr;
+	DirectX::XMFLOAT4X4 worldmatrix = DirectX::XMFLOAT4X4(1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1);
 
 	ModelDX12::Mesh m_Mesh;
 	ModelResource::Mesh mesh;
