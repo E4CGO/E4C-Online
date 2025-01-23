@@ -74,7 +74,7 @@ namespace EnemyState
 		// 徘徊ステート
 		void MoveState::Enter()
 		{
-			owner->SetAnimation(::MouseMob::ANIM_IDLE, true);
+			owner->SetAnimation(::MouseMob::ANIM_MOVE, true);
 		}
 		void MoveState::Execute(float elapsedTime)
 		{
