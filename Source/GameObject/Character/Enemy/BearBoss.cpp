@@ -3,7 +3,7 @@
 
 #include "BearBoss.h"
 #include "BearBossState.h"
-
+#include "TAKOEngine/Physics/CollisionManager.h"
 
 BearBoss::BearBoss(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("Data/Model/Enemy/MDLANM_ENMboss_1205.glb", scaling, renderMode)
 {
@@ -50,4 +50,48 @@ BearBoss::BearBoss(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("
 
 void BearBoss::UpdateTarget()
 {
+}
+
+#include "TAKOEngine/Physics/AttackCollider.h"
+
+PunchImpact::PunchImpact(DirectX::XMFLOAT3 pos, Character* owner) : Projectile("")
+{
+	SetOwner(owner);
+	position = pos;
+
+	MakeAttackCollider(20, 0, { pos, minRadius }, Collider::COLLIDER_OBJ::ENEMY_PROJECTILE, Collider::COLLIDER_OBJ::PLAYER, nullptr);
+	m_pColliders[0]->SetCollisionFunction([&](Collider* myCol, Collider* otherCol) {CollisionFunction(myCol, otherCol); });
+
+}
+
+void PunchImpact::Update(float elapsedTime)
+{
+	float radius = minRadius + (maxRadius - minRadius) * (time / existTime);
+	m_pColliders[0]->SetParam({ position,radius });
+	UpdateColliders();
+
+	time += elapsedTime;
+
+	if (time > existTime) Destory();
+}
+
+void PunchImpact::CollisionFunction(Collider* myCol, Collider* otherCol)
+{
+	AttackSphereCollider* attack = static_cast<AttackSphereCollider*>(myCol);
+	for (GameObject* owner : attack->GetHitOthers())
+	{
+		// 既にヒットした敵には当たらない
+		if (owner == otherCol->GetOwner()) return;
+	}
+
+	if (attack->GetPower() > otherCol->GetArmor())
+	{
+		Character* chara = static_cast<Character*>(otherCol->GetOwner());
+		if (chara->IsGround())
+		{
+			uint16_t damage = attack->GetPower() - otherCol->GetArmor();
+			attack->RegisterHitOthers(chara);
+			chara->OnDamage(damage);
+		}
+	}
 }

@@ -12,8 +12,6 @@ public:
 	void Update(float elapsedTime) override;
 	void Render(const RenderContext& rc) override;
 
-	virtual void UpdateColliders() {};
-
 	void PointTo(const DirectX::XMFLOAT3& target);
 	void SetFront(DirectX::XMFLOAT3 front) { this->front = front; }
 	void SetDirection(DirectX::XMFLOAT3 direction) { this->direction = direction; };

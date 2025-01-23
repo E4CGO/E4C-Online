@@ -21,6 +21,7 @@
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Props/SpawnerManager.h"
+#include "GameObject/Projectile/ProjectileManager.h"
 
 #include "Map/DungeonData.h"
 
@@ -64,7 +65,7 @@ void StageOpenWorld_E4C::Initialize()
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
 	teleporter->SetVisibility(true);
 
-	Spawner* spawner = new Spawner(ENEMY_TYPE::BIRD, 5, -1);
+	Spawner* spawner = new Spawner(ENEMY_TYPE::BEAR_BOSS, 1, -1);
 	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
 	spawner->SetSearchRadius(10.0f);
 	SpawnerManager::Instance().Register(spawner);
@@ -181,6 +182,7 @@ void StageOpenWorld_E4C::Initialize()
 
 void StageOpenWorld_E4C::Finalize()
 {
+	PROJECTILES.Clear();
 	T_GRAPHICS.GetShadowRenderer()->Finalize();
 }
 
@@ -222,6 +224,8 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 		T_INPUT.KeepCursorCenter();
 	}
 	PlayerCharacterManager::Instance().Update(elapsedTime);
+
+	PROJECTILES.Update(elapsedTime);
 
 	COLLISIONS.Contacts();
 
@@ -314,6 +318,8 @@ void StageOpenWorld_E4C::RenderDX12()
 		PlayerCharacterManager::Instance().RenderDX12(rc);
 
 		ENEMIES.RenderDX12(rc);
+
+		PROJECTILES.RenderDX12(rc);
 
 		teleporter->RenderDX12(rc);
 

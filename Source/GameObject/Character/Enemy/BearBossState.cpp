@@ -109,11 +109,15 @@ namespace EnemyState
 			attackArms[0].objType = Collider::COLLIDER_OBJ::ENEMY_ATTACK;
 			attackArms[0].hittableOBJ = Collider::COLLIDER_OBJ::PLAYER;
 			attackArms[0].capsule = { {0, 0, 0}, {1, 0, 0}, 2.0f, 1.4f };
+			attackArms[0].hitStartRate = 159.0f / maxFlame;
+			attackArms[0].hitEndRate = 168.0f / maxFlame;
 			attackArms[1].power = 50;
 			attackArms[1].idx = ::BearBoss::COLLIDER_ID::COL_ATTACK_RIGHT_HAND;
 			attackArms[1].objType = Collider::COLLIDER_OBJ::ENEMY_ATTACK;
 			attackArms[1].hittableOBJ = Collider::COLLIDER_OBJ::PLAYER;
 			attackArms[1].capsule = { {0, 0, 0}, {-1, 0, 0}, 2.0f, 1.4f };
+			attackArms[1].hitStartRate = 264.0f / maxFlame;
+			attackArms[1].hitEndRate = 273.0f / maxFlame;
 
 			DirectX::XMFLOAT4X4* leftArmMatrix = &owner->GetModel(0)->FindNode("JOT_L_Elbow")->worldTransform;
 			DirectX::XMFLOAT4X4* rightArmMatrix = &owner->GetModel(0)->FindNode("JOT_R_Elbow")->worldTransform;
@@ -140,6 +144,8 @@ namespace EnemyState
 			owner->GetCollider(attackArms[0].idx)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
 			owner->GetCollider(attackArms[1].idx)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
 
+			UpdatePunchImpact(elapsedTime);
+
 			PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById(owner->GetTarget());
 			if (player == nullptr)
 			{
@@ -150,6 +156,38 @@ namespace EnemyState
 		{
 			owner->DeleteAttackCollider(attackArms[0].idx);
 			owner->DeleteAttackCollider(attackArms[1].idx);
+
+			impacts[0] = false;
+			impacts[1] = false;
+		}
+		void AttackPunchState::UpdatePunchImpact(float elapsedTime)
+		{
+			if (!impacts[0])
+			{
+				if (owner->GetModel()->GetAnimationRate() > impact1StartRate)
+				{
+					DirectX::XMFLOAT4X4* matrix = &owner->GetModel(0)->FindNode("JOT_L_Hand")->worldTransform;
+
+					DirectX::XMFLOAT3 pos = { matrix->_41, matrix->_42 , matrix->_43 };
+
+					PunchImpact* impact = new PunchImpact(pos, owner);
+					PROJECTILES.Register(impact);
+					impacts[0] = true;
+				}
+			}
+			if (!impacts[1])
+			{
+				if (owner->GetModel()->GetAnimationRate() > impact2StartRate)
+				{
+					DirectX::XMFLOAT4X4* matrix = &owner->GetModel(0)->FindNode("JOT_R_Hand")->worldTransform;
+
+					DirectX::XMFLOAT3 pos = { matrix->_41, matrix->_42 , matrix->_43 };
+
+					PunchImpact* impact = new PunchImpact(pos, owner);
+					PROJECTILES.Register(impact);
+					impacts[1] = true;
+				}
+			}
 		}
 	}
 }
