@@ -198,6 +198,7 @@ namespace PlayerCharacterState
 	void HurtState::Enter()
 	{
 		owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_HURT, false, 0.1f);
+		owner->SetTrail(false);
 	}
 	void HurtState::Execute(float elapsedTime)
 	{

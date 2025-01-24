@@ -3,7 +3,8 @@
 
 #include "PlayerCharacterSwordState.h"
 #include "PlayerCharacterState.h"
-
+#include "Source/GameObject/Character/Enemy/EnemyManager.h"
+#include <limits>
 namespace PlayerCharacterState
 {
 	namespace Sword
@@ -83,9 +84,6 @@ namespace PlayerCharacterState
 		void AttackNormalState::Execute(float elapsedTime)
 		{
 			subState->Execute(elapsedTime);
-
-			// 反重力
-			owner->StopFall();
 			owner->StopMove();
 
 			if (!owner->IsPlayAnimation()) // 攻撃モーション終わり
@@ -120,12 +118,17 @@ namespace PlayerCharacterState
 				attackData.hitEndRate = sphereAttacks[0].hitEndRate;
 
 				owner->MakeAttackCollider(attackData, sphereAttacks[0].sphere, matrix);
+
+				owner->FaceToEnemy();
 			}
 		}
 		void AttackNormalState_1::Execute(float elapsedTime)
 		{
 			if (owner->IsPlayer())
 			{
+				
+
+
 				owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_1)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
 
 				float time = owner->GetModel()->GetCurrentAnimationSeconds();
@@ -204,6 +207,8 @@ namespace PlayerCharacterState
 				attackData.hitEndRate = sphereAttacks[1].hitEndRate;
 
 				owner->MakeAttackCollider(attackData, sphereAttacks[1].sphere, matrix);
+
+				owner->FaceToEnemy();
 			}
 		}
 		void AttackNormalState_2::Execute(float elapsedTime)
@@ -212,7 +217,7 @@ namespace PlayerCharacterState
 			if (owner->IsPlayer())
 			{
 				owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_2)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
-
+				
 				if (0.185f <= time && time <= 0.418f)
 				{
 					if (owner->InputAttackNormal())
@@ -286,6 +291,8 @@ namespace PlayerCharacterState
 				attackData.hitEndRate = sphereAttacks[2].hitEndRate;
 
 				owner->MakeAttackCollider(attackData, sphereAttacks[2].sphere, matrix);
+
+				owner->FaceToEnemy();
 			}
 		}
 		void AttackNormalState_3::Execute(float elapsedTime)
@@ -294,7 +301,7 @@ namespace PlayerCharacterState
 			if (owner->IsPlayer())
 			{
 				owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_3)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
-
+				
 				if (0.5f <= time && time <= 0.753f)
 				{
 					if (owner->InputAttackNormal())
@@ -401,10 +408,13 @@ namespace PlayerCharacterState
 				attackData.hitStartRate = sphereAttacks[3].hitStartRate;
 				attackData.hitEndRate = sphereAttacks[3].hitEndRate;
 				owner->MakeAttackCollider(attackData, sphereAttacks[3].sphere, matrix);
+
+				owner->FaceToEnemy();
 			}
 		}
 		void Skill1ContinueStart::Execute(float elapsedTime)
 		{
+			
 			if (owner->IsPlayer())
 			{
 				owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_SKILL_1)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
@@ -452,8 +462,7 @@ namespace PlayerCharacterState
 		void Skill2State::Execute(float elapsedTime)
 		{
 			float time = owner->GetModel()->GetCurrentAnimationSeconds();
-			// 反重力
-			owner->StopFall();
+			
 			owner->StopMove();
 
 			if (1.215f <= time)

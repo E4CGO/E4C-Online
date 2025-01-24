@@ -35,6 +35,8 @@ protected:
 	float m_currentRate = 0.0f;	// 現在のアニメーションレート
 	float m_hitStartRate = 0.0f;	// 攻撃判定が発生するタイミングのアニメーションレート(min0%)
 	float m_hitEndRate = 1.0f;	// 攻撃判定が消滅するタイミングのアニメーションレート(max100%)
+	int m_playerMp = 0;
+	int m_playerMaxMp = 0;
 };
 
 class AttackCapsuleCollider : public CapsuleCollider
@@ -63,6 +65,8 @@ protected:
 	float m_currentRate = 0.0f;	// 現在のアニメーションレート
 	float m_hitStartRate = 0.0f;	// 攻撃判定が発生するタイミングのアニメーションレート(min0%)
 	float m_hitEndRate = 1.0f;	// 攻撃判定が消滅するタイミングのアニメーションレート(max100%)
+
+	
 };
 
 #endif // !__ATTACK_COLLIDER_H__

@@ -193,6 +193,7 @@ public:
 	bool IsFall() { return velocity.y < -10.0f; }
 
 	void FaceToCamera();
+	void FaceToEnemy();
 	void TurnByInput();
 
 	uint32_t GetClientId() { return m_client_id; }
@@ -242,6 +243,7 @@ public:
 	bool IsTrail() { return m_isTrail; }
 	void SetTrail(bool trail) { m_isTrail = trail; }
 
+	void SetHitStop(bool stop) { m_hitStop = stop; }
 	// 自機判定
 	bool IsPlayer() { return GAME_DATA.GetClientId() == m_client_id; };
 
@@ -361,6 +363,9 @@ protected:
 	DirectX::XMFLOAT3 trailPosition[2][MAX_POLYGON];
 
 	bool m_isTrail = false;
+	bool m_hitStop = false;
+	float m_stopTimer = 0.f;
+	float m_stopTime = 0.05f;
 };
 
 #endif // __INCLUDED_PLAYER_CHARACTER_H__

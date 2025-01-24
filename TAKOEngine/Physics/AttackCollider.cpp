@@ -4,6 +4,8 @@
 #include "AttackCollider.h"
 #include "Source/GameObject/Character/Character.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
+#include "Source/GameObject/Character/Player/PlayerCharacter.h"
+#include "Source/GameObject/Character/Player/PlayerCharacterManager.h"
 void AttackSphereCollider::Update()
 {
 	SphereCollider::Update();
@@ -26,6 +28,9 @@ void AttackSphereCollider::Update()
 
 void AttackSphereCollider::OnCollision(Collider* other)
 {
+	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
+	m_playerMp = player->GetMp();
+	m_playerMaxMp = player->GetMaxMp(); // 最大MPを取得
 	if (collisionFanction)
 	{
 		collisionFanction(this, other);
@@ -46,7 +51,16 @@ void AttackSphereCollider::OnCollision(Collider* other)
       
 	    // 攻撃がヒットしたらカメラシェイクをリセット
 	    CameraManager::Instance().GetCamera()->ResetShakeTimer();
-      CameraManager::Instance().GetCamera()->SetShake(true);
+        CameraManager::Instance().GetCamera()->SetShake(true);
+		m_playerMp += 5;
+		if (m_playerMp > m_playerMaxMp)
+		{
+			m_playerMp = m_playerMaxMp;
+		}
+		player->SetCurrentMp(m_playerMp);
+		player->SetHitStop(true);
+
+
 			chara->OnDamage(damage);
 		}
 	}
