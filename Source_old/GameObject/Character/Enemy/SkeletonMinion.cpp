@@ -16,7 +16,7 @@ SkeletonMinion::SkeletonMinion(float scaling) : Enemy("Data/Model/Enemy/characte
 	atk = 10;
 	moveSpeed = 2.0f;
 	turnSpeed = DirectX::XMConvertToRadians(180);
-	m_SearchRange = 24.0f;
+	SetSearchRange(24.0f);
 
 	// 移動用Collider
 	Sphere sphere({ 0, 0.6f / scaling, 0 }, 0.6f);

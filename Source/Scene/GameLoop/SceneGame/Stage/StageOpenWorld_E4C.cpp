@@ -65,7 +65,7 @@ void StageOpenWorld_E4C::Initialize()
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
 	teleporter->SetVisibility(true);
 
-	Spawner* spawner = new Spawner(ENEMY_TYPE::MOUSE, 1, -1);
+	Spawner* spawner = new Spawner(ENEMY_TYPE::CROC, 5, -1);
 	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
 	spawner->SetSearchRadius(10.0f);
 	SpawnerManager::Instance().Register(spawner);
@@ -178,25 +178,29 @@ void StageOpenWorld_E4C::Initialize()
 
 	// 影初期化
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
+
+	
+	
 }
 
 void StageOpenWorld_E4C::Finalize()
 {
+	PROJECTILES.Clear();
 	T_GRAPHICS.GetShadowRenderer()->Finalize();
 }
 
 void StageOpenWorld_E4C::Update(float elapsedTime)
-{
-	
+{	
+	// ゲームループ内で
+	cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
+	cameraController->Update(elapsedTime);
 	Online::OnlineController* onlineController = m_pScene->GetOnlineController();
 	if (onlineController->GetState() == Online::OnlineController::STATE::LOGINED)
 	{
 		onlineController->BeginSync();
 	}
 
-	// ゲームループ内で
-	cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
-	cameraController->Update(elapsedTime);
+	
 
 	if (T_INPUT.KeyDown(VK_MENU))
 	{
@@ -244,6 +248,8 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
 	}
 
+	
+
 	m_sceneTickTimer = elapsedTime;
 	m_sceneGlobalTimer += elapsedTime;
 }
@@ -264,6 +270,8 @@ void StageOpenWorld_E4C::Render()
 
 	// ライトの情報を詰め込む
 	LightManager::Instance().PushRenderContext(rc);
+
+	
 
 	for (auto& it : models)
 	{
@@ -364,4 +372,5 @@ void StageOpenWorld_E4C::DrawSceneGUI()
 	ImVec2 pos = ImGui::GetMainViewport()->Pos;
 	ImGui::SetNextWindowPos(ImVec2(pos.x + 10, pos.y + 10), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+	ImGui::InputFloat("shaketimer", &shakeTimer);
 }
