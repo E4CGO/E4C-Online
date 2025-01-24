@@ -55,12 +55,7 @@ private:
 
 
 
-	DirectX::XMFLOAT3 shakeOffset{};
-	DirectX::XMFLOAT3 shakenTarget{};
-	float shakeAmplitude; // シェイクの振幅
-	DirectX::XMFLOAT3 shakeFrequency; // シェイクの周波数
-	// カメラシェイク用の時間
-	float shakeTime = 0.0f;
+	
 	
 	float distanceCache;
 
