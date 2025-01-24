@@ -23,7 +23,7 @@ public:
 
 	void SetPosition(const DirectX::XMFLOAT3& position) override { tempPosition = this->position = position; };
 
-	void Collision() override;
+	//void Collision() override;
 
 	void OnHitEnemy(HitResult& hit) override;
 

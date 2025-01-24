@@ -74,9 +74,9 @@ namespace EnemyState
 				uint8_t idx = ::CrocodileMob::COLLIDER_ID::COL_ATTACK;
 				Collider::COLLIDER_OBJ objType = Collider::COLLIDER_OBJ::ENEMY_ATTACK;
 				uint16_t hittableOBJ = Collider::COLLIDER_OBJ::PLAYER;
-				float hitStartRate = 7.0f / 17.0f;
-				float hitEndRate = 73.0f / 170.0f;
-				Capsule capsule{ {120.0f, 0, 0}, {0, 1, 0}, 1.0f, 0.6f };
+				float hitStartRate = 56.0f / 124.0f;
+				float hitEndRate = 64.0f / 124.0f;
+				Sphere sphere{ {0, 0, 0}, 0.6f };
 			};
 
 		private:
