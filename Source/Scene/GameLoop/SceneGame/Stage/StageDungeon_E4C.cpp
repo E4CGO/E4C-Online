@@ -321,13 +321,12 @@ void StageDungeon_E4C::RenderDX12()
 		rc.d3d_command_list = m_frameBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
-		// プレイヤー
-		PlayerCharacterManager::Instance().RenderDX12(rc);
 		GameObjectManager::Instance().RenderDX12(rc);
 		SpawnerManager::Instance().RenderDX12(rc);
 		ENEMIES.RenderDX12(rc);
 		MAPTILES.RenderDX12(rc);
-
+		// プレイヤー
+		PlayerCharacterManager::Instance().RenderDX12(rc);
 		// レンダーターゲットへの書き込み終了待ち
 		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
 	}
@@ -336,7 +335,7 @@ void StageDungeon_E4C::RenderDX12()
 	{
 		postprocessingRenderer->Render(m_frameBuffer);
 	}
-
+	
 	// 2D描画
 	{
 		T_TEXT.BeginDX12();
@@ -345,7 +344,7 @@ void StageDungeon_E4C::RenderDX12()
 
 		T_TEXT.EndDX12();
 	}
-
+	
 	// デバッグ
 	{
 #ifdef _DEBUG
