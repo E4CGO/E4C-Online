@@ -403,3 +403,23 @@ void Character::Update(float elapsedTime)
 	ModelObject::Update(elapsedTime);
 	UpdateColliders();
 }
+
+/**************************************************************************//**
+ 	@brief		座標が視界に存在するか判定
+	@param[in]	point	判断する座標
+	@param[in]	angle	視界の角度
+	@return	
+*//***************************************************************************/
+bool Character::InSight(const DirectX::XMFLOAT3 point, float angle)
+{
+
+	DirectX::XMFLOAT3 direction = point - position;
+	// 平面化
+	direction.y = 0.0f;
+	DirectX::XMVECTOR Direction = DirectX::XMLoadFloat3(&direction);
+	// 方向ベクトル化
+	DirectX::XMFLOAT3 front = { sinf(this->angle.y), 0.0f, cosf(this->angle.y) };
+	DirectX::XMVECTOR Front = DirectX::XMLoadFloat3(&front);
+
+	return DirectX::XMConvertToDegrees(DirectX::XMVectorGetX(DirectX::XMVector3AngleBetweenVectors(Direction, Front))) <= angle;
+}

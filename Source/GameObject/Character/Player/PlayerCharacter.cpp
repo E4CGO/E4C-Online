@@ -249,6 +249,9 @@ void PlayerCharacter::UpdateColliders()
 bool  PlayerCharacter::CollisionVsEnemies()
 {
 	bool isHit = false;
+
+	if (!m_pMoveCollider->IsEnable()) return isHit;
+
 	HitResult hit;
 	for (Enemy*& enemy : ENEMIES.GetAll())
 	{

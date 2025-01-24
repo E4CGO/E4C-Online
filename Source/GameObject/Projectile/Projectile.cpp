@@ -71,71 +71,71 @@ void Projectile::Destory()
 	PROJECTILES.Remove(this);
 }
 
-void Projectile::Collision()
-{
-	if (m_pMoveCollider == nullptr) return;
-
-	if ((collisionTarget & COLLISION_TARGET::STAGE) > 0)
-	{
-		Collider* col = m_pMoveCollider.get();
-		for (ModelObject*& map : MAPTILES.GetAll())
-		{
-			HitResult hit;
-			DirectX::XMFLOAT3 direction = {};
-			if (map->GetMoveCollider()->Collision(col, {}, hit))
-			{
-				if (fabsf(hit.normal.y) < 0.01f)
-				{
-					OnHitWall(hit);
-				}
-				else
-				{
-					OnHitGround(hit);
-				}
-			}
-		}
-	}
-	if ((collisionTarget & COLLISION_TARGET::ENEMY) > 0)
-	{
-		Enemy* hitTarget = nullptr;
-		int hitCollider = -1;
-		HitResult hit;
-		for (Enemy*& enemy : ENEMIES.GetAll())
-		{
-			for (std::pair<int, Collider*> enemyCollider : enemy->GetColliders())
-			{
-				HitResult temp;
-				if (m_pMoveCollider->Collision(enemyCollider.second, {}, temp)) // 衝突
-				{
-					if (temp.distance < hit.distance) // 一番接近計算
-					{
-						hit = temp;
-						hitTarget = enemy;
-						hitCollider = enemyCollider.first;
-					}
-					if (pierce) // 貫通処理：当たった敵全部
-					{
-						if (atk > 0 && owner == PlayerCharacterManager::Instance().GetPlayerCharacterById()) // クライアントの攻撃しか処理しない
-						{
-							OnHitEnemy(hit);
-							SendCollision(hitTarget, enemyCollider.first);
-						}
-					}
-					continue; // 次の敵
-				}
-			}
-		}
-		if (hitTarget != nullptr && !pierce) // 非貫通処理：衝突の一番近い目標
-		{
-			if (atk > 0 && owner == PlayerCharacterManager::Instance().GetPlayerCharacterById()) // クライアントの攻撃しか処理しない
-			{
-				OnHitEnemy(hit);
-				SendCollision(hitTarget, hitCollider);
-			}
-			Destory();
-		}
-	}
-}
+//void Projectile::Collision()
+//{
+//	if (m_pMoveCollider == nullptr) return;
+//
+//	if ((collisionTarget & COLLISION_TARGET::STAGE) > 0)
+//	{
+//		Collider* col = m_pMoveCollider.get();
+//		for (ModelObject*& map : MAPTILES.GetAll())
+//		{
+//			HitResult hit;
+//			DirectX::XMFLOAT3 direction = {};
+//			if (map->GetMoveCollider()->Collision(col, {}, hit))
+//			{
+//				if (fabsf(hit.normal.y) < 0.01f)
+//				{
+//					OnHitWall(hit);
+//				}
+//				else
+//				{
+//					OnHitGround(hit);
+//				}
+//			}
+//		}
+//	}
+//	if ((collisionTarget & COLLISION_TARGET::ENEMY) > 0)
+//	{
+//		Enemy* hitTarget = nullptr;
+//		int hitCollider = -1;
+//		HitResult hit;
+//		for (Enemy*& enemy : ENEMIES.GetAll())
+//		{
+//			for (std::pair<int, Collider*> enemyCollider : enemy->GetColliders())
+//			{
+//				HitResult temp;
+//				if (m_pMoveCollider->Collision(enemyCollider.second, {}, temp)) // 衝突
+//				{
+//					if (temp.distance < hit.distance) // 一番接近計算
+//					{
+//						hit = temp;
+//						hitTarget = enemy;
+//						hitCollider = enemyCollider.first;
+//					}
+//					if (pierce) // 貫通処理：当たった敵全部
+//					{
+//						if (atk > 0 && owner == PlayerCharacterManager::Instance().GetPlayerCharacterById()) // クライアントの攻撃しか処理しない
+//						{
+//							OnHitEnemy(hit);
+//							SendCollision(hitTarget, enemyCollider.first);
+//						}
+//					}
+//					continue; // 次の敵
+//				}
+//			}
+//		}
+//		if (hitTarget != nullptr && !pierce) // 非貫通処理：衝突の一番近い目標
+//		{
+//			if (atk > 0 && owner == PlayerCharacterManager::Instance().GetPlayerCharacterById()) // クライアントの攻撃しか処理しない
+//			{
+//				OnHitEnemy(hit);
+//				SendCollision(hitTarget, hitCollider);
+//			}
+//			Destory();
+//		}
+//	}
+//}
 
 void Projectile::SendCollision(Enemy* target, int colider_id)
 {

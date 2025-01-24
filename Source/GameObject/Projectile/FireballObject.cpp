@@ -48,58 +48,58 @@ void FireballObject::Update(float elapsedTime)
 /**************************************************************************//**
 	@brief	当たり判定処理
 *//***************************************************************************/
-void FireballObject::Collision()
-{
-	//Collider* col = collider.get();
-	//for (ModelObject*& map : MAPTILES.GetAll())
-	//{
-	//	HitResult hit;
-	//	DirectX::XMFLOAT3 direction = {};
-	//	if (map->GetCollider()->RayCast(tempPosition, position, hit))
-	//	{
-	//		OnHitGround(hit);
-	//		break;
-	//	}
-	//}
-
-	Enemy* hitTarget = nullptr;
-	int hitCollider = -1;
-	HitResult hit;
-	for (Enemy*& enemy : ENEMIES.GetAll())
-	{
-		for (std::pair<int, Collider*> enemyCollider : enemy->GetColliders())
-		{
-			HitResult temp;
-			if (enemyCollider.second->RayCast(tempPosition, position, temp)) // レイ衝突
-			{
-				if (temp.distance < hit.distance) // 一番接近計算
-				{
-					hit = temp;
-					hitTarget = enemy;
-					hitCollider = enemyCollider.first;
-				}
-				if (pierce) // 貫通処理：当たった敵全部
-				{
-					if (owner == PlayerCharacterManager::Instance().GetPlayerCharacterById(GAME_DATA.GetClientId())) // クライアントの攻撃しか処理しない
-					{
-						OnHitEnemy(hit);
-						SendCollision(hitTarget, enemyCollider.first);
-					}
-				}
-				continue; // 次の敵
-			}
-		}
-	}
-	if (hitTarget != nullptr && !pierce) // 非貫通処理：衝突の一番近い目標
-	{
-		if (owner == PlayerCharacterManager::Instance().GetPlayerCharacterById(GAME_DATA.GetClientId())) // クライアントの攻撃しか処理しない
-		{
-			OnHitEnemy(hit);
-			SendCollision(hitTarget, hitCollider);
-		}
-		Destory();
-	}
-}
+//void FireballObject::Collision()
+//{
+//	//Collider* col = collider.get();
+//	//for (ModelObject*& map : MAPTILES.GetAll())
+//	//{
+//	//	HitResult hit;
+//	//	DirectX::XMFLOAT3 direction = {};
+//	//	if (map->GetCollider()->RayCast(tempPosition, position, hit))
+//	//	{
+//	//		OnHitGround(hit);
+//	//		break;
+//	//	}
+//	//}
+//
+//	Enemy* hitTarget = nullptr;
+//	int hitCollider = -1;
+//	HitResult hit;
+//	for (Enemy*& enemy : ENEMIES.GetAll())
+//	{
+//		for (std::pair<int, Collider*> enemyCollider : enemy->GetColliders())
+//		{
+//			HitResult temp;
+//			if (enemyCollider.second->RayCast(tempPosition, position, temp)) // レイ衝突
+//			{
+//				if (temp.distance < hit.distance) // 一番接近計算
+//				{
+//					hit = temp;
+//					hitTarget = enemy;
+//					hitCollider = enemyCollider.first;
+//				}
+//				if (pierce) // 貫通処理：当たった敵全部
+//				{
+//					if (owner == PlayerCharacterManager::Instance().GetPlayerCharacterById(GAME_DATA.GetClientId())) // クライアントの攻撃しか処理しない
+//					{
+//						OnHitEnemy(hit);
+//						SendCollision(hitTarget, enemyCollider.first);
+//					}
+//				}
+//				continue; // 次の敵
+//			}
+//		}
+//	}
+//	if (hitTarget != nullptr && !pierce) // 非貫通処理：衝突の一番近い目標
+//	{
+//		if (owner == PlayerCharacterManager::Instance().GetPlayerCharacterById(GAME_DATA.GetClientId())) // クライアントの攻撃しか処理しない
+//		{
+//			OnHitEnemy(hit);
+//			SendCollision(hitTarget, hitCollider);
+//		}
+//		Destory();
+//	}
+//}
 
 /**************************************************************************//**
 	@brief		ダメージ計算
