@@ -188,48 +188,9 @@ void ThridPersonCameraController::Update(float elapsedTime)
 	DirectX::XMStoreFloat3(&eye, Eye);
 	DirectX::XMStoreFloat3(&up, Up);
 	DirectX::XMStoreFloat3(&right, Right);
-
-	//試しに上矢印キーでフラグがtrueになるようにしている、本来は攻撃が的に当たった時のみtrueにする
-	if (GetAsyncKeyState(VK_UP) & 0x01)
-	{
-		shake = true;
-	}
-
-	CameraShake(elapsedTime);
-
-	shakenTarget = { focus.x + shakeOffset.x, focus.y + shakeOffset.y, focus.z + shakeOffset.z };
-	CameraManager::Instance().GetCamera()->SetLookAt(eye, shakenTarget, DirectX::XMFLOAT3(0, 1, 0));
+	// カメラに設定
+	CameraManager::Instance().GetCamera()->SetLookAt(eye,focus, DirectX::XMFLOAT3(0, 1, 0));
 }
-
-void ThridPersonCameraController::CameraShake(float elapsedTime)
-{
-	//後にマジックナンバーは全て変数にする
-	shakeAmplitude = 0.1f;
-    
-	// 時間に応じてシェイク量を減少
-	if (shakeTime < 0.2f) {
-		shakeAmplitude = 1.f * (0.2 - shakeTime);
-	}
-	else {
-		shakeAmplitude = 0.f;
-	}
-
-	if (shake)
-	{
-		shakeTime += elapsedTime;
-
-		shakeOffset.x = (NoiseGenerator::PerlinNoise({ shakeTime * 10.f, 0.0f, 0.f }, 1) - 0.5f) * shakeAmplitude;
-		shakeOffset.y = (NoiseGenerator::PerlinNoise({ 0.0f, shakeTime * 10.f, 0.0f }, 1) - 0.5f) * shakeAmplitude;
-
-		
-	}
-	if (shakeTime > 0.2f)
-	{
-		shake = false;
-		shakeTime = 0;
-	}
-}
-
 DirectX::XMFLOAT3 ThridPersonCameraController::GetTargetPt(float distance)
 {
 	return eye + (XMFLOAT3Normalize(focus - eye) * distance);
