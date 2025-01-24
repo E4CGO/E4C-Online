@@ -3,7 +3,7 @@
 
 #include "AttackCollider.h"
 #include "Source/GameObject/Character/Character.h"
-
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 void AttackSphereCollider::Update()
 {
 	SphereCollider::Update();
@@ -37,6 +37,9 @@ void AttackSphereCollider::OnCollision(Collider* other)
 		uint16_t damage = m_power - other->GetArmor();
 	Character* chara = static_cast<Character*>(other->GetOwner());
 	m_hitOthers.emplace_back(chara);
+	// 攻撃がヒットしたらカメラシェイクをリセット
+	CameraManager::Instance().GetCamera()->ResetShakeTimer();
+	CameraManager::Instance().GetCamera()->SetShake(true);
 		chara->OnDamage(damage);
 	}
 }

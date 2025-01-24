@@ -177,6 +177,9 @@ void StageOpenWorld_E4C::Initialize()
 
 	// 影初期化
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
+
+	
+	
 }
 
 void StageOpenWorld_E4C::Finalize()
@@ -185,18 +188,17 @@ void StageOpenWorld_E4C::Finalize()
 }
 
 void StageOpenWorld_E4C::Update(float elapsedTime)
-{
-	Camera* camera = CameraManager::Instance().GetCamera();
-	camera->CameraShake(elapsedTime);
+{	
+	// ゲームループ内で
+	cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
+	cameraController->Update(elapsedTime);
 	Online::OnlineController* onlineController = m_pScene->GetOnlineController();
 	if (onlineController->GetState() == Online::OnlineController::STATE::LOGINED)
 	{
 		onlineController->BeginSync();
 	}
 
-	// ゲームループ内で
-	cameraController->SyncContrllerToCamera(camera);
-	cameraController->Update(elapsedTime);
+	
 
 	ENEMIES.Update(elapsedTime);
 
@@ -242,6 +244,8 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	{
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
 	}
+
+	
 
 	m_sceneTickTimer = elapsedTime;
 	m_sceneGlobalTimer += elapsedTime;
@@ -364,4 +368,5 @@ void StageOpenWorld_E4C::DrawSceneGUI()
 	ImVec2 pos = ImGui::GetMainViewport()->Pos;
 	ImGui::SetNextWindowPos(ImVec2(pos.x + 10, pos.y + 10), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+	ImGui::InputFloat("shaketimer", &shakeTimer);
 }

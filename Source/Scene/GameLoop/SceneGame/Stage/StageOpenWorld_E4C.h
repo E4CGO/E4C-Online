@@ -118,6 +118,8 @@ private:
 
 	float m_sceneGlobalTimer = 0;
 	float m_sceneTickTimer = 0;
+	float shakeTimer = 0;
+	float shakeTime = 0.2f;
 };
 
 #endif // !__INCLUDED_STAGE_OPEN_WORLD_E4C_H__
