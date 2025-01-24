@@ -1,5 +1,5 @@
 //! @file PlayerCharacter.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDED_PLAYER_CHARACTER_H__
 #define __INCLUDED_PLAYER_CHARACTER_H__
@@ -9,29 +9,56 @@
 
 #include "TAKOEngine/AI/StateMachine.h"
 #include "GameObject/Character/Character.h"
-#include "GameObject/Character/Player/Player.h"
 #include "GameData.h"
 #include "PlayerCharacterData.h"
+#include "TAKOEngine/Rendering/DebugRenderer/SphereRenderer.h"
 
 class Enemy;
+
+static const uint32_t Input_Up = (1 << 0);			// 上
+static const uint32_t Input_Down = (1 << 1);		// 下
+static const uint32_t Input_Left = (1 << 2);		// 左
+static const uint32_t Input_Right = (1 << 3);		// 右
+static const uint32_t Input_Jump = (1 << 4);		// ジャンプ
+static const uint32_t Input_Dodge = (1 << 5);		// 回避
+static const uint32_t Input_Attack_N = (1 << 6);	// 一般攻撃
+static const uint32_t Input_Attack_S = (1 << 7);	// 特殊攻撃
+static const uint32_t Input_Skill_1 = (1 << 8);		// スキル1
+static const uint32_t Input_Skill_2 = (1 << 9);		// スキル2
+static const uint32_t Input_Skill_3 = (1 << 10);	// スキル3
+static const uint32_t Input_Skill_4 = (1 << 11);	// スキル4
+static const uint32_t Input_Menu = (1 << 12);		// メニュー
+
+static const uint32_t Input_R_Attack_N = (1 << 13);	// 一般攻撃リリース
+static const uint32_t Input_R_Attack_S = (1 << 14);	// 特殊攻撃リリース
+static const uint32_t Input_R_Skill_1 = (1 << 15);	// スキル1リリース
+static const uint32_t Input_R_Skill_2 = (1 << 16);	// スキル2リリース
+static const uint32_t Input_R_Skill_3 = (1 << 17);	// スキル3リリース
+static const uint32_t Input_R_Skill_4 = (1 << 18);	// スキル4リリース
+
+struct ATTACK_DATA
+{
+	int damage = 0;
+	DirectX::XMFLOAT3 force = {};
+	bool power = false;
+};
 
 class PlayerCharacter : public Character
 {
 public:
 	// コンストラクタ(引数付き)
-	PlayerCharacter(uint64_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
+	PlayerCharacter(uint32_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
 	// コンストラクタ(引数付き)
-	PlayerCharacter(PlayerCharacterData::CharacterInfo dataInfo);
+	PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataInfo);
 	// デストラクタ
 	~PlayerCharacter();
-
 
 #pragma pack(push, 1)
 	// 同期用
 	struct SYNC_DATA
 	{
-		uint64_t client_id;
-		uint64_t sync_count_id;
+		uint32_t client_id;
+		uint32_t sync_count_id;
 		float position[3];
 		float velocity[3];
 		float rotate;
@@ -40,86 +67,36 @@ public:
 	};
 #pragma pack(pop)
 
-
 	// KayKit Adventurers
 	enum Animation
 	{
-		OneHanded_Melee_Attack_Chop,
-		OneHanded_Melee_Attack_Slice_Diagonal,
-		OneHanded_Melee_Attack_Slice_Horizontal,
-		OneHanded_Melee_Attack_Stab,
-		OneHanded_Ranged_Aiming,
-		OneHanded_Ranged_Reload,
-		OneHanded_Ranged_Shoot,
-		OneHanded_Ranged_Shooting,
-		TwoHanded_Melee_Attack_Chop,
-		TwoHanded_Melee_Attack_Slice,
-		TwoHanded_Melee_Attack_Spin,
-		TwoHanded_Melee_Attack_Spinning,
-		TwoHanded_Melee_Attack_Stab,
-		TwoHanded_Melee_Idle,
-		TwoHanded_Ranged_Aiming,
-		TwoHanded_Ranged_Reload,
-		TwoHanded_Ranged_Shoot,
-		TwoHanded_Ranged_Shooting,
-		Block,
-		Block_Attack,
-		Block_Hit,
-		Blocking,
-		Cheer,
-		Death_A,
-		Death_A_Pose,
-		Death_B,
-		Death_B_Pose,
-		Dodge_Backward,
-		Dodge_Forward,
-		Dodge_Left,
-		Dodge_Right,
-		Dualwield_Melee_Attack_Chop,
-		Dualwield_Melee_Attack_Slice,
-		Dualwield_Melee_Attack_Stab,
-		Hit_A,
-		Hit_B,
-		Idle,
-		Interact,
-		Jump_Full_Long,
-		Jump_Full_Short,
-		Jump_Idle,
-		Jump_Land,
-		Jump_Start,
-		Lie_Down,
-		Lie_Idle,
-		Lie_Pose,
-		Lie_StandUp,
-		Pickup,
-		Running_A,
-		Running_B,
-		Running_Strafe_Left,
-		Running_Strafe_Right,
-		Sit_Chair_Down,
-		Sit_Chair_Idle,
-		Sit_Chair_Pose,
-		Sit_Chair_StandUp,
-		Sit_Floor_Down,
-		Sit_Floor_Idle,
-		Sit_Floor_Pose,
-		Sit_Floor_StandUp,
-		Spellcast_Charge,
-		Spellcast_Long,
-		Spellcast_Raise,
-		Spellcast_Shoot,
-		T_POSE,
-		Throw,
-		Unarmed_Idle,
-		Unarmed_Melee_Attack_Kick,
-		Unarmed_Melee_Attack_Punch_A,
-		Unarmed_Melee_Attack_Punch_B,
-		Unarmed_Pose,
-		Use_Item,
-		Walking_A,
-		Walking_B,
-		Walking_Backward,
-		Walking_C
+		ANIM_ROD_IDLE,
+		ANIM_ROD_MOVE_START,
+		ANIM_ROD_MOVE_CONTINUE,
+		ANIM_ROD_CHARGE_START,
+		ANIM_ROD_CHARGE_CONTINUE,
+		ANIM_ROD_ATTACK_COMBO_FIRST,
+		ANIM_ROD_ATTACK_COMBO_SECOND,
+		ANIM_ROD_ATTACK_COMBO_THIRD,
+		ANIM_ROD_CHARGE_END,
+		ANIM_ROD_ATTACK_SPECIAL_FIRST,
+		ANIM_ROD_ATTACK_SPECIAL_SECOND,
+		ANIM_ROD_HURT,
+		ANIM_ROD_DEATH,
+		ANIM_SWORD_IDLE,
+		ANIM_SWORD_MOVE_START,
+		ANIM_SWORD_MOVE_CONTINUE,
+		ANIM_SWORD_ATTACK_COMBO_FIRST,
+		ANIM_SWORD_ATTACK_COMBO_SECOND,
+		ANIM_SWORD_ATTACK_COMBO_THIRD,
+		ANIM_SWORD_ATTACK_SPECIAL_FIRST,
+		ANIM_SWORD_ATTACK_SPECIAL_SECOND,
+		ANIM_SHIELD_GUARD_START,
+		ANIM_SHIELD_GUARD_CONTINUE,
+		ANIM_SHIELD_GUARD_KNOCKBACK_CONTINUE,
+		ANIM_SHIELD_GUARD_FINISH,
+		ANIM_SWORD_HURT,
+		ANIM_SWORD_DEATH
 	};
 
 	enum STATE : uint8_t
@@ -144,6 +121,19 @@ public:
 		READY = 255,	// 待機 (準備完了)
 	};
 
+	enum COLLIDER_ID : uint8_t
+	{
+		COL_BODY,
+		COL_ATTACK_1,
+		COL_ATTACK_2,
+		COL_ATTACK_3,
+		COL_ATTACK_SPECIAL,
+		COL_SKILL_1,
+		COL_SKILL_2,
+		COL_SKILL_3,
+		COL_SKILL_4,
+	};
+
 	enum COLOR_PATTERN {
 		DEFAULT,
 		RED,
@@ -151,16 +141,35 @@ public:
 		BLUE,
 		END
 	};
+
+	enum class WEAPON_TYPE {
+		SWORD_SIMPLE = 1,
+		SWORD_NORMAL,
+		SWORD_COMPLEX,
+		ROD_SIMPLE,
+		ROD_NORMAL,
+		ROD_COMPLEX,
+		ENUM_COUNT
+	};
+
+	enum class ENERGY_TYPE
+	{
+		STAMINA = 1,
+		MANA,
+		ENUM_COUNT
+	};
+
 	// 更新処理
 	virtual void Update(float elapsedTime) override;
 	// 描画処理
 	void Render(const RenderContext& rc) override;
+	void RenderDX12(const RenderContextDX12& rc) override;
 
 	// 外見パターンを読み取る
 	void LoadAppearance(const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]);
 
 	void Jump();
-	void InputMove(float elapsedTime);
+	bool InputMove(float elapsedTime);
 
 	DirectX::XMFLOAT2 GetInputDirection();
 	// 入力管理
@@ -168,7 +177,7 @@ public:
 	bool InputJump() { return (input & Input_Jump); }
 	bool InputDodge();
 	bool InputAttackNormal() { return (input & Input_Attack_N) > 0; }
-	bool InputAttackSpecial() { return (input & Input_Attack_S) > 0; }
+	bool InputSpecial() { return (input & Input_Attack_S) > 0; }
 	bool InputSkill1() { return (input & Input_Skill_1) > 0; }
 	bool InputSkill2() { return (input & Input_Skill_2) > 0; }
 	bool InputSkill3() { return (input & Input_Skill_3) > 0; }
@@ -186,9 +195,8 @@ public:
 	void FaceToCamera();
 	void TurnByInput();
 
-	uint64_t GetClientId() { return m_client_id; }
-	void SetClientId(const uint64_t id) { m_client_id = id; }
-	int GetClassType() { return type; }
+	uint32_t GetClientId() { return m_client_id; }
+	void SetClientId(const uint32_t id) { m_client_id = id; }
 
 	float GetTurnSpeed() { return turnSpeed; }
 	void SetTurnSpeed(float turnSpeed) { this->turnSpeed = turnSpeed; }
@@ -196,17 +204,21 @@ public:
 	const std::string& GetName() { return m_name; }
 	void SetName(const char* name) { this->m_name = name; }
 
-	void SetMenuVisibility(bool value) { this->m_menuVisible = value; }
-	bool GetMenuVisibility() { return this->m_menuVisible; }
-
 	void SetSaveFileName(std::string value) { this->m_SaveFile = value; }
 	std::string GetCharacterSaveFileName() { return this->m_SaveFile; }
 
 	// MP管理
 	void RecoverMp(float elapsedTime);
 	void ModifyMp(float mp);
+	void SetCurrentMp(float mp) { this->mp = mp; }
 	float GetMp() { return mp; }
 	float GetMaxMp() { return maxMp; }
+
+	void SetWeaponType(WEAPON_TYPE weapontype) { m_weaponType = static_cast<WEAPON_TYPE>(weapontype); }
+	void SetEnergyType(ENERGY_TYPE energytype) { m_energyType = static_cast<ENERGY_TYPE>(energytype); }
+
+	WEAPON_TYPE GetWeaponType() { return m_weaponType; }
+	ENERGY_TYPE GetEnergyType() { return m_energyType; }
 
 	// スキルタイマー
 	float GetSkillTimerTime(int idx);
@@ -221,11 +233,21 @@ public:
 
 	float GetMpCost(int idx);
 
+
+	//剣ノード取得
+	const iModel::Node* GetSwordTrailNode();
+
+
+	void SwordTrail();
+	bool IsTrail() { return m_isTrail; }
+	void SetTrail(bool trail) { m_isTrail = trail; }
+
 	// 自機判定
 	bool IsPlayer() { return GAME_DATA.GetClientId() == m_client_id; };
 
 	// ダメージコールバック
-	virtual void OnDamage(const HitResult& hit, int damage);
+	//virtual void OnDamage(const HitResult& hit, int damage);
+	virtual void OnDamage(const uint16_t& damage) override;
 
 	// ターゲットを取得
 	DirectX::XMFLOAT3 GetTarget() { return target; }
@@ -237,11 +259,6 @@ public:
 	// ステートマシンを取得
 	StateMachine<PlayerCharacter>* GetStateMachine() { return stateMachine; }
 
-	Collider* GetAttackCollider(int idx) { return m_pattackColliders[idx]; }
-	std::unordered_map<int, Collider*> GetAttackColliders() { return m_pattackColliders; }
-	void EnableAttackColliders(bool enable = true) { for (const std::pair<int, Collider*>& collider : m_pattackColliders) collider.second->SetEnable(enable); }
-
-
 	// 同期用データを取得
 	void GetSyncData(SYNC_DATA& data);
 	// 同期用データを計算
@@ -251,21 +268,29 @@ public:
 protected:
 	void RegisterCommonState();
 	void UpdateTarget();													// 自機用アイム目標更新
+	void UpdateHorizontalMove(float elapsedTime) override;					// 水平移動更新処理
+	void PositionAdjustment() override;										// 位置補正処理
 	virtual void UpdateColliders() override;								// 衝突判定の更新
 
 	void UpdateSkillTimers(float elapsedTime);								// スキルタイマー
 
-	bool CollisionVsEnemies(
-		Collider* collider,
-		int damage,
-		bool power = false,
-		float force = 0.0f,
-		int effectIdx = -1,
-		float effectScale = 1.0f
-	); // 汎用 敵との判定
+	bool CollisionVsEnemies();
 
-private:
-	uint64_t m_client_id = 0;
+	//bool CollisionVsEnemyAttack(
+	//	Collider* collider,
+	//	int damage,
+	//	bool power = false,
+	//	float force = 0.0f,
+	//	int effectIdx = -1,
+	//	float effectScale = 1.0f
+	//); // 汎用 敵との判定
+
+	//void AttackEnemy(Collider* attackCol, Collider* enemyCol);
+
+protected:
+	float radius = 0;	// 当たり判定半径
+
+	uint32_t m_client_id = 0;
 
 	uint32_t input = 0;						// キー入力
 	DirectX::XMFLOAT2 inputDirection = {};	// 移動方向
@@ -277,9 +302,10 @@ private:
 	float mp = 100.0f;
 	float maxMp = 100.0f;
 	float mpRecoverRate = 8.0f; // 毎秒回復量
-	PLAYER_CLASS type = PLAYER_CLASS::Null;
 	int atk = 10;
 	std::string m_name;
+	WEAPON_TYPE m_weaponType;
+	ENERGY_TYPE m_energyType;
 
 	float moveSpeed = 0.0f;
 	float turnSpeed = 0.0f;
@@ -300,6 +326,10 @@ private:
 		}
 	};
 	std::unordered_map<int, SkillTimer> skillTimer;
+
+	std::unique_ptr<SphereRenderer> m_sphere;
+
+	std::unique_ptr<SpriteDX12> m_swordSprite = std::make_unique<SpriteDX12>(1, "Data/Sprites/trail.png");
 protected:
 
 	static inline DirectX::XMFLOAT4 colorSet[COLOR_PATTERN::END] = {
@@ -311,7 +341,8 @@ protected:
 
 	StateMachine<PlayerCharacter>* stateMachine;
 
-	std::unordered_map<int, Collider*> m_pattackColliders; // 攻撃判定
+	//Collider* m_hitCollider;	// ヒット判定
+	//std::unordered_map<int, Collider*> m_pattackColliders; // 攻撃判定
 
 	// 同期用
 	std::mutex m_mut;
@@ -321,9 +352,15 @@ protected:
 		float time = 0.0f;
 		DirectX::XMFLOAT3 position = {};
 		float angle = 0.0f;
-		uint64_t old_sync_count = 0;
+		uint32_t old_sync_count = 0;
 		SYNC_DATA sync_data = {};
 	} m_tempData;
+
+	//ポリゴンの最大数
+	static const int MAX_POLYGON = 12;
+	DirectX::XMFLOAT3 trailPosition[2][MAX_POLYGON];
+
+	bool m_isTrail = false;
 };
 
 #endif // __INCLUDED_PLAYER_CHARACTER_H__

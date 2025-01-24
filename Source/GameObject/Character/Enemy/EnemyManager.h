@@ -1,9 +1,14 @@
-#pragma once
+﻿//! @file EnemyManager.h
+//! @note 
 
-#include "TAKOEngine\Tool\Singleton.h"
+#ifndef __INCLUDE_ENEMY_MANAGER_H__
+#define __INCLUDE_ENEMY_MANAGER_H__
 
-#include "GameObject\ObjectManager.h"
-#include "GameObject\Character\Enemy\Enemy.h"
+
+#include "TAKOEngine/Tool/Singleton.h"
+
+#include "GameObject/ObjectManager.h"
+#include "GameObject/Character/Enemy/Enemy.h"
 
 class EnemyManager : public ObjectManager<Enemy>, public Singleton<EnemyManager>
 {
@@ -11,17 +16,27 @@ class EnemyManager : public ObjectManager<Enemy>, public Singleton<EnemyManager>
 protected:
 	EnemyManager() = default;
 	~EnemyManager() = default;
-
 public:
-	Enemy* Register(Enemy* enemy) override;
+	// オブジェクトとして更新処理
+	void Update(float elapsedTime) override;
+	// オブジェクトとして描画処理
+	void Render(const RenderContext& rc) override;
+	void RenderDX12(const RenderContextDX12& rc) override;
 
-	Enemy* GetEnemyById(int id);
-	// ���C�L���X�g
+	Enemy* GetEnemyById(const uint32_t& id);
+
+	// レイキャスト
 	bool RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, HitResult& hit, bool camera = false);
-
-	Enemy* UpdateOrCreate(ENEMY_DATA data);
+	// 同期エネミーID登録
+	void RegisterSync(const uint32_t& enemy_id);
 private:
-	int count = -1;
+	std::mutex m_mut;
+
+	//std::vector<Enemy::SYNC_DATA> m_enemySyncData; // 同期リストk
+	std::set<uint32_t> m_syncEnemies;
 };
 
 #define ENEMIES EnemyManager::Instance()
+
+#endif // !__INCLUDE_ENEMY_MANAGER_H__
+

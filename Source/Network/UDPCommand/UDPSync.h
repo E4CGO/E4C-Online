@@ -1,8 +1,10 @@
 ﻿//! @file UDPSync.h
 //! @note 
 
-#include "UDPCommand.h"
+#ifndef __INCLUDE_ONLINE_UDP_SYNC_H__
+#define __INCLUDE_ONLINE_UDP_SYNC_H__
 
+#include "UDPCommand.h"
 
 namespace Online
 {
@@ -21,7 +23,8 @@ namespace Online
 		// データ送信
 		void Send(void* data) override;
 	private:
-		uint64_t m_sync_count_id = 1;
+		uint32_t m_sync_count_id = 1;
 	};
 }
 
+#endif // !__INCLUDE_ONLINE_UDP_SYNC_H__

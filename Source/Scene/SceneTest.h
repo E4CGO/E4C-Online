@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Scene/Scene.h"
-#include "GameObject/Character/Player/Barbarian.h"
 #include "GameObject/Character/Player/PlayerCharacter.h"
 #include "Map/MapTile.h"
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
@@ -27,9 +26,6 @@ private:
 	std::unique_ptr<ThridPersonCameraController> cameraController;
 
 	MapTile* stage;
-	
-
-	std::unique_ptr<Player> player;
 
 	std::unique_ptr<PlayerCharacter> newPlayer;
 };
@@ -42,19 +38,15 @@ public:
 
 	// 初期化
 	void Initialize() override {
-		player = new Barbarian;
 	};
 	// 終了化
 	void Finalize() override {
-		delete player;
 	};
 
 	// 更新処理
 	void Update(float elapsedTime) override {
-		player->Update(elapsedTime);
 	};
 	// 描画処理
 	void Render() override {};
 private:
-	Player* player;
 };

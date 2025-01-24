@@ -7,9 +7,8 @@
 #include <memory>
 
 #include "TAKOEngine/Rendering/Sprite.h"
-#include "TAKOEngine/Rendering/SpriteDX12.h"
 
-#include "UI/Widget/WidgetButton.h"
+#include "TAKOEngine/GUI/WidgetButton.h"
 #include "UI/Widget/WidgetText.h"
 
 /**************************************************************************//**

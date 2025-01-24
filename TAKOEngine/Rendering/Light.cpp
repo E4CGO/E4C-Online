@@ -7,20 +7,24 @@
 #include "TAKOEngine/Rendering/Light.h"
 
 //***********************************************************
-// @brief       ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-// @param[in]   ‚È‚µ
-// @return      ‚È‚µ
+// @brief       ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+// @param[in]   ãªã—
+// @return      ãªã—
 //***********************************************************
-Light::Light(LightType lightType) : lightType(lightType) {}
+Light::Light(LightType lightType) : lightType(lightType) 
+{
+	// DebugPrimitiveç”¨
+	m_sphere = std::make_unique<SphereRenderer>(Graphics::Instance().GetDeviceDX12());
+}
 
 //***********************************************************
-// @brief      ƒ‰ƒCƒgî•ñ‚ğRenderContext‚ÉÏ‚Ş
-// @param[in]  rc  ƒŒƒ“ƒ_[ƒRƒ“ƒeƒLƒXƒg
-// @return     ‚È‚µ
+// @brief      ãƒ©ã‚¤ãƒˆæƒ…å ±ã‚’RenderContextã«ç©ã‚€
+// @param[in]  rc  ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆ
+// @return     ãªã—
 //***********************************************************
 void Light::PushRenderContext(RenderContext& rc) const
 {
-	// “o˜^‚³‚ê‚Ä‚¢‚éŒõŒ¹‚Ìî•ñ‚ğİ’è
+	// ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹å…‰æºã®æƒ…å ±ã‚’è¨­å®š
 	switch (lightType)
 	{
 	case	LightType::Directional:
@@ -69,9 +73,9 @@ void Light::PushRenderContext(RenderContext& rc) const
 }
 
 //***********************************************************
-// @brief      ƒfƒoƒbƒOî•ñ‚Ì•\¦
-// @param[in]  ‚È‚µ
-// @return     ‚È‚µ
+// @brief      ãƒ‡ãƒãƒƒã‚°æƒ…å ±ã®è¡¨ç¤º
+// @param[in]  ãªã—
+// @return     ãªã—
 //***********************************************************
 void Light::DrawDebugGUI()
 {
@@ -123,86 +127,97 @@ void Light::DrawDebugGUI()
 }
 
 //***********************************************************
-// @brief      ƒfƒoƒbƒO}Œ`‚Ì•\¦
-// @param[in]  ‚È‚µ
-// @return     ‚È‚µ
+// @brief      ãƒ‡ãƒãƒƒã‚°å›³å½¢ã®è¡¨ç¤º
+// @param[in]  ãªã—
+// @return     ãªã—
 //***********************************************************
 void Light::DrawDebugPrimitive()
 {
-	DebugRenderer* debugRenderer = Graphics::Instance().GetDebugRenderer();
-	LineRenderer* lineRenderer = Graphics::Instance().GetLineRenderer();
+	//DebugRenderer* debugRenderer = Graphics::Instance().GetDebugRenderer();
+	//LineRenderer* lineRenderer = Graphics::Instance().GetLineRenderer();
 
-	switch (lightType)
-	{
-	case LightType::Directional:
-	{
-		//	•½sŒõŒ¹‚Í•\¦‚µ‚È‚¢B
-		break;
-	}
-	case LightType::Point:
-	{
-		//	“_ŒõŒ¹‚Í‘S•ûˆÊ‚ÉŒõ‚ğ•úË‚·‚éŒõŒ¹‚È‚Ì‚Å‹…‘Ì‚ğ•`‰æ‚·‚éB
-		debugRenderer->DrawSphere(position, range, color);
-		break;
-	}
-	case LightType::Spot:
-	{
-		DirectX::XMVECTOR	Direction = DirectX::XMLoadFloat3(&direction);
-		float len;
-		DirectX::XMStoreFloat(&len, DirectX::XMVector3Length(Direction));
-		if (len <= 0.00001f)
-			break;
-		Direction = DirectX::XMVector3Normalize(Direction);
-		//	²Zo
-		DirectX::XMFLOAT3 dir;
-		DirectX::XMStoreFloat3(&dir, Direction);
-		DirectX::XMVECTOR Work = fabs(dir.y) == 1 ? DirectX::XMVectorSet(1, 0, 0, 0)
-			: DirectX::XMVectorSet(0, 1, 0, 0);
-		DirectX::XMVECTOR	XAxis = DirectX::XMVector3Cross(Direction, Work);
-		DirectX::XMVECTOR	YAxis = DirectX::XMVector3Cross(XAxis, Direction);
-		XAxis = DirectX::XMVector3Cross(Direction, YAxis);
+	//switch (lightType)
+	//{
+	//case LightType::Directional:
+	//{
+	//	//	å¹³è¡Œå…‰æºã¯è¡¨ç¤ºã—ãªã„ã€‚
+	//	break;
+	//}
+	//case LightType::Point:
+	//{
+	//	//	ç‚¹å…‰æºã¯å…¨æ–¹ä½ã«å…‰ã‚’æ”¾å°„ã™ã‚‹å…‰æºãªã®ã§çƒä½“ã‚’æç”»ã™ã‚‹ã€‚
+	//	if (Graphics::Instance().isDX11Active) debugRenderer->SetSphere(position, range, color);
+	//	else
+	//	{
+	//		// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆè¨­å®š
+	//		RenderContextDX12 rc;
+	//		rc.d3d_command_list = Graphics::Instance().GetFrameBufferManager()->GetCommandList();
 
-		static constexpr int SplitCount = 16;
-		for (int u = 0; u < SplitCount; u++)
-		{
-			float s = static_cast<float>(u) / static_cast<float>(SplitCount);
-			float r = -DirectX::XM_PI + DirectX::XM_2PI * s;
-			// ‰ñ“]s—ñZo
-			DirectX::XMMATRIX	RotationZ = DirectX::XMMatrixRotationAxis(Direction, r);
-			// ü‚ğZo
-			DirectX::XMFLOAT3	OldPoint;
-			{
-				DirectX::XMVECTOR	Point = Direction;
-				DirectX::XMMATRIX	Rotation = DirectX::XMMatrixRotationAxis(XAxis, acosf(outerCorn))
-					* RotationZ;
-				Point = DirectX::XMVectorMultiply(Point, DirectX::XMVectorSet(range, range, range, 0));
-				Point = DirectX::XMVector3TransformCoord(Point, Rotation);
-				Point = DirectX::XMVectorAdd(Point, DirectX::XMLoadFloat3(&position));
-				DirectX::XMFLOAT3	pos;
-				DirectX::XMStoreFloat3(&pos, Point);
-				lineRenderer->AddVertex(position, color);
-				lineRenderer->AddVertex(pos, color);
-				OldPoint = pos;
-			}
-			// ‹…–Ê‚ğZo
-			for (int v = 0; v <= SplitCount; ++v)
-			{
-				float s = static_cast<float>(v) / static_cast<float>(SplitCount);
-				float a = outerCorn + (1.0f - outerCorn) * s;
-				DirectX::XMVECTOR	Point = Direction;
-				DirectX::XMMATRIX	Rotation = DirectX::XMMatrixRotationAxis(XAxis, acosf(a))
-					* RotationZ;
-				Point = DirectX::XMVectorMultiply(Point, DirectX::XMVectorSet(range, range, range, 0));
-				Point = DirectX::XMVector3TransformCoord(Point, Rotation);
-				Point = DirectX::XMVectorAdd(Point, DirectX::XMLoadFloat3(&position));
-				DirectX::XMFLOAT3	pos;
-				DirectX::XMStoreFloat3(&pos, Point);
-				lineRenderer->AddVertex(OldPoint, color);
-				lineRenderer->AddVertex(pos, color);
-				OldPoint = pos;
-			}
-		}
-		break;
-	}
-	}
+	//		// æç”»
+	//		m_sphere->SetSphere(position, range, color);
+	//		m_sphere->Render(rc);
+	//	}
+
+	//	break;
+	//}
+	//case LightType::Spot:
+	//{
+	//	DirectX::XMVECTOR	Direction = DirectX::XMLoadFloat3(&direction);
+	//	float len;
+	//	DirectX::XMStoreFloat(&len, DirectX::XMVector3Length(Direction));
+	//	if (len <= 0.00001f)
+	//		break;
+	//	Direction = DirectX::XMVector3Normalize(Direction);
+	//	//	è»¸ç®—å‡º
+	//	DirectX::XMFLOAT3 dir;
+	//	DirectX::XMStoreFloat3(&dir, Direction);
+	//	DirectX::XMVECTOR Work = fabs(dir.y) == 1 ? DirectX::XMVectorSet(1, 0, 0, 0)
+	//		: DirectX::XMVectorSet(0, 1, 0, 0);
+	//	DirectX::XMVECTOR	XAxis = DirectX::XMVector3Cross(Direction, Work);
+	//	DirectX::XMVECTOR	YAxis = DirectX::XMVector3Cross(XAxis, Direction);
+	//	XAxis = DirectX::XMVector3Cross(Direction, YAxis);
+
+	//	static constexpr int SplitCount = 16;
+	//	for (int u = 0; u < SplitCount; u++)
+	//	{
+	//		float s = static_cast<float>(u) / static_cast<float>(SplitCount);
+	//		float r = -DirectX::XM_PI + DirectX::XM_2PI * s;
+	//		// å›è»¢è¡Œåˆ—ç®—å‡º
+	//		DirectX::XMMATRIX	RotationZ = DirectX::XMMatrixRotationAxis(Direction, r);
+	//		// ç·šã‚’ç®—å‡º
+	//		DirectX::XMFLOAT3	OldPoint;
+	//		{
+	//			DirectX::XMVECTOR	Point = Direction;
+	//			DirectX::XMMATRIX	Rotation = DirectX::XMMatrixRotationAxis(XAxis, acosf(outerCorn))
+	//				* RotationZ;
+	//			Point = DirectX::XMVectorMultiply(Point, DirectX::XMVectorSet(range, range, range, 0));
+	//			Point = DirectX::XMVector3TransformCoord(Point, Rotation);
+	//			Point = DirectX::XMVectorAdd(Point, DirectX::XMLoadFloat3(&position));
+	//			DirectX::XMFLOAT3	pos;
+	//			DirectX::XMStoreFloat3(&pos, Point);
+	//			lineRenderer->AddVertex(position, color);
+	//			lineRenderer->AddVertex(pos, color);
+	//			OldPoint = pos;
+	//		}
+	//		// çƒé¢ã‚’ç®—å‡º
+	//		for (int v = 0; v <= SplitCount; ++v)
+	//		{
+	//			float s = static_cast<float>(v) / static_cast<float>(SplitCount);
+	//			float a = outerCorn + (1.0f - outerCorn) * s;
+	//			DirectX::XMVECTOR	Point = Direction;
+	//			DirectX::XMMATRIX	Rotation = DirectX::XMMatrixRotationAxis(XAxis, acosf(a))
+	//				* RotationZ;
+	//			Point = DirectX::XMVectorMultiply(Point, DirectX::XMVectorSet(range, range, range, 0));
+	//			Point = DirectX::XMVector3TransformCoord(Point, Rotation);
+	//			Point = DirectX::XMVectorAdd(Point, DirectX::XMLoadFloat3(&position));
+	//			DirectX::XMFLOAT3	pos;
+	//			DirectX::XMStoreFloat3(&pos, Point);
+	//			lineRenderer->AddVertex(OldPoint, color);
+	//			lineRenderer->AddVertex(pos, color);
+	//			OldPoint = pos;
+	//		}
+	//	}
+	//	break;
+	//}
+	//}
 }

@@ -25,7 +25,7 @@ namespace Online
 		return true;
 	}
 	/**************************************************************************//**
-		@brief		ログイン受信関数
+		@brief		ログイン送信関数
 		@param[in]	data データ参照ポインタ
 		@return		成功判断
 	*//***************************************************************************/
@@ -35,13 +35,11 @@ namespace Online
 
 		std::vector<uint8_t> buffer;
 
-		std::string utf8name = Encode::shift_jis_to_utf8(loginData->name.c_str());
-
-		CreateHeaderBuffer(buffer, m_cmd, sizeof(loginData->appearance) + static_cast<uint32_t>(utf8name.size() - 1));
+		CreateHeaderBuffer(buffer, m_cmd, sizeof(loginData->appearance) + static_cast<uint32_t>(loginData->name.size()));
 		// 外見データ
 		buffer.insert(buffer.end(), loginData->appearance, loginData->appearance + sizeof(loginData->appearance));
 		// 名前データ
-		U8Buffer::InsertU8(buffer, utf8name);
+		U8Buffer::Insert(buffer, loginData->name);
 
 		bool result = m_pcontroller->GetTcpSocket()->Send(buffer.data(), buffer.size()) >= 0;
 
@@ -56,7 +54,6 @@ namespace Online
 		}
 		return result;
 	}
-
 
 	/**************************************************************************//**
 		@brief		ログイン待ちスレッド

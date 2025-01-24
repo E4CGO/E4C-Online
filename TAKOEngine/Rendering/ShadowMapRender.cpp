@@ -5,9 +5,10 @@
 #include <imgui.h>
 #include "Misc.h"
 
-#include "TAKOEngine\Rendering\ShadowMapRender.h"
 #include "TAKOEngine\Rendering\Graphics.h"
-#include "TAKOEngine/Editor/Camera/CameraManager.h"
+#include "TAKOEngine\Editor\Camera\CameraManager.h"
+
+#include "TAKOEngine\Rendering\ShadowMapRender.h"
 
 namespace myRenderer
 {
@@ -338,4 +339,210 @@ DepthStencil::DepthStencil(UINT width, UINT height)
 	depth_stencil_view_desc.Texture2D.MipSlice = 0;
 	hr = device->CreateDepthStencilView(texture2d.Get(), &depth_stencil_view_desc, depthStencilView.ReleaseAndGetAddressOf());
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+}
+
+//***********************************************************
+// @brief       コンストラクタ
+// @param[in]   device　    ID3D12Device*
+// @return      なし
+//***********************************************************
+ShadowMapRenderDX12::ShadowMapRenderDX12()
+{
+}
+
+//***********************************************************
+// @brief       初期化
+// @param[in]   device　    ID3D12Device*
+// @return      なし
+//***********************************************************
+void ShadowMapRenderDX12::Init(ID3D12Device* device)
+{
+	CreateFrameBuffer(device);
+}
+
+//***********************************************************
+// @brief       終了処理
+// @param[in]   なし
+// @return      なし
+//***********************************************************
+void ShadowMapRenderDX12::Finalize()
+{
+	if (m_models.size() != 0)
+	{
+		m_models.clear();
+	}
+
+	if (dsv_descriptor != nullptr)
+	{
+		Graphics::Instance().GetDepthStencilDescriptorHeap()->PushDescriptor(dsv_descriptor);
+	}
+
+	if (srv_descriptor != nullptr)
+	{
+		Graphics::Instance().GetShaderResourceDescriptorHeap()->PushDescriptor(srv_descriptor);
+	}
+
+	if (sampler_descriptor != nullptr)
+	{
+		Graphics::Instance().GetSamplerDescriptorHeap()->PushDescriptor(sampler_descriptor);
+	}
+}
+
+//***********************************************************
+// @brief       モデル登録
+// @param[in]   model　    iModel*
+// @return      なし
+//***********************************************************
+void ShadowMapRenderDX12::ModelRegister(iModel* model)
+{
+	// モデルが既に登録されているか調べる
+	std::vector<iModel*>::iterator it = std::find(m_models.begin(), m_models.end(), model);
+	if (it != m_models.end())
+		return;
+
+	m_models.emplace_back(model);
+}
+
+//***********************************************************
+// @brief       描画
+// @param[in]   frameBuffer    FrameBufferManager*
+// @return      なし
+//***********************************************************
+void ShadowMapRenderDX12::Render(FrameBufferManager* frameBuffer)
+{
+	Graphics& graphics = Graphics::Instance();
+
+	// シーン用定数バッファ更新
+	const Descriptor* scene_cbv_descriptor = graphics.UpdateSceneConstantBuffer(
+		CameraManager::Instance().GetCamera(), 0, 0);
+
+	RenderContextDX12 rc;
+	rc.d3d_command_list = frameBuffer->GetCommandList();
+	rc.scene_cbv_descriptor = scene_cbv_descriptor;
+
+	// 描画
+	{
+		// レンダーターゲットを変更
+		frameBuffer->SetRenderTarget(dsv_descriptor->GetCpuHandle(), ShadowMapSize);
+		frameBuffer->ClearDepthStencilView(dsv_descriptor->GetCpuHandle());
+
+		ModelShaderDX12* shader = graphics.GetModelShaderDX12(ModelShaderDX12Id::shadowMap);
+		for (auto& model : m_models)
+		{
+			// スキニング
+			graphics.GetSkinningPipeline()->Compute(rc, model);
+
+			for (const ModelDX12::Mesh& mesh : model->GetMeshes())
+			{
+				shader->Render(rc, mesh);
+			}
+		}
+	}
+
+	// レンダーターゲットを元に戻す
+	frameBuffer->SetRenderTarget(graphics.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
+}
+
+//********************************************************
+// @brief     フレームバッファ用のコンスタントバッファを作成
+// @param[in] なし
+// @return    なし
+//********************************************************
+void ShadowMapRenderDX12::CreateFrameBuffer(ID3D12Device* device)
+{
+	// ヒーププロパティの設定
+	D3D12_HEAP_PROPERTIES d3d_heap_props{};
+	d3d_heap_props.Type = D3D12_HEAP_TYPE_DEFAULT;
+	d3d_heap_props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	d3d_heap_props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	d3d_heap_props.CreationNodeMask = 1;
+	d3d_heap_props.VisibleNodeMask = 1;
+
+	// リソースの設定
+	D3D12_RESOURCE_DESC d3d_resource_desc{};
+	d3d_resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	d3d_resource_desc.Alignment = 0;
+	d3d_resource_desc.Width = ShadowMapSize;
+	d3d_resource_desc.Height = ShadowMapSize;
+	d3d_resource_desc.DepthOrArraySize = 1;
+	d3d_resource_desc.MipLevels = 1;
+	d3d_resource_desc.Format = DXGI_FORMAT_R32_TYPELESS;
+	d3d_resource_desc.SampleDesc.Count = 1;
+	d3d_resource_desc.SampleDesc.Quality = 0;
+	d3d_resource_desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	d3d_resource_desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+	D3D12_CLEAR_VALUE dsvClearValue;
+	dsvClearValue.Format = DXGI_FORMAT_D32_FLOAT;
+	dsvClearValue.DepthStencil.Depth = 1.0f;
+	dsvClearValue.DepthStencil.Stencil = 0;
+
+	// リソースの生成
+	HRESULT hr = device->CreateCommittedResource(
+		&d3d_heap_props,
+		D3D12_HEAP_FLAG_NONE,
+		&d3d_resource_desc,
+		D3D12_RESOURCE_STATE_DEPTH_WRITE,
+		&dsvClearValue,
+		IID_PPV_ARGS(d3d_dsv_srv_resource.GetAddressOf()));
+	d3d_dsv_srv_resource->SetName(L"ShadowMap");
+
+	// ディスクリプタ取得
+	dsv_descriptor = Graphics::Instance().GetDepthStencilDescriptorHeap()->PopDescriptor();
+
+	// デプスステンシルビューの設定
+	D3D12_DEPTH_STENCIL_VIEW_DESC d3d_dsv_desc{};
+	d3d_dsv_desc.Format = DXGI_FORMAT_D32_FLOAT;
+	d3d_dsv_desc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	d3d_dsv_desc.Flags = D3D12_DSV_FLAG_NONE;
+
+	// デプスステンシルビュー生成
+	device->CreateDepthStencilView(
+		d3d_dsv_srv_resource.Get(),
+		&d3d_dsv_desc,
+		dsv_descriptor->GetCpuHandle());
+
+	// シェーダーリソースビューの設定
+	D3D12_SHADER_RESOURCE_VIEW_DESC d3d_srv_desc = {};
+	d3d_srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	d3d_srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	d3d_srv_desc.Format = DXGI_FORMAT_R32_FLOAT;
+	d3d_srv_desc.Texture2D.MipLevels = d3d_resource_desc.MipLevels;
+	d3d_srv_desc.Texture2D.MostDetailedMip = 0;
+
+	// ディスクリプタ取得
+	srv_descriptor = Graphics::Instance().GetShaderResourceDescriptorHeap()->PopDescriptor();
+
+	// シェーダリソースビューを生成.
+	device->CreateShaderResourceView(
+		d3d_dsv_srv_resource.Get(),
+		&d3d_srv_desc,
+		srv_descriptor->GetCpuHandle());
+
+	// シャドウサンプラー
+	{
+		// サンプラの設定
+		D3D12_SAMPLER_DESC d3d_sampler_desc{};
+		d3d_sampler_desc.Filter = D3D12_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+		d3d_sampler_desc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+		d3d_sampler_desc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+		d3d_sampler_desc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+		d3d_sampler_desc.MipLODBias = 0;
+		d3d_sampler_desc.MaxAnisotropy = 1;
+		d3d_sampler_desc.ComparisonFunc = D3D12_COMPARISON_FUNC_LESS;
+		d3d_sampler_desc.BorderColor[0] = D3D12_FLOAT32_MAX;
+		d3d_sampler_desc.BorderColor[1] = D3D12_FLOAT32_MAX;
+		d3d_sampler_desc.BorderColor[2] = D3D12_FLOAT32_MAX;
+		d3d_sampler_desc.BorderColor[3] = D3D12_FLOAT32_MAX;
+		d3d_sampler_desc.MinLOD = 0;
+		d3d_sampler_desc.MaxLOD = 0;
+
+		// ディスクリプタ取得
+		sampler_descriptor = Graphics::Instance().GetSamplerDescriptorHeap()->PopDescriptor();
+
+		// サンプラー生成
+		device->CreateSampler(
+			&d3d_sampler_desc,
+			sampler_descriptor->GetCpuHandle());
+	}
 }

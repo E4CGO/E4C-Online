@@ -64,12 +64,5 @@ namespace Online
 		U8Buffer::Insert(buffer, syncData.sub_state);
 
 		m_pcontroller->GetUdpSocket()->Send(buffer.data(), buffer.size());
-
-		//std::cout << "Sync: ";
-		//for (uint8_t& t : buffer)
-		//{
-		//	std::cout << (unsigned)t << ",";
-		//}
-		//std::cout << std::endl;
 	}
 }

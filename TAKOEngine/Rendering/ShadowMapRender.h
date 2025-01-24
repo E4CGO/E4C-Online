@@ -10,6 +10,7 @@
 #include "TAKOEngine/Rendering/MyRender.h"
 #include "TAKOEngine/Rendering/RenderContext.h"
 #include "TAKOEngine/Rendering/FrameBuffer.h"
+#include "TAKOEngine/Rendering/FrameBufferManager.h"
 #include "TAKOEngine/Rendering/Model/Model.h"
 #include "TAKOEngine/Rendering/Light.h"
 
@@ -96,4 +97,43 @@ namespace myRenderer
 	}
 }
  
+//**********************************************************************
+// @class ShadowMapRenderDX12
+// @brief 影を描画する用のレンダラ
+// @par   [説明]
+//**********************************************************************
+class ShadowMapRenderDX12
+{
+public:
+	ShadowMapRenderDX12();
+	~ShadowMapRenderDX12() {};
+
+	void Init(ID3D12Device* device);
+
+	void Finalize();
+
+	//シャドウマップに描画するモデルを登録
+	void ModelRegister(iModel* model);
+
+	//描画
+	void Render(FrameBufferManager* frameBuffer);
+
+	const Descriptor* GetShadowSRV() { return srv_descriptor; }
+	const Descriptor* GetShadowSampler() { return sampler_descriptor; }
+
+private:
+	void CreateFrameBuffer(ID3D12Device* device);
+
+private:
+	Microsoft::WRL::ComPtr<ID3D12Resource>			d3d_dsv_srv_resource;
+
+	const Descriptor* dsv_descriptor = nullptr;
+	const Descriptor* srv_descriptor = nullptr;
+	const Descriptor* sampler_descriptor = nullptr;
+
+	const UINT ShadowMapSize = 2048;
+
+	std::vector<iModel*> m_models;
+};
+
 #endif // !__GRAPHICS_SHADOWMAP_RENDER_H__

@@ -1,14 +1,39 @@
-#include "TAKOEngine/Runtime/tentacle_lib.h"
+ï»¿#include "TAKOEngine/Runtime/tentacle_lib.h"
 
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
 
-// ‰Šú‰»
+// åˆæœŸåŒ–
 void SceneLoading::Initialize()
 {
+	if (T_GRAPHICS.isDX12Active)
+	{
+		m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
+
+		m_loadingPlane = std::make_unique<PlaneDX12>("Data/Sprites/gear.png", 1.0f, XMFLOAT3{ 0.0f, 0.0f, -10.0f }, 0.0f, 1.5f);
+		m_loadingPlane->SetShaderDX12(ModelShaderDX12Id::Loading);
+
+		CameraManager& cameraManager = CameraManager::Instance();
+		mainCamera = new Camera();
+		cameraManager.Register(mainCamera);
+		cameraManager.SetCamera(0);
+		mainCamera->SetPerspectiveFov(
+			DirectX::XMConvertToRadians(45),							// ç”»è§’
+			T_GRAPHICS.GetScreenWidth() / T_GRAPHICS.GetScreenHeight(),	// ç”»é¢ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”
+			0.1f,														// ãƒ‹ã‚¢ã‚¯ãƒªãƒƒãƒ—
+			10000.0f													// ãƒ•ã‚¡ãƒ¼ã‚¯ãƒªãƒƒãƒ—
+		);
+
+		mainCamera->SetLookAt(
+			{ 0.0, 0.0f, 1.0f },		// è¦–ç‚¹
+			{ 0.0f, 0.0f, 0.0f },	// æ³¨è¦–ç‚¹
+			{ 0, 0.969f, -0.248f }	// ä¸Šãƒ™ã‚¯ãƒˆãƒ«
+		);
+	}
+
 	thread = new std::thread(LoadingThread, this);
 }
-// I—¹‰»
+// çµ‚äº†åŒ–
 void SceneLoading::Finalize()
 {
 	if (thread != nullptr)
@@ -18,18 +43,20 @@ void SceneLoading::Finalize()
 		thread = nullptr;
 	}
 }
-// XVˆ—
+// æ›´æ–°å‡¦ç†
 void SceneLoading::Update(float elapsedTime)
 {
 	if (nextScene->IsReady())
 	{
 		SceneManager::Instance().ChangeScene(nextScene);
 	}
+
+	m_timer += elapsedTime;
 }
-// •`‰æˆ—
+// æç”»å‡¦ç†
 void SceneLoading::Render()
 {
-	// ‰æ–ÊƒNƒŠƒA
+	// ç”»é¢ã‚¯ãƒªã‚¢
 	T_GRAPHICS.GetFrameBuffer(FrameBufferId::Display)->Clear(T_GRAPHICS.GetDeviceContext(), 0, 0, 0, 1);
 
 	T_TEXT.Begin();
@@ -48,7 +75,40 @@ void SceneLoading::Render()
 
 void SceneLoading::RenderDX12()
 {
+	RenderContextDX12 rc;
+
 	T_GRAPHICS.BeginRender();
+
+	m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
+	m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
+	m_frameBuffer->Clear(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
+
+	const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
+		CameraManager::Instance().GetCamera(), m_timer, 0);
+
+	rc.d3d_command_list = m_frameBuffer->GetCommandList();
+	rc.scene_cbv_descriptor = scene_cbv_descriptor;
+
+	m_loadingPlane->RenderDX12(rc);
+
+	m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
+
+	postprocessingRenderer->Render(m_frameBuffer);
+
+	T_TEXT.BeginDX12();
+
+	T_TEXT.RenderDX12(
+		FONT_ID::HGpop,
+		L"Now Loading...",
+		T_GRAPHICS.GetScreenWidth() * 0.95f, T_GRAPHICS.GetScreenHeight() * 0.95f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		0.0f,
+		FONT_ALIGN::RIGHT
+	);
+
+	T_TEXT.EndDX12();
+
+	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(T_GRAPHICS.GetFrameBufferManager()->GetCommandList());
 	T_GRAPHICS.End();
 }
 
@@ -56,15 +116,15 @@ void SceneLoading::LoadingThread(SceneLoading* scene)
 {
 	srand(static_cast <unsigned> (time(NULL)));
 
-	// COMŠÖ˜A‚Ì‰Šú‰»‚ÅƒXƒŒƒbƒh–ˆ‚ÉŒÄ‚Ô•K—v‚ª‚ ‚é
+	// COMé–¢é€£ã®åˆæœŸåŒ–ã§ã‚¹ãƒ¬ãƒƒãƒ‰æ¯ã«å‘¼ã¶å¿…è¦ãŒã‚ã‚‹
 	CoInitialize(nullptr);
 
-	// Ÿ‚ÌƒV[ƒ“‚Ì‰Šú‰»‚ğs‚¤
+	// æ¬¡ã®ã‚·ãƒ¼ãƒ³ã®åˆæœŸåŒ–ã‚’è¡Œã†
 	scene->nextScene->Initialize();
 
-	// ƒXƒŒƒbƒh‚ªI‚í‚é‘O‚ÉCOMŠÖ˜A‚ÌI—¹‰»
+	// ã‚¹ãƒ¬ãƒƒãƒ‰ãŒçµ‚ã‚ã‚‹å‰ã«COMé–¢é€£ã®çµ‚äº†åŒ–
 	CoUninitialize();
 
-	// Ÿ‚ÌƒV[ƒ“‚Ì€”õŠ®—¹İ’è
+	// æ¬¡ã®ã‚·ãƒ¼ãƒ³ã®æº–å‚™å®Œäº†è¨­å®š
 	scene->nextScene->SetReady();
 }

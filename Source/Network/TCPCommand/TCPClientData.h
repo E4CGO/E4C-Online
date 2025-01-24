@@ -22,7 +22,7 @@ namespace Online
 		TCPClientData(OnlineController* controller, uint8_t cmd) : TCPCommand(controller, cmd) {};
 
 		struct CLIENT_DATA {
-			uint64_t client_id;
+			uint32_t client_id;
 			char appearance[10];
 		};
 

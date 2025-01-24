@@ -1,9 +1,13 @@
 ﻿#include "Camera.h"
 #include "TAKOEngine/Tool/Mathf.h"
 #include <stdlib.h>
+#include "TAKOEngine/Tool/PerlinNoise.h"
+#include "GameObject/Character/Character.h"
+#include "ThridPersonCameraController.h"
 // 指定方向を向く
 void Camera::SetLookAt(const DirectX::XMFLOAT3& eye, const DirectX::XMFLOAT3& focus, const DirectX::XMFLOAT3& up)
 {
+
 	// 視点、注視点、上方向からビュー行列を作成
 	DirectX::XMVECTOR Eye = DirectX::XMLoadFloat3(&eye);
 	DirectX::XMVECTOR Focus = DirectX::XMLoadFloat3(&focus);
@@ -46,13 +50,33 @@ void Camera::SetPerspectiveFov(float fovY, float aspect, float nearZ, float farZ
 	this->nearZ  = nearZ;
 	this->farZ   = farZ;
 }
+void Camera::CameraShake(float shakeAmplitude, float shakeTime,float elapsedTime)
+{
+	if (shakeTimer < shakeTime) {
+		shakeAmplitude = 1.f * (shakeTime - shakeTimer);
+	}
+	else {
+		shakeAmplitude = 0.f;
+	}
+	if (m_shake)
+	{
+		shakeTimer += elapsedTime;
 
-void Camera::MoveToCamera(const DirectX::XMFLOAT3& eye, const DirectX::XMFLOAT3& focus, float transitiontime, float transitionDuration, float elapsedTime)
+		shakeOffset.x = (NoiseGenerator::PerlinNoise({ shakeTimer * 10.f, 0.0f, 0.f }, 1) - 0.5f) * shakeAmplitude;
+		shakeOffset.y = (NoiseGenerator::PerlinNoise({ 0.0f, shakeTimer * 10.f, 0.0f }, 1) - 0.5f) * shakeAmplitude;
+	}
+	if (shakeTimer > shakeTime)
+	{
+		m_shake = false;
+		shakeTimer = 0;
+	}
+}
+void Camera::MoveTo(const DirectX::XMFLOAT3& eye, const DirectX::XMFLOAT3& focus, float transitiontime, float transitionDuration)
 {
 	// 遷移時間を増加
-	if (transitiontime < transitionDuration)
+	if (transitiontime > transitionDuration)
 	{
-		transitiontime += elapsedTime;
+		transitiontime = transitionDuration;
 	}
 
 	// 補間係数を計算（0.0〜1.0の範囲）
@@ -70,12 +94,14 @@ void Camera::MoveToCamera(const DirectX::XMFLOAT3& eye, const DirectX::XMFLOAT3&
 	interpolatedFocus.z = Mathf::Lerp(this->GetFocus().z, focus.z, t);
 
 
+	
+
 
 	// 補間結果をカメラに設定
 	this->SetLookAt(interpolatedEye, interpolatedFocus, { 0.0f, 1.0f, 0.0f });
 }
 
-void Camera::RotateToCamera(const DirectX::XMFLOAT3& target, float& angle, float radius, float speed, float elapsedTime)
+void Camera::RotateTo(const DirectX::XMFLOAT3& target, float& angle, float radius, float speed, float elapsedTime)
 {
 
 	// 回転の進行
@@ -101,17 +127,17 @@ void Camera::RotateToCamera(const DirectX::XMFLOAT3& target, float& angle, float
 		angle = 0.0f;
 	}
 }
-void Camera::Move2PointToCamera(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const DirectX::XMFLOAT3& startFocus, const DirectX::XMFLOAT3& endFocus, float& transitionTime, float transitionDuration, float elapsedTime)
+void Camera::Move2PointToCamera(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const DirectX::XMFLOAT3& startFocus, const DirectX::XMFLOAT3& endFocus, float transitionTime, float transitionDuration)
 {
 	// 遷移時間の更新
-	if (transitionTime < transitionDuration)
+	if (transitionTime > transitionDuration)
 	{
-		transitionTime += elapsedTime;
+		transitionTime = transitionDuration;
 	}
 
 	// 補間係数を計算（0.0〜1.0の範囲でクランプ）
 	float t = transitionTime / transitionDuration;
-	t = std::min(t, 1.0f);
+	t = min(t, 1.0f);
 
 	// カメラの位置と注視点を補間
 	DirectX::XMFLOAT3 interpolatedEye{};
@@ -137,7 +163,7 @@ void Camera::Move2PointToCamera(const DirectX::XMFLOAT3& start, const DirectX::X
 
 }
 
-void Camera::MovePointToCamera(const std::vector<DirectX::XMFLOAT3>& positions, const std::vector<DirectX::XMFLOAT3>& focusPoints,  float& transitionTime, float transitionDuration, float elapsedTime)
+void Camera::MoveByPoints(const std::vector<DirectX::XMFLOAT3>& positions, const std::vector<DirectX::XMFLOAT3>& focusPoints, float transitionTime, float transitionDuration)
 {
 	if (positions.size() < 2 || focusPoints.size() < 2 || positions.size() != focusPoints.size())
 	{
@@ -146,11 +172,10 @@ void Camera::MovePointToCamera(const std::vector<DirectX::XMFLOAT3>& positions, 
 	}
 
 	// 遷移時間の更新
-	if (transitionTime < transitionDuration)
+	if (transitionTime > transitionDuration)
 	{
-		transitionTime += elapsedTime;
+		transitionTime = transitionDuration;
 	}
-
 	// 現在のセグメントのスタートとエンドのポイントを取得
 	int nextSegment = (currentSegment + 1) % positions.size();
 

@@ -1,19 +1,19 @@
-//! @file GameObject.cpp
-//! @note 
+ï»¿//! @file GameObject.cpp
+//! @note
 
 #include "GameObject.h"
 
 /**************************************************************************//**
-		@brief		ƒgƒ‰ƒ“ƒXƒtƒH[ƒ€XV
-		@param[in]	‚È‚µ
-		@return		‚È‚µ
+		@brief		ãƒˆãƒ©ãƒ³ã‚¹ãƒ•ã‚©ãƒ¼ãƒ æ›´æ–°
+		@param[in]	ãªã—
+		@return		ãªã—
 *//***************************************************************************/
 void GameObject::UpdateTransform() {
-	// ƒXƒP[ƒ‹s—ñ¶¬
+	// ã‚¹ã‚±ãƒ¼ãƒ«è¡Œåˆ—ç”Ÿæˆ
 	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
-	// ‰ñ“]s—ñ¶¬
+	// å›è»¢è¡Œåˆ—ç”Ÿæˆ
 	DirectX::XMMATRIX R = AnglesToMatrix(angle);
-	// ˆÊ’us—ñ¶¬
+	// ä½ç½®è¡Œåˆ—ç”Ÿæˆ
 	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 
 	DirectX::XMMATRIX W = S * R * T;
@@ -22,9 +22,9 @@ void GameObject::UpdateTransform() {
 }
 
 /**************************************************************************//**
- 	@brief		ƒ[ƒJƒ‹ƒ|ƒWƒeƒBƒu‚©‚çƒ[ƒ‹ƒh‚Ö
-	@param[in]	v ƒrƒ…[ˆÊ’u
-	@return	ƒ[ƒ‹ƒhƒ|ƒWƒVƒ‡ƒ“
+	@brief		ãƒ­ãƒ¼ã‚«ãƒ«ãƒã‚¸ãƒ†ã‚£ãƒ–ã‹ã‚‰ãƒ¯ãƒ¼ãƒ«ãƒ‰ã¸
+	@param[in]	v ãƒ“ãƒ¥ãƒ¼ä½ç½®
+	@return	ãƒ¯ãƒ¼ãƒ«ãƒ‰ãƒã‚¸ã‚·ãƒ§ãƒ³
 *//***************************************************************************/
 DirectX::XMFLOAT3 GameObject::LocalPositiontoWorld(DirectX::XMFLOAT3 v)
 {
@@ -35,12 +35,12 @@ DirectX::XMFLOAT3 GameObject::LocalPositiontoWorld(DirectX::XMFLOAT3 v)
 }
 
 /**************************************************************************//**
- 	@brief		ƒIƒuƒWƒFƒNƒg‚ÌƒXƒNƒŠ[ƒ“À•W‚ğæ“¾iŠù’mƒrƒ…[ƒ|[ƒgAƒrƒ…[ƒvƒƒWƒFƒNƒVƒ‡ƒ“Aƒ[ƒ‹ƒhj
-	@param[in]	viewport	ƒrƒ…[ƒ|[ƒgQÆ
-	@param[in]	View		ƒrƒ…[s—ñQÆ
-	@param[in]	Projection	ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñQÆ
-	@param[in]	World		ƒ[ƒ‹ƒhs—ñQÆ
-	@return		ƒXƒNƒŠ[ƒ“À•W
+	@brief		ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åº§æ¨™ã‚’å–å¾—ï¼ˆæ—¢çŸ¥ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆã€ãƒ“ãƒ¥ãƒ¼ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³ã€ãƒ¯ãƒ¼ãƒ«ãƒ‰ï¼‰
+	@param[in]	viewport	ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆå‚ç…§
+	@param[in]	View		ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—å‚ç…§
+	@param[in]	Projection	ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—å‚ç…§
+	@param[in]	World		ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—å‚ç…§
+	@return		ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åº§æ¨™
 *//***************************************************************************/
 DirectX::XMFLOAT3 GameObject::GetScreenPosition(
 	const D3D11_VIEWPORT& viewport,
@@ -53,9 +53,9 @@ DirectX::XMFLOAT3 GameObject::GetScreenPosition(
 }
 
 /**************************************************************************//**
- 	@brief		ƒIƒuƒWƒFƒNƒg‚ÌƒXƒNƒŠ[ƒ“À•W‚ğæ“¾iƒrƒ…[ƒ|[ƒgAƒrƒ…[ƒvƒƒWƒFƒNƒVƒ‡ƒ“Aƒ[ƒ‹ƒhÄŒvZj
-	@param[in]	‚È‚µ
-	@return		ƒXƒNƒŠ[ƒ“À•W
+	@brief		ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åº§æ¨™ã‚’å–å¾—ï¼ˆãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆã€ãƒ“ãƒ¥ãƒ¼ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³ã€ãƒ¯ãƒ¼ãƒ«ãƒ‰å†è¨ˆç®—ï¼‰
+	@param[in]	ãªã—
+	@return		ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åº§æ¨™
 *//***************************************************************************/
 DirectX::XMFLOAT3 GameObject::GetScreenPosition()
 {
@@ -63,13 +63,13 @@ DirectX::XMFLOAT3 GameObject::GetScreenPosition()
 }
 
 /**************************************************************************//**
- 	@brief		‰ñ“]²‚ÆŠp“x‚ğ—˜—p‚µ‚Ä‰ñ“]‚·‚é
-	@param[in]	Axis	‰ñ“]²
-	@param[in]	Angle	Šp“x
+	@brief		å›è»¢è»¸ã¨è§’åº¦ã‚’åˆ©ç”¨ã—ã¦å›è»¢ã™ã‚‹
+	@param[in]	Axis	å›è»¢è»¸
+	@param[in]	Angle	è§’åº¦
 *//***************************************************************************/
 void GameObject::RotateAxis(const DirectX::XMFLOAT3 Axis, float Angle)
 {
-	// ‰ñ“]s—ñ¶¬
+	// å›è»¢è¡Œåˆ—ç”Ÿæˆ
 	DirectX::XMVECTOR Q = DirectX::XMQuaternionRotationRollPitchYaw(angle.x, angle.y, angle.z);
 	DirectX::XMVECTOR R = DirectX::XMQuaternionRotationAxis(DirectX::XMLoadFloat3(&Axis), Angle);
 	Q = DirectX::XMQuaternionMultiply(R, Q);

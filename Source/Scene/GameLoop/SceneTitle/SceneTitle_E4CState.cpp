@@ -4,69 +4,184 @@
 #include "Scene/SceneManager.h"
 #include "Scene/GameLoop/SceneCharacter/SceneCharacter_E4C.h"
 
-#include "Source/UI/Widget/WidgetText.h"
-#include "Source/UI/Widget/WidgetButtonImage.h"
-
-WidgetText* title = nullptr;;
-WidgetButtonImage* btnStart = nullptr;;
-WidgetButtonImage* btnExit = nullptr;;
-
+/**************************************************************************//**
+	@brief タイトル画面初期
+*//***************************************************************************/
 void SceneTitle_E4CState::InitState::Enter()
 {
-	title = new WidgetText("TITLE TO BE DECIDED");
-	title->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-	title->SetScale(2.0f);
-	title->SetBorder(1);
-	title->SetBorderColor({ 1.0f, 0.0f, 0.0f, 1.0f });
-	title->SetAlign(FONT_ALIGN::CENTER);
-	title->SetPosition({ SCREEN_W * 0.5f, SCREEN_H * 0.2f });
-	UI.Register(title);
+	if (T_GRAPHICS.isDX11Active)
+	{
+		m_imgBackground = new WidgetImage("Data/Sprites/UI/Title/background.png");
+		m_imgBackground->SetPosition({ 0, 0 });
+		m_imgBackground->SetSize({ SCREEN_W, SCREEN_H });
+		UI.Register(m_imgBackground);
+	}
+	if (T_GRAPHICS.isDX12Active)
+	{
+		m_backgroundAnimation = new WidgetStripeAnimation("Data/Sprites/UI/Title/Title_Anim.png",
+			0, 0, SCREEN_W, SCREEN_H,
+			819, 0, 819, 434,
+			20, 0.1f);
+		UI.Register(m_backgroundAnimation);
+	}
 
-	btnStart = new WidgetButtonImage("", "Data/Sprites/UI/start.png", [&](WidgetButton*) {
+	m_imgLogo = new WidgetImage("Data/Sprites/UI/Title/title_logo.png");
+	m_imgLogo->SetPosition({ SCREEN_W * .64f,  SCREEN_H * .15f });
+	m_imgLogo->SetSize({ m_imgLogo->GetSize().x * .5f * SCREEN_W / 1920.0f, m_imgLogo->GetSize().y * .5f * SCREEN_H / 1080.0f });
+	UI.Register(m_imgLogo);
+
+	// TODO:
+	//for (int i = 0; i < m_MenuOptions.size(); i++)
+	//{
+	//	std::string spriteName = "Data/Sprites/UI/Title/" + m_MenuOptions[i] + "_d.png";
+	//	std::string spriteNameHover = "Data/Sprites/UI/Title/" + m_MenuOptions[i] + "_h.png";
+
+	//	WidgetButtonImage* btnOption = new WidgetButtonImage("", spriteName.c_str(), spriteNameHover.c_str(), [&](WidgetButton*) {
+	//		owner->GetStateMachine()->ChangeState(SceneTitle_E4C::STATE::START);
+	//		});
+	//	btnOption->SetPosition({ SCREEN_W * .7f, SCREEN_H * 0.5f + btnOption->GetSize().y * 0.75f * i });
+	//	btnOption->SetSize({ btnOption->GetSize().x * .5f ,  btnOption->GetSize().y * .5f });
+	//	UI.Register(btnOption);
+	//}
+
+	m_btnStart = new WidgetButtonImage("", "Data/Sprites/UI/Title/new_d.png", "Data/Sprites/UI/Title/new_h.png", [&](WidgetButton*) {
 		owner->GetStateMachine()->ChangeState(SceneTitle_E4C::STATE::START);
 		});
-	btnStart->SetPosition({ SCREEN_W * 0.5f - 196.0f * 0.5f * 1.5f, SCREEN_H * 0.5f });
-	btnStart->SetSize({ 196.0f * 1.5f, 92.0f * 1.5f });
-	UI.Register(btnStart);
+	m_btnStart->SetPosition({ SCREEN_W * .7f, SCREEN_H * 0.5f });
+	m_btnStart->SetSize({ m_btnStart->GetSize().x * .5f * SCREEN_W / 1920.0f, m_btnStart->GetSize().y * .5f * SCREEN_H / 1080.0f });
+	UI.Register(m_btnStart);
 
-	btnExit = new WidgetButtonImage("", "Data/Sprites/UI/exit.png", [&](WidgetButton*) {
+	m_btnOption = new WidgetButtonImage("", "Data/Sprites/UI/Title/option_d.png", "Data/Sprites/UI/Title/option_h.png", [&](WidgetButton*) {
+		owner->GetStateMachine()->ChangeState(SceneTitle_E4C::STATE::OPTION);
+		});
+	m_btnOption->SetPosition({ SCREEN_W * .7f, SCREEN_H * 0.5f + m_btnStart->GetSize().y * 1.2f * 1.0f });
+	m_btnOption->SetSize({ m_btnOption->GetSize().x * .5f * SCREEN_W / 1920.0f, m_btnOption->GetSize().y * .5f * SCREEN_H / 1080.0f });
+	UI.Register(m_btnOption);
+
+	m_btnCredits = new WidgetButtonImage("", "Data/Sprites/UI/Title/credits_d.png", "Data/Sprites/UI/Title/credits_h.png", [&](WidgetButton*) {
+		owner->GetStateMachine()->ChangeState(SceneTitle_E4C::STATE::CREDITS);
+		});
+	m_btnCredits->SetPosition({ SCREEN_W * .7f, SCREEN_H * 0.5f + m_btnStart->GetSize().y * 1.2f * 2.0f });
+	m_btnCredits->SetSize({ m_btnCredits->GetSize().x * .5f * SCREEN_W / 1920.0f,  m_btnCredits->GetSize().y * .5f * SCREEN_H / 1080.0f });
+	UI.Register(m_btnCredits);
+
+	m_btnExit = new WidgetButtonImage("", "Data/Sprites/UI/Title/exit_d.png", "Data/Sprites/UI/Title/exit_h.png", [&](WidgetButton*) {
 		owner->GetStateMachine()->ChangeState(SceneTitle_E4C::STATE::EXIT);
 		});
-	btnExit->SetPosition({ SCREEN_W * 0.5f - 163.0f * 0.5f * 1.5f, SCREEN_H * 0.8f });
-	btnExit->SetSize({ 163.0f * 1.5f, 128.0f });
-	UI.Register(btnExit);
+	m_btnExit->SetPosition({ SCREEN_W * .7f, SCREEN_H * 0.5f + m_btnStart->GetSize().y * 1.2f * 3.0f });
+	m_btnExit->SetSize({ m_btnExit->GetSize().x * .5f * SCREEN_W / 1920.0f, m_btnExit->GetSize().y * .5f * SCREEN_H / 1080.0f });
+	UI.Register(m_btnExit);
 }
 
+/**************************************************************************//**
+	@brief タイトル画面アップデート
+	@param[in]    elapsedTime　変更時間
+*//***************************************************************************/
 void SceneTitle_E4CState::InitState::Execute(float elapsedTime)
 {
 }
 
+/**************************************************************************//**
+	@brief	切り替え終了
+*//***************************************************************************/
 void SceneTitle_E4CState::InitState::Exit()
 {
+	UI.Clear();
+	SetCursor(::LoadCursor(NULL, IDC_HAND));
 }
 
-// タイトルステート
+/**************************************************************************//**
+	@brief	ゲームを始める準備
+*//***************************************************************************/
 void SceneTitle_E4CState::StartState::Enter()
 {
 }
+/**************************************************************************//**
+	@brief    ゲームに切り替え
+	@param[in]    elapsedTime	変更時間
+*//***************************************************************************/
 void SceneTitle_E4CState::StartState::Execute(float elapsedTime)
 {
 	SceneManager::Instance().ChangeScene(new SceneLoading(new SceneCharacter_E4C));
 }
+/**************************************************************************//**
+	@brief	切り替え終了
+*//***************************************************************************/
 void SceneTitle_E4CState::StartState::Exit()
 {
 	UI.Clear();
 	SetCursor(::LoadCursor(NULL, IDC_HAND));
 }
 
+/**************************************************************************//*
+	@brief	オープション画面初期
+*//***************************************************************************/
+void SceneTitle_E4CState::OptionState::Enter()
+{
+	m_settingWindow = new WidgetSettingWindow;
+
+	UI.Register(m_settingWindow);
+}
+/**************************************************************************//**
+	@brief	オープション画面アップデート
+	@param[in]    elapsedTime	変更時間
+*//***************************************************************************/
+void SceneTitle_E4CState::OptionState::Execute(float elapsedTime)
+{
+	if (m_settingWindow->IsEnd())
+	{
+		owner->GetStateMachine()->ChangeState(SceneTitle_E4C::STATE::INIT);
+	}
+}
+/**************************************************************************//**
+	@brief	切り替え終了
+*//***************************************************************************/
+void SceneTitle_E4CState::OptionState::Exit()
+{
+	UI.Clear();
+	SetCursor(::LoadCursor(NULL, IDC_HAND));
+}
+
 // タイトルステート
+/**************************************************************************//**
+	@brief	クレジット画面初期
+*//***************************************************************************/
+void SceneTitle_E4CState::CreditsState::Enter()
+{
+}
+/**************************************************************************//**
+	@brief	クレジット画面初期アップデート
+	@param[in]    elapsedTime	変更時間
+*//***************************************************************************/
+void SceneTitle_E4CState::CreditsState::Execute(float elapsedTime)
+{
+}
+/**************************************************************************//**
+	@brief	切り替え終了
+*//***************************************************************************/
+void SceneTitle_E4CState::CreditsState::Exit()
+{
+	UI.Clear();
+	SetCursor(::LoadCursor(NULL, IDC_HAND));
+}
+
+/**************************************************************************//**
+	@brief	ゲームを終了
+*//***************************************************************************/
 void SceneTitle_E4CState::ExitState::Enter()
 {
 	PostMessage(TentacleLib::hWnd, WM_QUIT, 0, 0);
 }
+/**************************************************************************//**
+	@brief	ゲームの終了アップデート
+	@param[in]    elapsedTime	変更時間
+*//***************************************************************************/
 void SceneTitle_E4CState::ExitState::Execute(float elapsedTime)
 {
 }
+/**************************************************************************//**
+	@brief	切り替え終了
+*//***************************************************************************/
 void SceneTitle_E4CState::ExitState::Exit()
 {
 	SetCursor(::LoadCursor(NULL, IDC_HAND));

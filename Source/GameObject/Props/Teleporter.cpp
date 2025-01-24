@@ -19,63 +19,71 @@
 Teleporter::Teleporter(Stage* stage, Online::OnlineController* onlineController) : m_pStage(stage), m_pOnlineController(onlineController), ModelObject()
 {
 	m_timer = 0.0f;
-	SetShader(ModelShaderId::Portal);
-
-	ID3D11Device* device = T_GRAPHICS.GetDevice();
-
-	HRESULT hr = S_OK;
+	if (T_GRAPHICS.isDX11Active)
 	{
-		using namespace DirectX;
+		SetShader(ModelShaderId::Portal);
 
-		m_mesh.vertices = m_defaultVertices;
+		ID3D11Device* device = T_GRAPHICS.GetDevice();
 
-		// 頂点バッファを作成するための設定オプション
-		D3D11_BUFFER_DESC buffer_desc = {};
-		buffer_desc.ByteWidth = sizeof(ModelResource::Vertex) * 4; // 4頂点
-		buffer_desc.Usage = D3D11_USAGE_DYNAMIC;
-		buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		buffer_desc.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
-		buffer_desc.MiscFlags = 0;
-		buffer_desc.StructureByteStride = 0;
+		HRESULT hr = S_OK;
+		{
+			using namespace DirectX;
 
-		D3D11_SUBRESOURCE_DATA vertexData = {};
-		vertexData.pSysMem = m_mesh.vertices.data();
+			m_mesh.vertices = m_defaultVertices;
 
-		// 頂点バッファオブオブジェクトの生成
-		hr = device->CreateBuffer(&buffer_desc, &vertexData, m_mesh.vertexBuffer.GetAddressOf());
+			// 頂点バッファを作成するための設定オプション
+			D3D11_BUFFER_DESC buffer_desc = {};
+			buffer_desc.ByteWidth = sizeof(ModelResource::Vertex) * 4; // 4頂点
+			buffer_desc.Usage = D3D11_USAGE_DYNAMIC;
+			buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			buffer_desc.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
+			buffer_desc.MiscFlags = 0;
+			buffer_desc.StructureByteStride = 0;
+
+			D3D11_SUBRESOURCE_DATA vertexData = {};
+			vertexData.pSysMem = m_mesh.vertices.data();
+
+			// 頂点バッファオブオブジェクトの生成
+			hr = device->CreateBuffer(&buffer_desc, &vertexData, m_mesh.vertexBuffer.GetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+		}
+
+		{
+			unsigned int indices[] = {
+				0, 1, 2,
+				2, 1, 3
+			};
+
+			D3D11_BUFFER_DESC indexBufferDesc = {};
+			indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+			indexBufferDesc.ByteWidth = sizeof(indices);
+			indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+
+			D3D11_SUBRESOURCE_DATA indexData = {};
+			indexData.pSysMem = indices;
+
+			hr = device->CreateBuffer(&indexBufferDesc, &indexData, m_mesh.indexBuffer.GetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+		}
+		m_mesh.material = new ModelResource::Material;
+
+		// ダミーテクスチャ生成
+		D3D11_TEXTURE2D_DESC desc;
+		hr = GpuResourceUtils::CreateDummyTexture(device, 0xFFFFFFFF, m_mesh.material->diffuseMap.GetAddressOf(), &desc);
+
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-	}
 
-	{
-		unsigned int indices[] = {
-			0, 1, 2,
-			2, 1, 3
+		m_textureSize = {
+			static_cast<float>(desc.Width),
+			static_cast<float>(desc.Height)
 		};
-
-		D3D11_BUFFER_DESC indexBufferDesc = {};
-		indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-		indexBufferDesc.ByteWidth = sizeof(indices);
-		indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-
-		D3D11_SUBRESOURCE_DATA indexData = {};
-		indexData.pSysMem = indices;
-
-		hr = device->CreateBuffer(&indexBufferDesc, &indexData, m_mesh.indexBuffer.GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
-	m_mesh.material = new ModelResource::Material;
 
-	// ダミーテクスチャ生成
-	D3D11_TEXTURE2D_DESC desc;
-	hr = GpuResourceUtils::CreateDummyTexture(device, 0xFFFFFFFF, m_mesh.material->diffuseMap.GetAddressOf(), &desc);
-
-	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-
-	m_textureSize = {
-		static_cast<float>(desc.Width),
-		static_cast<float>(desc.Height)
-	};
-
+	if (T_GRAPHICS.isDX12Active)
+	{
+		m_portalFrame = std::make_unique<PlaneDX12>("Data/Sprites/gear.png", 1.0f, XMFLOAT3{ 0.0f, 0.0f, 0.0f }, 0.0f, 1.0f);
+		m_portalFrame->SetShaderDX12(ModelShaderDX12Id::PortalSquare);
+	}
 }
 
 /**************************************************************************//**
@@ -86,8 +94,8 @@ Teleporter::Teleporter(Stage* stage, Online::OnlineController* onlineController)
 void Teleporter::Update(float elapsedTime)
 {
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
-	const float radius = 0.5f * scale.x;
-	if (player != nullptr && XMFLOAT3LengthSq(player->GetPosition() - (position - DirectX::XMFLOAT3{ 0.0f, 0.5f * scale.y, 0.0f })) < radius* radius)
+	const float radius = m_interractionDistance * scale.x;
+	if (player != nullptr && XMFLOAT3LengthSq(player->GetPosition() - (position - DirectX::XMFLOAT3{ 0.0f, 0.5f * scale.y, 0.0f })) < radius * radius)
 	{
 		m_timer += elapsedTime;
 		if (m_timer >= m_portalTime)
@@ -117,6 +125,12 @@ void Teleporter::Update(float elapsedTime)
 	{
 		ModelResource::Vertex& vertice = m_mesh.vertices[i];
 		DirectX::XMStoreFloat3(&vertice.position, DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&m_defaultVertices[i].position), Transform));
+	}
+
+	if (T_GRAPHICS.isDX12Active)
+	{
+		m_portalFrame->SetPosition(position);
+		m_portalFrame->Update(elapsedTime);
 	}
 }
 
@@ -148,7 +162,20 @@ void Teleporter::Render(const RenderContext& rc)
 }
 
 /**************************************************************************//**
- 	@brief		転送開始
+	@brief		描画処理
+	@param[in]	rc	レンダーコンテンツ参照
+	@return		なし
+*//***************************************************************************/
+void Teleporter::RenderDX12(const RenderContextDX12& rc)
+{
+	if (m_isVisible)
+	{
+		m_portalFrame->RenderDX12(rc);
+	}
+}
+
+/**************************************************************************//**
+	@brief		転送開始
 	@param[in]	なし
 	@return		なし
 *//***************************************************************************/

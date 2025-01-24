@@ -1,4 +1,4 @@
-//! @file ObjectManager.h
+ï»¿//! @file ObjectManager.h
 //! @note
 
 #ifndef __INCLUDED_OBJECT_MANAGER__
@@ -41,7 +41,7 @@ public:
 		}
 	}
 
-	void RenderDX12(const RenderContextDX12& rc)
+	virtual void RenderDX12(const RenderContextDX12& rc)
 	{
 		for (T* item : this->items)
 		{
@@ -58,12 +58,12 @@ public:
 			this->Register(item);
 		}
 	}
-	// ƒAƒCƒeƒ€‚Ì“o˜^‚ğ‰ğœ‚·‚é
+	// ã‚¢ã‚¤ãƒ†ãƒ ã®ç™»éŒ²ã‚’è§£é™¤ã™ã‚‹
 	void Remove(T* item)
 	{
 		removes.insert(item);
 	}
-	// ƒŠƒTƒCƒY
+	// ãƒªã‚µã‚¤ã‚º
 	void Resize(int size)
 	{
 		int i = 0;
@@ -73,7 +73,7 @@ public:
 			if (i > size) removes.insert(item);
 		}
 	}
-	// ƒfƒoƒbƒOî•ñ‚Ì•\¦
+	// ãƒ‡ãƒãƒƒã‚°æƒ…å ±ã®è¡¨ç¤º
 	void DrawDebugGUI()
 	{
 		for (T* item : this->items)
@@ -81,7 +81,7 @@ public:
 			item->DrawDebugGUI();
 		}
 	}
-	// ƒfƒoƒbƒOƒvƒŠƒ~ƒeƒBƒu‚Ì•\¦
+	// ãƒ‡ãƒãƒƒã‚°ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–ã®è¡¨ç¤º
 	void DrawDebugPrimitive()
 	{
 		for (T* item : this->items)

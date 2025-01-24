@@ -9,7 +9,7 @@
 
 #include "TAKOEngine/Rendering/Sprite.h"
 
-#include "UI/Widget/WidgetButton.h"
+#include "TAKOEngine/GUI/WidgetButton.h"
 
 /**************************************************************************//**
 	@class	WidgetInputBool
@@ -34,8 +34,10 @@ public:
 private:
 	// TRUE画像
 	std::shared_ptr<Sprite> m_trueImage;
+	std::shared_ptr<SpriteDX12> m_trueImageDX12;
 	// FALSE画像
 	std::shared_ptr<Sprite> m_falseImage;
+	std::shared_ptr<SpriteDX12> m_falseImageDX12;
 	// UIラベル
 	std::string m_label;
 	// bool値参照ポインタ

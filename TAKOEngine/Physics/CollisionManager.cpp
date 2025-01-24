@@ -1,98 +1,32 @@
-#include "CollisionManager.h"
+ï»¿#include "CollisionManager.h"
 
-#include "TAKOEngine/Physics/CollisionDataManager.h"
-
-#include "GameObject/Character/Player/PlayerManager.h"
-#include "GameObject/Character/Enemy/EnemyManager.h"
-#include "GameObject/Projectile/ProjectileManager.h"
-
-void CollisionManager::Update(float elapsedTime)
+void CollisionManager::Contacts()
 {
-	EnemiesVsEnemiesCollsiion();
-	PlayerPositionAdjustment();
-
-	ProjectileCollision();
-	PlayerAttackToEnemyCollision();
-	EnemyAttackToPlayerCollision();
-}
-
-/**
-* “G“¯mÕ“Ë”»’è
-**/
-void CollisionManager::EnemiesVsEnemiesCollsiion()
-{
-}
-
-/**
-* ©‹@ˆÊ’u’²®
-* “GÕ“Ë”»’è
-**/
-void CollisionManager::PlayerPositionAdjustment()
-{
-	// ©‹@ŒÀ’è
-	Player* player = PLAYERS.GetPlayerById(GAME_DATA.GetClientId());
-	if (!player) return;
-	DirectX::XMFLOAT3 position = player->GetPosition();
-	Collider* playerCollider = player->GetCollider();
-
-	// “GÕ“Ë
-	for (Enemy*& enemy : ENEMIES.GetAll())
+	for (int i = 0; i < items.size(); i++)
 	{
-		for (const std::pair<int, Collider*>& collider : enemy->GetColliders())
+		Collider* col1 = items[i];
+		if (!col1->IsEnable()) continue;
+		
+		for (int j = i + 1; j < items.size(); j++)
 		{
-			HitResult hit;
-			if (collider.second->Collision(playerCollider, {}, hit))
+			Collider* col2 = items[j];
+			if (!col2->IsEnable()) continue;
+
+			if ((col1->GetHittableOBJ() & col2->GetOBJType()) || (col2->GetHittableOBJ() & col1->GetOBJType()))
 			{
-				DirectX::XMFLOAT3 diff = hit.normal * -1.0f;
-				diff *= (collider.second->GetScale().x + playerCollider->GetScale().x - hit.distance);
-				diff.y = 0.0f;
-				position += diff;
-				playerCollider->SetPosition(playerCollider->GetPosition() + diff);
+				HitResult hit;
+				if (col1->Collision(col2, {}, hit))
+				{
+					if (col1->GetHittableOBJ() & col2->GetOBJType())
+					{
+						col1->OnCollision(col2);
+					}
+					if (col2->GetHittableOBJ() & col1->GetOBJType())
+					{
+						col2->OnCollision(col1);
+					}
+				}
 			}
 		}
-	}
-
-	// ƒ}ƒbƒv“à‚Ì’²®‚·‚é
-	// Y
-	if (position.y < -15.0f)
-	{
-		position.y = 0.2f;
-	}
-	player->SetPosition(position);
-	player->UpdateTransform();
-}
-
-void CollisionManager::ProjectileCollision()
-{
-	for (Projectile*& projectile : PROJECTILES.GetAll())
-	{
-		projectile->Collision();
-	}
-}
-
-void CollisionManager::PlayerAttackToEnemyCollision()
-{
-	Player* player = PLAYERS.GetPlayerById(GAME_DATA.GetClientId());
-	if (!player) return;	// ©‹@‚¾‚¯
-
-	player->AttackCollision();
-}
-
-/**
-* “GUŒ‚
-* ©‹@‚¾‚¯”»’f
-* Œ‹‰Ê‚ÍƒzƒXƒg‚É‘—‚ç‚È‚¢
-* HPAƒXƒe[ƒg‚Í“¯Šú
-**/
-void CollisionManager::EnemyAttackToPlayerCollision()
-{
-	Player* player = PLAYERS.GetPlayerById(GAME_DATA.GetClientId());
-	if (!player) return;
-	Collider* playerCollider = player->GetCollider();
-	if (!playerCollider->IsEnable()) return;
-
-	for (Enemy*& enemy : ENEMIES.GetAll())
-	{
-		enemy->AttackCollision();
 	}
 }

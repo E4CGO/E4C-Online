@@ -1,4 +1,8 @@
-﻿#pragma once
+﻿//! @file StageDungeon_E4C.h
+//! @note
+
+#ifndef __INCLUDED_STAGE_DUNGEON_E4C_H__
+#define __INCLUDED_STAGE_DUNGEON_E4C_H__
 
 #include <memory>
 #include <array>
@@ -7,26 +11,21 @@
 #include "GameObject/ModelObject.h"
 #include "GameObject/GameObject.h"
 #include "GameObject/Character/Player/PlayerCharacter.h"
-#include "TAKOEngine/Rendering/Shaders/PlaneShader.h"
 
 #include "Scene/Scene.h"
 #include "Scene/Stage/Stage.h"
 
+#include "Map/DungeonData.h"
 #include "Map/MapTile.h"
 #include "Map/RoomBase.h"
-#include "Map/SimpleRoom1.h"
-#include "Map/EndRoom1.h"
-#include "Map/CrossRoom1.h"
-#include "Map/CrossRoom2.h"
-#include "Map/Passage1.h"
-#include "Map/DeadEndRoom.h"
+#include "UI/Widget/WidgetText.h"
 
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
+#include "TAKOEngine/Rendering/Shaders/PlaneShader.h"
 #include "TAKOEngine/Tool/GLTFImporter.h"
 
-#include "Source/UI/Widget/WidgetButtonImage.h"
-#include "Source/UI/Widget/WidgetImage.h"
+using namespace ns_RoomData;
 
 class SceneGame_E4C;
 
@@ -60,8 +59,12 @@ public:
 	void Update(float elapsedTime) override;
 
 	void Render() override;
-protected:
-	void OnPhase() override;
+
+	void RenderDX12() override;
+private:
+	// シーンGUI描画
+	void DrawSceneGUI();
+
 protected:
 	SceneGame_E4C* m_pScene;
 
@@ -73,11 +76,7 @@ protected:
 
 	bool isLeader = true;
 
-	std::unique_ptr <Plane> plane;
 	std::unique_ptr <Plane> portal;
-
-	WidgetButtonImage* btnExit;
-	WidgetImage* background;
 
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {
@@ -87,11 +86,20 @@ protected:
 		"Data/Sprites/big_background.t.png"
 	};
 
-	bool isPause = false;
-
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
 
 	float transitionTime = 0.0f;
 	float transitionDuration = 2.f;  // 5秒かけて移動
 	int currentSegment = 0;
+	int currentFloor = 0;
+
+	// フレームバッファマネージャー
+	FrameBufferManager* m_frameBuffer;
+
+	// ポストエフェクト
+	std::unique_ptr<PostprocessingRendererDX12>	postprocessingRenderer = std::make_unique<PostprocessingRendererDX12>();
+
+	std::unique_ptr<ModelObject> instancingModel;
 };
+
+#endif // !__INCLUDED_STAGE_DUNGEON_E4C_H__

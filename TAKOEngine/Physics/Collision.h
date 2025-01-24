@@ -14,7 +14,7 @@ struct HitResult
 {
 	DirectX::XMFLOAT3	position = { 0, 0, 0 };// レイとポリゴンの交点
 	DirectX::XMFLOAT3	normal = { 0, 0, 0 };	// 衝突したポリゴンの法線ベクトル
-	float				distance = 0.0f; 		// レイの始点から交点までの距離
+	float				distance = FLT_MAX; 		// レイの始点から交点までの距離
 	int					materialIndex = -1; 	// 衝突したポリゴンのマテリアル番号
 	DirectX::XMFLOAT3	triangleVerts[3] = {};
 };
@@ -82,6 +82,12 @@ struct AABB
 {
 	DirectX::XMFLOAT3	position;	// 中心
 	DirectX::XMFLOAT3	radii;	// 半径
+};
+struct OBB
+{
+	DirectX::XMFLOAT3	position;	// 中心
+	DirectX::XMFLOAT3	radii;	// 反辺長
+	DirectX::XMFLOAT4	orientation;	// 姿勢
 };
 struct Capsule
 {

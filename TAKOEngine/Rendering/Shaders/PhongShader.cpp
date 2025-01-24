@@ -1,5 +1,5 @@
 ﻿//! @file PhongShader.cpp
-//! @note 
+//! @note
 
 #include "TAKOEngine/Rendering/Misc.h"
 #include "TAKOEngine/Rendering/Graphics.h"
@@ -47,7 +47,7 @@ void PhongShader::SetShaderResourceView(const ModelResource::Mesh& mesh, ID3D11D
 //***********************************************************
 PhongShaderDX12::PhongShaderDX12(ID3D12Device* device, bool instancing)
 {
-	Graphics&                 graphics = Graphics::Instance();
+	Graphics& graphics = Graphics::Instance();
 	const RenderStateDX12* renderState = graphics.GetRenderStateDX12();
 
 	HRESULT hr = S_OK;
@@ -79,9 +79,9 @@ PhongShaderDX12::PhongShaderDX12(ID3D12Device* device, bool instancing)
 		pipeline_state_desc.pRootSignature = m_d3d_root_signature.Get();
 
 		pipeline_state_desc.VS.pShaderBytecode = vsData.data();
-		pipeline_state_desc.VS.BytecodeLength  = vsData.size();
+		pipeline_state_desc.VS.BytecodeLength = vsData.size();
 		pipeline_state_desc.PS.pShaderBytecode = psData.data();
-		pipeline_state_desc.PS.BytecodeLength  = psData.size();
+		pipeline_state_desc.PS.BytecodeLength = psData.size();
 
 		// 入力レイアウト
 		D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
@@ -104,7 +104,7 @@ PhongShaderDX12::PhongShaderDX12(ID3D12Device* device, bool instancing)
 		pipeline_state_desc.DepthStencilState = renderState->GetDepthState(DepthState::TestAndWrite);
 
 		//ラスタライザーステート
-		pipeline_state_desc.RasterizerState = renderState->GetRasterizer(RasterizerState::SolidCullNone);
+		pipeline_state_desc.RasterizerState = renderState->GetRasterizer(RasterizerState::SolidCullBack);
 
 		//プリミティブトポロジー
 		pipeline_state_desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -114,11 +114,11 @@ PhongShaderDX12::PhongShaderDX12(ID3D12Device* device, bool instancing)
 
 		//レンダーターゲット数
 		pipeline_state_desc.NumRenderTargets = 1;
-		pipeline_state_desc.RTVFormats[0]    = RenderTargetFormat;
-		pipeline_state_desc.DSVFormat        = DepthStencilFormat;
+		pipeline_state_desc.RTVFormats[0] = RenderTargetFormat;
+		pipeline_state_desc.DSVFormat = DepthStencilFormat;
 
 		//マルチサンプリング
-		pipeline_state_desc.SampleDesc.Count   = 1;
+		pipeline_state_desc.SampleDesc.Count = 1;
 		pipeline_state_desc.SampleDesc.Quality = 0;
 
 		//アダプタ
@@ -134,7 +134,7 @@ PhongShaderDX12::PhongShaderDX12(ID3D12Device* device, bool instancing)
 	}
 
 	//サンプラーステート設定
-	m_sampler = graphics.GetSampler(SamplerState::LinearWrap);
+	m_sampler = graphics.GetSampler(SamplerState::AnisotropicWrap);
 }
 
 //***********************************************************
@@ -152,16 +152,9 @@ PhongShaderDX12::~PhongShaderDX12()
 // @param[in]   model  描画対象のモデルデータを指すポインタ
 // @return      なし
 //***********************************************************
-void PhongShaderDX12::Render(const RenderContextDX12& rc, ModelDX12* model)
+void PhongShaderDX12::Render(const RenderContextDX12& rc, const ModelDX12::Mesh& mesh)
 {
 	Graphics& graphics = Graphics::Instance();
-
-	// カメラに写っている範囲のオブジェクトをフラグでマークする配列を用意
-	std::vector<bool> visibleObjects(model->GetMeshes().size(), false);
-
-	// 視錐台カリングを実行して可視オブジェクトをマーク
-	FrustumCulling::FrustumCullingFlag(CameraManager::Instance().GetCamera(), model->GetMeshes(), visibleObjects);
-	int culling = 0;
 
 	//パイプライン設定
 	rc.d3d_command_list->SetGraphicsRootSignature(m_d3d_root_signature.Get());
@@ -170,43 +163,42 @@ void PhongShaderDX12::Render(const RenderContextDX12& rc, ModelDX12* model)
 	//シーン定数バッファ設定
 	rc.d3d_command_list->SetGraphicsRootDescriptorTable(0, rc.scene_cbv_descriptor->GetGpuHandle());  //CbScene
 
-	for (const ModelDX12::Mesh& mesh : model->GetMeshes())
+	// シャドウマップ設定
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(6, rc.shadowMap.shadow_srv_descriptor->GetGpuHandle());
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(7, rc.shadowMap.shadow_sampler_descriptor->GetGpuHandle());
+
+	const ModelResource::Mesh* res_mesh = mesh.mesh;
+	const ModelDX12::Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
+
+	// メッシュ定数バッファ設定
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(1, frame_resource.cbv_descriptor->GetGpuHandle());  //CbMesh
+
+	// 頂点バッファ設定
+	rc.d3d_command_list->IASetVertexBuffers(0, 1, mesh.bones.empty() ? &mesh.mesh->d3d_vbv : &frame_resource.d3d_vbv);
+	rc.d3d_command_list->IASetIndexBuffer(&res_mesh->d3d_ibv);
+	rc.d3d_command_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// サブセット
+	const ModelResource::Material* material = res_mesh->material;
+
+	// マテリアル定数バッファ設定
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(2, material->cbv_descriptor->GetGpuHandle());  //CbMaterial
+
+	// シェーダーリソースビュー設定
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(3, material->srv_descriptor->GetGpuHandle());         //ディフューズテクスチャ
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(4, material->srv_normal_descriptor->GetGpuHandle());  //法線テクスチャ
+
+	//サンプラーステート設定
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(5, m_sampler->GetDescriptor()->GetGpuHandle());
+
+	// 描画
+	if (frame_resource.instancingCount == 0)
 	{
-		if (!visibleObjects[culling++]) continue;
-
-		const ModelResource::Mesh* res_mesh = mesh.mesh;
-		const ModelDX12::Mesh::FrameResource& frame_resource = mesh.frame_resources.at(graphics.GetCurrentBufferIndex());
-
-		// メッシュ定数バッファ設定
-		rc.d3d_command_list->SetGraphicsRootDescriptorTable(1, frame_resource.cbv_descriptor->GetGpuHandle());  //CbMesh
-
-		// 頂点バッファ設定
-		rc.d3d_command_list->IASetVertexBuffers(0, 1, mesh.bones.empty() ? &mesh.mesh->d3d_vbv : &frame_resource.d3d_vbv);
-		rc.d3d_command_list->IASetIndexBuffer(&res_mesh->d3d_ibv);
-		rc.d3d_command_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		// サブセット
-		const ModelResource::Material* material = res_mesh->material;
-
-		// マテリアル定数バッファ設定
-		rc.d3d_command_list->SetGraphicsRootDescriptorTable(2, material->cbv_descriptor->GetGpuHandle());  //CbMaterial
-
-		// シェーダーリソースビュー設定
-		rc.d3d_command_list->SetGraphicsRootDescriptorTable(3, material->srv_descriptor->GetGpuHandle());         //ディフューズテクスチャ
-		rc.d3d_command_list->SetGraphicsRootDescriptorTable(4, material->srv_normal_descriptor->GetGpuHandle());  //法線テクスチャ
-
-		//サンプラーステート設定
-		rc.d3d_command_list->SetGraphicsRootDescriptorTable(5, m_sampler->GetDescriptor()->GetGpuHandle());
-
-		// 描画
-		if (frame_resource.instancingCount == 0)
-		{
-			rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), 1, 0, 0, 0);
-		}
-		else
-		{
-			//インスタンシング
-			rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), frame_resource.instancingCount, 0, 0, 0);
-		}
+		rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), 1, 0, 0, 0);
+	}
+	else
+	{
+		//インスタンシング
+		rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), frame_resource.instancingCount, 0, 0, 0);
 	}
 }

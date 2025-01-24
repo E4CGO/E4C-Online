@@ -1,5 +1,4 @@
 #include "MapCollisionManager.h"
-#include "UnrotatedBoxCollider.h"
 #include "imgui.h"
 
 MapCollisionManager::~MapCollisionManager()
@@ -11,10 +10,6 @@ void MapCollisionManager::DrawDebugGUI()
 {
 	if (ImGui::TreeNode("MapColliders"))
 	{
-		if (ImGui::Button("+")) {
-			Register(new UnrotatedBoxCollider);
-		}
-
 		int nodeId = 0;
 		for (Collider* collider : items)
 		{

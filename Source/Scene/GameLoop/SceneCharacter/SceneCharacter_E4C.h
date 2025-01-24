@@ -12,7 +12,6 @@
 #include "TAKOEngine/Editor/Camera/FreeCameraController.h"
 #include "TAKOEngine/AI/StateMachine.h"
 #include "PlayerCharacterData.h"
-#include "GameObject/Character/Player/NonPlayerCharacter.h"
 #include "GameObject/Character/Player/PlayerCharacter.h"
 #include "Scene/Scene.h"
 
@@ -26,6 +25,14 @@ class SceneCharacter_E4C : public Scene
 public:
 	SceneCharacter_E4C() = default;
 	~SceneCharacter_E4C() = default;
+public:
+	enum STATE
+	{
+		INIT,
+		CHARACTER_SELECTION,
+		CHARACTER_CREATION,
+		START
+	};
 
 	// 初期化
 	void Initialize() override;
@@ -42,44 +49,63 @@ public:
 	StateMachine<SceneCharacter_E4C>* GetStateMachine() { return stateMachine.get(); }
 
 	void UpdateCurrentModel(int characterNumber, int modelType, int value);
+
+	int GetSelectedCharacterIdx() { return m_selectedCharacter; }
+	PlayerCharacter* GetSelectedCharacter() { return m_previewCharacters[m_selectedCharacter]; }
+	void SetSelectedCharacter(PlayerCharacter* character)
+	{
+		for (int i = 0; i < m_previewCharacters.size(); i++)
+		{
+			if (m_previewCharacters[i] == character) {
+				SetSelectedCharacter(i);
+				return;
+			}
+		}
+	}
+	void SetSelectedCharacter(int idx)
+	{
+		m_selectedCharacter = idx;
+	}
+
+	PlayerCharacter* RegisterCharacter(PlayerCharacter* chara)
+	{
+		m_previewCharacters.push_back(chara);
+		return chara;
+	}
+	const std::vector<PlayerCharacter*>& GetCharacters() { return m_previewCharacters; }
 private:
 	// シーンGUI描画
 	void DrawSceneGUI();
-public:
-	enum STATE
-	{
-		INIT,
-		CHARACTERSELECTION,
-		CHARACTERCREATION,
-		START
-	};
-
-	std::unique_ptr<FreeCameraController> cameraController;
-
-	std::vector<std::unique_ptr<NonPlayerCharacter>> m_previewCharacters;
-
 private:
 	std::unique_ptr<StateMachine<SceneCharacter_E4C>> stateMachine;
 
 	std::unique_ptr<myRenderer::shadow::ShadowMapRender> shadowMapRenderer = std::make_unique<myRenderer::shadow::ShadowMapRender>();
 
+	std::unique_ptr<FreeCameraController> cameraController;
+
+	std::vector<PlayerCharacter*> m_previewCharacters;
+	int m_selectedCharacter = 0; // 選択したキャラ
+
 	// フレームバッファマネージャー
 	FrameBufferManager* m_frameBuffer;
+
+	// ポストエフェクト
+	std::unique_ptr<PostprocessingRendererDX12>	postprocessingRenderer = std::make_unique<PostprocessingRendererDX12>();
 
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {
 		"",											// マスク
+		"Data/Sprites/UI/start.png",
+		"Data/Sprites/UI/back.png",
+		"Data/Sprites/UI/keybinds/key_Left.png",
+		"Data/Sprites/UI/keybinds/key_Right.png",
+		"Data/Sprites/big_background.t.png"
 		// Setting UI
 	};
 	std::unordered_set<std::shared_ptr<Sprite>> spritePreLoad;
 
 	// Model Preload
 	std::unordered_set<const char*> modelList = {
-		"Data/Model/Character/WEAPON_BARB.glb",
-		"Data/Model/Character/WEAPON_MAGE.glb",
-		"Data/Model/Character/HEAD_BARB.glb",
-		"Data/Model/Character/BODY_BARB.glb",
-		"Data/Model/Character/HEAD_MAGE.glb",
 		"Data/Model/Character/PlayerModels/MDL_PLAYER_BODY_ANIMATION.glb",
 		"Data/Model/Character/PlayerModels/MDL_PLAYER_BOTTOM_ANIMATION.glb",
 		"Data/Model/Character/PlayerModels/MDL_PLAYER_TOP_ANIMATION.glb",
@@ -87,12 +113,21 @@ private:
 		"Data/Model/Character/PlayerModels/MDL_PLAYER_SWORD_ANIMATION.glb",
 		"Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD1_ANIMATION.glb",
 		"Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD2_ANIMATION.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_ROD_ANIMATION.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_F_BODY_ANIMATION.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_F_BOTTOM_ANIMATION.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_F_TOP_ANIMATION.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_F_HAIR_ANIMATION.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_F_SWORD_ANIMATION.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_F_SHIELD1_ANIMATION.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_F_SHIELD2_ANIMATION.glb",
+		"Data/Model/Character/PlayerModels/MDL_PLAYER_F_ROD_ANIMATION.glb",
 	};
 	std::unordered_set<std::shared_ptr<ModelResource>> modelPreLoad;
 
-	static const int m_maxCharacters;
-
 	static float m_time;
+
+	float transitiontime = 0.f;
 };
 
 #endif // __SCENE_CHARACTER_E4C_H__

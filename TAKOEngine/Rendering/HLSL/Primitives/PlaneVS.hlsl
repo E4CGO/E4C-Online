@@ -1,6 +1,7 @@
 #include "Plane.hlsli"
 
 // 頂点シェーダーエントリポイント
+[RootSignature(ROOT_SIG)]
 VS_OUT main(
 	float4 position : POSITION,
 	float4 boneWeights : BONE_WEIGHTS,

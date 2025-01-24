@@ -25,7 +25,8 @@ void MapQuadtree::CreateQuadtree(DirectX::XMFLOAT3 minPos, DirectX::XMFLOAT3 max
 	m_level = level;
 
 	// 空間配列サイズ保存
-	m_linerLength = ((1 << ((m_level + 1) << 1)) - 1) / 3;	// (4 ^ (m_level + 1) - 1) / (4 - 1)
+	//m_linerLength = ((1 << ((m_level + 1) << 1)) - 1) / 3;	// (4 ^ (m_level + 1) - 1) / (4 - 1)
+	m_linerLength = GetLevelStart(m_level + 1);
 
 	// 空間配列作成
 	m_quadtreeNodes = new Node[m_linerLength];
@@ -146,19 +147,19 @@ bool MapQuadtree::Regist(Triangle* mesh)
 
 	uint8_t mortonArea = 0b1111;	// その空間を分割した時に位置するエリア
 	
-	if ((mortonCodeMin >> ((shift - 1) * 2)) & 0x01)	// 最小点が空間の1, 3側にある時
+	if (((mortonCodeMin << 2) >> (shift * 2)) & 0x01)	// 最小点が空間の1, 3側にある時
 	{
 		mortonArea &= ~0b0101;	// 0,2側のフラグを消す
 	}
-	if ((~mortonCodeMax >> ((shift - 1) * 2)) & 0x01)	// 最大点が空間の0, 2側にある時
+	if (((~mortonCodeMax << 2) >> (shift * 2)) & 0x01)	// 最大点が空間の0, 2側にある時
 	{
 		mortonArea &= ~0b1010;	// 1,3側のフラグを消す
 	}
-	if ((mortonCodeMin >> ((shift - 1) * 2)) & 0x02)	// 最小点が空間の2, 3側にある時
+	if (((mortonCodeMin << 2) >> (shift * 2)) & 0x02)	// 最小点が空間の2, 3側にある時
 	{
 		mortonArea &= ~0b0011;	// 0,1側のフラグを消す
 	}
-	if ((~mortonCodeMax >> ((shift - 1) * 2)) & 0x02)	// 最大点が空間の0, 1側にある時
+	if (((~mortonCodeMax << 2) >> (shift * 2)) & 0x02)	// 最大点が空間の0, 1側にある時
 	{
 		mortonArea &= ~0b1100;	// 2,3側のフラグを消す
 	}
@@ -201,6 +202,8 @@ bool MapQuadtree::IntersectVerticalRayVsTriangle(const DirectX::XMFLOAT3& raySta
 	// レイの始点のモートンコードと線形インデックスを算出
 	uint32_t mortonCode = GetMortonCode(rayStart, m_quadtreeNodes[GetLevelStart(m_level)].m_size);
 	uint32_t index = GetLevelStart(m_level) + mortonCode;
+	
+	if (index >= GetLevelStart(m_level + 1))	return false;
 
 	uint32_t level = m_level;		// 探索する階層（最下層から）
 	uint8_t mortonArea = 0b1111;	// その空間内で探索するエリア
@@ -242,7 +245,6 @@ bool MapQuadtree::IntersectVsRay(const DirectX::XMFLOAT3& rayStart, const Direct
 
 	// レイの水平方向の成分のベクトル
 	XMFLOAT3 horizontalRayDirection = { rayDirection.x * rayDist , 0.0f, rayDirection.z * rayDist };
-	float horizontalRayDist = XMFLOAT3Length(horizontalRayDirection);
 
 	// xz軸それぞれのレイの向きをプラス→１、ゼロ→０、マイナス→－１で記録
 	int directionX = rayDirection.x > 0.0f ? 1 : (rayDirection.x < 0.0f ? -1 : 0);
@@ -375,7 +377,7 @@ bool MapQuadtree::IntersectVsRay(const DirectX::XMFLOAT3& rayStart, const Direct
 
 				// 既に見つかっている最短交差距離よりも探索する空間までの距離が長くなっていれば、
 				// これ以上進む必要はないため現在の階層の処理を終了させる
-				if (result.distance < horizontalRayDist * tx)	break;
+				if (result.distance < rayDist * tx)	break;
 
 				// 移動するのでtxとnowXを更新する
 				tx += dx;
@@ -398,7 +400,7 @@ bool MapQuadtree::IntersectVsRay(const DirectX::XMFLOAT3& rayStart, const Direct
 
 				// 既に見つかっている最短交差距離よりも探索する空間までの距離が長くなっていれば、
 				// これ以上進む必要はないため現在の階層の処理を終了させる
-				if (result.distance < horizontalRayDist * tz)	break;
+				if (result.distance < rayDist * tz)	break;
 
 				// 移動するのでtzとnowZを更新する
 				tz += dz;
@@ -467,24 +469,173 @@ bool MapQuadtree::IntersectVsRayInNode(
 				result			: ヒット結果
 	@return		交差判定
 *//***************************************************************************/
-bool MapQuadtree::IntersectSphereCastVsTriangle(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayDirection, float rayDist, float rayRadius, HitResult& result)
+bool MapQuadtree::IntersectVsSphereCast(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayDirection, float rayDist, float rayRadius, HitResult& result)
 {
-	Capsule spherecast;
-	spherecast.position = rayStart;
-	spherecast.direction = rayDirection;
-	spherecast.length = rayDist;
-	spherecast.radius = rayRadius;
+	Capsule spherecast(rayStart, rayDirection, rayDist, rayRadius);
 
-	return IntersectVsCapsule(spherecast, true);
+	return IntersectVsCapsule(spherecast, &result);
 }
 
 /**************************************************************************//**
-	@brief		カプセルの押し戻し
-	@param[in]	capsule		: カプセルオブジェクト
-				wallCheck	: 壁判定だけするか（押し戻しはしない）
+	@brief		球の衝突判定
+	@param[in]	sphere		: 球オブジェクト
 	@return		衝突判定
 *//***************************************************************************/
-bool MapQuadtree::IntersectVsCapsule(Capsule& capsule, bool wallCheck)
+bool MapQuadtree::IntersectVsSphere(Sphere& sphere)
+{
+	XMFLOAT3 minPos, maxPos;
+	sphere.GetBoundPoints(&minPos, &maxPos);
+	XMVECTOR position = XMLoadFloat3(&sphere.position);
+	bool hit = false;
+
+	// 球の最小点が四分木の最小点を含むノードから数えて何個目のノードに居るか算出（０個目スタート）
+	const uint32_t minX = static_cast<uint32_t>((minPos.x - m_quadtreeNodes[0].m_minPos.x) / m_quadtreeNodes[GetLevelStart(m_level)].m_size.x);
+	if (minX >= 1u << m_level) return false;	// 範囲外ならfalse
+	const uint32_t minZ = static_cast<uint32_t>((minPos.z - m_quadtreeNodes[0].m_minPos.z) / m_quadtreeNodes[GetLevelStart(m_level)].m_size.z);
+	if (minZ >= 1u << m_level) return false;	// 範囲外ならfalse
+
+	// 球の最大点が四分木の最小点を含むノードから数えて何個目のノードに居るか算出（０個目スタート）
+	const uint32_t maxX = static_cast<uint32_t>((maxPos.x - m_quadtreeNodes[0].m_minPos.x) / m_quadtreeNodes[GetLevelStart(m_level)].m_size.x);
+	if (maxX >= 1u << m_level) return false;	// 範囲外ならfalse
+	const uint32_t maxZ = static_cast<uint32_t>((maxPos.z - m_quadtreeNodes[0].m_minPos.z) / m_quadtreeNodes[GetLevelStart(m_level)].m_size.z);
+	if (maxZ >= 1u << m_level) return false;	// 範囲外ならfalse
+
+	// 探索用変数の準備
+	uint32_t nowX = minX;
+	uint32_t nowZ = minZ;
+	uint32_t level = m_level;	// 探索する階層（最下層から）
+	int32_t  depth = m_level - level;
+	uint32_t mortonCode = 0;	// 探索するモートンコード
+	uint32_t index = 0;			// 探索する空間配列番号
+	uint8_t mortonArea = 0;	// その空間内で探索するエリア	
+
+	while (1)
+	{
+		mortonArea = 0b1111;
+		if (depth)
+		{
+			if (minX >> (depth - 1) & 0x01)	// minXが空間の1,3側にある時
+			{
+				mortonArea &= ~0b0101;	// 0,2側のフラグを消す
+			}
+			if (minZ >> (depth - 1) & 0x01)	// minZが空間の2,3側にある時
+			{
+				mortonArea &= ~0b0011;	// 0,1側のフラグを消す
+			}
+		}
+
+		while (nowZ <= maxZ >> depth)
+		{
+			while (nowX <= maxX >> depth)
+			{
+				// モートンコードと線形インデックスを算出
+				mortonCode = bitSeparete(nowX) | (bitSeparete(nowZ) << 1);
+				index = GetLevelStart(level) + mortonCode;
+
+				// 球押し戻し
+				IntersectVsSphereInNode(index, mortonArea, position, sphere.radius, hit);
+
+				// 隣の空間へ
+				nowX++;
+				mortonArea |= (mortonArea & 0b1010) >> 1;	// 隣のフラグを立てる
+				if (depth && nowX == maxX >> depth)	// 最小空間ではなく、xが最大点の空間の時
+				{
+					if (~maxX >> (depth - 1) & 0x01)	// maxXが空間の0,2側にある時
+					{
+						mortonArea &= ~0b1010;	// 1,3側のフラグを消す
+					}
+				}
+			}
+			// 隣の列の空間へ
+			nowX = minX >> depth;
+			nowZ++;
+			mortonArea = 0b1111;
+			if (depth)
+			{
+				if (minX >> (depth - 1) & 0x01)	// minXが空間の1,3側にある時
+				{
+					mortonArea &= ~0b0101;	// 0,2側のフラグを消す
+				}
+
+				if (nowZ == maxZ >> depth)	// zが最大点の空間の時
+				{
+					if (~maxZ >> (depth - 1) & 0x01)	// maxZが空間の0,1側にある時
+					{
+						mortonArea &= ~0b1100;	// 2,3側のフラグを消す
+					}
+				}
+
+			}
+		}
+
+		// ルート空間の時break
+		if (level == 0)	break;
+
+		// 親空間へ
+		level--;
+		depth++;
+		nowX = minX >> depth;
+		nowZ = minZ >> depth;
+	}
+
+	XMStoreFloat3(&sphere.position, position);
+
+	return hit;
+}
+
+/**************************************************************************//**
+	@brief		ある空間内での球の衝突判定
+	@param[in]	index		: 探索する空間
+				mortonArea	: その空間内で探索するエリア
+				spherePos	: 位置
+				radius		: 半径
+				hit			: 全体の返り値となるフラグ
+				result		: 最短距離のメッシュを返す（スフィアキャスト利用時に使用）
+	@return		衝突判定
+*//***************************************************************************/
+bool MapQuadtree::IntersectVsSphereInNode(
+	uint32_t index,
+	uint8_t mortonArea,
+	DirectX::XMVECTOR& spherePos,
+	float radius,
+	bool& hit)
+{
+	bool ret = false; //この空間内での衝突判定
+	OFT* oft = m_quadtreeNodes[index].m_pLatest;
+	IntersectionResult intersect;
+
+	while (oft)
+	{
+		if (oft->m_mortonArea & mortonArea)
+		{
+			XMVECTOR triPos[3] =
+			{
+				XMLoadFloat3(&oft->m_pMesh->position[0]),
+				XMLoadFloat3(&oft->m_pMesh->position[1]),
+				XMLoadFloat3(&oft->m_pMesh->position[2])
+			};
+
+			if (Collision::IntersectSphereVsTriangle(spherePos, radius, triPos, &intersect, true))
+			{
+				// 球のみ押し戻し処理
+				spherePos = XMVectorAdd(spherePos, XMVectorScale(intersect.normal, intersect.penetration));
+				hit = true;
+				ret = true;
+			}
+		}
+		oft = oft->m_pNext;
+	}
+
+	return ret;
+}
+
+/**************************************************************************//**
+	@brief		カプセルの衝突判定
+	@param[in]	capsule		: カプセルオブジェクト
+				result		: 最短距離のメッシュを返す（スフィアキャスト利用時に使用）
+	@return		衝突判定
+*//***************************************************************************/
+bool MapQuadtree::IntersectVsCapsule(Capsule& capsule, HitResult* result)
 {
 	XMFLOAT3 minPos, maxPos;
 	capsule.GetBoundPoints(&minPos, &maxPos);
@@ -494,11 +645,15 @@ bool MapQuadtree::IntersectVsCapsule(Capsule& capsule, bool wallCheck)
 
 	// カプセルの最小点が四分木の最小点を含むノードから数えて何個目のノードに居るか算出（０個目スタート）
 	const uint32_t minX = static_cast<uint32_t>((minPos.x - m_quadtreeNodes[0].m_minPos.x) / m_quadtreeNodes[GetLevelStart(m_level)].m_size.x);
+	if (minX >= 1u << m_level) return false;	// 範囲外ならfalse
 	const uint32_t minZ = static_cast<uint32_t>((minPos.z - m_quadtreeNodes[0].m_minPos.z) / m_quadtreeNodes[GetLevelStart(m_level)].m_size.z);
+	if (minZ >= 1u << m_level) return false;	// 範囲外ならfalse
 	
 	// カプセルの最大点が四分木の最小点を含むノードから数えて何個目のノードに居るか算出（０個目スタート）
 	const uint32_t maxX = static_cast<uint32_t>((maxPos.x - m_quadtreeNodes[0].m_minPos.x) / m_quadtreeNodes[GetLevelStart(m_level)].m_size.x);
+	if (maxX >= 1u << m_level) return false;	// 範囲外ならfalse
 	const uint32_t maxZ = static_cast<uint32_t>((maxPos.z - m_quadtreeNodes[0].m_minPos.z) / m_quadtreeNodes[GetLevelStart(m_level)].m_size.z);
+	if (maxZ >= 1u << m_level) return false;	// 範囲外ならfalse
 
 	// 探索用変数の準備
 	uint32_t nowX = minX;
@@ -532,7 +687,16 @@ bool MapQuadtree::IntersectVsCapsule(Capsule& capsule, bool wallCheck)
 				mortonCode = bitSeparete(nowX) | (bitSeparete(nowZ) << 1);
 				index = GetLevelStart(level) + mortonCode;
 				
-				IntersectVsCapsuleInNode(index, mortonArea, position, direction, capsule.radius, capsule.length, wallCheck, hit);
+				if (result)
+				{
+					// スフィアキャスト利用
+					IntersectVsCapsuleInNode(index, mortonArea, position, direction, capsule.radius, capsule.length, hit, result);
+				}
+				else
+				{
+					// カプセル押し戻し
+					IntersectVsCapsuleInNode(index, mortonArea, position, direction, capsule.radius, capsule.length, hit);
+				}
 	
 				// 隣の空間へ
 				nowX++;
@@ -577,7 +741,7 @@ bool MapQuadtree::IntersectVsCapsule(Capsule& capsule, bool wallCheck)
 		nowZ = minZ >> depth;
 	}
 	
-	if (!wallCheck)
+	if (!result)
 	{
 		XMStoreFloat3(&capsule.position, position);
 	}
@@ -586,15 +750,15 @@ bool MapQuadtree::IntersectVsCapsule(Capsule& capsule, bool wallCheck)
 }
 
 /**************************************************************************//**
-	@brief		ある空間内でのカプセルの押し戻し
+	@brief		ある空間内でのカプセルの衝突判定
 	@param[in]	index		: 探索する空間
 				mortonArea	: その空間内で探索するエリア
 				capsulePos	: 位置
 				direction	: 向き
 				radius		: 半径
 				length		: 長さ
-				wallCheck	: 壁判定だけするか（押し戻しはしない）
 				hit			: 全体の返り値となるフラグ
+				result		: 最短距離のメッシュを返す（スフィアキャスト利用時に使用）
 	@return		衝突判定
 *//***************************************************************************/
 bool MapQuadtree::IntersectVsCapsuleInNode(
@@ -604,12 +768,11 @@ bool MapQuadtree::IntersectVsCapsuleInNode(
 	const DirectX::XMVECTOR& direction,
 	float radius,
 	float length,
-	bool wallCheck,
-	bool& hit)
+	bool& hit,
+	HitResult* result)
 {
 	bool ret = false; //この空間内での衝突判定
 	OFT* oft = m_quadtreeNodes[index].m_pLatest;
-	IntersectionResult result;
 	
 	while (oft)
 	{
@@ -622,21 +785,32 @@ bool MapQuadtree::IntersectVsCapsuleInNode(
 				XMLoadFloat3(&oft->m_pMesh->position[2])
 			};
 
-			if (Collision::IntersectCapsuleVsTriangle(capsulePos, direction, radius, length, triPos, &result))
+			if (result)
 			{
-				if (wallCheck)
+				HitResult tmpResult;
+				if (Collision::IntersectSphereCastVsTriangle(capsulePos, direction, length, radius, triPos, &tmpResult, true))
 				{
-					// wallCheckがtrueのときは壁に当たっている時true
-					if (result.normal.m128_f32[1] < 0.4f)	// 66度以上の壁
+					if (result->distance > tmpResult.distance)
 					{
+						result->distance = tmpResult.distance;
+						result->normal = tmpResult.normal;
+						result->position = tmpResult.position;
+						result->triangleVerts[0] = tmpResult.triangleVerts[0];
+						result->triangleVerts[1] = tmpResult.triangleVerts[1];
+						result->triangleVerts[2] = tmpResult.triangleVerts[2];
+						result->materialIndex = oft->m_pMesh->materialIndex;
 						hit = true;
 						ret = true;
 					}
 				}
-				else
+			}
+			else
+			{
+				IntersectionResult intersect;
+				if (Collision::IntersectCapsuleVsTriangle(capsulePos, direction, radius, length, triPos, &intersect))
 				{
 					// カプセルのみ押し戻し処理
-					capsulePos = XMVectorAdd(capsulePos, XMVectorScale(result.normal, result.penetration));
+					capsulePos = XMVectorAdd(capsulePos, XMVectorScale(intersect.normal, intersect.penetration));
 					hit = true;
 					ret = true;
 				}
@@ -644,6 +818,6 @@ bool MapQuadtree::IntersectVsCapsuleInNode(
 		}
 		oft = oft->m_pNext;
 	}
-
+	
 	return ret;
 }

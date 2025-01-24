@@ -1,141 +1,183 @@
-#pragma once
+//! @file Enemy.h
+//! @note
+
+#ifndef __INCLUDED_ENEMY_H__
+#define __INCLUDED_ENEMY_H__
 
 #include "TAKOEngine/AI/StateMachine.h"
 
 #include <memory>
-#include <unordered_map>
 
-#include "GameObject/Character/Player/Player.h"
+#include "TAKOEngine/Tool/Mathf.h"
+
+#include "GameObject/Character/Player/PlayerCharacter.h"
+#include "GameObject/Character/Player/PlayerCharacterManager.h"
 
 struct ENEMY_COLLISION
 {
-	int enemy_id = -1;
-	int player_id = -1;
-	int colider_id = -1;
+	uint32_t enemy_id = -1;
+	uint32_t player_id = -1;
+	uint32_t colider_id = -1;
 	int count = -1;
-	int damage = 0;
+	int damage = 10;
 	DirectX::XMFLOAT3 force = {};
 	bool power = false;
 };
 
-struct ENEMY_DATA
+enum ENEMY_TYPE : uint8_t
 {
-	int enemy_id = -1;
-	int enemyType = -1;
-	DirectX::XMFLOAT3 position = {};
-	DirectX::XMFLOAT3 velocity = {};
-	int target = -1;
-	DirectX::XMFLOAT3 angle = {};
-	int state = -1;
-	int subState = -1;
-	int hp = 1;
-	int maxHp = 1;
-};
-
-enum ENEMY_TYPE
-{
-	CHEST_COIN = 0,							// •ó” 
-	CHEST_EMPTY = 1,						// •ó” (‹ó)
-
-	CHEST_EMPTY_SKELETON_MINION,			// •ó” (‹ó) ƒXƒPƒ‹ƒgƒ“¶¬
-
-	SKELETON_MINION,						// ƒfƒtƒHƒ‹ƒgœ
-	SKELETON_MINION_BOSS,					// ƒfƒtƒHƒ‹ƒgœƒ{ƒX
+	MOUSE,									// ãƒã‚ºãƒŸ
+	BEAR_BOSS,								// ç†Šãƒœã‚¹
+	BIRD,									// é³¥
+	PIG,									// è±š
+	CROC,									// é°
 	END,
 };
+
+class Spawner;
 
 class Enemy : public Character
 {
 public:
-	Enemy(const char* filename, float scaling = 1.0f);
-	~Enemy();
+	Enemy(const char* filename, float scaling = 1.0f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX11);
+	virtual ~Enemy();
 
+public:
+	enum STATE : uint8_t
+	{
+		IDLE,
+
+		HURT,
+		DEATH,
+
+		END,
+	};
+
+#pragma pack(push, 1)
+	struct SYNC_DATA
+	{
+		uint32_t enemy_id;
+		uint8_t type;
+		float position[3];
+		uint32_t target_id;
+		float targetPosition[3];
+		float rotate;
+		uint8_t state;
+	};
+#pragma pack(pop)
+
+public:
 	virtual void Update(float elapsedTime) override;
 	void Render(const RenderContext& rc) override;
 
-	virtual void OnDamage(const ENEMY_COLLISION& hit);
+	void SetSpawnPosition(const DirectX::XMFLOAT3& position) { this->m_SpawnPosition = position; }
+
+	virtual void OnDamage(const uint16_t& damage) override;
 	virtual void OnDeath();
 
-	bool IsShowHp() { return showHp; }
+	const bool IsShowHp() const { return showHp; }
 
 	int GetAttack() { return atk; }
 
-	void ImportData(ENEMY_DATA data);
-	void ExportData(ENEMY_DATA& data);
+	void SetEnemyId(const uint32_t& id) { enemy_id = id; }
+	const uint32_t GetEnemyId() const { return enemy_id; }
 
-	void SetEnemyId(int id) { enemy_id = id; }
-	int GetEnemyId() { return enemy_id; }
+	bool IsAlive();
 
 	bool MoveTo(float elapsedTime, const DirectX::XMFLOAT3& target);
 	void TurnTo(float elapsedTime, const DirectX::XMFLOAT3& target);
 
-	Player* GetClosestPlayer(float limit = FLT_MAX);
-	virtual void UpdateTarget() { target = nullptr; }
-	void SetTarget(Player* player) { target = player; }
-	Player* GetTarget() { return target; }
+	PlayerCharacter* GetClosestPlayer(float limit = FLT_MAX);
+	virtual void UpdateTarget();
 
 	int GetState() { return stateMachine->GetStateIndex(); }
 	StateMachine<Enemy>* GetStateMachine() { return stateMachine; }
 
-	std::unordered_map<int, Collider*> GetColliders() { return colliders; }
-	std::unordered_map<int, Collider*> GetAttackColliders() { return attackColliders; }
-	void EnableAttackColliders(bool enable = true) { for (const std::pair<int, Collider*>& collider : attackColliders) collider.second->SetEnable(enable); }
-	virtual void AttackCollision() override;
+	static Enemy* EnemyFactory(uint8_t enemyType);
 
-	static Enemy* EnemyFactory(int enemyType);
+	void SetSpawner(Spawner* spawner) { m_pSpawner = spawner; }
 
-public:
-	enum Animation
+	const bool IsMine() const { return m_isMine; }
+	void SetIsMine(bool flag = true) { m_isMine = flag; }
+
+	void SetRandomMoveTargetPosition();
+	bool SearchPlayer();
+
+	void SetSearchRange(const float range) { m_SearchRange = range; m_SearchRangeSq = range * range; }
+	const float GetSearchRange() const { return m_SearchRange; }
+
+	DirectX::XMFLOAT3 GetTargetPosition() { return m_TargetPosition; }
+	void SetTargetPosition(const DirectX::XMFLOAT3 position) { m_TargetPosition = position; }
+
+	void SetTarget(uint32_t client_id) { m_target = client_id; }
+	void SetTarget(PlayerCharacter* player) { m_target = (player != nullptr) ? player->GetClientId() : UINT32_MAX ; }
+	uint32_t GetTarget() { return m_target; }
+
+	// åŒæœŸ
+	const SYNC_DATA SyncData ();
+	void Sync(const SYNC_DATA& data);
+
+	void AddHate(uint32_t client_id, int hate)
 	{
-		Attack_1H,
-		Attack_Combo,
-		Attack_Spinning,
-		Base,
-		Block,
-		Cheer,
-		Climbing,
-		Dance,
-		Dash_Back,
-		Dash_Front,
-		Dash_Left,
-		Dash_Right,
-		Defeat,
-		Heavy_Attack,
-		Hop,
-		Idle,
-		Interact,
-		Jump,
-		Laying_Down_Idle,
-		Pick_Up,
-		Roll,
-		Run,
-		Shoot_1H,
-		Shoot_2H,
-		Shoot_Bow,
-		Shooting_1H,
-		Shooting_2H,
-		Throw,
-		Walk,
-		Wave
-	};
+		if (m_hate.contains(client_id))
+		{
+			m_hate[client_id] += hate;
+		}
+		else
+		{
+			m_hate[client_id] = hate;
+		}
+	}
+	PlayerCharacter* GetHighestHateClient()
+	{
+		PlayerCharacter* result = nullptr;
+		int highestHate = INT_MIN;
+		for (const std::pair<uint32_t, int>client : m_hate)
+		{
+			PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById(client.first);
+			if (player == nullptr)
+			{
+				m_hate.erase(client.first);
+				continue;
+			}
+			if (highestHate < client.second)
+			{
+				result = player;
+				highestHate = client.second;
+			}
+		}
+		return result;
+	}
+
 protected:
-	int enemy_id = -1;
-	int enemyType = -1;
+	uint32_t enemy_id = 0;
+	uint8_t enemyType = -1;
 
-	int atk = 10; // UŒ‚—Í
+	int atk = 10; // æ”»æ’ƒåŠ›
 
-	Player* target = nullptr;
+	uint32_t m_target = UINT32_MAX;
+	DirectX::XMFLOAT3 m_TargetPosition = {};
 
 	float moveSpeed = 0.0f;
 	float turnSpeed = 0.0f;
 	float jumpSpeed = 0.0f;
 
+	DirectX::XMFLOAT3 m_SpawnPosition;
+	float m_SearchRange;
+	float m_SearchRangeSq;
+	float m_AttackRange;
+
 	StateMachine<Enemy>* stateMachine;
 
 	int subState = -1;
 
-	std::unordered_map<int, Collider*> colliders;		// “–‚½‚è”»’è
-	std::unordered_map<int, Collider*> attackColliders;	// UŒ‚”»’è
+	bool showHp = true;	// HPè¡¨ç¤º
 
-	bool showHp = true;	// HP•\¦
+	Spawner* m_pSpawner = nullptr; // ã‚¹ãƒãƒŠãƒ¼
+
+	bool m_isMine = false; // ãƒ­ãƒ¼ã‚«ãƒ«
+
+	std::unordered_map<uint32_t, int> m_hate; //ãƒ˜ã‚¤ãƒˆå€¤	
 };
+
+#endif //!__INCLUDED_ENEMY_H__

@@ -1,10 +1,10 @@
-#include "UVScrollShader.h"
+ï»¿#include "UVScrollShader.h"
 
 #include "TAKOEngine/Rendering/GpuResourceUtils.h"
 
 UVScrollShader::UVScrollShader(ID3D11Device* device) : SpriteShader(device, "Data/Shader/SpriteVS.cso", "Data/Shader/UVScrollPS.cso")
 {
-	// ƒV[ƒ“—pƒoƒbƒtƒ@
+	// ã‚·ãƒ¼ãƒ³ç”¨ãƒãƒƒãƒ•ã‚¡
 	GpuResourceUtils::CreateConstantBuffer(
 		device,
 		sizeof(CbScroll),

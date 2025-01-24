@@ -41,6 +41,7 @@ public:
 		std::string	textureFilename;
 		std::string diffuseTextureFileName;
 		std::string normalTextureFileName;
+		std::string emissiveTextureFileName;
 
 		DirectX::XMFLOAT4 color = { 1, 1, 1, 1 };
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> diffuseMap;
@@ -49,10 +50,14 @@ public:
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cbv_resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_srv_resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_normal_srv_resource;
+		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_emissive_srv_resource;
 
 		const Descriptor* cbv_descriptor = nullptr;
 		const Descriptor* srv_descriptor = nullptr;
 		const Descriptor* srv_normal_descriptor = nullptr;
+		const Descriptor* srv_emissive_descriptor = nullptr;
+
+		int shaderId = 0;
 
 		template<class Archive>
 		void serialize(Archive& archive);
@@ -114,9 +119,7 @@ public:
 		std::vector<Bone> bones;
 
 		DirectX::BoundingBox	localBounds;
-		DirectX::XMFLOAT3		boundsMin;
-		DirectX::XMFLOAT3		boundsMax;
-
+		
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_vb_resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_ib_resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cb_resource;

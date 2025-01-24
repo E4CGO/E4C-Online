@@ -34,7 +34,13 @@ namespace Online
 
 	protected:
 		//TCP送信用ヘッダ
-		void CreateHeaderBuffer(std::vector<uint8_t>& buffer, uint8_t cmd, uint32_t size);
+		void CreateHeaderBuffer(std::vector<uint8_t>& buffer, uint8_t cmd, uint32_t size = 0);
+		void CreateHeaderBuffer(std::vector<uint8_t>& buffer, uint8_t cmd, size_t size)
+		{
+			if (size <= UINT32_MAX) {
+				CreateHeaderBuffer(buffer, cmd, static_cast<uint32_t>(size));
+			}
+		}
 
 		// Rustの文字を受信
 		bool ReceiveString(std::string& string) {
@@ -56,8 +62,8 @@ namespace Online
 
 		PlayerCharacter* ReceiveClient()
 		{
-			uint64_t client_id = 0;
-			if (m_pcontroller->GetTcpSocket()->Receive(&client_id, sizeof(uint64_t)) > 0)
+			uint32_t client_id = 0;
+			if (m_pcontroller->GetTcpSocket()->Receive(&client_id, sizeof(uint32_t)) > 0)
 			{
 				// 外見パーツ
 				uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM] = {};

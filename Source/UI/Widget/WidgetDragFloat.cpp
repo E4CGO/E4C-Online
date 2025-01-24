@@ -5,6 +5,7 @@
 
 #include "TAKOEngine/Runtime/tentacle_lib.h"
 #include "TAKOEngine/Rendering/ResourceManager.h"
+#include "TAKOEngine/Tool/Encode.h"
 
 /**************************************************************************//**
 	@brief		コンストラクタ
@@ -12,8 +13,16 @@
 *//***************************************************************************/
 WidgetDragBar::WidgetDragBar(float rate) : m_rate(rate)
 {
-	m_scrollBar = RESOURCE.LoadSpriteResource("Data/Sprites/button_frame.png");
-	m_scrollBtn = RESOURCE.LoadSpriteResource("Data/Sprites/button2_ready_on.png");
+	if (T_GRAPHICS.isDX11Active)
+	{
+		m_scrollBar = RESOURCE.LoadSpriteResource("Data/Sprites/button_frame.png");
+		m_scrollBtn = RESOURCE.LoadSpriteResource("Data/Sprites/button2_ready_on.png");
+	}
+	else
+	{
+		m_scrollBarDX12 = RESOURCE.LoadSpriteResourceDX12("Data/Sprites/button_frame.png");
+		m_scrollBtnDX12 = RESOURCE.LoadSpriteResourceDX12("Data/Sprites/button2_ready_on.png");
+	}
 }
 
 /**************************************************************************//**
@@ -46,8 +55,28 @@ void WidgetDragBar::Render(const RenderContext& rc)
 		m_size.x * 0.05f, m_size.y
 	);
 }
+/**************************************************************************//**
+	@brief		描画処理
+	@param[in]	rc	レンダーコンテンツ
+	@return		なし
+*//***************************************************************************/
 void WidgetDragBar::RenderDX12(const RenderContextDX12& rc)
 {
+	m_scrollBarDX12->Begin(rc);
+	m_scrollBarDX12->Draw(
+		m_position.x, m_position.y + m_size.y * 0.25f,
+		m_size.x, m_size.y * 0.5f,
+		0,
+		1, 1, 1, 1);
+	m_scrollBarDX12->End(rc.d3d_command_list);
+
+	m_scrollBtnDX12->Begin(rc);
+	m_scrollBtnDX12->Draw(
+		m_position.x - m_size.x * 0.025f + m_size.x * m_rate, m_position.y,
+		m_size.x * 0.05f, m_size.y,
+		0,
+		1, 1, 1, 1);
+	m_scrollBtnDX12->End(rc.d3d_command_list);
 }
 /**************************************************************************//**
 	@brief		コンストラクタ
@@ -112,6 +141,21 @@ void WidgetDragFloat::Render(const RenderContext& rc)
 	m_pBar->Render(rc);
 }
 
+/**************************************************************************//**
+	@brief		描画処理
+	@param[in]	rc	レンダーコンテンツ
+	@return		なし
+*//***************************************************************************/
 void WidgetDragFloat::RenderDX12(const RenderContextDX12& rc)
 {
+	T_TEXT.RenderDX12(
+		FONT_ID::HGpop,
+		Encode::string_to_wstring(m_label),
+		m_position.x, m_position.y,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		0.0f,
+		FONT_ALIGN::TOP_LEFT,
+		0.5f,
+		1);
+	m_pBar->RenderDX12(rc);
 }

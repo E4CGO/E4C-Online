@@ -1,52 +1,29 @@
-#include "Map/MapTileManager.h"
+Ôªø#include "Map/MapTileManager.h"
 #include "Scene/Stage/Stage.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "TAKOEngine/Rendering/LightManager.h"
+#include "GameObject/Props/SpawnerManager.h"
+#include "TAKOEngine/Physics/CollisionManager.h"
 
 void Stage::Initialize()
 {
-	timer = 0.0f;
-	finish = false;
-	pointer = 0;
+	m_timer = 0.0f;
 
 	MAPTILES.Clear();
 	ENEMIES.Clear();
-	enemyList.clear();
+	SpawnerManager::Instance().Clear();
+	
 }
 
 void Stage::Finalize()
 {
 	MAPTILES.Clear();
 	ENEMIES.Clear();
+	SpawnerManager::Instance().Clear();
 	LightManager::Instance().Clear();
-	enemyList.clear();
 }
 
 void Stage::Update(float elapsedTime)
 {
-	timer += elapsedTime;
-
-	// ÉXÉ|ÉiÅ[
-	for (int i = pointer; i < enemyList.size(); i++) {
-		ENEMY_LIST_DATA& enemyData = enemyList.at(i);
-		if (enemyData.phase == phase && enemyData.time <= timer)
-		{
-			// ìGê∂ê¨
-			Enemy* enemy = ENEMIES.Register(Enemy::EnemyFactory(enemyData.enemyType));
-			enemy->SetPosition(enemyData.position);
-			enemy->SetAngle(enemyData.rotation);
-			pointer++;
-		}
-	}
-}
-
-void Stage::SetPhase(int phase)
-{
-	this->phase = phase;
-	timer = 0.0f;
-	OnPhase();
-}
-void Stage::NextPhase()
-{
-	SetPhase(++phase);
+	m_timer += elapsedTime;
 }

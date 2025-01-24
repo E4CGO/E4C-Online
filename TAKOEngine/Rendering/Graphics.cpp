@@ -14,6 +14,9 @@
 #include "TAKOEngine/Rendering/Shaders/ShadowMapShader.h"
 #include "TAKOEngine/Rendering/Shaders//PlaneShader.h"
 #include "TAKOEngine/Rendering/Shaders/ParticleShader.h"
+#include "TAKOEngine/Rendering/Shaders/HitParticleShader.h"
+#include "TAKOEngine/Rendering/Shaders/CylinderShader.h"
+#include "TAKOEngine/Rendering/Shaders/FoliageShader.h"
 
 #include "TAKOEngine/Rendering/Shaders/UVScrollShader.h"
 #include "TAKOEngine/Rendering/Shaders/MaskShader.h"
@@ -23,6 +26,8 @@
 #include "TAKOEngine/Rendering/Shaders/FinalpassShader.h"
 #include "TAKOEngine/Rendering/Shaders/LambertShader.h"
 #include "TAKOEngine/Rendering/Shaders/DeferredLightingShader.h"
+
+#include "TAKOEngine/Tool/Encode.h"
 
 Graphics* Graphics::s_instance = nullptr;
 
@@ -103,6 +108,13 @@ void Graphics::FinishDX12()
 			m_sampler_descriptor_heap->PushDescriptor(m_sampler[i]->GetDescriptor());
 		}
 	}
+
+	for (int i = 0; i < static_cast<int>(ModelShaderDX12Id::EnumCount); i++)
+	{
+		dx12_modelshaders[i]->Finalize();
+	}
+
+	dx12_lineRenderer->Finalize();
 }
 
 //******************************************************************
@@ -131,16 +143,19 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 #ifdef USEDX12
 
 	UINT dxgi_factory_flags = 0;
+	D2D1_FACTORY_OPTIONS d2dFactoryOptions = {};
 
 	{
 		Microsoft::WRL::ComPtr<ID3D12Debug> d3d_debug;
 		Microsoft::WRL::ComPtr<ID3D12Debug1> d3d_debug1;
+
 		if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(d3d_debug.GetAddressOf()))))
 		{
 			if (SUCCEEDED(d3d_debug->QueryInterface(IID_PPV_ARGS(&d3d_debug1))))
 			{
 				//d3d_debug->EnableDebugLayer();
 				d3d_debug1->SetEnableGPUBasedValidation(true);
+				d2dFactoryOptions.debugLevel = D2D1_DEBUG_LEVEL_INFORMATION;
 			}
 			//dxgi_factory_flags |= DXGI_CREATE_FACTORY_DEBUG;
 		}
@@ -293,263 +308,321 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 			COMPLETION_CHECK
 		}
 
-		m_rtv_descriptor_heap = std::make_unique<DescriptorHeap>(m_d3d_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 10);
-		m_dsv_descriptor_heap = std::make_unique<DescriptorHeap>(m_d3d_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1000);
-		m_shader_resource_descriptor_heap = std::make_unique<DescriptorHeap>(m_d3d_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1000);
-		m_sampler_descriptor_heap = std::make_unique<DescriptorHeap>(m_d3d_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, 1000);
-
-		m_viewport.TopLeftX = 0;
-		m_viewport.TopLeftY = 0;
-		m_viewport.Width = screenWidth;
-		m_viewport.Height = screenHeight;
-		m_viewport.MinDepth = 0.0f;
-		m_viewport.MaxDepth = 1.0f;
-
-		// フレームバッファ用のレンダリングターゲットビューを作成
-		CreateRTVForFameBuffer();
-
-		// フレームバッファ用の深度ステンシルビューを作成
-		CreateDSVForFrameBuffer(screenWidth, screenHeight);
-
-		// フレームバッファ用のコンスタントバッファを作成
-		CreateConstantBuffer();
-
-		// コマンドリストとコマンドアロケーターの作成
-		CreateCommand();
-
 		{
+			// D2D, DWrite, テキストレンダリング設定
 			{
-				D3D12_COMMAND_QUEUE_DESC d3d_command_queue_desc{};
-				d3d_command_queue_desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-				d3d_command_queue_desc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
-				d3d_command_queue_desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-				d3d_command_queue_desc.NodeMask = 0;
+				UINT createDeviceFlags = 0;
+				createDeviceFlags |= D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 
-				hr = m_d3d_device->CreateCommandQueue(
-					&d3d_command_queue_desc,
-					IID_PPV_ARGS(m_resource_queue.d3d_command_queue.GetAddressOf())
-				);
-				COMPLETION_CHECK
-					m_resource_queue.d3d_command_queue->SetName(L"ResourceCommandQueue");
-
-				hr = m_d3d_device->CreateFence(
-					0,
-					D3D12_FENCE_FLAG_NONE,
-					IID_PPV_ARGS(&m_resource_queue.d3d_fence)
-				);
-				COMPLETION_CHECK
-					m_resource_queue.d3d_fence->SetName(L"ResourceFence");
-
-				m_resource_queue.fence_event = CreateEvent(
+				Microsoft::WRL::ComPtr<ID3D11Device> d3d11Device;
+				D3D11On12CreateDevice(
+					m_d3d_device.Get(),
+					createDeviceFlags,
 					nullptr,
-					FALSE,
-					FALSE,
+					0,
+					reinterpret_cast<IUnknown**>(m_graphics_queue.d3d_command_queue.GetAddressOf()),
+					1,
+					0,
+					&d3d11Device,
+					&m_d3d11DeviceContext,
 					nullptr
 				);
+
+				d3d11Device.As(&m_d3d11On12Device);
+
+				{
+					D2D1_DEVICE_CONTEXT_OPTIONS deviceOptions = D2D1_DEVICE_CONTEXT_OPTIONS_NONE;
+					D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory3), &d2dFactoryOptions, &m_d2dFactory);
+					Microsoft::WRL::ComPtr<IDXGIDevice> dxgiDevice;
+					m_d3d11On12Device.As(&dxgiDevice);
+					m_d2dFactory->CreateDevice(dxgiDevice.Get(), &m_d2dDevice);
+					m_d2dDevice->CreateDeviceContext(deviceOptions, &m_d2dDeviceContext);
+					DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), &m_dWriteFactory);
+				}
+
+				bitmapProperties = D2D1::BitmapProperties1(
+					D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
+					D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED)
+				);
 			}
 
-			{
-				hr = m_d3d_device->CreateCommandAllocator(
-					D3D12_COMMAND_LIST_TYPE_DIRECT,
-					IID_PPV_ARGS(m_d3d_resource_command_allocator.GetAddressOf())
-				);
-				COMPLETION_CHECK
-					m_d3d_resource_command_allocator->SetName(L"ResourceCommandAllocator");
-			}
+			m_rtv_descriptor_heap = std::make_unique<DescriptorHeap>(m_d3d_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 10);
+			m_dsv_descriptor_heap = std::make_unique<DescriptorHeap>(m_d3d_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 10);
+			m_shader_resource_descriptor_heap = std::make_unique<DescriptorHeap>(m_d3d_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 50000);
+			m_sampler_descriptor_heap = std::make_unique<DescriptorHeap>(m_d3d_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, 10);
+
+			m_viewport.TopLeftX = 0;
+			m_viewport.TopLeftY = 0;
+			m_viewport.Width = screenWidth;
+			m_viewport.Height = screenHeight;
+			m_viewport.MinDepth = 0.0f;
+			m_viewport.MaxDepth = 1.0f;
+
+			// フレームバッファ用のレンダリングターゲットビューを作成
+			CreateRTVForFameBuffer();
+
+			// フレームバッファ用の深度ステンシルビューを作成
+			CreateDSVForFrameBuffer(screenWidth, screenHeight);
+
+			// フレームバッファ用のコンスタントバッファを作成
+			CreateConstantBuffer();
+
+			// コマンドリストとコマンドアロケーターの作成
+			CreateCommand();
 
 			{
-				hr = m_d3d_device->CreateCommandList(
-					0,
-					D3D12_COMMAND_LIST_TYPE_DIRECT,
-					m_d3d_resource_command_allocator.Get(),
-					nullptr,
-					IID_PPV_ARGS(m_d3d_resource_command_list.GetAddressOf())
-				);
-				COMPLETION_CHECK
-					m_d3d_resource_command_list->SetName(L"ResourceCommandList");
+				{
+					D3D12_COMMAND_QUEUE_DESC d3d_command_queue_desc{};
+					d3d_command_queue_desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+					d3d_command_queue_desc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
+					d3d_command_queue_desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+					d3d_command_queue_desc.NodeMask = 0;
+
+					hr = m_d3d_device->CreateCommandQueue(
+						&d3d_command_queue_desc,
+						IID_PPV_ARGS(m_resource_queue.d3d_command_queue.GetAddressOf())
+					);
+					COMPLETION_CHECK
+						m_resource_queue.d3d_command_queue->SetName(L"ResourceCommandQueue");
+
+					hr = m_d3d_device->CreateFence(
+						0,
+						D3D12_FENCE_FLAG_NONE,
+						IID_PPV_ARGS(&m_resource_queue.d3d_fence)
+					);
+					COMPLETION_CHECK
+						m_resource_queue.d3d_fence->SetName(L"ResourceFence");
+
+					m_resource_queue.fence_event = CreateEvent(
+						nullptr,
+						FALSE,
+						FALSE,
+						nullptr
+					);
+				}
+
+				{
+					hr = m_d3d_device->CreateCommandAllocator(
+						D3D12_COMMAND_LIST_TYPE_DIRECT,
+						IID_PPV_ARGS(m_d3d_resource_command_allocator.GetAddressOf())
+					);
+					COMPLETION_CHECK
+						m_d3d_resource_command_allocator->SetName(L"ResourceCommandAllocator");
+				}
+
+				{
+					hr = m_d3d_device->CreateCommandList(
+						0,
+						D3D12_COMMAND_LIST_TYPE_DIRECT,
+						m_d3d_resource_command_allocator.Get(),
+						nullptr,
+						IID_PPV_ARGS(m_d3d_resource_command_list.GetAddressOf())
+					);
+					COMPLETION_CHECK
+						m_d3d_resource_command_list->SetName(L"ResourceCommandList");
+				}
+			}
+
+			// IMGUI
+			{
+				if (isDX12Active)
+				{
+					m_imgui_renderer = std::make_unique<ImGuiRenderer>(hWnd, m_d3d_device.Get(), RenderTargetFormat, BufferCount, m_shader_resource_descriptor_heap);
+				}
 			}
 		}
-
-		// IMGUI
-		{
-			if (isDX12Active)
-			{
-				m_imgui_renderer = std::make_unique<ImGuiRenderer>(hWnd, m_d3d_device.Get(), RenderTargetFormat, BufferCount, m_shader_resource_descriptor_heap);
-			}
-		}
-	}
 
 #endif // USEDX12
 
-	// ADAPTER
-	IDXGIFactory* factory;
-	CreateDXGIFactory(IID_PPV_ARGS(&factory));
-	IDXGIAdapter* adapter;
-	for (UINT adapter_index = 0; S_OK == factory->EnumAdapters(adapter_index, &adapter); ++adapter_index) {
-		DXGI_ADAPTER_DESC adapter_desc;
-		adapter->GetDesc(&adapter_desc);
-		if (adapter_desc.VendorId == 0x1002/*AMD*/ || adapter_desc.VendorId == 0x10DE/*NVIDIA*/)
-		{
-			break;
+		// ADAPTER
+		IDXGIFactory* factory;
+		CreateDXGIFactory(IID_PPV_ARGS(&factory));
+		IDXGIAdapter* adapter;
+		for (UINT adapter_index = 0; S_OK == factory->EnumAdapters(adapter_index, &adapter); ++adapter_index) {
+			DXGI_ADAPTER_DESC adapter_desc;
+			adapter->GetDesc(&adapter_desc);
+			if (adapter_desc.VendorId == 0x1002/*AMD*/ || adapter_desc.VendorId == 0x10DE/*NVIDIA*/)
+			{
+				break;
+			}
+			adapter->Release();
 		}
-		adapter->Release();
-	}
-	if (adapter == nullptr)
-	{
-		factory->EnumAdapters(0, &adapter);
-		DXGI_ADAPTER_DESC adapter_desc;
-		adapter->GetDesc(&adapter_desc);
-	}
-	factory->Release();
+		if (adapter == nullptr)
+		{
+			factory->EnumAdapters(0, &adapter);
+			DXGI_ADAPTER_DESC adapter_desc;
+			adapter->GetDesc(&adapter_desc);
+		}
+		factory->Release();
 
-	// デバイス&スワップチェーン生成
-	{
 		UINT createDeviceFlags = 0;
+		// デバイス&スワップチェーン生成
+		{
 #ifdef _DEBUG
-		createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+			createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif // _DEBUG
 
-		D3D_FEATURE_LEVEL featureLevels[] =
-		{
-			D3D_FEATURE_LEVEL_11_0,
-			D3D_FEATURE_LEVEL_10_1,
-			D3D_FEATURE_LEVEL_10_0,
-			D3D_FEATURE_LEVEL_9_3,
-			D3D_FEATURE_LEVEL_9_2,
-			D3D_FEATURE_LEVEL_9_1,
-		};
+			D3D_FEATURE_LEVEL featureLevels[] =
+			{
+				D3D_FEATURE_LEVEL_11_0,
+				D3D_FEATURE_LEVEL_10_1,
+				D3D_FEATURE_LEVEL_10_0,
+				D3D_FEATURE_LEVEL_9_3,
+				D3D_FEATURE_LEVEL_9_2,
+				D3D_FEATURE_LEVEL_9_1,
+			};
 
-		// スワップチェーン設定
-		DXGI_SWAP_CHAIN_DESC swapchainDesc;
-		{
-			swapchainDesc.BufferDesc.Width = screenWidth;
-			swapchainDesc.BufferDesc.Height = screenHeight;
-			swapchainDesc.BufferDesc.RefreshRate.Numerator = 60;
-			swapchainDesc.BufferDesc.RefreshRate.Denominator = 1;
+			// スワップチェーン設定
+			DXGI_SWAP_CHAIN_DESC swapchainDesc;
+			{
+				swapchainDesc.BufferDesc.Width = screenWidth;
+				swapchainDesc.BufferDesc.Height = screenHeight;
+				swapchainDesc.BufferDesc.RefreshRate.Numerator = 60;
+				swapchainDesc.BufferDesc.RefreshRate.Denominator = 1;
 
-			swapchainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-			swapchainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-			swapchainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-			swapchainDesc.SampleDesc.Count = 1;
-			swapchainDesc.SampleDesc.Quality = 0;
-			swapchainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-			swapchainDesc.BufferCount = 1;
-			swapchainDesc.OutputWindow = hWnd;
-			swapchainDesc.Windowed = TRUE;
-			swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-			swapchainDesc.Flags = 0;
+				swapchainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+				swapchainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+				swapchainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+				swapchainDesc.SampleDesc.Count = 1;
+				swapchainDesc.SampleDesc.Quality = 0;
+				swapchainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+				swapchainDesc.BufferCount = 1;
+				swapchainDesc.OutputWindow = hWnd;
+				swapchainDesc.Windowed = TRUE;
+				swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+				swapchainDesc.Flags = 0;
+			}
+
+			D3D_FEATURE_LEVEL featureLevel;
+
+			// デバイス&スワップチェーン生成
+			hr = D3D11CreateDeviceAndSwapChain(
+				// nullptr,l/
+				adapter,
+				//D3D_DRIVER_TYPE_HARDWARE,
+				D3D_DRIVER_TYPE_UNKNOWN,
+				nullptr,
+				createDeviceFlags,
+				featureLevels,
+				ARRAYSIZE(featureLevels),
+				D3D11_SDK_VERSION,
+				&swapchainDesc,
+				swapchain.GetAddressOf(),
+				device.GetAddressOf(),
+				&featureLevel,
+				immediateContext.GetAddressOf()
+			);
+			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 		}
+		adapter->Release();
 
-		D3D_FEATURE_LEVEL featureLevel;
+		// レンダーステート作成
+		renderState = std::make_unique<RenderState>(device.Get());
+		m_renderStateDX12 = std::make_unique<RenderStateDX12>();
 
-		// デバイス&スワップチェーン生成
-		hr = D3D11CreateDeviceAndSwapChain(
-			// nullptr,l/
-			adapter,
-			//D3D_DRIVER_TYPE_HARDWARE,
-			D3D_DRIVER_TYPE_UNKNOWN,
-			nullptr,
-			createDeviceFlags,
-			featureLevels,
-			ARRAYSIZE(featureLevels),
-			D3D11_SDK_VERSION,
-			&swapchainDesc,
-			swapchain.GetAddressOf(),
-			device.GetAddressOf(),
-			&featureLevel,
-			immediateContext.GetAddressOf()
-		);
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+		// フレームバッファ作成
+		frameBuffers[static_cast<int>(FrameBufferId::Display)] = std::make_unique<FrameBuffer>(device.Get(), swapchain.Get());
+		frameBuffers[static_cast<int>(FrameBufferId::Scene)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight);
+		frameBuffers[static_cast<int>(FrameBufferId::Luminance)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth / 2, screenHeight / 2);
+		frameBuffers[static_cast<int>(FrameBufferId::GaussianBlur)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth / 2, screenHeight / 2);
+		frameBuffers[static_cast<int>(FrameBufferId::Normal)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
+		frameBuffers[static_cast<int>(FrameBufferId::Position)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT);
+
+		// フレームバッファマネージャー
+		m_framebufferManager = std::make_unique<FrameBufferManager>();
+		m_framebufferManager->Init(d3d_command_list.Get());
+
+		// フレームバッファ作成(DX12)
+		const wchar_t* resourceName1[] = { L"SceneRenderTarget", L"SceneDepthStencil" };
+		const wchar_t* resourceName2[] = { L"LuminanceRenderTarget",L"LuminanceDepthStencil" };
+		const wchar_t* resourceName3[] = { L"GaussianBlurRenderTarget",L"GaussianBlurDepthStencil" };
+		const wchar_t* resourceName4[] = { L"NormalRenderTarget",L"NormalDepthStencil" };
+		const wchar_t* resourceName5[] = { L"PositionRenderTarget",L"PositionDepthStencil" };
+		dx12_frameBuffers[static_cast<int>(FrameBufferDX12Id::Scene)] = std::make_unique<FrameBufferDX12>(m_d3d_device.Get(), resourceName1, screenWidth, screenHeight);
+		dx12_frameBuffers[static_cast<int>(FrameBufferDX12Id::Luminance)] = std::make_unique<FrameBufferDX12>(m_d3d_device.Get(), resourceName2, screenWidth / 2, screenHeight / 2);
+		dx12_frameBuffers[static_cast<int>(FrameBufferDX12Id::GaussianBlur)] = std::make_unique<FrameBufferDX12>(m_d3d_device.Get(), resourceName3, screenWidth / 2, screenHeight / 2);
+		dx12_frameBuffers[static_cast<int>(FrameBufferDX12Id::Normal)] = std::make_unique<FrameBufferDX12>(m_d3d_device.Get(), resourceName4, screenWidth, screenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
+		dx12_frameBuffers[static_cast<int>(FrameBufferDX12Id::Position)] = std::make_unique<FrameBufferDX12>(m_d3d_device.Get(), resourceName5, screenWidth, screenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT);
+
+		//サンプラーステート作成
+		m_sampler[static_cast<int>(SamplerState::PointWrap)] = std::make_unique<SamplerManager>(SamplerState::PointWrap);
+		m_sampler[static_cast<int>(SamplerState::PointClamp)] = std::make_unique<SamplerManager>(SamplerState::PointClamp);
+		m_sampler[static_cast<int>(SamplerState::LinearWrap)] = std::make_unique<SamplerManager>(SamplerState::LinearWrap);
+		m_sampler[static_cast<int>(SamplerState::LinearClamp)] = std::make_unique<SamplerManager>(SamplerState::LinearClamp);
+		m_sampler[static_cast<int>(SamplerState::LinearBorder)] = std::make_unique<SamplerManager>(SamplerState::LinearBorder);
+		m_sampler[static_cast<int>(SamplerState::LinearMirror)] = std::make_unique<SamplerManager>(SamplerState::LinearMirror);
+		m_sampler[static_cast<int>(SamplerState::AnisotropicWrap)] = std::make_unique<SamplerManager>(SamplerState::AnisotropicWrap);
+		m_sampler[static_cast<int>(SamplerState::ShadowMap)] = std::make_unique<SamplerManager>(SamplerState::ShadowMap);
+
+		// ギズモ生成
+		gizmos = std::make_unique<Gizmos>(device.Get());
+
+		// モデルシェーダー生成
+		modelShaders[static_cast<int>(ModelShaderId::Phong)] = std::make_unique<PhongShader>(device.Get());
+		modelShaders[static_cast<int>(ModelShaderId::Toon)] = std::make_unique<ToonShader>(device.Get());
+		modelShaders[static_cast<int>(ModelShaderId::Skydome)] = std::make_unique<SkydomeShader>(device.Get());
+		modelShaders[static_cast<int>(ModelShaderId::ShadowMap)] = std::make_unique<ShadowMapShader>(device.Get());
+		modelShaders[static_cast<int>(ModelShaderId::Plane)] = std::make_unique<PlaneShader>(device.Get());
+		modelShaders[static_cast<int>(ModelShaderId::Portal)] = std::make_unique<PortalShader>(device.Get());
+		modelShaders[static_cast<int>(ModelShaderId::Billboard)] = std::make_unique<BillboardShader>(device.Get());
+		modelShaders[static_cast<int>(ModelShaderId::Fireball)] = std::make_unique<FireballShader>(device.Get());
+		modelShaders[static_cast<int>(ModelShaderId::Lambert)] = std::make_unique<LambertShader>(device.Get());
+		modelShaders[static_cast<int>(ModelShaderId::PortalSquare)] = std::make_unique<PortalSquareShader>(device.Get());
+
+		// DX12のモデルシェーダー生成
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Lambert)] = std::make_unique<LambertShaderDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::LambertInstancing)] = std::make_unique<LambertShaderDX12>(m_d3d_device.Get(), true);
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Phong)] = std::make_unique<PhongShaderDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::PhongInstancing)] = std::make_unique<PhongShaderDX12>(m_d3d_device.Get(), true);
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Toon)] = std::make_unique<ToonShaderDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::ToonInstancing)] = std::make_unique<ToonShaderDX12>(m_d3d_device.Get(), true);
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Skydome)] = std::make_unique<SkydomeShaderDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::shadowMap)] = std::make_unique<ShadowMapShaderDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Plane)] = std::make_unique<PlaneShaderDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::PortalSquare)] = std::make_unique<PortalSquareShaderDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Billboard)] = std::make_unique<BillBoardShaderDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Fireball)] = std::make_unique<FireballShaderDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Loading)] = std::make_unique<LoadingShaderDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Zone)] = std::make_unique<ZoneShaderDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Electric)] = std::make_unique<ElectricShaderDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Foliage)] = std::make_unique<FoliageShader>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Charge)] = std::make_unique<ChargeShaderdDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::HealCylinder)] = std::make_unique<HealingShaderdCylinderDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::HealCircle)] = std::make_unique<HealingShaderdCircleDX12>(m_d3d_device.Get());
+
+		// スプライトシェーダー生成
+		spriteShaders[static_cast<int>(SpriteShaderId::Default)] = std::make_unique<DefaultSpriteShader>(device.Get());
+		spriteShaders[static_cast<int>(SpriteShaderId::UVScroll)] = std::make_unique<UVScrollShader>(device.Get());
+		spriteShaders[static_cast<int>(SpriteShaderId::Mask)] = std::make_unique<MaskShader>(device.Get());
+		spriteShaders[static_cast<int>(SpriteShaderId::ColorGrading)] = std::make_unique<ColorGradingShader>(device.Get());
+		spriteShaders[static_cast<int>(SpriteShaderId::GaussianBlur)] = std::make_unique<GaussianBlurShader>(device.Get());
+		spriteShaders[static_cast<int>(SpriteShaderId::LuminanceExtraction)] = std::make_unique<LuminanceExtractionShader>(device.Get());
+		spriteShaders[static_cast<int>(SpriteShaderId::Finalpass)] = std::make_unique<FinalpassShader>(device.Get());
+		spriteShaders[static_cast<int>(SpriteShaderId::Deferred)] = std::make_unique<DeferredLightingShader>(device.Get());
+
+		// DX12のスプライトシェーダー生成
+		dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::Default)] = std::make_unique<DefaultSpriteShaderDX12>(m_d3d_device.Get());
+		dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::LuminanceExtraction)] = std::make_unique<LuminanceExtractionShaderDX12>(m_d3d_device.Get());
+		dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::GaussianBlur)] = std::make_unique<GaussianBlurShaderDX12>(m_d3d_device.Get());
+		dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::ColorGrading)] = std::make_unique<ColorGradingShaderDX12>(m_d3d_device.Get());
+		dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::Finalpass)] = std::make_unique<FinalpassShaderDX12>(m_d3d_device.Get());
+		dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::InjectionParticle)] = std::make_unique<ParticleShader>(m_d3d_device.Get());
+		dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::HitParticle)] = std::make_unique<HitParticleShader>(m_d3d_device.Get());
+
+		// レンダラ
+		debugRenderer = std::make_unique<DebugRenderer>(device.Get());
+		lineRenderer = std::make_unique<LineRenderer>(device.Get(), 1024);
+		dx12_lineRenderer = std::make_unique<LineRendererDX12>(m_d3d_device.Get(), 1024);
+
+		// パーティクル
+		m_compute[static_cast<int>(ComputeShaderDX12Id::Injection)] = std::make_unique<ParticleCompute>(m_d3d_device.Get());
+
+		//スキニング
+		m_skinning_pipeline = std::make_unique<SkinningPipeline>(m_d3d_device.Get());
+
+		// シャドウマップ
+		m_shadowMapRenderer = std::make_unique<ShadowMapRenderDX12>();
 	}
-	adapter->Release();
-
-	// レンダーステート作成
-	renderState = std::make_unique<RenderState>(device.Get());
-	m_renderStateDX12 = std::make_unique<RenderStateDX12>();
-
-	// フレームバッファ作成
-	frameBuffers[static_cast<int>(FrameBufferId::Display)] = std::make_unique<FrameBuffer>(device.Get(), swapchain.Get());
-	frameBuffers[static_cast<int>(FrameBufferId::Scene)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight);
-	frameBuffers[static_cast<int>(FrameBufferId::Luminance)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth / 2, screenHeight / 2);
-	frameBuffers[static_cast<int>(FrameBufferId::GaussianBlur)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth / 2, screenHeight / 2);
-	frameBuffers[static_cast<int>(FrameBufferId::Normal)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
-	frameBuffers[static_cast<int>(FrameBufferId::Position)] = std::make_unique<FrameBuffer>(device.Get(), screenWidth, screenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT);
-
-	// フレームバッファマネージャー
-	m_framebufferManager = std::make_unique<FrameBufferManager>();
-	m_framebufferManager->Init(d3d_command_list.Get());
-
-	// フレームバッファ作成(DX12)
-	const wchar_t* resourceName1[] = { L"SceneRenderTarget", L"SceneDepthStencil" };
-	const wchar_t* resourceName2[] = { L"LuminanceRenderTarget",L"LuminanceDepthStencil" };
-	const wchar_t* resourceName3[] = { L"GaussianBlurRenderTarget",L"GaussianBlurDepthStencil" };
-	const wchar_t* resourceName4[] = { L"NormalRenderTarget",L"NormalDepthStencil" };
-	const wchar_t* resourceName5[] = { L"PositionRenderTarget",L"PositionDepthStencil" };
-	dx12_frameBuffers[static_cast<int>(FrameBufferDX12Id::Scene)] = std::make_unique<FrameBufferDX12>(m_d3d_device.Get(), resourceName1, screenWidth, screenHeight);
-	dx12_frameBuffers[static_cast<int>(FrameBufferDX12Id::Luminance)] = std::make_unique<FrameBufferDX12>(m_d3d_device.Get(), resourceName2, screenWidth / 2, screenHeight / 2);
-	dx12_frameBuffers[static_cast<int>(FrameBufferDX12Id::GaussianBlur)] = std::make_unique<FrameBufferDX12>(m_d3d_device.Get(), resourceName3, screenWidth / 2, screenHeight / 2);
-	dx12_frameBuffers[static_cast<int>(FrameBufferDX12Id::Normal)] = std::make_unique<FrameBufferDX12>(m_d3d_device.Get(), resourceName4, screenWidth, screenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
-	dx12_frameBuffers[static_cast<int>(FrameBufferDX12Id::Position)] = std::make_unique<FrameBufferDX12>(m_d3d_device.Get(), resourceName5, screenWidth, screenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT);
-
-	//サンプラーステート作成
-	m_sampler[static_cast<int>(SamplerState::PointWrap)] = std::make_unique<SamplerManager>(SamplerState::PointWrap);
-	m_sampler[static_cast<int>(SamplerState::PointClamp)] = std::make_unique<SamplerManager>(SamplerState::PointClamp);
-	m_sampler[static_cast<int>(SamplerState::LinearWrap)] = std::make_unique<SamplerManager>(SamplerState::LinearWrap);
-	m_sampler[static_cast<int>(SamplerState::LinearClamp)] = std::make_unique<SamplerManager>(SamplerState::LinearClamp);
-	m_sampler[static_cast<int>(SamplerState::LinearBorder)] = std::make_unique<SamplerManager>(SamplerState::LinearBorder);
-	m_sampler[static_cast<int>(SamplerState::AnisotropicWrap)] = std::make_unique<SamplerManager>(SamplerState::AnisotropicWrap);
-	m_sampler[static_cast<int>(SamplerState::ShadowMap)] = std::make_unique<SamplerManager>(SamplerState::ShadowMap);
-
-	// ギズモ生成
-	gizmos = std::make_unique<Gizmos>(device.Get());
-
-	// モデルシェーダー生成
-	modelShaders[static_cast<int>(ModelShaderId::Phong)] = std::make_unique<PhongShader>(device.Get());
-	modelShaders[static_cast<int>(ModelShaderId::Toon)] = std::make_unique<ToonShader>(device.Get());
-	modelShaders[static_cast<int>(ModelShaderId::Skydome)] = std::make_unique<SkydomeShader>(device.Get());
-	modelShaders[static_cast<int>(ModelShaderId::ShadowMap)] = std::make_unique<ShadowMapShader>(device.Get());
-	modelShaders[static_cast<int>(ModelShaderId::Plane)] = std::make_unique<PlaneShader>(device.Get());
-	modelShaders[static_cast<int>(ModelShaderId::Portal)] = std::make_unique<PortalShader>(device.Get());
-	modelShaders[static_cast<int>(ModelShaderId::Billboard)] = std::make_unique<BillboardShader>(device.Get());
-	modelShaders[static_cast<int>(ModelShaderId::Fireball)] = std::make_unique<FireballShader>(device.Get());
-	modelShaders[static_cast<int>(ModelShaderId::Lambert)] = std::make_unique<LambertShader>(device.Get());
-
-	// DX12のモデルシェーダー生成
-	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Lambert)] = std::make_unique<LambertShaderDX12>(m_d3d_device.Get());
-	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::LambertInstancing)] = std::make_unique<LambertShaderDX12>(m_d3d_device.Get(), true);
-	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Phong)] = std::make_unique<PhongShaderDX12>(m_d3d_device.Get());
-	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::PhongInstancing)] = std::make_unique<PhongShaderDX12>(m_d3d_device.Get(), true);
-	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Toon)] = std::make_unique<ToonShaderDX12>(m_d3d_device.Get());
-	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::ToonInstancing)] = std::make_unique<ToonShaderDX12>(m_d3d_device.Get(), true);
-	dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Skydome)] = std::make_unique<SkydomeShaderDX12>(m_d3d_device.Get());
-
-	// スプライトシェーダー生成
-	spriteShaders[static_cast<int>(SpriteShaderId::Default)] = std::make_unique<DefaultSpriteShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::UVScroll)] = std::make_unique<UVScrollShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::Mask)] = std::make_unique<MaskShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::ColorGrading)] = std::make_unique<ColorGradingShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::GaussianBlur)] = std::make_unique<GaussianBlurShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::LuminanceExtraction)] = std::make_unique<LuminanceExtractionShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::Finalpass)] = std::make_unique<FinalpassShader>(device.Get());
-	spriteShaders[static_cast<int>(SpriteShaderId::Deferred)] = std::make_unique<DeferredLightingShader>(device.Get());
-
-	// DX12のスプライトシェーダー生成
-	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::Default)] = std::make_unique<DefaultSpriteShaderDX12>(m_d3d_device.Get());
-	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::LuminanceExtraction)] = std::make_unique<LuminanceExtractionShaderDX12>(m_d3d_device.Get());
-	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::GaussianBlur)] = std::make_unique<GaussianBlurShaderDX12>(m_d3d_device.Get());
-	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::ColorGrading)] = std::make_unique<ColorGradingShaderDX12>(m_d3d_device.Get());
-	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::Finalpass)] = std::make_unique<FinalpassShaderDX12>(m_d3d_device.Get());
-	dx12_spriteShaders[static_cast<int>(SpriteShaderDX12Id::Particle)] = std::make_unique<ParticleShader>(m_d3d_device.Get());
-
-	// レンダラ
-	debugRenderer = std::make_unique<DebugRenderer>(device.Get());
-	lineRenderer = std::make_unique<LineRenderer>(device.Get(), 1024);
-
-	// パーティクル
-	m_compute = std::make_unique<ParticleCompute>(m_d3d_device.Get());
-
-	//スキニング
-	m_skinning_pipeline = std::make_unique<SkinningPipeline>(m_d3d_device.Get());
 }
 
 //******************************************************************
@@ -598,6 +671,34 @@ DirectX::XMFLOAT3 Graphics::GetScreenPosition(
 //******************************************************************
 // @brief     スクリーン作成取得
 // @param[in] worldPosition　  ワールド座標系での位置
+// @param[in] viewport         ビューポート情報
+// @param[in] View             ビュー行列
+// @param[in] Projection       射影行列
+// @param[in] World            ワールド行列
+// @return    DirectX::XMFLOAT3
+//******************************************************************
+DirectX::XMFLOAT3 Graphics::GetScreenPosition(const DirectX::XMFLOAT3 worldPosition, const D3D12_VIEWPORT& viewport, const DirectX::XMMATRIX& View, const DirectX::XMMATRIX& Projection, const DirectX::XMMATRIX World)
+{
+	DirectX::XMVECTOR ScreenPosition = DirectX::XMVector3Project(
+		DirectX::XMVectorSet(worldPosition.x, worldPosition.y, worldPosition.z, 0),
+		viewport.TopLeftX,
+		viewport.TopLeftY,
+		viewport.Width,
+		viewport.Height,
+		viewport.MinDepth,
+		viewport.MaxDepth,
+		Projection,
+		View,
+		World
+	);
+	DirectX::XMFLOAT3 screenPosition;
+	DirectX::XMStoreFloat3(&screenPosition, ScreenPosition);
+	return screenPosition;
+}
+
+//******************************************************************
+// @brief     スクリーン作成取得
+// @param[in] worldPosition　  ワールド座標系での位置
 // @return    DirectX::XMFLOAT3
 //******************************************************************
 DirectX::XMFLOAT3 Graphics::GetScreenPosition(const DirectX::XMFLOAT3 worldPosition)
@@ -612,7 +713,12 @@ DirectX::XMFLOAT3 Graphics::GetScreenPosition(const DirectX::XMFLOAT3 worldPosit
 	DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&CameraManager::Instance().GetCamera()->GetProjection());
 	DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
 
-	return GetScreenPosition(worldPosition, viewport, View, Projection, World);
+	if (T_GRAPHICS.isDX11Active)
+	{
+		return GetScreenPosition(worldPosition, viewport, View, Projection, World);
+	}
+
+	return GetScreenPosition(worldPosition, T_GRAPHICS.GetViewPort(), View, Projection, World);
 }
 
 //******************************************************************
@@ -647,7 +753,7 @@ void Graphics::BeginRender()
 	// レンダーターゲットを設定
 	m_framebufferManager->SetRenderTarget(rtv_descriptor[frame_buffer_index]->GetCpuHandle(), dsv_descriptor->GetCpuHandle());
 
-	const float clearColor[] = { 0.6f, 0.6f, 0.6f, 1.0f };
+	const float clearColor[] = { 0.2f, 0.2f, 0.2f, 1.0f };
 	m_framebufferManager->ClearRenderTargetView(rtv_descriptor[frame_buffer_index]->GetCpuHandle(), clearColor);
 	m_framebufferManager->ClearDepthStencilView(dsv_descriptor->GetCpuHandle(), 1.0f);
 }
@@ -710,6 +816,9 @@ void Graphics::Execute()
 
 	m_graphics_queue.d3d_command_queue->ExecuteCommandLists(_countof(d3d_command_lists), d3d_command_lists);
 
+	// Flush to submit the 11 command list to the shared command queue.
+	T_GRAPHICS.GetD3D112DDeviceContext()->Flush();
+
 	// 画面表示
 	m_dxgi_swap_chain->Present(SyncInterval, SyncInterval == 0 ? DXGI_PRESENT_ALLOW_TEARING : 0);
 
@@ -723,7 +832,7 @@ void Graphics::Execute()
 // @param[in] camera　カメラ
 // @return    const Descriptor*
 //******************************************************************
-const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera)
+const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera, float timerGlobalTime, float timerGlobalDeltaTime)
 {
 	LightManager& ligtManager = LightManager::Instance();
 
@@ -734,6 +843,13 @@ const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera)
 	cb_scene_data->camera_position.x = camera->GetEye().x;
 	cb_scene_data->camera_position.y = camera->GetEye().y;
 	cb_scene_data->camera_position.z = camera->GetEye().z;
+
+	// 影情報
+	cb_scene_data->shadowBias = 0.001f;
+	cb_scene_data->shadowColor = { 0.5f, 0.5f, 0.5f };
+
+	cb_scene_data->timerGlobal = timerGlobalTime;
+	cb_scene_data->timerTick = timerGlobalDeltaTime;
 
 	// ライト情報
 	cb_scene_data->ambientLightColor = ligtManager.GetAmbientColor();
@@ -749,6 +865,108 @@ const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera)
 			cb_scene_data->directionalLightData.direction.z = light->GetDirection().z;
 			cb_scene_data->directionalLightData.direction.w = 0.0f;
 			cb_scene_data->directionalLightData.color = light->GetColor();
+
+			// ライトビュープロジェクション
+			{
+				DirectX::XMVECTOR cameraPosition = DirectX::XMVectorSet(camera->GetEye().x, camera->GetEye().y, camera->GetEye().z, 1.0f);
+				DirectX::XMVECTOR cameraUp = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera->GetUp()));
+				DirectX::XMVECTOR cameraFront = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera->GetFront()));
+				DirectX::XMVECTOR cameraRight = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera->GetRight()));
+
+				//平行光源からカメラ位置を作成し、そこから原点の位置を見るように視線行列を生成
+				DirectX::XMVECTOR LightDirection = DirectX::XMVectorSet(light->GetDirection().x, light->GetDirection().y, light->GetDirection().z, 0);
+				LightDirection = DirectX::XMVectorScale(LightDirection, -250);
+				DirectX::XMMATRIX LightView = DirectX::XMMatrixLookAtLH(
+					LightDirection,
+					DirectX::XMVectorZero(),
+					DirectX::XMVectorSet(0, 1, 0, 0));
+
+				//シャドウマップに描画したい範囲の射影行列を生成
+				DirectX::XMMATRIX Projection = DirectX::XMMatrixOrthographicLH(100, 100, 0.1f, 500.0f);
+				DirectX::XMMATRIX ViewProjection = LightView * Projection;
+
+				//エリアを内容する試錐台の８頂点を算出する
+				DirectX::XMVECTOR vertex[8];
+				{
+					//エリアの近平面の中心からの上面までの距離を求める
+					float nearY = tanf(camera->GetFovY() / 2.0f) * camera->GetNearZ();
+
+					//エリアの近平面の中心からの右面までの距離を求める
+					float nearX = nearY * camera->GetAspect();
+
+					//エリアの遠平面の中心からの上面までの距離を求める
+					float farY = tanf(camera->GetFovY() / 2.0f) * 100;
+
+					//エリアの遠平面の中心からの右面までの距離を求める
+					float farX = farY * camera->GetAspect();
+
+					//エリアの近平面の中心座標を求める
+					DirectX::XMVECTOR nearPosition = DirectX::XMVectorAdd(cameraPosition, DirectX::XMVectorScale(cameraFront, camera->GetNearZ()));
+
+					//エリアの遠平面の中心座標を求める
+					DirectX::XMVECTOR farPosition = DirectX::XMVectorAdd(cameraPosition, DirectX::XMVectorScale(cameraFront, 100));
+
+					//8頂点を求める
+					{
+						//近平面の右上
+						vertex[0] = DirectX::XMVectorAdd(nearPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, nearY), DirectX::XMVectorScale(cameraRight, nearX)));
+
+						//近平面の左上
+						vertex[1] = DirectX::XMVectorAdd(nearPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, nearY), DirectX::XMVectorScale(cameraRight, -nearX)));
+
+						//近平面の右下
+						vertex[2] = DirectX::XMVectorAdd(nearPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, -nearY), DirectX::XMVectorScale(cameraRight, nearX)));
+
+						//近平面の左下
+						vertex[3] = DirectX::XMVectorAdd(nearPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, -nearY), DirectX::XMVectorScale(cameraRight, -nearX)));
+
+						//遠平面の右上
+						vertex[4] = DirectX::XMVectorAdd(farPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, farY), DirectX::XMVectorScale(cameraRight, farX)));
+
+						//遠平面の左上
+						vertex[5] = DirectX::XMVectorAdd(farPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, farY), DirectX::XMVectorScale(cameraRight, -farX)));
+
+						//遠平面の右下
+						vertex[6] = DirectX::XMVectorAdd(farPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, -farY), DirectX::XMVectorScale(cameraRight, farX)));
+
+						//遠平面の左下
+						vertex[7] = DirectX::XMVectorAdd(farPosition, DirectX::XMVectorAdd(DirectX::XMVectorScale(cameraUp, -farY), DirectX::XMVectorScale(cameraRight, -farX)));
+					}
+				}
+
+				//8頂点をライトビュープロジェクション空間にして、最大値、最小値を求める
+				DirectX::XMFLOAT3 vertexMin(FLT_MAX, FLT_MAX, FLT_MAX), vertexMax(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+				for (auto& it : vertex)
+				{
+					DirectX::XMFLOAT3 p;
+					DirectX::XMStoreFloat3(&p, DirectX::XMVector3TransformCoord(it, ViewProjection));
+					vertexMin.x = min(p.x, vertexMin.x);
+					vertexMin.y = min(p.y, vertexMin.y);
+					vertexMin.z = min(p.z, vertexMin.z);
+					vertexMax.x = max(p.x, vertexMax.x);
+					vertexMax.y = max(p.y, vertexMax.y);
+					vertexMax.z = max(p.z, vertexMax.z);
+				}
+
+				//クロップ行列を求める
+				float xScale = 2.0f / (vertexMax.x - vertexMin.x);
+				float yScale = 2.0f / (vertexMax.y - vertexMin.y);
+
+				// 中心座標から正しいオフセットを計算
+				float xOffset = -(vertexMin.x + vertexMax.x) * 0.25f * xScale;
+				float yOffset = -(vertexMin.y + vertexMax.y) * 0.25f * yScale;
+
+				DirectX::XMMATRIX clopMatrix = DirectX::XMMatrixSet
+				(
+					xScale, 0, 0, 0,
+					0, yScale, 0, 0,
+					0, 0, 1, 0,
+					xOffset, yOffset, 0, 1
+				);
+
+				// ライトビュープロジェクション行列
+				DirectX::XMStoreFloat4x4(&cb_scene_data->light_view_projection, ViewProjection * clopMatrix);
+			}
 			break;
 		}
 		case	LightType::Point:
@@ -803,6 +1021,25 @@ void Graphics::CreateRTVForFameBuffer()
 		d3d_rtv_resource[i]->SetName(L"BackBuffer");
 
 		m_d3d_device->CreateRenderTargetView(d3d_rtv_resource[i].Get(), nullptr, rtv_descriptor[i]->GetCpuHandle());
+
+		//　テキスト画面バファー
+		D3D11_RESOURCE_FLAGS d3d11Flags = { D3D11_BIND_RENDER_TARGET };
+		m_d3d11On12Device->CreateWrappedResource(
+			d3d_rtv_resource[i].Get(),
+			&d3d11Flags,
+			D3D12_RESOURCE_STATE_RENDER_TARGET,
+			D3D12_RESOURCE_STATE_PRESENT,
+			IID_PPV_ARGS(&m_wrappedBackBuffers[i])
+		);
+
+		//　テキストバファー
+		Microsoft::WRL::ComPtr<IDXGISurface> surface;
+		m_wrappedBackBuffers[i].As(&surface);
+		m_d2dDeviceContext->CreateBitmapFromDxgiSurface(
+			surface.Get(),
+			&bitmapProperties,
+			&m_d2dRenderTargets[i]
+		);
 	}
 }
 
@@ -1080,12 +1317,12 @@ HRESULT Graphics::CreateTexture(const BYTE* pixels, UINT width, UINT height, DXG
 // @param[in] d3d_resource    ID3D12Resource**
 // @return    HRESULT
 //******************************************************************
-HRESULT Graphics::CreateDummyTexture(ID3D12Resource** d3d_resource)
+HRESULT Graphics::CreateDummyTexture(ID3D12Resource** d3d_resource, int color)
 {
 	const UINT width = 8;
 	const UINT height = 8;
 	UINT pixels[width * height];
-	::memset(pixels, 0xFF, sizeof(pixels));
+	::memset(pixels, color, sizeof(pixels));
 
 	// ヒーププロパティの設定
 	D3D12_HEAP_PROPERTIES d3d_heap_props = {};

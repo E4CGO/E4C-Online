@@ -1,11 +1,11 @@
-#include <tchar.h>
+ï»¿#include <tchar.h>
 #include <iostream>
 #include "Framework.h"
 
 const LONG SCREEN_WIDTH = 1280;
 const LONG SCREEN_HEIGHT = 720;
 
-LPCWSTR GAME_TITLE = _T("P2Pƒ_ƒ“ƒWƒ‡ƒ“EƒAƒhƒxƒ“ƒ`ƒƒ[DX12");
+LPCWSTR GAME_TITLE = _T("Ludus Somnia");
 
 LRESULT CALLBACK fnWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {

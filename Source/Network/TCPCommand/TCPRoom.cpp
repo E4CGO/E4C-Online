@@ -40,7 +40,7 @@ namespace Online
 	bool TCPRoomIn::Send(void* data)
 	{
 		std::vector<uint8_t> buffer;
-		CreateHeaderBuffer(buffer, m_cmd, 0);
+		CreateHeaderBuffer(buffer, m_cmd);
 		return m_pcontroller->GetTcpSocket()->Send(buffer.data(), buffer.size()) >= 0;
 	}
 
@@ -80,7 +80,7 @@ namespace Online
 	*//***************************************************************************/
 	bool TCPRoomOut::Receive(size_t size)
 	{
-		uint64_t client_id = 0;
+		uint32_t client_id = 0;
 		if (m_pcontroller->GetTcpSocket()->Receive(&client_id, size) > 0)
 		{
 			if (client_id == GAME_DATA.GetClientId()) return true;

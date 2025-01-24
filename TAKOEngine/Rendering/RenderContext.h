@@ -173,6 +173,13 @@ struct SkydomeData
 	const Descriptor* skyTexture = nullptr;
 };
 
+//影情報
+struct ShadowMapDataDX12
+{
+	const Descriptor* shadow_srv_descriptor = nullptr;
+	const Descriptor* shadow_sampler_descriptor = nullptr;
+};
+
 // パーティクル情報
 struct ParticleData
 {
@@ -194,6 +201,17 @@ struct ParticleData
 	//ノイズ
 	float noiseSpeed = 0.4f;
 	float noisePower = 100.0f;
+};
+
+// ヒットパーティクル情報
+struct HitParticleData
+{
+	// コンスタントバッファ
+	const Descriptor* cbv_descriptor = nullptr;
+	const Descriptor* srv_descriptor = nullptr;
+
+	D3D12_VERTEX_BUFFER_VIEW d3d_vbv = {};
+	int maxParticle = 0;
 };
 
 struct RenderContext
@@ -237,7 +255,7 @@ struct RenderContextDX12
 {
 	ID3D12GraphicsCommandList* d3d_command_list = nullptr;
 	const Descriptor* scene_cbv_descriptor = nullptr;
-
+	
 	DirectX::XMFLOAT4X4	view;
 	DirectX::XMFLOAT4X4	projection;
 	DirectX::XMFLOAT4	light_direction;
@@ -253,6 +271,13 @@ struct RenderContextDX12
 
 	// パーティクル情報
 	ParticleData            particleData;
+	HitParticleData         hitParticleData;
+
+	// 影情報
+	ShadowMapDataDX12       shadowMap;
+
+	// 板のコンスタントバッファ
+	const Descriptor* plane_cbv_descriptor = nullptr;
 };
 
 #endif // !__INCLUDE_RENDER_CONTEXT_H__

@@ -1,10 +1,10 @@
-#include "MaskShader.h"
+ï»¿#include "MaskShader.h"
 
 #include "TAKOEngine/Rendering/GpuResourceUtils.h"
 
 MaskShader::MaskShader(ID3D11Device* device) : SpriteShader(device, "Data/Shader/SpriteVS.cso", "Data/Shader/MaskPS.cso")
 {
-	// ƒV[ƒ“—pƒoƒbƒtƒ@
+	// ã‚·ãƒ¼ãƒ³ç”¨ãƒãƒƒãƒ•ã‚¡
 	GpuResourceUtils::CreateConstantBuffer(
 		device,
 		sizeof(CbMask),
@@ -14,7 +14,7 @@ MaskShader::MaskShader(ID3D11Device* device) : SpriteShader(device, "Data/Shader
 
 void MaskShader::UpdateConstantBuffer(const RenderContext& rc)
 {
-	//	’è”ƒoƒbƒtƒ@‚Ì’†g‚ğXV‚µ‚Ü‚·
+	//	å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®ä¸­èº«ã‚’æ›´æ–°ã—ã¾ã™
 	CbMask cbMask;
 	cbMask.dissolveThreshold = rc.maskData.dissolveThreshold;
 	cbMask.edgeThreshold = rc.maskData.edgeThreshold;

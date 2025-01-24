@@ -1,10 +1,10 @@
-#include "Projectile.h"
+ï»¿#include "Projectile.h"
 
 #include "TAKOEngine/Physics/CollisionDataManager.h"
 
 #include "GameObject/Projectile/ProjectileManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
-#include "GameObject/Character/Player/PlayerManager.h"
+#include "GameObject/Character/Player/PlayerCharacterManager.h"
 
 #include "Map/MapTileManager.h"
 
@@ -13,7 +13,7 @@
 void Projectile::Update(float elapsedTime)
 {
 	DirectX::XMFLOAT3 velocity = direction * speed;
-	// d—Í
+	// é‡åŠ›
 	velocity.y += gravity * 60.0f * elapsedTime; // elapsedFrame;
 	position += velocity * elapsedTime;
 
@@ -26,8 +26,13 @@ void Projectile::Render(const RenderContext& rc)
 {
 	ModelObject::Render(rc);
 #ifdef _DEBUG
-	if (collider) collider->DrawDebugPrimitive({ 1, 1, 1, 1 });
+	if (m_pMoveCollider) m_pMoveCollider->DrawDebugPrimitive({ 1, 1, 1, 1 });
 #endif // _DEBUG
+}
+
+void Projectile::RenderDX12(const RenderContextDX12& rc)
+{
+	ModelObject::RenderDX12(rc);
 }
 
 void Projectile::PointTo(const DirectX::XMFLOAT3& target)
@@ -35,7 +40,7 @@ void Projectile::PointTo(const DirectX::XMFLOAT3& target)
 	DirectX::XMFLOAT3 targetDirect = XMFLOAT3Normalize(target - position);
 	DirectX::XMMATRIX R = AnglesToMatrix({});
 
-	// …•½Šp“x
+	// æ°´å¹³è§’åº¦
 	DirectX::XMFLOAT3 frontH = XMFLOAT3Normalize(front - DirectX::XMFLOAT3{ 0, front.y, 0.0f });
 	if (XMFLOAT3LengthSq(frontH) > 0.0f)
 	{
@@ -48,7 +53,7 @@ void Projectile::PointTo(const DirectX::XMFLOAT3& target)
 		angle = MatrixToAngles(R);
 	}
 
-	// ‚’¼Šp“x
+	// å‚ç›´è§’åº¦
 	if (front.y != 0.0f)
 	{
 		DirectX::XMFLOAT3 frontV = XMFLOAT3Normalize(front - DirectX::XMFLOAT3{ front.x, 0.0f, front.z });
@@ -66,71 +71,71 @@ void Projectile::Destory()
 	PROJECTILES.Remove(this);
 }
 
-void Projectile::Collision()
-{
-	if (collider == nullptr) return;
-
-	if ((collisionTarget & COLLISION_TARGET::STAGE) > 0)
-	{
-		Collider* col = collider.get();
-		for (ModelObject*& map : MAPTILES.GetAll())
-		{
-			HitResult hit;
-			DirectX::XMFLOAT3 direction = {};
-			if (map->GetCollider()->Collision(col, {}, hit))
-			{
-				if (fabsf(hit.normal.y) < 0.01f)
-				{
-					OnHitWall(hit);
-				}
-				else
-				{
-					OnHitGround(hit);
-				}
-			}
-		}
-	}
-	if ((collisionTarget & COLLISION_TARGET::ENEMY) > 0)
-	{
-		Enemy* hitTarget = nullptr;
-		int hitCollider = -1;
-		HitResult hit;
-		for (Enemy*& enemy : ENEMIES.GetAll())
-		{
-			for (std::pair<int, Collider*> enemyCollider : enemy->GetColliders())
-			{
-				HitResult temp;
-				if (collider->Collision(enemyCollider.second, {}, temp)) // Õ“Ë
-				{
-					if (temp.distance < hit.distance) // ˆê”ÔÚ‹ßŒvZ
-					{
-						hit = temp;
-						hitTarget = enemy;
-						hitCollider = enemyCollider.first;
-					}
-					if (pierce) // ŠÑ’Êˆ—F“–‚½‚Á‚½“G‘S•”
-					{
-						if (atk > 0 && owner == PLAYERS.GetPlayerById(GAME_DATA.GetClientId())) // ƒNƒ‰ƒCƒAƒ“ƒg‚ÌUŒ‚‚µ‚©ˆ—‚µ‚È‚¢
-						{
-							OnHitEnemy(hit);
-							SendCollision(hitTarget, enemyCollider.first);
-						}
-					}
-					continue; // Ÿ‚Ì“G
-				}
-			}
-		}
-		if (hitTarget != nullptr && !pierce) // ”ñŠÑ’Êˆ—FÕ“Ë‚Ìˆê”Ô‹ß‚¢–Ú•W
-		{
-			if (atk > 0 && owner == PLAYERS.GetPlayerById(GAME_DATA.GetClientId())) // ƒNƒ‰ƒCƒAƒ“ƒg‚ÌUŒ‚‚µ‚©ˆ—‚µ‚È‚¢
-			{
-				OnHitEnemy(hit);
-				SendCollision(hitTarget, hitCollider);
-			}
-			Destory();
-		}
-	}
-}
+//void Projectile::Collision()
+//{
+//	if (m_pMoveCollider == nullptr) return;
+//
+//	if ((collisionTarget & COLLISION_TARGET::STAGE) > 0)
+//	{
+//		Collider* col = m_pMoveCollider.get();
+//		for (ModelObject*& map : MAPTILES.GetAll())
+//		{
+//			HitResult hit;
+//			DirectX::XMFLOAT3 direction = {};
+//			if (map->GetMoveCollider()->Collision(col, {}, hit))
+//			{
+//				if (fabsf(hit.normal.y) < 0.01f)
+//				{
+//					OnHitWall(hit);
+//				}
+//				else
+//				{
+//					OnHitGround(hit);
+//				}
+//			}
+//		}
+//	}
+//	if ((collisionTarget & COLLISION_TARGET::ENEMY) > 0)
+//	{
+//		Enemy* hitTarget = nullptr;
+//		int hitCollider = -1;
+//		HitResult hit;
+//		for (Enemy*& enemy : ENEMIES.GetAll())
+//		{
+//			for (std::pair<int, Collider*> enemyCollider : enemy->GetColliders())
+//			{
+//				HitResult temp;
+//				if (m_pMoveCollider->Collision(enemyCollider.second, {}, temp)) // è¡çª
+//				{
+//					if (temp.distance < hit.distance) // ä¸€ç•ªæ¥è¿‘è¨ˆç®—
+//					{
+//						hit = temp;
+//						hitTarget = enemy;
+//						hitCollider = enemyCollider.first;
+//					}
+//					if (pierce) // è²«é€šå‡¦ç†ï¼šå½“ãŸã£ãŸæ•µå…¨éƒ¨
+//					{
+//						if (atk > 0 && owner == PlayerCharacterManager::Instance().GetPlayerCharacterById()) // ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã®æ”»æ’ƒã—ã‹å‡¦ç†ã—ãªã„
+//						{
+//							OnHitEnemy(hit);
+//							SendCollision(hitTarget, enemyCollider.first);
+//						}
+//					}
+//					continue; // æ¬¡ã®æ•µ
+//				}
+//			}
+//		}
+//		if (hitTarget != nullptr && !pierce) // éè²«é€šå‡¦ç†ï¼šè¡çªã®ä¸€ç•ªè¿‘ã„ç›®æ¨™
+//		{
+//			if (atk > 0 && owner == PlayerCharacterManager::Instance().GetPlayerCharacterById()) // ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã®æ”»æ’ƒã—ã‹å‡¦ç†ã—ãªã„
+//			{
+//				OnHitEnemy(hit);
+//				SendCollision(hitTarget, hitCollider);
+//			}
+//			Destory();
+//		}
+//	}
+//}
 
 void Projectile::SendCollision(Enemy* target, int colider_id)
 {

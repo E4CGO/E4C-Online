@@ -23,15 +23,15 @@
 
 /**************************************************************************//**
 	@class	GLTFModelDX11
-	@brief	TinyGLTF�x�[�X���f��
-	@par    [����]
-		TinyGLTF�œǂݍ��݂Ń��f���쐬
+	@brief	TinyGLTFベースモデル
+	@par    [説明]
+		TinyGLTFで読み込みでモデル作成
 *//***************************************************************************/
 class GLTFModelDX11 : public iModel
 {
 public:
 	GLTFModelDX11(ID3D11Device* device, const std::string& filename, float scaling = 1.0f, int modelType = 0);
-	~GLTFModelDX11() {};
+	~GLTFModelDX11() override {};
 
 	void cumulate_transforms(std::vector<ModelResource::node>& nodes);
 
@@ -39,20 +39,51 @@ public:
 
 	void animate(size_t animation_index, float time, std::vector<ModelResource::node>& animated_nodes);
 
-	void UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform);
-	void PlayAnimation(int index, bool loop, float blendSeconds = 0.2f);
-	bool IsPlayAnimation() const;
-	void UpdateAnimation(float elapsedTime);
-	void ComputeAnimation(float elapsedTime);
-	void ComputeBlending(float elapsedTime);
-	void ComputeWorldBounds();
+	void UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform) override;
+	void PlayAnimation(int index, bool loop, float blendSeconds = 0.2f) override;
+	bool IsPlayAnimation() const override; 
+	void UpdateAnimation(float elapsedTime) override;
+	void ComputeAnimation(float elapsedTime) override;
+	void ComputeBlending(float elapsedTime) override;
+	void ComputeWorldBounds() override;
 
-	iModel::Node* FindNode(const char* name);
+	// ノードデータ取得
+	const std::vector<Node>& GetNodes() const override { return nodes; }
+	Node* FindNode(const char* name) override;
 
-	void CopyAnimations(iModel* model);
-	void CopyNodes(iModel* model);
+	// ルートノード取得
+	Node* GetRootNode() override { return nodes.data(); }
 
-	void DrawDebugGUI();
+	// メッシュ取得
+	const std::vector<Mesh>& GetMeshes() const override { return m_meshes; }
+
+	// リソース取得
+	const ModelResource* GetResource() const override { return resource.get(); }
+
+	int GetCurrentAnimationIndex() const override { return  currentAnimationIndex; }
+
+	// 現在のアニメーション再生時間取得
+	float GetCurrentAnimationSeconds() const override { return  currentAnimationSeconds; }
+	float GetAnimationRate() const override { return currentAnimationSeconds / resource->GetAnimations().at(currentAnimationIndex).secondsLength; }
+	void SetAnimationRate(float rate) override { currentAnimationSeconds = resource->GetAnimations().at(currentAnimationIndex).secondsLength * rate; }
+
+	void CopyAnimations(iModel* model) override;
+	void CopyNodes(iModel* model) override;
+
+	void DrawDebugGUI() override;
+
+	// インスタンシング用関数----------------------------------
+	//割り当てられた番号を返す
+	int AllocateInstancingIndex() override { return -1; };
+
+	//割り当てられた番号を解放する
+	void FreeInstancingIndex(int instancingIndex) override {};
+
+	//行列計算
+	void UpdateTransform(int instancingIndex, const DirectX::XMFLOAT4X4& transform) override {};
+
+	//現在の姿勢行列を取得
+	const DirectX::XMFLOAT4X4& GetTransform(int instancingIndex) const override { return m_transform[0]; };
 
 private:
 

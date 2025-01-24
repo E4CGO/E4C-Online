@@ -57,10 +57,11 @@ namespace TentacleLib
 
 		setting.title = APPLICATION_NAME;
 
-		//SDL_Init(SDL_INIT_AUDIO);
+		graphics.SetDX12Render(true);
+		graphics.SetDX11Render(false);
+
 		input.Init(hWnd);
 		timer.Init();
-		//audio.Init();
 		graphics.Initalize(hWnd, 2);
 
 		textSprite.Init(graphics.GetDevice());
@@ -70,7 +71,6 @@ namespace TentacleLib
 
 	void Finalize()
 	{
-		//SDL_Quit();
 	}
 
 	void SetSyncInterval(UINT syncInterval)
