@@ -59,6 +59,11 @@ RoomBase::RoomBase(
 		// 次の部屋の生成を行う
 		GenerateNextRoomAutomatically(roomAABBs, isLastRoomGenerated);
 	}
+	else
+	{
+		// 自身のAABBを配列に登録する
+		roomAABBs.emplace_back(m_aabb);
+	}
 }
 
 RoomBase::RoomBase(
@@ -501,9 +506,9 @@ void RoomBase::GenerateNextRoomFromOrder(
 	std::vector<uint8_t>& roomOrder,
 	int& orderIndex)
 {
-	//// 自身のAABBを算出
-	//m_aabb = CalcAABB(DUNGEONDATA.GetRoomGenSetting(roomType).aabb,
-	//	m_position, DirectX::XMConvertToDegrees(m_angle.y));
+	// 自身のAABBを算出
+	m_aabb = CalcAABB(DUNGEONDATA.GetRoomGenSetting(roomType).aabb,
+		m_position, DirectX::XMConvertToDegrees(m_angle.y));
 
 	// AABB配列に保存
 	roomAABBs.emplace_back(m_aabb);
