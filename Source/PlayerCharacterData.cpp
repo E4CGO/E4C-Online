@@ -16,18 +16,36 @@ PlayerCharacterData::PlayerCharacterData()
 	m_pAppearancePatterns[APPEARANCE_PATTERN::GENDER].push_back(new PlayerCharacterPatternGender(true));
 	m_pAppearancePatterns[APPEARANCE_PATTERN::GENDER].push_back(new PlayerCharacterPatternGender(false));
 
-	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSword("Data/Model/Character/PlayerModels/MDL_PLAYER_SWORD_ANIMATION.glb"));
-	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternRod("Data/Model/Character/PlayerModels/MDL_PLAYER_ROD_ANIMATION.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSword("Data/Model/Character/PlayerModels/PlayerMale/Weapons/MDLANM_PLAYER_SWORD.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSword("Data/Model/Character/PlayerModels/PlayerMale/Weapons/MDLANM_PLAYER_SWORD2.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSword("Data/Model/Character/PlayerModels/PlayerMale/Weapons/MDLANM_PLAYER_SWORD3.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternRod("Data/Model/Character/PlayerModels/PlayerMale/Weapons/MDLANM_PLAYER_ROD.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternRod("Data/Model/Character/PlayerModels/PlayerMale/Weapons/MDLANM_PLAYER_ROD2.glb"));
 
-	m_pAppearancePatterns[APPEARANCE_PATTERN::BOTTOM].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/MDL_PLAYER_BOTTOM_ANIMATION.glb"));
-	m_pAppearancePatterns[APPEARANCE_PATTERN::TOP].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/MDL_PLAYER_TOP_ANIMATION.glb"));
-
-	m_pAppearancePatterns[APPEARANCE_PATTERN::HAIR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/MDL_PLAYER_HAIR_ANIMATION.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::HAIR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Hair/MDLANM_PLAYER_HAIR.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::HAIR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Hair/MDLANM_PLAYER_HAIR2.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::HAIR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Hair/MDLANM_PLAYER_HAIR3.glb"));
 	m_pAppearancePatterns[APPEARANCE_PATTERN::HAIR].push_back(new PlayerCharacterPatternNone);
 
+	m_pAppearancePatterns[APPEARANCE_PATTERN::TOP].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Costume1/MDLANM_PLAYER_TOP.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::TOP].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Costume2/MDLANM_PLAYER_TOP.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::TOP].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Costume3/MDLANM_PLAYER_TOP.glb"));
+
+	m_pAppearancePatterns[APPEARANCE_PATTERN::ARM_GEAR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Costume1/MDLANM_PLAYER_ARM.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::ARM_GEAR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Costume2/MDLANM_PLAYER_ARM.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::ARM_GEAR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Costume3/MDLANM_PLAYER_ARM.glb"));
+
+	m_pAppearancePatterns[APPEARANCE_PATTERN::BOTTOM].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Costume1/MDLANM_PLAYER_BOTTOM.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::BOTTOM].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Costume2/MDLANM_PLAYER_BOTTOM.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::BOTTOM].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Costume3/MDLANM_PLAYER_BOTTOM.glb"));
+
+	m_pAppearancePatterns[APPEARANCE_PATTERN::EYE_COLOR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Costume1/MDLANM_PLAYER_SHOES.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::EYE_COLOR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Costume2/MDLANM_PLAYER_SHOES.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::EYE_COLOR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Costume3/MDLANM_PLAYER_SHOES.glb"));
+
 	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternNone);
-	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternShield("Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD1_ANIMATION.glb"));
-	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternShield("Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD2_ANIMATION.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternShield("Data/Model/Character/PlayerModels/PlayerMale/Weapons/MDLANM_PLAYER_SHIELD1.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternShield("Data/Model/Character/PlayerModels/PlayerMale/Weapons/MDLANM_PLAYER_SHIELD2.glb"));
 }
 
 /**************************************************************************//**
@@ -68,18 +86,36 @@ void PlayerCharacterData::SetMalePatterns()
 	m_pAppearancePatterns[APPEARANCE_PATTERN::GENDER].push_back(new PlayerCharacterPatternGender(true));
 	m_pAppearancePatterns[APPEARANCE_PATTERN::GENDER].push_back(new PlayerCharacterPatternGender(false));
 
-	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSword("Data/Model/Character/PlayerModels/MDL_PLAYER_SWORD_ANIMATION.glb"));
-	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternRod("Data/Model/Character/PlayerModels/MDL_PLAYER_ROD_ANIMATION.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSword("Data/Model/Character/PlayerModels/PlayerMale/Weapons/MDLANM_PLAYER_SWORD.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSword("Data/Model/Character/PlayerModels/PlayerMale/Weapons/MDLANM_PLAYER_SWORD2.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSword("Data/Model/Character/PlayerModels/PlayerMale/Weapons/MDLANM_PLAYER_SWORD3.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternRod("Data/Model/Character/PlayerModels/PlayerMale/Weapons/MDLANM_PLAYER_ROD.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternRod("Data/Model/Character/PlayerModels/PlayerMale/Weapons/MDLANM_PLAYER_ROD2.glb"));
 
-	m_pAppearancePatterns[APPEARANCE_PATTERN::BOTTOM].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/MDL_PLAYER_BOTTOM_ANIMATION.glb"));
-	m_pAppearancePatterns[APPEARANCE_PATTERN::TOP].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/MDL_PLAYER_TOP_ANIMATION.glb"));
-
-	m_pAppearancePatterns[APPEARANCE_PATTERN::HAIR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/MDL_PLAYER_HAIR_ANIMATION.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::HAIR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Hair/MDLANM_PLAYER_HAIR.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::HAIR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Hair/MDLANM_PLAYER_HAIR2.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::HAIR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Hair/MDLANM_PLAYER_HAIR3.glb"));
 	m_pAppearancePatterns[APPEARANCE_PATTERN::HAIR].push_back(new PlayerCharacterPatternNone);
 
+	m_pAppearancePatterns[APPEARANCE_PATTERN::TOP].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Costume1/MDLANM_PLAYER_TOP.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::TOP].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Costume2/MDLANM_PLAYER_TOP.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::TOP].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Costume3/MDLANM_PLAYER_TOP.glb"));
+
+	m_pAppearancePatterns[APPEARANCE_PATTERN::ARM_GEAR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Costume1/MDLANM_PLAYER_ARM.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::ARM_GEAR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Costume2/MDLANM_PLAYER_ARM.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::ARM_GEAR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Costume3/MDLANM_PLAYER_ARM.glb"));
+
+	m_pAppearancePatterns[APPEARANCE_PATTERN::BOTTOM].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Costume1/MDLANM_PLAYER_BOTTOM.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::BOTTOM].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Costume2/MDLANM_PLAYER_BOTTOM.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::BOTTOM].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Costume3/MDLANM_PLAYER_BOTTOM.glb"));
+
+	m_pAppearancePatterns[APPEARANCE_PATTERN::EYE_COLOR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Costume1/MDLANM_PLAYER_SHOES.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::EYE_COLOR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Costume2/MDLANM_PLAYER_SHOES.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::EYE_COLOR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerMale/Costume3/MDLANM_PLAYER_SHOES.glb"));
+
 	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternNone);
-	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternShield("Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD1_ANIMATION.glb"));
-	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternShield("Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD2_ANIMATION.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternShield("Data/Model/Character/PlayerModels/PlayerMale/Weapons/MDLANM_PLAYER_SHIELD1.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternShield("Data/Model/Character/PlayerModels/PlayerMale/Weapons/MDLANM_PLAYER_SHIELD2.glb"));
 }
 
 void PlayerCharacterData::SetFemalePatterns()
@@ -89,18 +125,34 @@ void PlayerCharacterData::SetFemalePatterns()
 	m_pAppearancePatterns[APPEARANCE_PATTERN::GENDER].push_back(new PlayerCharacterPatternGender(true));
 	m_pAppearancePatterns[APPEARANCE_PATTERN::GENDER].push_back(new PlayerCharacterPatternGender(false));
 
-	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSword("Data/Model/Character/PlayerModels/MDL_PLAYER_F_SWORD_ANIMATION.glb"));
-	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternRod("Data/Model/Character/PlayerModels/MDL_PLAYER_F_ROD_ANIMATION.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSword("Data/Model/Character/PlayerModels/PlayerFemale/Weapons/MDLANM_PLAYER_F_SWORD.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSword("Data/Model/Character/PlayerModels/PlayerFemale/Weapons/MDLANM_PLAYER_F_SWORD2.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternSword("Data/Model/Character/PlayerModels/PlayerFemale/Weapons/MDLANM_PLAYER_F_SWORD3.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternRod("Data/Model/Character/PlayerModels/PlayerFemale/Weapons/MDLANM_PLAYER_F_ROD.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternRod("Data/Model/Character/PlayerModels/PlayerFemale/Weapons/MDLANM_PLAYER_F_ROD2.glb"));
 
-	m_pAppearancePatterns[APPEARANCE_PATTERN::BOTTOM].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/MDL_PLAYER_F_BOTTOM_ANIMATION.glb"));
-	m_pAppearancePatterns[APPEARANCE_PATTERN::TOP].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/MDL_PLAYER_F_TOP_ANIMATION.glb"));
-
-	m_pAppearancePatterns[APPEARANCE_PATTERN::HAIR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/MDL_PLAYER_F_HAIR_ANIMATION.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::HAIR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerFemale/Hair/MDLANM_PLAYER_F_HAIR.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::HAIR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerFemale/Hair/MDLANM_PLAYER_F_HAIR2.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::HAIR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerFemale/Hair/MDLANM_PLAYER_F_HAIR3.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::HAIR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerFemale/Hair/MDLANM_PLAYER_F_HAIR4.glb"));
 	m_pAppearancePatterns[APPEARANCE_PATTERN::HAIR].push_back(new PlayerCharacterPatternNone);
 
+	m_pAppearancePatterns[APPEARANCE_PATTERN::TOP].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerFemale/Costume1/MDLANM_PLAYER_F_TOP.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::TOP].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerFemale/Costume2/MDLANM_PLAYER_F_TOP.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::TOP].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerFemale/Costume3/MDLANM_PLAYER_F_TOP.glb"));
+
+	m_pAppearancePatterns[APPEARANCE_PATTERN::ARM_GEAR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerFemale/MDLANM_PLAYER_F_ARM.glb"));
+
+	m_pAppearancePatterns[APPEARANCE_PATTERN::BOTTOM].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerFemale/Costume1/MDLANM_PLAYER_F_BOTTOM.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::BOTTOM].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerFemale/Costume2/MDLANM_PLAYER_F_BOTTOM.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::BOTTOM].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerFemale/Costume3/MDLANM_PLAYER_F_BOTTOM.glb"));
+
+	m_pAppearancePatterns[APPEARANCE_PATTERN::EYE_COLOR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerFemale/Costume1/MDLANM_PLAYER_F_SHOES.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::EYE_COLOR].push_back(new PlayerCharacterPatternSingleModel("Data/Model/Character/PlayerModels/PlayerFemale/Costume2/MDLANM_PLAYER_F_SHOES.glb"));
+
 	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternNone);
-	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternShield("Data/Model/Character/PlayerModels/MDL_PLAYER_F_SHIELD1_ANIMATION.glb"));
-	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternShield("Data/Model/Character/PlayerModels/MDL_PLAYER_F_SHIELD2_ANIMATION.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternShield("Data/Model/Character/PlayerModels/PlayerFemale/Weapons/MDLANM_PLAYER_F_SHIELD1.glb"));
+	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(new PlayerCharacterPatternShield("Data/Model/Character/PlayerModels/PlayerFemale/Weapons/MDLANM_PLAYER_F_SHIELD2.glb"));
 }
 
 /**************************************************************************//**

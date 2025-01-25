@@ -260,6 +260,12 @@ namespace PlayerCharacterState
 		void Skill1State::Enter()
 		{
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_ATTACK_SPECIAL_FIRST, false, 0.1f);
+
+			Projectile* beam = PROJECTILES.Register(new BeamObject(owner));
+			beam->SetPosition({ owner->GetShotPosition().x, owner->GetShotPosition().y * 2, owner->GetShotPosition().z });
+			beam->PointTo(owner->GetShotPosition() + owner->GetFront());
+			beam->SetDirection(owner->GetFront());
+			beam->SetOwner(owner);
 		}
 		void Skill1State::Execute(float elapsedTime)
 		{

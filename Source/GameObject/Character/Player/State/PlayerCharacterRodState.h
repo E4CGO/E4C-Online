@@ -8,6 +8,7 @@
 #include "Source/GameObject/Projectile/ProjectileManager.h"
 #include "Source/GameObject/Projectile/FireballObject.h"
 #include "Source/GameObject/Projectile/ParticleObject.h"
+#include "Source/GameObject/Projectile/BeamObject.h"
 
 namespace PlayerCharacterState
 {
