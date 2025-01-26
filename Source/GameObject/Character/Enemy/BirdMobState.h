@@ -1,4 +1,4 @@
-﻿//! @file BirdMobState.h
+//! @file BirdMobState.h
 //! @note 
 
 #ifndef __INCLUDE_BIRD_MOB_STATE_H__
@@ -125,20 +125,6 @@ namespace EnemyState
 			void Execute(float elapsedTime) override;
 			// ステートから出ていくときのメソッド
 			void Exit() override;
-
-			struct BIRD_ATTACK
-			{
-				int power = 5;
-				uint8_t idx = ::BirdMob::COLLIDER_ID::COL_ATTACK;
-				Collider::COLLIDER_OBJ objType = Collider::COLLIDER_OBJ::ENEMY_ATTACK;
-				uint16_t hittableOBJ = Collider::COLLIDER_OBJ::PLAYER;
-				float hitStartRate = 0.0f;
-				float hitEndRate = 1.0f;
-				Sphere sphere{ {0, 60.0f, 0}, 0.5f };
-			};
-
-		private:
-			BIRD_ATTACK birdAttack;
 		};
 		// 攻撃着地ステート
 		class AttackLandingState : public HierarchicalState<Enemy>
