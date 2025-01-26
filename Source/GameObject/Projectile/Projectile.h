@@ -21,6 +21,8 @@ public:
 	Character* GetOwner() { return owner; }
 	void SetOwner(Character* character) { owner = character; }
 
+	void SetMove(bool isMoving) { canMove = isMoving; }
+
 	//virtual void Collision();
 protected:
 	void SendCollision(Enemy* target, int colider_id);
@@ -41,6 +43,7 @@ protected:
 	uint8_t collisionTarget = 0;
 	bool pierce = false;	// 貫通 (複数目標に当たる)
 	bool power = false;		// 衝撃 （強・弱）
+	bool canMove = true;
 	float coolTime = 0.2f;	// 命中後無敵時間
 	float force = 0.0f;
 

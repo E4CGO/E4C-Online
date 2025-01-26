@@ -1,4 +1,4 @@
-﻿//! @file WidgetCharacterModify.h
+//! @file WidgetCharacterModify.h
 //! @note 
 
 #ifndef __INCLUDED_WIDGET_CHARACTER_MODIFY_H__
@@ -28,11 +28,29 @@ public:
 
 	void SaveData();
 private:
+
+	DirectX::XMFLOAT2 pos;
+
+	const char* labels[13] = {
+		"性別",
+		"髪",
+		"髪の色",
+		"目の色",
+		"肌の色",
+		"上半身服",
+		"上半身服色",
+		"下半身服",
+		"下半身服色",
+		"腕装備",
+		"腕装備色",
+		"左手装備",
+		"右手装備"
+	};
+
 	SceneCharacter_E4C* m_pScene;
 	PlayerCharacterData::CharacterInfo m_info;
 	PlayerCharacterData::CharacterInfo m_infoTemp;
 	std::vector<Widget*> m_pWidgets;
 };
-
 
 #endif // !__INCLUDED_WIDGET_CHARACTER_MODIFY_H__

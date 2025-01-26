@@ -1,23 +1,22 @@
-﻿//! @file FireballObject.h
+//! @file BeamObject.h
 //! @note
 
-#ifndef __INCLUDED_FIREBALL_OBJECT_H__
-#define __INCLUDED_FIREBALL_OBJECT_H__
+#ifndef __INCLUDED_BEAM_OBJECT_H__
+#define __INCLUDED_BEAM_OBJECT_H__
 
 #include "Projectile.h"
-#include "TAKOEngine/Rendering/Plane.h"
 
 /**************************************************************************//**
-	@class	FireballObject
+	@class	BeamObject
 	@brief	飛翔体として火球クラス
 	@par    [説明]
 		範囲で弱い魔法の攻撃
 *//***************************************************************************/
-class FireballObject : public Projectile
+class BeamObject : public Projectile
 {
 public:
-	FireballObject(PlayerCharacter* owner);
-	~FireballObject() = default;
+	BeamObject(PlayerCharacter* owner);
+	~BeamObject() = default;
 
 	void Update(float elapsedTime) override;
 
@@ -30,9 +29,10 @@ public:
 	void RenderDX12(const RenderContextDX12& rc) override;
 private:
 	DirectX::XMFLOAT3 tempPosition = {}; // 1フレーム前の位置
-	float timer = 5.0f; // 寿命
+	float timer = 2.0f; // 寿命
 
-	std::unique_ptr<PlaneDX12> m_fireball;
+	float m_distance = 0.5f;
+	std::unique_ptr<ModelObject> m_beam;
 };
 
 #endif // __INCLUDED_FIREBALL_OBJECT_H__
