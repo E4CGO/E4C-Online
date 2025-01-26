@@ -16,13 +16,13 @@ WidgetInputBool::WidgetInputBool(const char* label, bool* value) : m_label(label
 {
 	if (T_GRAPHICS.isDX11Active)
 	{
-		m_trueImage = RESOURCE.LoadSpriteResource("Data/Sprites/button_agree.png");
-		m_falseImage = RESOURCE.LoadSpriteResource("Data/Sprites/button3_ready.png");
+		m_trueImage = RESOURCE.LoadSpriteResource("Data/Sprites/UI/Game/slider button.png");
+		m_falseImage = RESOURCE.LoadSpriteResource("Data/Sprites/UI/Game/check box.png");
 	}
 	else
 	{
-		m_trueImageDX12 = RESOURCE.LoadSpriteResourceDX12("Data/Sprites/button_agree.png");
-		m_falseImageDX12 = RESOURCE.LoadSpriteResourceDX12("Data/Sprites/button3_ready.png");
+		m_trueImageDX12 = RESOURCE.LoadSpriteResourceDX12("Data/Sprites/UI/Game/slider button.png");
+		m_falseImageDX12 = RESOURCE.LoadSpriteResourceDX12("Data/Sprites/UI/Game/check box.png");
 	}
 };
 

@@ -20,10 +20,12 @@ void PlayerCharacterPatternGender::Execute(PlayerCharacter* chara)
 		if (T_GRAPHICS.isDX12Active)
 		{
 			chara->LoadModel("Data/Model/Character/PlayerModels/PlayerMale/MDLANM_PLAYER_BODY.glb", 1.0f, ModelObject::RENDER_MODE::DX12);
+			chara->SetGenderType(PlayerCharacter::GENDER_TYPE::MALE);
 		}
 		if (T_GRAPHICS.isDX11Active)
 		{
 			chara->LoadModel("Data/Model/Character/PlayerModels/PlayerMale/MDLANM_PLAYER_BODY.glb", 1.0f, ModelObject::RENDER_MODE::DX11);
+			chara->SetGenderType(PlayerCharacter::GENDER_TYPE::MALE);
 		}
 
 		PLAYER_CHARACTER_DATA.SetMalePatterns();
@@ -33,10 +35,12 @@ void PlayerCharacterPatternGender::Execute(PlayerCharacter* chara)
 		if (T_GRAPHICS.isDX12Active)
 		{
 			chara->LoadModel("Data/Model/Character/PlayerModels/PlayerFemale/MDLANM_PLAYER_F_BODY.glb", 1.0f, ModelObject::RENDER_MODE::DX12);
+			chara->SetGenderType(PlayerCharacter::GENDER_TYPE::FEMALE);
 		}
 		if (T_GRAPHICS.isDX11Active)
 		{
 			chara->LoadModel("Data/Model/Character/PlayerModels/PlayerFemale/MDLANM_PLAYER_F_BODY.glb", 1.0f, ModelObject::RENDER_MODE::DX11);
+			chara->SetGenderType(PlayerCharacter::GENDER_TYPE::FEMALE);
 		}
 
 		PLAYER_CHARACTER_DATA.SetFemalePatterns();
