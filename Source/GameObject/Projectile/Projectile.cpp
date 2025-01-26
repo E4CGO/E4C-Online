@@ -12,12 +12,16 @@
 
 void Projectile::Update(float elapsedTime)
 {
-	DirectX::XMFLOAT3 velocity = direction * speed;
-	// 重力
-	velocity.y += gravity * 60.0f * elapsedTime; // elapsedFrame;
-	position += velocity * elapsedTime;
+	if (canMove)
+	{
+		DirectX::XMFLOAT3 velocity = direction * speed;
+		// 重力
+		velocity.y += gravity * 60.0f * elapsedTime; // elapsedFrame;
+		position += velocity * elapsedTime;
 
-	direction = XMFLOAT3Normalize(velocity);
+		direction = XMFLOAT3Normalize(velocity);
+	}
+
 	ModelObject::Update(elapsedTime);
 	UpdateColliders();
 }

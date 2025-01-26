@@ -30,7 +30,7 @@ public:
 	void RenderDX12(const RenderContextDX12& rc) override;
 private:
 	DirectX::XMFLOAT3 tempPosition = {}; // 1フレーム前の位置
-	float timer = 2.0f; // 寿命
+	float timer = 5.0f; // 寿命
 
 	std::unique_ptr<PlaneDX12> m_fireball;
 };

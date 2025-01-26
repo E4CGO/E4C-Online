@@ -82,7 +82,7 @@ private:
 	std::deque<RunningDustDX12> runningDust;
 	bool running = true;
 	float f_timer;
-	int f_count = 0.0f;// 何個目のモデルか数える
+	int f_count = 0;// 何個目のモデルか数える
 	float f_INTERVAL = 0.1f;// push の間隔
 	float f_popINTERVAL = 0.3f;// pop の間隔
 	float f_alpha = 0.2f;// 透明度

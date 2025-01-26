@@ -20,23 +20,17 @@ WidgetCharacterModify::WidgetCharacterModify(SceneCharacter_E4C* scene) : m_pSce
 
 	m_pWidgets.clear();
 
-	DirectX::XMFLOAT2 pos = { SCREEN_W * 0.6f, SCREEN_H * 0.1f };
+	pos = { SCREEN_W * 0.6f, SCREEN_H * 0.1f };
 
-	const char* labels[] = {
-		"性別",
-		"髪",
-		"髪の色",
-		"目の色",
-		"肌の色",
-		"上半身服",
-		"上半身服色",
-		"下半身服",
-		"下半身服色",
-		"腕装備",
-		"腕装備色",
-		"左手装備",
-		"右手装備",
-	};
+	switch (m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::GENDER])
+	{
+	case 0:
+		PLAYER_CHARACTER_DATA.SetMalePatterns();
+		break;
+	case 1:
+		PLAYER_CHARACTER_DATA.SetFemalePatterns();
+		break;
+	}
 
 	for (uint8_t i = 0; i < PlayerCharacterData::APPEARANCE_PATTERN::NUM; i++)
 	{
@@ -83,8 +77,11 @@ void WidgetCharacterModify::Update(float elapsedTime)
 			}
 		}
 
-		if (m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT] == PLAYER_CHARACTER_DATA.WEAPON_PATTERN_MAIN::WEAPON_MAIN_ROD)
+		if (m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT] == PLAYER_CHARACTER_DATA.WEAPON_PATTERN_MAIN::WEAPON_MAIN_ROD ||
+			m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT] == PLAYER_CHARACTER_DATA.WEAPON_PATTERN_MAIN::WEAPON_MAIN_ROD2)
+		{
 			m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT] = PLAYER_CHARACTER_DATA.WEAPON_PATTERN_OFFHAND::WEAPON_OFFHAND_NONE;
+		}
 		m_pScene->GetSelectedCharacter()->LoadAppearance(m_info.pattern);
 		m_infoTemp = m_info;
 	}

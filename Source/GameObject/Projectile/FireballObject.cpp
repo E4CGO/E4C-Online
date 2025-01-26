@@ -21,8 +21,10 @@ FireballObject::FireballObject(PlayerCharacter* owner) : Projectile("Data/Model/
 	force = 10.0f;
 	coolTime = 0.1f;
 
-	m_fireball = std::make_unique<PlaneDX12>("Data/Sprites/fire.png", 1.0f, DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f, 1.0f);
+	m_fireball = std::make_unique<PlaneDX12>("Data/Sprites/fire.png", 1.0f, DirectX::XMFLOAT3(-1.0f, 1.0f, 0.0f), 0.0f, 1.0f);
 	m_fireball->SetShaderDX12(ModelShaderDX12Id::Fireball);
+	m_fireball->SetScale({ 0.0f, 0.0f, 0.0f });
+	m_fireball->UpdateTransform();
 }
 
 /**************************************************************************//**
@@ -34,8 +36,8 @@ void FireballObject::Update(float elapsedTime)
 	tempPosition = position; // 1フレーム前の位置更新
 
 	Projectile::Update(elapsedTime); // 位置更新
-
 	m_fireball->SetPosition(position);
+	m_fireball->SetScale({ scale.x, scale.y, scale.z });
 	m_fireball->Update(elapsedTime);
 
 	timer -= elapsedTime;

@@ -120,7 +120,7 @@ void StageOpenWorld_E4C::Initialize()
 		models["target1"]->SetPosition({ -34.9f, 1.8f, 20.4f });
 		models["target1"]->SetAngle({ 0.0f, -0.84f, 0.0f });
 		models.emplace("target2", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget1.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
-		models["target2"]->SetPosition({ -38.1, 1.80f, 16.2f });
+		models["target2"]->SetPosition({ -38.1f, 1.80f, 16.2f });
 		models["target2"]->SetAngle({ 0.0f, -1.0f, 0.0f });
 		models.emplace("target3", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget2.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["target3"]->SetPosition({ -32.0, 1.80f, 23.4f });
