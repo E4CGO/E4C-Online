@@ -336,6 +336,12 @@ namespace Online
 				m_udpCommands[UDP_CMD::SYNC]->Send(nullptr);
 
 				EndSync();
+				for (PlayerCharacter* player : PlayerCharacterManager::Instance().GetAll())
+				{
+					if (player->IsPlayer()) continue;
+					player->Hide();
+				}
+
 
 				STAGES.ChangeStage(newDungeon);
 			}
