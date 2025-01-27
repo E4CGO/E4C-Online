@@ -12,14 +12,15 @@
 
 void Projectile::Update(float elapsedTime)
 {
-	DirectX::XMFLOAT3 velocity = direction * speed;
-	// 重力
-	velocity.y += gravity * 60.0f * elapsedTime; // elapsedFrame;
-	position += velocity * elapsedTime;
+	//DirectX::XMFLOAT3 velocity = m_direction * m_speed;
+	//// 重力
+	//velocity.y += m_gravity * 60.0f * elapsedTime; // elapsedFrame;
+	//position += velocity * elapsedTime;
 
-	direction = XMFLOAT3Normalize(velocity);
+	//m_direction = XMFLOAT3Normalize(velocity);
 	ModelObject::Update(elapsedTime);
 	UpdateColliders();
+	m_currentTimer -= elapsedTime;
 }
 
 void Projectile::Render(const RenderContext& rc)
@@ -35,35 +36,35 @@ void Projectile::RenderDX12(const RenderContextDX12& rc)
 	ModelObject::RenderDX12(rc);
 }
 
-void Projectile::PointTo(const DirectX::XMFLOAT3& target)
-{
-	DirectX::XMFLOAT3 targetDirect = XMFLOAT3Normalize(target - position);
-	DirectX::XMMATRIX R = AnglesToMatrix({});
-
-	// 水平角度
-	DirectX::XMFLOAT3 frontH = XMFLOAT3Normalize(front - DirectX::XMFLOAT3{ 0, front.y, 0.0f });
-	if (XMFLOAT3LengthSq(frontH) > 0.0f)
-	{
-		DirectX::XMFLOAT3 targetDirectH = XMFLOAT3Normalize(targetDirect - DirectX::XMFLOAT3{ 0.0f, targetDirect.y, 0.0f });
-
-		float AngleH = acosf(XMFLOAT3Dot(targetDirectH, frontH));
-		DirectX::XMFLOAT3 Axis = XMFLOAT3Normalize(XMFLOAT3Corss(frontH, targetDirectH));
-		DirectX::XMMATRIX RotationH = DirectX::XMMatrixRotationAxis(DirectX::XMLoadFloat3(&Axis), AngleH);
-		R *= RotationH;
-		angle = MatrixToAngles(R);
-	}
-
-	// 垂直角度
-	if (front.y != 0.0f)
-	{
-		DirectX::XMFLOAT3 frontV = XMFLOAT3Normalize(front - DirectX::XMFLOAT3{ front.x, 0.0f, front.z });
-		float AngleV = acosf(XMFLOAT3Dot(targetDirect, frontV));
-		DirectX::XMFLOAT3 Axis = XMFLOAT3Normalize(XMFLOAT3Corss(frontV, targetDirect));
-		DirectX::XMMATRIX RotationV = DirectX::XMMatrixRotationAxis(DirectX::XMLoadFloat3(&Axis), AngleV);
-		R *= RotationV;
-		angle = MatrixToAngles(R);
-	}
-}
+//void Projectile::PointTo(const DirectX::XMFLOAT3& target)
+//{
+//	DirectX::XMFLOAT3 targetDirect = XMFLOAT3Normalize(target - position);
+//	DirectX::XMMATRIX R = AnglesToMatrix({});
+//
+//	// 水平角度
+//	DirectX::XMFLOAT3 frontH = XMFLOAT3Normalize(m_owner->GetFront() - DirectX::XMFLOAT3{ 0, m_owner->GetFront().y, 0.0f });
+//	if (XMFLOAT3LengthSq(frontH) > 0.0f)
+//	{
+//		DirectX::XMFLOAT3 targetDirectH = XMFLOAT3Normalize(targetDirect - DirectX::XMFLOAT3{ 0.0f, targetDirect.y, 0.0f });
+//
+//		float AngleH = acosf(XMFLOAT3Dot(targetDirectH, frontH));
+//		DirectX::XMFLOAT3 Axis = XMFLOAT3Normalize(XMFLOAT3Corss(frontH, targetDirectH));
+//		DirectX::XMMATRIX RotationH = DirectX::XMMatrixRotationAxis(DirectX::XMLoadFloat3(&Axis), AngleH);
+//		R *= RotationH;
+//		angle = MatrixToAngles(R);
+//	}
+//
+//	// 垂直角度
+//	if (m_owner->GetFront().y != 0.0f)
+//	{
+//		DirectX::XMFLOAT3 frontV = XMFLOAT3Normalize(m_owner->GetFront() - DirectX::XMFLOAT3{ m_owner->GetFront().x, 0.0f, m_owner->GetFront().z });
+//		float AngleV = acosf(XMFLOAT3Dot(targetDirect, frontV));
+//		DirectX::XMFLOAT3 Axis = XMFLOAT3Normalize(XMFLOAT3Corss(frontV, targetDirect));
+//		DirectX::XMMATRIX RotationV = DirectX::XMMatrixRotationAxis(DirectX::XMLoadFloat3(&Axis), AngleV);
+//		R *= RotationV;
+//		angle = MatrixToAngles(R);
+//	}
+//}
 
 void Projectile::Destory()
 {
@@ -137,8 +138,8 @@ void Projectile::Destory()
 //	}
 //}
 
-void Projectile::SendCollision(Enemy* target, int colider_id)
-{
-	ENEMYCOLLISIONS.Register(target, colider_id, atk, power, direction * force);
-	target->SetHurtCoolTime(coolTime);
-}
+//void Projectile::SendCollision(Enemy* target, int colider_id)
+//{
+//	ENEMYCOLLISIONS.Register(target, colider_id, atk, power, direction * force);
+//	target->SetHurtCoolTime(coolTime);
+//}

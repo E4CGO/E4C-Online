@@ -8,8 +8,6 @@ namespace PlayerCharacterState
 {
 	namespace Rod
 	{
-		bool m_isShot = false;
-
 		// 待機用ステート
 		void WaitState::Enter()
 		{
@@ -71,20 +69,19 @@ namespace PlayerCharacterState
 		// 一般攻撃ステート
 		void AttackNormalState::Enter()
 		{
-			m_isShot = false;
 			owner->SetAnimationSpeed(1.f);
 
-			SetSubState(NORMAL_ATTACK_STATE::ATTACK_1);
+			SetSubState(FIREBALL_STATE::CHARGE_READY);
 		}
 		void AttackNormalState::Execute(float elapsedTime)
 		{
 			subState->Execute(elapsedTime);
 
 			// 反重力
-			owner->StopFall();
+			//owner->StopFall();
 			owner->StopMove();
 
-			if (!owner->IsPlayAnimation()) // 攻撃モーション終わり
+			if (this->GetSubStateIndex() == FIREBALL_STATE::ATTACK_END && !owner->IsPlayAnimation())
 			{
 				owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 			}
@@ -93,141 +90,106 @@ namespace PlayerCharacterState
 		{
 			owner->SetAnimationSpeed(1.0f);
 		}
-		//  一般攻撃1
+		// Fireball攻撃準備
+		void AttackNormalState_Ready::Enter()
+		{
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_CHARGE_START, false, 0.1f);
+		}
+		void AttackNormalState_Ready::Execute(float elapsedTime)
+		{
+			if (!owner->IsPlayAnimation())
+				owner->GetStateMachine()->ChangeSubState(FIREBALL_STATE::CHARGE);
+			
+			if (owner->IsPlayer())
+			{
+				DirectX::XMFLOAT3 target = owner->GetTarget();
+				owner->FaceToCamera();
+
+				if(owner->ReleaseAttackNormal())
+					owner->GetStateMachine()->ChangeSubState(FIREBALL_STATE::ATTACK_END);
+			}
+		}
+		// Fireball攻撃チャージ
+		void AttackNormalState_Charge::Enter()
+		{
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_CHARGE_CONTINUE, true);
+			Projectile* arrow = PROJECTILES.Register(new FireballObject(owner));
+			m_chargeTme = 0.0f;
+		}
+		void AttackNormalState_Charge::Execute(float elapsedTime)
+		{
+			if (owner->IsPlayer())
+			{
+				DirectX::XMFLOAT3 target = owner->GetTarget();
+				owner->FaceToCamera();
+
+				if (owner->ReleaseAttackNormal())
+				{
+					if (m_chargeTme > MAX_ChargeTime)
+					{
+						owner->GetStateMachine()->ChangeSubState(FIREBALL_STATE::ATTACK_3);
+					}
+					else if (m_chargeTme < MAX_ChargeTime * 0.5f)
+					{
+						owner->GetStateMachine()->ChangeSubState(FIREBALL_STATE::ATTACK_1);
+					}
+					else
+					{
+						owner->GetStateMachine()->ChangeSubState(FIREBALL_STATE::ATTACK_2);
+					}
+				}
+			}
+			m_chargeTme += elapsedTime;
+		}
+		// Fireball小攻撃
 		void AttackNormalState_1::Enter()
 		{
-			owner->SetAnimationSpeed(1.0f);
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_ATTACK_COMBO_FIRST, false, 0.1f);
 		}
 		void AttackNormalState_1::Execute(float elapsedTime)
 		{
-			if (owner->IsPlayer())
-			{
-				float time = owner->GetModel()->GetCurrentAnimationSeconds();
-
-				if (0.3f <= time)
-				{
-					if (!m_isShot)
-					{
-						Projectile* arrow = PROJECTILES.Register(new FireballObject(owner));
-						arrow->SetPosition({ owner->GetShotPosition().x, owner->GetShotPosition().y * 2, owner->GetShotPosition().z });
-						arrow->PointTo(owner->GetShotPosition() + owner->GetFront());
-						arrow->SetDirection(owner->GetFront());
-						arrow->SetOwner(owner);
-
-						m_isShot = true;
-					}
-				}
-
-				if (0.95f <= time)
-				{
-					if (owner->InputAttackNormal())
-					{
-						owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_2);
-					}
-				}
-				else if (0.435f <= time)
-				{
-					if (owner->InputMove(elapsedTime))
-					{
-						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::MOVE);
-					}
-					else if (owner->InputDodge())
-					{
-						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
-					}
-					else if (owner->InputSpecial())
-					{
-						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
-					}
-				}
-			}
-			else
-			{
-				if (!owner->IsPlayAnimation())
-					owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_2);
-			}
+			if (!owner->IsPlayAnimation())
+				owner->GetStateMachine()->ChangeSubState(FIREBALL_STATE::ATTACK_END);
 		}
-		//  一般攻撃2
+		// Fireball中攻撃
 		void AttackNormalState_2::Enter()
 		{
-			owner->SetAnimationSpeed(1.0f);
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_ATTACK_COMBO_SECOND, false, 0.2f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_ATTACK_COMBO_SECOND, false, 0.1f);
 		}
 		void AttackNormalState_2::Execute(float elapsedTime)
 		{
-			float time = owner->GetModel()->GetCurrentAnimationSeconds();
-			if (owner->IsPlayer())
-			{
-				if (0.95f <= time)
-				{
-					if (owner->InputAttackNormal())
-					{
-						owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_3);
-					}
-				}
-				else if (0.835f <= time)
-				{
-					if (owner->InputMove(elapsedTime))
-					{
-						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::MOVE);
-					}
-					else if (owner->InputDodge())
-					{
-						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
-					}
-					else if (owner->InputSpecial())
-					{
-						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
-					}
-				}
-			}
-			else
-			{
-				if (!owner->IsPlayAnimation())
-					owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_3);
-			}
+			if (!owner->IsPlayAnimation())
+				owner->GetStateMachine()->ChangeSubState(FIREBALL_STATE::ATTACK_END);
 		}
-		//  一般攻撃3
+		// Fireball大攻撃
 		void AttackNormalState_3::Enter()
 		{
-			owner->SetAnimationSpeed(0.7f);
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_ATTACK_COMBO_THIRD, false, 0.2f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_ATTACK_COMBO_THIRD, false, 0.1f);
 		}
 		void AttackNormalState_3::Execute(float elapsedTime)
 		{
-			float time = owner->GetModel()->GetCurrentAnimationSeconds();
+			if (!owner->IsPlayAnimation())
+				owner->GetStateMachine()->ChangeSubState(FIREBALL_STATE::ATTACK_END);
+		}
+		// Fireball攻撃終了
+		void AttackNormalState_End::Enter()
+		{
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_CHARGE_END, false, 0.1f);
+		}
+		void AttackNormalState_End::Execute(float elapsedTime)
+		{
 			if (owner->IsPlayer())
 			{
-				if (0.95f <= time)
-				{
-					if (owner->InputAttackNormal())
-					{
-						owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_1);
-					}
-				}
-				else if (0.95f <= time)
-				{
-					if (owner->InputMove(elapsedTime))
-					{
-						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::MOVE);
-					}
-					else if (owner->InputDodge())
-					{
-						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
-					}
-					else if (owner->InputSpecial())
-					{
-						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
-					}
-				}
+				if (owner->InputAttackNormal())
+					owner->GetStateMachine()->ChangeSubState(FIREBALL_STATE::CHARGE);
+
+				owner->InputMove(elapsedTime);
+				owner->Jump();
 			}
-			else
-			{
-				if (!owner->IsPlayAnimation())
-					owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_1);
-			}
-			if (!owner->IsPlayer()) return;
+
+			PlayerTransition(
+				owner,
+				flag_Jump | flag_Move );
 		}
 
 		// 特殊攻撃ステート

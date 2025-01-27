@@ -132,9 +132,12 @@ void PlayerCharacterPatternRod::Execute(PlayerCharacter* chara)
 		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::MOVE), new MoveState(chara));
 
 		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::ATTACK_NORMAL), new AttackNormalState(chara));
+		stateMachine->RegisterSubState(static_cast<int>(PlayerCharacter::STATE::ATTACK_NORMAL), CHARGE_READY, new AttackNormalState_Ready(chara));
+		stateMachine->RegisterSubState(static_cast<int>(PlayerCharacter::STATE::ATTACK_NORMAL), CHARGE, new AttackNormalState_Charge(chara));
 		stateMachine->RegisterSubState(static_cast<int>(PlayerCharacter::STATE::ATTACK_NORMAL), ATTACK_1, new AttackNormalState_1(chara));
-		stateMachine->RegisterSubState(static_cast<int>(PlayerCharacter::STATE::ATTACK_NORMAL), ATTACK_2, new AttackNormalState_2(chara));
+		stateMachine->RegisterSubState(static_cast<int>(PlayerCharacter::STATE::ATTACK_NORMAL), ATTACK_2, new AttackNormalState_2(chara));;
 		stateMachine->RegisterSubState(static_cast<int>(PlayerCharacter::STATE::ATTACK_NORMAL), ATTACK_3, new AttackNormalState_3(chara));
+		stateMachine->RegisterSubState(static_cast<int>(PlayerCharacter::STATE::ATTACK_NORMAL), ATTACK_END, new AttackNormalState_End(chara));
 
 		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::ATTACK_SPECIAL), new AttackSpecialState(chara));
 		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::SKILL_1), new Skill1State(chara));

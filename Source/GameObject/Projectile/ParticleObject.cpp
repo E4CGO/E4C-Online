@@ -36,9 +36,9 @@ void ParticleObject::Update(float elapsedTime)
 	@brief		ダメージ計算
 	@param[in]    hit	相手の当たり判定
 *//***************************************************************************/
-void ParticleObject::OnHitEnemy(HitResult& hit)
-{
-}
+//void ParticleObject::OnHitEnemy(HitResult& hit)
+//{
+//}
 
 /**************************************************************************//**
 	@brief		レンダリング
@@ -46,5 +46,6 @@ void ParticleObject::OnHitEnemy(HitResult& hit)
 *//***************************************************************************/
 void ParticleObject::RenderDX12(const RenderContextDX12& rc)
 {
+	ModelObject::RenderDX12(rc);
 	m_particle->Render(rc);
 }

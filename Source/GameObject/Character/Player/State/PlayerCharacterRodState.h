@@ -13,13 +13,14 @@ namespace PlayerCharacterState
 {
 	namespace Rod
 	{
-		enum NORMAL_ATTACK_STATE {
+		enum FIREBALL_STATE {
+			CHARGE_READY,
+			CHARGE,
 			ATTACK_1,
 			ATTACK_2,
 			ATTACK_3,
+			ATTACK_END,
 		};
-
-		extern bool m_IsShot;
 
 		// 待機用ステートオブジェクト
 		class WaitState : public HierarchicalState<PlayerCharacter>
@@ -68,7 +69,7 @@ namespace PlayerCharacterState
 			void Exit() override;
 		};
 
-		// 一般攻撃
+		// Fireball攻撃
 		class AttackNormalState : public HierarchicalState<PlayerCharacter>
 		{
 		public:
@@ -83,7 +84,42 @@ namespace PlayerCharacterState
 			// ステートから出ていくときのメソッド
 			void Exit() override;
 		};
-		// 一般攻撃1
+		// Fireball攻撃準備
+		class AttackNormalState_Ready : public HierarchicalState<PlayerCharacter>
+		{
+		public:
+			// コンストラクタ
+			AttackNormalState_Ready(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
+			// デストラクタ
+			~AttackNormalState_Ready() {}
+			// ステートに入った時のメソッド
+			void Enter() override;
+			// ステートで実行するメソッド
+			void Execute(float elapsedTime) override;
+			// ステートから出ていくときのメソッド
+			void Exit() override {};
+		};
+		// Fireball攻撃チャージ
+		class AttackNormalState_Charge : public HierarchicalState<PlayerCharacter>
+		{
+		public:
+			// コンストラクタ
+			AttackNormalState_Charge(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
+			// デストラクタ
+			~AttackNormalState_Charge() {}
+			// ステートに入った時のメソッド
+			void Enter() override;
+			// ステートで実行するメソッド
+			void Execute(float elapsedTime) override;
+			// ステートから出ていくときのメソッド
+			void Exit() override {};
+
+		private:
+			float m_chargeTme = 0.0f;
+			const float MAX_ChargeTime = 4.0f;
+			uint16_t m_power = 50;
+		};
+		// Fireball小攻撃
 		class AttackNormalState_1 : public HierarchicalState<PlayerCharacter>
 		{
 		public:
@@ -98,7 +134,7 @@ namespace PlayerCharacterState
 			// ステートから出ていくときのメソッド
 			void Exit() override {};
 		};
-		// 一般攻撃2
+		// Fireball中攻撃
 		class AttackNormalState_2 : public HierarchicalState<PlayerCharacter>
 		{
 		public:
@@ -113,7 +149,7 @@ namespace PlayerCharacterState
 			// ステートから出ていくときのメソッド
 			void Exit() override {};
 		};
-		// 一般攻撃3
+		// Fireball大攻撃
 		class AttackNormalState_3 : public HierarchicalState<PlayerCharacter>
 		{
 		public:
@@ -121,6 +157,21 @@ namespace PlayerCharacterState
 			AttackNormalState_3(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
 			// デストラクタ
 			~AttackNormalState_3() {}
+			// ステートに入った時のメソッド
+			void Enter() override;
+			// ステートで実行するメソッド
+			void Execute(float elapsedTime) override;
+			// ステートから出ていくときのメソッド
+			void Exit() override {};
+		};
+		// Fireball攻撃終了
+		class AttackNormalState_End : public HierarchicalState<PlayerCharacter>
+		{
+		public:
+			// コンストラクタ
+			AttackNormalState_End(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
+			// デストラクタ
+			~AttackNormalState_End() {}
 			// ステートに入った時のメソッド
 			void Enter() override;
 			// ステートで実行するメソッド

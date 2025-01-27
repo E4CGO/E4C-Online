@@ -25,7 +25,7 @@ public:
 
 	//void Collision() override;
 
-	void OnHitEnemy(HitResult& hit) override;
+	//void OnHitEnemy(HitResult& hit) override;
 
 	void RenderDX12(const RenderContextDX12& rc) override;
 private:
