@@ -3,6 +3,7 @@
 
 #include <DirectXMath.h>
 #include <vector>
+
 // カメラ
 
 class Camera
@@ -38,6 +39,8 @@ public:
 	// 右方向取得
 	const DirectX::XMFLOAT3& GetRight() const { return right; }
 
+	const DirectX::XMFLOAT3& GetShakenOffset() const { return shakeOffset; }
+
 	//視野角取得
 	const float& GetFovY() const { return fovY; }
 
@@ -61,6 +64,13 @@ public:
 	void MoveByPoints(const std::vector<DirectX::XMFLOAT3>& positions, const std::vector<DirectX::XMFLOAT3>& focusPoints,float transitionTime, float transitionDuration);
 	//始点、終点のポイントを経由して移動するカメラ
 	void Move2PointToCamera(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const DirectX::XMFLOAT3& startFocus, const DirectX::XMFLOAT3& endFocus, float transitionTime, float transitionDuration);
+
+	void CameraShake(float shakeAmplitude,float shakeTime,float elapsedTime);
+
+	// シェイクタイマーリセット用メソッド
+	void ResetShakeTimer() { shakeTimer = 0; }
+	// シェイク開始用メソッド
+	void SetShake(bool shake) { m_shake = shake; }
 private:
 	DirectX::XMFLOAT4X4 view;
 	DirectX::XMFLOAT4X4 projection;
@@ -83,4 +93,12 @@ private:
 	int currentSegment = 0;
 
 
+	DirectX::XMFLOAT3 shakeOffset{};
+	//DirectX::XMFLOAT3 shakenTarget{};
+	float shakeAmplitude; // シェイクの振幅
+	DirectX::XMFLOAT3 shakeFrequency; // シェイクの周波数
+	// カメラシェイク用の時間
+	float shakeTimer = 0.0f;
+
+	bool m_shake = false;
 };

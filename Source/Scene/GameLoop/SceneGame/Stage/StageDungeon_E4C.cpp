@@ -199,7 +199,6 @@ void StageDungeon_E4C::Finalize()
 
 void StageDungeon_E4C::Update(float elapsedTime)
 {
-	Camera* camera = CameraManager::Instance().GetCamera();
 	Online::OnlineController* onlineController = m_pScene->GetOnlineController();
 	if (onlineController->GetState() == Online::OnlineController::STATE::LOGINED)
 	{
@@ -215,7 +214,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	}
 
 	// ゲームループ内で
-	cameraController->SyncContrllerToCamera(camera);
+	cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
 	cameraController->Update(elapsedTime);
 
 	// 部屋を全てアップデート
