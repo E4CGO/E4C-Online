@@ -113,6 +113,7 @@ void ModelResource::Material::serialize(Archive& archive)
 		CEREAL_NVP(name),
 		CEREAL_NVP(diffuseTextureFileName),
 		CEREAL_NVP(normalTextureFileName),
+		CEREAL_NVP(emissiveTextureFileName),
 		CEREAL_NVP(color)
 	);
 }

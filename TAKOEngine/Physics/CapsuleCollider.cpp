@@ -125,6 +125,27 @@ bool CapsuleCollider::CollisionVsShpere(
 	return false;
 }
 
+bool CapsuleCollider::CollisionVsCapsule(
+	CapsuleCollider* other,
+	DirectX::XMFLOAT3& direction,
+	HitResult& result
+)
+{
+	Capsule otherCapsule(other->GetPosition(), other->GetDirection(), other->GetLength(), other->GetRadius());
+	IntersectionResult hit;
+	if (Collision::IntersectCapsuleVsCapsule(
+		XMLoadFloat3(&m_position), XMLoadFloat3(&m_Wdirection), m_length, m_radius,
+		XMLoadFloat3(&otherCapsule.position), XMLoadFloat3(&otherCapsule.direction), otherCapsule.length, otherCapsule.radius, &hit))
+	{
+		XMStoreFloat3(&result.normal, hit.normal);
+		XMStoreFloat3(&result.position, hit.pointB);
+		result.distance = hit.penetration;
+		return true;
+	}
+	return false;
+
+}
+
 /**************************************************************************//**
 		@brief		マップとの当たり判定
 		@param[in]	なし

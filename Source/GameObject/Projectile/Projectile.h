@@ -6,13 +6,12 @@
 class Projectile : public ModelObject
 {
 public:
-	Projectile(const char* filename, float scaling = 1.0f, Character* owner = nullptr) : ModelObject(filename, scaling), owner(owner) {}
-	~Projectile() = default;
+	Projectile(const char* filename, float scaling = 1.0f, Character* owner = nullptr) : ModelObject(filename, scaling, ModelObject::DX12), owner(owner) {}
+	virtual ~Projectile() = default;
 
-	void Update(float elapsedTime) override;
-	void Render(const RenderContext& rc) override;
-
-	virtual void UpdateColliders() {};
+	virtual void Update(float elapsedTime) override;
+	virtual void Render(const RenderContext& rc) override;
+	virtual void RenderDX12(const RenderContextDX12& rc) override;
 
 	void PointTo(const DirectX::XMFLOAT3& target);
 	void SetFront(DirectX::XMFLOAT3 front) { this->front = front; }
@@ -22,7 +21,9 @@ public:
 	Character* GetOwner() { return owner; }
 	void SetOwner(Character* character) { owner = character; }
 
-	virtual void Collision();
+	void SetMove(bool isMoving) { canMove = isMoving; }
+
+	//virtual void Collision();
 protected:
 	void SendCollision(Enemy* target, int colider_id);
 	void Destory();
@@ -42,6 +43,7 @@ protected:
 	uint8_t collisionTarget = 0;
 	bool pierce = false;	// 貫通 (複数目標に当たる)
 	bool power = false;		// 衝撃 （強・弱）
+	bool canMove = true;
 	float coolTime = 0.2f;	// 命中後無敵時間
 	float force = 0.0f;
 

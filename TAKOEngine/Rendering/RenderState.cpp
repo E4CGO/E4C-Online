@@ -671,6 +671,22 @@ RenderStateDX12::RenderStateDX12()
 		blendStates[static_cast<int>(BlendState::Transparency)] = desc;
 	}
 
+	//スクリーン
+	{
+		D3D12_BLEND_DESC desc{};
+		desc.AlphaToCoverageEnable = false;
+		desc.IndependentBlendEnable = false;
+		desc.RenderTarget[0].BlendEnable = true;
+		desc.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
+		desc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_COLOR;
+		desc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+		desc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+		desc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+		desc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+		desc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+		blendStates[static_cast<int>(BlendState::Screen)] = desc;
+	}
+
 	//通常合成(OIT)
 	{
 		D3D12_BLEND_DESC desc{};

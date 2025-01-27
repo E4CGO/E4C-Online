@@ -1,4 +1,4 @@
-﻿//! @file MouseMob.h
+﻿//! @file MouseMob.cpp
 //! @note ネズミ敵
 
 #ifndef __INCLUDED_MOUSE_MOB_H__
@@ -19,14 +19,29 @@ public:
 	MouseMob(float scaling = 0.5f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX11);
 	~MouseMob() = default;
 public:
+	enum STATE
+	{
+		WANDER = Enemy::STATE::END,
+		FOLLOW,
+		ENCOUNTER,
+		ATTACK,
+	};
+
 	enum COLLIDER_ID : uint8_t
 	{
 		COL_ATTACK,
 		COL_BODY,
 	};
 
-protected:
-	void UpdateTarget();
+	enum ANIMATION : uint8_t
+	{
+		ANIM_IDLE,
+		ANIM_MOVE,
+		ANIM_ATTACK,
+		ANIM_ENCOUNTER,
+		ANIM_DAMAGE,
+		ANIM_DIE,
+	};
 };
 
 #endif //!__INCLUDED_MOUSE_MOB_H__

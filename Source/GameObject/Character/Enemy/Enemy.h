@@ -26,11 +26,11 @@ struct ENEMY_COLLISION
 
 enum ENEMY_TYPE : uint8_t
 {
-	SKELETON_MINION,						// デフォルト骨
-	SKELETON_MINION_BOSS,					// デフォルト骨ボス
-
 	MOUSE,									// ネズミ
 	BEAR_BOSS,								// 熊ボス
+	BIRD,									// 鳥
+	PIG,									// 豚
+	CROC,									// 鰐
 	END,
 };
 
@@ -88,7 +88,7 @@ public:
 	void TurnTo(float elapsedTime, const DirectX::XMFLOAT3& target);
 
 	PlayerCharacter* GetClosestPlayer(float limit = FLT_MAX);
-	virtual void UpdateTarget() { m_target = UINT32_MAX; }
+	virtual void UpdateTarget();
 
 	int GetState() { return stateMachine->GetStateIndex(); }
 	StateMachine<Enemy>* GetStateMachine() { return stateMachine; }
@@ -103,6 +103,7 @@ public:
 	void SetRandomMoveTargetPosition();
 	bool SearchPlayer();
 
+	void SetSearchRange(const float range) { m_SearchRange = range; m_SearchRangeSq = range * range; }
 	const float GetSearchRange() const { return m_SearchRange; }
 
 	DirectX::XMFLOAT3 GetTargetPosition() { return m_TargetPosition; }
@@ -163,6 +164,7 @@ protected:
 
 	DirectX::XMFLOAT3 m_SpawnPosition;
 	float m_SearchRange;
+	float m_SearchRangeSq;
 	float m_AttackRange;
 
 	StateMachine<Enemy>* stateMachine;

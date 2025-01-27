@@ -78,6 +78,12 @@ protected:
 	DirectX::XMFLOAT2 textureSize = {};
 };
 
+/**************************************************************************//**
+	@class  PlaneDX12
+	@brief	板作るクラス
+	@par    [説明]
+		UEみたい板オブジェクト
+*//***************************************************************************/
 class PlaneDX12 : public ModelObject
 {
 public:
@@ -90,6 +96,11 @@ public:
 			delete mesh.material;
 			mesh.material = nullptr;
 		}
+
+		if (cbv_descriptor != nullptr)
+		{
+			T_GRAPHICS.GetShaderResourceDescriptorHeap()->PushDescriptor(cbv_descriptor);
+		}
 	}
 
 	virtual void Update(float elapsedTime) override;
@@ -97,6 +108,7 @@ public:
 	virtual void RenderDX12(const RenderContextDX12& rc) override;
 
 public:
+	void CreateConstantBuffer();
 
 	// アクセサ
 	// 位置取得
@@ -115,6 +127,13 @@ protected:
 
 	ModelDX12::Mesh m_Mesh;
 	ModelResource::Mesh mesh;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cbv_resource;
+	const Descriptor* cbv_descriptor = nullptr;
+	DirectX::XMFLOAT4X4 worldmatrix = DirectX::XMFLOAT4X4(1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1);
 
 	DirectX::XMFLOAT2 textureSize = {};
 };
@@ -190,10 +209,10 @@ public:
 	}
 };
 /**************************************************************************//**
-	@class	Fireball
-	@brief	魔法使い火球を作るクラス
+	@class	RunningDust
+	@brief	足元の埃
 	@par    [説明]
-		魔法使い攻撃
+		動いているとき交換
 *//***************************************************************************/
 class RunningDust : public Billboard
 {
@@ -203,6 +222,36 @@ public:
 		float alpha = 1.0f,
 		int model_id = 0, int age = 0);
 	virtual ~RunningDust()
+	{
+		if (mesh.material != nullptr)
+		{
+			delete mesh.material;
+			mesh.material = nullptr;
+		}
+	}
+
+	virtual void Update(float elapsedTime) override;
+
+public:
+	float alpha = 1.0f;
+	int model_id = 0;
+	int age = 0;
+};
+
+/**************************************************************************//**
+	@class	RunningDustDX12
+	@brief	足元の埃
+	@par    [説明]
+		動いているとき交換
+*//***************************************************************************/
+class RunningDustDX12 : public PlaneDX12
+{
+public:
+	RunningDustDX12(const char* filename, float scaling, XMFLOAT3 centerPos, float positionZ, float plane_width,
+		float alpha = 1.0f,
+		int model_id = 0, int age = 0);
+
+	virtual ~RunningDustDX12()
 	{
 		if (mesh.material != nullptr)
 		{

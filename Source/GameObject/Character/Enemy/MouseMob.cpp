@@ -1,5 +1,6 @@
-﻿#include "MouseMob.h"
-
+//! @file MouseMob.cpp
+//! @note 
+#include "MouseMob.h"
 #include "TAKOEngine/Physics/SphereCollider.h"
 #include "TAKOEngine/GUI/UIManager.h"
 
@@ -15,44 +16,34 @@ MouseMob::MouseMob(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("
 {
 	// 敵の基本パラメーター
 	enemyType = ENEMY_TYPE::MOUSE;
-	radius = 1.0f;
+	radius = 0.6f;
 	maxHp = hp = 50;
 	atk = 10;
 	moveSpeed = 2.0f;
-	turnSpeed = DirectX::XMConvertToRadians(180);
-	m_SearchRange = 24.0f;
-	m_AttackRange = 1.25f;
+	turnSpeed = DirectX::XMConvertToRadians(360);
+	SetSearchRange(24.0f);
+	m_AttackRange = 1.8f;
 
 	// 当たり判定
-	//m_pColliders[HitCollider::BodyHit] = new SphereCollider(scaling * 1.2f);
 	// 衝突判定
 	SetMoveCollider({ { 0, radius / scale.y, 0 }, radius }, Collider::COLLIDER_OBJ::ENEMY);
 
 	m_pColliders.clear();
 	// ヒット判定
 	Sphere sphere{ { 0, radius / scale.y, 0 }, radius };
-	SetCollider(COLLIDER_ID::COL_BODY, sphere, Collider::COLLIDER_OBJ::ENEMY, &transform);
+	SetCollider(COLLIDER_ID::COL_BODY, sphere, Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("JOT_C_Body")->worldTransform);
 	{
-		using namespace EnemyState;
-		// 基本ステート
-		stateMachine->RegisterState(mouseMob::STATE::SEARCH, new mouseMob::SearchState(this));
-		stateMachine->RegisterState(mouseMob::STATE::BATTLE, new mouseMob::BattleState(this));
+		using namespace EnemyState::MouseMob;
+		stateMachine->RegisterState(Enemy::STATE::IDLE, new IdleState(this));
+		stateMachine->SetState(Enemy::STATE::IDLE);
 
-		// 移動サブステート
-		stateMachine->RegisterSubState(mouseMob::STATE::SEARCH, mouseMob::SEARCH_STATE::WANDER, new mouseMob::WanderState(this, 1.0f));
-		stateMachine->RegisterSubState(mouseMob::STATE::SEARCH, mouseMob::SEARCH_STATE::IDLE, new mouseMob::IdleState(this, 3.0f, 5.0f));
+		stateMachine->RegisterState(::Enemy::STATE::HURT, new HurtState(this));
+		stateMachine->RegisterState(::Enemy::STATE::DEATH, new DeathState(this));
 
-		// 攻撃ステート
-		stateMachine->RegisterSubState(mouseMob::STATE::BATTLE, mouseMob::BATTLE_STATE::PURSUIT, new mouseMob::PursuitState(this, 2.0f, m_AttackRange, 3.0f, 5.0f));
-		stateMachine->RegisterSubState(mouseMob::STATE::BATTLE, mouseMob::BATTLE_STATE::ATTACK, new mouseMob::AttackState(this, 0.5f));
+		stateMachine->RegisterState(STATE::WANDER, new MoveState(this));
+		stateMachine->RegisterState(STATE::FOLLOW, new EnemyState::FollowState(this, 1.8f, STATE::ATTACK));
 
-		stateMachine->SetState(mouseMob::STATE::SEARCH);
+		stateMachine->RegisterState(STATE::ATTACK, new AttackState(this));
+		stateMachine->RegisterState(STATE::ENCOUNTER, new EncounterState(this));
 	}
-}
-
-// 一番近いプレイヤーをターゲット
-void MouseMob::UpdateTarget()
-{
-	PlayerCharacter* player = GetClosestPlayer(m_SearchRange);
-	m_target = (player == nullptr) ? UINT32_MAX : player->GetClientId();
 }

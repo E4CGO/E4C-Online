@@ -19,11 +19,13 @@ void PlayerCharacterPatternGender::Execute(PlayerCharacter* chara)
 	{
 		if (T_GRAPHICS.isDX12Active)
 		{
-			chara->LoadModel("Data/Model/Character/PlayerModels/MDL_PLAYER_BODY_ANIMATION.glb", 1.0f, ModelObject::RENDER_MODE::DX12);
+			chara->LoadModel("Data/Model/Character/PlayerModels/PlayerMale/MDLANM_PLAYER_BODY.glb", 1.0f, ModelObject::RENDER_MODE::DX12);
+			chara->SetGenderType(PlayerCharacter::GENDER_TYPE::MALE);
 		}
 		if (T_GRAPHICS.isDX11Active)
 		{
-			chara->LoadModel("Data/Model/Character/PlayerModels/MDL_PLAYER_BODY_ANIMATION.glb", 1.0f, ModelObject::RENDER_MODE::DX11);
+			chara->LoadModel("Data/Model/Character/PlayerModels/PlayerMale/MDLANM_PLAYER_BODY.glb", 1.0f, ModelObject::RENDER_MODE::DX11);
+			chara->SetGenderType(PlayerCharacter::GENDER_TYPE::MALE);
 		}
 
 		PLAYER_CHARACTER_DATA.SetMalePatterns();
@@ -32,11 +34,13 @@ void PlayerCharacterPatternGender::Execute(PlayerCharacter* chara)
 	{
 		if (T_GRAPHICS.isDX12Active)
 		{
-			chara->LoadModel("Data/Model/Character/PlayerModels/MDL_PLAYER_F_BODY_ANIMATION.glb", 1.0f, ModelObject::RENDER_MODE::DX12);
+			chara->LoadModel("Data/Model/Character/PlayerModels/PlayerFemale/MDLANM_PLAYER_F_BODY.glb", 1.0f, ModelObject::RENDER_MODE::DX12);
+			chara->SetGenderType(PlayerCharacter::GENDER_TYPE::FEMALE);
 		}
 		if (T_GRAPHICS.isDX11Active)
 		{
-			chara->LoadModel("Data/Model/Character/PlayerModels/MDL_PLAYER_F_BODY_ANIMATION.glb", 1.0f, ModelObject::RENDER_MODE::DX11);
+			chara->LoadModel("Data/Model/Character/PlayerModels/PlayerFemale/MDLANM_PLAYER_F_BODY.glb", 1.0f, ModelObject::RENDER_MODE::DX11);
+			chara->SetGenderType(PlayerCharacter::GENDER_TYPE::FEMALE);
 		}
 
 		PLAYER_CHARACTER_DATA.SetFemalePatterns();
@@ -137,6 +141,8 @@ void PlayerCharacterPatternRod::Execute(PlayerCharacter* chara)
 		stateMachine->RegisterSubState(static_cast<int>(PlayerCharacter::STATE::ATTACK_NORMAL), ATTACK_3, new AttackNormalState_3(chara));
 
 		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::ATTACK_SPECIAL), new AttackSpecialState(chara));
+		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::SKILL_1), new Skill1State(chara));
+		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::SKILL_2), new Skill2State(chara));
 	}
 
 	chara->SetEnergyType(PlayerCharacter::ENERGY_TYPE::MANA);

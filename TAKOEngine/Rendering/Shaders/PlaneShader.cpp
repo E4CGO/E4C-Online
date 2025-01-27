@@ -550,56 +550,6 @@ BillBoardShaderDX12::BillBoardShaderDX12(ID3D12Device* device, const char* verte
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 		m_d3d_pipeline_state->SetName(L"BillboardShaderPipelineState");
 	}
-
-	// ヒーププロパティの設定
-	D3D12_HEAP_PROPERTIES heap_props{};
-	heap_props.Type = D3D12_HEAP_TYPE_UPLOAD;
-	heap_props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-	heap_props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-	heap_props.CreationNodeMask = 1;
-	heap_props.VisibleNodeMask = 1;
-
-	// リソースの設定
-	D3D12_RESOURCE_DESC resource_desc{};
-	resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	resource_desc.Alignment = 0;
-	resource_desc.Width = ((sizeof(DirectX::XMFLOAT4X4)) + 255) & ~255;
-	resource_desc.Height = 1;
-	resource_desc.DepthOrArraySize = 1;
-	resource_desc.MipLevels = 1;
-	resource_desc.Format = DXGI_FORMAT_UNKNOWN;
-	resource_desc.SampleDesc.Count = 1;
-	resource_desc.SampleDesc.Quality = 0;
-	resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-	resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-	// リソースの生成
-	hr = d3d_device->CreateCommittedResource(
-		&heap_props,
-		D3D12_HEAP_FLAG_NONE,
-		&resource_desc,
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr,
-		IID_PPV_ARGS(d3d_cbv_resource.GetAddressOf()));
-	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-	d3d_cbv_resource->SetName(L"BillboardConstatBuffer");
-
-	// ディスクリプタ取得
-	cbv_descriptor = graphics.GetShaderResourceDescriptorHeap()->PopDescriptor();
-
-	// コンスタントバッファビューの生成
-	D3D12_CONSTANT_BUFFER_VIEW_DESC cbv_desc{};
-	cbv_desc.BufferLocation = d3d_cbv_resource->GetGPUVirtualAddress();
-	cbv_desc.SizeInBytes = static_cast<UINT>(resource_desc.Width);
-
-	d3d_device->CreateConstantBufferView(
-		&cbv_desc,
-		cbv_descriptor->GetCpuHandle());
-
-	void* mappedData = nullptr;
-	hr = d3d_cbv_resource->Map(0, nullptr, &mappedData);
-	memcpy(mappedData, &worldmatrix, sizeof(DirectX::XMFLOAT4X4));
-	d3d_cbv_resource->Unmap(0, nullptr);
 }
 
 /**************************************************************************//**
@@ -611,11 +561,6 @@ void BillBoardShaderDX12::Render(const RenderContextDX12& rc, const ModelDX12::M
 {
 	Graphics& graphics = Graphics::Instance();
 
-	void* mappedData = nullptr;
-	d3d_cbv_resource->Map(0, nullptr, &mappedData);
-	memcpy(mappedData, &mesh.mesh->offsetTransforms[0], sizeof(DirectX::XMFLOAT4X4));
-	d3d_cbv_resource->Unmap(0, nullptr);
-
 	// パイプライン設定
 	rc.d3d_command_list->SetGraphicsRootSignature(m_d3d_root_signature.Get());
 	rc.d3d_command_list->SetPipelineState(m_d3d_pipeline_state.Get());
@@ -624,7 +569,7 @@ void BillBoardShaderDX12::Render(const RenderContextDX12& rc, const ModelDX12::M
 	rc.d3d_command_list->SetGraphicsRootDescriptorTable(0, rc.scene_cbv_descriptor->GetGpuHandle());
 
 	// シーン定数バッファ設定
-	rc.d3d_command_list->SetGraphicsRootDescriptorTable(1, cbv_descriptor->GetGpuHandle());
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(1, rc.plane_cbv_descriptor->GetGpuHandle());
 
 	//パイプライン設定
 	rc.d3d_command_list->SetPipelineState(m_d3d_pipeline_state.Get());

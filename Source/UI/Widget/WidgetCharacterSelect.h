@@ -5,6 +5,7 @@
 #define __INCLUDED_WIDGET_CHARACTER_SELECT_H__
 
 #include "UI/Widget/WidgetButtonImage.h"
+#include "TAKOEngine/Rendering/Plane.h"
 #include "PlayerCharacterData.h"
 
 class SceneCharacter_E4C;
@@ -45,6 +46,5 @@ private:
 	SceneCharacter_E4C* m_pScene;
 	std::vector<WidgetCharacter*> m_pCharacterButtons;
 };
-
 
 #endif // !__INCLUDED_WIDGET_CHARACTER_SELECT_H__
