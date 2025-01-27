@@ -16,13 +16,13 @@
 class Scene
 {
 public:
-	Scene() = default;
-	virtual ~Scene() = default;
+	Scene() {};
+	virtual ~Scene() {};
 
 	// 初期化
-	virtual void Initialize() = 0;
+	virtual void Initialize() {};
 	// 終了化
-	virtual void Finalize() = 0;
+	virtual void Finalize() {};
 
 	// 更新処理
 	virtual void Update(float elapsedTime) {};

@@ -18,6 +18,7 @@
 #include "Scene/GameLoop/SceneGame/Stage/StageDungeon_E4C.h"	
 
 #include "Scene/SceneManager.h"
+#include "Scene/Stage/StageManager.h"
 
 namespace Online
 {
@@ -45,6 +46,7 @@ namespace Online
 		m_tcpCommands[TCP_CMD::ROOM_NEW] = new TCPRoomNew(this, TCP_CMD::ROOM_NEW);
 		m_tcpCommands[TCP_CMD::ROOM_IN] = new TCPRoomIn(this, TCP_CMD::ROOM_IN);
 		m_tcpCommands[TCP_CMD::ROOM_OUT] = new TCPRoomOut(this, TCP_CMD::ROOM_OUT);
+		m_tcpCommands[TCP_CMD::ROOM_NEXT] = new TCPRoomNext(this, TCP_CMD::ROOM_NEXT);
 
 		m_tcpCommands[TCP_CMD::ENEMY_NEW] = new TCPEnemyNew(this, TCP_CMD::ENEMY_NEW);
 		m_tcpCommands[TCP_CMD::ENEMY_SYNC] = new TCPEnemySync(this, TCP_CMD::ENEMY_SYNC);
@@ -290,6 +292,7 @@ namespace Online
 			{
 				dungeon->GenerateDungeon();
 				std::vector<uint8_t> roomOrder = dungeon->GetRoomOrder();
+				roomOrder.insert(roomOrder.begin(), DUNGEONDATA.GetCurrentFloor());
 				m_tcpCommands[TCP_CMD::ROOM_NEW]->Send(&roomOrder);
 			}
 		}
@@ -320,6 +323,23 @@ namespace Online
 				m_pMatchingUI = nullptr;
 			}
 		}
+		else
+		{
+			// 次の階
+			if (StageDungeon_E4C* dungeon = dynamic_cast<StageDungeon_E4C*>(STAGES.GetStage()))
+			{
+				StageDungeon_E4C* newDungeon = new StageDungeon_E4C(dungeon->GetScene());
+				newDungeon->SetRoomOrder(roomOrder);
+
+				PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
+				player->SetPosition({ 0.0f, 0.0f, 0.0f });
+				m_udpCommands[UDP_CMD::SYNC]->Send(nullptr);
+
+				EndSync();
+
+				STAGES.ChangeStage(newDungeon);
+			}
+		}
 	}
 	/**************************************************************************//**
 		@brief	入室送信
@@ -327,6 +347,11 @@ namespace Online
 	void OnlineController::RoomIn()
 	{
 		m_tcpCommands[TCP_CMD::ROOM_IN]->Send(nullptr);
+	}
+
+	void OnlineController::NextRoom(std::vector<uint8_t>& roomOrder)
+	{
+		m_tcpCommands[TCP_CMD::ROOM_NEXT]->Send(&roomOrder);
 	}
 
 	/**************************************************************************//**
