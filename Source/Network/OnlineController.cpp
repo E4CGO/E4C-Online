@@ -51,7 +51,7 @@ namespace Online
 		m_tcpCommands[TCP_CMD::ENEMY_NEW] = new TCPEnemyNew(this, TCP_CMD::ENEMY_NEW);
 		m_tcpCommands[TCP_CMD::ENEMY_SYNC] = new TCPEnemySync(this, TCP_CMD::ENEMY_SYNC);
 		m_tcpCommands[TCP_CMD::ENEMY_OWNER] = new TCPEnemyOwner(this, TCP_CMD::ENEMY_OWNER);
-		//m_tcpCommands[TCP_CMD::ENEMY_DESTROY] = new (this, TCP_CMD::ENEMY_DESTROY);
+		m_tcpCommands[TCP_CMD::ENEMY_DESTROY] = new TCPEnemyRemove(this, TCP_CMD::ENEMY_DESTROY);
 
 
 		m_tcpCommands[TCP_CMD::CHAT] = new TCPChat(this, TCP_CMD::CHAT);
@@ -383,6 +383,15 @@ namespace Online
 	void OnlineController::SyncEnemy(std::vector<Enemy::SYNC_DATA>& data)
 	{
 		m_tcpCommands[TCP_CMD::ENEMY_SYNC]->Send(&data);
+	}
+
+	/**************************************************************************//**
+	 	@brief		エネミーの削除送信
+		@param[in]	enemy_ids
+	*//***************************************************************************/
+	void OnlineController::RemoveEnemy(std::set<uint32_t>& enemy_ids)
+	{
+		m_tcpCommands[TCP_CMD::ENEMY_DESTROY]->Send(&enemy_ids);
 	}
 
 	/**************************************************************************//**

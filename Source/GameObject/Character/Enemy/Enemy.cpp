@@ -107,6 +107,10 @@ void Enemy::OnDamage(const uint16_t& damage)
 void Enemy::OnDeath()
 {
 	ENEMIES.Remove(this);
+	if (this->IsMine())
+	{
+		ENEMIES.RegisterRemove(enemy_id);
+	}
 }
 
 Enemy* Enemy::EnemyFactory(uint8_t enemyType)
