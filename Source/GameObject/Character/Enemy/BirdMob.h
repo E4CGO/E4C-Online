@@ -43,8 +43,11 @@ public:
 		ATTACK_LAND,
 	};
 
-protected:
-	void UpdateTarget();
+	enum COLLIDER_ID : uint8_t
+	{
+		COL_ATTACK,
+		COL_BODY,
+	};
 };
 
 #endif // !__INCLUDE_BIRD_MOB_H__

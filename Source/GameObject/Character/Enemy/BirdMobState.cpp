@@ -17,6 +17,7 @@ namespace EnemyState
 		{
 			if (owner->IsGround())
 			{
+				if (!owner->IsPlayAnimation());
 				EnemyState::StateTransition(owner, ::BirdMob::STATE::TAKE_OFF);
 				return;
 			}
@@ -37,7 +38,7 @@ namespace EnemyState
 					EnemyState::StateTransition(owner, ::BirdMob::STATE::FOLLOW);
 				}
 			}
-			else if(m_waitTimer == 0.0f)
+			else if (m_waitTimer == 0.0f)
 			{
 				// 徘徊
 				owner->SetTarget(nullptr);
@@ -77,11 +78,11 @@ namespace EnemyState
 			::EnemyState::MoveState::Execute(elapsedTime);
 		}
 
-		
 		// 攻撃ステート
 		void AttackState::Enter()
 		{
 			this->SetSubState(::BirdMob::ATTACK_MOVE);
+			owner->OnSuperArmor();
 		}
 		void AttackState::Execute(float elapsedTime)
 		{
@@ -95,6 +96,7 @@ namespace EnemyState
 		void AttackState::Exit()
 		{
 			subState->Exit();
+			owner->OffSuperArmor();
 		}
 
 		// 攻撃移動ステート
@@ -130,9 +132,20 @@ namespace EnemyState
 			owner->Stop();
 			owner->SetGravity(-1.5f);
 			owner->SetAnimation(::BirdMob::ANIM_ATTACK_2, true);
+
+			ModelObject::ATTACK_COLLIDER_DATA attackData;
+			attackData.power = birdAttack.power;
+			attackData.idx = birdAttack.idx;
+			attackData.objType = birdAttack.objType;
+			attackData.hittableOBJ = birdAttack.hittableOBJ;
+			attackData.hitStartRate = birdAttack.hitStartRate;
+			attackData.hitEndRate = birdAttack.hitEndRate;
+			owner->MakeAttackCollider(attackData, birdAttack.sphere, &owner->GetModel(0)->FindNode("JOT_C_Body")->worldTransform);
 		}
 		void AttackDiveState::Execute(float elapsedTime)
 		{
+			owner->GetCollider(birdAttack.idx)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
+
 			if (owner->IsGround())
 			{
 				owner->GetStateMachine()->ChangeSubState(::BirdMob::ATTACK_LAND);
@@ -140,6 +153,7 @@ namespace EnemyState
 		}
 		void AttackDiveState::Exit()
 		{
+			owner->DeleteAttackCollider(birdAttack.idx);
 			owner->SetGravity(0.0f);
 		}
 
