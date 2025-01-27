@@ -65,6 +65,7 @@ namespace SceneCharacter_E4CState
 		const float m_cameraTime = 0.5f;
 		WidgetCharacterSelect* m_pWidgetCharacterSelect;
 		WidgetPauseMenu* m_pPauseMenu;
+		WidgetImage* m_pbackground;
 	};
 
 	/**************************************************************************//**
@@ -93,8 +94,10 @@ namespace SceneCharacter_E4CState
 
 		PlayerCharacter* m_pCharacter = nullptr;
 
-		WidgetButtonText* m_pBackBtn = nullptr;
-		WidgetButtonText* m_pStartBtn = nullptr;
+		WidgetImage* m_pCharaBackground = nullptr;
+		WidgetImage* m_pCharaText = nullptr;
+		WidgetButtonImage* m_pBackBtn = nullptr;
+		WidgetButtonImage* m_pStartBtn = nullptr;
 
 		WidgetCharacterModify* m_pWidgetCharacterModify = nullptr;
 	};

@@ -1,4 +1,4 @@
-﻿#include "FireballObject.h"
+#include "BeamObject.h"
 
 #include "TAKOEngine/Physics/CollisionDataManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
@@ -8,7 +8,7 @@
 	@brief    コンテクスト
 	@param[in]    owner	プレイヤー
 *//***************************************************************************/
-FireballObject::FireballObject(PlayerCharacter* owner) : Projectile("Data/Model/Object/arrow.glb", 1.0f, owner)
+BeamObject::BeamObject(PlayerCharacter* owner) : Projectile("Data/Model/Object/EffectBeam.glb", 1.0f, owner)
 {
 	collisionTarget |= COLLISION_TARGET::ENEMY | COLLISION_TARGET::STAGE;
 
@@ -21,24 +21,34 @@ FireballObject::FireballObject(PlayerCharacter* owner) : Projectile("Data/Model/
 	force = 10.0f;
 	coolTime = 0.1f;
 
-	m_fireball = std::make_unique<PlaneDX12>("Data/Sprites/fire.png", 1.0f, DirectX::XMFLOAT3(-1.0f, 1.0f, 0.0f), 0.0f, 1.0f);
-	m_fireball->SetShaderDX12(ModelShaderDX12Id::Fireball);
-	m_fireball->SetScale({ 0.0f, 0.0f, 0.0f });
-	m_fireball->UpdateTransform();
+	DirectX::XMFLOAT3 startPosition = { owner->GetPosition().x, owner->GetPosition().y + 1.0f, owner->GetPosition().z };
+	DirectX::XMVECTOR vStartPosition = DirectX::XMLoadFloat3(&startPosition);
+	DirectX::XMFLOAT3 front = owner->GetFront();
+	DirectX::XMVECTOR direction = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&front));
+	direction = DirectX::XMVectorScale(direction, m_distance);
+	DirectX::XMVECTOR newPosition = XMVectorAdd(vStartPosition, direction);
+	DirectX::XMStoreFloat3(&startPosition, newPosition);
+
+	m_beam = std::make_unique<ModelObject>("Data/Model/Object/EffectBeam.glb", 1.0f, ModelObject::DX12, ModelObject::LHS_TOON);
+	m_beam->SetShader("EffectBeam", ModelShaderDX12Id::HealCylinder);
+
+	m_beam->SetPosition(startPosition);
+
+	m_beam->SetAngle(owner->GetAngle());
+	m_beam->RotateAxis({ 0.0f, 1.0f, 0.0f }, XMConvertToRadians(180.0f));
 }
 
 /**************************************************************************//**
 	@brief		変更
 	@param[in]    elapsedTime
 *//***************************************************************************/
-void FireballObject::Update(float elapsedTime)
+void BeamObject::Update(float elapsedTime)
 {
 	tempPosition = position; // 1フレーム前の位置更新
 
 	Projectile::Update(elapsedTime); // 位置更新
-	m_fireball->SetPosition(position);
-	m_fireball->SetScale({ scale.x, scale.y, scale.z });
-	m_fireball->Update(elapsedTime);
+
+	m_beam->Update(elapsedTime);
 
 	timer -= elapsedTime;
 	if (timer < 0.0f)
@@ -47,10 +57,10 @@ void FireballObject::Update(float elapsedTime)
 	}
 }
 
-/**************************************************************************//**
-	@brief	当たり判定処理
-*//***************************************************************************/
-//void FireballObject::Collision()
+///**************************************************************************//**
+//	@brief	当たり判定処理
+//*//***************************************************************************/
+//void BeamObject::Collision()
 //{
 //	//Collider* col = collider.get();
 //	//for (ModelObject*& map : MAPTILES.GetAll())
@@ -107,7 +117,7 @@ void FireballObject::Update(float elapsedTime)
 	@brief		ダメージ計算
 	@param[in]    hit	相手の当たり判定
 *//***************************************************************************/
-void FireballObject::OnHitEnemy(HitResult& hit)
+void BeamObject::OnHitEnemy(HitResult& hit)
 {
 }
 
@@ -115,8 +125,7 @@ void FireballObject::OnHitEnemy(HitResult& hit)
 	@brief		レンダリング
 	@param[in]    rc	レンダリングコンテクスト
 *//***************************************************************************/
-void FireballObject::RenderDX12(const RenderContextDX12& rc)
+void BeamObject::RenderDX12(const RenderContextDX12& rc)
 {
-	ModelObject::RenderDX12(rc);
-	m_fireball->RenderDX12(rc);
+	m_beam->RenderDX12(rc);
 }

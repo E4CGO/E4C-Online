@@ -153,7 +153,7 @@ void WidgetCharacter::RenderDX12(const RenderContextDX12& rc)
 		T_TEXT.RenderDX12(
 			FONT_ID::HGpop,
 			Encode::string_to_wstring(m_pCharacter->GetName()),
-			m_position.x + 5.0f , m_position.y + 5.0f
+			m_position.x + 5.0f, m_position.y + 5.0f
 		);
 	}
 }

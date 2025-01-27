@@ -1,5 +1,5 @@
-﻿//! @file BirdMobState.cpp
-//! @note 
+//! @file BirdMobState.cpp
+//! @note
 
 #include "BirdMobState.h"
 #include "TAKOEngine/Tool/Mathf.h"
@@ -38,7 +38,7 @@ namespace EnemyState
 					EnemyState::StateTransition(owner, ::BirdMob::STATE::FOLLOW);
 				}
 			}
-			else if(m_waitTimer == 0.0f)
+			else if (m_waitTimer == 0.0f)
 			{
 				// 徘徊
 				owner->SetTarget(nullptr);
@@ -78,7 +78,6 @@ namespace EnemyState
 			::EnemyState::MoveState::Execute(elapsedTime);
 		}
 
-		
 		// 攻撃ステート
 		void AttackState::Enter()
 		{
@@ -146,7 +145,7 @@ namespace EnemyState
 		void AttackDiveState::Execute(float elapsedTime)
 		{
 			owner->GetCollider(birdAttack.idx)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
-			
+
 			if (owner->IsGround())
 			{
 				owner->GetStateMachine()->ChangeSubState(::BirdMob::ATTACK_LAND);

@@ -44,7 +44,7 @@ void StageDungeon_E4C::GenerateDungeon()
 		// ダンジョンの自動生成を行う
 		// 生成する部屋タイプを算出
 		//RoomType firstRoomType = RoomType::FIRST_START;
-		RoomType firstRoomType = DUNGEONDATA.GetCurrentFloorGenSetting().firstRoomType;
+		RoomType firstRoomType = DUNGEONDATA.GetCurrentFloorGenSetting().startRoomType;
 
 		std::vector<RoomType> placeableRooms;
 		placeableRooms.emplace_back(firstRoomType);
@@ -161,7 +161,8 @@ void StageDungeon_E4C::Initialize()
 		if (currentFloor < DUNGEONDATA.GetDungeonGenSetting().maxFloor)
 		{
 			if (room->GetRoomType() == RoomType::FIRST_END ||
-				room->GetRoomType() == RoomType::FIRST_BOSS)
+				room->GetRoomType() == RoomType::FIRST_BOSS ||
+				room->GetRoomType() == RoomType::SECOND_END)
 			{
 				room->PlaceTeleporterTile(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
 			}
@@ -170,7 +171,8 @@ void StageDungeon_E4C::Initialize()
 		else
 		{
 			if (room->GetRoomType() == RoomType::FIRST_END ||
-				room->GetRoomType() == RoomType::FIRST_BOSS)
+				room->GetRoomType() == RoomType::FIRST_BOSS ||
+				room->GetRoomType() == RoomType::SECOND_END)
 			{
 				room->PlaceTeleporterTile(new StageOpenWorld_E4C(m_pScene), m_pScene->GetOnlineController());
 			}
@@ -328,6 +330,20 @@ void StageDungeon_E4C::RenderDX12()
 		ENEMIES.RenderDX12(rc);
 		MAPTILES.RenderDX12(rc);
 
+		for (RoomBase* room : rootRoom->GetAll())
+		{
+			if (room->GetRoomType() == DUNGEONDATA.GetCurrentFloorGenSetting().endRoomType)
+			{
+				room->Render(rc);
+			}
+			else
+			{
+				room->Render(rc);
+			}
+
+			//room->Render(rc);
+		}
+
 		// レンダーターゲットへの書き込み終了待ち
 		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
 	}
@@ -372,6 +388,12 @@ void StageDungeon_E4C::DrawSceneGUI()
 			if (i < m_roomOrder.size() - 1) orderText += ",";
 		}
 		ImGui::Text(orderText.c_str());
+
+		ImGui::SeparatorText("ダンジョン全体の生成設定");
+		ImGui::Text(("最大階数：" + std::to_string(DUNGEONDATA.GetDungeonGenSetting().maxFloor)).c_str());
+
+		ImGui::SeparatorText("現在の階の生成設定");
+		ImGui::Text(("最大深度：" + std::to_string(DUNGEONDATA.GetCurrentFloorGenSetting().maxDepth)).c_str());
 	}
 	ImGui::End();
 }

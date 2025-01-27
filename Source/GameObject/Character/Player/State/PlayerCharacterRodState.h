@@ -8,6 +8,7 @@
 #include "Source/GameObject/Projectile/ProjectileManager.h"
 #include "Source/GameObject/Projectile/FireballObject.h"
 #include "Source/GameObject/Projectile/ParticleObject.h"
+#include "Source/GameObject/Projectile/BeamObject.h"
 
 namespace PlayerCharacterState
 {
@@ -18,8 +19,6 @@ namespace PlayerCharacterState
 			ATTACK_2,
 			ATTACK_3,
 		};
-
-		extern bool m_IsShot;
 
 		// 待機用ステートオブジェクト
 		class WaitState : public HierarchicalState<PlayerCharacter>
@@ -143,7 +142,7 @@ namespace PlayerCharacterState
 			// ステートから出ていくときのメソッド
 			void Exit() override;
 
-			Projectile* m_particle = nullptr;
+			Projectile* m_pparticle = nullptr;
 		};
 
 		// スキル_1 回レ
@@ -159,7 +158,10 @@ namespace PlayerCharacterState
 			// ステートで実行するメソッド
 			void Execute(float elapsedTime) override;
 			// ステートから出ていくときのメソッド
-			void Exit() override {};
+			void Exit() override;
+
+		private:
+			Projectile* m_pbeam;
 		};
 
 		class Skill2State : public HierarchicalState<PlayerCharacter>

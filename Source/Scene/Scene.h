@@ -106,5 +106,5 @@ private:
 
 	float m_timer = 0;
 	std::unique_ptr<PlaneDX12> m_loadingPlane;
-	Camera* mainCamera;
+	std::unique_ptr<Camera> mainCamera;
 };

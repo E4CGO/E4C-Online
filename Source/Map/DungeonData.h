@@ -16,8 +16,6 @@ namespace ns_RoomData
 	// 部屋タイプ
 	enum RoomType : uint8_t
 	{
-		DEAD_END,	// 行き止まり
-
 		FIRST_START,	// 最初のフロア：最初の部屋
 		FIRST_I,		// 最初のフロア：Ｉ字の部屋
 		FIRST_T,		// 最初のフロア：Ｔ字の部屋
@@ -25,16 +23,20 @@ namespace ns_RoomData
 		FIRST_SPAWNER,	// 最初のフロア：スポナーの部屋
 		FIRST_END,		// 最初のフロア：最後の部屋
 		FIRST_BOSS,		// 最初のフロア：ボス部屋
+		FIRST_DEAD_END,	// 最初のフロア：行き止まり
 
-		TEST_I,		// テスト：Ｉ字の部屋
-		TEST_T,		// テスト：Ｔ字の部屋
-		TEST_X,		// テスト：十字の部屋
-		TEST_END,	// テスト：最後の部屋
+		SECOND_START,		// 第二のフロア：最初の部屋
+		SECOND_L1,			// 第二のフロア：Ⅼ字の部屋・右向き
+		SECOND_L2,			// 第二のフロア：Ⅼ字の部屋・左向き
+		SECOND_CROSS,		// 第二のフロア：十字の部屋
+		SECOND_END,			// 第二のフロア：最後の部屋
+		SECOND_DEAD_END,	// 第二のフロア：行き止まり
 
 		TUTO_START,			// チュートリアル：最初の部屋
 		TUTO_NOTHINGROOM,	// チュートリアル：何もない部屋
 		TUTO_SPAWNERROOM,	// チュートリアル：スポナーのある部屋
 		TUTO_END,			// チュートリアル：最後の部屋
+		TUTO_DEAD_END,		// チュートリアル：行き止まり
 
 		ROOMTYPE_COUNT
 	};
@@ -158,7 +160,9 @@ public:
 	struct FloorGenerateSetting
 	{
 		int maxDepth = 0;	// 最大深度 親からの距離（深度）がこの値以上になった場合、子の生成をキャンセルする
-		RoomType firstRoomType = RoomType::TUTO_START;	// 最初に生成する最初の部屋タイプ
+		RoomType startRoomType = RoomType::TUTO_START;	// 最初に生成する部屋タイプ
+		RoomType endRoomType = RoomType::TUTO_END;		// 最後に生成する部屋タイプ
+		RoomType deadEndRoomType = RoomType::TUTO_DEAD_END;	// 行き止まりに生成する部屋タイプ
 	};
 
 	// ダンジョンの生成設定
