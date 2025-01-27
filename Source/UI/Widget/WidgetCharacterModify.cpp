@@ -50,7 +50,7 @@ WidgetCharacterModify::WidgetCharacterModify(SceneCharacter_E4C* scene) : m_pSce
 	}
 
 	WidgetInputString* inputName = new WidgetInputString("##InputName", &m_info.name, 20);
-	inputName->SetPosition({ SCREEN_W * 0.5f - (inputName->GetSize().x * 0.5f), SCREEN_H * 0.80f });
+	inputName->SetPosition({ SCREEN_W * 0.5f - (inputName->GetSize().x * 1.0f), SCREEN_H * 0.80f });
 	m_pWidgets.push_back(inputName);
 }
 /**************************************************************************//**

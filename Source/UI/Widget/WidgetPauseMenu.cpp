@@ -13,8 +13,8 @@ WidgetPauseMenu::WidgetPauseMenu()
 {
 	if (T_GRAPHICS.isDX11Active)
 	{
-		background = RESOURCE.LoadSpriteResource("Data/Sprites/bar_ready.png");
-		m_size = background->GetTextureSize() * 0.2f;
+		background = RESOURCE.LoadSpriteResource("Data/Sprites/UI/Game/frame.png");
+		m_size = background->GetTextureSize() * 1.0f;
 		m_position = {
 			(SCREEN_W - m_size.x) / 2.0f,
 			(SCREEN_H - m_size.y) / 2.0f
@@ -22,8 +22,8 @@ WidgetPauseMenu::WidgetPauseMenu()
 	}
 	else
 	{
-		backgroundDX12 = RESOURCE.LoadSpriteResourceDX12("Data/Sprites/bar_ready.png");
-		m_size = backgroundDX12->GetTextureSize() * .2f;
+		backgroundDX12 = RESOURCE.LoadSpriteResourceDX12("Data/Sprites/UI/Game/frame.png");
+		m_size = backgroundDX12->GetTextureSize() * 1.0f;
 		m_position = {
 			(SCREEN_W - m_size.x) / 2.0f,
 			(SCREEN_H - m_size.y) / 2.0f
@@ -38,30 +38,30 @@ WidgetPauseMenu::WidgetPauseMenu()
 	m_pauseButton->SetSize({ m_pauseButton->GetSize().x * 0.2f * SCREEN_W / 1920.0f, m_pauseButton->GetSize().y * 0.2f * SCREEN_H / 1080.0f });
 	m_pauseButton->SetPosition({ SCREEN_W * 0.95f, SCREEN_H * 0.01f });
 
-	m_resumeButton = new WidgetButtonImage("", "Data/Sprites/UI/resume.png", [&](WidgetButton*) {
+	m_resumeButton = new WidgetButtonImage("", "Data/Sprites/UI/Game/RESUME_d.png", "Data/Sprites/UI/Game/RESUME_h.png", [&](WidgetButton*) {
 		this->isActive = false;
 		});
-	m_resumeButton->SetPosition({ SCREEN_W * 0.5f, SCREEN_H * 0.5f });
-	m_resumeButton->SetSize({ m_resumeButton->GetSize().x * .5f * SCREEN_W / 1920.0f, m_resumeButton->GetSize().y * .5f * SCREEN_H / 1080.0f });
+	m_resumeButton->SetPosition({ SCREEN_W * .5f - m_resumeButton->GetSize().x * SCREEN_W / 1920.0f * 0.5f, SCREEN_H * 0.3f });
+	m_resumeButton->SetSize({ m_resumeButton->GetSize().x * SCREEN_W / 1920.0f, m_resumeButton->GetSize().y * SCREEN_H / 1080.0f });
 
-	m_toTitleButton = new WidgetButtonImage("", "Data/Sprites/UI/main menu.png", [&](WidgetButton*) {
+	m_toTitleButton = new WidgetButtonImage("", "Data/Sprites/UI/Game/MAIN MENU_d.png", "Data/Sprites/UI/Game/MAIN MENU_h.png", [&](WidgetButton*) {
 		SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTitle_E4C));
 		});
-	m_toTitleButton->SetPosition({ SCREEN_W * .5f, SCREEN_H * 0.5f + m_resumeButton->GetSize().y * 1.2f * 1.0f });
-	m_toTitleButton->SetSize({ m_toTitleButton->GetSize().x * .5f * SCREEN_W / 1920.0f, m_toTitleButton->GetSize().y * .5f * SCREEN_H / 1080.0f });
+	m_toTitleButton->SetPosition({ SCREEN_W * .5f - m_resumeButton->GetSize().x * SCREEN_W / 1920.0f * 0.5f, SCREEN_H * 0.3f + m_resumeButton->GetSize().y * 1.5f * 1.0f });
+	m_toTitleButton->SetSize({ m_toTitleButton->GetSize().x * SCREEN_W / 1920.0f, m_toTitleButton->GetSize().y * SCREEN_H / 1080.0f });
 
-	m_settingsButton = new WidgetButtonImage("", "Data/Sprites/UI/options.png", "Data/Sprites/UI/options.png", [&](WidgetButton*) {
+	m_settingsButton = new WidgetButtonImage("", "Data/Sprites/UI/Game/OPTION_d.png", "Data/Sprites/UI/Game/OPTION_h.png", [&](WidgetButton*) {
 		m_settingsWindow = new WidgetSettingWindow;
 		this->isSettingsActive = true;
 		});
-	m_settingsButton->SetPosition({ SCREEN_W * .5f, SCREEN_H * 0.5f + m_resumeButton->GetSize().y * 1.2f * 2.0f });
-	m_settingsButton->SetSize({ m_settingsButton->GetSize().x * .5f * SCREEN_W / 1920.0f,  m_settingsButton->GetSize().y * .5f * SCREEN_H / 1080.0f });
+	m_settingsButton->SetPosition({ SCREEN_W * .5f - m_resumeButton->GetSize().x * SCREEN_W / 1920.0f * 0.5f, SCREEN_H * 0.3f + m_resumeButton->GetSize().y * 1.5f * 2.0f });
+	m_settingsButton->SetSize({ m_settingsButton->GetSize().x * SCREEN_W / 1920.0f,  m_settingsButton->GetSize().y * SCREEN_H / 1080.0f });
 
-	m_exitButton = new WidgetButtonImage("", "Data/Sprites/UI/exit.png", "Data/Sprites/UI/exit.png", [&](WidgetButton*) {
+	m_exitButton = new WidgetButtonImage("", "Data/Sprites/UI/Game/EXIT_d.png", "Data/Sprites/UI/Game/EXIT_h.png", [&](WidgetButton*) {
 		PostMessage(TentacleLib::hWnd, WM_QUIT, 0, 0);
 		});
-	m_exitButton->SetPosition({ SCREEN_W * .5f, SCREEN_H * 0.5f + m_resumeButton->GetSize().y * 1.2f * 3.0f });
-	m_exitButton->SetSize({ m_exitButton->GetSize().x * .5f * SCREEN_W / 1920.0f, m_exitButton->GetSize().y * .5f * SCREEN_H / 1080.0f });
+	m_exitButton->SetPosition({ SCREEN_W * .5f - m_resumeButton->GetSize().x * SCREEN_W / 1920.0f * 0.5f, SCREEN_H * 0.3f + m_resumeButton->GetSize().y * 1.5f * 3.0f });
+	m_exitButton->SetSize({ m_exitButton->GetSize().x * SCREEN_W / 1920.0f, m_exitButton->GetSize().y * SCREEN_H / 1080.0f });
 }
 
 /**************************************************************************//**
