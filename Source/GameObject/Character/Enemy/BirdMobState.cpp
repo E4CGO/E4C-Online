@@ -1,5 +1,5 @@
 //! @file BirdMobState.cpp
-//! @note 
+//! @note
 
 #include "BirdMobState.h"
 #include "TAKOEngine/Tool/Mathf.h"

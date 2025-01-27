@@ -1,5 +1,5 @@
 //! @file BirdMobState.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDE_BIRD_MOB_STATE_H__
 #define __INCLUDE_BIRD_MOB_STATE_H__

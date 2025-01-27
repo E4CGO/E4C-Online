@@ -1,5 +1,5 @@
 //! @file BirdMob.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDE_BIRD_MOB_H__
 #define __INCLUDE_BIRD_MOB_H__
