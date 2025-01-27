@@ -84,6 +84,8 @@ public:
 
 	// 地面判定
 	bool IsGround() const { return isGround; }
+	// 壁判定
+	bool IsWall() const { return isWall; }
 
 	float GetHurtCoolTime() { return hurtCoolTime; }
 	void SetHurtCoolTime(float second) { hurtCoolTime = second; }
