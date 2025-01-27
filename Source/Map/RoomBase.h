@@ -56,30 +56,30 @@ public:
 
 	virtual void Render(const RenderContextDX12 rc)
 	{
-		// AABBの描画
-		// radiiは半径なので2倍して直径にしてからSetCubeを行う
-		// 自身のAABB
-		{
-			DirectX::XMFLOAT3 diameter = {
-				m_aabb.radii.x * 2.0f,
-				m_aabb.radii.y * 2.0f,
-				m_aabb.radii.z * 2.0f
-			};
-			//m_aabbCube->SetCube(m_aabb.position, diameter, { 1.0f, 1.0f, 1.0f, 1.0f });
-			//m_aabbCube->Render(rc);
-		}
+		//// AABBの描画
+		//// radiiは半径なので2倍して直径にしてからSetCubeを行う
+		//// 自身のAABB
+		//{
+		//	DirectX::XMFLOAT3 diameter = {
+		//		m_aabb.radii.x * 2.0f,
+		//		m_aabb.radii.y * 2.0f,
+		//		m_aabb.radii.z * 2.0f
+		//	};
+		//	m_aabbCube->SetCube(m_aabb.position, diameter, { 1.0f, 1.0f, 1.0f, 1.0f });
+		//	m_aabbCube->Render(rc);
+		//}
 
-		// 子の部屋を生成する時のAABB
-		for (int i = 0; i < m_debugAABBs.size(); i++)
-		{
-			DirectX::XMFLOAT3 diameter = {
-				m_debugAABBs.at(i).radii.x * 2.0f,
-				m_debugAABBs.at(i).radii.y * 2.0f,
-				m_debugAABBs.at(i).radii.z * 2.0f
-			};
-			//m_debugCubes.at(i)->SetCube(m_debugAABBs.at(i).position, diameter, { 1.0f, 0.0f, 0.0f, 1.0f });
-			//m_debugCubes.at(i)->Render(rc);
-		}
+		//// 子の部屋を生成する時のAABB
+		//for (int i = 0; i < m_debugAABBs.size(); i++)
+		//{
+		//	DirectX::XMFLOAT3 diameter = {
+		//		m_debugAABBs.at(i).radii.x * 2.0f,
+		//		m_debugAABBs.at(i).radii.y * 2.0f,
+		//		m_debugAABBs.at(i).radii.z * 2.0f
+		//	};
+		//	m_debugCubes.at(i)->SetCube(m_debugAABBs.at(i).position, diameter, { 1.0f, 0.0f, 0.0f, 1.0f });
+		//	m_debugCubes.at(i)->Render(rc);
+		//}
 	}
 
 	void UpdateTransform();
@@ -146,7 +146,7 @@ public:
 		if (this->childs.size() == 0)
 		{
 			// DEAD_END（行き止まり）なら親を登録
-			if (this->roomType == RoomType::DEAD_END)
+			if (this->roomType == DUNGEONDATA.GetCurrentFloorGenSetting().deadEndRoomType)
 			{
 				childs.emplace_back(this->parent);
 			}
@@ -199,7 +199,7 @@ public:
 	void AddRoom(RoomBase* room) { this->childs.emplace_back(room); }
 
 	// 部屋の接続点データを取得
-	std::vector<TILE_DATA> GetConnectPointData() const { return m_connectPointDatas; }
+	std::vector<TILE_DATA> GetConnectPointDatas() const { return m_connectPointDatas; }
 	const TILE_DATA GetConnectPointData(int index) const { return m_connectPointDatas.at(index); }
 
 	// 行列取得
@@ -254,7 +254,7 @@ protected:
 	int depth = 0;
 	AABB m_aabb = {};		// 当たり判定
 
-	RoomType roomType = RoomType::DEAD_END;
+	RoomType roomType = RoomType::TUTO_START;
 
 	RoomBase* parent = nullptr;		// 親
 	std::vector<RoomBase*> childs;	// 子

@@ -1,5 +1,5 @@
 ﻿//! @file BirdMob.cpp
-//! @note 
+//! @note
 
 #include "BirdMob.h"
 #include "BirdMobState.h"

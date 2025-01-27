@@ -62,6 +62,10 @@ void SceneCharacter_E4CState::CharacterSelectionState::Enter()
 		character->Show();
 	}
 
+	m_pbackground = new WidgetImage("Data/Sprites/UI/Character/BG_holes.png");
+	m_pbackground->SetSize({ SCREEN_W, SCREEN_H });
+	UI.Register(m_pbackground);
+
 	m_cameraOriginPos = CameraManager::Instance().GetCamera()->GetEye();
 	m_cameraOriginFocus = CameraManager::Instance().GetCamera()->GetFocus();
 	m_cameraTimer = 0.0f;
@@ -104,6 +108,7 @@ void SceneCharacter_E4CState::CharacterSelectionState::Execute(float elapsedTime
 void SceneCharacter_E4CState::CharacterSelectionState::Exit()
 {
 	UI.Remove(m_pWidgetCharacterSelect);
+	UI.Remove(m_pbackground);
 	SetCursor(::LoadCursor(NULL, IDC_HAND));
 }
 
@@ -124,17 +129,25 @@ void SceneCharacter_E4CState::CharacterCreationState::Enter()
 	m_cameraOriginFocus = CameraManager::Instance().GetCamera()->GetFocus();
 	m_cameraTimer = 0.0f;
 
-	m_pBackBtn = new WidgetButtonText("Back", [&](WidgetButton*) {
+	m_pCharaBackground = new WidgetImage("Data/Sprites/UI/Character/bg_w_hole.png");
+	m_pCharaBackground->SetSize({ SCREEN_W, SCREEN_H });
+	UI.Register(m_pCharaBackground);
+
+	m_pCharaText = new WidgetImage("Data/Sprites/UI/Character/CharaCreation.png");
+	m_pCharaText->SetPosition({ SCREEN_H * 0.30f, SCREEN_H * 0.1f });
+	UI.Register(m_pCharaText);
+
+	m_pBackBtn = new WidgetButtonImage("", "Data/Sprites/UI/Character/back_d.png", "Data/Sprites/UI/Character/back_h.png", [&](WidgetButton*) {
 		owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::CHARACTER_SELECTION);
 		});
 	m_pBackBtn->SetPosition({ SCREEN_H * 0.1f, SCREEN_H * 0.1f });
 	UI.Register(m_pBackBtn);
 
-	m_pStartBtn = new WidgetButtonText("Start", [&](WidgetButton*) {
+	m_pStartBtn = new WidgetButtonImage("", "Data/Sprites/UI/Character/start.png", "Data/Sprites/UI/Character/start.png", [&](WidgetButton*) {
 		PLAYER_CHARACTER_DATA.SetCurrentCharacter(owner->GetSelectedCharacterIdx());
 		owner->GetStateMachine()->ChangeState(SceneCharacter_E4C::STATE::START);
 		});
-	m_pStartBtn->SetPosition({ SCREEN_W * 0.5f - (m_pStartBtn->GetSize().x * 0.5f), SCREEN_H * 0.85f });
+	m_pStartBtn->SetPosition({ SCREEN_W * 0.85f, SCREEN_H * 0.90f });
 	UI.Register(m_pStartBtn);
 
 	m_pWidgetCharacterModify = new WidgetCharacterModify(owner);
@@ -157,7 +170,7 @@ void SceneCharacter_E4CState::CharacterCreationState::Execute(float elapsedTime)
 			m_cameraOriginPos,
 			m_pCharacter->GetPosition() + DirectX::XMFLOAT3{ -0.5f, 2.5f, 5.5f },
 			m_cameraOriginFocus,
-			m_pCharacter->GetPosition() + DirectX::XMFLOAT3{ -0.5f, 1.2f, 0.0f },
+			m_pCharacter->GetPosition() + DirectX::XMFLOAT3{ -1.5f, 1.2f, 0.0f },
 			m_cameraTimer,
 			m_cameraTime
 		);
@@ -179,6 +192,12 @@ void SceneCharacter_E4CState::CharacterCreationState::Exit()
 	m_pWidgetCharacterModify->SaveData();
 	UI.Remove(m_pWidgetCharacterModify);
 	m_pWidgetCharacterModify = nullptr;
+
+	UI.Remove(m_pCharaBackground);
+	m_pCharaBackground = nullptr;
+
+	UI.Remove(m_pCharaText);
+	m_pCharaText = nullptr;
 
 	PLAYER_CHARACTER_DATA.SaveData();
 	SetCursor(::LoadCursor(NULL, IDC_HAND));

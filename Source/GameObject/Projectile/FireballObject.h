@@ -24,8 +24,6 @@ public:
 
 	void RenderDX12(const RenderContextDX12& rc) override;
 private:
-	//DirectX::XMFLOAT3 tempPosition = {}; // 1フレーム前の位置
-	//float timer = 2.0f; // 寿命
 	float m_radius = 0.0f;
 	float m_chargeTime = 0.0f;
 	bool m_isCharge = true;	// チャージ中かどうか

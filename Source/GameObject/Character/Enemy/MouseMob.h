@@ -42,7 +42,6 @@ public:
 		ANIM_DAMAGE,
 		ANIM_DIE,
 	};
-
 };
 
 #endif //!__INCLUDED_MOUSE_MOB_H__

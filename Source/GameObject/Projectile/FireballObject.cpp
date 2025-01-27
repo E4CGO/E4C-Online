@@ -23,6 +23,8 @@ FireballObject::FireballObject(PlayerCharacter* owner) : Projectile("Data/Model/
 
 	m_fireball = std::make_unique<PlaneDX12>("Data/Sprites/fire.png", 1.0f, DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f, 1.0f);
 	m_fireball->SetShaderDX12(ModelShaderDX12Id::Fireball);
+	m_fireball->SetScale({ 0.0f, 0.0f, 0.0f });
+	m_fireball->UpdateTransform();
 }
 
 /**************************************************************************//**
