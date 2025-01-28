@@ -192,8 +192,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 		onlineController->BeginSync();
 	}
 
-	
-
 	if (T_INPUT.KeyDown(VK_MENU))
 	{
 		if (TentacleLib::isShowCursor())
@@ -240,8 +238,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
 	}
 
-	
-
 	m_sceneTickTimer = elapsedTime;
 	m_sceneGlobalTimer += elapsedTime;
 }
@@ -262,8 +258,6 @@ void StageOpenWorld_E4C::Render()
 
 	// ライトの情報を詰め込む
 	LightManager::Instance().PushRenderContext(rc);
-
-	
 
 	for (auto& it : models)
 	{
