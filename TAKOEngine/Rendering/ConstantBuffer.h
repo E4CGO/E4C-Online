@@ -30,10 +30,19 @@ struct CbScene
 	DirectX::XMFLOAT3 shadowColor;
 
 	// 草情報
+	float grass_height_factor;
+	float grass_width_factor;
+	float grass_curvature;
+	float grass_withered_factor;
+	float grass_height_variance;
+	float perlin_noise_distribution_factor;
 	float tesselation_max_subdivision;
-	float grass_blade_height;
-	float grass_blade_width;
-	float noise_seed_multiplier;
+	float tesselation_max_distance;
+	DirectX::XMFLOAT4 grass_specular_color;
+
+	DirectX::XMFLOAT4 avatar_position;
+	float wind_frequency;
+	float wind_strength;
 };
 
 struct CbLambertMaterial

@@ -214,6 +214,14 @@ struct HitParticleData
 	int maxParticle = 0;
 };
 
+// 草情報
+struct GrassData
+{
+	const Descriptor* grass_srv_descriptor = nullptr;
+	const Descriptor* grass_srv_distortion_descriptor = nullptr;
+	DirectX::XMFLOAT4 position = {};
+};
+
 struct RenderContext
 {
 	ID3D11DeviceContext* deviceContext;
@@ -278,6 +286,9 @@ struct RenderContextDX12
 
 	// 板のコンスタントバッファ
 	const Descriptor* plane_cbv_descriptor = nullptr;
+
+	// 草の情報
+	GrassData  grassData;
 };
 
 #endif // !__INCLUDE_RENDER_CONTEXT_H__

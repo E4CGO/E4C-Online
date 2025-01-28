@@ -28,6 +28,8 @@ public:
 private:
 	Microsoft::WRL::ComPtr<ID3D12PipelineState>		m_d3d_pipeline_state;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature>		m_d3d_root_signature;
+
+	SamplerManager* m_sampler = nullptr;
 };
 
 #endif // !__GRAPHICS_GRASS_SHADER_H__

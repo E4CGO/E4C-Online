@@ -276,7 +276,7 @@ public:
 
 	void FinishDX12();
 
-	const Descriptor* UpdateSceneConstantBuffer(const Camera* camera, float timerGlobalTime, float timerGlobalDeltaTime);
+	const Descriptor* UpdateSceneConstantBuffer(const Camera* camera, float timerGlobalTime, float timerGlobalDeltaTime, const RenderContextDX12& rc = {});
 
 	// テクスチャ読み込み
 	HRESULT LoadTexture(const char* filename, ID3D12Resource** d3d_resource);

@@ -834,7 +834,7 @@ void Graphics::Execute()
 // @param[in] camera　カメラ
 // @return    const Descriptor*
 //******************************************************************
-const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera, float timerGlobalTime, float timerGlobalDeltaTime)
+const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera, float timerGlobalTime, float timerGlobalDeltaTime, const RenderContextDX12& rc)
 {
 	LightManager& ligtManager = LightManager::Instance();
 
@@ -1007,10 +1007,20 @@ const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera, floa
 	}
 
 	// 草情報
-	cb_scene_data->tesselation_max_subdivision = 3.513f;
-	cb_scene_data->grass_blade_height = 1.098f;
-	cb_scene_data->grass_blade_width = 0.254f;
-	cb_scene_data->noise_seed_multiplier = 1.741f;
+	cb_scene_data->grass_height_factor              = 0.856f;
+	cb_scene_data->grass_width_factor               = 0.041f;
+	cb_scene_data->grass_curvature                  = 0.6f;
+	cb_scene_data->grass_withered_factor            = 0.194f;
+	cb_scene_data->grass_height_variance            = 0.165f;
+	cb_scene_data->perlin_noise_distribution_factor = 0.178f;
+	cb_scene_data->tesselation_max_subdivision      = 20.0f;
+	cb_scene_data->tesselation_max_distance         = 80.0f;
+	cb_scene_data->grass_specular_color             = { 0.885f, 0.673f, 0.328f, 1.000f };
+
+	cb_scene_data->avatar_position = rc.grassData.position;
+	
+	cb_scene_data->wind_frequency = 22.388f;
+	cb_scene_data->wind_strength = 0.5f;
 
 	return cbv_descriptor;
 }
