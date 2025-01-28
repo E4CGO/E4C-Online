@@ -107,7 +107,7 @@ void Enemy::OnDamage(const uint16_t& damage)
 void Enemy::OnDeath()
 {
 	ENEMIES.Remove(this);
-	if (this->IsMine())
+	if (this->IsMine() && ONLINE_CONTROLLER->GetState() == Online::State::SYNC)
 	{
 		ENEMIES.RegisterRemove(enemy_id);
 	}
