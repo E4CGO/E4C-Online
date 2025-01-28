@@ -59,6 +59,24 @@ namespace Online {
 	};
 
 	/**************************************************************************//**
+		@class		TCPEnemySync
+		@brief		エネミー削除処理クラス
+		@par	[説明]
+					エネミー削除データ送信する
+	*//***************************************************************************/
+	class TCPEnemyRemove : public TCPCommand
+	{
+	public:
+		TCPEnemyRemove(OnlineController* controller, uint8_t cmd) : TCPCommand(controller, cmd) {};
+		~TCPEnemyRemove() {};
+
+		// データ受信
+		//bool Receive(size_t size) override;
+		// データ送信
+		bool Send(void* data) override;
+	};
+
+	/**************************************************************************//**
 		@class		TCPEnemyOwner
 		@brief		エネミーオーナーの変更
 		@par	[説明]
