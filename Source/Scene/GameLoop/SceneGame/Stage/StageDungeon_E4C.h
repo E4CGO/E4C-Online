@@ -19,6 +19,8 @@
 #include "Map/MapTile.h"
 #include "Map/RoomBase.h"
 #include "UI/Widget/WidgetText.h"
+#include "Source/UI/Widget/WidgetPlayerHP.h"
+#include "Source/UI/Widget/WidgetPauseMenu.h"
 
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
@@ -78,8 +80,6 @@ protected:
 
 	bool isLeader = true;
 
-	std::unique_ptr <Plane> portal;
-
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {
 		"",											// マスク
@@ -94,6 +94,8 @@ protected:
 	float transitionDuration = 2.f;  // 5秒かけて移動
 	int currentSegment = 0;
 	int currentFloor = 0;
+
+	WidgetText* floorText;
 
 	// フレームバッファマネージャー
 	FrameBufferManager* m_frameBuffer;
