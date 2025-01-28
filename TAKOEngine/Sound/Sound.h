@@ -45,6 +45,15 @@ public:
 	// 音楽をクリーンアップ
 	void Finalize();
 
+	void SetVolume(float newVolume) {
+		if (this->m_volume != newVolume)
+		{
+			this->m_volume = newVolume;
+			alSourcef(m_Sources[0], AL_GAIN, this->m_volume);
+		}
+	}
+	const float GetVolume() { return m_volume; }
+
 private:
 	mp3dec_t m_Mp3d;
 	mp3dec_file_info_t m_Info;
@@ -55,7 +64,7 @@ private:
 	std::vector<ALuint> m_Buffers;
 	std::vector<ALuint> m_Sources;
 
-	std::vector<SoundData> sounds;
+	float m_volume = 0.25f;
 };
 
 #endif //__INCLUDED_SOUND_H__
