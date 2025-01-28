@@ -69,6 +69,7 @@ enum class ModelShaderDX12Id
 	Charge,
 	HealCylinder,
 	HealCircle,
+	Grass,
 
 	EnumCount
 };

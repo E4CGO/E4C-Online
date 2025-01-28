@@ -39,6 +39,7 @@ public:
 		LHS_Phong,
 		LHS_Phong_Instancing,
 		Foliage,
+		Grass,
 	};
 
 	RENDER_MODE m_renderMode = DX11;

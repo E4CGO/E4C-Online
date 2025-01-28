@@ -28,6 +28,12 @@ struct CbScene
 	// 影情報
 	float shadowBias;
 	DirectX::XMFLOAT3 shadowColor;
+
+	// 草情報
+	float tesselation_max_subdivision;
+	float grass_blade_height;
+	float grass_blade_width;
+	float noise_seed_multiplier;
 };
 
 struct CbLambertMaterial

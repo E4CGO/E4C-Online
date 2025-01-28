@@ -17,6 +17,7 @@
 #include "TAKOEngine/Rendering/Shaders/HitParticleShader.h"
 #include "TAKOEngine/Rendering/Shaders/CylinderShader.h"
 #include "TAKOEngine/Rendering/Shaders/FoliageShader.h"
+#include "TAKOEngine/Rendering/Shaders/GrassShader.h"
 
 #include "TAKOEngine/Rendering/Shaders/UVScrollShader.h"
 #include "TAKOEngine/Rendering/Shaders/MaskShader.h"
@@ -589,6 +590,7 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Charge)] = std::make_unique<ChargeShaderdDX12>(m_d3d_device.Get());
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::HealCylinder)] = std::make_unique<HealingShaderdCylinderDX12>(m_d3d_device.Get());
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::HealCircle)] = std::make_unique<HealingShaderdCircleDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Grass)] = std::make_unique<GrassShader>(m_d3d_device.Get());
 
 		// スプライトシェーダー生成
 		spriteShaders[static_cast<int>(SpriteShaderId::Default)] = std::make_unique<DefaultSpriteShader>(device.Get());
@@ -1003,6 +1005,12 @@ const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera, floa
 		}
 		}
 	}
+
+	// 草情報
+	cb_scene_data->tesselation_max_subdivision = 3.513f;
+	cb_scene_data->grass_blade_height = 1.098f;
+	cb_scene_data->grass_blade_width = 0.254f;
+	cb_scene_data->noise_seed_multiplier = 1.741f;
 
 	return cbv_descriptor;
 }
