@@ -159,6 +159,13 @@ public:
 		ENUM_COUNT
 	};
 
+	enum class GENDER_TYPE
+	{
+		MALE = 0,
+		FEMALE,
+		ENUM_COUNT
+	};
+
 	// 更新処理
 	virtual void Update(float elapsedTime) override;
 	// 描画処理
@@ -217,9 +224,11 @@ public:
 
 	void SetWeaponType(WEAPON_TYPE weapontype) { m_weaponType = static_cast<WEAPON_TYPE>(weapontype); }
 	void SetEnergyType(ENERGY_TYPE energytype) { m_energyType = static_cast<ENERGY_TYPE>(energytype); }
+	void SetGenderType(GENDER_TYPE gendertype) { m_genderType = static_cast<GENDER_TYPE>(gendertype); }
 
 	WEAPON_TYPE GetWeaponType() { return m_weaponType; }
 	ENERGY_TYPE GetEnergyType() { return m_energyType; }
+	GENDER_TYPE GetGenderType() { return m_genderType; }
 
 	// スキルタイマー
 	float GetSkillTimerTime(int idx);
@@ -234,10 +243,8 @@ public:
 
 	float GetMpCost(int idx);
 
-
 	//剣ノード取得
 	const iModel::Node* GetSwordTrailNode();
-
 
 	void SwordTrail();
 	bool IsTrail() { return m_isTrail; }
@@ -308,6 +315,7 @@ protected:
 	std::string m_name;
 	WEAPON_TYPE m_weaponType;
 	ENERGY_TYPE m_energyType;
+	GENDER_TYPE m_genderType;
 
 	float moveSpeed = 0.0f;
 	float turnSpeed = 0.0f;

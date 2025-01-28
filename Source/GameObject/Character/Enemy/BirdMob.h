@@ -1,5 +1,5 @@
-﻿//! @file BirdMob.h
-//! @note 
+//! @file BirdMob.h
+//! @note
 
 #ifndef __INCLUDE_BIRD_MOB_H__
 #define __INCLUDE_BIRD_MOB_H__
@@ -48,7 +48,6 @@ public:
 		COL_ATTACK,
 		COL_BODY,
 	};
-
 };
 
 #endif // !__INCLUDE_BIRD_MOB_H__

@@ -40,15 +40,8 @@ void SceneTitle_E4C::Initialize()
 	stateMachine->SetState(STATE::INIT);
 
 	Sound::Instance().InitAudio();
-	Sound::Instance().LoadAudio("Data/Sound/1-Parallel(Title_Theme).mp3");/*
-	Sound::Instance().LoadAudio("Data/Sound/2-A_Royal_Visit.mp3");
-	Sound::Instance().LoadAudio("Data/Sound/3-Dreamland(Overworld).mp3");
-	Sound::Instance().LoadAudio("Data/Sound/4-Encounter(battle_theme_Overworld_Tutorial).mp3");
-	Sound::Instance().LoadAudio("Data/Sound/5-Miraculous_Maze(Dungeon).mp3");
+	Sound::Instance().LoadAudio("Data/Sound/1-Parallel(Title_Theme).mp3");
 	Sound::Instance().LoadAudio("Data/Sound/7-Credits.mp3");
-	Sound::Instance().LoadAudio("Data/Sound/8-Toys_Battle.mp3");
-	Sound::Instance().LoadAudio("Data/Sound/9-Lead_The_Way.mp3");
-	Sound::Instance().LoadAudio("Data/Sound/10-Determined_Clash.mp3");*/
 	Sound::Instance().PlayAudio(0);
 }
 
@@ -60,6 +53,7 @@ void SceneTitle_E4C::Finalize()
 	spritePreLoad.clear();
 	UI.Clear();
 	Sound::Instance().StopAudio(0);
+	Sound::Instance().Finalize();
 }
 
 /**************************************************************************//**
@@ -69,6 +63,8 @@ void SceneTitle_E4C::Finalize()
 void SceneTitle_E4C::Update(float elapsedTime)
 {
 	stateMachine->Update(elapsedTime);
+
+	//Sound::Instance().SetVolume(GAME_SETTING.GameVolume);
 
 	UI.Update(elapsedTime);
 }

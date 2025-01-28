@@ -41,29 +41,43 @@ void DungeonData::InitFloorGenSettings()
 
 	// 将来的にjson読み込みにする
 	m_floorGenerateSettings.at(0).maxDepth = 5;
-	m_floorGenerateSettings.at(0).firstRoomType = RoomType::TUTO_START;
+	m_floorGenerateSettings.at(0).startRoomType = RoomType::TUTO_START;
+	m_floorGenerateSettings.at(0).endRoomType = RoomType::TUTO_END;
+	m_floorGenerateSettings.at(0).deadEndRoomType = RoomType::TUTO_DEAD_END;
 
 	// FirstFloor
 	m_floorGenerateSettings.at(1).maxDepth = 4;
-	m_floorGenerateSettings.at(1).firstRoomType = RoomType::FIRST_START;
+	m_floorGenerateSettings.at(1).startRoomType = RoomType::FIRST_START;
+	m_floorGenerateSettings.at(1).endRoomType = RoomType::FIRST_END;
+	m_floorGenerateSettings.at(1).deadEndRoomType = RoomType::FIRST_DEAD_END;
 	m_floorGenerateSettings.at(2).maxDepth = 5;
-	m_floorGenerateSettings.at(2).firstRoomType = RoomType::FIRST_START;
+	m_floorGenerateSettings.at(2).startRoomType = RoomType::FIRST_START;
+	m_floorGenerateSettings.at(2).endRoomType = RoomType::FIRST_END;
+	m_floorGenerateSettings.at(2).deadEndRoomType = RoomType::FIRST_DEAD_END;
 
 	// SecondFloor
 	m_floorGenerateSettings.at(3).maxDepth = 4;
-	m_floorGenerateSettings.at(3).firstRoomType = RoomType::FIRST_START;
-	m_floorGenerateSettings.at(4).maxDepth = 4;
-	m_floorGenerateSettings.at(4).firstRoomType = RoomType::FIRST_START;
+	m_floorGenerateSettings.at(3).startRoomType = RoomType::SECOND_START;
+	m_floorGenerateSettings.at(3).endRoomType = RoomType::SECOND_END;
+	m_floorGenerateSettings.at(3).deadEndRoomType = RoomType::SECOND_DEAD_END;
+	m_floorGenerateSettings.at(4).maxDepth = 5;
+	m_floorGenerateSettings.at(4).startRoomType = RoomType::SECOND_START;
+	m_floorGenerateSettings.at(4).endRoomType = RoomType::SECOND_END;
+	m_floorGenerateSettings.at(4).deadEndRoomType = RoomType::SECOND_DEAD_END;
 
 	// ThirdFloor
 	m_floorGenerateSettings.at(5).maxDepth = 4;
-	m_floorGenerateSettings.at(5).firstRoomType = RoomType::FIRST_START;
-	m_floorGenerateSettings.at(6).maxDepth = 4;
-	m_floorGenerateSettings.at(6).firstRoomType = RoomType::FIRST_START;
+	m_floorGenerateSettings.at(5).startRoomType = RoomType::FIRST_START;
+	m_floorGenerateSettings.at(5).endRoomType = RoomType::FIRST_END;
+	m_floorGenerateSettings.at(5).deadEndRoomType = RoomType::FIRST_DEAD_END;
+	m_floorGenerateSettings.at(6).maxDepth = 5;
+	m_floorGenerateSettings.at(6).startRoomType = RoomType::FIRST_START;
+	m_floorGenerateSettings.at(6).endRoomType = RoomType::FIRST_END;
+	m_floorGenerateSettings.at(6).deadEndRoomType = RoomType::FIRST_DEAD_END;
 
 	// BossFloor
 	m_floorGenerateSettings.at(7).maxDepth = 4;
-	m_floorGenerateSettings.at(7).firstRoomType = RoomType::FIRST_BOSS;
+	m_floorGenerateSettings.at(7).startRoomType = RoomType::FIRST_BOSS;
 }
 
 void DungeonData::InitRoomGenSettings()
@@ -71,7 +85,7 @@ void DungeonData::InitRoomGenSettings()
 	// 部屋タイプの数で配列をリサイズする
 	m_roomGenerateSettings.resize(ROOMTYPE_COUNT);
 
-	for (int i = (int)RoomType::DEAD_END; i < (int)RoomType::ROOMTYPE_COUNT; i++)
+	for (int i = (int)RoomType::FIRST_START; i < (int)RoomType::ROOMTYPE_COUNT; i++)
 	{
 		m_roomGenerateSettings.at((RoomType)i) = LoadRoomGenSetting((RoomType(i)));
 	}
@@ -104,6 +118,25 @@ void DungeonData::InitRoomGenSettings()
 	m_roomGenerateSettings.at(FIRST_SPAWNER).placementCandidates.emplace_back(RoomType::FIRST_T);
 	m_roomGenerateSettings.at(FIRST_SPAWNER).placementCandidates.emplace_back(RoomType::FIRST_FOUNTAIN);
 	//m_roomGenerateSettings.at(FIRST_SPAWNER).placementCandidates.emplace_back(RoomType::FIRST_SPAWNER);
+
+	m_roomGenerateSettings.at(SECOND_START).placementCandidates.emplace_back(RoomType::SECOND_L1);
+	m_roomGenerateSettings.at(SECOND_START).placementCandidates.emplace_back(RoomType::SECOND_L2);
+	m_roomGenerateSettings.at(SECOND_START).placementCandidates.emplace_back(RoomType::SECOND_CROSS);
+
+	m_roomGenerateSettings.at(SECOND_L1).weight = 10;
+	m_roomGenerateSettings.at(SECOND_L1).placementCandidates.emplace_back(RoomType::SECOND_L1);
+	m_roomGenerateSettings.at(SECOND_L1).placementCandidates.emplace_back(RoomType::SECOND_L2);
+	m_roomGenerateSettings.at(SECOND_L1).placementCandidates.emplace_back(RoomType::SECOND_CROSS);
+
+	m_roomGenerateSettings.at(SECOND_L2).weight = 10;
+	m_roomGenerateSettings.at(SECOND_L2).placementCandidates.emplace_back(RoomType::SECOND_L1);
+	m_roomGenerateSettings.at(SECOND_L2).placementCandidates.emplace_back(RoomType::SECOND_L2);
+	m_roomGenerateSettings.at(SECOND_L2).placementCandidates.emplace_back(RoomType::SECOND_CROSS);
+
+	m_roomGenerateSettings.at(SECOND_CROSS).weight = 5;
+	m_roomGenerateSettings.at(SECOND_CROSS).placementCandidates.emplace_back(RoomType::SECOND_L1);
+	m_roomGenerateSettings.at(SECOND_CROSS).placementCandidates.emplace_back(RoomType::SECOND_L2);
+	//m_roomGenerateSettings.at(SECOND_CROSS).placementCandidates.emplace_back(RoomType::SECOND_CROSS);
 
 
 
@@ -647,9 +680,6 @@ void DungeonData::InitFileNames()
 	// 部屋タイプの数で配列をリサイズする
 	m_fileNames.resize(ROOMTYPE_COUNT);
 
-	// 行き止まり
-	m_fileNames.at(DEAD_END) = (char*)("Data/RoomDatas/DeadEnd_A.json");
-
 	// 最初のフロア
 	m_fileNames.at(FIRST_START) = (char*)("Data/RoomDatas/FirstFloor_Start.json");
 	m_fileNames.at(FIRST_I) = (char*)("Data/RoomDatas/FirstFloor_I.json");
@@ -658,16 +688,20 @@ void DungeonData::InitFileNames()
 	m_fileNames.at(FIRST_SPAWNER) = (char*)("Data/RoomDatas/FirstFloor_Spawner.json");
 	m_fileNames.at(FIRST_END) = (char*)("Data/RoomDatas/FirstFloor_End.json");
 	m_fileNames.at(FIRST_BOSS) = (char*)("Data/RoomDatas/FirstFloor_Boss.json");
+	m_fileNames.at(FIRST_DEAD_END) = (char*)("Data/RoomDatas/FirstFloor_DeadEnd.json");
 
-	// テストフロア
-	m_fileNames.at(TEST_I) = (char*)("Data/RoomDatas/TestFloor_I.json");
-	m_fileNames.at(TEST_T) = (char*)("Data/RoomDatas/TestFloor_T.json");
-	m_fileNames.at(TEST_X) = (char*)("Data/RoomDatas/TestFloor_X.json");
-	m_fileNames.at(TEST_END) = (char*)("Data/RoomDatas/TestFloor_End.json");
+	// 第二のフロア
+	m_fileNames.at(SECOND_START) = (char*)("Data/RoomDatas/SecondFloor_Start.json");
+	m_fileNames.at(SECOND_L1) = (char*)("Data/RoomDatas/SecondFloor_L1.json");
+	m_fileNames.at(SECOND_L2) = (char*)("Data/RoomDatas/SecondFloor_L2.json");
+	m_fileNames.at(SECOND_CROSS) = (char*)("Data/RoomDatas/SecondFloor_Cross.json");
+	m_fileNames.at(SECOND_END) = (char*)("Data/RoomDatas/SecondFloor_End.json");
+	m_fileNames.at(SECOND_DEAD_END) = (char*)("Data/RoomDatas/SecondFloor_DeadEnd.json");
 
 	// チュートリアルフロア
 	m_fileNames.at(TUTO_START) = (char*)("Data/RoomDatas/TutoFloor_Start.json");
 	m_fileNames.at(TUTO_NOTHINGROOM) = (char*)("Data/RoomDatas/TutoFloor_Nothing.json");
 	m_fileNames.at(TUTO_SPAWNERROOM) = (char*)("Data/RoomDatas/TutoFloor_Spawner.json");
 	m_fileNames.at(TUTO_END) = (char*)("Data/RoomDatas/TutoFloor_End.json");
+	m_fileNames.at(TUTO_DEAD_END) = (char*)("Data/RoomDatas/FirstFloor_DeadEnd.json");
 }

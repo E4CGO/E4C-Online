@@ -291,10 +291,10 @@ PlaneDX12::PlaneDX12(const char* filename, float scaling, XMFLOAT3 centerPos, fl
 
 	// 頂点データー
 	std::vector <ModelResource::Vertex> vertices = {
-		{ { centerPos.x + plane_width, centerPos.y - plane_width, positionZ }, { 1.0f, 0.0f, 0.0f, 0.0f }, { 0, 0, 0, 0 }, { 0.0f, 0.0f }, { 0.5f, 0.5f, 0.5f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
-		{ { centerPos.x + plane_width, centerPos.y + plane_width, positionZ }, { 1.0f, 0.0f, 0.0f, 0.0f }, { 0, 0, 0, 0 }, { 1.0f, 0.0f }, { 0.5f, 0.5f, 0.5f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
-		{ { centerPos.x - plane_width, centerPos.y - plane_width, positionZ }, { 1.0f, 0.0f, 0.0f, 0.0f }, { 0, 0, 0, 0 }, { 0.0f, 1.0f }, { 0.5f, 0.5f, 0.5f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
-		{ { centerPos.x - plane_width, centerPos.y + plane_width, positionZ }, { 1.0f, 0.0f, 0.0f, 0.0f }, { 0, 0, 0, 0 }, { 1.0f, 1.0f }, { 0.5f, 0.5f, 0.5f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } }
+		{ { centerPos.x + plane_width, centerPos.y - plane_width, positionZ }, { 1.0f, 0.0f, 0.0f, 0.0f }, { 0, 0, 0, 0 }, { 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+		{ { centerPos.x + plane_width, centerPos.y + plane_width, positionZ }, { 1.0f, 0.0f, 0.0f, 0.0f }, { 0, 0, 0, 0 }, { 1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+		{ { centerPos.x - plane_width, centerPos.y - plane_width, positionZ }, { 1.0f, 0.0f, 0.0f, 0.0f }, { 0, 0, 0, 0 }, { 0.0f, 1.0f }, { 1.0f, 1.0f, 1.5f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+		{ { centerPos.x - plane_width, centerPos.y + plane_width, positionZ }, { 1.0f, 0.0f, 0.0f, 0.0f }, { 0, 0, 0, 0 }, { 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } }
 	};
 
 	// 頂点バッファの生成

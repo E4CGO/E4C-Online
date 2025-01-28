@@ -139,13 +139,11 @@ void SceneRoomTest_E4C::Finalize()
 
 void SceneRoomTest_E4C::Update(float elapsedTime)
 {
+	// カメラ更新
 	m_cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
 	m_cameraController->Update(elapsedTime);
 
 	Camera* camera = CameraManager::Instance().GetCamera();
-
-	NODES.Update(elapsedTime);
-
 	CameraManager::Instance().GetCamera()->GetFocus();
 
 	if (T_GRAPHICS.isDX12Active)
@@ -157,6 +155,16 @@ void SceneRoomTest_E4C::Update(float elapsedTime)
 		}
 
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(testModel->GetModel().get());
+	}
+
+	// Delete
+	if (T_INPUT.KeyPress(VK_DELETE))
+	{
+		if (selectionNode != nullptr)
+		{
+			NODES.Remove(selectionNode);
+			ChangeSelectedNode(nullptr);
+		}
 	}
 
 	// RayCast
@@ -209,8 +217,15 @@ void SceneRoomTest_E4C::Update(float elapsedTime)
 			{
 				ChangeSelectedNode(hitNode);
 			}
+			else
+			{
+				ChangeSelectedNode(nullptr);
+			}
 		}
 	}
+
+	// ノード更新
+	NODES.Update(elapsedTime);
 }
 
 void SceneRoomTest_E4C::Render()

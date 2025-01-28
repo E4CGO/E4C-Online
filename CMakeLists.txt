@@ -192,6 +192,8 @@ set(Source__GameObject__Character
 source_group("Source\\GameObject\\Character" FILES ${Source__GameObject__Character})
 
 set(Source__GameObject__Projectile
+    "Source/GameObject/Projectile/BeamObject.cpp"
+    "Source/GameObject/Projectile/BeamObject.h"
     "Source/GameObject/Projectile/FireballObject.cpp"
     "Source/GameObject/Projectile/FireballObject.h"
     "Source/GameObject/Projectile/ParticleObject.cpp"
