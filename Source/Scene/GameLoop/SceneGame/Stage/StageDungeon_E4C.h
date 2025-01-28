@@ -78,6 +78,8 @@ protected:
 
 	std::unique_ptr <Plane> portal;
 
+	std::unique_ptr<WidgetText> floorText;
+
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {
 		"",											// マスク

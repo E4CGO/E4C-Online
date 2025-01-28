@@ -32,6 +32,13 @@ namespace ns_RoomData
 		SECOND_END,			// 第二のフロア：最後の部屋
 		SECOND_DEAD_END,	// 第二のフロア：行き止まり
 
+		THIRD_START,		// 第三のフロア：最初の部屋
+		THIRD_I,			// 第三のフロア：Ｉ字の部屋
+		THIRD_T,			// 第三のフロア：Ｔ字の部屋
+		THIRD_BARREL,		// 第三のフロア：タルの部屋
+		THIRD_END,			// 第三のフロア：最後の部屋
+		THIRD_DEAD_END,		// 第三のフロア：行き止まり
+
 		TUTO_START,			// チュートリアル：最初の部屋
 		TUTO_NOTHINGROOM,	// チュートリアル：何もない部屋
 		TUTO_SPAWNERROOM,	// チュートリアル：スポナーのある部屋

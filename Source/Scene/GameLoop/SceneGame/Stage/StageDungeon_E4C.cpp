@@ -116,8 +116,10 @@ void StageDungeon_E4C::Initialize()
 
 	// プレイヤー
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
-	player->SetPosition({ 0.0f, 10.0f, 2.0f });
+	player->SetPosition({ 0.0f, 2.0f, 2.0f });
+	player->SetAngle({ 0.0f, 0.0f, 0.0f });
 	player->GetStateMachine()->ChangeState(PlayerCharacter::STATE::IDLE);
+	player->UpdateTransform();
 
 	// カメラ設定
 	Camera* mainCamera = CameraManager::Instance().GetCamera();
@@ -129,7 +131,7 @@ void StageDungeon_E4C::Initialize()
 	);
 	mainCamera->SetLookAt(
 		{ 0, 5.0f, 5.0f },		// 視点
-		player->GetPosition(),			// 注視点
+		player->GetPosition(),	// 注視点
 		{ 0, 0.969f, -0.248f }	// 上ベクトル
 	);
 	cameraController = std::make_unique<ThridPersonCameraController>();
@@ -142,13 +144,12 @@ void StageDungeon_E4C::Initialize()
 	currentFloor = DUNGEONDATA.GetCurrentFloor();
 
 	// テキスト設定
-	WidgetText* floorText = new WidgetText();
+	floorText = std::make_unique<WidgetText>();
 	floorText->SetText(("現在の階：" + std::to_string(currentFloor) + "階").c_str());
 	floorText->SetBorderColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 	floorText->SetBorder(2);
 	floorText->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 	floorText->SetPosition({ 30.0f, 30.0f });
-	UI.Register(floorText);
 
 	GenerateDungeon();
 
@@ -160,9 +161,7 @@ void StageDungeon_E4C::Initialize()
 		// currentFloorが最大階でない場合は階段の行先はStageDungeon
 		if (currentFloor < DUNGEONDATA.GetDungeonGenSetting().maxFloor)
 		{
-			if (room->GetRoomType() == RoomType::FIRST_END ||
-				room->GetRoomType() == RoomType::FIRST_BOSS ||
-				room->GetRoomType() == RoomType::SECOND_END)
+			if (room->GetRoomType() == DUNGEONDATA.GetCurrentFloorGenSetting().endRoomType)
 			{
 				room->PlaceTeleporterTile(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
 			}
@@ -170,9 +169,7 @@ void StageDungeon_E4C::Initialize()
 		// 最大階以上なら階段の行先はStageOpenWorld
 		else
 		{
-			if (room->GetRoomType() == RoomType::FIRST_END ||
-				room->GetRoomType() == RoomType::FIRST_BOSS ||
-				room->GetRoomType() == RoomType::SECOND_END)
+			if (room->GetRoomType() == DUNGEONDATA.GetCurrentFloorGenSetting().endRoomType)
 			{
 				room->PlaceTeleporterTile(new StageOpenWorld_E4C(m_pScene), m_pScene->GetOnlineController());
 			}
@@ -182,8 +179,6 @@ void StageDungeon_E4C::Initialize()
 	// 部屋の当たり判定を設定
 	MAPTILES.CreateSpatialIndex(5, 7);
 
-	//Console::Instance().Open();
-
 	// 影初期化
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
 }
@@ -192,7 +187,6 @@ void StageDungeon_E4C::Finalize()
 {
 	ENEMIES.Clear();
 	MAPTILES.Clear();
-	UI.Clear();
 	SpawnerManager::Instance().Clear();
 	GameObjectManager::Instance().Clear();
 
@@ -220,15 +214,24 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	cameraController->SyncContrllerToCamera(camera);
 	cameraController->Update(elapsedTime);
 
-	// 部屋を全てアップデート
-	rootRoom->Update(elapsedTime);
+	// 部屋
+	for (RoomBase* room : rootRoom->GetAll())
+	{
+		room->Update(elapsedTime);
+	}
+
+	// テキスト
+	floorText->Update(elapsedTime);
 
 	PlayerCharacterManager::Instance().Update(elapsedTime);
 	GameObjectManager::Instance().Update(elapsedTime);
 	SpawnerManager::Instance().Update(elapsedTime);
+
+	// なんかUIアップデートせんとあかんっぽい(01/27)
+	UI.Update(elapsedTime);
+
 	ENEMIES.Update(elapsedTime);
 	MAPTILES.Update(elapsedTime);
-	UI.Update(elapsedTime);
 
 	if (T_INPUT.KeyDown(VK_MENU))
 	{
@@ -286,7 +289,6 @@ void StageDungeon_E4C::Render()
 
 	// 描画
 	PlayerCharacterManager::Instance().Render(rc);
-
 	GameObjectManager::Instance().Render(rc);
 
 	MAPTILES.Render(rc);
@@ -312,7 +314,7 @@ void StageDungeon_E4C::RenderDX12()
 
 		// シャドウマップ
 		{
-			T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
+			//T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
 			rc.shadowMap.shadow_srv_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSRV();
 			rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();
 		}
@@ -341,8 +343,6 @@ void StageDungeon_E4C::RenderDX12()
 			{
 				room->Render(rc);
 			}
-
-			//room->Render(rc);
 		}
 
 		// レンダーターゲットへの書き込み終了待ち
@@ -357,9 +357,7 @@ void StageDungeon_E4C::RenderDX12()
 	// 2D描画
 	{
 		T_TEXT.BeginDX12();
-
-		UI.RenderDX12(rc);
-
+		floorText->RenderDX12(rc);
 		T_TEXT.EndDX12();
 	}
 
