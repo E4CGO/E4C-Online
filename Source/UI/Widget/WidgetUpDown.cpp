@@ -13,8 +13,8 @@
 *//***************************************************************************/
 WidgetArrowLeft::WidgetArrowLeft(uint8_t* value, uint8_t minValue, uint8_t maxValue)
 {
-	btn = RESOURCE.LoadSpriteResource("Data/Sprites/UI/keybinds/key_Left.png");
-	btnDX12 = RESOURCE.LoadSpriteResourceDX12("Data/Sprites/UI/keybinds/key_Left.png");
+	btn = RESOURCE.LoadSpriteResource("Data/Sprites/UI/Character/left_button.png");
+	btnDX12 = RESOURCE.LoadSpriteResourceDX12("Data/Sprites/UI/Character/right_button.png");
 	this->value = value;
 	this->minValue = minValue;
 	this->maxValue = maxValue;

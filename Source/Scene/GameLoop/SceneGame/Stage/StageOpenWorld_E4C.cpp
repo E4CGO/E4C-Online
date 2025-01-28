@@ -49,8 +49,8 @@ void StageOpenWorld_E4C::Initialize()
 	UI.Register(m_pCharacterGauge);
 	UI.Register(m_pPauseMenu);
 
-	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
-	village_collision = new MapTile("Data/Model/Stage/Terrain_Village_Collision.glb", 1.f);
+	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 1.0f);
+	village_collision = new MapTile("Data/Model/Stage/Terrain_Village_Collision.glb", 1.0f);
 	stage_collision->Update(0);
 	village_collision->Update(0);
 	stage_collision->SetMoveCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
@@ -65,7 +65,7 @@ void StageOpenWorld_E4C::Initialize()
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
 	teleporter->SetVisibility(true);
 
-	Spawner* spawner = new Spawner(ENEMY_TYPE::MOUSE, 1, -1);
+	Spawner* spawner = new Spawner(ENEMY_TYPE::CROC, 5, -1);
 	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
 	spawner->SetSearchRadius(10.0f);
 	SpawnerManager::Instance().Register(spawner);
@@ -121,7 +121,7 @@ void StageOpenWorld_E4C::Initialize()
 		models["target1"]->SetPosition({ -34.9f, 1.8f, 20.4f });
 		models["target1"]->SetAngle({ 0.0f, -0.84f, 0.0f });
 		models.emplace("target2", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget1.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
-		models["target2"]->SetPosition({ -38.1, 1.80f, 16.2f });
+		models["target2"]->SetPosition({ -38.1f, 1.80f, 16.2f });
 		models["target2"]->SetAngle({ 0.0f, -1.0f, 0.0f });
 		models.emplace("target3", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget2.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["target3"]->SetPosition({ -32.0, 1.80f, 23.4f });
@@ -168,9 +168,9 @@ void StageOpenWorld_E4C::Initialize()
 	cameraController->SetPlayer(player);
 	CURSOR_OFF;
 
-	Sound::Instance().Finalize();
 	Sound::Instance().InitAudio();
 	Sound::Instance().LoadAudio("Data/Sound/3-Dreamland(Overworld).mp3");
+	Sound::Instance().LoadAudio("Data/Sound/4-Encounter(battle_theme_Overworld_Tutorial).mp3");
 	Sound::Instance().PlayAudio(0);
 
 	// ダンジョンの階の再設定
@@ -183,21 +183,24 @@ void StageOpenWorld_E4C::Initialize()
 
 void StageOpenWorld_E4C::Finalize()
 {
+	PROJECTILES.Clear();
+	Sound::Instance().StopAudio(0);
+	Sound::Instance().Finalize();
 	T_GRAPHICS.GetShadowRenderer()->Finalize();
 }
 
 void StageOpenWorld_E4C::Update(float elapsedTime)
 {
-	Camera* camera = CameraManager::Instance().GetCamera();
+	// ゲームループ内で
+	cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
+	cameraController->Update(elapsedTime);
 	Online::OnlineController* onlineController = m_pScene->GetOnlineController();
 	if (onlineController->GetState() == Online::OnlineController::STATE::LOGINED)
 	{
 		onlineController->BeginSync();
 	}
 
-	// ゲームループ内で
-	cameraController->SyncContrllerToCamera(camera);
-	cameraController->Update(elapsedTime);
+	
 
 	if (T_INPUT.KeyDown(VK_MENU))
 	{
@@ -245,6 +248,8 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
 	}
 
+	
+
 	m_sceneTickTimer = elapsedTime;
 	m_sceneGlobalTimer += elapsedTime;
 }
@@ -265,6 +270,8 @@ void StageOpenWorld_E4C::Render()
 
 	// ライトの情報を詰め込む
 	LightManager::Instance().PushRenderContext(rc);
+
+	
 
 	for (auto& it : models)
 	{
@@ -365,4 +372,5 @@ void StageOpenWorld_E4C::DrawSceneGUI()
 	ImVec2 pos = ImGui::GetMainViewport()->Pos;
 	ImGui::SetNextWindowPos(ImVec2(pos.x + 10, pos.y + 10), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+	ImGui::InputFloat("shaketimer", &shakeTimer);
 }

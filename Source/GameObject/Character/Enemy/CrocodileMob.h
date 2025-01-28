@@ -1,29 +1,28 @@
-﻿//! @file MouseMob.cpp
-//! @note ネズミ敵
+﻿//! @file CrocodileMob.h
+//! @note 鰐敵
 
-#ifndef __INCLUDED_MOUSE_MOB_H__
-#define __INCLUDED_MOUSE_MOB_H__
+#ifndef __INCLUDED_CROCODILE_MOB_H__
+#define __INCLUDED_CROCODILE_MOB_H__
 
 #include "Enemy.h"
 #include "EnemyState.h"
 
 /**************************************************************************//**
-	@class　MouseMob
-	@brief	ネズミ敵を作成、管理
+	@class　CrocodileMob
+	@brief	鰐敵を作成、管理
 	@par    [説明]
-			ネズミ敵の設定クラス
+			鰐敵の設定クラス
 *//***************************************************************************/
-class MouseMob : public Enemy
+class CrocodileMob : public Enemy
 {
 public:
-	MouseMob(float scaling = 0.5f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX11);
-	~MouseMob() = default;
+	CrocodileMob(float scaling = 0.5f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX11);
+	~CrocodileMob() = default;
 public:
 	enum STATE
 	{
 		WANDER = Enemy::STATE::END,
 		FOLLOW,
-		ENCOUNTER,
 		ATTACK,
 	};
 
@@ -38,10 +37,9 @@ public:
 		ANIM_IDLE,
 		ANIM_MOVE,
 		ANIM_ATTACK,
-		ANIM_ENCOUNTER,
 		ANIM_DAMAGE,
 		ANIM_DIE,
 	};
 };
 
-#endif //!__INCLUDED_MOUSE_MOB_H__
+#endif //!__INCLUDED_CROCODILE_MOB_H__

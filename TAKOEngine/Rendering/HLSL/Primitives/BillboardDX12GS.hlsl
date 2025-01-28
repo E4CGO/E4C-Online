@@ -23,7 +23,7 @@ void main(
     };
     
     const float aspect = 1920.0 / 1080.0;
-    float2 particle_scale = float2(1.0f, 1.0f * aspect);
+    float2 particle_scale = float2(WorldMatrix[0][0], WorldMatrix[1][1] * aspect);
     
     [unroll]
     for (uint vert_index = 0; vert_index < 4; ++vert_index)

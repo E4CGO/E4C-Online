@@ -81,7 +81,7 @@ namespace EnemyState
 
 		owner->MoveTo(elapsedTime, target->GetPosition());
 
-		if (XMFLOAT3HorizontalLength(target->GetPosition() - owner->GetPosition()) < m_distance * m_distance)
+		if (XMFLOAT3HorizontalLengthSq(target->GetPosition() - owner->GetPosition()) < m_distance * m_distance)
 		{
 			StateTransition(owner, static_cast<uint8_t>(m_nextState));
 		}

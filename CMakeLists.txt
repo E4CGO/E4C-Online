@@ -192,6 +192,8 @@ set(Source__GameObject__Character
 source_group("Source\\GameObject\\Character" FILES ${Source__GameObject__Character})
 
 set(Source__GameObject__Projectile
+    "Source/GameObject/Projectile/BeamObject.cpp"
+    "Source/GameObject/Projectile/BeamObject.h"
     "Source/GameObject/Projectile/FireballObject.cpp"
     "Source/GameObject/Projectile/FireballObject.h"
     "Source/GameObject/Projectile/ParticleObject.cpp"
@@ -219,6 +221,14 @@ set(Source__GameObject__Character__Enemy
     "Source/GameObject/Character/Enemy/BearBoss.h"
     "Source/GameObject/Character/Enemy/BearBossState.cpp"
     "Source/GameObject/Character/Enemy/BearBossState.h"
+    "Source/GameObject/Character/Enemy/BirdMob.cpp"
+    "Source/GameObject/Character/Enemy/BirdMob.h"
+    "Source/GameObject/Character/Enemy/BirdMobState.cpp"
+    "Source/GameObject/Character/Enemy/BirdMobState.h"
+    "Source/GameObject/Character/Enemy/CrocodileMob.cpp"
+    "Source/GameObject/Character/Enemy/CrocodileMob.h"
+    "Source/GameObject/Character/Enemy/CrocodileMobState.cpp"
+    "Source/GameObject/Character/Enemy/CrocodileMobState.h"
     "Source/GameObject/Character/Enemy/Enemy.cpp"
     "Source/GameObject/Character/Enemy/Enemy.h"
     "Source/GameObject/Character/Enemy/EnemyManager.cpp"

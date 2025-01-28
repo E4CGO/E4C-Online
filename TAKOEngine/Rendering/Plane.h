@@ -96,6 +96,11 @@ public:
 			delete mesh.material;
 			mesh.material = nullptr;
 		}
+
+		if (cbv_descriptor != nullptr)
+		{
+			T_GRAPHICS.GetShaderResourceDescriptorHeap()->PushDescriptor(cbv_descriptor);
+		}
 	}
 
 	virtual void Update(float elapsedTime) override;
@@ -103,6 +108,7 @@ public:
 	virtual void RenderDX12(const RenderContextDX12& rc) override;
 
 public:
+	void CreateConstantBuffer();
 
 	// アクセサ
 	// 位置取得
@@ -121,6 +127,13 @@ protected:
 
 	ModelDX12::Mesh m_Mesh;
 	ModelResource::Mesh mesh;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cbv_resource;
+	const Descriptor* cbv_descriptor = nullptr;
+	DirectX::XMFLOAT4X4 worldmatrix = DirectX::XMFLOAT4X4(1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1);
 
 	DirectX::XMFLOAT2 textureSize = {};
 };

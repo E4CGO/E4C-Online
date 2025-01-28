@@ -28,6 +28,7 @@ public:
 public:
 	struct GameSetting
 	{
+		//float GameVolume = 0.5f;			// 音量
 		float CameraSensitivity = 5.0f;		// カメラ感度
 		bool CamerainvertX = false;			// カメラX反転
 		bool CamerainvertY = false;			// カメラY反転
