@@ -16,7 +16,7 @@
 CrocodileMob::CrocodileMob(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("Data/Model/Enemy/MDLANM_ENMcroc_0120.glb", scaling, renderMode)
 {
 	// 敵の基本パラメーター
-	enemyType = ENEMY_TYPE::MOUSE;
+	enemyType = ENEMY_TYPE::CROC;
 	radius = 0.6f;
 	maxHp = hp = 50;
 	atk = 10;

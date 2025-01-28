@@ -318,7 +318,7 @@ void StageDungeon_E4C::RenderDX12()
 
 		// シャドウマップ
 		{
-			T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
+			//T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
 			rc.shadowMap.shadow_srv_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSRV();
 			rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();
 		}

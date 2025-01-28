@@ -61,6 +61,8 @@ public:
 	void Render() override;
 
 	void RenderDX12() override;
+
+	SceneGame_E4C* GetScene() { return m_pScene; }
 private:
 	// シーンGUI描画
 	void DrawSceneGUI();

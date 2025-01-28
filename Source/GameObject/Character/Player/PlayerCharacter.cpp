@@ -613,6 +613,10 @@ void PlayerCharacter::Update(float elapsedTime)
 				};
 				angle.y = Mathf::LerpRadian(m_tempData.angle, m_tempData.sync_data.rotate, rate);
 			}
+			if (m_tempData.position.y - position.y > 10.0f)
+			{
+				position.y = m_tempData.position.y;
+			}
 		}
 	}
 	{
@@ -910,13 +914,13 @@ void PlayerCharacter::ImportSyncData(const SYNC_DATA& data)
 	if (m_tempData.old_sync_count < data.sync_count_id)
 	{
 		std::lock_guard<std::mutex> lock(m_mut);
+		Show();
 		if (m_tempData.old_sync_count == 0)	// 初めての同期
 		{
 			SetPosition({ data.position[0], data.position[1], data.position[2] });
 			Stop();
 			//AddImpulse({ data.velocity[0], data.velocity[1], data.velocity[2] });
 			SetAngle({ 0.0f, data.rotate, 0.0f });
-			Show();
 		}
 		m_tempData.old_sync_count = m_tempData.sync_data.sync_count_id;
 		m_tempData.timer = 0.0f;
