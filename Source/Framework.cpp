@@ -75,8 +75,6 @@ Framework::~Framework()
 	}
 
 	Network::Finalize();
-
-	Sound::Instance().Finalize();
 }
 
 // 更新処理

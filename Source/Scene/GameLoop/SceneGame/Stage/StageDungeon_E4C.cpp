@@ -13,6 +13,7 @@
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Tool/GLTFImporter.h"
 #include "TAKOEngine/Tool/Timer.h"
+#include "TAKOEngine/Sound/Sound.h"
 
 #include "GameObject/GameObjectManager.h"
 #include "GameObject/ModelObject.h"
@@ -184,6 +185,10 @@ void StageDungeon_E4C::Initialize()
 
 	//Console::Instance().Open();
 
+	Sound::Instance().InitAudio();
+	Sound::Instance().LoadAudio("Data/Sound/5-Miraculous_Maze(Dungeon).mp3");
+	Sound::Instance().PlayAudio(0);
+
 	// 影初期化
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
 }
@@ -195,6 +200,8 @@ void StageDungeon_E4C::Finalize()
 	UI.Clear();
 	SpawnerManager::Instance().Clear();
 	GameObjectManager::Instance().Clear();
+	Sound::Instance().StopAudio(0);
+	Sound::Instance().Finalize();
 
 	T_GRAPHICS.GetShadowRenderer()->Finalize();
 }
