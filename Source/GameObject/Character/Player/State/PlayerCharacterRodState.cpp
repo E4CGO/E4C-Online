@@ -291,6 +291,9 @@ namespace PlayerCharacterState
 			m_pbeam->PointTo(owner->GetShotPosition() + owner->GetFront());
 			m_pbeam->SetDirection(owner->GetFront());
 			m_pbeam->SetOwner(owner);
+
+			owner->GetEffectCharge()->Activate();
+			owner->GetEffectCharge()->SetLooping();
 		}
 		void Skill1State::Execute(float elapsedTime)
 		{
@@ -310,6 +313,9 @@ namespace PlayerCharacterState
 		void Skill2State::Enter()
 		{
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_ATTACK_SPECIAL_SECOND, false, 0.1f);
+
+			owner->GetEffectHealing()->SetObjectPositions(owner->GetPosition(), owner->GetFront());
+			owner->GetEffectHealing()->Activate();
 		}
 		void Skill2State::Execute(float elapsedTime)
 		{

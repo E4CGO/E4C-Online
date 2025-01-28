@@ -87,7 +87,7 @@ ZoneShaderDX12::ZoneShaderDX12(ID3D12Device* device, const char* vertexShaderNam
 		pipeline_state_desc.DepthStencilState = renderState->GetDepthState(DepthState::TestAndWrite);
 
 		//ラスタライザーステート
-		pipeline_state_desc.RasterizerState = renderState->GetRasterizer(RasterizerState::SolidCullNone);
+		pipeline_state_desc.RasterizerState = renderState->GetRasterizer(RasterizerState::SolidCullFront);
 
 		//プリミティブトポロジー
 		pipeline_state_desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -111,9 +111,17 @@ ZoneShaderDX12::ZoneShaderDX12(ID3D12Device* device, const char* vertexShaderNam
 		//パイプラインステートの生成
 		hr = device->CreateGraphicsPipelineState(
 			&pipeline_state_desc,
-			IID_PPV_ARGS(m_d3d_pipeline_state.GetAddressOf()));
+			IID_PPV_ARGS(m_d3d_pipeline_state_front.GetAddressOf()));
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-		m_d3d_pipeline_state->SetName(L"ZoneShaderPipelineState");
+		m_d3d_pipeline_state_front->SetName(L"ZoneShaderPipelineState");
+
+		pipeline_state_desc.RasterizerState = renderState->GetRasterizer(RasterizerState::SolidCullBack);
+
+		hr = device->CreateGraphicsPipelineState(
+			&pipeline_state_desc,
+			IID_PPV_ARGS(m_d3d_pipeline_state_back.GetAddressOf()));
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+		m_d3d_pipeline_state_back->SetName(L"PlaneShaderPipelineStateBack");
 	}
 
 	m_sampler = graphics.GetSampler(SamplerState::AnisotropicWrap);
@@ -130,7 +138,7 @@ void ZoneShaderDX12::Render(const RenderContextDX12& rc, const ModelDX12::Mesh& 
 
 	//パイプライン設定
 	rc.d3d_command_list->SetGraphicsRootSignature(m_d3d_root_signature.Get());
-	rc.d3d_command_list->SetPipelineState(m_d3d_pipeline_state.Get());
+	rc.d3d_command_list->SetPipelineState(m_d3d_pipeline_state_front.Get());
 
 	//シーン定数バッファ設定
 	rc.d3d_command_list->SetGraphicsRootDescriptorTable(0, rc.scene_cbv_descriptor->GetGpuHandle());  //CbScene
@@ -163,7 +171,20 @@ void ZoneShaderDX12::Render(const RenderContextDX12& rc, const ModelDX12::Mesh& 
 	//サンプラーステート設定
 	rc.d3d_command_list->SetGraphicsRootDescriptorTable(5, m_sampler->GetDescriptor()->GetGpuHandle());
 
-	// 描画
+	// 前描画
+	if (frame_resource.instancingCount == 0)
+	{
+		rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), 1, 0, 0, 0);
+	}
+	else
+	{
+		//インスタンシング
+		rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), frame_resource.instancingCount, 0, 0, 0);
+	}
+
+	// 後ろ描画
+	rc.d3d_command_list->SetPipelineState(m_d3d_pipeline_state_back.Get());
+
 	if (frame_resource.instancingCount == 0)
 	{
 		rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), 1, 0, 0, 0);

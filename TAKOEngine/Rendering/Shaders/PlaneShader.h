@@ -230,4 +230,27 @@ public:
 	virtual ~FireballShaderDX12() override = default;
 };
 
+/**************************************************************************//**
+	@class    BeamDX12DX12
+	@brief    BeamDX12DX12のパラーメータ設定クラス
+	@par    [説明]
+		円の回復の効果を描画するクラス
+*//***************************************************************************/
+class MagicPlaneDX12 : public ModelShaderDX12
+{
+public:
+	MagicPlaneDX12(ID3D12Device* device, const char* vertexShaderName = "Data/Shader/PrimitiveDX12VS.cso", const char* pixelShaderName = "Data/Shader/EffectPlaneDX12PS.cso");
+
+	virtual ~MagicPlaneDX12() override = default;
+
+	void Finalize() override {};
+
+	void Render(const RenderContextDX12& rc, const ModelDX12::Mesh& mesh) override;
+
+	Microsoft::WRL::ComPtr<ID3D12PipelineState>		m_d3d_pipeline_state;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature>		m_d3d_root_signature;
+
+	SamplerManager* m_sampler = nullptr;
+};
+
 #endif //!__INCLUDED_PLANE_SHADER_H__
