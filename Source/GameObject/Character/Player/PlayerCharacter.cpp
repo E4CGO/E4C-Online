@@ -25,8 +25,6 @@
 #include "TAKOEngine/Tool/Mathf.h"
 #include "TAKOEngine/Rendering/LineRenderer.h"
 
-
-
 PlayerCharacter::PlayerCharacter(uint32_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]) : Character()
 {
 	scale = { 0.5f, 0.5f, 0.5f };
@@ -61,6 +59,10 @@ PlayerCharacter::PlayerCharacter(uint32_t id, const char* name, const uint8_t ap
 
 	// DebugPrimitive用
 	m_sphere = std::make_unique<SphereRenderer>(T_GRAPHICS.GetDeviceDX12());
+
+	m_EffectZone = std::make_unique<ZoneObject>();
+	m_EffectCharge = std::make_unique<ChargeObject>();
+	m_EffectHealing = std::make_unique<HealingObject>();
 }
 
 PlayerCharacter::PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataInfo) : Character()
@@ -86,6 +88,13 @@ PlayerCharacter::PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataI
 
 	// DebugPrimitive用
 	m_sphere = std::make_unique<SphereRenderer>(T_GRAPHICS.GetDeviceDX12());
+
+	// 効果
+	{
+		m_EffectZone = std::make_unique<ZoneObject>();
+		m_EffectCharge = std::make_unique<ChargeObject>();
+		m_EffectHealing = std::make_unique<HealingObject>();
+	}
 }
 
 /**************************************************************************//**
@@ -197,7 +206,8 @@ void PlayerCharacter::UpdateHorizontalMove(float elapsedTime)
 						}
 					}
 					position = pos - XMFLOAT3{ 0, height * 0.5f, 0 };
-					m_pMoveCollider->SetPosition(position + XMFLOAT3{ 0, radius, 0 });}
+					m_pMoveCollider->SetPosition(position + XMFLOAT3{ 0, radius, 0 });
+				}
 				else
 				{
 					position.x += mx;
@@ -256,8 +266,7 @@ bool  PlayerCharacter::CollisionVsEnemies()
 	for (Enemy*& enemy : ENEMIES.GetAll())
 	{
 		if (!enemy->GetMoveCollider()) continue;
- 
- 
+
 		if (m_pMoveCollider->Collision(enemy->GetMoveCollider(), {}, hit))
 		{
 			hit.position.y = position.y;
@@ -514,7 +523,6 @@ void PlayerCharacter::UpdateSkillTimers(float elapsedTime)
 }
 void PlayerCharacter::SwordTrail()
 {
-	
 	const iModel::Node* swordnode1 = GetSwordTrailNode();
 	LineRenderer* sword = Graphics::Instance().GetLineRenderer();
 	LineRendererDX12* dx12_sword = Graphics::Instance().GetLineRendererDX12();
@@ -574,7 +582,6 @@ void PlayerCharacter::SwordTrail()
 			}
 		}
 	}
-	
 }
 //剣の軌跡ノード取得
 const iModel::Node* PlayerCharacter::GetSwordTrailNode()
@@ -582,12 +589,11 @@ const iModel::Node* PlayerCharacter::GetSwordTrailNode()
 	iModel::Node* node = this->GetModel()->FindNode("JOT_C_Blade");
 
 	return node;
-
 }
 void PlayerCharacter::Update(float elapsedTime)
 {
 	SwordTrail();
-	
+
 	std::lock_guard<std::mutex> lock(m_mut);
 	{
 		ProfileScopedSection_2("input", ImGuiControl::Profiler::Red);
@@ -631,6 +637,15 @@ void PlayerCharacter::Update(float elapsedTime)
 		//ProfileScopedSection_2("character", ImGuiControl::Profiler::Purple);
 
 		Character::Update(elapsedTime);
+
+		// 効果
+		{
+			m_EffectZone->SetPosition(position);
+			m_EffectZone->Update(elapsedTime);
+			m_EffectCharge->SetPosition(position);
+			m_EffectCharge->Update(elapsedTime);
+			m_EffectHealing->Update(elapsedTime);
+		}
 	}
 	iModel::Node* node = this->GetModel()->FindNode("Mesh_0");
 }
@@ -638,7 +653,7 @@ void PlayerCharacter::Update(float elapsedTime)
 void PlayerCharacter::Render(const RenderContext& rc)
 {
 	Character::Render(rc);
-	
+
 	DirectX::XMFLOAT3 front = CameraManager::Instance().GetCamera()->GetFront();
 	DirectX::XMFLOAT3 eye = CameraManager::Instance().GetCamera()->GetEye();
 	DirectX::XMFLOAT3 namePos = this->position + DirectX::XMFLOAT3{ 0, 2.2f, 0 };
@@ -692,6 +707,12 @@ void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
 	LineRendererDX12* dx12_sword = Graphics::Instance().GetLineRendererDX12();
 	dx12_sword->Render(rc.d3d_command_list, m_swordSprite.get());
 	if (dot < 0.0f) return;
+
+	{
+		m_EffectZone->RenderDX12(rc);
+		m_EffectCharge->RenderDX12(rc);
+		m_EffectHealing->RenderDX12(rc);
+	}
 
 #ifdef _DEBUG
 	m_pMoveCollider->DrawDebugPrimitive({ 1, 1, 1, 1 });
@@ -810,14 +831,12 @@ void PlayerCharacter::OnDamage(const uint16_t& damage)
 	}
 	else
 	{
-		if(!superArmor)
-		stateMachine->ChangeState(static_cast<int>(STATE::HURT));
+		if (!superArmor)
+			stateMachine->ChangeState(static_cast<int>(STATE::HURT));
 	}
 }
 
 bool PlayerCharacter::InputMove(float elapsedTime) {
-
-
 	// 移動処理
 	Move(inputDirection.x, inputDirection.y, this->moveSpeed);
 	// 旋回処理

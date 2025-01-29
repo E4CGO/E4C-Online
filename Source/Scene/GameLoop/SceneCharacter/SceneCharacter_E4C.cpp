@@ -90,7 +90,7 @@ void SceneCharacter_E4C::Initialize()
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
 
 	Sound::Instance().InitAudio();
-	Sound::Instance().LoadAudio("Data/Sound/2-A_Royal_Visit.mp3");
+	Sound::Instance().LoadAudio("Data/Sound/11-Character_select.mp3");
 	Sound::Instance().PlayAudio(0);
 }
 
