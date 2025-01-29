@@ -888,8 +888,8 @@ void SpawnerNode::Render(const RenderContext& rc)
 	// 継承元のRender呼び出し
 	ModelObject::Render(rc);
 
-	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, spawnerData.spawnRadius, 1.5f, { 1, 0, 0, 1 });
-	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, spawnerData.searchRadius, 1.5f, { 1, 0, 1, 1 });
+	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, spawnRadius, 1.5f, { 1, 0, 0, 1 });
+	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, searchRadius, 1.5f, { 1, 0, 1, 1 });
 }
 
 Node* SpawnerNode::Duplicate()
@@ -931,22 +931,22 @@ void SpawnerNode::DrawDebugGUI()
 	// スポナーデータ
 	if (ImGui::TreeNodeEx("SpawnerData", ImGuiTreeNodeFlags_DefaultOpen)) {
 		// enemyType
-		int enemyTypeInt = (int)spawnerData.enemyType;
+		int enemyTypeInt = (int)enemyType;
 		if (ImGui::InputInt("EnemyType", &enemyTypeInt)) {
 			// 最大数を超えないように調整
 			if (enemyTypeInt < 0) enemyTypeInt = 0;
-			spawnerData.enemyType = (uint8_t)enemyTypeInt;
+			enemyType = (uint8_t)enemyTypeInt;
 		}
 		// searchRadius
-		ImGui::SliderFloat("SearchRadius", &spawnerData.searchRadius, 0.0f, 30.0f);
+		ImGui::SliderFloat("SearchRadius", &searchRadius, 0.0f, 30.0f);
 		// spawnRadius
-		ImGui::SliderFloat("SpawnRadius", &spawnerData.spawnRadius, 0.0f, 30.0f);
+		ImGui::SliderFloat("SpawnRadius", &spawnRadius, 0.0f, 30.0f);
 		// maxExistedEnemiesNum
-		ImGui::SliderInt("MaxExistedEnemiesNum", &spawnerData.maxExistedEnemiesNum, 0, 30);
+		ImGui::SliderInt("MaxExistedEnemiesNum", &maxExistedEnemiesNum, 0, 30);
 		// maxSpawnedEnemiesNum
-		ImGui::SliderInt("MaxSpawnedEnemiesNum", &spawnerData.maxSpawnedEnemiesNum, -1, 30);
+		ImGui::SliderInt("MaxSpawnedEnemiesNum", &maxSpawnedEnemiesNum, -1, 30);
 		// spawnTime
-		ImGui::SliderFloat("SpawnTime", &spawnerData.spawnTime, 1.0f, 30.0f);
+		ImGui::SliderFloat("SpawnTime", &spawnTime, 1.0f, 30.0f);
 
 		ImGui::TreePop();
 	}

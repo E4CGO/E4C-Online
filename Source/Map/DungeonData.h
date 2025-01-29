@@ -8,6 +8,10 @@
 
 #include "TAKOEngine/Tool/Singleton.h"
 #include "TAKOEngine/Physics/Collision.h"
+#include "TAKOEngine/Runtime/tentacle_lib.h"
+#include "TAKOEngine/Network/HttpRequest.h"
+#include "TAKOEngine/Network/WinSock2Wrapper.h"
+#include <fstream>
 #include <vector>
 
 // 部屋データ
@@ -107,6 +111,15 @@ namespace ns_RoomData
 		TILETYPE_COUNT
 	};
 
+	// タイル用データ
+	struct TILE_DATA
+	{
+		DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT3 angle = { 0.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f };
+		DirectX::XMFLOAT4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	};
+
 	// スポナーデータ
 	struct SPAWNER_DATA
 	{
@@ -119,36 +132,17 @@ namespace ns_RoomData
 		int maxSpawnedEnemiesNum = -1;
 
 		float spawnTime = 2.0f;
+
+		TILE_DATA tileData;
 	};
 
-	// テレポーターデータ
-	struct TELEPORTER_DATA
+	// 次の階への階段データ
+	struct STAIR_TO_NEXTFLOOR_DATA
 	{
 		float portalTime = 3.0f;
 		float interactionDistance = 5.0f;
-	};
 
-	// 配置する通常のタイル用データ
-	struct TILE_DATA
-	{
-		DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
-		DirectX::XMFLOAT3 angle = { 0.0f, 0.0f, 0.0f };
-		DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f };
-		DirectX::XMFLOAT4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	};
-
-	// 配置するスポナー用データ
-	struct TILE_SPAWNER_DATA
-	{
 		TILE_DATA tileData;
-		SPAWNER_DATA spawnerData;
-	};
-
-	// 配置する次の部屋への階段用データ
-	struct TILE_STAIR_DATA
-	{
-		TILE_DATA tileData;
-		TELEPORTER_DATA teleporterData;
 	};
 
 	// モデルファイル読み込み用データ
@@ -220,6 +214,10 @@ public:
 	const std::vector<FILE_DATA> GetCollisionFileDatas(TileType type) const { return m_collisionFileDatas.at(type); }
 	// ファイル名の取得
 	const char* GetFileName(RoomType type) { return m_fileNames.at(type); }
+	// 配置データの取得
+	const std::vector<std::vector<TILE_DATA>> GetRoomTileDatas(RoomType type) { return m_roomTileDatas.at(type); }
+	const std::vector<SPAWNER_DATA> GetRoomSpawnerDatas(RoomType type) { return m_roomSpawnerDatas.at(type); }
+	const std::vector<STAIR_TO_NEXTFLOOR_DATA> GetStairToNextFloorDatas(RoomType type) { return m_roomStairDatas.at(type); }
 
 private:
 	// 各種初期化
@@ -230,6 +228,9 @@ private:
 	void InitModelFileDatas();
 	void InitCollisionFileDatas();
 	void InitTileDatas();
+	TILE_DATA LoadTileData(nlohmann::json_abi_v3_11_3::json nodeData);
+	SPAWNER_DATA LoadSpawnerData(nlohmann::json_abi_v3_11_3::json nodeData);
+	STAIR_TO_NEXTFLOOR_DATA LoadStairData(nlohmann::json_abi_v3_11_3::json nodeData);
 
 	// jsonデータ読み込み
 	RoomGenerateSetting LoadRoomGenSetting(RoomType roomType);
@@ -240,11 +241,12 @@ private:
 	int m_currentFloor = 1;										// 現在の階
 	std::vector<std::vector<FILE_DATA>> m_modelFileDatas;		// 見た目用ファイル読み込み用データ配列
 	std::vector<std::vector<FILE_DATA>> m_collisionFileDatas;	// 当たり判定用ファイル読み込み用データ配列
-	std::vector<char*> m_fileNames;						// ファイル名配列
+
+	std::vector<char*> m_fileNames;	// ファイル名配列
 
 	std::vector<std::vector<std::vector<TILE_DATA>>> m_roomTileDatas;	// タイル 配置データ			DATA * 配置するタイルの数 * タイルの種類の数 * 部屋の種類の数
-	std::vector<std::vector<TILE_SPAWNER_DATA>> m_roomSpawnerDatas;		// スポナー 配置データ			DATA * 配置するタイルの数 * 部屋の種類の数
-	std::vector<std::vector<TILE_STAIR_DATA>> m_roomStairDatas;			// 次の部屋への階段 配置データ	DATA * 配置するタイルの数 * 部屋の種類の数
+	std::vector<std::vector<SPAWNER_DATA>> m_roomSpawnerDatas;			// スポナー 配置データ			DATA * 配置するタイルの数 * 部屋の種類の数
+	std::vector<std::vector<STAIR_TO_NEXTFLOOR_DATA>> m_roomStairDatas;	// 次の部屋への階段 配置データ	DATA * 配置するタイルの数 * 部屋の種類の数
 };
 #define DUNGEONDATA DungeonData::Instance()
 

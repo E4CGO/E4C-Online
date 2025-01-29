@@ -1,11 +1,5 @@
 #include "DungeonData.h"
 
-#include "TAKOEngine/Runtime/tentacle_lib.h"
-#include "TAKOEngine/Network/HttpRequest.h"
-#include "TAKOEngine/Network/WinSock2Wrapper.h"
-
-#include <fstream>
-
 DungeonData::DungeonData()
 {
 	// 初期化
@@ -27,6 +21,8 @@ void DungeonData::Initialize()
 
 	InitModelFileDatas();
 	InitCollisionFileDatas();
+
+	InitTileDatas();
 }
 
 void DungeonData::InitDungeonGenSetting()
@@ -679,11 +675,125 @@ void DungeonData::InitCollisionFileDatas()
 
 void DungeonData::InitTileDatas()
 {
+	// まずリサイズ
+	m_roomTileDatas.resize(RoomType::ROOMTYPE_COUNT);
+	for (int i = (int)RoomType::FIRST_START; i < (int)RoomType::ROOMTYPE_COUNT; i++) m_roomTileDatas.at(i).resize(TileType::TILETYPE_COUNT);
+
+	m_roomSpawnerDatas.resize(RoomType::ROOMTYPE_COUNT);
+	m_roomStairDatas.resize(RoomType::ROOMTYPE_COUNT);
+
 	// 部屋の数だけぶん回す
 	for (int i = (int)RoomType::FIRST_START; i < (int)RoomType::ROOMTYPE_COUNT; i++)
 	{
-		m_roomGenerateSettings.at((RoomType)i) = LoadRoomGenSetting((RoomType(i)));
+		nlohmann::json loadFile;
+		std::ifstream ifs(m_fileNames.at((RoomType)i));
+
+		if (ifs.is_open())
+		{
+			ifs >> loadFile;
+
+			for (nlohmann::json_abi_v3_11_3::json nodeData : loadFile["NodeDatas"])
+			{
+				TileType type = nodeData["Type"];
+
+				switch (type)
+				{
+				case ns_RoomData::SPAWNER:				m_roomSpawnerDatas.at((RoomType)i).emplace_back(LoadSpawnerData(nodeData));	break;
+				case ns_RoomData::STAIR_TO_NEXTFLOOR:	m_roomStairDatas.at((RoomType)i).emplace_back(LoadStairData(nodeData));	break;
+				default: m_roomTileDatas.at((RoomType)i).at(type).emplace_back(LoadTileData(nodeData));	break;
+				}
+			}
+			ifs.close();
+		}
 	}
+
+	int a = 0;
+}
+
+TILE_DATA DungeonData::LoadTileData(nlohmann::json_abi_v3_11_3::json nodeData)
+{
+	DirectX::XMFLOAT3 position = {
+		nodeData["Position"].at(0),
+		nodeData["Position"].at(1),
+		nodeData["Position"].at(2),
+	};
+	DirectX::XMFLOAT3 angle = {
+		nodeData["Angle"].at(0),
+		nodeData["Angle"].at(1),
+		nodeData["Angle"].at(2),
+	};
+	DirectX::XMFLOAT3 scale = {
+	nodeData["Scale"].at(0),
+	nodeData["Scale"].at(1),
+	nodeData["Scale"].at(2),
+	};
+
+	TILE_DATA tileData;
+	tileData.position = position;
+	tileData.angle = angle;
+	tileData.scale = scale;
+
+	return tileData;
+}
+
+SPAWNER_DATA DungeonData::LoadSpawnerData(nlohmann::json_abi_v3_11_3::json nodeData)
+{
+	SPAWNER_DATA spawnerData;
+	if (!nodeData.is_null())
+	{
+		spawnerData.tileData.position = {
+			nodeData["Position"].at(0),
+			nodeData["Position"].at(1),
+			nodeData["Position"].at(2),
+		};
+		spawnerData.tileData.angle = {
+			nodeData["Angle"].at(0),
+			nodeData["Angle"].at(1),
+			nodeData["Angle"].at(2),
+		};
+		spawnerData.tileData.scale = {
+			nodeData["Scale"].at(0),
+			nodeData["Scale"].at(1),
+			nodeData["Scale"].at(2),
+		};
+	}
+	if (!nodeData["SpawnerData"].is_null())
+	{
+		spawnerData.enemyType = nodeData["SpawnerData"]["EnemyType"];
+		spawnerData.searchRadius = nodeData["SpawnerData"]["SearchRadius"];
+	}
+
+	return spawnerData;
+}
+
+STAIR_TO_NEXTFLOOR_DATA DungeonData::LoadStairData(nlohmann::json_abi_v3_11_3::json nodeData)
+{
+	STAIR_TO_NEXTFLOOR_DATA stairToNextFloorData;
+	if (!nodeData.is_null())
+	{
+		stairToNextFloorData.tileData.position = {
+			nodeData["Position"].at(0),
+			nodeData["Position"].at(1),
+			nodeData["Position"].at(2),
+		};
+		stairToNextFloorData.tileData.angle = {
+			nodeData["Angle"].at(0),
+			nodeData["Angle"].at(1),
+			nodeData["Angle"].at(2),
+		};
+		stairToNextFloorData.tileData.scale = {
+			nodeData["Scale"].at(0),
+			nodeData["Scale"].at(1),
+			nodeData["Scale"].at(2),
+		};
+	}
+	if (!nodeData["TeleporterData"].is_null())
+	{
+		stairToNextFloorData.portalTime = nodeData["TeleporterData"]["PortalTime"];
+		stairToNextFloorData.interactionDistance = nodeData["TeleporterData"]["InteractionDistance"];
+	}
+
+	return stairToNextFloorData;
 }
 
 DungeonData::RoomGenerateSetting DungeonData::LoadRoomGenSetting(RoomType roomType)

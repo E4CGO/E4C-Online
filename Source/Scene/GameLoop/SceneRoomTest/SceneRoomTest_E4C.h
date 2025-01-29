@@ -115,8 +115,8 @@ public:
 	{
 		nlohmann::json spawnerJsonData;
 		spawnerJsonData = {
-			{ "EnemyType", spawnerData.enemyType },
-			{ "SearchRadius", spawnerData.searchRadius }
+			{ "EnemyType", enemyType },
+			{ "SearchRadius", searchRadius }
 		};
 
 		saveFile["NodeDatas"].push_back({
@@ -129,11 +129,23 @@ public:
 	}
 
 	// スポナーデータのゲッター、セッター
-	SPAWNER_DATA GetSpawnerData() { return spawnerData; }
-	void SetSpawnerData(SPAWNER_DATA newData) { spawnerData = newData; }
+	uint8_t GetEnemyType() { return enemyType; }
+	void SetEnemyType(uint8_t enemyType) { this->enemyType = enemyType; }
+	float GetSearchRadius() { return searchRadius; }
+	void SetSearchRadius(float searchRadius) { this->searchRadius = searchRadius; }
+	float GetSpawnRadius() { return spawnRadius; }
+	void SetSpawnRadius(float spawnRadius) { this->spawnRadius = spawnRadius; }
 
 protected:
-	SPAWNER_DATA spawnerData;
+	uint8_t enemyType = 0;
+
+	float searchRadius = 5.0f;
+	float spawnRadius = 3.0f;
+
+	int maxExistedEnemiesNum = 1;
+	int maxSpawnedEnemiesNum = -1;
+
+	float spawnTime = 2.0f;
 };
 
 // 接続点ノード
