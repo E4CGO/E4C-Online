@@ -5,7 +5,7 @@
 #include "BearBossState.h"
 #include "TAKOEngine/Physics/CollisionManager.h"
 
-BearBoss::BearBoss(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("Data/Model/Enemy/MDLANM_ENMboss_1205.glb", scaling, renderMode)
+BearBoss::BearBoss(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("Data/Model/Enemy/MDLANM_ENMboss_0123.glb", scaling, renderMode)
 {
 	enemyType = ENEMY_TYPE::BEAR_BOSS;
 	radius = 3.0f;
@@ -67,7 +67,7 @@ PunchImpact::PunchImpact(DirectX::XMFLOAT3 pos, Character* owner) : Projectile("
 void PunchImpact::Update(float elapsedTime)
 {
 	float radius = minRadius + (maxRadius - minRadius) * (time / existTime);
-	m_pColliders[0]->SetParam({ position,radius });
+	m_pColliders[0]->SetParam({ position, radius });
 	UpdateColliders();
 
 	time += elapsedTime;

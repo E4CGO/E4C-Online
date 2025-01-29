@@ -31,6 +31,8 @@
 
 #include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
 
+#include "PreloadManager.h"
+
 void StageOpenWorld_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
@@ -43,6 +45,7 @@ void StageOpenWorld_E4C::Initialize()
 	{
 		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
 	}
+	PRELOAD.Join("OpenWorldModels");
 
 	m_pCharacterGauge = new WidgetPlayerHP();
 	m_pPauseMenu = new WidgetPauseMenu();
@@ -65,7 +68,7 @@ void StageOpenWorld_E4C::Initialize()
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
 	teleporter->SetVisibility(true);
 
-	Spawner* spawner = new Spawner(ENEMY_TYPE::CROC, 5, -1);
+	Spawner* spawner = new Spawner(ENEMY_TYPE::PIG, 5, -1);
 	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
 	spawner->SetSearchRadius(10.0f);
 	SpawnerManager::Instance().Register(spawner);
@@ -91,13 +94,6 @@ void StageOpenWorld_E4C::Initialize()
 		models.emplace("target3", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget2.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_Phong));
 		models["target3"]->SetPosition({ -32.0f, 1.80f, 23.4f });
 		models["target3"]->SetAngle({ 0.0f, -1.0f, 0.0f });
-
-		//// プレイヤーが走るときの土埃
-		//runningDust1 = std::make_unique<RunningDust>(T_GRAPHICS.GetDevice(), "Data/Sprites/smoke.png", 100.0f,
-		//	DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),	// position
-		//	1.0f,			// alpha
-		//	f_count,	// model_id
-		//	0);		// age
 	}
 
 	if (T_GRAPHICS.isDX12Active)
@@ -199,8 +195,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 		onlineController->BeginSync();
 	}
 
-	
-
 	if (T_INPUT.KeyDown(VK_MENU))
 	{
 		if (TentacleLib::isShowCursor())
@@ -247,8 +241,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
 	}
 
-	
-
 	m_sceneTickTimer = elapsedTime;
 	m_sceneGlobalTimer += elapsedTime;
 }
@@ -269,8 +261,6 @@ void StageOpenWorld_E4C::Render()
 
 	// ライトの情報を詰め込む
 	LightManager::Instance().PushRenderContext(rc);
-
-	
 
 	for (auto& it : models)
 	{
@@ -360,7 +350,11 @@ void StageOpenWorld_E4C::RenderDX12()
 
 		T_TEXT.EndDX12();
 	}
+
+#ifdef _DEBUG
 	DrawSceneGUI();
+#endif // DEBUG
+
 	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
 
 	T_GRAPHICS.End();

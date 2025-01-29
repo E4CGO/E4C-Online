@@ -70,7 +70,7 @@ public:
 	~PunchImpact() = default;
 
 	void Update(float elapsedTime) override;
-	void CollisionFunction(Collider* myCol, Collider* otherCol);
+	void CollisionFunction(Collider* myCol, Collider* otherCol) override;
 
 	void RenderDX12(const RenderContextDX12& rc) override
 	{

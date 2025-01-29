@@ -53,7 +53,8 @@ public:
 	void Render(const RenderContextDX12& rc, const ModelDX12::Mesh& mesh) override;
 
 private:
-	Microsoft::WRL::ComPtr<ID3D12PipelineState>		m_d3d_pipeline_state;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState>		m_d3d_pipeline_state_front;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState>		m_d3d_pipeline_state_back;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature>		m_d3d_root_signature;
 
 	SamplerManager* m_sampler = nullptr;
@@ -113,6 +114,20 @@ public:
 	HealingShaderdCircleDX12(ID3D12Device* device) : ZoneShaderDX12(device, "Data/Shader/PrimitiveDX12VS.cso", "Data/Shader/HealCircleDX12PS.cso") {}
 
 	virtual ~HealingShaderdCircleDX12() override = default;
+};
+
+/**************************************************************************//**
+	@class    BeamDX12DX12
+	@brief    BeamDX12DX12のパラーメータ設定クラス
+	@par    [説明]
+		ビームの効果を描画するクラス
+*//***************************************************************************/
+class BeamDX12 : public ZoneShaderDX12
+{
+public:
+	BeamDX12(ID3D12Device* device) : ZoneShaderDX12(device, "Data/Shader/PrimitiveDX12VS.cso", "Data/Shader/BeamDX12PS.cso") {}
+
+	virtual ~BeamDX12() override = default;
 };
 
 #endif //!__INCLUDED_CYLINDER_SHADER_H__

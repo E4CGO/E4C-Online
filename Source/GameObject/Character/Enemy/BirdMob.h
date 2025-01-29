@@ -1,4 +1,4 @@
-//! @file BirdMob.h
+﻿//! @file BirdMob.h
 //! @note
 
 #ifndef __INCLUDE_BIRD_MOB_H__

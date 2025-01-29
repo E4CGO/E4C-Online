@@ -150,18 +150,18 @@ float4 main(VS_OUT pin) : SV_TARGET
     float3 diffuse = 0;
     float3 specular = 0;
     
-    //float3 L = normalize(-light_direction.xyz);
-    //float3 V = normalize(camera_position.xyz - pin.world_position.xyz);
-    //float3 N = normalize(pin.world_normal.xyz);
+    float3 L = normalize(-directionalLightData.direction.xyz);
+    float3 V = normalize(cameraPosition.xyz - pin.tangent.xyz);
+    float3 N = normalize(pin.normal.xyz);
 
     diffuse += light_color * color.rgb * test_light_factor;
-    //specular += pow(max(0, dot(N, normalize(V + L))), 128);
+    specular += pow(max(0, dot(N, normalize(V + L))), 128);
 
     // EMISSION
-    float4 emissive = texture0.Sample(sampler0, pin.texcoord);
-    const float emissive_intensity = 0.1;
+    //float4 emissive = texture0.Sample(sampler0, pin.texcoord);
+    //const float emissive_intensity = 0.1;
 
-    return float4((diffuse /* + specular +  emissive * emissive_intensity */), 1.0f);
+    return float4((diffuse  + specular /* + emissive * emissive_intensity */), 1.0f);
 #else
     return float4(color, 1.0);
 #endif

@@ -1,4 +1,4 @@
-//! @file BirdMob.cpp
+﻿//! @file BirdMob.cpp
 //! @note
 
 #include "BirdMob.h"

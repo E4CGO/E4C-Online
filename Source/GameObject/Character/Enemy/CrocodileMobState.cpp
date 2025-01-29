@@ -89,7 +89,11 @@ namespace EnemyState
 		*//***************************************************************************/
 		void AttackState::Execute(float elapsedTime)
 		{
-			owner->GetCollider(crocodileAttack.idx)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
+			Collider* collider = owner->GetCollider(crocodileAttack.idx);
+			if (collider != nullptr) {
+
+				collider->SetCurrentRate(owner->GetModel()->GetAnimationRate());
+			}
 
 			if (!owner->IsPlayAnimation())
 			{
