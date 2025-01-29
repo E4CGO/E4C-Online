@@ -275,6 +275,9 @@ namespace PlayerCharacterState
 		void Skill2State::Enter()
 		{
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_ATTACK_SPECIAL_SECOND, false, 0.1f);
+
+			owner->GetEffectHealing()->SetObjectPositions(owner->GetPosition(), owner->GetFront());
+			owner->GetEffectHealing()->Activate();
 		}
 		void Skill2State::Execute(float elapsedTime)
 		{

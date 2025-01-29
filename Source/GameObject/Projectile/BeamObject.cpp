@@ -11,7 +11,7 @@
 *//***************************************************************************/
 BeamObject::BeamObject(PlayerCharacter* owner) : Projectile("Data/Model/Object/EffectBeam.glb", 1.0f, owner)
 {
-	SetShader("EffectBeam", ModelShaderDX12Id::HealCylinder);
+	SetShader("EffectBeam", ModelShaderDX12Id::Beam);
 
 	//DirectX::XMFLOAT3 startPosition = { owner->GetPosition().x, owner->GetPosition().y + 1.0f, owner->GetPosition().z };
 	//DirectX::XMVECTOR vStartPosition = DirectX::XMLoadFloat3(&startPosition);

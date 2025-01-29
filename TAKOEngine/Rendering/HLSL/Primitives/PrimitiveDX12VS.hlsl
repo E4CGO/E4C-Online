@@ -27,8 +27,12 @@ VS_OUT main(
     vout.vertex = mul(position, viewProjection);
     vout.position = position.xyz;
     vout.texcoord = texcoord;
-    vout.normal = normal;
-    vout.tangent = tangent;
+       
+    // world normal
+    vout.normal = normalize(mul(float4(normal, 0.f), world_transform));
+    // world position
+    vout.tangent = mul(position, world_transform);
+    
     vout.binormal = normalize(cross(vout.normal, vout.tangent));
     vout.color.rgb = color.rgb * materialColor.rgb;
     vout.color.a = color.a;
