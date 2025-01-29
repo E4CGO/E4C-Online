@@ -2,10 +2,11 @@
 
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
-
+#include "PreloadManager.h"
 // 初期化
 void SceneLoading::Initialize()
 {
+	PRELOAD.Join("SceneLoading.Sprite");
 	if (T_GRAPHICS.isDX12Active)
 	{
 		m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();

@@ -16,15 +16,21 @@
 
 #include "GameData.h"
 
+#include "PreloadManager.h"
+
 /**************************************************************************//**
 	@brief	初期化
 *//***************************************************************************/
 void SceneTitle_E4C::Initialize()
 {
-	// Sprite Resource Preload
-	for (auto& filename : spriteList)
+	PRELOAD.Join("TitleMenuSprite");
+	if (T_GRAPHICS.isDX11Active)
 	{
-		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
+		// Sprite Resource Preload
+		for (auto& filename : spriteList)
+		{
+			spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
+		}
 	}
 
 	// フレームバッファマネージャー

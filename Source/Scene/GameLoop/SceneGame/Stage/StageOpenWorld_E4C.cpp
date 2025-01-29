@@ -31,6 +31,8 @@
 
 #include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
 
+#include "PreloadManager.h"
+
 void StageOpenWorld_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
@@ -43,6 +45,7 @@ void StageOpenWorld_E4C::Initialize()
 	{
 		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
 	}
+	PRELOAD.Join("OpenWorldModels");
 
 	m_pCharacterGauge = new WidgetPlayerHP();
 	m_pPauseMenu = new WidgetPauseMenu();

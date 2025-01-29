@@ -142,6 +142,8 @@ set(Source
     "Source/PlayerCharacterData.h"
     "Source/PlayerCharacterPattern.cpp"
     "Source/PlayerCharacterPattern.h"
+    "Source/PreloadManager.cpp"
+    "Source/PreloadManager.h"
 )
 source_group("Source" FILES ${Source})
 
