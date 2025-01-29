@@ -13,8 +13,8 @@ PreloadManager::PreloadManager()
 	{
 		using json = nlohmann::json;
 		std::ifstream f("Data/Model/preload.json");
+		if (f.fail()) return;
 		json data = json::parse(f);
-
 		for (auto& group : data) {
 			NewGroup(group["group"], group["type"]);
 			const auto& list = group["list"];
