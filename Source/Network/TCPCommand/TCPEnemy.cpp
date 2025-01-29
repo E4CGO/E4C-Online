@@ -120,6 +120,23 @@ namespace Online
 
 		return m_pcontroller->GetTcpSocket()->Send(buffer.data(), buffer.size()) >= 0;
 	}
+
+	bool TCPEnemyRemove::Send(void* data)
+	{
+		std::set<uint32_t>* sendData = static_cast<std::set<uint32_t>*>(data);
+
+		std::vector<uint8_t> buffer;
+
+		CreateHeaderBuffer(buffer, m_cmd, sizeof(uint32_t) + sizeof(uint32_t) * sendData->size());
+		// 数
+		U8Buffer::Insert(buffer, static_cast<uint32_t>(sendData->size()));
+		for (const uint32_t& enemy_id : *sendData)
+		{
+			U8Buffer::Insert(buffer, enemy_id);
+		}
+		return m_pcontroller->GetTcpSocket()->Send(buffer.data(), buffer.size()) >= 0;
+	}
+
 	/**************************************************************************//**
 	 	@brief		エネミーオーナー変換受信関数
 		@param[in]	size データサイズ

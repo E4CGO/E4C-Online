@@ -144,7 +144,11 @@ namespace EnemyState
 		}
 		void AttackDiveState::Execute(float elapsedTime)
 		{
-			owner->GetCollider(birdAttack.idx)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
+			Collider* collider = owner->GetCollider(birdAttack.idx);
+			if (collider != nullptr)
+			{
+				collider->SetCurrentRate(owner->GetModel()->GetAnimationRate());
+			}
 
 			if (owner->IsGround())
 			{

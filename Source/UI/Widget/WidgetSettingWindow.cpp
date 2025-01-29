@@ -56,6 +56,7 @@ WidgetSettingWindow::WidgetSettingWindow()
 
 	cacheGameSetting = GAME_SETTING;
 	// オプション。
+	//OptionsList.push_back(new WidgetDragFloat("音量", &cacheGameSetting.CameraSensitivity, 0.0f, 1.0f));
 	OptionsList.push_back(new WidgetDragFloat("カメラ感度", &cacheGameSetting.CameraSensitivity, 3.0f, 20.0f));
 	OptionsList.push_back(new WidgetInputBool("X軸反転", &cacheGameSetting.CamerainvertX));
 	OptionsList.push_back(new WidgetInputBool("Y軸反転", &cacheGameSetting.CamerainvertY));

@@ -13,6 +13,7 @@
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Tool/GLTFImporter.h"
 #include "TAKOEngine/Tool/Timer.h"
+#include "TAKOEngine/Sound/Sound.h"
 
 #include "GameObject/GameObjectManager.h"
 #include "GameObject/ModelObject.h"
@@ -142,7 +143,7 @@ void StageDungeon_E4C::Initialize()
 	currentFloor = DUNGEONDATA.GetCurrentFloor();
 
 	// テキスト設定
-	WidgetText* floorText = new WidgetText();
+	floorText = new WidgetText();
 	floorText->SetText(("現在の階：" + std::to_string(currentFloor) + "階").c_str());
 	floorText->SetBorderColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 	floorText->SetBorder(2);
@@ -184,6 +185,10 @@ void StageDungeon_E4C::Initialize()
 
 	//Console::Instance().Open();
 
+	Sound::Instance().InitAudio();
+	Sound::Instance().LoadAudio("Data/Sound/5-Miraculous_Maze(Dungeon).mp3");
+	Sound::Instance().PlayAudio(0);
+
 	// 影初期化
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
 }
@@ -192,9 +197,11 @@ void StageDungeon_E4C::Finalize()
 {
 	ENEMIES.Clear();
 	MAPTILES.Clear();
-	UI.Clear();
+	UI.Remove(floorText);
 	SpawnerManager::Instance().Clear();
 	GameObjectManager::Instance().Clear();
+	Sound::Instance().StopAudio(0);
+	Sound::Instance().Finalize();
 
 	T_GRAPHICS.GetShadowRenderer()->Finalize();
 }
@@ -311,7 +318,7 @@ void StageDungeon_E4C::RenderDX12()
 
 		// シャドウマップ
 		{
-			T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
+			//T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
 			rc.shadowMap.shadow_srv_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSRV();
 			rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();
 		}

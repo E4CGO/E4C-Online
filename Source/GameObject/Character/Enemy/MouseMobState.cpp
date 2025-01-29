@@ -114,7 +114,11 @@ namespace EnemyState
 		*//***************************************************************************/
 		void AttackState::Execute(float elapsedTime)
 		{
-			owner->GetCollider(mouseAttack.idx)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
+			Collider* collider = owner->GetCollider(mouseAttack.idx);
+			if (collider != nullptr)
+			{
+				collider->SetCurrentRate(owner->GetModel()->GetAnimationRate());
+			}
 
 			if (!owner->IsPlayAnimation())
 			{
@@ -137,7 +141,7 @@ namespace EnemyState
 		{
 			owner->SetAnimation(::MouseMob::ANIMATION::ANIM_DAMAGE, false, 0.1f);
 		}
-		
+
 		/**************************************************************************//**
 			@brief	死亡ステート
 		*//***************************************************************************/

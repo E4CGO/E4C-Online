@@ -49,8 +49,8 @@ void StageOpenWorld_E4C::Initialize()
 	UI.Register(m_pCharacterGauge);
 	UI.Register(m_pPauseMenu);
 
-	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 0.01f);
-	village_collision = new MapTile("Data/Model/Stage/Terrain_Village_Collision.glb", 1.f);
+	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 1.0f);
+	village_collision = new MapTile("Data/Model/Stage/Terrain_Village_Collision.glb", 1.0f);
 	stage_collision->Update(0);
 	village_collision->Update(0);
 	stage_collision->SetMoveCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
@@ -91,13 +91,6 @@ void StageOpenWorld_E4C::Initialize()
 		models.emplace("target3", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget2.glb", 1.0f, ModelObject::RENDER_MODE::DX11, ModelObject::MODEL_TYPE::LHS_Phong));
 		models["target3"]->SetPosition({ -32.0f, 1.80f, 23.4f });
 		models["target3"]->SetAngle({ 0.0f, -1.0f, 0.0f });
-
-		//// プレイヤーが走るときの土埃
-		//runningDust1 = std::make_unique<RunningDust>(T_GRAPHICS.GetDevice(), "Data/Sprites/smoke.png", 100.0f,
-		//	DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),	// position
-		//	1.0f,			// alpha
-		//	f_count,	// model_id
-		//	0);		// age
 	}
 
 	if (T_GRAPHICS.isDX12Active)
@@ -167,9 +160,9 @@ void StageOpenWorld_E4C::Initialize()
 	cameraController->SetPlayer(player);
 	CURSOR_OFF;
 
-	Sound::Instance().Finalize();
 	Sound::Instance().InitAudio();
 	Sound::Instance().LoadAudio("Data/Sound/3-Dreamland(Overworld).mp3");
+	Sound::Instance().LoadAudio("Data/Sound/4-Encounter(battle_theme_Overworld_Tutorial).mp3");
 	Sound::Instance().PlayAudio(0);
 
 	// ダンジョンの階の再設定
@@ -178,19 +171,18 @@ void StageOpenWorld_E4C::Initialize()
 
 	// 影初期化
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
-
-	
-	
 }
 
 void StageOpenWorld_E4C::Finalize()
 {
 	PROJECTILES.Clear();
+	Sound::Instance().StopAudio(0);
+	Sound::Instance().Finalize();
 	T_GRAPHICS.GetShadowRenderer()->Finalize();
 }
 
 void StageOpenWorld_E4C::Update(float elapsedTime)
-{	
+{
 	// ゲームループ内で
 	cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
 	cameraController->Update(elapsedTime);
@@ -199,8 +191,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	{
 		onlineController->BeginSync();
 	}
-
-	
 
 	if (T_INPUT.KeyDown(VK_MENU))
 	{
@@ -248,8 +238,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
 	}
 
-	
-
 	m_sceneTickTimer = elapsedTime;
 	m_sceneGlobalTimer += elapsedTime;
 }
@@ -270,8 +258,6 @@ void StageOpenWorld_E4C::Render()
 
 	// ライトの情報を詰め込む
 	LightManager::Instance().PushRenderContext(rc);
-
-	
 
 	for (auto& it : models)
 	{
@@ -361,7 +347,11 @@ void StageOpenWorld_E4C::RenderDX12()
 
 		T_TEXT.EndDX12();
 	}
+
+#ifdef _DEBUG
 	DrawSceneGUI();
+#endif // DEBUG
+
 	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
 
 	T_GRAPHICS.End();

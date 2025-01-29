@@ -27,7 +27,7 @@ public:
 
 	void SetVisibility(bool isVisible) { this->m_isVisible = isVisible; }
 
-	void Teleport();
+	virtual void Teleport();
 
 	Stage* GetStage() { return m_pStage; }
 protected:

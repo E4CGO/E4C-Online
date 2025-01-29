@@ -183,8 +183,8 @@ public:
 	// 部屋の生成設定を配列から取得
 	RoomGenerateSetting GetRoomGenSetting(RoomType type) { return m_roomGenerateSettings.at(static_cast<int>(type)); }
 	// 現在の階取得・設定・次の階へ
-	const int GetCurrentFloor() const { return m_currentFloor; }
-	void SetCurrentFloor(int floor) { m_currentFloor = floor; }
+	const uint8_t GetCurrentFloor() const { return m_currentFloor; }
+	void SetCurrentFloor(uint8_t floor) { m_currentFloor = floor; }
 	void GoToNextFloor() { m_currentFloor++; }
 
 	// ファイル読み込み用データの取得
@@ -208,7 +208,7 @@ private:
 	std::vector<RoomGenerateSetting> m_roomGenerateSettings;	// 部屋の生成設定配列
 	std::vector<FloorGenerateSetting> m_floorGenerateSettings;	// 階全体の生成設定配列
 	DungeonGenerateSetting m_dungeonGenerateSetting;			// ダンジョンの生成設定
-	int m_currentFloor = 1;										// 現在の階
+	uint8_t m_currentFloor = 1;										// 現在の階
 	std::vector<std::vector<FILE_DATA>> m_modelFileDatas;		// 見た目用ファイル読み込み用データ配列
 	std::vector<std::vector<FILE_DATA>> m_collisionFileDatas;	// 当たり判定用ファイル読み込み用データ配列
 	std::vector<char*> m_fileNames;						// ファイル名配列

@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
+#include "Map/DungeonData.h"
 
 namespace Online
 {
@@ -19,8 +20,9 @@ namespace Online
 		ZeroMemory(buffer, size + 1);
 		if (m_pcontroller->GetTcpSocket()->Receive(buffer, size) > 0)
 		{
+			DUNGEONDATA.SetCurrentFloor(buffer[8]);
 			std::vector<uint8_t> roomOrder;
-			for (int i = 8; i < size; i++)
+			for (int i = 9; i < size; i++)
 			{
 				roomOrder.push_back(buffer[i]);
 			}
@@ -93,5 +95,17 @@ namespace Online
 			return true;
 		}
 		return false;
+	}
+
+	bool TCPRoomNext::Send(void* data)
+	{
+
+		std::vector<uint8_t>* roomOrder = static_cast<std::vector<uint8_t>*>(data);
+
+		std::vector<uint8_t> buffer;
+		CreateHeaderBuffer(buffer, m_cmd, roomOrder->size());
+		buffer.insert(buffer.end(), roomOrder->begin(), roomOrder->end());
+
+		return m_pcontroller->GetTcpSocket()->Send(buffer.data(), buffer.size()) >= 0;
 	}
 }
