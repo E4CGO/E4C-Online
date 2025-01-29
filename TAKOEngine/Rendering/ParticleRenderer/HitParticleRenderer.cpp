@@ -151,7 +151,7 @@ const Descriptor* HitParticleRenderer::UpdateSceneConstantBuffer(const RenderCon
 	cbv_data->max_particle_count = m_compute->GetMaxParticle();
 
 	cbv_data->sprite_sheet_grid = { 3,2 };
-	cbv_data->respawn_radius = 0.5f;
+	cbv_data->respawn_radius = 1.0f;
 
 	cbv_data->emission_position.x = m_compute->GetPosition().x;
 	cbv_data->emission_position.y = m_compute->GetPosition().y;

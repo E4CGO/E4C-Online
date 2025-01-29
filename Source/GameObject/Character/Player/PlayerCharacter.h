@@ -12,6 +12,9 @@
 #include "GameData.h"
 #include "PlayerCharacterData.h"
 #include "TAKOEngine/Rendering/DebugRenderer/SphereRenderer.h"
+#include "Source/GameObject/Props/ZoneObject.h"
+#include "Source/GameObject/Props/ChargeObject.h"
+#include "Source/GameObject/Props/HealingObject.h"
 
 class Enemy;
 
@@ -200,7 +203,6 @@ public:
 	bool IsFall() { return velocity.y < -10.0f; }
 
 	void FaceToCamera();
-	void FaceToEnemy();
 	void TurnByInput();
 
 	uint32_t GetClientId() { return m_client_id; }
@@ -250,7 +252,10 @@ public:
 	bool IsTrail() { return m_isTrail; }
 	void SetTrail(bool trail) { m_isTrail = trail; }
 
-	void SetHitStop(bool stop) { m_hitStop = stop; }
+	ZoneObject* GetEffectZone() { return m_EffectZone.get(); }
+	ChargeObject* GetEffectCharge() { return m_EffectCharge.get(); }
+	HealingObject* GetEffectHealing() { return m_EffectHealing.get(); }
+
 	// 自機判定
 	bool IsPlayer() { return GAME_DATA.GetClientId() == m_client_id; };
 
@@ -261,7 +266,7 @@ public:
 	// ターゲットを取得
 	DirectX::XMFLOAT3 GetTarget() { return target; }
 	// 発射物起点を取得
-	virtual DirectX::XMFLOAT3 GetShotPosition() { return position + DirectX::XMFLOAT3{ 0, height * 0.5f, 0 }; }
+	virtual DirectX::XMFLOAT3 GetShotPosition() { return position + DirectX::XMFLOAT3{ sinf(angle.y) * (radius + 0.5f) * 2.0f, height * 0.6f, cosf(angle.y) * (radius + 0.5f) * 2.0f }; }
 
 	// ステートを取得
 	int GetState() { return stateMachine->GetStateIndex(); }
@@ -371,9 +376,10 @@ protected:
 	DirectX::XMFLOAT3 trailPosition[2][MAX_POLYGON];
 
 	bool m_isTrail = false;
-	bool m_hitStop = false;
-	float m_stopTimer = 0.f;
-	float m_stopTime = 0.05f;
+
+	std::unique_ptr<ZoneObject> m_EffectZone;
+	std::unique_ptr<ChargeObject> m_EffectCharge;
+	std::unique_ptr<HealingObject> m_EffectHealing;
 };
 
 #endif // __INCLUDED_PLAYER_CHARACTER_H__

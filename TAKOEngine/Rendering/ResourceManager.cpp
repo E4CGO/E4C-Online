@@ -5,6 +5,7 @@
 std::shared_ptr<ModelResource> ResourceManager::LoadModelResource(const char* filename)
 {
 	if (strlen(filename) == 0) return nullptr;
+	std::lock_guard<std::mutex> lock(m_mut);
 
 	// モデル検索
 	ModelMap::iterator it = models.find(filename);
@@ -31,6 +32,7 @@ std::shared_ptr<ModelResource> ResourceManager::LoadModelResource(const char* fi
 std::shared_ptr<ModelResource> ResourceManager::LoadModelDX12Resource(const char* filename)
 {
 	if (strlen(filename) == 0) return nullptr;
+	std::lock_guard<std::mutex> lock(m_mut);
 
 	// モデル検索
 	ModelMap::iterator it = models.find(filename);
@@ -57,6 +59,7 @@ std::shared_ptr<ModelResource> ResourceManager::LoadModelDX12Resource(const char
 std::shared_ptr<ModelResource> ResourceManager::LoadModelResourceGLTF(std::string filename)
 {
 	if (filename.size() == 0) return nullptr;
+	std::lock_guard<std::mutex> lock(m_mut);
 
 	// モデル検索
 	ModelMap::iterator it = models.find(filename);
@@ -82,6 +85,7 @@ std::shared_ptr<ModelResource> ResourceManager::LoadModelResourceGLTF(std::strin
 
 std::shared_ptr<Sprite> ResourceManager::LoadSpriteResource(const char* filename)
 {
+	std::lock_guard<std::mutex> lock(m_mut);
 	// スプライト検索
 	SpriteMap::iterator it = sprites.find(filename);
 	if (it != sprites.end())
@@ -113,8 +117,9 @@ std::shared_ptr<Sprite> ResourceManager::LoadSpriteResource(const char* filename
 
 std::shared_ptr<SpriteDX12> ResourceManager::LoadSpriteResourceDX12(const char* filename)
 {
+	std::lock_guard<std::mutex> lock(m_mut);
 	// スプライト検索
-	SpriteMapDX12::iterator it = spritesDX12.find(filename);
+	//SpriteMapDX12::iterator it = spritesDX12.find(filename);
 	//if (it != spritesDX12.end())
 	//{
 	//	// リンク(寿命)が切れていないか確認

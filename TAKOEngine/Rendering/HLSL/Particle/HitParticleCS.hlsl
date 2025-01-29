@@ -60,7 +60,8 @@ void spawn(in uint id, inout particle p)
     float sin_phi = sin(phi);
     float cos_phi = cos(phi);
 	
-    float radius = 2.0f * f0 + (respawn_radius * 3);
+    float radius = 5.0;
+    //float radius = 2.0f * f0 + (respawn_radius * 3);
 
     p.position.x = emission_position.x + radius * sin_theta * cos_phi;
     p.position.y = emission_position.y + radius * sin_theta * sin_phi;

@@ -113,6 +113,9 @@ public:
 	void SetTarget(PlayerCharacter* player) { m_target = (player != nullptr) ? player->GetClientId() : UINT32_MAX ; }
 	uint32_t GetTarget() { return m_target; }
 
+	void SetTurnSpeed(const float speed) { turnSpeed = speed; }
+	float GetTurnSpeed () const { return turnSpeed; }
+
 	// 同期
 	const SYNC_DATA SyncData ();
 	void Sync(const SYNC_DATA& data);

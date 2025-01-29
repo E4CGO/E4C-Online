@@ -92,7 +92,10 @@ namespace Online
 			if (hit_id > m_receivedHit[enemy_id])
 			{
 				Enemy* enemy = ENEMIES.GetEnemyById(enemy_id);
-				enemy->OnDamage(damage);
+				if (enemy != nullptr)
+				{
+					enemy->OnDamage(damage);
+				}
 				m_receivedHit[enemy_id] = hit_id;
 			}
 			U8Buffer::Insert(callback, enemy_id);

@@ -46,6 +46,14 @@ void EnemyManager::Update(float elapsedTime)
 
 		m_syncEnemies.clear(); // 削除
 	}
+
+	// 一気削除
+	if (m_removeEnemies.size() > 0)
+	{
+		ONLINE_CONTROLLER->RemoveEnemy(m_removeEnemies);
+
+		m_removeEnemies.clear();
+	}
 }
 /**************************************************************************//**
 	@brief		エネミーの描画処理
@@ -116,6 +124,14 @@ bool EnemyManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOA
 void EnemyManager::RegisterSync(const uint32_t& enemy_id)
 {
 	m_syncEnemies.insert(enemy_id);
+}
+/**************************************************************************//**
+ 	@brief		削除エネミーID登録
+	@param[in]	enemy_id エネミーID
+*//***************************************************************************/
+void EnemyManager::RegisterRemove(const uint32_t& enemy_id)
+{
+	m_removeEnemies.insert(enemy_id);
 }
 
 

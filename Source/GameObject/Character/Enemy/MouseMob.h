@@ -1,4 +1,4 @@
-﻿//! @file MouseMob.cpp
+﻿//! @file MouseMob.h
 //! @note ネズミ敵
 
 #ifndef __INCLUDED_MOUSE_MOB_H__

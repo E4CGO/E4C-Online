@@ -29,11 +29,13 @@ public:
 	bool RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, HitResult& hit, bool camera = false);
 	// 同期エネミーID登録
 	void RegisterSync(const uint32_t& enemy_id);
+	void RegisterRemove(const uint32_t& enemy_id);
 private:
 	std::mutex m_mut;
 
 	//std::vector<Enemy::SYNC_DATA> m_enemySyncData; // 同期リストk
 	std::set<uint32_t> m_syncEnemies;
+	std::set<uint32_t> m_removeEnemies;
 };
 
 #define ENEMIES EnemyManager::Instance()
