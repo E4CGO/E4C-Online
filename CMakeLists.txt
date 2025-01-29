@@ -247,6 +247,10 @@ set(Source__GameObject__Character__Enemy
     "Source/GameObject/Character/Enemy/MouseMob.h"
     "Source/GameObject/Character/Enemy/MouseMobState.cpp"
     "Source/GameObject/Character/Enemy/MouseMobState.h"
+    "Source/GameObject/Character/Enemy/PigMob.cpp"
+    "Source/GameObject/Character/Enemy/PigMob.h"
+    "Source/GameObject/Character/Enemy/PigMobState.cpp"
+    "Source/GameObject/Character/Enemy/PigMobState.h"
 )
 source_group("Source\\GameObject\\Character\\Enemy" FILES ${Source__GameObject__Character__Enemy})
 
