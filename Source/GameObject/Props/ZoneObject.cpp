@@ -1,7 +1,8 @@
 #include "ZoneObject.h"
+#include "Source/GameObject/Character/Player/PlayerCharacterManager.h"
 
 /**************************************************************************//**
-	@brief    ƒ‚ƒfƒ‹İ’è
+	@brief    ãƒ¢ãƒ‡ãƒ«è¨­å®š
 *//***************************************************************************/
 ZoneObject::ZoneObject() : ModelObject()
 {
@@ -11,7 +12,7 @@ ZoneObject::ZoneObject() : ModelObject()
 }
 
 /**************************************************************************//**
-	@brief    XV
+	@brief    æ›´æ–°
 	@param[in]    elapsedTime
 *//***************************************************************************/
 void ZoneObject::Update(float elapsedTime)
@@ -20,6 +21,12 @@ void ZoneObject::Update(float elapsedTime)
 
 	if (m_isVisibleActive)
 	{
+		PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
+		if (XMFLOAT3HorizontalLength((player->GetPosition() - position)) <= m_currentZoneRadius)
+		{
+			player->SetDefenceBuff();
+		}
+
 		m_currentActiveTime += elapsedTime;
 		float progress;
 
@@ -51,7 +58,7 @@ void ZoneObject::Update(float elapsedTime)
 }
 
 /**************************************************************************//**
-	@brief    DX11‚Ì•`‰æ
+	@brief    DX11ã®æç”»
 	@param[in]    rc
 *//***************************************************************************/
 void ZoneObject::Render(const RenderContext& rc)
@@ -63,7 +70,7 @@ void ZoneObject::Render(const RenderContext& rc)
 }
 
 /**************************************************************************//**
-	@brief    DX12‚Ì•`‰æ
+	@brief    DX12ã®æç”»
 	@param[in]    rc
 *//***************************************************************************/
 void ZoneObject::RenderDX12(const RenderContextDX12& rc)

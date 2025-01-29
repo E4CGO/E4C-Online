@@ -224,6 +224,12 @@ public:
 	float GetMp() { return mp; }
 	float GetMaxMp() { return maxMp; }
 
+	void SetDefenceBuff() {
+		this->m_isDefenceBuff = true;
+		m_DefenceBuffTimeoutTimer = m_DefenceBuffTimeout;
+	}
+	const bool GetDefenceBuffValue() { return this->m_isDefenceBuff; }
+
 	void SetWeaponType(WEAPON_TYPE weapontype) { m_weaponType = static_cast<WEAPON_TYPE>(weapontype); }
 	void SetEnergyType(ENERGY_TYPE energytype) { m_energyType = static_cast<ENERGY_TYPE>(energytype); }
 	void SetGenderType(GENDER_TYPE gendertype) { m_genderType = static_cast<GENDER_TYPE>(gendertype); }
@@ -317,6 +323,10 @@ protected:
 	float maxMp = 100.0f;
 	float mpRecoverRate = 8.0f; // 毎秒回復量
 	int atk = 10;
+	bool m_isDefenceBuff = false;
+	const float m_DefenceBuffTimeout = 3.0f;
+	float m_DefenceBuffTimeoutTimer = 0.0f;
+
 	std::string m_name;
 	WEAPON_TYPE m_weaponType;
 	ENERGY_TYPE m_energyType;
