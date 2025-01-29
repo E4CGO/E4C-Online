@@ -665,7 +665,7 @@ void DungeonData::InitCollisionFileDatas()
 	m_collisionFileDatas.at(FLOOR_CHECK).emplace_back("Data/Model/DungeonAssets/SM_Floor_Check_Board.glb", 4.0f);
 	m_collisionFileDatas.at(FLOOR_GRAY).emplace_back("Data/Model/DungeonAssets/SM_Floor_Gray.glb", 4.0f);
 	m_collisionFileDatas.at(HEART_ARCH).emplace_back("Data/Model/DungeonAssets/SM_Heart_Arch_01a.glb", 4.0f);
-	m_collisionFileDatas.at(STAIR_STEP_01B).emplace_back("Data/Model/DungeonAssets/StairStepCollision_01b.glb", 4.0f);
+	m_collisionFileDatas.at(STAIR_STEP_01B).emplace_back("Data/Model/DungeonAssets/SlopeCollision_01a.glb", 4.0f);
 	m_collisionFileDatas.at(TOY_ARCH_01A).emplace_back("Data/Model/DungeonAssets/ToyArchCollision.glb", 4.0f);
 	m_collisionFileDatas.at(TOY_ARCH_SUPPORT_01A).emplace_back("Data/Model/DungeonAssets/ToyArchCollision.glb", 4.0f);
 	m_collisionFileDatas.at(WALL_PAPER).emplace_back("Data/Model/DungeonAssets/SM_Wall_Paper.glb", 4.0f);
