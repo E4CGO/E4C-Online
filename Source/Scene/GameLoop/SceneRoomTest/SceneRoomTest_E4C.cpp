@@ -495,16 +495,44 @@ void SceneRoomTest_E4C::SaveRoomData()
 		};
 
 		// ノードデータ設定
+		nlohmann::json json;
 		saveFile["NodeDatas"] = nlohmann::json::array();
-		for (Node* tileNode : NODES.GetAll())
+		for (Node* node : NODES.GetAll())
 		{
-			saveFile["NodeDatas"].push_back({
-				{ "Type", tileNode->GetType() },
-				{ "Position", { tileNode->GetPosition().x, tileNode->GetPosition().y, tileNode->GetPosition().z }},
-				{ "Angle", { tileNode->GetAngle().x, tileNode->GetAngle().y, tileNode->GetAngle().z }},
-				{ "Scale", { tileNode->GetScale().x, tileNode->GetScale().y, tileNode->GetScale().z }},
-				});
+			node->SaveToJson(saveFile);
 		}
+		//for (Node& node : nodes)
+		//{
+		//	saveFile["NodeDatas"].push_back({
+		//		{ "Type", node.GetType() },
+		//		{ "Position", { node.GetPosition().x, node.GetPosition().y, node.GetPosition().z }},
+		//		{ "Angle", { node.GetAngle().x, node.GetAngle().y, node.GetAngle().z }},
+		//		{ "Scale", { node.GetScale().x, node.GetScale().y, node.GetScale().z }},
+		//		});
+		//}
+
+		//for (SpawnerNode& spawner : spawners)
+		//{
+		//	saveFile["NodeDatas"].push_back({
+		//		{ "Type", spawner.GetType() },
+		//		{ "Position", { spawner.GetPosition().x, spawner.GetPosition().y, spawner.GetPosition().z }},
+		//		{ "Angle", { spawner.GetAngle().x, spawner.GetAngle().y, spawner.GetAngle().z }},
+		//		{ "Scale", { spawner.GetScale().x, spawner.GetScale().y, spawner.GetScale().z }},
+		//		{ "SpawnerData",
+		//			{ "EnemyType", { spawner.GetSpawnerData().enemyType }},
+		//			{ "SearchRadius", { spawner.GetSpawnerData().searchRadius }}
+		//			}});
+		//}
+
+		//for (Node* tileNode : NODES.GetAll())
+		//{
+		//	saveFile["NodeDatas"].push_back({
+		//		{ "Type", tileNode->GetType() },
+		//		{ "Position", { tileNode->GetPosition().x, tileNode->GetPosition().y, tileNode->GetPosition().z }},
+		//		{ "Angle", { tileNode->GetAngle().x, tileNode->GetAngle().y, tileNode->GetAngle().z }},
+		//		{ "Scale", { tileNode->GetScale().x, tileNode->GetScale().y, tileNode->GetScale().z }},
+		//		});
+		//}
 
 		std::ofstream ofs(filePath);
 		if (ofs.is_open())
@@ -552,6 +580,7 @@ void SceneRoomTest_E4C::DrawDebugGUI()
 				if (ImGui::BeginMenu("オブジェクトノード")) {
 					if (ImGui::MenuItem("Spawner"))	AddSpawner();
 					if (ImGui::MenuItem("ConnectPoint")) AddConnectPoint();
+					if (ImGui::MenuItem("StairToNextFloor")) AddStairToNextFloor();
 					ImGui::EndMenu();
 				}
 				ImGui::EndMenu();
@@ -669,7 +698,8 @@ void SceneRoomTest_E4C::AddTileNode(
 	switch (type) {
 	case ns_RoomData::PORTAL:
 	case ns_RoomData::SPAWNER:
-	case ns_RoomData::CONNECTPOINT: return;	// ポータル、スポナー、接続点は別の関数で生成する
+	case ns_RoomData::CONNECTPOINT:
+	case ns_RoomData::STAIR_TO_NEXTFLOOR:	return;	// こやつらは別の関数で生成する
 	default: break;
 	}
 
@@ -703,6 +733,18 @@ void SceneRoomTest_E4C::AddConnectPoint(
 	ConnectPointNode* newNode = new ConnectPointNode(NODES.GetUniqueName(name));
 	newNode->SetPosition(position);
 	newNode->SetAngle(angle);
+	NODES.Register(newNode);
+
+	// 追加したノードを選択させる
+	ChangeSelectedNode(newNode);
+}
+
+void SceneRoomTest_E4C::AddStairToNextFloor(
+	std::string name,
+	DirectX::XMFLOAT3 position)
+{
+	StairToNextFloorNode* newNode = new StairToNextFloorNode(NODES.GetUniqueName(name));
+	newNode->SetPosition(position);
 	NODES.Register(newNode);
 
 	// 追加したノードを選択させる
@@ -846,8 +888,8 @@ void SpawnerNode::Render(const RenderContext& rc)
 	// 継承元のRender呼び出し
 	ModelObject::Render(rc);
 
-	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, spawnerData.spawnRadius, 1.5f, { 1,0,0,1 });
-	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, spawnerData.searchRadius, 1.5f, { 1,0,1,1 });
+	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, spawnerData.spawnRadius, 1.5f, { 1, 0, 0, 1 });
+	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, spawnerData.searchRadius, 1.5f, { 1, 0, 1, 1 });
 }
 
 Node* SpawnerNode::Duplicate()
@@ -1058,4 +1100,60 @@ void ConnectPointNode::DrawDebugGUI()
 	}
 	// scale
 	ImGui::DragFloat3("Scale", &scale.x, 0.1f);
+}
+
+void StairToNextFloorNode::Render(const RenderContext& rc)
+{
+	// 継承元のRender呼び出し
+	ModelObject::Render(rc);
+
+	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, interactionDistance, 1.5f, { 0, 1, 1, 1 });
+}
+
+Node* StairToNextFloorNode::Duplicate()
+{
+	StairToNextFloorNode* newNode = new StairToNextFloorNode(name);
+	newNode->SetPosition(this->position);
+	newNode->SetAngle(this->angle);
+	newNode->SetScale(this->scale);
+	newNode->SetPortalTime(this->portalTime);
+	newNode->SetInteractionDistance(this->interactionDistance);
+
+	return newNode;
+}
+
+void StairToNextFloorNode::DrawDebugGUI()
+{
+	ImGui::Text("Type: SPAWNER");
+
+	// name
+	std::string inputName = name;
+	if (ImGui::InputText("Name", inputName.data(), 256)) {
+		// 正規表現も行ってからセットする
+		name = NODES.GetUniqueName(inputName.c_str());
+	}
+
+	// pos
+	ImGui::DragFloat3("Position", &position.x, 0.1f);
+	// angle
+	DirectX::XMFLOAT3 debugAngle = angle;
+	debugAngle.x = DirectX::XMConvertToDegrees(debugAngle.x);
+	debugAngle.y = DirectX::XMConvertToDegrees(debugAngle.y);
+	debugAngle.z = DirectX::XMConvertToDegrees(debugAngle.z);
+	if (ImGui::DragFloat3("Angle", &debugAngle.x, 1.0f)) {
+		angle.x = DirectX::XMConvertToRadians(debugAngle.x);
+		angle.y = DirectX::XMConvertToRadians(debugAngle.y);
+		angle.z = DirectX::XMConvertToRadians(debugAngle.z);
+	}
+	// scale
+	ImGui::DragFloat3("Scale", &scale.x, 0.1f);
+
+	// テレポーターデータ
+	if (ImGui::TreeNodeEx("TeleporterData", ImGuiTreeNodeFlags_DefaultOpen)) {
+		// portalTime
+		ImGui::SliderFloat("PortalTime", &portalTime, 0.0f, 16.0f);
+		// interactionDistance
+		ImGui::SliderFloat("InteractionDistance", &interactionDistance, 0.0f, 64.0f);
+		ImGui::TreePop();
+	}
 }

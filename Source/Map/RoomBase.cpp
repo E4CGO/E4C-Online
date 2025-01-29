@@ -717,7 +717,9 @@ void RoomBase::PlaceMapTile(bool isLeader)
 		}
 
 		// ConnectPointはコンストラクタで既に読込み済だからcontinue
-		if (tileType == TileType::CONNECTPOINT) continue;
+		// StairToNextFloorもcontinue
+		if (tileType == TileType::CONNECTPOINT ||
+			tileType == TileType::STAIR_TO_NEXTFLOOR) continue;
 
 		std::vector<FILE_DATA> collisionFileDatas;	// 当たり判定用
 		std::vector<FILE_DATA> modelFileDatas;		// 描画用

@@ -51,6 +51,17 @@ public:
 	// 自身を複製する
 	virtual Node* Duplicate() { return nullptr; }
 
+	// jsonへ保存
+	virtual void SaveToJson(nlohmann::json_abi_v3_11_3::json& saveFile)
+	{
+		saveFile["NodeDatas"].push_back({
+			{ "Type", type },
+			{ "Position", { position.x, position.y, position.z }},
+			{ "Angle", { angle.x, angle.y, angle.z }},
+			{ "Scale", { scale.x, scale.y, scale.z }},
+			});
+	}
+
 protected:
 	std::string name;
 	TileType type;
@@ -99,10 +110,31 @@ public:
 	// デバッグGUI描画
 	void DrawDebugGUI() override;
 
+	// jsonへ保存
+	void SaveToJson(nlohmann::json_abi_v3_11_3::json& saveFile) override
+	{
+		nlohmann::json spawnerJsonData;
+		spawnerJsonData = {
+			{ "EnemyType", spawnerData.enemyType },
+			{ "SearchRadius", spawnerData.searchRadius }
+		};
+
+		saveFile["NodeDatas"].push_back({
+			{ "Type", type },
+			{ "Position", { position.x, position.y, position.z }},
+			{ "Angle", { angle.x, angle.y, angle.z }},
+			{ "Scale", { scale.x, scale.y, scale.z }},
+			{ "SpawnerData", spawnerJsonData }
+			});
+	}
+
+	// スポナーデータのゲッター、セッター
+	SPAWNER_DATA GetSpawnerData() { return spawnerData; }
+	void SetSpawnerData(SPAWNER_DATA newData) { spawnerData = newData; }
+
 protected:
 	SPAWNER_DATA spawnerData;
 };
-
 
 // 接続点ノード
 class ConnectPointNode : public Node
@@ -117,6 +149,49 @@ public:
 
 	// デバッグGUI描画
 	void DrawDebugGUI() override;
+};
+
+// 次の部屋へ行くためのノード
+class StairToNextFloorNode : public Node
+{
+public:
+	StairToNextFloorNode(std::string name) :
+		Node(name, TileType::STAIR_TO_NEXTFLOOR) {}
+
+	void Render(const RenderContext& rc) override;
+
+	Node* Duplicate() override;
+
+	// デバッグGUI描画
+	void DrawDebugGUI() override;
+
+	// jsonへ保存
+	void SaveToJson(nlohmann::json_abi_v3_11_3::json& saveFile) override
+	{
+		nlohmann::json teleporterJsonData;
+		teleporterJsonData = {
+			{ "PortalTime", portalTime },
+			{ "InteractionDistance", interactionDistance }
+		};
+
+		saveFile["NodeDatas"].push_back({
+			{ "Type", type },
+			{ "Position", { position.x, position.y, position.z }},
+			{ "Angle", { angle.x, angle.y, angle.z }},
+			{ "Scale", { scale.x, scale.y, scale.z }},
+			{ "TeleporterData", teleporterJsonData }
+			});
+	}
+
+	float GetPortalTime() { return portalTime; }
+	void SetPortalTime(float newPortalTime) { portalTime = newPortalTime; }
+
+	float GetInteractionDistance() { return interactionDistance; }
+	void SetInteractionDistance(float newDistance) { interactionDistance = newDistance; }
+
+protected:
+	float portalTime = 3.0f;
+	float interactionDistance = 5.0f;
 };
 
 
@@ -173,6 +248,11 @@ public:
 		std::string name = "ConnectPoint",
 		DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f },
 		DirectX::XMFLOAT3 angle = { 0.0f, 0.0f, 0.0f });
+	// StairToNextFloor追加
+	void AddStairToNextFloor(
+		std::string name = "StairToNextFloor",
+		DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f });
+
 	// ノード複製
 	void DuplicateNode();
 	// ノード削除

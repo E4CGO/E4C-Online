@@ -16,7 +16,7 @@ StairToNextFloor::StairToNextFloor(Stage* stage, Online::OnlineController* onlin
 {
 	m_cylinderRenderer = std::make_unique<CylinderRenderer>(T_GRAPHICS.GetDeviceDX12());
 
-	m_interractionDistance = 12.0f;
+	m_interactionDistance = 12.0f;
 }
 
 /**************************************************************************//**
@@ -27,7 +27,7 @@ StairToNextFloor::StairToNextFloor(Stage* stage, Online::OnlineController* onlin
 void StairToNextFloor::Update(float elapsedTime)
 {
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
-	const float radius = m_interractionDistance * scale.x;
+	const float radius = m_interactionDistance * scale.x;
 	if (player != nullptr && XMFLOAT3LengthSq(player->GetPosition() - (position - DirectX::XMFLOAT3{ 0.0f, 0.5f * scale.y, 0.0f })) < radius * radius)
 	{
 		m_timer += elapsedTime;
@@ -60,7 +60,7 @@ void StairToNextFloor::RenderDX12(const RenderContextDX12& rc)
 #ifdef _DEBUG
 	m_cylinderRenderer->SetCylinder(position,
 		{ 0.0f, 1.0f, 0.0f },
-		m_interractionDistance, 1.0f,
+		m_interactionDistance, 1.0f,
 		{ 1.0f, 1.0f, 1.0f, 1.0f });
 	m_cylinderRenderer->Render(rc);
 

@@ -222,6 +222,8 @@ public:
 	virtual int DrawDebugGUI(int i = 0);
 
 protected:
+
+
 	DirectX::XMFLOAT3 m_position = { 0.0f, 0.0f, 0.0f };
 	DirectX::XMFLOAT3 m_angle = { 0.0f, 0.0f, 0.0f };
 	DirectX::XMFLOAT3 m_scale = { 1.0f, 1.0f, 1.0f };

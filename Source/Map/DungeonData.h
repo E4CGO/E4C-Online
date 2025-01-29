@@ -121,13 +121,34 @@ namespace ns_RoomData
 		float spawnTime = 2.0f;
 	};
 
-	// 配置するタイルデータ
+	// テレポーターデータ
+	struct TELEPORTER_DATA
+	{
+		float portalTime = 3.0f;
+		float interactionDistance = 5.0f;
+	};
+
+	// 配置する通常のタイル用データ
 	struct TILE_DATA
 	{
 		DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
 		DirectX::XMFLOAT3 angle = { 0.0f, 0.0f, 0.0f };
 		DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f };
 		DirectX::XMFLOAT4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	};
+
+	// 配置するスポナー用データ
+	struct TILE_SPAWNER_DATA
+	{
+		TILE_DATA tileData;
+		SPAWNER_DATA spawnerData;
+	};
+
+	// 配置する次の部屋への階段用データ
+	struct TILE_STAIR_DATA
+	{
+		TILE_DATA tileData;
+		TELEPORTER_DATA teleporterData;
 	};
 
 	// モデルファイル読み込み用データ
@@ -208,6 +229,7 @@ private:
 	void InitRoomGenSettings();	// 四番目に〃
 	void InitModelFileDatas();
 	void InitCollisionFileDatas();
+	void InitTileDatas();
 
 	// jsonデータ読み込み
 	RoomGenerateSetting LoadRoomGenSetting(RoomType roomType);
@@ -219,6 +241,10 @@ private:
 	std::vector<std::vector<FILE_DATA>> m_modelFileDatas;		// 見た目用ファイル読み込み用データ配列
 	std::vector<std::vector<FILE_DATA>> m_collisionFileDatas;	// 当たり判定用ファイル読み込み用データ配列
 	std::vector<char*> m_fileNames;						// ファイル名配列
+
+	std::vector<std::vector<std::vector<TILE_DATA>>> m_roomTileDatas;	// タイル 配置データ			DATA * 配置するタイルの数 * タイルの種類の数 * 部屋の種類の数
+	std::vector<std::vector<TILE_SPAWNER_DATA>> m_roomSpawnerDatas;		// スポナー 配置データ			DATA * 配置するタイルの数 * 部屋の種類の数
+	std::vector<std::vector<TILE_STAIR_DATA>> m_roomStairDatas;			// 次の部屋への階段 配置データ	DATA * 配置するタイルの数 * 部屋の種類の数
 };
 #define DUNGEONDATA DungeonData::Instance()
 
