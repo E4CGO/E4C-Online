@@ -26,7 +26,7 @@ BeamObject::BeamObject(PlayerCharacter* owner) : Projectile("Data/Model/Object/E
 
 	scale.z = 0.0f;
 
-	m_power = 20;
+	m_power = 30;
 	m_existTime = 1.5f;
 	m_coolTime = 0.5f;
 	m_currentTimer = m_coolTime;

@@ -116,6 +116,6 @@ void ParticleObject::CollisionFunction(Collider* myCol, Collider* otherCol)
 *//***************************************************************************/
 void ParticleObject::RenderDX12(const RenderContextDX12& rc)
 {
-	ModelObject::RenderDX12(rc);
+	//ModelObject::RenderDX12(rc);
 	m_particle->Render(rc);
 }
