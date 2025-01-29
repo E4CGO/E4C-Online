@@ -112,7 +112,7 @@ namespace PlayerCharacterState
 		void AttackNormalState_Charge::Enter()
 		{
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_CHARGE_CONTINUE, true);
-			Projectile* arrow = PROJECTILES.Register(new FireballObject(owner));
+			Projectile* fireball = PROJECTILES.Register(new FireballObject(owner));
 			m_chargeTme = 0.0f;
 		}
 		void AttackNormalState_Charge::Execute(float elapsedTime)
@@ -136,6 +136,8 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeSubState(FIREBALL_STATE::ATTACK_2);
 					}
+					
+					owner->ModifyMp(-20.0f * m_chargeTme * 0.25f);
 				}
 			}
 			m_chargeTme += elapsedTime;
@@ -174,7 +176,6 @@ namespace PlayerCharacterState
 		void AttackNormalState_End::Enter()
 		{
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_CHARGE_END, false, 0.1f);
-			owner->ModifyMp(-20.0f);
 		}
 		void AttackNormalState_End::Execute(float elapsedTime)
 		{
@@ -196,15 +197,18 @@ namespace PlayerCharacterState
 		void AttackSpecialState::Enter()
 		{
 			owner->SetAnimationSpeed(1.0f);
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_CHARGE_START, false, 0.05f);
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_CHARGE_CONTINUE, true);
 
-			m_pparticle = PROJECTILES.Register(new ParticleObject(owner));
-			m_pparticle->SetOwner(owner);
+			Projectile* particle = PROJECTILES.Register(new ParticleObject(owner));
 		}
 		void AttackSpecialState::Execute(float elapsedTime)
 		{
 			owner->StopMove();
+
+			if (owner->GetMp() < -10.0f * elapsedTime)
+			{
+				owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
+			}
 
 			if (!owner->InputSpecial())
 			{
@@ -217,7 +221,6 @@ namespace PlayerCharacterState
 		{
 			owner->SetAnimationSpeed(1.0f);
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_IDLE, false, 0.05f);
-			PROJECTILES.Remove(m_pparticle);
 		}
 
 		// スキル_1ステート
@@ -227,17 +230,38 @@ namespace PlayerCharacterState
 
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_ATTACK_SPECIAL_FIRST, false, 0.1f);
 
-			m_pbeam = PROJECTILES.Register(new BeamObject(owner));
-			m_pbeam->SetPosition({ owner->GetShotPosition().x, owner->GetShotPosition().y * 2, owner->GetShotPosition().z });
-			m_pbeam->PointTo(owner->GetShotPosition() + owner->GetFront());
-			m_pbeam->SetDirection(owner->GetFront());
-			m_pbeam->SetOwner(owner);
+			if (owner->IsPlayer())
+			{
+				m_dir = owner->GetTarget() - owner->GetPosition();
+				m_dir = XMFLOAT3Normalize({m_dir.x, 0, m_dir.z});
+				XMFLOAT3 pos = owner->GetPosition() + XMFLOAT3{0.5f * m_dir.x, 1.0f, 0.5f * m_dir.z};
+				m_dir = XMFLOAT3Normalize(owner->GetTarget() - pos);
+
+				XMFLOAT3 angle{};
+				angle.y = atan2(m_dir.x, m_dir.z);
+				angle.y += DirectX::XM_PI;
+				while (angle.y > DirectX::XM_PI) angle.y -= DirectX::XM_2PI;
+				while (angle.y < -DirectX::XM_PI) angle.y += DirectX::XM_2PI;
+				angle.x = acosf(XMFLOAT3Dot({ 0, 0, 1 }, { 0, m_dir.y, sqrtf(m_dir.x * m_dir.x + m_dir.z * m_dir.z) }));
+				if (m_dir.y < 0.0f)
+				{
+					angle.x = -angle.x;
+				}
+				Projectile* beam = PROJECTILES.Register(new BeamObject(owner));
+				beam->SetPosition(pos);
+				beam->SetAngle(angle);
+			}
 		}
 		void Skill1State::Execute(float elapsedTime)
 		{
 			float time = owner->GetModel()->GetCurrentAnimationSeconds();
 			// 反重力
 			owner->StopMove();
+
+			if (owner->IsPlayer())
+			{
+				owner->Turn(elapsedTime, m_dir.x, m_dir.z, owner->GetTurnSpeed());
+			}
 
 			if (!owner->IsPlayAnimation()) // 攻撃モーション終わり
 			{

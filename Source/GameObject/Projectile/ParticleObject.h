@@ -20,8 +20,9 @@ public:
 	~ParticleObject() = default;
 
 	void Update(float elapsedTime) override;
+	void CollisionFunction(Collider* myCol, Collider* otherCol) override;
 
-	void SetPosition(const DirectX::XMFLOAT3& position) override { tempPosition = this->position = position; };
+	//void SetPosition(const DirectX::XMFLOAT3& position) override { tempPosition = this->position = position; };
 
 	//void Collision() override;
 
@@ -29,11 +30,12 @@ public:
 
 	void RenderDX12(const RenderContextDX12& rc) override;
 private:
-	DirectX::XMFLOAT3 tempPosition = {}; // 1フレーム前の位置
-	float timer = 2.0f; // 寿命
+	//DirectX::XMFLOAT3 tempPosition = {}; // 1フレーム前の位置
+	//float timer = 2.0f; // 寿命
+	float m_radius = 1.0f;
+	float m_distance = 5.0f;
 
 	std::unique_ptr<HitParticleRenderer> m_particle;
-	float m_distance = 5.0f;
 };
 
 #endif // __INCLUDED_PARTICLE_OBJECT_H__

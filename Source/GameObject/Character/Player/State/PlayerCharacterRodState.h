@@ -194,11 +194,9 @@ namespace PlayerCharacterState
 			void Execute(float elapsedTime) override;
 			// ステートから出ていくときのメソッド
 			void Exit() override;
-
-			Projectile* m_pparticle = nullptr;
 		};
 
-		// スキル_1 回レ
+		// スキル_1 ビーム
 		class Skill1State : public HierarchicalState<PlayerCharacter>
 		{
 		public:
@@ -214,7 +212,7 @@ namespace PlayerCharacterState
 			void Exit() override;
 
 		private:
-			Projectile* m_pbeam;
+			DirectX::XMFLOAT3 m_dir;
 		};
 
 		class Skill2State : public HierarchicalState<PlayerCharacter>
