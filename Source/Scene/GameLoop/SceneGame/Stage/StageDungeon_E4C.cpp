@@ -30,6 +30,7 @@
 
 #include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
 
+#include "PreloadManager.h"
 static float timer = 0;
 
 void StageDungeon_E4C::GenerateDungeon()
@@ -105,6 +106,8 @@ void StageDungeon_E4C::GenerateDungeon()
 void StageDungeon_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
+
+	PRELOAD.Join("DungeonModels");
 
 	// フレームバッファマネージャー
 	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
