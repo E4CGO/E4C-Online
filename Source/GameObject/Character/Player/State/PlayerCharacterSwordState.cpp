@@ -90,14 +90,13 @@ namespace PlayerCharacterState
 
 			if (!owner->IsPlayAnimation()) // 攻撃モーション終わり
 			{
-
 				owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 			}
 		}
 		void AttackNormalState::Exit()
 		{
 			owner->SetAnimationSpeed(1.0f);
-			
+
 			subState->Exit();
 		}
 		//  一般攻撃1
@@ -105,10 +104,9 @@ namespace PlayerCharacterState
 		{
 			owner->SetAnimationSpeed(1.0f);
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_COMBO_FIRST, false, 0.1f);
-			
+
 			if (owner->IsPlayer())
 			{
-
 				XMFLOAT4X4* matrix = owner->GetTransformAdress();
 
 				ModelObject::ATTACK_COLLIDER_DATA attackData;
@@ -135,7 +133,6 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_2);
 					}
-					
 				}
 				else if (0.435f <= time)
 				{
@@ -174,7 +171,6 @@ namespace PlayerCharacterState
 				if (!owner->IsPlayAnimation())
 					owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_2);
 			}
-			
 		}
 		void AttackNormalState_1::Exit()
 		{
@@ -191,9 +187,7 @@ namespace PlayerCharacterState
 
 			if (owner->IsPlayer())
 			{
-
 				XMFLOAT4X4* matrix = owner->GetTransformAdress();
-				Sphere attack2{ {  0, 1.5f, 2.0f} , 0.5f };
 
 				ModelObject::ATTACK_COLLIDER_DATA attackData;
 				attackData.power = sphereAttacks[1].power;
@@ -219,7 +213,6 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_3);
 					}
-
 				}
 				else if (0.835f <= time)
 				{
@@ -274,7 +267,6 @@ namespace PlayerCharacterState
 
 			if (owner->IsPlayer())
 			{
-
 				XMFLOAT4X4* matrix = &owner->GetModel(0)->FindNode("JOT_C_Hip")->worldTransform;
 
 				ModelObject::ATTACK_COLLIDER_DATA attackData;
@@ -448,12 +440,13 @@ namespace PlayerCharacterState
 		void Skill2State::Enter()
 		{
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_SPECIAL_SECOND, false, 0.1f);
+			owner->GetEffectZone()->Activate();
 		}
 		void Skill2State::Execute(float elapsedTime)
 		{
 			float time = owner->GetModel()->GetCurrentAnimationSeconds();
 			// 反重力
-			owner->StopFall();
+
 			owner->StopMove();
 
 			if (1.215f <= time)

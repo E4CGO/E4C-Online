@@ -590,6 +590,8 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Charge)] = std::make_unique<ChargeShaderdDX12>(m_d3d_device.Get());
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::HealCylinder)] = std::make_unique<HealingShaderdCylinderDX12>(m_d3d_device.Get());
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::HealCircle)] = std::make_unique<HealingShaderdCircleDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Beam)] = std::make_unique<BeamDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::MagicPlane)] = std::make_unique<MagicPlaneDX12>(m_d3d_device.Get());
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Grass)] = std::make_unique<GrassShader>(m_d3d_device.Get());
 
 		// スプライトシェーダー生成

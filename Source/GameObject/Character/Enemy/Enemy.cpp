@@ -1,3 +1,6 @@
+//! @file Enemy.cpp
+//! @note 
+
 #include "TAKOEngine/Tool/Mathf.h"
 #include "TAKOEngine/Physics/CollisionManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
@@ -5,6 +8,7 @@
 #include "GameObject/Character/Enemy/MouseMob.h"
 #include "GameObject/Character/Enemy/BirdMob.h"
 #include "GameObject/Character/Enemy/CrocodileMob.h"
+#include "GameObject/Character/Enemy/PigMob.h"
 #include "GameObject/Character/Enemy/BearBoss.h"
 #include "GameObject/Props/Spawner.h"
 #include "Network/OnlineController.h"
@@ -122,6 +126,7 @@ Enemy* Enemy::EnemyFactory(uint8_t enemyType)
 	case ENEMY_TYPE::BEAR_BOSS: return  new BearBoss(1.0f, render_mode); break;
 	case ENEMY_TYPE::BIRD: return  new BirdMob(0.5f, render_mode); break;
 	case ENEMY_TYPE::CROC: return  new CrocodileMob(0.5f, render_mode); break;
+	case ENEMY_TYPE::PIG: return  new PigMob(0.5f, render_mode); break;
 	}
 	return nullptr;
 }

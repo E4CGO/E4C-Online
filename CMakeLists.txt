@@ -142,6 +142,8 @@ set(Source
     "Source/PlayerCharacterData.h"
     "Source/PlayerCharacterPattern.cpp"
     "Source/PlayerCharacterPattern.h"
+    "Source/PreloadManager.cpp"
+    "Source/PreloadManager.h"
 )
 source_group("Source" FILES ${Source})
 
@@ -205,6 +207,10 @@ set(Source__GameObject__Projectile
 source_group("Source\\GameObject\\Projectile" FILES ${Source__GameObject__Projectile})
 
 set(Source__GameObject__Props
+    "Source/GameObject/Props/ChargeObject.cpp"
+    "Source/GameObject/Props/ChargeObject.h"
+    "Source/GameObject/Props/HealingObject.cpp"
+    "Source/GameObject/Props/HealingObject.h"
     "Source/GameObject/Props/Spawner.cpp"
     "Source/GameObject/Props/Spawner.h"
     "Source/GameObject/Props/SpawnerManager.cpp"
@@ -213,6 +219,8 @@ set(Source__GameObject__Props
     "Source/GameObject/Props/StairToNextFloor.h"
     "Source/GameObject/Props/Teleporter.cpp"
     "Source/GameObject/Props/Teleporter.h"
+    "Source/GameObject/Props/ZoneObject.cpp"
+    "Source/GameObject/Props/ZoneObject.h"
 )
 source_group("Source\\GameObject\\Props" FILES ${Source__GameObject__Props})
 
@@ -239,6 +247,10 @@ set(Source__GameObject__Character__Enemy
     "Source/GameObject/Character/Enemy/MouseMob.h"
     "Source/GameObject/Character/Enemy/MouseMobState.cpp"
     "Source/GameObject/Character/Enemy/MouseMobState.h"
+    "Source/GameObject/Character/Enemy/PigMob.cpp"
+    "Source/GameObject/Character/Enemy/PigMob.h"
+    "Source/GameObject/Character/Enemy/PigMobState.cpp"
+    "Source/GameObject/Character/Enemy/PigMobState.h"
 )
 source_group("Source\\GameObject\\Character\\Enemy" FILES ${Source__GameObject__Character__Enemy})
 
@@ -695,8 +707,10 @@ set(TAKOEngine__Rendering__HLSL__Debug
 source_group("TAKOEngine\\Rendering\\HLSL\\Debug" FILES ${TAKOEngine__Rendering__HLSL__Debug})
 
 set(TAKOEngine__Rendering__HLSL__Effects
+    "TAKOEngine/Rendering/HLSL/Effects/BeamDX12PS.hlsl"
     "TAKOEngine/Rendering/HLSL/Effects/ChargeDX12PS.hlsl"
     "TAKOEngine/Rendering/HLSL/Effects/ChargeSquareDX12PS.hlsl"
+    "TAKOEngine/Rendering/HLSL/Effects/EffectPlaneDX12PS.hlsl"
     "TAKOEngine/Rendering/HLSL/Effects/ElectricDX12PS.hlsl"
     "TAKOEngine/Rendering/HLSL/Effects/Fireball.hlsli"
     "TAKOEngine/Rendering/HLSL/Effects/FireballDX12PS.hlsl"
@@ -956,8 +970,10 @@ set(SHADER_NAMES
     "LineDX12VS.cso"
     "LinePS.cso"
     "LineVS.cso"
+    "BeamDX12PS.cso"
     "ChargeDX12PS.cso"
     "ChargeSquareDX12PS.cso"
+    "EffectPlaneDX12PS.cso"
     "ElectricDX12PS.cso"
     "FireballDX12PS.cso"
     "FireballPS.cso"
@@ -1059,8 +1075,10 @@ set(HLSL_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/LineDX12VS.hlsl,5.0,Vertex,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/LinePS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Debug/LineVS.hlsl,5.0,Vertex,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Effects/BeamDX12PS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Effects/ChargeDX12PS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Effects/ChargeSquareDX12PS.hlsl,5.0,Pixel,main"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Effects/EffectPlaneDX12PS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Effects/ElectricDX12PS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Effects/FireballDX12PS.hlsl,5.0,Pixel,main"
     "${CMAKE_CURRENT_SOURCE_DIR}/TAKOEngine/Rendering/HLSL/Effects/FireballPS.hlsl,5.0,Pixel,main"
