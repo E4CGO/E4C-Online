@@ -85,6 +85,7 @@ void SceneGame_E4C::Update(float elapsedTime)
 {
 	STAGES.Update(elapsedTime);
 	UI.Update(elapsedTime);
+	COLLISIONS.Contacts();
 	stateMachine->Update(elapsedTime);
 }
 

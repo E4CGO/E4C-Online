@@ -52,25 +52,25 @@ HitParticleRenderer::~HitParticleRenderer()
 // @param[in]   framBuffer     フレームバッファ
 // @return      なし
 //***********************************************************
-void HitParticleRenderer::Render(FrameBufferManager* framBuffer)
+void HitParticleRenderer::Render(const RenderContextDX12& rc)
 {
-	RenderContextDX12 rc;
-	rc.d3d_command_list = framBuffer->GetCommandList();
+	RenderContextDX12 rcn;
+	rcn.d3d_command_list = rc.d3d_command_list;
 
 	// コンスタントバッファ更新
-	rc.hitParticleData.cbv_descriptor = UpdateSceneConstantBuffer(rc);
+	rcn.hitParticleData.cbv_descriptor = UpdateSceneConstantBuffer(rcn);
 
 	// 計算
-	m_compute->Compute(rc);
+	m_compute->Compute(rcn);
 
 	// シェーダーリソースビュー更新
-	rc.hitParticleData.srv_descriptor = m_compute->srv_descriptor;
-	rc.hitParticleData.d3d_vbv = m_compute->d3d_vbv;
-	rc.hitParticleData.maxParticle = m_compute->GetMaxParticle();
+	rcn.hitParticleData.srv_descriptor = m_compute->srv_descriptor;
+	rcn.hitParticleData.d3d_vbv = m_compute->d3d_vbv;
+	rcn.hitParticleData.maxParticle = m_compute->GetMaxParticle();
 
 	// シェーダー
 	SpriteShaderDX12* shader = T_GRAPHICS.GetSpriteShaderDX12(SpriteShaderDX12Id::HitParticle);
-	shader->Render(rc, nullptr);
+	shader->Render(rcn, nullptr);
 }
 
 //*************************************************************
@@ -80,33 +80,33 @@ void HitParticleRenderer::Render(FrameBufferManager* framBuffer)
 //*************************************************************
 void HitParticleRenderer::CreateConstantBuffer()
 {
-	Graphics&     graphics   = Graphics::Instance();
+	Graphics& graphics = Graphics::Instance();
 	ID3D12Device* d3d_device = graphics.GetDeviceDX12();
 
 	HRESULT hr = S_OK;
 
 	// ヒーププロパティの設定
 	D3D12_HEAP_PROPERTIES heap_props{};
-	heap_props.Type                 = D3D12_HEAP_TYPE_UPLOAD;
-	heap_props.CPUPageProperty      = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	heap_props.Type = D3D12_HEAP_TYPE_UPLOAD;
+	heap_props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
 	heap_props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-	heap_props.CreationNodeMask     = 1;
-	heap_props.VisibleNodeMask      = 1;
+	heap_props.CreationNodeMask = 1;
+	heap_props.VisibleNodeMask = 1;
 
 	// リソースの設定
 	D3D12_RESOURCE_DESC resource_desc{};
-	resource_desc.Dimension          = D3D12_RESOURCE_DIMENSION_BUFFER;
-	resource_desc.Alignment          = 0;
-	resource_desc.Width              = ((sizeof(CbScene)) + 255) & ~255;
-	resource_desc.Height             = 1;
-	resource_desc.DepthOrArraySize   = 1;
-	resource_desc.MipLevels          = 1;
-	resource_desc.Format             = DXGI_FORMAT_UNKNOWN;
-	resource_desc.SampleDesc.Count   = 1;
+	resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	resource_desc.Alignment = 0;
+	resource_desc.Width = ((sizeof(CbScene)) + 255) & ~255;
+	resource_desc.Height = 1;
+	resource_desc.DepthOrArraySize = 1;
+	resource_desc.MipLevels = 1;
+	resource_desc.Format = DXGI_FORMAT_UNKNOWN;
+	resource_desc.SampleDesc.Count = 1;
 	resource_desc.SampleDesc.Quality = 0;
-	resource_desc.Layout             = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-	resource_desc.Flags              = D3D12_RESOURCE_FLAG_NONE;
-	
+	resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
 	// リソースの生成
 	hr = d3d_device->CreateCommittedResource(
 		&heap_props,
@@ -143,10 +143,10 @@ const Descriptor* HitParticleRenderer::UpdateSceneConstantBuffer(const RenderCon
 {
 	const Camera* camera = CameraManager::Instance().GetCamera();
 
-	cbv_data->view       = camera->GetView();
+	cbv_data->view = camera->GetView();
 	cbv_data->projection = camera->GetProjection();
 
-	cbv_data->time      += T_TIMER.Delta();
+	cbv_data->time += T_TIMER.Delta();
 	cbv_data->delta_time = T_TIMER.Delta();
 	cbv_data->max_particle_count = m_compute->GetMaxParticle();
 

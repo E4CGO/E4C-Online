@@ -21,6 +21,7 @@
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Props/SpawnerManager.h"
+#include "GameObject/Projectile/ProjectileManager.h"
 
 #include "Map/DungeonData.h"
 
@@ -91,12 +92,12 @@ void StageOpenWorld_E4C::Initialize()
 		models["target3"]->SetPosition({ -32.0f, 1.80f, 23.4f });
 		models["target3"]->SetAngle({ 0.0f, -1.0f, 0.0f });
 
-		// プレイヤーが走るときの土埃
-		runningDust1 = std::make_unique<RunningDust>(T_GRAPHICS.GetDevice(), "Data/Sprites/smoke.png", 100.0f,
-			DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),	// position
-			1.0f,			// alpha
-			f_count,	// model_id
-			0);		// age
+		//// プレイヤーが走るときの土埃
+		//runningDust1 = std::make_unique<RunningDust>(T_GRAPHICS.GetDevice(), "Data/Sprites/smoke.png", 100.0f,
+		//	DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),	// position
+		//	1.0f,			// alpha
+		//	f_count,	// model_id
+		//	0);		// age
 	}
 
 	if (T_GRAPHICS.isDX12Active)
@@ -104,12 +105,12 @@ void StageOpenWorld_E4C::Initialize()
 		models.emplace("map", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models.emplace("village", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Village.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 
-		models.emplace("bush", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Bush.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		models.emplace("bush", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Bush.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::Foliage));
 		models.emplace("tree1t", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tree_1_Trunk.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
-		models.emplace("tree1l", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tree_1_Leaf.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		models.emplace("tree1l", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tree_1_Leaf.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::Foliage));
 		models.emplace("tree2t", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tree_2_Trunk.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
-		models.emplace("tree2l", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tree_2_Leaf.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
-		models.emplace("flower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Flower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		models.emplace("tree2l", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Tree_2_Leaf.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::Foliage));
+		models.emplace("flower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Flower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::Foliage));
 
 		models.emplace("portal", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Portal.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["portal"]->SetPosition({ -34.0f, 4.0f, -45.0f });
@@ -129,11 +130,11 @@ void StageOpenWorld_E4C::Initialize()
 		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
 		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
 
-		// パーティクル
-		//DirectX::XMFLOAT3 p_pos = { 0,3,0 };
-		//m_particle[0] = std::make_unique<HitParticleRenderer>(p_pos);
-		//p_pos = { 3,3,0 };
-		//m_particle[1] = std::make_unique<HitParticleRenderer>(p_pos);
+		runningDust1 = std::make_unique<RunningDustDX12>("Data/Sprites/smoke.png", 100.0f,
+			DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),	// position
+			1.0f,			// alpha
+			f_count,	// model_id
+			0);		// age
 	}
 
 	// 光
@@ -197,8 +198,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	cameraController->SyncContrllerToCamera(camera);
 	cameraController->Update(elapsedTime);
 
-	ENEMIES.Update(elapsedTime);
-
 	if (T_INPUT.KeyDown(VK_MENU))
 	{
 		if (TentacleLib::isShowCursor())
@@ -221,20 +220,22 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	{
 		T_INPUT.KeepCursorCenter();
 	}
-	PlayerCharacterManager::Instance().Update(elapsedTime);
-
-	COLLISIONS.Contacts();
 
 	sky->Update(elapsedTime);
 	teleporter->Update(elapsedTime);
 
-	teleporter->Update(elapsedTime);
+	ENEMIES.Update(elapsedTime);
 
 	SpawnerManager::Instance().Update(elapsedTime);
+
+	PROJECTILES.Update(elapsedTime);
+
+	PlayerCharacterManager::Instance().Update(elapsedTime);
 
 	for (auto& it : models)
 	{
 		it.second->Update(elapsedTime);
+		if (it.first == "bush" || it.first == "flower") continue;
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(it.second->GetModel().get());
 	}
 
@@ -264,8 +265,6 @@ void StageOpenWorld_E4C::Render()
 	// ライトの情報を詰め込む
 	LightManager::Instance().PushRenderContext(rc);
 
-	
-
 	for (auto& it : models)
 	{
 		it.second->Render(rc);
@@ -276,6 +275,8 @@ void StageOpenWorld_E4C::Render()
 	teleporter->Render(rc);
 
 	ENEMIES.Render(rc);
+
+	PROJECTILES.Render(rc);
 
 	UI.Render(rc);
 
@@ -312,12 +313,11 @@ void StageOpenWorld_E4C::RenderDX12()
 		rc.d3d_command_list = m_frameBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
-		// プレイヤー
-		PlayerCharacterManager::Instance().RenderDX12(rc);
-
-		ENEMIES.RenderDX12(rc);
-
-		teleporter->RenderDX12(rc);
+		// skyBox
+		{
+			rc.skydomeData.skyTexture = m_sprites[1]->GetDescriptor();
+			sky->RenderDX12(rc);
+		}
 
 		// ステージ
 		for (auto& it : models)
@@ -325,17 +325,16 @@ void StageOpenWorld_E4C::RenderDX12()
 			it.second->RenderDX12(rc);
 		}
 
+		teleporter->RenderDX12(rc);
+
+		ENEMIES.RenderDX12(rc);
+
 		SpawnerManager::Instance().RenderDX12(rc);
 
-		// skyBox
-		{
-			rc.skydomeData.skyTexture = m_sprites[1]->GetDescriptor();
-			sky->RenderDX12(rc);
-		}
+		PROJECTILES.RenderDX12(rc);
 
-		// パーティクル
-		//m_particle[0]->Render(m_frameBuffer);
-		//m_particle[1]->Render(m_frameBuffer);
+		// プレイヤー
+		PlayerCharacterManager::Instance().RenderDX12(rc);
 
 		// レンダーターゲットへの書き込み終了待ち
 		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
