@@ -165,8 +165,7 @@ void StageDungeon_E4C::Initialize()
 		// currentFloorが最大階でない場合は階段の行先はStageDungeon
 		if (currentFloor < DUNGEONDATA.GetDungeonGenSetting().maxFloor)
 		{
-			if (room->GetRoomType() == RoomType::FIRST_END ||
-				room->GetRoomType() == RoomType::FIRST_BOSS)
+			if (room->GetRoomType() == DUNGEONDATA.GetCurrentFloorGenSetting().endRoomType)
 			{
 				room->PlaceTeleporterTile(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
 			}
@@ -174,8 +173,7 @@ void StageDungeon_E4C::Initialize()
 		// 最大階以上なら階段の行先はStageOpenWorld
 		else
 		{
-			if (room->GetRoomType() == RoomType::FIRST_END ||
-				room->GetRoomType() == RoomType::FIRST_BOSS)
+			if (room->GetRoomType() == DUNGEONDATA.GetCurrentFloorGenSetting().endRoomType)
 			{
 				room->PlaceTeleporterTile(new StageOpenWorld_E4C(m_pScene), m_pScene->GetOnlineController());
 			}

@@ -99,8 +99,6 @@ protected:
 	int currentSegment = 0;
 	int currentFloor = 0;
 
-	WidgetText* floorText;
-
 	// フレームバッファマネージャー
 	FrameBufferManager* m_frameBuffer;
 
