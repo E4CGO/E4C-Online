@@ -10,7 +10,9 @@ namespace PlayerCharacterState
 	{
 		bool m_isShot = false;
 		Projectile* m_pfireball = nullptr;
-
+		float normalAttackUseStamina = 20;
+		float skill1AttackUseStamina = 50;
+		float spcialAttackUseStamina = 1;
 		// 待機用ステート
 		void WaitState::Enter()
 		{
@@ -26,7 +28,7 @@ namespace PlayerCharacterState
 		// 待機ステート
 		void IdleState::Enter()
 		{
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_IDLE, true, 0.1f);
+			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_IDLE, true, 0.2f);
 		}
 
 		void IdleState::Execute(float elapsedTime)
@@ -36,10 +38,34 @@ namespace PlayerCharacterState
 			owner->InputMove(elapsedTime);
 			owner->Jump();
 
-			PlayerTransition(
-				owner,
-				flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2
-			);
+			if (owner->GetMp() > skill1AttackUseStamina)
+			{
+				PlayerTransition(
+					owner,
+					flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2
+				);
+			}
+			else if (owner->GetMp() > normalAttackUseStamina)
+			{
+				PlayerTransition(
+					owner,
+					flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_2
+				);
+			}
+			else if (owner->GetMp() > spcialAttackUseStamina)
+			{
+				PlayerTransition(
+					owner,
+					flag_Dodge | flag_Jump | flag_Move | flag_Fall |  flag_AttackS | flag_Skill_2
+				);
+			}
+			else
+			{
+				PlayerTransition(
+					owner,
+					flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_Skill_2
+				);
+			}
 		}
 
 		void IdleState::Exit()
@@ -58,11 +84,34 @@ namespace PlayerCharacterState
 
 			owner->InputMove(elapsedTime);
 			owner->Jump();
-
-			PlayerTransition(
-				owner,
-				flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2
-			);
+			if (owner->GetMp() > skill1AttackUseStamina)
+			{
+				PlayerTransition(
+					owner,
+					flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2
+				);
+			}
+			else if (owner->GetMp() > normalAttackUseStamina)
+			{
+				PlayerTransition(
+					owner,
+					flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_AttackN | flag_AttackS |  flag_Skill_2
+				);
+			}
+			else if (owner->GetMp() > spcialAttackUseStamina)
+			{
+				PlayerTransition(
+					owner,
+					flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_AttackS | flag_Skill_2
+				);
+			}
+			else
+			{
+				PlayerTransition(
+					owner,
+					flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_Skill_2
+				);
+			}
 		}
 
 		void MoveState::Exit()
@@ -138,7 +187,7 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
 					}
-					else if (owner->InputSpecial())
+					else if (owner->InputSpecial()&&owner->GetMp()>spcialAttackUseStamina)
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
 					}
@@ -184,7 +233,7 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
 					}
-					else if (owner->InputSpecial())
+					else if (owner->InputSpecial() && owner->GetMp() > spcialAttackUseStamina)
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
 					}
@@ -216,7 +265,7 @@ namespace PlayerCharacterState
 
 					m_isShot = false;
 
-					owner->ModifyMp(-20.0f);
+					owner->ModifyMp(-normalAttackUseStamina);
 
 					owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::IDLE);
 				}
@@ -237,7 +286,7 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
 					}
-					else if (owner->InputSpecial())
+					else if (owner->InputSpecial() && owner->GetMp() > spcialAttackUseStamina)
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
 					}
@@ -265,11 +314,10 @@ namespace PlayerCharacterState
 		{
 			owner->StopMove();
 
-			if (!owner->InputSpecial())
+			if (!owner->InputSpecial()||owner->GetMp()<spcialAttackUseStamina)
 			{
 				owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 			}
-
 			owner->ModifyMp(-10.0f * elapsedTime);
 		}
 		void AttackSpecialState::Exit()
@@ -282,7 +330,7 @@ namespace PlayerCharacterState
 		// スキル_1ステート
 		void Skill1State::Enter()
 		{
-			owner->ModifyMp(-50.0f);
+			owner->ModifyMp(-skill1AttackUseStamina);
 
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_ATTACK_SPECIAL_FIRST, false, 0.1f);
 

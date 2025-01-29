@@ -124,56 +124,58 @@ namespace PlayerCharacterState
 		}
 		void AttackNormalState_1::Execute(float elapsedTime)
 		{
-			if (owner->IsPlayer())
-			{
-				owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_1)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
+			
+				if (owner->IsPlayer())
+				{
+					owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_1)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
 
-				float time = owner->GetModel()->GetCurrentAnimationSeconds();
-				if (0.184f <= time && time <= 0.368f)
-				{
-					if (owner->InputAttackNormal())
+					float time = owner->GetModel()->GetCurrentAnimationSeconds();
+					if (0.184f <= time && time <= 0.368f)
 					{
-						owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_2);
+						if (owner->InputAttackNormal())
+						{
+							owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_2);
+						}
+
 					}
-					
-				}
-				else if (0.435f <= time)
-				{
-					if (owner->InputMove(elapsedTime))
+					else if (0.435f <= time)
 					{
-						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::MOVE);
+						if (owner->InputMove(elapsedTime))
+						{
+							owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::MOVE);
+						}
+						else if (owner->InputDodge())
+						{
+							owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
+						}
+						else if (owner->InputSpecial())
+						{
+							owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
+						}
+						else if (owner->InputSkill1())
+						{
+							owner->GetStateMachine()->ChangeState(SKILL_1_STATE::ATTACK_START);
+						}
+						else if (owner->InputSkill2())
+						{
+							owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
+						}
 					}
-					else if (owner->InputDodge())
+					if (0.05f <= time && time <= 0.115f)
 					{
-						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
+						owner->SetTrail(true);
 					}
-					else if (owner->InputSpecial())
+					else
 					{
-						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
+						owner->SetTrail(false);
 					}
-					else if (owner->InputSkill1())
-					{
-						owner->GetStateMachine()->ChangeState(SKILL_1_STATE::ATTACK_START);
-					}
-					else if (owner->InputSkill2())
-					{
-						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
-					}
-				}
-				if (0.05f <= time && time <= 0.115f)
-				{
-					owner->SetTrail(true);
 				}
 				else
 				{
-					owner->SetTrail(false);
+					if (!owner->IsPlayAnimation())
+						owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_2);
 				}
-			}
-			else
-			{
-				if (!owner->IsPlayAnimation())
-					owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_2);
-			}
+			
 			
 		}
 		void AttackNormalState_1::Exit()

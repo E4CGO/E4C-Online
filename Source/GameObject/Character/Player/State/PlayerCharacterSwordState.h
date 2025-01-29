@@ -35,6 +35,7 @@ namespace PlayerCharacterState
 		
 		extern ATTACK_SPHERE sphereAttacks[4];
 
+
 		// 待機用ステートオブジェクト
 		class WaitState : public HierarchicalState<PlayerCharacter>
 		{

@@ -20,6 +20,9 @@ namespace PlayerCharacterState
 			ATTACK_3,
 		};
 
+		
+
+
 		// 待機用ステートオブジェクト
 		class WaitState : public HierarchicalState<PlayerCharacter>
 		{
