@@ -13,6 +13,7 @@
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Tool/GLTFImporter.h"
 #include "TAKOEngine/Tool/Timer.h"
+#include "TAKOEngine/Sound/Sound.h"
 
 #include "GameObject/GameObjectManager.h"
 #include "GameObject/ModelObject.h"
@@ -29,6 +30,7 @@
 
 #include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
 
+#include "PreloadManager.h"
 static float timer = 0;
 
 void StageDungeon_E4C::GenerateDungeon()
@@ -105,6 +107,8 @@ void StageDungeon_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
 
+	PRELOAD.Join("DungeonModels");
+
 	// フレームバッファマネージャー
 	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
 
@@ -161,7 +165,8 @@ void StageDungeon_E4C::Initialize()
 		// currentFloorが最大階でない場合は階段の行先はStageDungeon
 		if (currentFloor < DUNGEONDATA.GetDungeonGenSetting().maxFloor)
 		{
-			if (room->GetRoomType() == DUNGEONDATA.GetCurrentFloorGenSetting().endRoomType)
+			if (room->GetRoomType() == RoomType::FIRST_END ||
+				room->GetRoomType() == RoomType::FIRST_BOSS)
 			{
 				room->PlaceTeleporterTile(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
 			}
@@ -169,7 +174,8 @@ void StageDungeon_E4C::Initialize()
 		// 最大階以上なら階段の行先はStageOpenWorld
 		else
 		{
-			if (room->GetRoomType() == DUNGEONDATA.GetCurrentFloorGenSetting().endRoomType)
+			if (room->GetRoomType() == RoomType::FIRST_END ||
+				room->GetRoomType() == RoomType::FIRST_BOSS)
 			{
 				room->PlaceTeleporterTile(new StageOpenWorld_E4C(m_pScene), m_pScene->GetOnlineController());
 			}
@@ -179,6 +185,8 @@ void StageDungeon_E4C::Initialize()
 	// 部屋の当たり判定を設定
 	MAPTILES.CreateSpatialIndex(5, 7);
 
+	//Console::Instance().Open();
+
 	// 影初期化
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
 }
@@ -187,15 +195,17 @@ void StageDungeon_E4C::Finalize()
 {
 	ENEMIES.Clear();
 	MAPTILES.Clear();
+	UI.Clear();
 	SpawnerManager::Instance().Clear();
 	GameObjectManager::Instance().Clear();
+	Sound::Instance().StopAudio(0);
+	Sound::Instance().Finalize();
 
 	T_GRAPHICS.GetShadowRenderer()->Finalize();
 }
 
 void StageDungeon_E4C::Update(float elapsedTime)
 {
-	Camera* camera = CameraManager::Instance().GetCamera();
 	Online::OnlineController* onlineController = m_pScene->GetOnlineController();
 	if (onlineController->GetState() == Online::OnlineController::STATE::LOGINED)
 	{
@@ -211,7 +221,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	}
 
 	// ゲームループ内で
-	cameraController->SyncContrllerToCamera(camera);
+	cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
 	cameraController->Update(elapsedTime);
 
 	// 部屋

@@ -65,5 +65,18 @@ namespace Online
         //// データ送信
         //bool Send(void* data) override;
     };
+    /**************************************************************************//**
+    	@class	    TCPRoomNext
+    	@brief	    次の階に行く処理命令
+    	@par	[説明]
+    *//***************************************************************************/
+    class TCPRoomNext : public TCPCommand
+    {
+    public:
+        TCPRoomNext(OnlineController* controller, uint8_t cmd) : TCPCommand(controller, cmd) {};
+
+        // データ送信
+        bool Send(void* data) override;
+    };
 }
 #endif

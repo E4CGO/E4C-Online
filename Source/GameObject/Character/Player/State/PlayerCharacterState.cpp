@@ -212,6 +212,7 @@ namespace PlayerCharacterState
 	// 死亡
 	void DeathState::Enter()
 	{
+		owner->GetMoveCollider()->SetEnable(false);
 		for (std::pair<int, Collider*> collider : owner->GetColliders()) collider.second->SetEnable(false);
 		owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_DEATH, false, 0.1f);
 	}

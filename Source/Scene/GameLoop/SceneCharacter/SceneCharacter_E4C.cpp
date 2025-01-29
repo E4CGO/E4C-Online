@@ -5,6 +5,7 @@
 #include "TAKOEngine/Rendering/ResourceManager.h"
 #include "TAKOEngine/GUI/UIManager.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
+#include "TAKOEngine/Sound/Sound.h"
 
 #include <imgui.h>
 #include <string>
@@ -13,6 +14,7 @@
 #include "SceneCharacter_E4CState.h"
 
 #include "GameData.h"
+#include "PreloadManager.h"
 
 /**************************************************************************//**
 	@brief	初期化
@@ -35,10 +37,11 @@ void SceneCharacter_E4C::Initialize()
 	else
 	{
 		// Model Resource Preload
-		for (auto& filename : modelList)
-		{
-			modelPreLoad.insert(RESOURCE.LoadModelDX12Resource(filename));
-		}
+				//for (auto& filename : modelList)
+		//{
+		//	modelPreLoad.insert(RESOURCE.LoadModelDX12Resource(filename));
+		//}
+		PRELOAD.Join("CharacterModels");
 	}
 
 	//シャドウマップレンダラ
@@ -87,6 +90,10 @@ void SceneCharacter_E4C::Initialize()
 
 	// 影初期化
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
+
+	Sound::Instance().InitAudio();
+	Sound::Instance().LoadAudio("Data/Sound/11-Character_select.mp3");
+	Sound::Instance().PlayAudio(0);
 }
 
 /**************************************************************************//**
@@ -104,6 +111,8 @@ void SceneCharacter_E4C::Finalize()
 	UI.Clear();
 	shadowMapRenderer->Clear();
 	CameraManager::Instance().Clear();
+	Sound::Instance().StopAudio(0);
+	Sound::Instance().Finalize();
 
 	T_GRAPHICS.GetShadowRenderer()->Finalize();
 }
@@ -225,12 +234,10 @@ void SceneCharacter_E4C::RenderDX12()
 
 			T_TEXT.EndDX12();
 		}
-
 	}
-#ifdef _DEBUG
 	DrawSceneGUI();
 	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
-#endif
+
 	T_GRAPHICS.End();
 }
 
@@ -253,21 +260,21 @@ void SceneCharacter_E4C::DrawSceneGUI()
 	ImGui::SetNextWindowPos(ImVec2(pos.x + 10, pos.y + 10), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
 
-	if (ImGui::Begin("Scene##Debug", nullptr, ImGuiWindowFlags_None))
-	{
-		if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			// カメラ
-			DirectX::XMFLOAT3 eye = CameraManager::Instance().GetCamera()->GetEye();
-			ImGui::DragFloat3("Eye", &eye.x, 0.01f, 100.0f);
-			DirectX::XMFLOAT3 focus = CameraManager::Instance().GetCamera()->GetFocus();
-			ImGui::DragFloat3("Fcous", &focus.x, 0.01f, 100.0f);
-			DirectX::XMFLOAT3 up = CameraManager::Instance().GetCamera()->GetUp();
-			ImGui::DragFloat3("Up", &up.x, 0.01f, 100.0f);
+	//if (ImGui::Begin("Scene##Debug", nullptr, ImGuiWindowFlags_None))
+	//{
+	//	if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
+	//	{
+	//		// カメラ
+	//		DirectX::XMFLOAT3 eye = CameraManager::Instance().GetCamera()->GetEye();
+	//		ImGui::DragFloat3("Eye", &eye.x, 0.01f, 100.0f);
+	//		DirectX::XMFLOAT3 focus = CameraManager::Instance().GetCamera()->GetFocus();
+	//		ImGui::DragFloat3("Fcous", &focus.x, 0.01f, 100.0f);
+	//		DirectX::XMFLOAT3 up = CameraManager::Instance().GetCamera()->GetUp();
+	//		ImGui::DragFloat3("Up", &up.x, 0.01f, 100.0f);
 
-			CameraManager::Instance().GetCamera()->SetLookAt(eye, focus, up);
-			cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
-		}
-	}
-	ImGui::End();
+	//		CameraManager::Instance().GetCamera()->SetLookAt(eye, focus, up);
+	//		cameraController->SyncCameraToController(CameraManager::Instance().GetCamera());
+	//	}
+	//}
+	//ImGui::End();
 }

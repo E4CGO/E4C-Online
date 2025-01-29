@@ -3,7 +3,7 @@
 
 #include "AttackCollider.h"
 #include "Source/GameObject/Character/Character.h"
-
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 void AttackSphereCollider::Update()
 {
 	SphereCollider::Update();
@@ -26,18 +26,29 @@ void AttackSphereCollider::Update()
 
 void AttackSphereCollider::OnCollision(Collider* other)
 {
-	for (GameObject* owner : m_hitOthers)
+	if (collisionFanction)
 	{
-		// 既にヒットした敵には当たらない
-		if (owner == other->GetOwner()) return;
+		collisionFanction(this, other);
 	}
-
-	if (m_power > other->GetArmor())
+	else
 	{
-		uint16_t damage = m_power - other->GetArmor();
-	Character* chara = static_cast<Character*>(other->GetOwner());
-	m_hitOthers.emplace_back(chara);
-		chara->OnDamage(damage);
+		for (GameObject* owner : m_hitOthers)
+		{
+			// 既にヒットした敵には当たらない
+			if (owner == other->GetOwner()) return;
+		}
+
+		if (m_power > other->GetArmor())
+		{
+			uint16_t damage = m_power - other->GetArmor();
+			Character* chara = static_cast<Character*>(other->GetOwner());
+			m_hitOthers.emplace_back(chara);
+      
+	    // 攻撃がヒットしたらカメラシェイクをリセット
+	    CameraManager::Instance().GetCamera()->ResetShakeTimer();
+      CameraManager::Instance().GetCamera()->SetShake(true);
+			chara->OnDamage(damage);
+		}
 	}
 }
 
@@ -63,17 +74,24 @@ void AttackCapsuleCollider::Update()
 
 void AttackCapsuleCollider::OnCollision(Collider* other)
 {
-	for (GameObject* owner : m_hitOthers)
+	if (collisionFanction)
 	{
-		// 既にヒットした敵には当たらない
-		if (owner == other->GetOwner()) return;
+		collisionFanction(this, other);
 	}
-
-	if (m_power > other->GetArmor())
+	else
 	{
-		uint16_t damage = m_power - other->GetArmor();
-		Character* chara = static_cast<Character*>(other->GetOwner());
-		m_hitOthers.emplace_back(chara);
-		chara->OnDamage(damage);
+		for (GameObject* owner : m_hitOthers)
+		{
+			// 既にヒットした敵には当たらない
+			if (owner == other->GetOwner()) return;
+		}
+
+		if (m_power > other->GetArmor())
+		{
+			uint16_t damage = m_power - other->GetArmor();
+			Character* chara = static_cast<Character*>(other->GetOwner());
+			m_hitOthers.emplace_back(chara);
+			chara->OnDamage(damage);
+		}
 	}
 }

@@ -47,7 +47,7 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
         corner = corners[vertex_index];
         
         float2 streak = max(0, dot(normalize(-view_space_velocity), normalize(float3(corner, 0.0f)))) * -view_space_velocity.xy;
-        float streak_factor = 60.0f;
+        float streak_factor = 15.0f;
         corner = corner + streak_factor * streak;
         
         element.position.xy += corner * float2(size.x, size.y * aspect_ratio);

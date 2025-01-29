@@ -14,6 +14,7 @@ public:
 		static SceneManager instance;
 		return instance;
 	}
+	Scene* GetScene() { return currentScene; }
 	// 更新処理
 	void Update(float elapsedTime);
 	// 描画処理
@@ -23,6 +24,7 @@ public:
 	void Clear();
 	// シーン切り替え
 	void ChangeScene(Scene* scene);
+
 private:
 	Scene* currentScene = nullptr;
 	Scene* nextScene = nullptr;

@@ -82,7 +82,7 @@ void DungeonData::InitRoomGenSettings()
 	// 部屋タイプの数で配列をリサイズする
 	m_roomGenerateSettings.resize(ROOMTYPE_COUNT);
 
-	for (int i = (int)RoomType::FIRST_START; i < (int)RoomType::ROOMTYPE_COUNT; i++)
+	for (int i = (int)RoomType::DEAD_END; i < (int)RoomType::ROOMTYPE_COUNT; i++)
 	{
 		m_roomGenerateSettings.at((RoomType)i) = LoadRoomGenSetting((RoomType(i)));
 	}

@@ -19,6 +19,14 @@ public:
 	MouseMob(float scaling = 0.5f, ModelObject::RENDER_MODE renderMode = ModelObject::RENDER_MODE::DX11);
 	~MouseMob() = default;
 public:
+	enum STATE
+	{
+		WANDER = Enemy::STATE::END,
+		FOLLOW,
+		ENCOUNTER,
+		ATTACK,
+	};
+
 	enum COLLIDER_ID : uint8_t
 	{
 		COL_ATTACK,
@@ -34,9 +42,6 @@ public:
 		ANIM_DAMAGE,
 		ANIM_DIE,
 	};
-
-protected:
-	void UpdateTarget();
 };
 
 #endif //!__INCLUDED_MOUSE_MOB_H__

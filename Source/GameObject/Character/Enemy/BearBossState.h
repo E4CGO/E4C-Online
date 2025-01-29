@@ -91,7 +91,19 @@ namespace EnemyState
 				float hitEndRate = 1.0f;
 				Capsule capsule{};
 			};
+
+		private:
+			void UpdatePunchImpact(float elapsedTime);
+
+		private:
 			ATTACK_ARM attackArms[2];
+			bool impacts[2] = { false, false };
+
+			const float maxFlame = 572.0f; // attackのアニメーション:572フレーム
+			const float impactFlame1 = 165.0f;
+			const float impactFlame2 = 270.0f;
+			const float impact1StartRate = impactFlame1 / maxFlame;
+			const float impact2StartRate = impactFlame2 / maxFlame;
 		};
 	}
 }

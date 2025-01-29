@@ -1,6 +1,9 @@
 ﻿#include "Camera.h"
 #include "TAKOEngine/Tool/Mathf.h"
 #include <stdlib.h>
+#include "TAKOEngine/Tool/PerlinNoise.h"
+#include "GameObject/Character/Character.h"
+#include "ThridPersonCameraController.h"
 // 指定方向を向く
 void Camera::SetLookAt(const DirectX::XMFLOAT3& eye, const DirectX::XMFLOAT3& focus, const DirectX::XMFLOAT3& up)
 {
@@ -47,7 +50,27 @@ void Camera::SetPerspectiveFov(float fovY, float aspect, float nearZ, float farZ
 	this->nearZ  = nearZ;
 	this->farZ   = farZ;
 }
+void Camera::CameraShake(float shakeAmplitude, float shakeTime,float elapsedTime)
+{
+	if (shakeTimer < shakeTime) {
+		shakeAmplitude = 1.f * (shakeTime - shakeTimer);
+	}
+	else {
+		shakeAmplitude = 0.f;
+	}
+	if (m_shake)
+	{
+		shakeTimer += elapsedTime;
 
+		shakeOffset.x = (NoiseGenerator::PerlinNoise({ shakeTimer * 10.f, 0.0f, 0.f }, 1) - 0.5f) * shakeAmplitude;
+		shakeOffset.y = (NoiseGenerator::PerlinNoise({ 0.0f, shakeTimer * 10.f, 0.0f }, 1) - 0.5f) * shakeAmplitude;
+	}
+	if (shakeTimer > shakeTime)
+	{
+		m_shake = false;
+		shakeTimer = 0;
+	}
+}
 void Camera::MoveTo(const DirectX::XMFLOAT3& eye, const DirectX::XMFLOAT3& focus, float transitiontime, float transitionDuration)
 {
 	// 遷移時間を増加
@@ -70,6 +93,8 @@ void Camera::MoveTo(const DirectX::XMFLOAT3& eye, const DirectX::XMFLOAT3& focus
 	interpolatedFocus.y = Mathf::Lerp(this->GetFocus().y, focus.y, t);
 	interpolatedFocus.z = Mathf::Lerp(this->GetFocus().z, focus.z, t);
 
+
+	
 
 
 	// 補間結果をカメラに設定
@@ -112,7 +137,7 @@ void Camera::Move2PointToCamera(const DirectX::XMFLOAT3& start, const DirectX::X
 
 	// 補間係数を計算（0.0〜1.0の範囲でクランプ）
 	float t = transitionTime / transitionDuration;
-	t = std::min(t, 1.0f);
+	t = min(t, 1.0f);
 
 	// カメラの位置と注視点を補間
 	DirectX::XMFLOAT3 interpolatedEye{};

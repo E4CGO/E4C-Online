@@ -48,6 +48,7 @@ namespace Online
 		ROOM_NEW,			/*!< 部屋の作成*/
 		ROOM_IN,			/*!< 入室命令処理 */
 		ROOM_OUT,			/*!< クライアント退室処理 */
+		ROOM_NEXT,			/*!< 次の部屋 */
 
 		ENEMY_NEW,			/*!< エネミー生成処理 */
 		ENEMY_SYNC,			/*!< エネミー同期処理 */
@@ -168,11 +169,15 @@ namespace Online
 		void NewRoom(const std::vector<uint8_t>& roomOrder);
 		// 入室送信
 		void RoomIn();
+		// 次の部屋
+		void NextRoom(std::vector<uint8_t>& roomOrder);
 
 		// エネミーの生成送信
 		void NewEnemy(const uint8_t enemyType, uint8_t spawnerId, uint8_t count = 1);
 		// エネミーの同期送信
 		void SyncEnemy(std::vector<Enemy::SYNC_DATA>& data);
+		// エネミーの削除送信
+		void RemoveEnemy(std::set<uint32_t>& enemy_ids);
 
 		void RegisterHit(const uint32_t& enemy_id, const uint16_t& damage) {
 			std::lock_guard<std::mutex> lock(m_hit_mtx);

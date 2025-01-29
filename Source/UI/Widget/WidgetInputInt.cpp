@@ -1,5 +1,5 @@
 ﻿//! @file WidgetInputInt.cpp
-//! @note 
+//! @note
 
 #include "WidgetInputInt.h"
 #include "TAKOEngine/Tool/XMFLOAT.h"
@@ -8,7 +8,7 @@ template <typename T>
 WidgetInputInt<T>::WidgetInputInt(T* integer, T min, T max, bool loop) : m_pInt(integer), m_min(min), m_max(max), m_loopFlag(loop)
 {
 	const DirectX::XMFLOAT2 size = { 50.0f, 50.0f };
-	m_pBtnLeft = new WidgetButtonImage("", "Data/Sprites/UI/keybinds/key_Left.png", [&](WidgetButton*) {
+	m_pBtnLeft = new WidgetButtonImage("", "Data/Sprites/UI/Character/left_button.png", [&](WidgetButton*) {
 		if ((*m_pInt) > m_min)
 		{
 			(*m_pInt)--;
@@ -18,7 +18,7 @@ WidgetInputInt<T>::WidgetInputInt(T* integer, T min, T max, bool loop) : m_pInt(
 			(*m_pInt) = m_max;
 		}
 		});
-	m_pBtnRight = new WidgetButtonImage("", "Data/Sprites/UI/keybinds/key_Right.png", [&](WidgetButton*) {
+	m_pBtnRight = new WidgetButtonImage("", "Data/Sprites/UI/Character/right_button.png", [&](WidgetButton*) {
 		if ((*m_pInt) < m_max)
 		{
 			(*m_pInt)++;

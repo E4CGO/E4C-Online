@@ -1,5 +1,5 @@
 ﻿//! @file BirdMob.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDE_BIRD_MOB_H__
 #define __INCLUDE_BIRD_MOB_H__
@@ -43,8 +43,11 @@ public:
 		ATTACK_LAND,
 	};
 
-protected:
-	void UpdateTarget();
+	enum COLLIDER_ID : uint8_t
+	{
+		COL_ATTACK,
+		COL_BODY,
+	};
 };
 
 #endif // !__INCLUDE_BIRD_MOB_H__

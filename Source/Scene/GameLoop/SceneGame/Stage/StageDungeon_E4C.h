@@ -19,6 +19,8 @@
 #include "Map/MapTile.h"
 #include "Map/RoomBase.h"
 #include "UI/Widget/WidgetText.h"
+#include "Source/UI/Widget/WidgetPlayerHP.h"
+#include "Source/UI/Widget/WidgetPauseMenu.h"
 
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Editor/Camera/CameraManager.h"
@@ -61,6 +63,8 @@ public:
 	void Render() override;
 
 	void RenderDX12() override;
+
+	SceneGame_E4C* GetScene() { return m_pScene; }
 private:
 	// シーンGUI描画
 	void DrawSceneGUI();
@@ -94,6 +98,8 @@ protected:
 	float transitionDuration = 2.f;  // 5秒かけて移動
 	int currentSegment = 0;
 	int currentFloor = 0;
+
+	WidgetText* floorText;
 
 	// フレームバッファマネージャー
 	FrameBufferManager* m_frameBuffer;

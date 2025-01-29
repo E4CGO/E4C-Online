@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mutex>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -36,6 +37,8 @@ private:
 	using SpriteMapDX12 = std::unordered_map<std::string, std::weak_ptr<SpriteDX12>>;
 	SpriteMap sprites;
 	SpriteMapDX12 spritesDX12;
+
+	std::mutex m_mut;
 };
 
 #define RESOURCE ResourceManager::Instance()

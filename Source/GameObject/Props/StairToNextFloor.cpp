@@ -26,6 +26,8 @@ StairToNextFloor::StairToNextFloor(Stage* stage, Online::OnlineController* onlin
 *//***************************************************************************/
 void StairToNextFloor::Update(float elapsedTime)
 {
+	if (!enable) return;
+
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
 	const float radius = m_interactionDistance * scale.x;
 	if (player != nullptr && XMFLOAT3LengthSq(player->GetPosition() - (position - DirectX::XMFLOAT3{ 0.0f, 0.5f * scale.y, 0.0f })) < radius * radius)
@@ -77,7 +79,23 @@ void StairToNextFloor::GoToNextFloor()
 	// currentFloor(現在の階)を一つ進める
 	DUNGEONDATA.GoToNextFloor();
 
-	StageManager::Instance().ChangeStage(m_pStage);
-	m_pStage = nullptr;
-	m_timer = -10.0f;
+	if (ONLINE_CONTROLLER->GetState() == Online::State::OFFLINE)
+	{
+		StageManager::Instance().ChangeStage(m_pStage);
+		m_pStage = nullptr;
+		m_timer = -10.0f;
+	}
+	else
+	{
+		if (auto dungeon = dynamic_cast<StageDungeon_E4C*>(m_pStage))
+		{
+			enable = false;
+			dungeon->GenerateDungeon();
+			std::vector<uint8_t> roomOrder = dungeon->GetRoomOrder();
+			roomOrder.insert(roomOrder.begin(), DUNGEONDATA.GetCurrentFloor());
+			ONLINE_CONTROLLER->NextRoom(roomOrder);
+			delete m_pStage;
+			m_pStage = nullptr;
+		}
+	}
 }
