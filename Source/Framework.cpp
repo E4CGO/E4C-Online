@@ -6,7 +6,6 @@
 
 #include "TAKOEngine/Tool/ImGuiRenderer.h"
 #include "TAKOEngine/Effects/EffectManager.h"
-
 #define MINIMP3_IMPLEMENTATION
 #include "TAKOEngine/Sound/Sound.h"
 #include "TAKOEngine/Network/Network.h"
@@ -15,8 +14,8 @@
 #include "Scene/GameLoop/SceneTitle/SceneTitle_E4C.h"
 #include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
 #include "Scene/GameLoop/SceneRoomTest/SceneRoomTest_E4C.h"
-
 #include "GameData.h"
+#include "PreloadManager.h"
 
 // 垂直同期間隔設定
 static const int syncInterval = 1;
@@ -52,6 +51,8 @@ Framework::Framework(HWND hWnd)
 	{
 		//EFFECTS.InitializeDX12();
 	}
+	// リソースプリロード
+	PRELOAD.Load();
 
 	// シーン初期化
 	//SceneManager::Instance().ChangeScene(new SceneLoading(new SceneRoomTest_E4C));
@@ -75,8 +76,6 @@ Framework::~Framework()
 	}
 
 	Network::Finalize();
-
-	Sound::Instance().Finalize();
 }
 
 // 更新処理

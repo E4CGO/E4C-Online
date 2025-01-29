@@ -16,13 +16,6 @@ namespace ns_RoomData
 	// 部屋タイプ
 	enum RoomType : uint8_t
 	{
-		SIMPLE_ROOM_1 = 0,
-		END_ROOM,
-		CROSS_ROOM_1,
-		CROSS_ROOM_2,
-		PASSAGE_1,
-		DEAD_END,
-
 		FIRST_START,	// 最初のフロア：最初の部屋
 		FIRST_I,		// 最初のフロア：Ｉ字の部屋
 		FIRST_T,		// 最初のフロア：Ｔ字の部屋
@@ -30,18 +23,22 @@ namespace ns_RoomData
 		FIRST_SPAWNER,	// 最初のフロア：スポナーの部屋
 		FIRST_END,		// 最初のフロア：最後の部屋
 		FIRST_BOSS,		// 最初のフロア：ボス部屋
+		FIRST_DEAD_END,	// 最初のフロア：行き止まり
 
-		TEST_I,		// テスト：Ｉ字の部屋
-		TEST_T,		// テスト：Ｔ字の部屋
-		TEST_X,		// テスト：十字の部屋
-		TEST_END,	// テスト：最後の部屋
+		SECOND_START,		// 第二のフロア：最初の部屋
+		SECOND_L1,			// 第二のフロア：Ⅼ字の部屋・右向き
+		SECOND_L2,			// 第二のフロア：Ⅼ字の部屋・左向き
+		SECOND_CROSS,		// 第二のフロア：十字の部屋
+		SECOND_END,			// 第二のフロア：最後の部屋
+		SECOND_DEAD_END,	// 第二のフロア：行き止まり
 
 		TUTO_START,			// チュートリアル：最初の部屋
 		TUTO_NOTHINGROOM,	// チュートリアル：何もない部屋
 		TUTO_SPAWNERROOM,	// チュートリアル：スポナーのある部屋
 		TUTO_END,			// チュートリアル：最後の部屋
+		TUTO_DEAD_END,		// チュートリアル：行き止まり
 
-		ROOMTYPE_COUNT,
+		ROOMTYPE_COUNT
 	};
 
 	// タイルタイプ
@@ -81,9 +78,26 @@ namespace ns_RoomData
 		FOUNTAIN,
 		STAIR_TO_NEXTFLOOR,
 		BOSSROOM,
+		BARREL,
+		WALL_BRICK_01A,
+		CHANDELIER,
+		FLOOR_BROWN,
+		FLOOR_CHECK,
+		FLOOR_GRAY,
+		HEART_ARCH,
+		PLASTIC_FLOWER,
+		SET_01A,
+		SET_01B,
+		SET_01C,
+		STAIR_STEP_01B,
+		TOY_ARCH_01A,
+		TOY_ARCH_SUPPORT_01A,
+		TOY_ARCH_TOP_01A,
+		WALL_PAPER,
+		WALL_SQUARES,
+		WELL,
 
-		// enumCount
-		TILETYPE_COUNT,
+		TILETYPE_COUNT
 	};
 
 	// スポナーデータ
@@ -136,53 +150,65 @@ public:
 	// 部屋の生成設定
 	struct RoomGenerateSetting
 	{
-		int weight = 0;	// 重み、値が大きいほど生成確率が高くなる
-		AABB aabb {};	// AABB、部屋同士の当たり判定などに使用
-		DirectX::XMFLOAT3 portalPosition {};		// ポータル配置座標
+		int weight = 0;	// 重み 値が大きいほど生成確率が高くなる
+		AABB aabb {};	// AABB 部屋同士の当たり判定などに使用
 		std::vector<TILE_DATA> connectPointDatas;	// 接続点データ配列
 		std::vector<RoomType> placementCandidates;	// 配置候補の部屋タイプを保存する配列
+	};
+
+	// 階全体の生成設定
+	struct FloorGenerateSetting
+	{
+		int maxDepth = 0;	// 最大深度 親からの距離（深度）がこの値以上になった場合、子の生成をキャンセルする
+		RoomType startRoomType = RoomType::TUTO_START;	// 最初に生成する部屋タイプ
+		RoomType endRoomType = RoomType::TUTO_END;		// 最後に生成する部屋タイプ
+		RoomType deadEndRoomType = RoomType::TUTO_DEAD_END;	// 行き止まりに生成する部屋タイプ
 	};
 
 	// ダンジョンの生成設定
 	struct DungeonGenerateSetting
 	{
 		int maxFloor = 3;	// 最大階数　最上階には次の階への階段などは設置しない
-		int maxDepth;		// 最大深度　親からの距離（深度）がこの値以上になった場合、子の生成をキャンセルする
-
-		RoomType firstRoomType;		// 最初に生成する最初の部屋タイプ
-		RoomType topFloorRoomType;	// 最上階に生成する最初の部屋タイプ
 	};
 
 	// 初期化
 	void Initialize();
-	// 各種初期化
-	void InitRoomGenerateSettings();
-	void InitDungeonGenerateSetting();
-	void InitModelFileDatas();
-	void InitCollisionFileDatas();
-	void InitFileNames();
 
-	// 部屋の生成設定を取得
-	RoomGenerateSetting GetRoomGenerateSetting(RoomType type) { return m_roomGenerateSettings.at(static_cast<int>(type)); }
 	// ダンジョンの生成設定を取得
-	DungeonGenerateSetting GetDungeonGenerateSetting() { return m_dungeonGenerateSetting; }
+	DungeonGenerateSetting GetDungeonGenSetting() { return m_dungeonGenerateSetting; }
+	// 階全体の生成設定を配列から取得
+	FloorGenerateSetting GetFloorGenSetting(int floor) { return m_floorGenerateSettings.at(floor); }
+	// 現在の階の生成設定を取得
+	FloorGenerateSetting GetCurrentFloorGenSetting() { return m_floorGenerateSettings.at(m_currentFloor); }
+	// 部屋の生成設定を配列から取得
+	RoomGenerateSetting GetRoomGenSetting(RoomType type) { return m_roomGenerateSettings.at(static_cast<int>(type)); }
 	// 現在の階取得・設定・次の階へ
-	const int GetCurrentFloor() const { return m_currentFloor; }
-	void SetCurrentFloor(int floor) { m_currentFloor = floor; }
+	const uint8_t GetCurrentFloor() const { return m_currentFloor; }
+	void SetCurrentFloor(uint8_t floor) { m_currentFloor = floor; }
 	void GoToNextFloor() { m_currentFloor++; }
 
 	// ファイル読み込み用データの取得
-	const std::vector<FILE_DATA> GetModelFileDatas(TileType type) const {
-		int a = 0;
-		int b = 0; return m_modelFileDatas.at(type); }
+	const std::vector<FILE_DATA> GetModelFileDatas(TileType type) const { return m_modelFileDatas.at(type); }
 	const std::vector<FILE_DATA> GetCollisionFileDatas(TileType type) const { return m_collisionFileDatas.at(type); }
 	// ファイル名の取得
 	const char* GetFileName(RoomType type) { return m_fileNames.at(type); }
 
 private:
+	// 各種初期化
+	void InitFileNames();	// 最初に呼び出す
+	void InitDungeonGenSetting();	// 二番目に呼び出す
+	void InitFloorGenSettings();	// 三番目に〃
+	void InitRoomGenSettings();	// 四番目に〃
+	void InitModelFileDatas();
+	void InitCollisionFileDatas();
+
+	// jsonデータ読み込み
+	RoomGenerateSetting LoadRoomGenSetting(RoomType roomType);
+
 	std::vector<RoomGenerateSetting> m_roomGenerateSettings;	// 部屋の生成設定配列
+	std::vector<FloorGenerateSetting> m_floorGenerateSettings;	// 階全体の生成設定配列
 	DungeonGenerateSetting m_dungeonGenerateSetting;			// ダンジョンの生成設定
-	int m_currentFloor = 1;										// 現在の階
+	uint8_t m_currentFloor = 1;										// 現在の階
 	std::vector<std::vector<FILE_DATA>> m_modelFileDatas;		// 見た目用ファイル読み込み用データ配列
 	std::vector<std::vector<FILE_DATA>> m_collisionFileDatas;	// 当たり判定用ファイル読み込み用データ配列
 	std::vector<char*> m_fileNames;						// ファイル名配列

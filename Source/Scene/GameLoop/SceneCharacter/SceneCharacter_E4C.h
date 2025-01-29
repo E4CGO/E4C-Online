@@ -106,22 +106,61 @@ private:
 
 	// Model Preload
 	std::unordered_set<const char*> modelList = {
-		"Data/Model/Character/PlayerModels/MDL_PLAYER_BODY_ANIMATION.glb",
-		"Data/Model/Character/PlayerModels/MDL_PLAYER_BOTTOM_ANIMATION.glb",
-		"Data/Model/Character/PlayerModels/MDL_PLAYER_TOP_ANIMATION.glb",
-		"Data/Model/Character/PlayerModels/MDL_PLAYER_HAIR_ANIMATION.glb",
-		"Data/Model/Character/PlayerModels/MDL_PLAYER_SWORD_ANIMATION.glb",
-		"Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD1_ANIMATION.glb",
-		"Data/Model/Character/PlayerModels/MDL_PLAYER_SHIELD2_ANIMATION.glb",
-		"Data/Model/Character/PlayerModels/MDL_PLAYER_ROD_ANIMATION.glb",
-		"Data/Model/Character/PlayerModels/MDL_PLAYER_F_BODY_ANIMATION.glb",
-		"Data/Model/Character/PlayerModels/MDL_PLAYER_F_BOTTOM_ANIMATION.glb",
-		"Data/Model/Character/PlayerModels/MDL_PLAYER_F_TOP_ANIMATION.glb",
-		"Data/Model/Character/PlayerModels/MDL_PLAYER_F_HAIR_ANIMATION.glb",
-		"Data/Model/Character/PlayerModels/MDL_PLAYER_F_SWORD_ANIMATION.glb",
-		"Data/Model/Character/PlayerModels/MDL_PLAYER_F_SHIELD1_ANIMATION.glb",
-		"Data/Model/Character/PlayerModels/MDL_PLAYER_F_SHIELD2_ANIMATION.glb",
-		"Data/Model/Character/PlayerModels/MDL_PLAYER_F_ROD_ANIMATION.glb",
+		//男性よう
+		"Data/Model/Character/PlayerModels/PlayerMale/MDLANM_PLAYER_BODY.glb",
+
+		"Data/Model/Character/PlayerModels/PlayerMale/Hair/MDLANM_PLAYER_HAIR.glb",
+		"Data/Model/Character/PlayerModels/PlayerMale/Hair/MDLANM_PLAYER_HAIR2.glb",
+		"Data/Model/Character/PlayerModels/PlayerMale/Hair/MDLANM_PLAYER_HAIR3.glb",
+
+		"Data/Model/Character/PlayerModels/PlayerMale/Costume1/MDLANM_PLAYER_TOP.glb",
+		"Data/Model/Character/PlayerModels/PlayerMale/Costume2/MDLANM_PLAYER_TOP.glb",
+		"Data/Model/Character/PlayerModels/PlayerMale/Costume3/MDLANM_PLAYER_TOP.glb",
+
+		"Data/Model/Character/PlayerModels/PlayerMale/Costume1/MDLANM_PLAYER_ARM.glb",
+		"Data/Model/Character/PlayerModels/PlayerMale/Costume2/MDLANM_PLAYER_ARM.glb",
+		"Data/Model/Character/PlayerModels/PlayerMale/Costume3/MDLANM_PLAYER_ARM.glb",
+
+		"Data/Model/Character/PlayerModels/PlayerMale/Costume1/MDLANM_PLAYER_BOTTOM.glb",
+		"Data/Model/Character/PlayerModels/PlayerMale/Costume2/MDLANM_PLAYER_BOTTOM.glb",
+		"Data/Model/Character/PlayerModels/PlayerMale/Costume3/MDLANM_PLAYER_BOTTOM.glb",
+
+		"Data/Model/Character/PlayerModels/PlayerMale/Costume1/MDLANM_PLAYER_SHOES.glb",
+		"Data/Model/Character/PlayerModels/PlayerMale/Costume2/MDLANM_PLAYER_SHOES.glb",
+		"Data/Model/Character/PlayerModels/PlayerMale/Costume3/MDLANM_PLAYER_SHOES.glb",
+
+		"Data/Model/Character/PlayerModels/PlayerMale/Weapons/MDLANM_PLAYER_SWORD.glb",
+		"Data/Model/Character/PlayerModels/PlayerMale/Weapons/MDLANM_PLAYER_SWORD2.glb",
+		"Data/Model/Character/PlayerModels/PlayerMale/Weapons/MDLANM_PLAYER_SWORD3.glb",
+		"Data/Model/Character/PlayerModels/PlayerMale/Weapons/MDLANM_PLAYER_ROD.glb",
+		"Data/Model/Character/PlayerModels/PlayerMale/Weapons/MDLANM_PLAYER_ROD2.glb",
+
+		//女性よう
+		"Data/Model/Character/PlayerModels/PlayerFemale/MDLANM_PLAYER_F_BODY.glb",
+
+		"Data/Model/Character/PlayerModels/PlayerFemale/Hair/MDLANM_PLAYER_F_HAIR.glb",
+		"Data/Model/Character/PlayerModels/PlayerFemale/Hair/MDLANM_PLAYER_F_HAIR2.glb",
+		"Data/Model/Character/PlayerModels/PlayerFemale/Hair/MDLANM_PLAYER_F_HAIR3.glb",
+		"Data/Model/Character/PlayerModels/PlayerFemale/Hair/MDLANM_PLAYER_F_HAIR4.glb",
+
+		"Data/Model/Character/PlayerModels/PlayerFemale/Costume1/MDLANM_PLAYER_F_TOP.glb",
+		"Data/Model/Character/PlayerModels/PlayerFemale/Costume2/MDLANM_PLAYER_F_TOP.glb",
+		"Data/Model/Character/PlayerModels/PlayerFemale/Costume3/MDLANM_PLAYER_F_TOP.glb",
+
+		"Data/Model/Character/PlayerModels/PlayerFemale/MDLANM_PLAYER_F_ARM.glb",
+
+		"Data/Model/Character/PlayerModels/PlayerFemale/Costume1/MDLANM_PLAYER_F_BOTTOM.glb",
+		"Data/Model/Character/PlayerModels/PlayerFemale/Costume2/MDLANM_PLAYER_F_BOTTOM.glb",
+		"Data/Model/Character/PlayerModels/PlayerFemale/Costume3/MDLANM_PLAYER_F_BOTTOM.glb",
+
+		"Data/Model/Character/PlayerModels/PlayerFemale/Costume1/MDLANM_PLAYER_F_SHOES.glb",
+		"Data/Model/Character/PlayerModels/PlayerFemale/Costume2/MDLANM_PLAYER_F_SHOES.glb",
+
+		"Data/Model/Character/PlayerModels/PlayerFemale/Weapons/MDLANM_PLAYER_F_SWORD.glb",
+		"Data/Model/Character/PlayerModels/PlayerFemale/Weapons/MDLANM_PLAYER_F_SWORD2.glb",
+		"Data/Model/Character/PlayerModels/PlayerFemale/Weapons/MDLANM_PLAYER_F_SWORD3.glb",
+		"Data/Model/Character/PlayerModels/PlayerFemale/Weapons/MDLANM_PLAYER_F_ROD.glb",
+		"Data/Model/Character/PlayerModels/PlayerFemale/Weapons/MDLANM_PLAYER_F_ROD2.glb",
 	};
 	std::unordered_set<std::shared_ptr<ModelResource>> modelPreLoad;
 

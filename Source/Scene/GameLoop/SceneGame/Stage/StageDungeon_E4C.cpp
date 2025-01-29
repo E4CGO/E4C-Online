@@ -1,4 +1,4 @@
-﻿//! @file StageDungeon_E4C.cpp
+//! @file StageDungeon_E4C.cpp
 //! @note
 
 #include "StageDungeon_E4C.h"
@@ -13,6 +13,7 @@
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "TAKOEngine/Tool/GLTFImporter.h"
 #include "TAKOEngine/Tool/Timer.h"
+#include "TAKOEngine/Sound/Sound.h"
 
 #include "GameObject/GameObjectManager.h"
 #include "GameObject/ModelObject.h"
@@ -29,6 +30,7 @@
 
 #include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
 
+#include "PreloadManager.h"
 static float timer = 0;
 
 void StageDungeon_E4C::GenerateDungeon()
@@ -44,13 +46,7 @@ void StageDungeon_E4C::GenerateDungeon()
 		// ダンジョンの自動生成を行う
 		// 生成する部屋タイプを算出
 		//RoomType firstRoomType = RoomType::FIRST_START;
-		RoomType firstRoomType = DUNGEONDATA.GetDungeonGenerateSetting().firstRoomType;
-
-		// 最上階なら最上階用の部屋タイプを持ってくる
-		if (currentFloor >= DUNGEONDATA.GetDungeonGenerateSetting().maxFloor)
-		{
-			firstRoomType = DUNGEONDATA.GetDungeonGenerateSetting().topFloorRoomType;
-		}
+		RoomType firstRoomType = DUNGEONDATA.GetCurrentFloorGenSetting().startRoomType;
 
 		std::vector<RoomType> placeableRooms;
 		placeableRooms.emplace_back(firstRoomType);
@@ -64,13 +60,13 @@ void StageDungeon_E4C::GenerateDungeon()
 			int totalWeight = 0;
 			for (RoomType type : placeableRooms)
 			{
-				totalWeight += dungeonData.GetRoomGenerateSetting(type).weight;
+				totalWeight += dungeonData.GetRoomGenSetting(type).weight;
 			}
 
 			int randomValue = std::rand() % totalWeight;
 			for (RoomType type : placeableRooms)
 			{
-				randomValue -= dungeonData.GetRoomGenerateSetting(type).weight;
+				randomValue -= dungeonData.GetRoomGenSetting(type).weight;
 
 				if (randomValue < 0) firstRoomType = type;
 			}
@@ -111,6 +107,8 @@ void StageDungeon_E4C::Initialize()
 {
 	Stage::Initialize(); // デフォルト
 
+	PRELOAD.Join("DungeonModels");
+
 	// フレームバッファマネージャー
 	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
 
@@ -148,25 +146,15 @@ void StageDungeon_E4C::Initialize()
 	currentFloor = DUNGEONDATA.GetCurrentFloor();
 
 	// テキスト設定
-	WidgetText* floorText = new WidgetText();
-	floorText->SetText((std::to_string(currentFloor) + "階").c_str());
+	floorText = new WidgetText();
+	floorText->SetText(("現在の階：" + std::to_string(currentFloor) + "階").c_str());
+	floorText->SetBorderColor({ 0.0f, 0.0f, 0.0f, 1.0f });
+	floorText->SetBorder(2);
+	floorText->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 	floorText->SetPosition({ 30.0f, 30.0f });
 	UI.Register(floorText);
 
 	GenerateDungeon();
-
-	// デバッグテキスト
-	WidgetText* debugText = new WidgetText();
-	std::string roomOrderText = "生成配列：";
-	for (int i = 0; i < m_roomOrder.size(); i++)
-	{
-		roomOrderText += std::to_string(m_roomOrder.at(i));
-
-		if (i < m_roomOrder.size() - 1) roomOrderText += ",";
-	}
-	debugText->SetText(roomOrderText.c_str());
-	debugText->SetPosition({ 30.0f, 60.0f });
-	UI.Register(debugText);
 
 	// 部屋のモデルを配置
 	for (RoomBase* room : rootRoom->GetAll())
@@ -174,10 +162,11 @@ void StageDungeon_E4C::Initialize()
 		room->PlaceMapTile(isLeader);
 
 		// currentFloorが最大階でない場合は階段の行先はStageDungeon
-		if (currentFloor < DUNGEONDATA.GetDungeonGenerateSetting().maxFloor)
+		if (currentFloor < DUNGEONDATA.GetDungeonGenSetting().maxFloor)
 		{
 			if (room->GetRoomType() == RoomType::FIRST_END ||
-				room->GetRoomType() == RoomType::FIRST_BOSS)
+				room->GetRoomType() == RoomType::FIRST_BOSS ||
+				room->GetRoomType() == RoomType::SECOND_END)
 			{
 				room->PlaceTeleporterTile(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
 			}
@@ -186,7 +175,8 @@ void StageDungeon_E4C::Initialize()
 		else
 		{
 			if (room->GetRoomType() == RoomType::FIRST_END ||
-				room->GetRoomType() == RoomType::FIRST_BOSS)
+				room->GetRoomType() == RoomType::FIRST_BOSS ||
+				room->GetRoomType() == RoomType::SECOND_END)
 			{
 				room->PlaceTeleporterTile(new StageOpenWorld_E4C(m_pScene), m_pScene->GetOnlineController());
 			}
@@ -198,6 +188,10 @@ void StageDungeon_E4C::Initialize()
 
 	//Console::Instance().Open();
 
+	Sound::Instance().InitAudio();
+	Sound::Instance().LoadAudio("Data/Sound/5-Miraculous_Maze(Dungeon).mp3");
+	Sound::Instance().PlayAudio(0);
+
 	// 影初期化
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
 }
@@ -206,16 +200,17 @@ void StageDungeon_E4C::Finalize()
 {
 	ENEMIES.Clear();
 	MAPTILES.Clear();
-	UI.Clear();
+	UI.Remove(floorText);
 	SpawnerManager::Instance().Clear();
 	GameObjectManager::Instance().Clear();
+	Sound::Instance().StopAudio(0);
+	Sound::Instance().Finalize();
 
 	T_GRAPHICS.GetShadowRenderer()->Finalize();
 }
 
 void StageDungeon_E4C::Update(float elapsedTime)
 {
-	Camera* camera = CameraManager::Instance().GetCamera();
 	Online::OnlineController* onlineController = m_pScene->GetOnlineController();
 	if (onlineController->GetState() == Online::OnlineController::STATE::LOGINED)
 	{
@@ -231,7 +226,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	}
 
 	// ゲームループ内で
-	cameraController->SyncContrllerToCamera(camera);
+	cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
 	cameraController->Update(elapsedTime);
 
 	// 部屋を全てアップデート
@@ -326,7 +321,7 @@ void StageDungeon_E4C::RenderDX12()
 
 		// シャドウマップ
 		{
-			T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
+			//T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
 			rc.shadowMap.shadow_srv_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSRV();
 			rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();
 		}
@@ -344,6 +339,20 @@ void StageDungeon_E4C::RenderDX12()
 		SpawnerManager::Instance().RenderDX12(rc);
 		ENEMIES.RenderDX12(rc);
 		MAPTILES.RenderDX12(rc);
+
+		for (RoomBase* room : rootRoom->GetAll())
+		{
+			if (room->GetRoomType() == DUNGEONDATA.GetCurrentFloorGenSetting().endRoomType)
+			{
+				room->Render(rc);
+			}
+			else
+			{
+				room->Render(rc);
+			}
+
+			//room->Render(rc);
+		}
 
 		// レンダーターゲットへの書き込み終了待ち
 		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
@@ -363,13 +372,38 @@ void StageDungeon_E4C::RenderDX12()
 		T_TEXT.EndDX12();
 	}
 
+	// デバッグ
+	{
+#ifdef _DEBUG
+		DrawSceneGUI();
+#endif // _DEBUG
+	}
+
 	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
 	T_GRAPHICS.End();
 }
 
 void StageDungeon_E4C::DrawSceneGUI()
 {
-	ImVec2 pos = ImGui::GetMainViewport()->Pos;
-	ImGui::SetNextWindowPos(ImVec2(pos.x + 10, pos.y + 10), ImGuiCond_FirstUseEver);
-	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+	if (ImGui::Begin("StageDungeon_E4C"))
+	{
+		// 現在の階
+		ImGui::Text(("現在の階：" + std::to_string(currentFloor)).c_str());
+
+		// 生成配列のテキスト
+		std::string orderText = "生成配列：";
+		for (int i = 0; i < m_roomOrder.size(); i++)
+		{
+			orderText += std::to_string(m_roomOrder.at(i));
+			if (i < m_roomOrder.size() - 1) orderText += ",";
+		}
+		ImGui::Text(orderText.c_str());
+
+		ImGui::SeparatorText("ダンジョン全体の生成設定");
+		ImGui::Text(("最大階数：" + std::to_string(DUNGEONDATA.GetDungeonGenSetting().maxFloor)).c_str());
+
+		ImGui::SeparatorText("現在の階の生成設定");
+		ImGui::Text(("最大深度：" + std::to_string(DUNGEONDATA.GetCurrentFloorGenSetting().maxDepth)).c_str());
+	}
+	ImGui::End();
 }

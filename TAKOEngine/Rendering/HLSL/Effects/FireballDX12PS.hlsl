@@ -1,4 +1,4 @@
-#include "Billboard.hlsli"
+#include "../Primitives/BillboardDX12.hlsli"
 
 Texture2D spriteTexture : register(t0);
 SamplerState spriteSampler : register(s0);

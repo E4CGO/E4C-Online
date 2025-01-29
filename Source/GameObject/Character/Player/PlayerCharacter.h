@@ -12,6 +12,9 @@
 #include "GameData.h"
 #include "PlayerCharacterData.h"
 #include "TAKOEngine/Rendering/DebugRenderer/SphereRenderer.h"
+#include "Source/GameObject/Props/ZoneObject.h"
+#include "Source/GameObject/Props/ChargeObject.h"
+#include "Source/GameObject/Props/HealingObject.h"
 
 class Enemy;
 
@@ -159,6 +162,13 @@ public:
 		ENUM_COUNT
 	};
 
+	enum class GENDER_TYPE
+	{
+		MALE = 0,
+		FEMALE,
+		ENUM_COUNT
+	};
+
 	// 更新処理
 	virtual void Update(float elapsedTime) override;
 	// 描画処理
@@ -216,9 +226,11 @@ public:
 
 	void SetWeaponType(WEAPON_TYPE weapontype) { m_weaponType = static_cast<WEAPON_TYPE>(weapontype); }
 	void SetEnergyType(ENERGY_TYPE energytype) { m_energyType = static_cast<ENERGY_TYPE>(energytype); }
+	void SetGenderType(GENDER_TYPE gendertype) { m_genderType = static_cast<GENDER_TYPE>(gendertype); }
 
 	WEAPON_TYPE GetWeaponType() { return m_weaponType; }
 	ENERGY_TYPE GetEnergyType() { return m_energyType; }
+	GENDER_TYPE GetGenderType() { return m_genderType; }
 
 	// スキルタイマー
 	float GetSkillTimerTime(int idx);
@@ -233,14 +245,16 @@ public:
 
 	float GetMpCost(int idx);
 
-
 	//剣ノード取得
 	const iModel::Node* GetSwordTrailNode();
 
-
 	void SwordTrail();
 	bool IsTrail() { return m_isTrail; }
-	void SetTrail(bool trail) { trail=m_isTrail; }
+	void SetTrail(bool trail) { m_isTrail = trail; }
+
+	ZoneObject* GetEffectZone() { return m_EffectZone.get(); }
+	ChargeObject* GetEffectCharge() { return m_EffectCharge.get(); }
+	HealingObject* GetEffectHealing() { return m_EffectHealing.get(); }
 
 	// 自機判定
 	bool IsPlayer() { return GAME_DATA.GetClientId() == m_client_id; };
@@ -306,6 +320,7 @@ protected:
 	std::string m_name;
 	WEAPON_TYPE m_weaponType;
 	ENERGY_TYPE m_energyType;
+	GENDER_TYPE m_genderType;
 
 	float moveSpeed = 0.0f;
 	float turnSpeed = 0.0f;
@@ -328,6 +343,8 @@ protected:
 	std::unordered_map<int, SkillTimer> skillTimer;
 
 	std::unique_ptr<SphereRenderer> m_sphere;
+
+	std::unique_ptr<SpriteDX12> m_swordSprite = std::make_unique<SpriteDX12>(1, "Data/Sprites/trail.png");
 protected:
 
 	static inline DirectX::XMFLOAT4 colorSet[COLOR_PATTERN::END] = {
@@ -359,6 +376,10 @@ protected:
 	DirectX::XMFLOAT3 trailPosition[2][MAX_POLYGON];
 
 	bool m_isTrail = false;
+
+	std::unique_ptr<ZoneObject> m_EffectZone;
+	std::unique_ptr<ChargeObject> m_EffectCharge;
+	std::unique_ptr<HealingObject> m_EffectHealing;
 };
 
 #endif // __INCLUDED_PLAYER_CHARACTER_H__

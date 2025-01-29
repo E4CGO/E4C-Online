@@ -31,8 +31,8 @@ CrocodileMob::CrocodileMob(float scaling, ModelObject::RENDER_MODE renderMode) :
 
 	m_pColliders.clear();
 	// ヒット判定
-	Sphere sphere{ { 0, radius / scale.y, 0 }, radius };
-	SetCollider(COLLIDER_ID::COL_BODY, sphere, Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("Croc_root")->worldTransform);
+	Sphere sphere{ { 0, radius / 0.03f, radius / 0.01f }, radius };
+	SetCollider(COLLIDER_ID::COL_BODY, sphere, Collider::COLLIDER_OBJ::ENEMY, &m_pmodels[0]->FindNode("Croc_neck")->worldTransform);
 	{
 		using namespace EnemyState::CrocodileMob;
 		stateMachine->RegisterState(Enemy::STATE::IDLE, new IdleState(this));

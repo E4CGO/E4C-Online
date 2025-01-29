@@ -38,6 +38,7 @@ public:
 		LHS_TOON_Instancing,
 		LHS_Phong,
 		LHS_Phong_Instancing,
+		Foliage,
 	};
 
 	RENDER_MODE m_renderMode = DX11;
@@ -88,6 +89,13 @@ public:
 
 	// カラー設定
 	void SetColor(const DirectX::XMFLOAT4 color) { this->m_color = color; }
+
+	// 位置設定
+	virtual void SetPosition(const DirectX::XMFLOAT3& position) override {
+		this->position = position; 
+		if(m_pMoveCollider)
+			m_pMoveCollider->SetPosition(position); 
+	}
 
 	// 移動用コライダー
 	Collider* GetMoveCollider() { return m_pMoveCollider.get(); }

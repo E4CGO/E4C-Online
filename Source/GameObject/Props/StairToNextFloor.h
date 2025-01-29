@@ -24,11 +24,12 @@ public:
 public:
 	virtual void Update(float elapsedTime) override;
 	void RenderDX12(const RenderContextDX12& rc) override;
-
 private:
 	void GoToNextFloor();
 
 	std::unique_ptr<CylinderRenderer> m_cylinderRenderer;
+
+	bool enable = true;
 };
 
 #endif // !__INCLUDE_STAIRTONEXTFLOOR__

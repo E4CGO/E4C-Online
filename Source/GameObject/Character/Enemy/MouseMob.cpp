@@ -1,4 +1,4 @@
-﻿//! @file MouseMob.cpp
+//! @file MouseMob.cpp
 //! @note 
 #include "MouseMob.h"
 #include "TAKOEngine/Physics/SphereCollider.h"
@@ -22,11 +22,9 @@ MouseMob::MouseMob(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("
 	moveSpeed = 2.0f;
 	turnSpeed = DirectX::XMConvertToRadians(360);
 	SetSearchRange(24.0f);
-	//m_AttackRange = 1.25f;
 	m_AttackRange = 1.8f;
 
 	// 当たり判定
-	//m_pColliders[HitCollider::BodyHit] = new SphereCollider(scaling * 1.2f);
 	// 衝突判定
 	SetMoveCollider({ { 0, radius / scale.y, 0 }, radius }, Collider::COLLIDER_OBJ::ENEMY);
 

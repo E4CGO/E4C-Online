@@ -1,11 +1,12 @@
-﻿#include "TAKOEngine/Runtime/tentacle_lib.h"
+#include "TAKOEngine/Runtime/tentacle_lib.h"
 
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
-
+#include "PreloadManager.h"
 // 初期化
 void SceneLoading::Initialize()
 {
+	PRELOAD.Join("SceneLoading.Sprite");
 	if (T_GRAPHICS.isDX12Active)
 	{
 		m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
@@ -13,10 +14,7 @@ void SceneLoading::Initialize()
 		m_loadingPlane = std::make_unique<PlaneDX12>("Data/Sprites/gear.png", 1.0f, XMFLOAT3{ 0.0f, 0.0f, -10.0f }, 0.0f, 1.5f);
 		m_loadingPlane->SetShaderDX12(ModelShaderDX12Id::Loading);
 
-		CameraManager& cameraManager = CameraManager::Instance();
-		mainCamera = new Camera();
-		cameraManager.Register(mainCamera);
-		cameraManager.SetCamera(0);
+		mainCamera = std::make_unique<Camera>();
 		mainCamera->SetPerspectiveFov(
 			DirectX::XMConvertToRadians(45),							// 画角
 			T_GRAPHICS.GetScreenWidth() / T_GRAPHICS.GetScreenHeight(),	// 画面アスペクト比
@@ -84,7 +82,7 @@ void SceneLoading::RenderDX12()
 	m_frameBuffer->Clear(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
 
 	const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
-		CameraManager::Instance().GetCamera(), m_timer, 0);
+		mainCamera.get(), m_timer, 0);
 
 	rc.d3d_command_list = m_frameBuffer->GetCommandList();
 	rc.scene_cbv_descriptor = scene_cbv_descriptor;

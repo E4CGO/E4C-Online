@@ -80,7 +80,7 @@ namespace EnemyState
 			attackData.hittableOBJ = crocodileAttack.hittableOBJ;
 			attackData.hitStartRate = crocodileAttack.hitStartRate;
 			attackData.hitEndRate = crocodileAttack.hitEndRate;
-			owner->MakeAttackCollider(attackData, crocodileAttack.capsule, &owner->GetModel(0)->FindNode("Croc_root")->worldTransform);
+			owner->MakeAttackCollider(attackData, crocodileAttack.sphere, &owner->GetModel(0)->FindNode("Croc_tongue3")->worldTransform);
 		}
 
 		/**************************************************************************//**
@@ -89,7 +89,11 @@ namespace EnemyState
 		*//***************************************************************************/
 		void AttackState::Execute(float elapsedTime)
 		{
-			owner->GetCollider(crocodileAttack.idx)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
+			Collider* collider = owner->GetCollider(crocodileAttack.idx);
+			if (collider != nullptr) {
+
+				collider->SetCurrentRate(owner->GetModel()->GetAnimationRate());
+			}
 
 			if (!owner->IsPlayAnimation())
 			{

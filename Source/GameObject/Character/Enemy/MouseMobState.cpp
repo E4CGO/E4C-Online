@@ -71,17 +71,11 @@ namespace EnemyState
 			}
 		}
 
-		/**************************************************************************//**
-		 	@brief	徘徊ステートに入る
-		*//***************************************************************************/
+		// 徘徊ステート
 		void MoveState::Enter()
 		{
 			owner->SetAnimation(::MouseMob::ANIM_MOVE, true);
 		}
-		/**************************************************************************//**
-		 	@brief		徘徊ステートを実行する
-			@param[in]	elapsedTime	経過時間
-		*//***************************************************************************/
 		void MoveState::Execute(float elapsedTime)
 		{
 			owner->UpdateTarget();
@@ -120,16 +114,17 @@ namespace EnemyState
 		*//***************************************************************************/
 		void AttackState::Execute(float elapsedTime)
 		{
-			owner->GetCollider(mouseAttack.idx)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
+			Collider* collider = owner->GetCollider(mouseAttack.idx);
+			if (collider != nullptr)
+			{
+				collider->SetCurrentRate(owner->GetModel()->GetAnimationRate());
+			}
 
 			if (!owner->IsPlayAnimation())
 			{
 				EnemyState::StateTransition(owner, ::Enemy::STATE::IDLE);
 			}
 		}
-		/**************************************************************************//**
-		 	@brief	攻撃ステートから出る
-		*//***************************************************************************/
 		void AttackState::Exit()
 		{
 			owner->DeleteAttackCollider(mouseAttack.idx);
@@ -143,7 +138,7 @@ namespace EnemyState
 		{
 			owner->SetAnimation(::MouseMob::ANIMATION::ANIM_DAMAGE, false, 0.1f);
 		}
-		
+
 		/**************************************************************************//**
 			@brief	死亡ステート
 		*//***************************************************************************/

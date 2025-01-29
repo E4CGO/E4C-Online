@@ -16,6 +16,7 @@
 #include "TAKOEngine/Rendering/Shaders/ParticleShader.h"
 #include "TAKOEngine/Rendering/Shaders/HitParticleShader.h"
 #include "TAKOEngine/Rendering/Shaders/CylinderShader.h"
+#include "TAKOEngine/Rendering/Shaders/FoliageShader.h"
 
 #include "TAKOEngine/Rendering/Shaders/UVScrollShader.h"
 #include "TAKOEngine/Rendering/Shaders/MaskShader.h"
@@ -112,6 +113,8 @@ void Graphics::FinishDX12()
 	{
 		dx12_modelshaders[i]->Finalize();
 	}
+
+	dx12_lineRenderer->Finalize();
 }
 
 //******************************************************************
@@ -582,6 +585,12 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Loading)] = std::make_unique<LoadingShaderDX12>(m_d3d_device.Get());
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Zone)] = std::make_unique<ZoneShaderDX12>(m_d3d_device.Get());
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Electric)] = std::make_unique<ElectricShaderDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Foliage)] = std::make_unique<FoliageShader>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Charge)] = std::make_unique<ChargeShaderdDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::HealCylinder)] = std::make_unique<HealingShaderdCylinderDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::HealCircle)] = std::make_unique<HealingShaderdCircleDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Beam)] = std::make_unique<BeamDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::MagicPlane)] = std::make_unique<MagicPlaneDX12>(m_d3d_device.Get());
 
 		// スプライトシェーダー生成
 		spriteShaders[static_cast<int>(SpriteShaderId::Default)] = std::make_unique<DefaultSpriteShader>(device.Get());
@@ -605,6 +614,7 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 		// レンダラ
 		debugRenderer = std::make_unique<DebugRenderer>(device.Get());
 		lineRenderer = std::make_unique<LineRenderer>(device.Get(), 1024);
+		dx12_lineRenderer = std::make_unique<LineRendererDX12>(m_d3d_device.Get(), 1024);
 
 		// パーティクル
 		m_compute[static_cast<int>(ComputeShaderDX12Id::Injection)] = std::make_unique<ParticleCompute>(m_d3d_device.Get());

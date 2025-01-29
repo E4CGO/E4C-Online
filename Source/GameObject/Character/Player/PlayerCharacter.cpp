@@ -25,8 +25,6 @@
 #include "TAKOEngine/Tool/Mathf.h"
 #include "TAKOEngine/Rendering/LineRenderer.h"
 
-
-
 PlayerCharacter::PlayerCharacter(uint32_t id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM]) : Character()
 {
 	scale = { 0.5f, 0.5f, 0.5f };
@@ -61,6 +59,10 @@ PlayerCharacter::PlayerCharacter(uint32_t id, const char* name, const uint8_t ap
 
 	// DebugPrimitive用
 	m_sphere = std::make_unique<SphereRenderer>(T_GRAPHICS.GetDeviceDX12());
+
+	m_EffectZone = std::make_unique<ZoneObject>();
+	m_EffectCharge = std::make_unique<ChargeObject>();
+	m_EffectHealing = std::make_unique<HealingObject>();
 }
 
 PlayerCharacter::PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataInfo) : Character()
@@ -86,6 +88,13 @@ PlayerCharacter::PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataI
 
 	// DebugPrimitive用
 	m_sphere = std::make_unique<SphereRenderer>(T_GRAPHICS.GetDeviceDX12());
+
+	// 効果
+	{
+		m_EffectZone = std::make_unique<ZoneObject>();
+		m_EffectCharge = std::make_unique<ChargeObject>();
+		m_EffectHealing = std::make_unique<HealingObject>();
+	}
 }
 
 /**************************************************************************//**
@@ -197,7 +206,8 @@ void PlayerCharacter::UpdateHorizontalMove(float elapsedTime)
 						}
 					}
 					position = pos - XMFLOAT3{ 0, height * 0.5f, 0 };
-					m_pMoveCollider->SetPosition(position + XMFLOAT3{ 0, radius, 0 });}
+					m_pMoveCollider->SetPosition(position + XMFLOAT3{ 0, radius, 0 });
+				}
 				else
 				{
 					position.x += mx;
@@ -249,12 +259,14 @@ void PlayerCharacter::UpdateColliders()
 bool  PlayerCharacter::CollisionVsEnemies()
 {
 	bool isHit = false;
+
+	if (!m_pMoveCollider->IsEnable()) return isHit;
+
 	HitResult hit;
 	for (Enemy*& enemy : ENEMIES.GetAll())
 	{
 		if (!enemy->GetMoveCollider()) continue;
- 
- 
+
 		if (m_pMoveCollider->Collision(enemy->GetMoveCollider(), {}, hit))
 		{
 			hit.position.y = position.y;
@@ -511,10 +523,10 @@ void PlayerCharacter::UpdateSkillTimers(float elapsedTime)
 }
 void PlayerCharacter::SwordTrail()
 {
-	
 	const iModel::Node* swordnode1 = GetSwordTrailNode();
 	LineRenderer* sword = Graphics::Instance().GetLineRenderer();
-	
+	LineRendererDX12* dx12_sword = Graphics::Instance().GetLineRendererDX12();
+
 	// トレイルデータをシフト
 	for (int i = 0; i < 2; ++i)
 	{
@@ -533,36 +545,43 @@ void PlayerCharacter::SwordTrail()
 	DirectX::XMStoreFloat3(&trailPosition[1][0], Tip);
 	if (IsTrail())
 	{
-			const int division = 10;
-			for (int i = 0; i < MAX_POLYGON - 3; ++i)
+		const int division = 10;
+		for (int i = 0; i < MAX_POLYGON - 3; ++i)
+		{
+			DirectX::XMVECTOR Root0 = DirectX::XMLoadFloat3(&trailPosition[0][i + 0]);
+			DirectX::XMVECTOR Root1 = DirectX::XMLoadFloat3(&trailPosition[0][i + 1]);
+			DirectX::XMVECTOR Root2 = DirectX::XMLoadFloat3(&trailPosition[0][i + 2]);
+			DirectX::XMVECTOR Root3 = DirectX::XMLoadFloat3(&trailPosition[0][i + 3]);
+
+			DirectX::XMVECTOR Tips0 = DirectX::XMLoadFloat3(&trailPosition[1][i + 0]);
+			DirectX::XMVECTOR Tips1 = DirectX::XMLoadFloat3(&trailPosition[1][i + 1]);
+			DirectX::XMVECTOR Tips2 = DirectX::XMLoadFloat3(&trailPosition[1][i + 2]);
+			DirectX::XMVECTOR Tips3 = DirectX::XMLoadFloat3(&trailPosition[1][i + 3]);
+
+			for (int j = 0; j < division; ++j)
 			{
-				DirectX::XMVECTOR Root0 = DirectX::XMLoadFloat3(&trailPosition[0][i + 0]);
-				DirectX::XMVECTOR Root1 = DirectX::XMLoadFloat3(&trailPosition[0][i + 1]);
-				DirectX::XMVECTOR Root2 = DirectX::XMLoadFloat3(&trailPosition[0][i + 2]);
-				DirectX::XMVECTOR Root3 = DirectX::XMLoadFloat3(&trailPosition[0][i + 3]);
+				float t = j / static_cast<float>(division - 1); // division - 1で割ることで、tの値が0から1になるように調整
+				float texcoordV = i / static_cast<float>(MAX_POLYGON - 3); // 軌跡全体に沿ったV座標を計算
+				DirectX::XMVECTOR Root = DirectX::XMVectorCatmullRom(Root0, Root1, Root2, Root3, t);
+				DirectX::XMVECTOR Tip = DirectX::XMVectorCatmullRom(Tips0, Tips1, Tips2, Tips3, t);
 
-				DirectX::XMVECTOR Tips0 = DirectX::XMLoadFloat3(&trailPosition[1][i + 0]);
-				DirectX::XMVECTOR Tips1 = DirectX::XMLoadFloat3(&trailPosition[1][i + 1]);
-				DirectX::XMVECTOR Tips2 = DirectX::XMLoadFloat3(&trailPosition[1][i + 2]);
-				DirectX::XMVECTOR Tips3 = DirectX::XMLoadFloat3(&trailPosition[1][i + 3]);
+				DirectX::XMFLOAT3 rootFloat3, tipFloat3;
+				DirectX::XMStoreFloat3(&rootFloat3, Root);
+				DirectX::XMStoreFloat3(&tipFloat3, Tip);
 
-				for (int j = 0; j < division; ++j)
+				if (T_GRAPHICS.isDX11Active)
 				{
-					float t = j / static_cast<float>(division - 1); // division - 1で割ることで、tの値が0から1になるように調整
-					float texcoordV = i / static_cast<float>(MAX_POLYGON - 3); // 軌跡全体に沿ったV座標を計算
-					DirectX::XMVECTOR Root = DirectX::XMVectorCatmullRom(Root0, Root1, Root2, Root3, t);
-					DirectX::XMVECTOR Tip = DirectX::XMVectorCatmullRom(Tips0, Tips1, Tips2, Tips3, t);
-
-					DirectX::XMFLOAT3 rootFloat3, tipFloat3;
-					DirectX::XMStoreFloat3(&rootFloat3, Root);
-					DirectX::XMStoreFloat3(&tipFloat3, Tip);
-
 					sword->AddVertex(rootFloat3, { 1, 1, 1, 1 }, { 0, texcoordV });
 					sword->AddVertex(tipFloat3, { 1, 1, 1, 1 }, { 1, texcoordV });
 				}
+				else
+				{
+					dx12_sword->AddVertex(rootFloat3, { 1, 1, 1, 1 }, { 0, texcoordV });
+					dx12_sword->AddVertex(tipFloat3, { 1, 1, 1, 1 }, { 1, texcoordV });
+				}
 			}
+		}
 	}
-	
 }
 //剣の軌跡ノード取得
 const iModel::Node* PlayerCharacter::GetSwordTrailNode()
@@ -570,14 +589,11 @@ const iModel::Node* PlayerCharacter::GetSwordTrailNode()
 	iModel::Node* node = this->GetModel()->FindNode("JOT_C_Blade");
 
 	return node;
-
 }
 void PlayerCharacter::Update(float elapsedTime)
 {
-	
-	
 	SwordTrail();
-	
+
 	std::lock_guard<std::mutex> lock(m_mut);
 	{
 		ProfileScopedSection_2("input", ImGuiControl::Profiler::Red);
@@ -603,6 +619,10 @@ void PlayerCharacter::Update(float elapsedTime)
 				};
 				angle.y = Mathf::LerpRadian(m_tempData.angle, m_tempData.sync_data.rotate, rate);
 			}
+			if (m_tempData.position.y - position.y > 10.0f)
+			{
+				position.y = m_tempData.position.y;
+			}
 		}
 	}
 	{
@@ -617,6 +637,15 @@ void PlayerCharacter::Update(float elapsedTime)
 		//ProfileScopedSection_2("character", ImGuiControl::Profiler::Purple);
 
 		Character::Update(elapsedTime);
+
+		// 効果
+		{
+			m_EffectZone->SetPosition(position);
+			m_EffectZone->Update(elapsedTime);
+			m_EffectCharge->SetPosition(position);
+			m_EffectCharge->Update(elapsedTime);
+			m_EffectHealing->Update(elapsedTime);
+		}
 	}
 	iModel::Node* node = this->GetModel()->FindNode("Mesh_0");
 }
@@ -624,7 +653,6 @@ void PlayerCharacter::Update(float elapsedTime)
 void PlayerCharacter::Render(const RenderContext& rc)
 {
 	Character::Render(rc);
-	
 
 	DirectX::XMFLOAT3 front = CameraManager::Instance().GetCamera()->GetFront();
 	DirectX::XMFLOAT3 eye = CameraManager::Instance().GetCamera()->GetEye();
@@ -671,16 +699,20 @@ void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
 {
 	Character::RenderDX12(rc);
 
-	
-
 	DirectX::XMFLOAT3 front = CameraManager::Instance().GetCamera()->GetFront();
 	DirectX::XMFLOAT3 eye = CameraManager::Instance().GetCamera()->GetEye();
 	DirectX::XMFLOAT3 namePos = this->position + DirectX::XMFLOAT3{ 0, 2.2f, 0 };
 	float dot = XMFLOAT3Dot(front, namePos - eye);
 
-	/*LineRenderer* sword = Graphics::Instance().GetLineRenderer();
-	sword->Render(T_GRAPHICS.GetDeviceContext(), rc.view, rc.projection);*/
+	LineRendererDX12* dx12_sword = Graphics::Instance().GetLineRendererDX12();
+	dx12_sword->Render(rc.d3d_command_list, m_swordSprite.get());
 	if (dot < 0.0f) return;
+
+	{
+		m_EffectZone->RenderDX12(rc);
+		m_EffectCharge->RenderDX12(rc);
+		m_EffectHealing->RenderDX12(rc);
+	}
 
 #ifdef _DEBUG
 	m_pMoveCollider->DrawDebugPrimitive({ 1, 1, 1, 1 });
@@ -799,14 +831,12 @@ void PlayerCharacter::OnDamage(const uint16_t& damage)
 	}
 	else
 	{
-		if(!superArmor)
-		stateMachine->ChangeState(static_cast<int>(STATE::HURT));
+		if (!superArmor)
+			stateMachine->ChangeState(static_cast<int>(STATE::HURT));
 	}
 }
 
 bool PlayerCharacter::InputMove(float elapsedTime) {
-
-
 	// 移動処理
 	Move(inputDirection.x, inputDirection.y, this->moveSpeed);
 	// 旋回処理
@@ -903,13 +933,13 @@ void PlayerCharacter::ImportSyncData(const SYNC_DATA& data)
 	if (m_tempData.old_sync_count < data.sync_count_id)
 	{
 		std::lock_guard<std::mutex> lock(m_mut);
+		Show();
 		if (m_tempData.old_sync_count == 0)	// 初めての同期
 		{
 			SetPosition({ data.position[0], data.position[1], data.position[2] });
 			Stop();
 			//AddImpulse({ data.velocity[0], data.velocity[1], data.velocity[2] });
 			SetAngle({ 0.0f, data.rotate, 0.0f });
-			Show();
 		}
 		m_tempData.old_sync_count = m_tempData.sync_data.sync_count_id;
 		m_tempData.timer = 0.0f;

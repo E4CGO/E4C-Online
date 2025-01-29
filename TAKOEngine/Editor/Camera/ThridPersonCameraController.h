@@ -14,8 +14,6 @@ public:
 
 	void SetPlayer(Character* player) { this->player = player; }
 
-	void CameraShake(float elapsedTime);
-
 	void Imgui();
 
 	DirectX::XMFLOAT2  GetOffset() { return offset; };
@@ -66,7 +64,7 @@ private:
 	
 	float distanceCache;
 
-	bool shake = false;
-};
 
+};
 #define TPSCamera ThridPersonCameraController::Instance()
+

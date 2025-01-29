@@ -75,13 +75,14 @@ private:
 	std::unordered_map<std::string, std::unique_ptr<ModelObject>> models;
 
 	std::unique_ptr<ModelObject> sky;
+
 	std::unique_ptr<SpriteDX12> m_sprites[8];
 
-	std::unique_ptr<RunningDust> runningDust1;
-	std::deque<RunningDust> runningDust;
+	std::unique_ptr<RunningDustDX12> runningDust1;
+	std::deque<RunningDustDX12> runningDust;
 	bool running = true;
 	float f_timer;
-	int f_count = 0.0f;// 何個目のモデルか数える
+	int f_count = 0;// 何個目のモデルか数える
 	float f_INTERVAL = 0.1f;// push の間隔
 	float f_popINTERVAL = 0.3f;// pop の間隔
 	float f_alpha = 0.2f;// 透明度
@@ -118,6 +119,8 @@ private:
 
 	float m_sceneGlobalTimer = 0;
 	float m_sceneTickTimer = 0;
+	float shakeTimer = 0;
+	float shakeTime = 0.2f;
 };
 
 #endif // !__INCLUDED_STAGE_OPEN_WORLD_E4C_H__
