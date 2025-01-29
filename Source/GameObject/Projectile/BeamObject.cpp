@@ -30,7 +30,7 @@ BeamObject::BeamObject(PlayerCharacter* owner) : Projectile("Data/Model/Object/E
 	DirectX::XMStoreFloat3(&startPosition, newPosition);
 
 	m_beam = std::make_unique<ModelObject>("Data/Model/Object/EffectBeam.glb", 1.0f, ModelObject::DX12, ModelObject::LHS_TOON);
-	m_beam->SetShader("EffectBeam", ModelShaderDX12Id::HealCylinder);
+	m_beam->SetShader("EffectBeam", ModelShaderDX12Id::Beam);
 
 	m_beam->SetPosition(startPosition);
 

@@ -69,6 +69,8 @@ enum class ModelShaderDX12Id
 	Charge,
 	HealCylinder,
 	HealCircle,
+	Beam,
+	MagicPlane,
 
 	EnumCount
 };
