@@ -119,6 +119,8 @@ public:
 		float hitEndRate = 1.0f;
 	};
 	void MakeAttackCollider(ATTACK_COLLIDER_DATA data, Sphere sphereParam, DirectX::XMFLOAT4X4* transform);
+	void MakePlayerNormalAttackCollider(ATTACK_COLLIDER_DATA data, Sphere sphereParam, DirectX::XMFLOAT4X4* transform);
+	void MakePlayerSkill1AttackCollider(ATTACK_COLLIDER_DATA data, Sphere sphereParam, DirectX::XMFLOAT4X4* transform);
 	void MakeAttackCollider(ATTACK_COLLIDER_DATA data, Capsule capsuleParam, DirectX::XMFLOAT4X4* transform);
 	void DeleteAttackCollider(uint8_t idx);
 

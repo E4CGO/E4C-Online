@@ -37,7 +37,13 @@ void Camera::SetLookAt(const DirectX::XMFLOAT3& eye, const DirectX::XMFLOAT3& fo
 	this->eye = eye;
 	this->focus = focus;
 }
-
+void Camera::ShakeStart(float shakeTime, float shakeAmplitude)
+{
+	CameraManager::Instance().GetCamera()->ResetShakeTimer();
+	CameraManager::Instance().GetCamera()->SetShakeAmplitude(shakeAmplitude);
+	CameraManager::Instance().GetCamera()->SetShakeTime(shakeTime);
+	CameraManager::Instance().GetCamera()->SetShake(true);
+}
 void Camera::SetPerspectiveFov(float fovY, float aspect, float nearZ, float farZ)
 {
 	// 画角、画面比率、クリップ距離からプロジェクション行列を作成
