@@ -142,9 +142,10 @@ void GrassShader::Render(const RenderContextDX12& rc, const ModelDX12::Mesh& mes
 	// シェーダーリソースビュー設定
 	rc.d3d_command_list->SetGraphicsRootDescriptorTable(3, rc.grassData.grass_srv_descriptor->GetGpuHandle());
 	rc.d3d_command_list->SetGraphicsRootDescriptorTable(4, rc.grassData.grass_srv_distortion_descriptor->GetGpuHandle());
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(5, rc.grassData.grass_srv_density_descriptor->GetGpuHandle());
 
 	//サンプラーステート設定
-	rc.d3d_command_list->SetGraphicsRootDescriptorTable(5, m_sampler->GetDescriptor()->GetGpuHandle());
+	rc.d3d_command_list->SetGraphicsRootDescriptorTable(6, m_sampler->GetDescriptor()->GetGpuHandle());
 
 	// 描画
 	rc.d3d_command_list->DrawIndexedInstanced(static_cast<UINT>(res_mesh->indices.size()), 1, 0, 0, 0);

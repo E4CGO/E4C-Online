@@ -133,6 +133,7 @@ void StageOpenWorld_E4C::Initialize()
 		// 草情報
 		m_sprites[2] = std::make_unique<SpriteDX12>(1, "Data/Sprites/distortiontexture.png");
 		m_sprites[3] = std::make_unique<SpriteDX12>(1, "Data/Sprites/grass.png");
+		m_sprites[4] = std::make_unique<SpriteDX12>(1, "Data/Sprites/density.png");
 	}
 
 	// 光
@@ -320,6 +321,7 @@ void StageOpenWorld_E4C::RenderDX12()
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 		rc.grassData.grass_srv_descriptor = m_sprites[3]->GetDescriptor();
 		rc.grassData.grass_srv_distortion_descriptor = m_sprites[2]->GetDescriptor();
+		rc.grassData.grass_srv_density_descriptor = m_sprites[4]->GetDescriptor();
 
 		// skyBox
 		{

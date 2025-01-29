@@ -1,6 +1,8 @@
 #include "Grass.hlsli" 
 
 Texture2D distortion_texture : register(t1);
+Texture2D densityMap : register(t2);
+
 SamplerState sampler0 : register(s0);
 
 float random(in float2 st)
@@ -61,9 +63,18 @@ float4x4 angle_axis(float angle, float3 axis)
 [maxvertexcount(BLADE_SEGMENTS * 2 + 1)]
 void main(triangle DS_OUTPUT input[3], inout TriangleStream<GS_OUT> output)
 {
+    float2 uv = float2((input[0].position.x / 150.0f + 0.5f), (input[0].position.z / -150.0f + 0.5f));
+    uv = clamp(uv, 0.0f, 1.0f);
+    float density = densityMap.SampleLevel(sampler0, uv, 0).g;
+    
+    if (density < 0.5f)
+    {
+        return;
+    }
+    
     const float perlin_noise = noise(input[0].position.xyz * perlin_noise_distribution_factor);
-    const float grass_blade_height = grass_height_factor + (perlin_noise * 2.0 - 1.0) * grass_height_variance;
-    const float grass_blade_width = grass_width_factor;
+    const float grass_blade_height = grass_height_factor + (perlin_noise * 2.0 - 1.0) * grass_height_variance * density;
+    const float grass_blade_width = grass_width_factor * density;
     const float4 withered_color = float4(perlin_noise * grass_withered_factor, 0.0, 0.0, 1.0);
     
     const float s = random(input[1].position.xy);

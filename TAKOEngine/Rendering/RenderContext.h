@@ -219,6 +219,7 @@ struct GrassData
 {
 	const Descriptor* grass_srv_descriptor = nullptr;
 	const Descriptor* grass_srv_distortion_descriptor = nullptr;
+	const Descriptor* grass_srv_density_descriptor = nullptr; // 草の生え具合
 	DirectX::XMFLOAT4 position = {};
 };
 
