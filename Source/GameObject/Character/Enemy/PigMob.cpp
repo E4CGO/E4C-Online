@@ -7,6 +7,7 @@
 
 #include "GameObject/Character/Enemy/PigMobState.h"
 #include "TAKOEngine/Physics/CollisionManager.h"
+#include "Map/MapTileManager.h"
 
 /**************************************************************************//**
 	@brief		コンストラクタ
@@ -55,7 +56,12 @@ PigMob::PigMob(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("Data
 *//***************************************************************************/
 void PigMob::Shot()
 {
-	// TODO コインを飛ばす
+	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById(GetTarget());
+	if (player == nullptr) return;
+
+	// コインを飛ばす
+	Projectile* coin = PROJECTILES.Register(new CoinBullet(player->GetPosition(), this));
+
 	// リロードフラグオフ
 	SetReload(false);
 }
@@ -76,4 +82,72 @@ void PigMob::SetReload(bool reloaded)
 		moveSpeed = m_tempMoveSpeed;
 	}
 
+}
+
+/**************************************************************************//**
+	@brief		コンストラクタ
+	@param[in]    target	
+	@param[in]    owner	
+*//***************************************************************************/
+CoinBullet::CoinBullet(DirectX::XMFLOAT3 target, Character* owner) : Projectile("Data/Model/Object/coin_fixed.glb", 1.0f, owner)
+{
+	m_radius = 0.5f;
+	m_power = 10;
+	m_speed = 10.0f;
+	m_turnSpeed = DirectX::XM_2PI;
+	m_existTime = 5.0f;
+	m_currentTimer = m_existTime;
+
+	SetMoveCollider({ {0, 0, 0}, m_radius }, Collider::COLLIDER_OBJ::ENEMY_PROJECTILE);
+	m_pColliders.clear();
+	MakeAttackCollider(m_power, 0, { {}, m_radius }, Collider::COLLIDER_OBJ::ENEMY_PROJECTILE, Collider::COLLIDER_OBJ::PLAYER, &transform);
+	m_pColliders[0]->SetCollisionFunction([&](Collider* myCol, Collider* otherCol) {CollisionFunction(myCol, otherCol); });
+
+	DirectX::XMFLOAT4X4 matrix = owner->GetModel()->FindNode("Pig_tail_jnt5")->worldTransform;
+	SetPosition({ matrix._41, matrix._42, matrix._43 });
+	m_direction = XMFLOAT3Normalize({ target.x - position.x, 0, target.z - position.z });
+}
+
+void CoinBullet::Update(float elapsedTime)
+{
+	DirectX::XMFLOAT3 velocity = m_direction * m_speed * elapsedTime;
+
+	// 衝突判定はオーナーのプレイヤーが計算
+	if (static_cast<PigMob*>(m_owner)->IsMine())
+	{
+		Sphere sphere;
+		sphere.position = position;
+		sphere.radius = m_radius;
+		if (MAPTILES.IntersectSphereVsMap(sphere))
+		{
+			Destory();
+		}
+	}
+	position += velocity;
+
+	Projectile::Update(elapsedTime);
+
+	if (m_currentTimer < 0.0f)
+	{
+		Destory();
+	}
+}
+
+/**************************************************************************//**
+	@brief	当たり判定処理
+*//***************************************************************************/
+void CoinBullet::CollisionFunction(Collider* myCol, Collider* otherCol)
+{
+	if (m_power > otherCol->GetArmor())
+	{
+		Character* chara = static_cast<Character*>(otherCol->GetOwner());
+		if (chara->IsGround())
+		{
+			uint16_t damage = m_power - otherCol->GetArmor();
+			chara->OnDamage(damage);
+		}
+	}
+
+	myCol->SetEnable(false);
+	Destory();
 }
