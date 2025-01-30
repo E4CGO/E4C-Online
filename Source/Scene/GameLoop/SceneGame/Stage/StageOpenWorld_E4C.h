@@ -15,6 +15,7 @@
 #include "TAKOEngine/Rendering/Plane.h"
 #include "GameObject/Props/Teleporter.h"
 #include "GameObject/Props/Spawner.h"
+//#include "GameObject/Props/OneWayWall.h"
 #include "GameObject/Character/Enemy/MouseMob.h"
 #include "Source/UI/Widget/WidgetPlayerHP.h"
 #include "Source/UI/Widget/WidgetPauseMenu.h"
@@ -71,6 +72,7 @@ private:
 	MapTile* village_collision = nullptr;
 
 	std::unique_ptr <Teleporter> teleporter;
+	//std::unique_ptr <OneWayWall> onewayWall;
 
 	std::unordered_map<std::string, std::unique_ptr<ModelObject>> models;
 

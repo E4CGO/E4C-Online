@@ -211,6 +211,8 @@ set(Source__GameObject__Props
     "Source/GameObject/Props/ChargeObject.h"
     "Source/GameObject/Props/HealingObject.cpp"
     "Source/GameObject/Props/HealingObject.h"
+    "Source/GameObject/Props/OneWayWall.cpp"
+    "Source/GameObject/Props/OneWayWall.h"
     "Source/GameObject/Props/Spawner.cpp"
     "Source/GameObject/Props/Spawner.h"
     "Source/GameObject/Props/SpawnerManager.cpp"
