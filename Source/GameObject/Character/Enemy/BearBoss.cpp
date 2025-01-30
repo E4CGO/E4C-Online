@@ -4,15 +4,18 @@
 #include "BearBoss.h"
 #include "BearBossState.h"
 #include "TAKOEngine/Physics/CollisionManager.h"
+#include "Network/OnlineController.h"
 
 BearBoss::BearBoss(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("Data/Model/Enemy/MDLANM_ENMboss_0123.glb", scaling, renderMode)
 {
 	enemyType = ENEMY_TYPE::BEAR_BOSS;
 	radius = 3.0f;
-	maxHp = hp = 500;
+	maxHp = hp = 1000;
 	atk = 10;
 	moveSpeed = 1.0f;
 	turnSpeed = DirectX::XMConvertToRadians(90);
+
+	SetSearchRange(20.0f);
 
 	// 衝突判定
 	SetMoveCollider({ { 0, radius, 0 }, radius }, Collider::COLLIDER_OBJ::ENEMY);
@@ -34,22 +37,70 @@ BearBoss::BearBoss(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("
 
 	{
 		using namespace EnemyState::BearBoss;
-		stateMachine->RegisterState(Enemy::STATE::IDLE, new EnemyState::BearBoss::IdleState(this));
+		stateMachine->RegisterState(Enemy::STATE::IDLE, new IdleState(this));
 		stateMachine->SetState(Enemy::STATE::IDLE);
 
 		stateMachine->RegisterState(::Enemy::STATE::HURT, nullptr);
-		//stateMachine->RegisterState(::Enemy::STATE::DEATH, nullptr);
+		stateMachine->RegisterState(::Enemy::STATE::DEATH, new DeathState(this));
 
-		stateMachine->RegisterState(STATE::WANDER, new EnemyState::BearBoss::MoveState(this));
-
+		stateMachine->RegisterState(STATE::WANDER, new MoveState(this));
+		stateMachine->RegisterState(STATE::FOLLOW, new FollowState(this));
 		stateMachine->RegisterState(STATE::ATTACK, new AttackState(this));
-		stateMachine->RegisterSubState(STATE::ATTACK, ATTACK_STATE::FOLLOW, new AttackFollowState(this));
-		stateMachine->RegisterSubState(STATE::ATTACK, ATTACK_STATE::PUNCH, new AttackPunchState(this));
+
+		stateMachine->RegisterState(STATE::ROAR, new RoarState(this));
+		stateMachine->RegisterState(STATE::FORM_CHANGE, new FormChangeState(this));
+
+		stateMachine->RegisterState(STATE::STUN, new StunState(this));
+		stateMachine->RegisterSubState(STATE::STUN, STUN_STATE::STUN_START, new StunStartState(this));
+		stateMachine->RegisterSubState(STATE::STUN, STUN_STATE::STUN_LOOP, new StunLoopState(this));
+		stateMachine->RegisterSubState(STATE::STUN, STUN_STATE::STUN_END, new StunEndState(this));
 	}
 }
 
-void BearBoss::UpdateTarget()
+
+void BearBoss::OnDamage(const uint16_t& damage)
 {
+	if (IsMine() || ONLINE_CONTROLLER->GetState() != Online::State::SYNC)
+	{
+		hp -= damage;
+		AddHate(PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetClientId(), damage);
+		if (hp > 0)
+		{
+			switch (m_phase)
+			{
+				case 0:
+					if (this->hp < (this->maxHp / 4 * 3)) // HP 75%
+					{
+						EnemyState::StateTransition(this, STATE::STUN);
+						m_phase++;
+					}
+					break;
+				case 1:
+					if (this->hp < (this->maxHp / 4 * 2)) // HP 50%
+					{
+						EnemyState::StateTransition(this, STATE::FORM_CHANGE);
+						m_phase++;
+					}
+					break;
+				case 2:
+					if (this->hp < (this->maxHp / 4))  // HP 25%
+					{
+						EnemyState::StateTransition(this, STATE::STUN);
+						m_phase++;
+					}
+					break;
+			}
+		}
+		else
+		{
+			EnemyState::StateTransition(this, Enemy::STATE::DEATH);
+		}
+	}
+	else
+	{
+		// 同期
+		ONLINE_CONTROLLER->RegisterHit(enemy_id, damage);
+	}
 }
 
 #include "TAKOEngine/Physics/AttackCollider.h"
