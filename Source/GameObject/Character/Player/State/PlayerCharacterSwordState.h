@@ -180,7 +180,7 @@ namespace PlayerCharacterState
 		{
 		public:
 
-			float impulseSpeed = 50.0f;
+			float impulseSpeed = 75.0f;
 
 			// コンストラクタ
 			Skill1ContinueStart(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
