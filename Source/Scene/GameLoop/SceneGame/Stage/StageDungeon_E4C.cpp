@@ -344,11 +344,11 @@ void StageDungeon_E4C::RenderDX12()
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
 		// プレイヤー
-		PlayerCharacterManager::Instance().RenderDX12(rc);
 		GameObjectManager::Instance().RenderDX12(rc);
 		SpawnerManager::Instance().RenderDX12(rc);
 		ENEMIES.RenderDX12(rc);
 		MAPTILES.RenderDX12(rc);
+		PlayerCharacterManager::Instance().RenderDX12(rc);
 
 		for (RoomBase* room : rootRoom->GetAll())
 		{
@@ -375,6 +375,7 @@ void StageDungeon_E4C::RenderDX12()
 	{
 		T_TEXT.BeginDX12();
 		floorText->RenderDX12(rc);
+		UI.RenderDX12(rc);
 		T_TEXT.EndDX12();
 	}
 

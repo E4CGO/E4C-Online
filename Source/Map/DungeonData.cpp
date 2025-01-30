@@ -688,6 +688,10 @@ void DungeonData::InitCollisionFileDatas()
 
 void DungeonData::InitTileDatas()
 {
+	// 現在のカレントディレクトリを保存しておく
+	char currentDirectory[260];
+	GetCurrentDirectoryA(260, currentDirectory);
+
 	// まずリサイズ
 	m_roomTileDatas.resize(RoomType::ROOMTYPE_COUNT);
 	for (int i = (int)RoomType::FIRST_START; i < (int)RoomType::ROOMTYPE_COUNT; i++) m_roomTileDatas.at(i).resize(TileType::TILETYPE_COUNT);
@@ -720,7 +724,7 @@ void DungeonData::InitTileDatas()
 		}
 	}
 
-	int a = 0;
+	SetCurrentDirectoryA(currentDirectory);
 }
 
 TILE_DATA DungeonData::LoadTileData(nlohmann::json_abi_v3_11_3::json nodeData)
