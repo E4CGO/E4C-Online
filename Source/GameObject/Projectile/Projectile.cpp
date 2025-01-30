@@ -13,7 +13,6 @@
 void Projectile::Update(float elapsedTime)
 {
 	ModelObject::Update(elapsedTime);
-	UpdateColliders();
 	m_currentTimer -= elapsedTime;
 }
 

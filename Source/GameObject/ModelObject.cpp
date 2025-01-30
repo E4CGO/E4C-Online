@@ -257,6 +257,8 @@ void ModelObject::Update(float elapsedTime)
 			model->UpdateTransform(transform);
 		}
 	}
+
+	UpdateColliders();
 }
 
 /**************************************************************************//**
