@@ -1398,6 +1398,8 @@ HRESULT Graphics::CreateDummyTexture(ID3D12Resource** d3d_resource, int color)
 //******************************************************************
 HRESULT Graphics::CopyBuffer(ID3D12Resource* d3d_src_resource, ID3D12Resource* d3d_dst_resource)
 {
+	std::lock_guard<std::mutex> lock(m_mutCopyBuffer);
+
 	D3D12_RESOURCE_BARRIER d3d_resource_barrier = {};
 	d3d_resource_barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	d3d_resource_barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;

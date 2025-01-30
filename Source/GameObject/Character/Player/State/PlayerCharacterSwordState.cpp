@@ -85,7 +85,6 @@ namespace PlayerCharacterState
 			subState->Execute(elapsedTime);
 
 			// 反重力
-			owner->StopFall();
 			owner->StopMove();
 
 			if (!owner->IsPlayAnimation()) // 攻撃モーション終わり
