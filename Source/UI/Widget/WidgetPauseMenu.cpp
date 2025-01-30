@@ -1,4 +1,4 @@
-﻿#include "WidgetPauseMenu.h"
+#include "WidgetPauseMenu.h"
 
 #include "TAKOEngine/Rendering/ResourceManager.h"
 #include "TAKOEngine/GUI/UIManager.h"
@@ -36,7 +36,7 @@ WidgetPauseMenu::WidgetPauseMenu()
 			this->isActive = true;
 		});
 	m_pauseButton->SetSize({ m_pauseButton->GetSize().x * 0.2f * SCREEN_W / 1920.0f, m_pauseButton->GetSize().y * 0.2f * SCREEN_H / 1080.0f });
-	m_pauseButton->SetPosition({ SCREEN_W * 0.95f, SCREEN_H * 0.01f });
+	m_pauseButton->SetPosition({ SCREEN_W * 0.95f, SCREEN_H * 0.02f });
 
 	m_resumeButton = new WidgetButtonImage("", "Data/Sprites/UI/Game/RESUME_d.png", "Data/Sprites/UI/Game/RESUME_h.png", [&](WidgetButton*) {
 		this->isActive = false;

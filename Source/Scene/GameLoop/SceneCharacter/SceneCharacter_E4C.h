@@ -83,6 +83,8 @@ private:
 
 	std::unique_ptr<FreeCameraController> cameraController;
 
+	std::unique_ptr<ModelObject> m_background;
+
 	std::vector<PlayerCharacter*> m_previewCharacters;
 	int m_selectedCharacter = 0; // 選択したキャラ
 

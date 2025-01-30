@@ -15,7 +15,7 @@ WidgetCharacterSelect::WidgetCharacterSelect(SceneCharacter_E4C* scene) : m_pSce
 {
 	const std::vector<PlayerCharacter*>& characters = m_pScene->GetCharacters();
 
-	DirectX::XMFLOAT2 size = { SCREEN_W * 0.2f, SCREEN_H * 0.7f };
+	DirectX::XMFLOAT2 size = { SCREEN_W * 0.21f, SCREEN_H * 0.7f };
 	for (int i = 0; i < characters.size(); i++)
 	{
 		WidgetCharacter* widget = new WidgetCharacter(scene, i, characters.at(i));
@@ -153,7 +153,7 @@ void WidgetCharacter::RenderDX12(const RenderContextDX12& rc)
 		T_TEXT.RenderDX12(
 			FONT_ID::HGpop,
 			Encode::string_to_wstring(m_pCharacter->GetName()),
-			m_position.x + 5.0f, m_position.y + 5.0f
+			m_position.x + 10.0f, m_position.y - 5.0f
 		);
 	}
 }
