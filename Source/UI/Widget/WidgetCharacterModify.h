@@ -27,6 +27,8 @@ public:
 	void RenderDX12(const RenderContextDX12& rc);
 
 	void SaveData();
+
+	void SetCharacterOptions();
 private:
 
 	DirectX::XMFLOAT2 pos;
@@ -52,6 +54,8 @@ private:
 	PlayerCharacterData::CharacterInfo m_info;
 	PlayerCharacterData::CharacterInfo m_infoTemp;
 	std::vector<Widget*> m_pWidgets;
+	std::vector<Widget*> m_pWidgetsCharacterOptions;
+
 };
 
 #endif // !__INCLUDED_WIDGET_CHARACTER_MODIFY_H__

@@ -645,6 +645,15 @@ void PlayerCharacter::Update(float elapsedTime)
 			m_EffectCharge->SetPosition(position);
 			m_EffectCharge->Update(elapsedTime);
 			m_EffectHealing->Update(elapsedTime);
+
+			if (m_DefenceBuffTimeoutTimer > 0)
+			{
+				m_DefenceBuffTimeoutTimer -= elapsedTime;
+			}
+			else
+			{
+				m_isDefenceBuff = false;
+			}
 		}
 	}
 	iModel::Node* node = this->GetModel()->FindNode("Mesh_0");
