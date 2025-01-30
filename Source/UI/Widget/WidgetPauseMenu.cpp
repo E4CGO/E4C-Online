@@ -81,13 +81,15 @@ void WidgetPauseMenu::Update(float elapsedTime)
 
 		if (isSettingsActive)
 		{
-			m_settingsWindow->Update(elapsedTime);
-
 			if (m_settingsWindow->IsEnd())
 			{
 				isSettingsActive = false;
-				m_settingsWindow->~WidgetSettingWindow();
 				delete m_settingsWindow;
+				m_settingsWindow = nullptr;
+			}
+			else
+			{
+				m_settingsWindow->Update(elapsedTime);
 			}
 		}
 	}

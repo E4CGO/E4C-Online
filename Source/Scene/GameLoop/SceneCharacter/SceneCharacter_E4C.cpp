@@ -139,12 +139,12 @@ void SceneCharacter_E4C::Update(float elapsedTime)
 		character->Update(elapsedTime);
 	}
 
+	m_background->Update(elapsedTime);
+
 #ifdef _DEBUG
 	// カメラ更新
 	cameraController->Update();
 	cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
-
-	m_background->Update(elapsedTime);
 
 	//CameraManager::Instance().GetCamera()->Move2PointToCamera(CameraManager::Instance().GetCamera()->GetEye(), { 6.f,2.f,9.f }, CameraManager::Instance().GetCamera()->GetFocus(), { -3.0f, 0.0, 0.0f }, transitiontime, 2.f, elapsedTime);
 #endif // _DEBUG
@@ -184,9 +184,10 @@ void SceneCharacter_E4C::Render()
 
 	T_TEXT.End();
 
+	DrawSceneGUI();
+
 #ifdef _DEBUG
 	// DebugIMGUI
-	DrawSceneGUI();
 	//shadowMapRenderer->DrawDebugGUI();
 #endif // _DEBUG
 }

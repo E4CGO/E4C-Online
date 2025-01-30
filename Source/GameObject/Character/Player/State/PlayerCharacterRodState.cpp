@@ -98,13 +98,13 @@ namespace PlayerCharacterState
 		{
 			if (!owner->IsPlayAnimation())
 				owner->GetStateMachine()->ChangeSubState(FIREBALL_STATE::CHARGE);
-			
+
 			if (owner->IsPlayer())
 			{
 				DirectX::XMFLOAT3 target = owner->GetTarget();
 				owner->FaceToCamera();
 
-				if(owner->ReleaseAttackNormal())
+				if (owner->ReleaseAttackNormal())
 					owner->GetStateMachine()->ChangeSubState(FIREBALL_STATE::ATTACK_END);
 			}
 		}
@@ -136,7 +136,7 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeSubState(FIREBALL_STATE::ATTACK_2);
 					}
-					
+
 					owner->ModifyMp(-20.0f * m_chargeTme * 0.25f);
 				}
 			}
@@ -190,7 +190,7 @@ namespace PlayerCharacterState
 
 			PlayerTransition(
 				owner,
-				flag_Jump | flag_Move );
+				flag_Jump | flag_Move);
 		}
 
 		// 特殊攻撃ステート
@@ -230,11 +230,14 @@ namespace PlayerCharacterState
 
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_ATTACK_SPECIAL_FIRST, false, 0.1f);
 
+			owner->GetEffectCharge()->Activate();
+			owner->GetEffectCharge()->SetLooping();
+
 			if (owner->IsPlayer())
 			{
 				m_dir = owner->GetTarget() - owner->GetPosition();
-				m_dir = XMFLOAT3Normalize({m_dir.x, 0, m_dir.z});
-				XMFLOAT3 pos = owner->GetPosition() + XMFLOAT3{0.5f * m_dir.x, 1.0f, 0.5f * m_dir.z};
+				m_dir = XMFLOAT3Normalize({ m_dir.x, 0, m_dir.z });
+				XMFLOAT3 pos = owner->GetPosition() + XMFLOAT3{ 0.5f * m_dir.x, 1.0f, 0.5f * m_dir.z };
 				m_dir = XMFLOAT3Normalize(owner->GetTarget() - pos);
 
 				XMFLOAT3 angle{};

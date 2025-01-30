@@ -72,9 +72,20 @@ void StageOpenWorld_E4C::Initialize()
 	//onewayWall = std::make_unique<OneWayWall>(OneWayWall::PlusZ); //引数に通れる方向が必要
 	//onewayWall->SetPosition({ 15.0f, 3.5f, 10.0f });
 
-	Spawner* spawner = new Spawner(ENEMY_TYPE::BEAR_BOSS, 1, -1);
+	Spawner* spawner = new Spawner(ENEMY_TYPE::MOUSE, 10, -1);
 	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
-	spawner->SetSearchRadius(10.0f);
+	spawner->SetSearchRadius(20.0f);
+	spawner->SetSpawnRadius(20.0f);
+	SpawnerManager::Instance().Register(spawner);
+	spawner = new Spawner(ENEMY_TYPE::CROC, 10, -1);
+	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
+	spawner->SetSearchRadius(20.0f);
+	spawner->SetSpawnRadius(20.0f);
+	SpawnerManager::Instance().Register(spawner);
+	spawner = new Spawner(ENEMY_TYPE::BIRD, 10, -1);
+	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
+	spawner->SetSearchRadius(20.0f);
+	spawner->SetSpawnRadius(20.0f);
 	SpawnerManager::Instance().Register(spawner);
 
 	if (T_GRAPHICS.isDX11Active)
@@ -114,7 +125,7 @@ void StageOpenWorld_E4C::Initialize()
 		models.emplace("flower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Flower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::Foliage));
 
 		models.emplace("portal", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Portal.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
-		models["portal"]->SetPosition({ -34.0f, 4.0f, -45.0f });
+		models["portal"]->SetPosition({ -34.5f, 4.3f, -45.0f });
 		models["portal"]->SetAngle({ 0.0f, 1.5f, 0.0f });
 
 		models.emplace("target1", std::make_unique<ModelObject>("Data/Model/Object/BlockTarget.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
@@ -134,11 +145,11 @@ void StageOpenWorld_E4C::Initialize()
 		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
 		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
 
-		runningDust1 = std::make_unique<RunningDustDX12>("Data/Sprites/smoke.png", 100.0f,
-			DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),	// position
-			1.0f,			// alpha
-			f_count,	// model_id
-			0);		// age
+		//runningDust1 = std::make_unique<RunningDustDX12>("Data/Sprites/smoke.png", 100.0f,
+		//	DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),	// position
+		//	1.0f,			// alpha
+		//	f_count,	// model_id
+		//	0);		// age
 
 		// 草情報
 		{
@@ -177,13 +188,12 @@ void StageOpenWorld_E4C::Initialize()
 	cameraController->SetEnable(true);
 	cameraController->SetPlayer(player);
 	CURSOR_OFF;
-	
+
 	PRELOAD.Unlock();
 	Sound::Instance().InitAudio();
 	Sound::Instance().LoadAudio("Data/Sound/3-Dreamland(Overworld).mp3");
 	Sound::Instance().LoadAudio("Data/Sound/4-Encounter(battle_theme_Overworld_Tutorial).mp3");
 	Sound::Instance().PlayAudio(0);
-
 
 	// ダンジョンの階の再設定
 	// 1階から始める
