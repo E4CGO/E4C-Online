@@ -114,11 +114,11 @@ namespace EnemyState
 			ATTACK_ARM attackArms[2];
 			bool impacts[2] = { false, false };
 
-			const float maxFlame = 572.0f; // attackのアニメーション:572フレーム
-			const float impactFlame1 = 165.0f;
-			const float impactFlame2 = 270.0f;
-			const float impact1StartRate = impactFlame1 / maxFlame;
-			const float impact2StartRate = impactFlame2 / maxFlame;
+			float maxFlame = 572.0f; // attackのアニメーション:572フレーム
+			float impactFlame1 = 165.0f;
+			float impactFlame2 = 270.0f;
+			float impact1StartRate = impactFlame1 / maxFlame;
+			float impact2StartRate = impactFlame2 / maxFlame;
 		};
 		class AngryAttackState : public AttackState
 		{
@@ -129,6 +129,10 @@ namespace EnemyState
 			~AngryAttackState() {}
 			// ステートに入った時のメソッド
 			void Enter() override;
+			// ステートで実行するメソッド
+			void Execute(float elapsedTime) override;
+		private:
+			void UpdateClawImpact(float elapsedTime);
 		};
 
 		// スタンステート
@@ -278,6 +282,7 @@ namespace EnemyState
 			void Enter() override {
 				EnemyState::DeathState::Enter();
 				owner->SetAnimation(::BearBoss::ANIM_DEATH, false);
+				owner->GetMoveCollider()->SetEnable(false);
 			}
 		};
 	}

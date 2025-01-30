@@ -71,7 +71,7 @@ void StageOpenWorld_E4C::Initialize()
 	//onewayWall = std::make_unique<OneWayWall>(OneWayWall::PlusZ); //引数に通れる方向が必要
 	//onewayWall->SetPosition({ 15.0f, 3.5f, 10.0f });
 
-	Spawner* spawner = new Spawner(ENEMY_TYPE::PIG, 5, -1);
+	Spawner* spawner = new Spawner(ENEMY_TYPE::BEAR_BOSS, 1, -1);
 	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
 	spawner->SetSearchRadius(10.0f);
 	SpawnerManager::Instance().Register(spawner);
