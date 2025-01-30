@@ -32,40 +32,39 @@ PreloadManager::PreloadManager()
 *//***************************************************************************/
 void PreloadManager::Load()
 {
-	for (const std::string& group : m_groupOrder)
-	{
-		m_loadList[group].thread = std::thread(&PreloadManager::LoadThread, this, group);
-	}
+	m_thread = std::thread(&PreloadManager::LoadThread, this);
 }
 /**************************************************************************//**
 	@brief		ロードスレッド関数
 	@param[in]	group ロードグループネーム
 *//***************************************************************************/
-void PreloadManager::LoadThread(const std::string& group)
+void PreloadManager::LoadThread()
 {
-	if (m_loadList.contains(group))
+	for (const std::string& group : m_groupOrder)
 	{
-		m_mtLoading.lock();
-
-		switch (m_loadList[group].type)
+		CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+		for (const std::string filename : m_loadList[group].list)
 		{
-		case PreloadManager::SPRITE:
-			CoInitialize(nullptr);
-			for (const std::string filename : m_loadList[group].list)
+			if (m_flgEnd) {
+				CoUninitialize();
+				return;
+			}
+			while (m_lock)
 			{
+				Sleep(10); // ロック
+			}
+			switch (m_loadList[group].type)
+			{
+			case PreloadManager::SPRITE:
 				m_spriteD12List.insert(RESOURCE.LoadSpriteResourceDX12(filename.c_str()));
-			}
-			CoUninitialize();
-			break;
-		case PreloadManager::MODEL:
-			for (const std::string filename : m_loadList[group].list)
-			{
+				break;
+			case PreloadManager::MODEL:
 				m_modelList.insert(RESOURCE.LoadModelDX12Resource(filename.c_str()));
+				break;
 			}
-			break;
 		}
-		m_mtLoading.unlock();
-		m_loadList[group];
+		m_loadList[group].done = true;
+		CoUninitialize();
 	}
 }
 
@@ -74,9 +73,7 @@ void PreloadManager::LoadThread(const std::string& group)
 *//***************************************************************************/
 PreloadManager::~PreloadManager()
 {
-	for (auto& group : m_loadList)
-	{
-		if (group.second.thread.joinable()) group.second.thread.join();
-	}
+	m_flgEnd = true;
+	if (m_thread.joinable()) m_thread.join();
 }
 
