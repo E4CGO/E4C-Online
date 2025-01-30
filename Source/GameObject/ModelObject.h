@@ -122,6 +122,8 @@ public:
 	void MakeAttackCollider(ATTACK_COLLIDER_DATA data, Sphere sphereParam, DirectX::XMFLOAT4X4* transform);
 	void MakeAttackCollider(ATTACK_COLLIDER_DATA data, Capsule capsuleParam, DirectX::XMFLOAT4X4* transform);
 	void DeleteAttackCollider(uint8_t idx);
+	// 被ダメージコールバック
+	virtual void OnDamage(const uint16_t& damage) {}
 
 	// アニメーションのスピードを取得
 	float GetAnimationSpeed() { return m_animationSpeed; }

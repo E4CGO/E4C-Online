@@ -98,7 +98,7 @@ public:
 	void SetCurrentHp(int hp) { this->hp = hp; }
 
 	// 被ダメージコールバック
-	virtual void OnDamage(const uint16_t& damage) { hp -= damage; }
+	virtual void OnDamage(const uint16_t& damage) override { hp -= damage; }
 	
 	// スーパーアーマー
 	bool GetSuperArmorFlag() { return superArmor; }
