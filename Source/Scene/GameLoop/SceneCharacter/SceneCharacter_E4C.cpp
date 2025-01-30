@@ -43,7 +43,7 @@ void SceneCharacter_E4C::Initialize()
 		//}
 		PRELOAD.Join("CharacterModels");
 	}
-
+	PRELOAD.Lock();
 	m_background = std::make_unique<ModelObject>("Data/Model/Object/PlaneBG.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_Phong);
 	m_background->SetPosition({ 0.0, 0.0f, -10.0f });
 	m_background->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
@@ -92,6 +92,8 @@ void SceneCharacter_E4C::Initialize()
 	stateMachine->RegisterState(STATE::CHARACTER_CREATION, new SceneCharacter_E4CState::CharacterCreationState(this));
 	stateMachine->RegisterState(STATE::START, new SceneCharacter_E4CState::StartState(this));
 	stateMachine->SetState(STATE::INIT);
+
+	PRELOAD.Unlock();
 
 	// 影初期化
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());

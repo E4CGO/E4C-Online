@@ -47,6 +47,7 @@ void StageOpenWorld_E4C::Initialize()
 	}
 	PRELOAD.Join("OpenWorldModels");
 
+	PRELOAD.Lock();
 	m_pCharacterGauge = new WidgetPlayerHP();
 	m_pPauseMenu = new WidgetPauseMenu();
 	UI.Register(m_pCharacterGauge);
@@ -173,11 +174,13 @@ void StageOpenWorld_E4C::Initialize()
 	cameraController->SetEnable(true);
 	cameraController->SetPlayer(player);
 	CURSOR_OFF;
-
+	
+	PRELOAD.Unlock();
 	Sound::Instance().InitAudio();
 	Sound::Instance().LoadAudio("Data/Sound/3-Dreamland(Overworld).mp3");
 	Sound::Instance().LoadAudio("Data/Sound/4-Encounter(battle_theme_Overworld_Tutorial).mp3");
 	Sound::Instance().PlayAudio(0);
+
 
 	// ダンジョンの階の再設定
 	// 1階から始める

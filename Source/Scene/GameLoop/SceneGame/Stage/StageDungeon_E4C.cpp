@@ -108,7 +108,7 @@ void StageDungeon_E4C::Initialize()
 	Stage::Initialize(); // デフォルト
 
 	PRELOAD.Join("DungeonModels");
-
+	PRELOAD.Lock();
 	// フレームバッファマネージャー
 	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
 
@@ -186,6 +186,7 @@ void StageDungeon_E4C::Initialize()
 	// 部屋の当たり判定を設定
 	MAPTILES.CreateSpatialIndex(5, 7);
 
+	PRELOAD.Unlock();
 	//Console::Instance().Open();
 
 	Sound::Instance().InitAudio();

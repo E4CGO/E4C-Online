@@ -43,6 +43,7 @@ void SceneTitle_E4C::Initialize()
 	stateMachine->RegisterState(STATE::OPTION, new SceneTitle_E4CState::OptionState(this));
 	stateMachine->RegisterState(STATE::CREDITS, new SceneTitle_E4CState::CreditsState(this));
 	stateMachine->RegisterState(STATE::EXIT, new SceneTitle_E4CState::ExitState(this));
+
 	stateMachine->SetState(STATE::INIT);
 
 	Sound::Instance().InitAudio();
