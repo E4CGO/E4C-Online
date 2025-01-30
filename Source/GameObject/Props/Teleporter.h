@@ -10,6 +10,8 @@
 #include "UI/Widget/WidgetMatching.h"
 #include "Network/OnlineController.h"
 
+#include <TAKOEngine\Rendering\DebugRenderer\CylinderRenderer.h>
+
 /**************************************************************************//**
 	@class	Teleporter
 	@brief	ステージ転送用ゲームオブジェクトクラス
@@ -54,6 +56,8 @@ protected:
 	WidgetMatching* m_pWidgetMatching = nullptr;
 
 	std::unique_ptr<PlaneDX12> m_portalFrame;
+
+	std::unique_ptr<CylinderRenderer> m_cylinderRenderer;
 
 	bool m_isVisible = false;
 };

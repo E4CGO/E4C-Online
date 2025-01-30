@@ -190,7 +190,7 @@ void StageDungeon_E4C::Finalize()
 {
 	ENEMIES.Clear();
 	MAPTILES.Clear();
-	UI.Clear();
+	//UI.Clear();
 	SpawnerManager::Instance().Clear();
 	GameObjectManager::Instance().Clear();
 	Sound::Instance().StopAudio(0);

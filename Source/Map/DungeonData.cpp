@@ -27,7 +27,7 @@ void DungeonData::Initialize()
 
 void DungeonData::InitDungeonGenSetting()
 {
-	m_dungeonGenerateSetting.maxFloor = 4;
+	m_dungeonGenerateSetting.maxFloor = 3;
 }
 
 void DungeonData::InitFloorGenSettings()
@@ -61,11 +61,11 @@ void DungeonData::InitFloorGenSettings()
 	//m_floorGenerateSettings.at(4).endRoomType = RoomType::SECOND_END;
 	//m_floorGenerateSettings.at(4).deadEndRoomType = RoomType::SECOND_DEAD_END;
 
-	// ThirdFloor
-	m_floorGenerateSettings.at(3).maxDepth = 4;
-	m_floorGenerateSettings.at(3).startRoomType = RoomType::THIRD_START;
-	m_floorGenerateSettings.at(3).endRoomType = RoomType::FIRST_END;
-	m_floorGenerateSettings.at(3).deadEndRoomType = RoomType::FIRST_DEAD_END;
+	// ThirdFloor 実装しない
+	//m_floorGenerateSettings.at(3).maxDepth = 4;
+	//m_floorGenerateSettings.at(3).startRoomType = RoomType::THIRD_START;
+	//m_floorGenerateSettings.at(3).endRoomType = RoomType::FIRST_END;
+	//m_floorGenerateSettings.at(3).deadEndRoomType = RoomType::FIRST_DEAD_END;
 	//m_floorGenerateSettings.at(6).maxDepth = 4;
 	//m_floorGenerateSettings.at(6).startRoomType = RoomType::FIRST_START;
 	//m_floorGenerateSettings.at(6).endRoomType = RoomType::FIRST_END;
@@ -73,8 +73,8 @@ void DungeonData::InitFloorGenSettings()
 
 	// BossFloor
 	// endRoomTypeが該当する部屋にテレポーターを配置するため、FIRST_BOSSを両方に適応させる
-	m_floorGenerateSettings.at(4).startRoomType = RoomType::FIRST_BOSS;
-	m_floorGenerateSettings.at(4).endRoomType = RoomType::FIRST_BOSS;
+	m_floorGenerateSettings.at(3).startRoomType = RoomType::FIRST_BOSS;
+	m_floorGenerateSettings.at(3).endRoomType = RoomType::FIRST_BOSS;
 }
 
 void DungeonData::InitRoomGenSettings()
@@ -870,7 +870,6 @@ void DungeonData::InitFileNames()
 
 	// 第二のフロア
 	m_fileNames.at(SECOND_START) = (char*)("Data/RoomDatas/SecondFloor_Start.json");
-	m_fileNames.at(SECOND_START_REVERSE) = (char*)("Data/RoomDatas/SecondFloor_Start_Reverse.json");
 	m_fileNames.at(SECOND_L1) = (char*)("Data/RoomDatas/SecondFloor_L1.json");
 	m_fileNames.at(SECOND_L2) = (char*)("Data/RoomDatas/SecondFloor_L2.json");
 	m_fileNames.at(SECOND_CROSS) = (char*)("Data/RoomDatas/SecondFloor_Cross.json");

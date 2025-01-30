@@ -31,7 +31,6 @@ namespace ns_RoomData
 		FIRST_DEAD_END,	// 最初のフロア：行き止まり
 
 		SECOND_START,		// 第二のフロア：最初の部屋
-		SECOND_START_REVERSE,	// 第二のフロア：最初の部屋・反転
 		SECOND_L1,			// 第二のフロア：Ⅼ字の部屋・右向き
 		SECOND_L2,			// 第二のフロア：Ⅼ字の部屋・左向き
 		SECOND_CROSS,		// 第二のフロア：十字の部屋

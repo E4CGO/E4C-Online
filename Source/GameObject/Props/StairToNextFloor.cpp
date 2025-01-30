@@ -16,7 +16,7 @@ StairToNextFloor::StairToNextFloor(Stage* stage, Online::OnlineController* onlin
 {
 	m_cylinderRenderer = std::make_unique<CylinderRenderer>(T_GRAPHICS.GetDeviceDX12());
 
-	m_interactionDistance = 12.0f;
+	//m_interactionDistance = 12.0f;
 }
 
 /**************************************************************************//**

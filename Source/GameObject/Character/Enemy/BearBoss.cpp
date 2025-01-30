@@ -104,6 +104,12 @@ void BearBoss::OnDamage(const uint16_t& damage)
 	}
 }
 
+void BearBoss::OnDeath()
+{
+	STAGES.GetStage()->DefeatBoss();
+	Enemy::OnDeath();
+}
+
 #include "TAKOEngine/Physics/AttackCollider.h"
 
 PunchImpact::PunchImpact(DirectX::XMFLOAT3 pos, Character* owner) : Projectile("")
@@ -125,7 +131,6 @@ void PunchImpact::Update(float elapsedTime)
 	time += elapsedTime;
 
 	if (time > existTime) {
-		STAGES.GetStage()->DefeatBoss();
 		Destory();
 	}
 }
