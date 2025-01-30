@@ -10,6 +10,8 @@
 #include "UI/Widget/WidgetMatching.h"
 #include "Network/OnlineController.h"
 
+#include <TAKOEngine\Rendering\DebugRenderer\CylinderRenderer.h>
+
 /**************************************************************************//**
 	@class	Teleporter
 	@brief	ステージ転送用ゲームオブジェクトクラス
@@ -27,6 +29,8 @@ public:
 
 	void SetVisibility(bool isVisible) { this->m_isVisible = isVisible; }
 
+	void SetInteractionDistance(float newDist) { this->m_interactionDistance = newDist; }
+
 	virtual void Teleport();
 
 	Stage* GetStage() { return m_pStage; }
@@ -37,7 +41,7 @@ protected:
 
 	float m_portalTime = 3.0f;
 	float m_timer = 0.0f;
-	float m_interractionDistance = 5.0f;
+	float m_interactionDistance = 5.0f;
 
 	DirectX::XMFLOAT2 m_textureSize = {};
 
@@ -52,6 +56,8 @@ protected:
 	WidgetMatching* m_pWidgetMatching = nullptr;
 
 	std::unique_ptr<PlaneDX12> m_portalFrame;
+
+	std::unique_ptr<CylinderRenderer> m_cylinderRenderer;
 
 	bool m_isVisible = false;
 };

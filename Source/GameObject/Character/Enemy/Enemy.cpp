@@ -94,7 +94,7 @@ void Enemy::OnDamage(const uint16_t& damage)
 		if (hp > 0)
 		{
 			if (!superArmor)
-			EnemyState::StateTransition(this, STATE::HURT);
+				EnemyState::StateTransition(this, STATE::HURT);
 		}
 		else
 		{
@@ -194,7 +194,7 @@ void Enemy::Sync(const Enemy::SYNC_DATA& data)
 	stateMachine->ChangeState(data.state);
 }
 /**************************************************************************//**
- 	@brief	ランダム目標座標を設定
+	@brief	ランダム目標座標を設定
 *//***************************************************************************/
 void Enemy::SetRandomMoveTargetPosition()
 {
@@ -204,7 +204,7 @@ void Enemy::SetRandomMoveTargetPosition()
 	m_TargetPosition.z = this->m_SpawnPosition.z + cosf(theta) * range;
 }
 /**************************************************************************//**
- 	@brief	ターゲットを更新
+	@brief	ターゲットを更新
 *//***************************************************************************/
 void Enemy::UpdateTarget()
 {

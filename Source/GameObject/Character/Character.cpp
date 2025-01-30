@@ -401,7 +401,6 @@ void Character::Update(float elapsedTime)
 
 	UpdateVelocity(elapsedTime);			// 移動更新
 	ModelObject::Update(elapsedTime);
-	UpdateColliders();
 }
 
 /**************************************************************************//**

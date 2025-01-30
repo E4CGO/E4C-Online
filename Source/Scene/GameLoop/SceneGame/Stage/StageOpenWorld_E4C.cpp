@@ -120,12 +120,15 @@ void StageOpenWorld_E4C::Initialize()
 		models.emplace("target1", std::make_unique<ModelObject>("Data/Model/Object/BlockTarget.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["target1"]->SetPosition({ -34.9f, 1.8f, 20.4f });
 		models["target1"]->SetAngle({ 0.0f, -0.84f, 0.0f });
+		models["target1"]->SetCollider(0, { {0, 1.5f, 0.2f}, 1.2f }, Collider::COLLIDER_OBJ::ENEMY, models["target1"]->GetTransformAdress());
 		models.emplace("target2", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget1.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["target2"]->SetPosition({ -38.1f, 1.80f, 16.2f });
 		models["target2"]->SetAngle({ 0.0f, -1.0f, 0.0f });
+		models["target2"]->SetCollider(0, { {0, 1.4f, 0}, 0.5f }, Collider::COLLIDER_OBJ::ENEMY, models["target2"]->GetTransformAdress());
 		models.emplace("target3", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget2.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["target3"]->SetPosition({ -32.0, 1.80f, 23.4f });
 		models["target3"]->SetAngle({ 0.0f, -1.0f, 0.0f });
+		models["target3"]->SetCollider(0, { {0, 1.4f, 0}, 0.5f }, Collider::COLLIDER_OBJ::ENEMY, models["target3"]->GetTransformAdress());
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 250.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
 		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);

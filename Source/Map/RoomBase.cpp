@@ -566,282 +566,98 @@ AABB RoomBase::CalcAABB(AABB aabb, DirectX::XMFLOAT3 pos, float degree) const
 
 void RoomBase::LoadMapData()
 {
-	nlohmann::json loadFile;
-	std::ifstream ifs(DUNGEONDATA.GetFileName(roomType));
-
-	if (ifs.is_open())
+	// 接続点データのロード
+	std::vector<TILE_DATA> connectPointDatas = DUNGEONDATA.GetRoomTileDatas(roomType).at((int)TileType::CONNECTPOINT);
+	for (const TILE_DATA& connectPointData : connectPointDatas)
 	{
-		ifs >> loadFile;
+		TILE_DATA resultData;
 
-		// ノードデータロード
-		for (const auto& nodeData : loadFile["NodeDatas"])
-		{
-			TileType tileType = nodeData["Type"];
+		// angleは m_angleを足してから
+		resultData.angle = connectPointData.angle + m_angle;
 
-			switch (tileType)
-			{
-			case ns_RoomData::PORTAL: continue;
+		// position はワールド座標に変換してから保存する
+		DirectX::XMFLOAT3 pointPos = connectPointData.position;
 
-			case ns_RoomData::SPAWNER:
-			{
-				DirectX::XMFLOAT3 position = {
-					nodeData["Position"].at(0),
-					nodeData["Position"].at(1),
-					nodeData["Position"].at(2)
-				};
-				DirectX::XMFLOAT3 angle = {
-					nodeData["Angle"].at(0),
-					nodeData["Angle"].at(1),
-					nodeData["Angle"].at(2)
-				};
-
-				TILE_DATA newData;
-				newData.position = DirectX::XMFLOAT3(position);
-				newData.angle = m_angle + angle;
-
-				// ワールド座標に変換し保存
-				DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&m_transform);
-				DirectX::XMVECTOR PointPos = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&newData.position), WorldTransform);
-				DirectX::XMStoreFloat3(&newData.position, PointPos);
-				m_tileDatas.at(tileType).emplace_back(TILE_DATA(
-					position,
-					angle,
-					{ 1.0f, 1.0f, 1.0f })
-				);
-			}
-			continue;
-
-			case ns_RoomData::CONNECTPOINT:
-			{
-				DirectX::XMFLOAT3 position = {
-					nodeData["Position"].at(0),
-					nodeData["Position"].at(1),
-					nodeData["Position"].at(2)
-				};
-				DirectX::XMFLOAT3 angle = {
-					nodeData["Angle"].at(0),
-					nodeData["Angle"].at(1),
-					nodeData["Angle"].at(2)
-				};
-
-				TILE_DATA newPoint;
-				newPoint.position = DirectX::XMFLOAT3(position);
-				newPoint.angle = m_angle + angle;
-
-				// ワールド座標に変換し保存
-				DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&m_transform);
-				DirectX::XMVECTOR PointPos = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&newPoint.position), WorldTransform);
-				DirectX::XMStoreFloat3(&newPoint.position, PointPos);
-				m_connectPointDatas.emplace_back(newPoint);
-			}
-			continue;
-
-			default:
-				break;
-			}
-
-			DirectX::XMFLOAT3 position = {
-				nodeData["Position"].at(0),
-				nodeData["Position"].at(1),
-				nodeData["Position"].at(2)
-			};
-			DirectX::XMFLOAT3 angle = {
-				nodeData["Angle"].at(0),
-				nodeData["Angle"].at(1),
-				nodeData["Angle"].at(2)
-			};
-			DirectX::XMFLOAT3 scale = {
-				nodeData["Scale"].at(0),
-				nodeData["Scale"].at(1),
-				nodeData["Scale"].at(2),
-			};
-
-			m_tileDatas.at(tileType).emplace_back(TILE_DATA(
-				position,
-				angle,
-				scale));
-		}
-		ifs.close();
+		DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&m_transform);
+		DirectX::XMVECTOR ConnectPointPos = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&pointPos), WorldTransform);
+		DirectX::XMStoreFloat3(&resultData.position, ConnectPointPos);
+		m_connectPointDatas.emplace_back(resultData);
 	}
 }
 
 void RoomBase::PlaceMapTile(bool isLeader)
 {
-	for (uint8_t tileType = TileType::FLOOR_01A; tileType < TileType::TILETYPE_COUNT; tileType++)
+	std::vector<std::vector<TILE_DATA>> tileDatas = DUNGEONDATA.GetRoomTileDatas(roomType);
+	std::vector<SPAWNER_DATA> spawnerDatas = DUNGEONDATA.GetRoomSpawnerDatas(roomType);
+
+	// 通常のタイルの読み込み
+	for (int i = (int)TileType::FLOOR_01A; i < (int)TileType::TILETYPE_COUNT; i++)
 	{
-		if (m_tileDatas.at(tileType).size() < 1) continue;
+		// これらはcontinueする　別の場所で使うため
+		if ((TileType)i == TileType::PORTAL ||
+			(TileType)i == TileType::CONNECTPOINT ||
+			(TileType)i == TileType::SPAWNER ||
+			(TileType)i == TileType::STAIR_TO_NEXTFLOOR) continue;
 
-		// Spawnerは特殊
-		if (tileType == TileType::SPAWNER)
-		{
-			for (const TILE_DATA& data : m_tileDatas.at(tileType))
-			{
-				Spawner* spawner = new Spawner(ENEMY_TYPE::MOUSE, 2, -1);
-
-				DirectX::XMFLOAT3 resultPos = data.position;
-				DirectX::XMFLOAT3 bufPos = resultPos;
-
-				float degree = DirectX::XMConvertToDegrees(m_angle.y);
-
-				// 360度以内に丸める
-				while (degree >= 360.0f) degree -= 360.0f;
-				while (degree < 0.0f) degree += 360.0f;
-
-				// 90度
-				if (degree > 89.9f && degree < 90.1f)
-				{
-					resultPos.x = bufPos.z;
-					resultPos.z = bufPos.x;
-				}
-
-				// 180度
-				if (degree > 179.9f && degree < 180.1f)
-				{
-					resultPos.z = -bufPos.z;
-				}
-
-				// 270度
-				if (degree > 269.9f && degree < 270.1f)
-				{
-					resultPos.x = -bufPos.z;
-					resultPos.z = bufPos.x;
-				}
-				resultPos += m_position;
-
-				spawner->SetPosition(resultPos);
-
-				SpawnerManager::Instance().Register(spawner);
-				//GameObjectManager::Instance().Register(spawner);
-			}
-			continue;
-		}
-
-		// ConnectPointはコンストラクタで既に読込み済だからcontinue
-		if (tileType == TileType::CONNECTPOINT) continue;
-
-		std::vector<FILE_DATA> collisionFileDatas;	// 当たり判定用
 		std::vector<FILE_DATA> modelFileDatas;		// 描画用
-
-		// 当たり判定用のデータが登録されているなら取得
-		if (DUNGEONDATA.GetCollisionFileDatas((TileType)tileType).size() > 0)
-		{
-			collisionFileDatas.emplace_back(DUNGEONDATA.GetCollisionFileDatas((TileType)tileType).at(0));
-		}
+		std::vector<FILE_DATA> collisionFileDatas;	// 当たり判定用
 
 		// 描画用のデータが登録されているなら取得
-		if (DUNGEONDATA.GetModelFileDatas((TileType)tileType).size() > 0)
+		if (DUNGEONDATA.GetModelFileDatas((TileType)i).size() > 0)
 		{
-			modelFileDatas.emplace_back(DUNGEONDATA.GetModelFileDatas((TileType)tileType).at(0));
-		}
-
-		// 描画用データがあるなら
-		if (modelFileDatas.size() > 0)
-		{
-			// ここのコメントアウトを解除するとインスタンシング
-
-			// インスタンシング
-			//if (T_GRAPHICS.isDX12Active &&
-			//	tileType == TileType::FLOOR_01A &&
-			//	tileType == TileType::FLOOR_01B &&
-			//	tileType == TileType::FLOOR_02A &&
-			//	tileType == TileType::FLOOR_03A &&
-			//	tileType == TileType::ARCH_FLOOR_01A &&
-			//	tileType == TileType::FLOOR_CLOUD_01A)
-			//{
-			//	FILE_DATA fileData = { modelFileDatas.at(0).fileName, modelFileDatas.at(0).scale };
-
-			//	std::filesystem::path filePath = fileData.fileName;
-			//	std::string fileNameStr = filePath.stem().string();
-			//	const char* fileName = fileNameStr.c_str();
-
-			//	ModelObject* instancingModel = new ModelObject(
-			//		fileData.fileName.c_str(),
-			//		fileData.scale,
-			//		ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_TOON);
-			//	instancingModel->SetShader(fileName, ModelShaderDX12Id::ToonInstancing);
-
-			//	DirectX::XMMATRIX LeftHandScaling = DirectX::XMMatrixScaling(-1, 1, 1);
-
-			//	for (int i = 0; i < m_tileDatas.at(tileType).size(); ++i)
-			//	{
-			//		int id = instancingModel->GetModel()->AllocateInstancingIndex();
-			//		if (id < 0) continue;
-
-			//		DirectX::XMFLOAT3 position = m_tileDatas.at(tileType).at(i).position;
-			//		DirectX::XMFLOAT3 angle = m_tileDatas.at(tileType).at(i).angle;
-			//		DirectX::XMFLOAT3 scale = m_tileDatas.at(tileType).at(i).scale;
-
-			//		// 床ならangleX = 0.0f
-			//		// 壁ならangleX = 90.0f
-			//		// angleYをマイナスに
-			//		// positionXをマイナスに
-
-			//		// スケール行列生成
-			//		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x * fileData.scale, scale.y * fileData.scale, scale.z * fileData.scale);
-			//		// 回転行列生成
-			//		float angleX = 0.0f;
-			//		DirectX::XMMATRIX R = DirectX::XMMatrixIdentity();
-			//		if (tileType == TileType::WALL_01A)
-			//		{
-			//			angleX = 0.0f;
-			//			DirectX::XMMATRIX X = DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(angleX));
-			//			DirectX::XMMATRIX Y = DirectX::XMMatrixRotationY(angle.y);
-			//			DirectX::XMMATRIX Z = DirectX::XMMatrixRotationZ(angle.z);
-
-			//			R = X * Y * Z;
-			//		}
-			//		// 位置行列生成
-			//		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(-position.x, position.y, position.z);
-
-			//		DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&m_transform);
-
-			//		DirectX::XMMATRIX W = (S * R * T) * P * LeftHandScaling;
-
-			//		DirectX::XMFLOAT4X4 tm;
-			//		DirectX::XMStoreFloat4x4(&tm, W);
-			//		instancingModel->GetModel()->UpdateTransform(id, tm);
-			//	}
-			//	MAPTILES.Register(instancingModel);
-
-			//  // ステージの影登録
-			//	//T_GRAPHICS.GetShadowRenderer()->ModelRegister(instancingModel->GetModel(0).get());
-			//}
-			//// 通常の読み込み
-			//else
+			for (FILE_DATA modelFileData : DUNGEONDATA.GetModelFileDatas((TileType)i))
 			{
-				for (const TILE_DATA& tileData : m_tileDatas.at(tileType))
-				{
-					MapTile* modelTile = new MapTile("", 1.0f, this);
-
-					for (const FILE_DATA& data : modelFileDatas)
-					{
-						if (T_GRAPHICS.isDX11Active)
-						{
-							modelTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX11, ModelObject::LHS_TOON);
-						}
-						if (T_GRAPHICS.isDX12Active)
-						{
-							modelTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX12, ModelObject::LHS_TOON);
-						}
-					}
-
-					modelTile->SetPosition(tileData.position);
-					modelTile->SetAngle(tileData.angle);
-					modelTile->SetScale(tileData.scale);
-					modelTile->Update(0);
-
-					// ステージの影登録
-					T_GRAPHICS.GetShadowRenderer()->ModelRegister(modelTile->GetModel(0).get());
-
-					GameObjectManager::Instance().Register(modelTile);
-				}
+				modelFileDatas.emplace_back(modelFileData);
 			}
 		}
 
-		// 当たり判定用データがあるなら
+		// 当たり判定用のデータが登録されているなら取得
+		if (DUNGEONDATA.GetCollisionFileDatas((TileType)i).size() > 0)
+		{
+			for (FILE_DATA collisionFileData : DUNGEONDATA.GetCollisionFileDatas((TileType)i))
+			{
+				collisionFileDatas.emplace_back(collisionFileData);
+			}
+		}
+
+		// 描画用タイル生成
+		if (modelFileDatas.size() > 0)
+		{
+			for (const TILE_DATA& tileData : tileDatas.at(i))
+			{
+				MapTile* modelTile = new MapTile("", 1.0f, this);
+
+				for (const FILE_DATA& data : modelFileDatas)
+				{
+					if (T_GRAPHICS.isDX11Active)
+					{
+						modelTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX11, ModelObject::LHS_TOON);
+					}
+					if (T_GRAPHICS.isDX12Active)
+					{
+						modelTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX12, ModelObject::LHS_TOON);
+					}
+				}
+				modelTile->SetPosition(tileData.position);
+				modelTile->SetAngle(tileData.angle);
+				modelTile->SetScale(tileData.scale);
+				modelTile->Update(0);
+
+				// ステージの影登録
+				if (modelTile->GetModels().size() > 0)
+				{
+					T_GRAPHICS.GetShadowRenderer()->ModelRegister(modelTile->GetModel(0).get());
+				}
+
+				// マネージャーに登録
+				GameObjectManager::Instance().Register(modelTile);
+			}
+		}
+
+		// 当たり判定用タイル生成
 		if (collisionFileDatas.size() > 0)
 		{
-			for (const TILE_DATA& tileData : m_tileDatas.at(tileType))
+			for (const TILE_DATA& tileData : tileDatas.at(i))
 			{
 				MapTile* colliderTile = new MapTile("", 1.0f, this);
 
@@ -856,7 +672,7 @@ void RoomBase::PlaceMapTile(bool isLeader)
 						colliderTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX12, ModelObject::LHS_PBR);
 					}
 				}
-				if (collisionFileDatas.size() != 0) colliderTile->SetMoveCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
+				if (collisionFileDatas.size() > 0) colliderTile->SetMoveCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
 
 				// SetCollider後にPos、Angle、Scaleを設定する
 				colliderTile->SetPosition(tileData.position);
@@ -864,52 +680,102 @@ void RoomBase::PlaceMapTile(bool isLeader)
 				colliderTile->SetScale(tileData.scale);
 				colliderTile->Update(0);
 				colliderTile->Hide();
+
 				MAPTILES.Register(colliderTile);
 			}
 		}
+	}
+
+	// スポナーの読み込み
+	for (const SPAWNER_DATA& spawnerData : spawnerDatas)
+	{
+		// position はワールド座標に変換してから保存する
+		DirectX::XMFLOAT3 spawnerPos = spawnerData.tileData.position;
+
+		DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&m_transform);
+		DirectX::XMVECTOR ResultSpawnerPos = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&spawnerPos), WorldTransform);
+		DirectX::XMFLOAT3 resultSpawnerPos;
+		DirectX::XMStoreFloat3(&resultSpawnerPos, ResultSpawnerPos);
+
+		Spawner* spawner = new Spawner(
+			spawnerData.enemyType,
+			spawnerData.maxExistedEnemiesNum,
+			spawnerData.maxSpawnedEnemiesNum);
+
+		spawner->SetPosition(resultSpawnerPos);
+		spawner->SetSearchRadius(spawnerData.searchRadius);
+		spawner->SetSpawnRadius(spawnerData.spawnRadius);
+		spawner->SetSpawnTime(spawnerData.spawnTime);
+
+		SpawnerManager::Instance().Register(spawner);
 	}
 }
 
 void RoomBase::PlaceTeleporterTile(Stage* stage, Online::OnlineController* onlineController)
 {
-	for (const TILE_DATA& data : m_tileDatas.at(TileType::STAIR_TO_NEXTFLOOR))
+	std::vector<STAIR_TO_NEXTFLOOR_DATA> stairDatas = DUNGEONDATA.GetStairToNextFloorDatas(roomType);
+
+	for (const STAIR_TO_NEXTFLOOR_DATA& stairData : stairDatas)
 	{
-		StairToNextFloor* stairToNextFloor = new StairToNextFloor(stage, onlineController);
-
-		DirectX::XMFLOAT3 resultPos = data.position;
-		DirectX::XMFLOAT3 bufPos = resultPos;
-
-		float degree = DirectX::XMConvertToDegrees(m_angle.y);
-
-		// 360度以内に丸める
-		while (degree >= 360.0f) degree -= 360.0f;
-		while (degree < 0.0f) degree += 360.0f;
-
-		// 90度
-		if (degree > 89.9f && degree < 90.1f)
+		// ボスフロアでないなら次の階への階段
+		if (!(DUNGEONDATA.GetCurrentFloor() >= DUNGEONDATA.GetDungeonGenSetting().maxFloor))
 		{
-			resultPos.x = bufPos.z;
-			resultPos.z = bufPos.x;
-		}
+			// position はワールド座標に変換してから保存する
+			DirectX::XMFLOAT3 stairPos = stairData.tileData.position;
 
-		// 180度
-		if (degree > 179.9f && degree < 180.1f)
+			DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&m_transform);
+			DirectX::XMVECTOR ResultStairPos = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&stairPos), WorldTransform);
+			DirectX::XMFLOAT3 resultStairPos;
+			DirectX::XMStoreFloat3(&resultStairPos, ResultStairPos);
+
+			StairToNextFloor* stair = new StairToNextFloor(stage, onlineController);
+			stair->SetPosition(resultStairPos);
+			stair->SetInteractionDistance(stairData.interactionDistance);
+
+			GameObjectManager::Instance().Register(stair);
+		}
+		// ボスフロアならOpenWorldへのテレポーターと階段を配置
+		else
 		{
-			resultPos.z = -bufPos.z;
+			// テレポーター
+			DirectX::XMFLOAT3 stairPos = stairData.tileData.position;
+
+			DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&m_transform);
+			DirectX::XMVECTOR ResultStairPos = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&stairPos), WorldTransform);
+			DirectX::XMFLOAT3 resultStairPos;
+			DirectX::XMStoreFloat3(&resultStairPos, ResultStairPos);
+
+			TeleportToOpenworld* teleporter = new TeleportToOpenworld();
+			teleporter->SetPosition(resultStairPos);
+			teleporter->SetInteractionDistance(stairData.interactionDistance);
+			GameObjectManager::Instance().Register(teleporter);
+
+			// 階段モデル（当たり判定なし）
+			MapTile* modelTile = new MapTile("", 1.0f, this);
+
+			std::vector<FILE_DATA> modelFileDatas = DUNGEONDATA.GetModelFileDatas(TileType::STAIR_STEP_01A);
+			for (const FILE_DATA& data : modelFileDatas)
+			{
+				if (T_GRAPHICS.isDX11Active)
+				{
+					modelTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX11, ModelObject::LHS_TOON);
+				}
+				if (T_GRAPHICS.isDX12Active)
+				{
+					modelTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX12, ModelObject::LHS_TOON);
+				}
+			}
+			modelTile->SetPosition({ -2.0f, 0.0f, 122.0f });
+			modelTile->SetAngle({ 0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f });
+			modelTile->SetScale({ 1.0f, 1.0f, 1.0f });
+			modelTile->Update(0);
+			// ステージの影登録
+			if (modelTile->GetModels().size() > 0)
+			{
+				T_GRAPHICS.GetShadowRenderer()->ModelRegister(modelTile->GetModel(0).get());
+			}
+			GameObjectManager::Instance().Register(modelTile);
 		}
-
-		// 270度
-		if (degree > 269.9f && degree < 270.1f)
-		{
-			resultPos.x = -bufPos.z;
-			resultPos.z = bufPos.x;
-		}
-		resultPos += m_position;
-
-		stairToNextFloor->SetPosition(resultPos);
-		//stairToNextFloor->SetScale({ 4.0f, 4.0f, 4.0f });
-
-		GameObjectManager::Instance().Register(stairToNextFloor);
 	}
 }
 

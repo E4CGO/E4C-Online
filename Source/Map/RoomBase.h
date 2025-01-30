@@ -47,28 +47,23 @@ public:
 	virtual void Update(float elapsedTime)
 	{
 		UpdateTransform();
-
-		for (RoomBase* child : childs)
-		{
-			child->Update(elapsedTime);
-		}
 	}
 
 	virtual void Render(const RenderContextDX12 rc)
 	{
-		//// AABBの描画
-		//// radiiは半径なので2倍して直径にしてからSetCubeを行う
-		//// 自身のAABB
-		//{
-		//	DirectX::XMFLOAT3 diameter = {
-		//		m_aabb.radii.x * 2.0f,
-		//		m_aabb.radii.y * 2.0f,
-		//		m_aabb.radii.z * 2.0f
-		//	};
-		//	m_aabbCube->SetCube(m_aabb.position, diameter, { 1.0f, 1.0f, 1.0f, 1.0f });
-		//	m_aabbCube->Render(rc);
-		//}
-
+#ifdef _DEBUG
+		// AABBの描画
+		// radiiは半径なので2倍して直径にしてからSetCubeを行う
+		// 自身のAABB
+		{
+			DirectX::XMFLOAT3 diameter = {
+				m_aabb.radii.x * 2.0f,
+				m_aabb.radii.y * 2.0f,
+				m_aabb.radii.z * 2.0f
+			};
+			m_aabbCube->SetCube(m_aabb.position, diameter, { 1.0f, 1.0f, 1.0f, 1.0f });
+			m_aabbCube->Render(rc);
+		}
 		//// 子の部屋を生成する時のAABB
 		//for (int i = 0; i < m_debugAABBs.size(); i++)
 		//{
@@ -80,6 +75,7 @@ public:
 		//	m_debugCubes.at(i)->SetCube(m_debugAABBs.at(i).position, diameter, { 1.0f, 0.0f, 0.0f, 1.0f });
 		//	m_debugCubes.at(i)->Render(rc);
 		//}
+#endif // _DEBUG
 	}
 
 	void UpdateTransform();
@@ -226,6 +222,8 @@ public:
 	virtual int DrawDebugGUI(int i = 0);
 
 protected:
+
+
 	DirectX::XMFLOAT3 m_position = { 0.0f, 0.0f, 0.0f };
 	DirectX::XMFLOAT3 m_angle = { 0.0f, 0.0f, 0.0f };
 	DirectX::XMFLOAT3 m_scale = { 1.0f, 1.0f, 1.0f };
