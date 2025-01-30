@@ -1,4 +1,6 @@
 #include "HealingObject.h"
+#include "Source/GameObject/Character/Player/PlayerCharacterManager.h"
+#include "TAKOEngine/Tool/XMFLOAT.h"
 
 /**************************************************************************//**
 	@brief    モデル設定
@@ -26,6 +28,12 @@ void HealingObject::Update(float elapsedTime)
 {
 	if (m_isVisibleActive)
 	{
+		PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
+		if (XMFLOAT3HorizontalLength((player->GetPosition() - m_EffectThird->GetPosition())) <= 3.0f * m_size)
+		{
+			player->ModifyHp(10.0f * elapsedTime);
+		}
+
 		m_EffectFirst->Update(elapsedTime);
 		m_EffectSecond->Update(elapsedTime);
 		m_EffectThird->Update(elapsedTime);

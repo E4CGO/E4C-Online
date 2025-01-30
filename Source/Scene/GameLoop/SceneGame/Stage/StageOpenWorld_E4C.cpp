@@ -68,8 +68,10 @@ void StageOpenWorld_E4C::Initialize()
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
 	teleporter->SetVisibility(true);
 
-	Spawner* spawner = new Spawner(ENEMY_TYPE::BEAR_BOSS, 1, 1);
-	//Spawner* spawner = new Spawner(ENEMY_TYPE::PIG, 5, -1);
+	//onewayWall = std::make_unique<OneWayWall>(OneWayWall::PlusZ); //引数に通れる方向が必要
+	//onewayWall->SetPosition({ 15.0f, 3.5f, 10.0f });
+
+	Spawner* spawner = new Spawner(ENEMY_TYPE::PIG, 5, -1);
 	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
 	spawner->SetSearchRadius(10.0f);
 	SpawnerManager::Instance().Register(spawner);
@@ -100,7 +102,7 @@ void StageOpenWorld_E4C::Initialize()
 	if (T_GRAPHICS.isDX12Active)
 	{
 		models.emplace("map", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
-		models.emplace("grass", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Collision_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::Grass));
+		//models.emplace("grass", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Collision_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::Grass));
 		models.emplace("village", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Village.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 
 		models.emplace("bush", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Bush.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::Foliage));
@@ -135,9 +137,11 @@ void StageOpenWorld_E4C::Initialize()
 			0);		// age
 
 		// 草情報
-		m_sprites[2] = std::make_unique<SpriteDX12>(1, "Data/Sprites/distortiontexture.png");
-		m_sprites[3] = std::make_unique<SpriteDX12>(1, "Data/Sprites/grass.png");
-		m_sprites[4] = std::make_unique<SpriteDX12>(1, "Data/Sprites/density.png");
+		{
+			//m_sprites[2] = std::make_unique<SpriteDX12>(1, "Data/Sprites/distortiontexture.png");
+			//m_sprites[3] = std::make_unique<SpriteDX12>(1, "Data/Sprites/grass.png");
+			//m_sprites[4] = std::make_unique<SpriteDX12>(1, "Data/Sprites/density.png");
+		}
 	}
 
 	// 光
@@ -231,6 +235,7 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	ENEMIES.Update(elapsedTime);
 
 	SpawnerManager::Instance().Update(elapsedTime);
+	//onewayWall->Update(elapsedTime);
 
 	PROJECTILES.Update(elapsedTime);
 
@@ -309,23 +314,27 @@ void StageOpenWorld_E4C::RenderDX12()
 			rc.shadowMap.shadow_srv_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSRV();
 			rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();
 		}
-
-		PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
-		rc.grassData.position.x = player->GetPosition().x;
-		rc.grassData.position.y = player->GetPosition().y;
-		rc.grassData.position.z = player->GetPosition().z;
-		rc.grassData.position.w = 0;
-
 		// シーン用定数バッファ更新
 		const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
 			CameraManager::Instance().GetCamera(), m_sceneGlobalTimer, m_sceneTickTimer, rc);
 
-		// レンダーコンテキスト設定
 		rc.d3d_command_list = m_frameBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
-		rc.grassData.grass_srv_descriptor = m_sprites[3]->GetDescriptor();
-		rc.grassData.grass_srv_distortion_descriptor = m_sprites[2]->GetDescriptor();
-		rc.grassData.grass_srv_density_descriptor = m_sprites[4]->GetDescriptor();
+
+		// 草
+		{
+			//PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
+			//rc.grassData.position.x = player->GetPosition().x;
+			//rc.grassData.position.y = player->GetPosition().y;
+			//rc.grassData.position.z = player->GetPosition().z;
+			//rc.grassData.position.w = 0;
+
+			//// レンダーコンテキスト設定
+
+			//rc.grassData.grass_srv_descriptor = m_sprites[3]->GetDescriptor();
+			//rc.grassData.grass_srv_distortion_descriptor = m_sprites[2]->GetDescriptor();
+			//rc.grassData.grass_srv_density_descriptor = m_sprites[4]->GetDescriptor();
+		}
 
 		// skyBox
 		{
@@ -340,7 +349,7 @@ void StageOpenWorld_E4C::RenderDX12()
 		}
 
 		teleporter->RenderDX12(rc);
-
+		//onewayWall->RenderDX12(rc);
 		ENEMIES.RenderDX12(rc);
 
 		SpawnerManager::Instance().RenderDX12(rc);

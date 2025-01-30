@@ -44,6 +44,11 @@ void SceneCharacter_E4C::Initialize()
 		PRELOAD.Join("CharacterModels");
 	}
 
+	m_background = std::make_unique<ModelObject>("Data/Model/Object/PlaneBG.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_Phong);
+	m_background->SetPosition({ 0.0, 0.0f, -10.0f });
+	m_background->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+	m_background->SetScale({ 20.0f, 20.0f, 1.0f });
+
 	//シャドウマップレンダラ
 	shadowMapRenderer->Initialize();
 
@@ -137,6 +142,8 @@ void SceneCharacter_E4C::Update(float elapsedTime)
 	cameraController->Update();
 	cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
 
+	m_background->Update(elapsedTime);
+
 	//CameraManager::Instance().GetCamera()->Move2PointToCamera(CameraManager::Instance().GetCamera()->GetEye(), { 6.f,2.f,9.f }, CameraManager::Instance().GetCamera()->GetFocus(), { -3.0f, 0.0, 0.0f }, transitiontime, 2.f, elapsedTime);
 #endif // _DEBUG
 
@@ -211,12 +218,15 @@ void SceneCharacter_E4C::RenderDX12()
 				rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();
 			}
 
+			m_background->RenderDX12(rc);
+
 			for (auto& it : m_previewCharacters)
 			{
 				if (it != nullptr) {
 					it->RenderDX12(rc);
 				}
 			}
+
 			// レンダーターゲットへの書き込み終了待ち
 			m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
 		}
