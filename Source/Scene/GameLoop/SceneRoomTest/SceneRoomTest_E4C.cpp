@@ -124,6 +124,7 @@ void SceneRoomTest_E4C::Initialize()
 	nodeDefaultNames.at(TileType::WALL_PAPER) = "WallPaper";
 	nodeDefaultNames.at(TileType::WALL_SQUARES) = "WallSquares";
 	nodeDefaultNames.at(TileType::WELL) = "Well";
+	nodeDefaultNames.at(TileType::ONEWAYWALL) = "OneWayWall";
 
 	//testModel = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
 	//testModel->SetPosition({ 0.0f, 0.0f, 0.0f });
@@ -770,6 +771,24 @@ void SceneRoomTest_E4C::AddTileNode(
 	case ns_RoomData::CONNECTPOINT:
 	case ns_RoomData::STAIR_TO_NEXTFLOOR:	return;	// こやつらは別の関数で生成する
 	default: break;
+	}
+
+	// OneWayWallは特殊処理
+	if (type == ns_RoomData::ONEWAYWALL)
+	{
+		// テストで星にしてる
+		importData = DUNGEONDATA.GetModelFileDatas(TileType::STAR).at(0);
+
+		TileNode* newNode = new TileNode(NODES.GetUniqueName(name), type, importData.fileName.c_str(), importData.scale);
+		newNode->SetPosition(position);
+		newNode->SetAngle(angle);
+		newNode->SetScale(scale);
+		NODES.Register(newNode);
+
+		// 追加したノードを選択
+		ChangeSelectedNode(newNode);
+
+		return;
 	}
 
 	TileNode* newNode = new TileNode(NODES.GetUniqueName(name), type, importData.fileName.c_str(), importData.scale);

@@ -109,6 +109,7 @@ namespace ns_RoomData
 		WALL_PAPER,
 		WALL_SQUARES,
 		WELL,
+		ONEWAYWALL,
 
 		TILETYPE_COUNT
 	};

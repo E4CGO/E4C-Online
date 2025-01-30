@@ -107,7 +107,8 @@ protected:
 	// ポストエフェクト
 	std::unique_ptr<PostprocessingRendererDX12>	postprocessingRenderer = std::make_unique<PostprocessingRendererDX12>();
 
-	std::unique_ptr<ModelObject> instancingModel;
+	float m_sceneGlobalTimer = 0;
+	float m_sceneTickTimer = 0;
 };
 
 #endif // !__INCLUDED_STAGE_DUNGEON_E4C_H__
