@@ -125,6 +125,9 @@ namespace EnemyState
 				EnemyState::StateTransition(owner, ::Enemy::STATE::IDLE);
 			}
 		}
+		/**************************************************************************//**
+		 	@brief	攻撃ステートから出る
+		*//***************************************************************************/
 		void AttackState::Exit()
 		{
 			owner->DeleteAttackCollider(mouseAttack.idx);

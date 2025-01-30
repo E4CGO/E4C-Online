@@ -17,8 +17,8 @@ PigMob::PigMob(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("Data
 {
 	// 敵の基本パラメーター
 	enemyType = ENEMY_TYPE::PIG;
-	radius = 0.6f;
-	maxHp = hp = 200;
+	radius = 1.0f;
+	maxHp = hp = 80;
 	atk = 10;
 	moveSpeed = 4.0f;
 	m_tempMoveSpeed = moveSpeed;

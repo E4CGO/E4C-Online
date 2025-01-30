@@ -266,7 +266,7 @@ public:
 	// ターゲットを取得
 	DirectX::XMFLOAT3 GetTarget() { return target; }
 	// 発射物起点を取得
-	virtual DirectX::XMFLOAT3 GetShotPosition() { return position + DirectX::XMFLOAT3{ 0, height * 0.5f, 0 }; }
+	virtual DirectX::XMFLOAT3 GetShotPosition() { return position + DirectX::XMFLOAT3{ sinf(angle.y) * (radius + 0.5f) * 2.0f, height * 0.6f, cosf(angle.y) * (radius + 0.5f) * 2.0f }; }
 
 	// ステートを取得
 	int GetState() { return stateMachine->GetStateIndex(); }

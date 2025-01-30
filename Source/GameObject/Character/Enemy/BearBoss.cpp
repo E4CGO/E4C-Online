@@ -116,7 +116,7 @@ PunchImpact::PunchImpact(DirectX::XMFLOAT3 pos, Character* owner) : Projectile("
 void PunchImpact::Update(float elapsedTime)
 {
 	float radius = minRadius + (maxRadius - minRadius) * (time / existTime);
-	m_pColliders[0]->SetParam({ position,radius });
+	m_pColliders[0]->SetParam({ position, radius });
 	UpdateColliders();
 
 	time += elapsedTime;

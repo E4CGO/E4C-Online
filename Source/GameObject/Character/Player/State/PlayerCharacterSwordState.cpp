@@ -188,7 +188,6 @@ namespace PlayerCharacterState
 			if (owner->IsPlayer())
 			{
 				XMFLOAT4X4* matrix = owner->GetTransformAdress();
-				Sphere attack2{ {  0, 1.5f, 2.0f} , 0.5f };
 
 				ModelObject::ATTACK_COLLIDER_DATA attackData;
 				attackData.power = sphereAttacks[1].power;
