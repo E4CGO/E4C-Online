@@ -345,7 +345,17 @@ namespace PlayerCharacterState
 		// スキル_1ステート
 		void Skill1State::Enter()
 		{
-			SetSubState(SKILL_1_STATE::ATTACK_START);
+			if (owner->IsPlayer())
+			{
+				if (owner->GetMp() <= 50.0f)
+				{
+					owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
+					return;
+				}
+				owner->ModifyMp(-50.0f);
+
+				SetSubState(SKILL_1_STATE::ATTACK_START);
+			}
 		}
 		void Skill1State::Execute(float elapsedTime)
 		{
@@ -438,8 +448,17 @@ namespace PlayerCharacterState
 
 		void Skill2State::Enter()
 		{
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_SPECIAL_SECOND, false, 0.1f);
-			owner->GetEffectZone()->Activate();
+			if (owner->IsPlayer())
+			{
+				if (owner->GetMp() <= 75.0f)
+				{
+					owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
+					return;
+				}
+				owner->ModifyMp(-75.0f);
+				owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_SPECIAL_SECOND, false, 0.1f);
+				owner->GetEffectZone()->Activate();
+			}
 		}
 		void Skill2State::Execute(float elapsedTime)
 		{
