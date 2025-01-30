@@ -6,6 +6,7 @@
 //#include <DirectXCollision.h>
 #include "SphereCollider.h"
 #include "CapsuleCollider.h"
+#include "AABBCollider.h"
 #include "Source/Map/MapTileManager.h"
 
 SphereCollider::SphereCollider(uint16_t _objType, DirectX::XMFLOAT4X4* _transform) : Collider(_objType, _transform)
@@ -71,6 +72,24 @@ bool SphereCollider::CollisionVsCapsule(
 	Capsule otherCapsule(other->GetPosition(), other->GetDirection(), other->GetLength(), other->GetRadius());
 	IntersectionResult hit;
 	if (Collision::IntersectSphereVsCapsule(XMLoadFloat3(&m_position), m_radius, XMLoadFloat3(&otherCapsule.position), XMLoadFloat3(&otherCapsule.direction), otherCapsule.length, otherCapsule.radius, &hit))
+	{
+		XMStoreFloat3(&result.normal, hit.normal);
+		XMStoreFloat3(&result.position, hit.pointB);
+		result.distance = hit.penetration;
+		return true;
+	}
+	return false;
+}
+
+bool SphereCollider::CollisionVsAABB(
+	AABBCollider* other,
+	DirectX::XMFLOAT3& direction,
+	HitResult& result
+)
+{
+	AABB otherAABB(other->GetPosition(), other->GetRadii());
+	IntersectionResult hit;
+	if (Collision::IntersectSphereVsAABB(XMLoadFloat3(&m_position), m_radius, XMLoadFloat3(&otherAABB.position), XMLoadFloat3(&otherAABB.radii), &hit))
 	{
 		XMStoreFloat3(&result.normal, hit.normal);
 		XMStoreFloat3(&result.position, hit.pointB);

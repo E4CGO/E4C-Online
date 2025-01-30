@@ -3,6 +3,7 @@
 
 #include "CapsuleCollider.h"
 #include "SphereCollider.h"
+#include "AABBCollider.h"
 
 //#include <DirectXCollision.h>
 #include "TAKOEngine/Runtime/tentacle_lib.h"
@@ -144,6 +145,24 @@ bool CapsuleCollider::CollisionVsCapsule(
 	}
 	return false;
 
+}
+
+bool CapsuleCollider::CollisionVsAABB(
+	AABBCollider* other,
+	DirectX::XMFLOAT3& direction,
+	HitResult& result
+)
+{
+	AABB otherAABB(other->GetPosition(), other->GetRadii());
+	IntersectionResult hit;
+	if (Collision::IntersectCapsuleVsAABB(XMLoadFloat3(&m_position), XMLoadFloat3(&m_Wdirection), m_length, m_radius, XMLoadFloat3(&otherAABB.position), XMLoadFloat3(&otherAABB.radii), &hit))
+	{
+		XMStoreFloat3(&result.normal, hit.normal);
+		XMStoreFloat3(&result.position, hit.pointB);
+		result.distance = hit.penetration;
+		return true;
+	}
+	return false;
 }
 
 /**************************************************************************//**
