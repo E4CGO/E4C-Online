@@ -298,6 +298,24 @@ void Character::UpdateHorizontalMove(float elapsedTime)
 
 		// マップ
 		if (m_pMoveCollider != nullptr) {
+			// 壁判定
+			HitResult hit;
+			if (MAPTILES.SphereCast(m_pMoveCollider->GetPosition(), XMFLOAT3Normalize({ mx, 0, mz }), velocityLengthXZ * elapsedTime, m_pMoveCollider->GetSphere().radius, hit))
+			{
+				if (XMFLOAT3Normalize(XMFLOAT3Corss(hit.triangleVerts[1] - hit.triangleVerts[0], hit.triangleVerts[2] - hit.triangleVerts[1])).y < 0.85f)
+				{
+					if (!isWall)
+					{
+						OnWall();
+					}
+					isWall = true;
+				}
+			}
+			else
+			{
+				isWall = false;
+			}
+
 			position.x += mx;
 			position.z += mz;
 			m_pMoveCollider->SetPosition(m_pMoveCollider->GetPosition() + XMFLOAT3{mx, 0, mz});
@@ -361,6 +379,7 @@ void Character::UpdateHorizontalMove(float elapsedTime)
 			}
 		}
 	}
+	else isWall = false;
 }
 
 /**************************************************************************//**
