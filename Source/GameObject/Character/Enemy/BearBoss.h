@@ -58,23 +58,30 @@ public:
 
 		ANIM_ROAR2,
 
-		ANIM_DIE,
+		ANIM_DEATH,
+	};
+
+	enum STUN_STATE
+	{
+		STUN_START,
+		STUN_LOOP,
+		STUN_END,
 	};
 
 	enum STATE : uint8_t
 	{
 		WANDER = Enemy::STATE::END,
+		FOLLOW,
 		ATTACK,
+		STUN,
+		ROAR,
+		FORM_CHANGE,
 	};
 
-	enum ATTACK_STATE : uint8_t
-	{
-		FOLLOW = 0,
-		PUNCH,
-	};
-
-protected:
-	void UpdateTarget() override;
+	void OnDamage(const uint16_t& damage) override;
+private:
+	// Phase
+	int m_phase = 0;
 };
 
 
@@ -113,7 +120,6 @@ public:
 			}
 		}
 	}
-
 private:
 	float time = 0.0f;
 	const float existTime = 0.5f;
