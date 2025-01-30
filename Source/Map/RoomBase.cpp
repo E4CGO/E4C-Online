@@ -797,8 +797,15 @@ void RoomBase::PlaceMapTile(bool isLeader)
 		DirectX::XMFLOAT3 resultSpawnerPos;
 		DirectX::XMStoreFloat3(&resultSpawnerPos, ResultSpawnerPos);
 
-		Spawner* spawner = new Spawner(ENEMY_TYPE::MOUSE, 2, -1);
+		Spawner* spawner = new Spawner(
+			spawnerData.enemyType,
+			spawnerData.maxExistedEnemiesNum,
+			spawnerData.maxSpawnedEnemiesNum);
+
 		spawner->SetPosition(resultSpawnerPos);
+		spawner->SetSearchRadius(spawnerData.searchRadius);
+		spawner->SetSpawnRadius(spawnerData.spawnRadius);
+		spawner->SetSpawnTime(spawnerData.spawnTime);
 
 		//Spawner* spawner = new Spawner(ENEMY_TYPE::MOUSE, 2, -1);
 
@@ -1060,8 +1067,42 @@ void RoomBase::PlaceTeleporterTile(Stage* stage, Online::OnlineController* onlin
 
 		StairToNextFloor* stair = new StairToNextFloor(stage, onlineController);
 		stair->SetPosition(resultStairPos);
+		stair->SetInteractionDistance(stairData.interactionDistance);
 
 		GameObjectManager::Instance().Register(stair);
+
+		// ボスフロアならついでに階段も配置する
+		if (DUNGEONDATA.GetCurrentFloor() >= DUNGEONDATA.GetDungeonGenSetting().maxFloor)
+		{
+			MapTile* modelTile = new MapTile("", 1.0f, this);
+
+			std::vector<FILE_DATA> modelFileDatas = DUNGEONDATA.GetModelFileDatas(TileType::STAIR_STEP_01A);
+
+			for (const FILE_DATA& data : modelFileDatas)
+			{
+				if (T_GRAPHICS.isDX11Active)
+				{
+					modelTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX11, ModelObject::LHS_TOON);
+				}
+				if (T_GRAPHICS.isDX12Active)
+				{
+					modelTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX12, ModelObject::LHS_TOON);
+				}
+			}
+			modelTile->SetPosition({ -2.0f, 0.0f, 598.0f });
+			modelTile->SetAngle({ 0.0f, DirectX::XMConvertToRadians(180.0f), 0.0f });
+			modelTile->SetScale({ 1.0f, 1.0f, 1.0f });
+			modelTile->Update(0);
+
+			// ステージの影登録
+			if (modelTile->GetModels().size() > 0)
+			{
+				T_GRAPHICS.GetShadowRenderer()->ModelRegister(modelTile->GetModel(0).get());
+			}
+
+			// マネージャーに登録
+			GameObjectManager::Instance().Register(modelTile);
+		}
 	}
 
 	//for (const TILE_DATA& data : m_tileDatas.at(TileType::STAIR_TO_NEXTFLOOR))

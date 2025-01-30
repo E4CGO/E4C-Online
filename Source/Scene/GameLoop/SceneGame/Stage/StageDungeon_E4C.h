@@ -60,6 +60,8 @@ public:
 
 	void Update(float elapsedTime) override;
 
+	void DefeatBoss() override;
+
 	void Render() override;
 
 	void RenderDX12() override;

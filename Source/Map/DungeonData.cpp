@@ -42,7 +42,7 @@ void DungeonData::InitFloorGenSettings()
 	m_floorGenerateSettings.at(0).deadEndRoomType = RoomType::TUTO_DEAD_END;
 
 	// FirstFloor
-	m_floorGenerateSettings.at(1).maxDepth = 3;
+	m_floorGenerateSettings.at(1).maxDepth = 4;
 	m_floorGenerateSettings.at(1).startRoomType = RoomType::FIRST_START;
 	m_floorGenerateSettings.at(1).endRoomType = RoomType::FIRST_END;
 	m_floorGenerateSettings.at(1).deadEndRoomType = RoomType::FIRST_DEAD_END;
@@ -90,30 +90,43 @@ void DungeonData::InitRoomGenSettings()
 	/*///// First Floor /////*/
 	m_roomGenerateSettings.at(FIRST_START).placementCandidates.emplace_back(RoomType::FIRST_I);
 	m_roomGenerateSettings.at(FIRST_START).placementCandidates.emplace_back(RoomType::FIRST_T);
+	m_roomGenerateSettings.at(FIRST_START).placementCandidates.emplace_back(RoomType::FIRST_T_REVERSE);
 	m_roomGenerateSettings.at(FIRST_START).placementCandidates.emplace_back(RoomType::FIRST_FOUNTAIN);
 	m_roomGenerateSettings.at(FIRST_START).placementCandidates.emplace_back(RoomType::FIRST_SPAWNER);
 
-	m_roomGenerateSettings.at(FIRST_I).weight = 10;
+	m_roomGenerateSettings.at(FIRST_I).weight = 8;
 	m_roomGenerateSettings.at(FIRST_I).placementCandidates.emplace_back(RoomType::FIRST_I);
 	m_roomGenerateSettings.at(FIRST_I).placementCandidates.emplace_back(RoomType::FIRST_T);
+	m_roomGenerateSettings.at(FIRST_I).placementCandidates.emplace_back(RoomType::FIRST_T_REVERSE);
 	m_roomGenerateSettings.at(FIRST_I).placementCandidates.emplace_back(RoomType::FIRST_FOUNTAIN);
 	m_roomGenerateSettings.at(FIRST_I).placementCandidates.emplace_back(RoomType::FIRST_SPAWNER);
 
-	m_roomGenerateSettings.at(FIRST_T).weight = 20;
+	m_roomGenerateSettings.at(FIRST_T).weight = 16;
 	m_roomGenerateSettings.at(FIRST_T).placementCandidates.emplace_back(RoomType::FIRST_I);
 	m_roomGenerateSettings.at(FIRST_T).placementCandidates.emplace_back(RoomType::FIRST_T);
+	m_roomGenerateSettings.at(FIRST_T).placementCandidates.emplace_back(RoomType::FIRST_T_REVERSE);
+	m_roomGenerateSettings.at(FIRST_T).placementCandidates.emplace_back(RoomType::FIRST_T_REVERSE);
 	m_roomGenerateSettings.at(FIRST_T).placementCandidates.emplace_back(RoomType::FIRST_FOUNTAIN);
 	m_roomGenerateSettings.at(FIRST_T).placementCandidates.emplace_back(RoomType::FIRST_SPAWNER);
 
-	m_roomGenerateSettings.at(FIRST_FOUNTAIN).weight = 5;
+	m_roomGenerateSettings.at(FIRST_T_REVERSE).weight = 16;
+	m_roomGenerateSettings.at(FIRST_T_REVERSE).placementCandidates.emplace_back(RoomType::FIRST_I);
+	m_roomGenerateSettings.at(FIRST_T_REVERSE).placementCandidates.emplace_back(RoomType::FIRST_T);
+	m_roomGenerateSettings.at(FIRST_T_REVERSE).placementCandidates.emplace_back(RoomType::FIRST_T_REVERSE);
+	m_roomGenerateSettings.at(FIRST_T_REVERSE).placementCandidates.emplace_back(RoomType::FIRST_FOUNTAIN);
+	m_roomGenerateSettings.at(FIRST_T_REVERSE).placementCandidates.emplace_back(RoomType::FIRST_SPAWNER);
+
+	m_roomGenerateSettings.at(FIRST_FOUNTAIN).weight = 8;
 	m_roomGenerateSettings.at(FIRST_FOUNTAIN).placementCandidates.emplace_back(RoomType::FIRST_I);
 	m_roomGenerateSettings.at(FIRST_FOUNTAIN).placementCandidates.emplace_back(RoomType::FIRST_T);
+	m_roomGenerateSettings.at(FIRST_FOUNTAIN).placementCandidates.emplace_back(RoomType::FIRST_T_REVERSE);
 	//m_roomGenerateSettings.at(FIRST_FOUNTAIN).placementCandidates.emplace_back(RoomType::FIRST_FOUNTAIN);
 	m_roomGenerateSettings.at(FIRST_FOUNTAIN).placementCandidates.emplace_back(RoomType::FIRST_SPAWNER);
 
-	m_roomGenerateSettings.at(FIRST_SPAWNER).weight = 10;
+	m_roomGenerateSettings.at(FIRST_SPAWNER).weight = 16;
 	m_roomGenerateSettings.at(FIRST_SPAWNER).placementCandidates.emplace_back(RoomType::FIRST_I);
 	m_roomGenerateSettings.at(FIRST_SPAWNER).placementCandidates.emplace_back(RoomType::FIRST_T);
+	m_roomGenerateSettings.at(FIRST_SPAWNER).placementCandidates.emplace_back(RoomType::FIRST_T_REVERSE);
 	m_roomGenerateSettings.at(FIRST_SPAWNER).placementCandidates.emplace_back(RoomType::FIRST_FOUNTAIN);
 	//m_roomGenerateSettings.at(FIRST_SPAWNER).placementCandidates.emplace_back(RoomType::FIRST_SPAWNER);
 
@@ -606,7 +619,7 @@ void DungeonData::InitModelFileDatas()
 	m_modelFileDatas.at(FIRE_HYDRANT).emplace_back("Data/Model/DungeonAssets/SM_Fire_Hydrant.glb", 4.0f);
 	m_modelFileDatas.at(FOUNTAIN).emplace_back("Data/Model/DungeonAssets/SM_Fountain_01.glb", 4.0f);
 	m_modelFileDatas.at(STAIR_TO_NEXTFLOOR).emplace_back("Data/Model/DungeonAssets/SM_Stairs_Steps_01a.glb", 4.0f);
-	m_modelFileDatas.at(BOSSROOM).emplace_back("Data/Model/DungeonAssets/SM_BossRoom.glb", 4.0f);
+	m_modelFileDatas.at(BOSSROOM).emplace_back("Data/Model/DungeonAssets/SM_BossRoom.glb", 2.0f);
 	m_modelFileDatas.at(BARREL).emplace_back("Data/Model/DungeonAssets/SM_Barrel.glb", 4.0f);
 	m_modelFileDatas.at(WALL_BRICK_01A).emplace_back("Data/Model/DungeonAssets/SM_Brick_Wall_01a.glb", 4.0f);
 	m_modelFileDatas.at(CHANDELIER).emplace_back("Data/Model/DungeonAssets/SM_Chandelier.glb", 4.0f);
@@ -658,14 +671,14 @@ void DungeonData::InitCollisionFileDatas()
 	//m_collisionFileDatas.at(STAIR_RAILING_01A).emplace_back("Data/Model/DungeonAssets/SM_Stairs_Railing_01a.glb", 4.0f);
 	//m_collisionFileDatas.at(STAIR_STEP_01A).emplace_back("Data/Model/DungeonAssets/SM_Stairs_Steps_01a.glb", 4.0f);
 	m_collisionFileDatas.at(FOUNTAIN).emplace_back("Data/Model/DungeonAssets/FountainCollision.glb", 4.0f);
-	m_collisionFileDatas.at(BOSSROOM).emplace_back("Data/Model/DungeonAssets/SM_BossRoom.glb", 4.0f);
+	m_collisionFileDatas.at(BOSSROOM).emplace_back("Data/Model/DungeonAssets/SM_BossRoom.glb", 2.0f);
 
 	m_collisionFileDatas.at(WALL_BRICK_01A).emplace_back("Data/Model/DungeonAssets/SM_Brick_Wall_01a.glb", 4.0f);
 	m_collisionFileDatas.at(FLOOR_BROWN).emplace_back("Data/Model/DungeonAssets/SM_Floor_Brown.glb", 4.0f);
 	m_collisionFileDatas.at(FLOOR_CHECK).emplace_back("Data/Model/DungeonAssets/SM_Floor_Check_Board.glb", 4.0f);
 	m_collisionFileDatas.at(FLOOR_GRAY).emplace_back("Data/Model/DungeonAssets/SM_Floor_Gray.glb", 4.0f);
 	m_collisionFileDatas.at(HEART_ARCH).emplace_back("Data/Model/DungeonAssets/SM_Heart_Arch_01a.glb", 4.0f);
-	m_collisionFileDatas.at(STAIR_STEP_01B).emplace_back("Data/Model/DungeonAssets/SlopeCollision_01a.glb", 4.0f);
+	m_collisionFileDatas.at(STAIR_STEP_01B).emplace_back("Data/Model/DungeonAssets/StairStepCollision_01b.glb", 4.0f);
 	m_collisionFileDatas.at(TOY_ARCH_01A).emplace_back("Data/Model/DungeonAssets/ToyArchCollision.glb", 4.0f);
 	m_collisionFileDatas.at(TOY_ARCH_SUPPORT_01A).emplace_back("Data/Model/DungeonAssets/ToyArchCollision.glb", 4.0f);
 	m_collisionFileDatas.at(WALL_PAPER).emplace_back("Data/Model/DungeonAssets/SM_Wall_Paper.glb", 4.0f);
@@ -761,6 +774,10 @@ SPAWNER_DATA DungeonData::LoadSpawnerData(nlohmann::json_abi_v3_11_3::json nodeD
 	{
 		spawnerData.enemyType = nodeData["SpawnerData"]["EnemyType"];
 		spawnerData.searchRadius = nodeData["SpawnerData"]["SearchRadius"];
+		spawnerData.spawnRadius = nodeData["SpawnerData"]["SpawnRadius"];
+		spawnerData.maxExistedEnemiesNum = nodeData["SpawnerData"]["MaxExistedEnemiesNum"];
+		spawnerData.maxSpawnedEnemiesNum = nodeData["SpawnerData"]["MaxSpawnedEnemiesNum"];
+		spawnerData.spawnTime = nodeData["SpawnerData"]["SpawnTime"];
 	}
 
 	return spawnerData;
@@ -829,6 +846,7 @@ void DungeonData::InitFileNames()
 	m_fileNames.at(FIRST_START) = (char*)("Data/RoomDatas/FirstFloor_Start.json");
 	m_fileNames.at(FIRST_I) = (char*)("Data/RoomDatas/FirstFloor_I.json");
 	m_fileNames.at(FIRST_T) = (char*)("Data/RoomDatas/FirstFloor_T.json");
+	m_fileNames.at(FIRST_T_REVERSE) = (char*)("Data/RoomDatas/FirstFloor_T_Reverse.json");
 	m_fileNames.at(FIRST_FOUNTAIN) = (char*)("Data/RoomDatas/FirstFloor_Fountain.json");
 	m_fileNames.at(FIRST_SPAWNER) = (char*)("Data/RoomDatas/FirstFloor_Spawner.json");
 	m_fileNames.at(FIRST_END) = (char*)("Data/RoomDatas/FirstFloor_End.json");

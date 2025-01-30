@@ -4,6 +4,7 @@
 #include "BearBoss.h"
 #include "BearBossState.h"
 #include "TAKOEngine/Physics/CollisionManager.h"
+#include "Scene/Stage/StageManager.h"
 
 BearBoss::BearBoss(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("Data/Model/Enemy/MDLANM_ENMboss_0123.glb", scaling, renderMode)
 {
@@ -72,7 +73,10 @@ void PunchImpact::Update(float elapsedTime)
 
 	time += elapsedTime;
 
-	if (time > existTime) Destory();
+	if (time > existTime) {
+		STAGES.GetStage()->DefeatBoss();
+		Destory();
+	}
 }
 
 void PunchImpact::CollisionFunction(Collider* myCol, Collider* otherCol)

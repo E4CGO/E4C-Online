@@ -19,6 +19,9 @@
 
 #include "Map/MapTile.h"
 #include "Map/MapTileManager.h"
+#include "GameObject/Character/Enemy/Enemy.h"
+
+#include "PreloadManager.h"
 
 #include "GameData.h"
 
@@ -29,6 +32,7 @@ void SceneRoomTest_E4C::Initialize()
 	{
 		m_spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
 	}
+	//PRELOAD.Join("CharacterModels");
 
 	//シャドウマップレンダラ
 	m_shadowMapRenderer->Initialize();
@@ -371,6 +375,8 @@ void SceneRoomTest_E4C::LoadRoomData()
 		{
 			ifs >> loadFile;
 
+			SetCurrentDirectoryA(currentDirectory);
+
 			// 部屋の生成設定をロード
 			roomSetting.weight = loadFile["RoomSetting"]["Weight"];
 			roomSetting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
@@ -380,73 +386,168 @@ void SceneRoomTest_E4C::LoadRoomData()
 			roomSetting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
 			roomSetting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
 
-			// ノードデータロード
-			for (const auto& nodeData : loadFile["NodeDatas"])
+			for (nlohmann::json_abi_v3_11_3::json nodeData : loadFile["NodeDatas"])
 			{
-				TileType tileType = nodeData["Type"];
-				DirectX::XMFLOAT3 position = {
-					nodeData["Position"].at(0),
-					nodeData["Position"].at(1),
-					nodeData["Position"].at(2)
-				};
-				DirectX::XMFLOAT3 angle = {
-					nodeData["Angle"].at(0),
-					nodeData["Angle"].at(1),
-					nodeData["Angle"].at(2)
-				};
-				DirectX::XMFLOAT3 scale = {
-					nodeData["Scale"].at(0),
-					nodeData["Scale"].at(1),
-					nodeData["Scale"].at(2),
-				};
+				TileType type = nodeData["Type"];
 
-				importDatas.emplace_back(position, angle, scale, tileType);
+				switch (type)
+				{
+				case ns_RoomData::SPAWNER: LoadSpawnerNodeData(nodeData);	break;
+				case ns_RoomData::CONNECTPOINT:	LoadConnectPointNodeData(nodeData);	break;
+				case ns_RoomData::STAIR_TO_NEXTFLOOR: LoadStairNodeData(nodeData);	break;
+				default: LoadTileNodeData(nodeData); break;
+				}
 			}
+
+			//// ノードデータロード
+			//for (const auto& nodeData : loadFile["NodeDatas"])
+			//{
+			//	TileType tileType = nodeData["Type"];
+			//	DirectX::XMFLOAT3 position = {
+			//		nodeData["Position"].at(0),
+			//		nodeData["Position"].at(1),
+			//		nodeData["Position"].at(2)
+			//	};
+			//	DirectX::XMFLOAT3 angle = {
+			//		nodeData["Angle"].at(0),
+			//		nodeData["Angle"].at(1),
+			//		nodeData["Angle"].at(2)
+			//	};
+			//	DirectX::XMFLOAT3 scale = {
+			//		nodeData["Scale"].at(0),
+			//		nodeData["Scale"].at(1),
+			//		nodeData["Scale"].at(2),
+			//	};
+
+			//	importDatas.emplace_back(position, angle, scale, tileType);
+			//}
 
 			ifs.close();
 		}
 	}
 
 	// 元のカレントディレクトリに戻す
-	SetCurrentDirectoryA(currentDirectory);
+	//SetCurrentDirectoryA(currentDirectory);
 
-	for (const IMPORT_DATA& data : importDatas)
+	//for (const IMPORT_DATA& data : importDatas)
+	//{
+	//	std::string nodeName;
+
+	//	switch (data.type)
+	//	{
+	//	case TileType::SPAWNER:			AddSpawner("Spawner", data.position);									break;
+	//	case TileType::CONNECTPOINT:	AddConnectPoint("ConnectPoint", data.position, data.angle);				break;
+	//	default:						AddTileNode(nodeDefaultNames.at(data.type), data.type, data.position, data.angle, data.scale);	break;
+	//	}
+	//}
+}
+
+void SceneRoomTest_E4C::LoadTileNodeData(nlohmann::json_abi_v3_11_3::json nodeData)
+{
+	if (!nodeData.is_null())
 	{
-		std::string nodeName;
-
-		switch (data.type)
-		{
-		case TileType::SPAWNER:			AddSpawner("Spawner", data.position);									break;
-		case TileType::CONNECTPOINT:	AddConnectPoint("ConnectPoint", data.position, data.angle);				break;
-		default:						AddTileNode(nodeDefaultNames.at(data.type), data.type, data.position, data.angle, data.scale);	break;
-		}
+		DirectX::XMFLOAT3 position = {
+			nodeData["Position"].at(0),
+			nodeData["Position"].at(1),
+			nodeData["Position"].at(2),
+		};
+		DirectX::XMFLOAT3 angle = {
+			nodeData["Angle"].at(0),
+			nodeData["Angle"].at(1),
+			nodeData["Angle"].at(2),
+		};
+		DirectX::XMFLOAT3 scale = {
+			nodeData["Scale"].at(0),
+			nodeData["Scale"].at(1),
+			nodeData["Scale"].at(2),
+		};
+		AddTileNode(nodeDefaultNames.at((int)nodeData["Type"]), (TileType)nodeData["Type"], position, angle, scale);
+		//AddTileNode(nodeDefaultNames.at(TileType::FLOOR_01A), TileType::FLOOR_01A, position, angle, scale);
 	}
 }
 
-void SceneRoomTest_E4C::LoadSpawnerData(const auto& nodeData)
+void SceneRoomTest_E4C::LoadSpawnerNodeData(nlohmann::json_abi_v3_11_3::json nodeData)
 {
-	TileType tileType = nodeData["Type"];
-	DirectX::XMFLOAT3 position = {
-		nodeData["Position"].at(0),
-		nodeData["Position"].at(1),
-		nodeData["Position"].at(2)
-	};
-	DirectX::XMFLOAT3 angle = {
-		nodeData["Angle"].at(0),
-		nodeData["Angle"].at(1),
-		nodeData["Angle"].at(2)
-	};
-	DirectX::XMFLOAT3 scale = {
-		nodeData["Scale"].at(0),
-		nodeData["Scale"].at(1),
-		nodeData["Scale"].at(2),
-	};
+	if (!nodeData.is_null())
+	{
+		DirectX::XMFLOAT3 position = {
+			nodeData["Position"].at(0),
+			nodeData["Position"].at(1),
+			nodeData["Position"].at(2),
+		};
 
-	SpawnerNode* newNode = new SpawnerNode(NODES.GetUniqueName("NewNode"));
-	newNode->SetPosition(position);
-	newNode->SetAngle(angle);
-	newNode->SetScale(scale);
-	NODES.Register(newNode);
+		if (!nodeData["SpawnerData"].is_null())
+		{
+			uint8_t enemyType = nodeData["SpawnerData"]["EnemyType"];
+			float searchRadius = nodeData["SpawnerData"]["SearchRadius"];
+			float spawnRadius = nodeData["SpawnerData"]["SpawnRadius"];
+			int maxExistedEnemiesNum = nodeData["SpawnerData"]["MaxExistedEnemiesNum"];
+			int maxSpawnedEnemiesNum = nodeData["SpawnerData"]["MaxSpawnedEnemiesNum"];
+			float spawnTime = nodeData["SpawnerData"]["SpawnTime"];
+
+			// ロードした値を使った生成
+			AddSpawner("Spawner",
+				position,
+				enemyType,
+				searchRadius,
+				spawnRadius,
+				maxExistedEnemiesNum,
+				maxSpawnedEnemiesNum,
+				spawnTime);
+
+			return;
+		}
+
+		// デフォルトの値を使った生成
+		AddSpawner("Spawner", position);
+	}
+}
+
+void SceneRoomTest_E4C::LoadConnectPointNodeData(nlohmann::json_abi_v3_11_3::json nodeData)
+{
+	if (!nodeData.is_null())
+	{
+		DirectX::XMFLOAT3 position = {
+			nodeData["Position"].at(0),
+			nodeData["Position"].at(1),
+			nodeData["Position"].at(2),
+		};
+		DirectX::XMFLOAT3 angle = {
+			nodeData["Angle"].at(0),
+			nodeData["Angle"].at(1),
+			nodeData["Angle"].at(2),
+		};
+		AddConnectPoint("ConnectPoint", position, angle);
+
+	}
+}
+
+void SceneRoomTest_E4C::LoadStairNodeData(nlohmann::json_abi_v3_11_3::json nodeData)
+{
+	if (!nodeData.is_null())
+	{
+		DirectX::XMFLOAT3 position = {
+			nodeData["Position"].at(0),
+			nodeData["Position"].at(1),
+			nodeData["Position"].at(2),
+		};
+
+		if (!nodeData["TeleporterData"].is_null())
+		{
+			float portalTime = nodeData["TeleporterData"]["PortalTime"];
+			float interactionDistance = nodeData["TeleporterData"]["InteractionDistance"];
+
+			// ロードした値を使った生成
+			AddStairToNextFloor("StairToNextFloor",
+				position,
+				portalTime,
+				interactionDistance);
+			return;
+		}
+
+		// デフォルトの値を使った生成
+		AddStairToNextFloor("StairToNextFloor", position);
+	}
 }
 
 /**************************************************************************//**
@@ -501,38 +602,6 @@ void SceneRoomTest_E4C::SaveRoomData()
 		{
 			node->SaveToJson(saveFile);
 		}
-		//for (Node& node : nodes)
-		//{
-		//	saveFile["NodeDatas"].push_back({
-		//		{ "Type", node.GetType() },
-		//		{ "Position", { node.GetPosition().x, node.GetPosition().y, node.GetPosition().z }},
-		//		{ "Angle", { node.GetAngle().x, node.GetAngle().y, node.GetAngle().z }},
-		//		{ "Scale", { node.GetScale().x, node.GetScale().y, node.GetScale().z }},
-		//		});
-		//}
-
-		//for (SpawnerNode& spawner : spawners)
-		//{
-		//	saveFile["NodeDatas"].push_back({
-		//		{ "Type", spawner.GetType() },
-		//		{ "Position", { spawner.GetPosition().x, spawner.GetPosition().y, spawner.GetPosition().z }},
-		//		{ "Angle", { spawner.GetAngle().x, spawner.GetAngle().y, spawner.GetAngle().z }},
-		//		{ "Scale", { spawner.GetScale().x, spawner.GetScale().y, spawner.GetScale().z }},
-		//		{ "SpawnerData",
-		//			{ "EnemyType", { spawner.GetSpawnerData().enemyType }},
-		//			{ "SearchRadius", { spawner.GetSpawnerData().searchRadius }}
-		//			}});
-		//}
-
-		//for (Node* tileNode : NODES.GetAll())
-		//{
-		//	saveFile["NodeDatas"].push_back({
-		//		{ "Type", tileNode->GetType() },
-		//		{ "Position", { tileNode->GetPosition().x, tileNode->GetPosition().y, tileNode->GetPosition().z }},
-		//		{ "Angle", { tileNode->GetAngle().x, tileNode->GetAngle().y, tileNode->GetAngle().z }},
-		//		{ "Scale", { tileNode->GetScale().x, tileNode->GetScale().y, tileNode->GetScale().z }},
-		//		});
-		//}
 
 		std::ofstream ofs(filePath);
 		if (ofs.is_open())
@@ -715,10 +784,22 @@ void SceneRoomTest_E4C::AddTileNode(
 
 void SceneRoomTest_E4C::AddSpawner(
 	std::string name,
-	DirectX::XMFLOAT3 position)
+	DirectX::XMFLOAT3 position,
+	uint8_t enemyType,
+	float searchRadius,
+	float spawnRadius,
+	int maxExistedEnemiesNum,
+	int maxSpawnedEnemiesNum,
+	float spawnTime)
 {
 	SpawnerNode* newNode = new SpawnerNode(NODES.GetUniqueName(name));
 	newNode->SetPosition(position);
+	newNode->SetEnemyType(enemyType);
+	newNode->SetSearchRadius(searchRadius);
+	newNode->SetSpawnRadius(spawnRadius);
+	newNode->SetMaxExistedEnemiesNum(maxExistedEnemiesNum);
+	newNode->SetMaxSpawnedEnemiesNum(maxSpawnedEnemiesNum);
+	newNode->SetSpawnTime(spawnTime);
 	NODES.Register(newNode);
 
 	// 追加したノードを選択させる
@@ -741,10 +822,14 @@ void SceneRoomTest_E4C::AddConnectPoint(
 
 void SceneRoomTest_E4C::AddStairToNextFloor(
 	std::string name,
-	DirectX::XMFLOAT3 position)
+	DirectX::XMFLOAT3 position,
+	float portalTime,
+	float interactionDistance)
 {
 	StairToNextFloorNode* newNode = new StairToNextFloorNode(NODES.GetUniqueName(name));
 	newNode->SetPosition(position);
+	newNode->SetPortalTime(portalTime);
+	newNode->SetInteractionDistance(interactionDistance);
 	NODES.Register(newNode);
 
 	// 追加したノードを選択させる
@@ -896,8 +981,12 @@ Node* SpawnerNode::Duplicate()
 {
 	SpawnerNode* newNode = new SpawnerNode(name);
 	newNode->SetPosition(this->position);
-	newNode->SetAngle(this->angle);
-	newNode->SetScale(this->scale);
+	newNode->SetEnemyType(this->enemyType);
+	newNode->SetSearchRadius(this->searchRadius);
+	newNode->SetSpawnRadius(this->spawnRadius);
+	newNode->SetMaxExistedEnemiesNum(this->maxExistedEnemiesNum);
+	newNode->SetMaxSpawnedEnemiesNum(this->maxSpawnedEnemiesNum);
+	newNode->SetSpawnTime(this->spawnTime);
 
 	return newNode;
 }
@@ -934,19 +1023,22 @@ void SpawnerNode::DrawDebugGUI()
 		int enemyTypeInt = (int)enemyType;
 		if (ImGui::InputInt("EnemyType", &enemyTypeInt)) {
 			// 最大数を超えないように調整
-			if (enemyTypeInt < 0) enemyTypeInt = 0;
+			if (enemyTypeInt > (enemyNames.size() - 1) ||
+				enemyTypeInt < 0) enemyTypeInt = 0;
 			enemyType = (uint8_t)enemyTypeInt;
 		}
+		// enemyType Text
+		ImGui::Text(("EnemyType: " + enemyNames.at(enemyTypeInt)).c_str());
 		// searchRadius
-		ImGui::SliderFloat("SearchRadius", &searchRadius, 0.0f, 30.0f);
+		ImGui::DragFloat("SearchRadius", &searchRadius, 0.1f, 0.0f, 64.0f);
 		// spawnRadius
-		ImGui::SliderFloat("SpawnRadius", &spawnRadius, 0.0f, 30.0f);
+		ImGui::DragFloat("SpawnRadius", &spawnRadius, 0.1f, 0.0f, 64.0f);
 		// maxExistedEnemiesNum
-		ImGui::SliderInt("MaxExistedEnemiesNum", &maxExistedEnemiesNum, 0, 30);
+		ImGui::DragInt("MaxExistedEnemiesNum", &maxExistedEnemiesNum, 1, 0, 32);
 		// maxSpawnedEnemiesNum
-		ImGui::SliderInt("MaxSpawnedEnemiesNum", &maxSpawnedEnemiesNum, -1, 30);
+		ImGui::DragInt("MaxSpawnedEnemiesNum", &maxSpawnedEnemiesNum, 1, 0, 32);
 		// spawnTime
-		ImGui::SliderFloat("SpawnTime", &spawnTime, 1.0f, 30.0f);
+		ImGui::DragFloat("SpawnTime", &spawnTime, 0.1f, 1.0f, 32.0f);
 
 		ImGui::TreePop();
 	}
@@ -1064,7 +1156,6 @@ Node* ConnectPointNode::Duplicate()
 	ConnectPointNode* newNode = new ConnectPointNode(name);
 	newNode->SetPosition(this->position);
 	newNode->SetAngle(this->angle);
-	newNode->SetScale(this->scale);
 
 	return newNode;
 }
@@ -1107,15 +1198,13 @@ void StairToNextFloorNode::Render(const RenderContext& rc)
 	// 継承元のRender呼び出し
 	ModelObject::Render(rc);
 
-	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, interactionDistance, 1.5f, { 0, 1, 1, 1 });
+	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, interactionDistance * 2, 1.5f, { 0, 1, 1, 1 });
 }
 
 Node* StairToNextFloorNode::Duplicate()
 {
 	StairToNextFloorNode* newNode = new StairToNextFloorNode(name);
 	newNode->SetPosition(this->position);
-	newNode->SetAngle(this->angle);
-	newNode->SetScale(this->scale);
 	newNode->SetPortalTime(this->portalTime);
 	newNode->SetInteractionDistance(this->interactionDistance);
 
@@ -1151,9 +1240,9 @@ void StairToNextFloorNode::DrawDebugGUI()
 	// テレポーターデータ
 	if (ImGui::TreeNodeEx("TeleporterData", ImGuiTreeNodeFlags_DefaultOpen)) {
 		// portalTime
-		ImGui::SliderFloat("PortalTime", &portalTime, 0.0f, 16.0f);
+		ImGui::DragFloat("PortalTime", &portalTime, 0.1f, 0.0f, 32.0f);
 		// interactionDistance
-		ImGui::SliderFloat("InteractionDistance", &interactionDistance, 0.0f, 64.0f);
+		ImGui::DragFloat("InteractionDistance", &interactionDistance, 0.1f, 0.0f, 64.0f);
 		ImGui::TreePop();
 	}
 }

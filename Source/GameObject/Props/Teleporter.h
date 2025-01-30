@@ -27,6 +27,8 @@ public:
 
 	void SetVisibility(bool isVisible) { this->m_isVisible = isVisible; }
 
+	void SetInteractionDistance(float newDist) { this->m_interactionDistance = newDist; }
+
 	virtual void Teleport();
 
 	Stage* GetStage() { return m_pStage; }

@@ -155,6 +155,10 @@ void StageDungeon_E4C::Initialize()
 	floorText->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 	floorText->SetPosition({ 30.0f, 30.0f });
 
+	//m_roomOrder.emplace_back(RoomType::FIRST_START);
+	//m_roomOrder.emplace_back(RoomType::FIRST_SPAWNER);
+	//m_roomOrder.emplace_back(RoomType::FIRST_END);
+
 	GenerateDungeon();
 
 	// 部屋のモデルを配置
@@ -170,14 +174,7 @@ void StageDungeon_E4C::Initialize()
 				room->PlaceTeleporterTile(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
 			}
 		}
-		// 最大階以上なら階段の行先はStageOpenWorld
-		else
-		{
-			if (room->GetRoomType() == DUNGEONDATA.GetCurrentFloorGenSetting().endRoomType)
-			{
-				room->PlaceTeleporterTile(new StageOpenWorld_E4C(m_pScene), m_pScene->GetOnlineController());
-			}
-		}
+		// 最大階（ボスフロア）はボス撃破関数で階段を配置する
 	}
 
 	// 部屋の当たり判定を設定
@@ -276,6 +273,18 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	}
 
 	m_timer += elapsedTime;
+}
+
+void StageDungeon_E4C::DefeatBoss()
+{
+	// 部屋のモデルを配置
+	for (RoomBase* room : rootRoom->GetAll())
+	{
+		if (room->GetRoomType() == DUNGEONDATA.GetCurrentFloorGenSetting().endRoomType)
+		{
+			room->PlaceTeleporterTile(new StageOpenWorld_E4C(m_pScene), m_pScene->GetOnlineController());
+		}
+	}
 }
 
 void StageDungeon_E4C::Render()
