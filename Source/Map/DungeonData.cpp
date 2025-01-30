@@ -134,21 +134,32 @@ void DungeonData::InitRoomGenSettings()
 	m_roomGenerateSettings.at(SECOND_START).placementCandidates.emplace_back(RoomType::SECOND_L1);
 	m_roomGenerateSettings.at(SECOND_START).placementCandidates.emplace_back(RoomType::SECOND_L2);
 	m_roomGenerateSettings.at(SECOND_START).placementCandidates.emplace_back(RoomType::SECOND_CROSS);
+	m_roomGenerateSettings.at(SECOND_START).placementCandidates.emplace_back(RoomType::SECOND_CROSS_REVERSE);
 
 	m_roomGenerateSettings.at(SECOND_L1).weight = 10;
 	m_roomGenerateSettings.at(SECOND_L1).placementCandidates.emplace_back(RoomType::SECOND_L1);
 	m_roomGenerateSettings.at(SECOND_L1).placementCandidates.emplace_back(RoomType::SECOND_L2);
 	m_roomGenerateSettings.at(SECOND_L1).placementCandidates.emplace_back(RoomType::SECOND_CROSS);
+	m_roomGenerateSettings.at(SECOND_L1).placementCandidates.emplace_back(RoomType::SECOND_CROSS_REVERSE);
 
 	m_roomGenerateSettings.at(SECOND_L2).weight = 10;
 	m_roomGenerateSettings.at(SECOND_L2).placementCandidates.emplace_back(RoomType::SECOND_L1);
 	m_roomGenerateSettings.at(SECOND_L2).placementCandidates.emplace_back(RoomType::SECOND_L2);
 	m_roomGenerateSettings.at(SECOND_L2).placementCandidates.emplace_back(RoomType::SECOND_CROSS);
+	m_roomGenerateSettings.at(SECOND_L2).placementCandidates.emplace_back(RoomType::SECOND_CROSS_REVERSE);
 
-	m_roomGenerateSettings.at(SECOND_CROSS).weight = 5;
+	m_roomGenerateSettings.at(SECOND_CROSS).weight = 4;
 	m_roomGenerateSettings.at(SECOND_CROSS).placementCandidates.emplace_back(RoomType::SECOND_L1);
 	m_roomGenerateSettings.at(SECOND_CROSS).placementCandidates.emplace_back(RoomType::SECOND_L2);
 	//m_roomGenerateSettings.at(SECOND_CROSS).placementCandidates.emplace_back(RoomType::SECOND_CROSS);
+	//m_roomGenerateSettings.at(SECOND_CROSS).placementCandidates.emplace_back(RoomType::SECOND_CROSS_REVERSE);
+
+	m_roomGenerateSettings.at(SECOND_CROSS_REVERSE).weight = 4;
+	m_roomGenerateSettings.at(SECOND_CROSS_REVERSE).placementCandidates.emplace_back(RoomType::SECOND_L1);
+	m_roomGenerateSettings.at(SECOND_CROSS_REVERSE).placementCandidates.emplace_back(RoomType::SECOND_L2);
+	//m_roomGenerateSettings.at(SECOND_CROSS_REVERSE).placementCandidates.emplace_back(RoomType::SECOND_CROSS);
+	//m_roomGenerateSettings.at(SECOND_CROSS_REVERSE).placementCandidates.emplace_back(RoomType::SECOND_CROSS_REVERSE);
+
 
 	/*///// Third Floor /////*/
 	m_roomGenerateSettings.at(THIRD_START).placementCandidates.emplace_back(RoomType::THIRD_T);
@@ -859,9 +870,11 @@ void DungeonData::InitFileNames()
 
 	// 第二のフロア
 	m_fileNames.at(SECOND_START) = (char*)("Data/RoomDatas/SecondFloor_Start.json");
+	m_fileNames.at(SECOND_START_REVERSE) = (char*)("Data/RoomDatas/SecondFloor_Start_Reverse.json");
 	m_fileNames.at(SECOND_L1) = (char*)("Data/RoomDatas/SecondFloor_L1.json");
 	m_fileNames.at(SECOND_L2) = (char*)("Data/RoomDatas/SecondFloor_L2.json");
 	m_fileNames.at(SECOND_CROSS) = (char*)("Data/RoomDatas/SecondFloor_Cross.json");
+	m_fileNames.at(SECOND_CROSS_REVERSE) = (char*)("Data/RoomDatas/SecondFloor_Cross_Reverse.json");
 	m_fileNames.at(SECOND_END) = (char*)("Data/RoomDatas/SecondFloor_End.json");
 	m_fileNames.at(SECOND_DEAD_END) = (char*)("Data/RoomDatas/SecondFloor_DeadEnd.json");
 
