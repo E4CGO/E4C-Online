@@ -40,14 +40,15 @@ void AttackSphereCollider::OnCollision(Collider* other)
 
 		if (m_power > other->GetArmor())
 		{
+			// 攻撃がヒットしたらカメラシェイクをリセット
+			CameraManager::Instance().GetCamera()->ResetShakeTimer();
+			CameraManager::Instance().GetCamera()->SetShake(true);
+
 			uint16_t damage = m_power - other->GetArmor();
-			Character* chara = static_cast<Character*>(other->GetOwner());
-			m_hitOthers.emplace_back(chara);
-      
-	    // 攻撃がヒットしたらカメラシェイクをリセット
-	    CameraManager::Instance().GetCamera()->ResetShakeTimer();
-      CameraManager::Instance().GetCamera()->SetShake(true);
-			chara->OnDamage(damage);
+			ModelObject* owner = static_cast<ModelObject*>(other->GetOwner());
+			m_hitOthers.emplace_back(owner);
+     
+			owner->OnDamage(damage);
 		}
 	}
 }
