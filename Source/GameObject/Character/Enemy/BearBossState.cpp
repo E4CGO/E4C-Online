@@ -113,16 +113,68 @@ namespace EnemyState
 		}
 		void AngryAttackState::Enter()
 		{
-			AttackState::Enter();
 			owner->SetAnimation(::BearBoss::ANIMATION::ANIM_PUNCH2, false);
-		}
+			
+			maxFlame = 442.0f;
+			impactFlame1 = 90.0f;
+			impactFlame2 = 160.0f;
+			impact1StartRate = impactFlame1 / maxFlame;
+			impact2StartRate = impactFlame2 / maxFlame;
 
+			attackArms[0].power = 50;
+			attackArms[0].idx = ::BearBoss::COLLIDER_ID::COL_ATTACK_LEFT_HAND;
+			attackArms[0].objType = Collider::COLLIDER_OBJ::ENEMY_ATTACK;
+			attackArms[0].hittableOBJ = Collider::COLLIDER_OBJ::PLAYER;
+			attackArms[0].capsule = { {0, 0, 0}, {1, 0, 0}, 5.0f, 1.4f };
+			attackArms[0].hitStartRate = 70.0f / maxFlame;
+			attackArms[0].hitEndRate = 270.0f / maxFlame;
+			attackArms[1].power = 50;
+			attackArms[1].idx = ::BearBoss::COLLIDER_ID::COL_ATTACK_RIGHT_HAND;
+			attackArms[1].objType = Collider::COLLIDER_OBJ::ENEMY_ATTACK;
+			attackArms[1].hittableOBJ = Collider::COLLIDER_OBJ::PLAYER;
+			attackArms[1].capsule = { {0, 0, 0}, {-1, 0, 0}, 5.0f, 1.4f };
+			attackArms[1].hitStartRate = 160.0f / maxFlame;
+			attackArms[1].hitEndRate = 200.0f / maxFlame;
+
+			DirectX::XMFLOAT4X4* leftArmMatrix = &owner->GetModel(0)->FindNode("JOT_L_Elbow")->worldTransform;
+			DirectX::XMFLOAT4X4* rightArmMatrix = &owner->GetModel(0)->FindNode("JOT_R_Elbow")->worldTransform;
+
+			ModelObject::ATTACK_COLLIDER_DATA attackData;
+			attackData.power = attackArms[0].power;
+			attackData.idx = attackArms[0].idx;
+			attackData.objType = attackArms[0].objType;
+			attackData.hittableOBJ = attackArms[0].hittableOBJ;
+			attackData.hitStartRate = attackArms[0].hitStartRate;
+			attackData.hitEndRate = attackArms[0].hitEndRate;
+			owner->MakeAttackCollider(attackData, attackArms[0].capsule, leftArmMatrix);
+
+			attackData.power = attackArms[1].power;
+			attackData.idx = attackArms[1].idx;
+			attackData.objType = attackArms[1].objType;
+			attackData.hittableOBJ = attackArms[1].hittableOBJ;
+			attackData.hitStartRate = attackArms[1].hitStartRate;
+			attackData.hitEndRate = attackArms[1].hitEndRate;
+			owner->MakeAttackCollider(attackData, attackArms[1].capsule, rightArmMatrix);
+		}
 		void AttackState::Execute(float elapsedTime)
 		{
 			owner->GetCollider(attackArms[0].idx)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
 			owner->GetCollider(attackArms[1].idx)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
 
 			UpdatePunchImpact(elapsedTime);
+
+			PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById(owner->GetTarget());
+			if (player == nullptr || !owner->IsPlayAnimation())
+			{
+				::EnemyState::StateTransition(owner, Enemy::STATE::IDLE);
+			}
+		}
+		void AngryAttackState::Execute(float elapsedTime)
+		{
+			owner->GetCollider(attackArms[0].idx)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
+			owner->GetCollider(attackArms[1].idx)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
+
+			UpdateClawImpact(elapsedTime);
 
 			PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById(owner->GetTarget());
 			if (player == nullptr || !owner->IsPlayAnimation())
@@ -167,11 +219,45 @@ namespace EnemyState
 				}
 			}
 		}
+		void AngryAttackState::UpdateClawImpact(float elapsedTime)
+		{
+			if (!impacts[0])
+			{
+				if (owner->GetModel()->GetAnimationRate() > impact1StartRate)
+				{
+					DirectX::XMFLOAT4X4* matrix = &owner->GetModel(0)->FindNode("JOT_L_Claw")->worldTransform;
+
+					DirectX::XMFLOAT3 pos = { matrix->_41, matrix->_42 , matrix->_43 };
+
+					PunchImpact* impact = new PunchImpact(pos, owner);
+					PROJECTILES.Register(impact);
+				}
+			}
+			if (!impacts[1])
+			{
+				if (owner->GetModel()->GetAnimationRate() > impact2StartRate)
+				{
+					DirectX::XMFLOAT4X4* matrix = &owner->GetModel(0)->FindNode("JOT_R_Claw")->worldTransform;
+
+					DirectX::XMFLOAT3 pos = { matrix->_41, matrix->_42 , matrix->_43 };
+
+					PunchImpact* impact = new PunchImpact(pos, owner);
+					PROJECTILES.Register(impact);
+				}
+			}
+
+			if (owner->GetModel()->GetAnimationRate() > 270.0f / maxFlame)
+			{
+				impacts[0] = true;
+				impacts[1] = true;
+			}
+		}
 
 		// スタンステート
 		void StunState::Enter()
 		{
 			this->SetSubState(::BearBoss::STUN_START);
+			owner->GetMoveCollider()->SetEnable(false);
 		}
 		void StunState::Execute(float elapsedTime)
 		{
@@ -184,12 +270,14 @@ namespace EnemyState
 		void StunState::Exit()
 		{
 			this->subState->Exit();
+			owner->GetMoveCollider()->SetEnable(true);
 		}
 
 		void StunStartState::Enter()
 		{
 			owner->SetAnimation(::BearBoss::ANIM_STUN_START, false);
 			// 弱点当たり判定消す
+			owner->GetCollider(::BearBoss::COLLIDER_ID::COL_BUTTON)->SetEnable(false);
 		}
 		void AngryStunStartState::Enter()
 		{
@@ -206,6 +294,7 @@ namespace EnemyState
 		void StunStartState::Exit()
 		{
 			// 弱点当たり判定復活
+			owner->GetCollider(::BearBoss::COLLIDER_ID::COL_BUTTON)->SetEnable(true);
 		}
 		void StunLoopState::Enter()
 		{
@@ -228,6 +317,7 @@ namespace EnemyState
 		{
 			owner->SetAnimation(::BearBoss::ANIM_STUN_END, false);
 			// 弱点当たり判定消す
+			owner->GetCollider(::BearBoss::COLLIDER_ID::COL_BUTTON)->SetEnable(false);
 		}
 		void AngryStunEndState::Enter()
 		{
@@ -237,6 +327,7 @@ namespace EnemyState
 		void StunEndState::Exit()
 		{
 			// 弱点当たり判定復活
+			owner->GetCollider(::BearBoss::COLLIDER_ID::COL_BUTTON)->SetEnable(true);
 		}
 
 		// 咆哮ステート

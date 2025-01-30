@@ -7,6 +7,7 @@
 
 #include "Scene/SceneManager.h"
 #include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
+#include "PreloadManager.h"
 
 using namespace SceneCharacter_E4CState;
 
@@ -55,6 +56,7 @@ void SceneCharacter_E4CState::InitState::Exit()
 *//***************************************************************************/
 void SceneCharacter_E4CState::CharacterSelectionState::Enter()
 {
+	PRELOAD.Lock();
 	m_pWidgetCharacterSelect = new WidgetCharacterSelect(owner);
 	UI.Register(m_pWidgetCharacterSelect);
 	for (PlayerCharacter* character : owner->GetCharacters())
@@ -72,6 +74,7 @@ void SceneCharacter_E4CState::CharacterSelectionState::Enter()
 
 	m_pPauseMenu = new WidgetPauseMenu();
 	UI.Register(m_pPauseMenu);
+	PRELOAD.Unlock();
 }
 /**************************************************************************//**
 	@brief		実行
@@ -117,6 +120,7 @@ void SceneCharacter_E4CState::CharacterSelectionState::Exit()
 *//***************************************************************************/
 void SceneCharacter_E4CState::CharacterCreationState::Enter()
 {
+	PRELOAD.Lock();
 	m_pCharacter = owner->GetSelectedCharacter();
 	std::vector<PlayerCharacter*> characters = owner->GetCharacters();
 	for (PlayerCharacter* character : characters)
@@ -152,6 +156,7 @@ void SceneCharacter_E4CState::CharacterCreationState::Enter()
 		});
 	m_pStartBtn->SetPosition({ SCREEN_W * 0.85f, SCREEN_H * 0.90f });
 	UI.Register(m_pStartBtn);
+	PRELOAD.Unlock();
 }
 
 /**************************************************************************//**

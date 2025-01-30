@@ -47,6 +47,7 @@ void StageOpenWorld_E4C::Initialize()
 	}
 	PRELOAD.Join("OpenWorldModels");
 
+	PRELOAD.Lock();
 	m_pCharacterGauge = new WidgetPlayerHP();
 	m_pPauseMenu = new WidgetPauseMenu();
 	UI.Register(m_pCharacterGauge);
@@ -71,7 +72,7 @@ void StageOpenWorld_E4C::Initialize()
 	//onewayWall = std::make_unique<OneWayWall>(OneWayWall::PlusZ); //引数に通れる方向が必要
 	//onewayWall->SetPosition({ 15.0f, 3.5f, 10.0f });
 
-	Spawner* spawner = new Spawner(ENEMY_TYPE::PIG, 5, -1);
+	Spawner* spawner = new Spawner(ENEMY_TYPE::BEAR_BOSS, 1, -1);
 	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
 	spawner->SetSearchRadius(10.0f);
 	SpawnerManager::Instance().Register(spawner);
@@ -119,12 +120,15 @@ void StageOpenWorld_E4C::Initialize()
 		models.emplace("target1", std::make_unique<ModelObject>("Data/Model/Object/BlockTarget.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["target1"]->SetPosition({ -34.9f, 1.8f, 20.4f });
 		models["target1"]->SetAngle({ 0.0f, -0.84f, 0.0f });
+		models["target1"]->SetCollider(0, { {0, 1.5f, 0.2f}, 1.2f }, Collider::COLLIDER_OBJ::ENEMY, models["target1"]->GetTransformAdress());
 		models.emplace("target2", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget1.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["target2"]->SetPosition({ -38.1f, 1.80f, 16.2f });
 		models["target2"]->SetAngle({ 0.0f, -1.0f, 0.0f });
+		models["target2"]->SetCollider(0, { {0, 1.4f, 0}, 0.5f }, Collider::COLLIDER_OBJ::ENEMY, models["target2"]->GetTransformAdress());
 		models.emplace("target3", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget2.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["target3"]->SetPosition({ -32.0, 1.80f, 23.4f });
 		models["target3"]->SetAngle({ 0.0f, -1.0f, 0.0f });
+		models["target3"]->SetCollider(0, { {0, 1.4f, 0}, 0.5f }, Collider::COLLIDER_OBJ::ENEMY, models["target3"]->GetTransformAdress());
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 250.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
 		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
@@ -173,11 +177,13 @@ void StageOpenWorld_E4C::Initialize()
 	cameraController->SetEnable(true);
 	cameraController->SetPlayer(player);
 	CURSOR_OFF;
-
+	
+	PRELOAD.Unlock();
 	Sound::Instance().InitAudio();
 	Sound::Instance().LoadAudio("Data/Sound/3-Dreamland(Overworld).mp3");
 	Sound::Instance().LoadAudio("Data/Sound/4-Encounter(battle_theme_Overworld_Tutorial).mp3");
 	Sound::Instance().PlayAudio(0);
+
 
 	// ダンジョンの階の再設定
 	// 1階から始める

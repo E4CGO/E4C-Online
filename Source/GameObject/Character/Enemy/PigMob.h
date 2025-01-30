@@ -41,7 +41,7 @@ public:
 		ANIM_DAMAGE,
 		ANIM_DIE,
 	};
-
+	void OnWall() override;
 	void Shot();
 	bool IsReloaded() const { return m_isReloaded; }
 	void SetReload(bool reloaded = true);

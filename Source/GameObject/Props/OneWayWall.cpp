@@ -13,7 +13,7 @@
 OneWayWall::OneWayWall(WayDirection dir, float scale, const char* filename) : ModelObject(filename, 1.0f, ModelObject::DX12), m_Scaling(scale)
 {
 	SetScale({ m_Scaling , m_Scaling , 1.0f});
-	angle.y = DirectX::XM_PIDIV2 * dir;
+	angle.y = DirectX::XM_PIDIV2 * static_cast<float>(dir);
 	AABB trigger{ {0, 0, -1.25f}, { m_Scaling * fabsf(cosf(angle.y)) + 0.5f * fabsf(sinf(angle.y)), m_Scaling, 1.0f * fabsf(cosf(angle.y)) + m_Scaling * fabsf(sinf(angle.y)) } };
 	AABB wall{ {0, 0, -0.25f}, { m_Scaling * fabsf(cosf(angle.y)) + 0.25f * fabsf(sinf(angle.y)), m_Scaling, 0.25f * fabsf(cosf(angle.y)) + m_Scaling * fabsf(sinf(angle.y))}};
 	//trigger.radii = trigger.radii * 0.5f;
@@ -40,7 +40,6 @@ void OneWayWall::Update(float elapsedTime)
 	m_pColliders[1]->SetEnable(true);
 
 	ModelObject::Update(elapsedTime);
-	UpdateColliders();
 }
 
 void OneWayWall::CollisionTrigger(Collider* myCol, Collider* otherCol)
