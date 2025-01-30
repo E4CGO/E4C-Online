@@ -1,11 +1,5 @@
 #include "DungeonData.h"
 
-#include "TAKOEngine/Runtime/tentacle_lib.h"
-#include "TAKOEngine/Network/HttpRequest.h"
-#include "TAKOEngine/Network/WinSock2Wrapper.h"
-
-#include <fstream>
-
 DungeonData::DungeonData()
 {
 	// 初期化
@@ -27,11 +21,13 @@ void DungeonData::Initialize()
 
 	InitModelFileDatas();
 	InitCollisionFileDatas();
+
+	InitTileDatas();
 }
 
 void DungeonData::InitDungeonGenSetting()
 {
-	m_dungeonGenerateSetting.maxFloor = 7;
+	m_dungeonGenerateSetting.maxFloor = 3;
 }
 
 void DungeonData::InitFloorGenSettings()
@@ -50,34 +46,35 @@ void DungeonData::InitFloorGenSettings()
 	m_floorGenerateSettings.at(1).startRoomType = RoomType::FIRST_START;
 	m_floorGenerateSettings.at(1).endRoomType = RoomType::FIRST_END;
 	m_floorGenerateSettings.at(1).deadEndRoomType = RoomType::FIRST_DEAD_END;
-	m_floorGenerateSettings.at(2).maxDepth = 5;
-	m_floorGenerateSettings.at(2).startRoomType = RoomType::FIRST_START;
-	m_floorGenerateSettings.at(2).endRoomType = RoomType::FIRST_END;
-	m_floorGenerateSettings.at(2).deadEndRoomType = RoomType::FIRST_DEAD_END;
+	//m_floorGenerateSettings.at(2).maxDepth = 4;
+	//m_floorGenerateSettings.at(2).startRoomType = RoomType::FIRST_START;
+	//m_floorGenerateSettings.at(2).endRoomType = RoomType::FIRST_END;
+	//m_floorGenerateSettings.at(2).deadEndRoomType = RoomType::FIRST_DEAD_END;
 
 	// SecondFloor
-	m_floorGenerateSettings.at(3).maxDepth = 4;
-	m_floorGenerateSettings.at(3).startRoomType = RoomType::SECOND_START;
-	m_floorGenerateSettings.at(3).endRoomType = RoomType::SECOND_END;
-	m_floorGenerateSettings.at(3).deadEndRoomType = RoomType::SECOND_DEAD_END;
-	m_floorGenerateSettings.at(4).maxDepth = 5;
-	m_floorGenerateSettings.at(4).startRoomType = RoomType::SECOND_START;
-	m_floorGenerateSettings.at(4).endRoomType = RoomType::SECOND_END;
-	m_floorGenerateSettings.at(4).deadEndRoomType = RoomType::SECOND_DEAD_END;
+	m_floorGenerateSettings.at(2).maxDepth = 3;
+	m_floorGenerateSettings.at(2).startRoomType = RoomType::SECOND_START;
+	m_floorGenerateSettings.at(2).endRoomType = RoomType::SECOND_END;
+	m_floorGenerateSettings.at(2).deadEndRoomType = RoomType::SECOND_DEAD_END;
+	//m_floorGenerateSettings.at(4).maxDepth = 4;
+	//m_floorGenerateSettings.at(4).startRoomType = RoomType::SECOND_START;
+	//m_floorGenerateSettings.at(4).endRoomType = RoomType::SECOND_END;
+	//m_floorGenerateSettings.at(4).deadEndRoomType = RoomType::SECOND_DEAD_END;
 
-	// ThirdFloor
-	m_floorGenerateSettings.at(5).maxDepth = 4;
-	m_floorGenerateSettings.at(5).startRoomType = RoomType::FIRST_START;
-	m_floorGenerateSettings.at(5).endRoomType = RoomType::FIRST_END;
-	m_floorGenerateSettings.at(5).deadEndRoomType = RoomType::FIRST_DEAD_END;
-	m_floorGenerateSettings.at(6).maxDepth = 5;
-	m_floorGenerateSettings.at(6).startRoomType = RoomType::FIRST_START;
-	m_floorGenerateSettings.at(6).endRoomType = RoomType::FIRST_END;
-	m_floorGenerateSettings.at(6).deadEndRoomType = RoomType::FIRST_DEAD_END;
+	// ThirdFloor 実装しない
+	//m_floorGenerateSettings.at(3).maxDepth = 4;
+	//m_floorGenerateSettings.at(3).startRoomType = RoomType::THIRD_START;
+	//m_floorGenerateSettings.at(3).endRoomType = RoomType::FIRST_END;
+	//m_floorGenerateSettings.at(3).deadEndRoomType = RoomType::FIRST_DEAD_END;
+	//m_floorGenerateSettings.at(6).maxDepth = 4;
+	//m_floorGenerateSettings.at(6).startRoomType = RoomType::FIRST_START;
+	//m_floorGenerateSettings.at(6).endRoomType = RoomType::FIRST_END;
+	//m_floorGenerateSettings.at(6).deadEndRoomType = RoomType::FIRST_DEAD_END;
 
 	// BossFloor
-	m_floorGenerateSettings.at(7).maxDepth = 4;
-	m_floorGenerateSettings.at(7).startRoomType = RoomType::FIRST_BOSS;
+	// endRoomTypeが該当する部屋にテレポーターを配置するため、FIRST_BOSSを両方に適応させる
+	m_floorGenerateSettings.at(3).startRoomType = RoomType::FIRST_BOSS;
+	m_floorGenerateSettings.at(3).endRoomType = RoomType::FIRST_BOSS;
 }
 
 void DungeonData::InitRoomGenSettings()
@@ -90,53 +87,99 @@ void DungeonData::InitRoomGenSettings()
 		m_roomGenerateSettings.at((RoomType)i) = LoadRoomGenSetting((RoomType(i)));
 	}
 
+	/*///// First Floor /////*/
 	m_roomGenerateSettings.at(FIRST_START).placementCandidates.emplace_back(RoomType::FIRST_I);
 	m_roomGenerateSettings.at(FIRST_START).placementCandidates.emplace_back(RoomType::FIRST_T);
+	m_roomGenerateSettings.at(FIRST_START).placementCandidates.emplace_back(RoomType::FIRST_T_REVERSE);
 	m_roomGenerateSettings.at(FIRST_START).placementCandidates.emplace_back(RoomType::FIRST_FOUNTAIN);
 	m_roomGenerateSettings.at(FIRST_START).placementCandidates.emplace_back(RoomType::FIRST_SPAWNER);
 
-	m_roomGenerateSettings.at(FIRST_I).weight = 10;
+	m_roomGenerateSettings.at(FIRST_I).weight = 8;
 	m_roomGenerateSettings.at(FIRST_I).placementCandidates.emplace_back(RoomType::FIRST_I);
 	m_roomGenerateSettings.at(FIRST_I).placementCandidates.emplace_back(RoomType::FIRST_T);
+	m_roomGenerateSettings.at(FIRST_I).placementCandidates.emplace_back(RoomType::FIRST_T_REVERSE);
 	m_roomGenerateSettings.at(FIRST_I).placementCandidates.emplace_back(RoomType::FIRST_FOUNTAIN);
 	m_roomGenerateSettings.at(FIRST_I).placementCandidates.emplace_back(RoomType::FIRST_SPAWNER);
 
-	m_roomGenerateSettings.at(FIRST_T).weight = 20;
+	m_roomGenerateSettings.at(FIRST_T).weight = 16;
 	m_roomGenerateSettings.at(FIRST_T).placementCandidates.emplace_back(RoomType::FIRST_I);
 	m_roomGenerateSettings.at(FIRST_T).placementCandidates.emplace_back(RoomType::FIRST_T);
+	m_roomGenerateSettings.at(FIRST_T).placementCandidates.emplace_back(RoomType::FIRST_T_REVERSE);
+	m_roomGenerateSettings.at(FIRST_T).placementCandidates.emplace_back(RoomType::FIRST_T_REVERSE);
 	m_roomGenerateSettings.at(FIRST_T).placementCandidates.emplace_back(RoomType::FIRST_FOUNTAIN);
 	m_roomGenerateSettings.at(FIRST_T).placementCandidates.emplace_back(RoomType::FIRST_SPAWNER);
 
-	m_roomGenerateSettings.at(FIRST_FOUNTAIN).weight = 5;
+	m_roomGenerateSettings.at(FIRST_T_REVERSE).weight = 16;
+	m_roomGenerateSettings.at(FIRST_T_REVERSE).placementCandidates.emplace_back(RoomType::FIRST_I);
+	m_roomGenerateSettings.at(FIRST_T_REVERSE).placementCandidates.emplace_back(RoomType::FIRST_T);
+	m_roomGenerateSettings.at(FIRST_T_REVERSE).placementCandidates.emplace_back(RoomType::FIRST_T_REVERSE);
+	m_roomGenerateSettings.at(FIRST_T_REVERSE).placementCandidates.emplace_back(RoomType::FIRST_FOUNTAIN);
+	m_roomGenerateSettings.at(FIRST_T_REVERSE).placementCandidates.emplace_back(RoomType::FIRST_SPAWNER);
+
+	m_roomGenerateSettings.at(FIRST_FOUNTAIN).weight = 8;
 	m_roomGenerateSettings.at(FIRST_FOUNTAIN).placementCandidates.emplace_back(RoomType::FIRST_I);
 	m_roomGenerateSettings.at(FIRST_FOUNTAIN).placementCandidates.emplace_back(RoomType::FIRST_T);
+	m_roomGenerateSettings.at(FIRST_FOUNTAIN).placementCandidates.emplace_back(RoomType::FIRST_T_REVERSE);
 	//m_roomGenerateSettings.at(FIRST_FOUNTAIN).placementCandidates.emplace_back(RoomType::FIRST_FOUNTAIN);
 	m_roomGenerateSettings.at(FIRST_FOUNTAIN).placementCandidates.emplace_back(RoomType::FIRST_SPAWNER);
 
-	m_roomGenerateSettings.at(FIRST_SPAWNER).weight = 10;
+	m_roomGenerateSettings.at(FIRST_SPAWNER).weight = 16;
 	m_roomGenerateSettings.at(FIRST_SPAWNER).placementCandidates.emplace_back(RoomType::FIRST_I);
 	m_roomGenerateSettings.at(FIRST_SPAWNER).placementCandidates.emplace_back(RoomType::FIRST_T);
+	m_roomGenerateSettings.at(FIRST_SPAWNER).placementCandidates.emplace_back(RoomType::FIRST_T_REVERSE);
 	m_roomGenerateSettings.at(FIRST_SPAWNER).placementCandidates.emplace_back(RoomType::FIRST_FOUNTAIN);
 	//m_roomGenerateSettings.at(FIRST_SPAWNER).placementCandidates.emplace_back(RoomType::FIRST_SPAWNER);
 
+	/*///// Second Floor /////*/
 	m_roomGenerateSettings.at(SECOND_START).placementCandidates.emplace_back(RoomType::SECOND_L1);
 	m_roomGenerateSettings.at(SECOND_START).placementCandidates.emplace_back(RoomType::SECOND_L2);
 	m_roomGenerateSettings.at(SECOND_START).placementCandidates.emplace_back(RoomType::SECOND_CROSS);
+	m_roomGenerateSettings.at(SECOND_START).placementCandidates.emplace_back(RoomType::SECOND_CROSS_REVERSE);
 
 	m_roomGenerateSettings.at(SECOND_L1).weight = 10;
 	m_roomGenerateSettings.at(SECOND_L1).placementCandidates.emplace_back(RoomType::SECOND_L1);
 	m_roomGenerateSettings.at(SECOND_L1).placementCandidates.emplace_back(RoomType::SECOND_L2);
 	m_roomGenerateSettings.at(SECOND_L1).placementCandidates.emplace_back(RoomType::SECOND_CROSS);
+	m_roomGenerateSettings.at(SECOND_L1).placementCandidates.emplace_back(RoomType::SECOND_CROSS_REVERSE);
 
 	m_roomGenerateSettings.at(SECOND_L2).weight = 10;
 	m_roomGenerateSettings.at(SECOND_L2).placementCandidates.emplace_back(RoomType::SECOND_L1);
 	m_roomGenerateSettings.at(SECOND_L2).placementCandidates.emplace_back(RoomType::SECOND_L2);
 	m_roomGenerateSettings.at(SECOND_L2).placementCandidates.emplace_back(RoomType::SECOND_CROSS);
+	m_roomGenerateSettings.at(SECOND_L2).placementCandidates.emplace_back(RoomType::SECOND_CROSS_REVERSE);
 
-	m_roomGenerateSettings.at(SECOND_CROSS).weight = 5;
+	m_roomGenerateSettings.at(SECOND_CROSS).weight = 4;
 	m_roomGenerateSettings.at(SECOND_CROSS).placementCandidates.emplace_back(RoomType::SECOND_L1);
 	m_roomGenerateSettings.at(SECOND_CROSS).placementCandidates.emplace_back(RoomType::SECOND_L2);
 	//m_roomGenerateSettings.at(SECOND_CROSS).placementCandidates.emplace_back(RoomType::SECOND_CROSS);
+	//m_roomGenerateSettings.at(SECOND_CROSS).placementCandidates.emplace_back(RoomType::SECOND_CROSS_REVERSE);
+
+	m_roomGenerateSettings.at(SECOND_CROSS_REVERSE).weight = 4;
+	m_roomGenerateSettings.at(SECOND_CROSS_REVERSE).placementCandidates.emplace_back(RoomType::SECOND_L1);
+	m_roomGenerateSettings.at(SECOND_CROSS_REVERSE).placementCandidates.emplace_back(RoomType::SECOND_L2);
+	//m_roomGenerateSettings.at(SECOND_CROSS_REVERSE).placementCandidates.emplace_back(RoomType::SECOND_CROSS);
+	//m_roomGenerateSettings.at(SECOND_CROSS_REVERSE).placementCandidates.emplace_back(RoomType::SECOND_CROSS_REVERSE);
+
+
+	/*///// Third Floor /////*/
+	m_roomGenerateSettings.at(THIRD_START).placementCandidates.emplace_back(RoomType::THIRD_T);
+	m_roomGenerateSettings.at(THIRD_START).placementCandidates.emplace_back(RoomType::THIRD_I);
+	m_roomGenerateSettings.at(THIRD_START).placementCandidates.emplace_back(RoomType::THIRD_BARREL);
+
+	m_roomGenerateSettings.at(THIRD_I).weight = 5;
+	m_roomGenerateSettings.at(THIRD_I).placementCandidates.emplace_back(RoomType::THIRD_T);
+	m_roomGenerateSettings.at(THIRD_I).placementCandidates.emplace_back(RoomType::THIRD_I);
+	m_roomGenerateSettings.at(THIRD_I).placementCandidates.emplace_back(RoomType::THIRD_BARREL);
+
+	m_roomGenerateSettings.at(THIRD_T).weight = 10;
+	m_roomGenerateSettings.at(THIRD_T).placementCandidates.emplace_back(RoomType::THIRD_T);
+	m_roomGenerateSettings.at(THIRD_T).placementCandidates.emplace_back(RoomType::THIRD_I);
+	m_roomGenerateSettings.at(THIRD_T).placementCandidates.emplace_back(RoomType::THIRD_BARREL);
+
+	m_roomGenerateSettings.at(THIRD_BARREL).weight = 10;
+	m_roomGenerateSettings.at(THIRD_BARREL).placementCandidates.emplace_back(RoomType::THIRD_T);
+	m_roomGenerateSettings.at(THIRD_BARREL).placementCandidates.emplace_back(RoomType::THIRD_I);
+	m_roomGenerateSettings.at(THIRD_BARREL).placementCandidates.emplace_back(RoomType::THIRD_BARREL);
 
 
 
@@ -587,7 +630,7 @@ void DungeonData::InitModelFileDatas()
 	m_modelFileDatas.at(FIRE_HYDRANT).emplace_back("Data/Model/DungeonAssets/SM_Fire_Hydrant.glb", 4.0f);
 	m_modelFileDatas.at(FOUNTAIN).emplace_back("Data/Model/DungeonAssets/SM_Fountain_01.glb", 4.0f);
 	m_modelFileDatas.at(STAIR_TO_NEXTFLOOR).emplace_back("Data/Model/DungeonAssets/SM_Stairs_Steps_01a.glb", 4.0f);
-	m_modelFileDatas.at(BOSSROOM).emplace_back("Data/Model/DungeonAssets/SM_BossRoom.glb", 4.0f);
+	m_modelFileDatas.at(BOSSROOM).emplace_back("Data/Model/DungeonAssets/SM_BossRoom.glb", 2.0f);
 	m_modelFileDatas.at(BARREL).emplace_back("Data/Model/DungeonAssets/SM_Barrel.glb", 4.0f);
 	m_modelFileDatas.at(WALL_BRICK_01A).emplace_back("Data/Model/DungeonAssets/SM_Brick_Wall_01a.glb", 4.0f);
 	m_modelFileDatas.at(CHANDELIER).emplace_back("Data/Model/DungeonAssets/SM_Chandelier.glb", 4.0f);
@@ -638,17 +681,151 @@ void DungeonData::InitCollisionFileDatas()
 
 	//m_collisionFileDatas.at(STAIR_RAILING_01A).emplace_back("Data/Model/DungeonAssets/SM_Stairs_Railing_01a.glb", 4.0f);
 	//m_collisionFileDatas.at(STAIR_STEP_01A).emplace_back("Data/Model/DungeonAssets/SM_Stairs_Steps_01a.glb", 4.0f);
-	m_collisionFileDatas.at(BOSSROOM).emplace_back("Data/Model/DungeonAssets/SM_BossRoom.glb", 4.0f);
+	m_collisionFileDatas.at(FOUNTAIN).emplace_back("Data/Model/DungeonAssets/FountainCollision.glb", 4.0f);
+	m_collisionFileDatas.at(BOSSROOM).emplace_back("Data/Model/DungeonAssets/SM_BossRoom.glb", 2.0f);
 
 	m_collisionFileDatas.at(WALL_BRICK_01A).emplace_back("Data/Model/DungeonAssets/SM_Brick_Wall_01a.glb", 4.0f);
 	m_collisionFileDatas.at(FLOOR_BROWN).emplace_back("Data/Model/DungeonAssets/SM_Floor_Brown.glb", 4.0f);
 	m_collisionFileDatas.at(FLOOR_CHECK).emplace_back("Data/Model/DungeonAssets/SM_Floor_Check_Board.glb", 4.0f);
 	m_collisionFileDatas.at(FLOOR_GRAY).emplace_back("Data/Model/DungeonAssets/SM_Floor_Gray.glb", 4.0f);
 	m_collisionFileDatas.at(HEART_ARCH).emplace_back("Data/Model/DungeonAssets/SM_Heart_Arch_01a.glb", 4.0f);
-	m_collisionFileDatas.at(STAIR_STEP_01B).emplace_back("Data/Model/DungeonAssets/SM_Stairs_Steps_01b.glb", 4.0f);
+	m_collisionFileDatas.at(STAIR_STEP_01B).emplace_back("Data/Model/DungeonAssets/StairStepCollision_01b.glb", 4.0f);
+	m_collisionFileDatas.at(TOY_ARCH_01A).emplace_back("Data/Model/DungeonAssets/ToyArchCollision.glb", 4.0f);
+	m_collisionFileDatas.at(TOY_ARCH_SUPPORT_01A).emplace_back("Data/Model/DungeonAssets/ToyArchCollision.glb", 4.0f);
 	m_collisionFileDatas.at(WALL_PAPER).emplace_back("Data/Model/DungeonAssets/SM_Wall_Paper.glb", 4.0f);
 	m_collisionFileDatas.at(WALL_SQUARES).emplace_back("Data/Model/DungeonAssets/SM_Wall_Squares.glb", 4.0f);
 	m_collisionFileDatas.at(WELL).emplace_back("Data/Model/DungeonAssets/SM_Well_01a.glb", 4.0f);
+}
+
+void DungeonData::InitTileDatas()
+{
+	// 現在のカレントディレクトリを保存しておく
+	char currentDirectory[260];
+	GetCurrentDirectoryA(260, currentDirectory);
+
+	// まずリサイズ
+	m_roomTileDatas.resize(RoomType::ROOMTYPE_COUNT);
+	for (int i = (int)RoomType::FIRST_START; i < (int)RoomType::ROOMTYPE_COUNT; i++) m_roomTileDatas.at(i).resize(TileType::TILETYPE_COUNT);
+
+	m_roomSpawnerDatas.resize(RoomType::ROOMTYPE_COUNT);
+	m_roomStairDatas.resize(RoomType::ROOMTYPE_COUNT);
+
+	// 部屋の数だけぶん回す
+	for (int i = (int)RoomType::FIRST_START; i < (int)RoomType::ROOMTYPE_COUNT; i++)
+	{
+		nlohmann::json loadFile;
+		std::ifstream ifs(m_fileNames.at((RoomType)i));
+
+		if (ifs.is_open())
+		{
+			ifs >> loadFile;
+
+			for (nlohmann::json_abi_v3_11_3::json nodeData : loadFile["NodeDatas"])
+			{
+				TileType type = nodeData["Type"];
+
+				switch (type)
+				{
+				case ns_RoomData::SPAWNER:				m_roomSpawnerDatas.at((RoomType)i).emplace_back(LoadSpawnerData(nodeData));	break;
+				case ns_RoomData::STAIR_TO_NEXTFLOOR:	m_roomStairDatas.at((RoomType)i).emplace_back(LoadStairData(nodeData));	break;
+				default: m_roomTileDatas.at((RoomType)i).at(type).emplace_back(LoadTileData(nodeData));	break;
+				}
+			}
+			ifs.close();
+		}
+	}
+
+	SetCurrentDirectoryA(currentDirectory);
+}
+
+TILE_DATA DungeonData::LoadTileData(nlohmann::json_abi_v3_11_3::json nodeData)
+{
+	DirectX::XMFLOAT3 position = {
+		nodeData["Position"].at(0),
+		nodeData["Position"].at(1),
+		nodeData["Position"].at(2),
+	};
+	DirectX::XMFLOAT3 angle = {
+		nodeData["Angle"].at(0),
+		nodeData["Angle"].at(1),
+		nodeData["Angle"].at(2),
+	};
+	DirectX::XMFLOAT3 scale = {
+	nodeData["Scale"].at(0),
+	nodeData["Scale"].at(1),
+	nodeData["Scale"].at(2),
+	};
+
+	TILE_DATA tileData;
+	tileData.position = position;
+	tileData.angle = angle;
+	tileData.scale = scale;
+
+	return tileData;
+}
+
+SPAWNER_DATA DungeonData::LoadSpawnerData(nlohmann::json_abi_v3_11_3::json nodeData)
+{
+	SPAWNER_DATA spawnerData;
+	if (!nodeData.is_null())
+	{
+		spawnerData.tileData.position = {
+			nodeData["Position"].at(0),
+			nodeData["Position"].at(1),
+			nodeData["Position"].at(2),
+		};
+		spawnerData.tileData.angle = {
+			nodeData["Angle"].at(0),
+			nodeData["Angle"].at(1),
+			nodeData["Angle"].at(2),
+		};
+		spawnerData.tileData.scale = {
+			nodeData["Scale"].at(0),
+			nodeData["Scale"].at(1),
+			nodeData["Scale"].at(2),
+		};
+	}
+	if (!nodeData["SpawnerData"].is_null())
+	{
+		spawnerData.enemyType = nodeData["SpawnerData"]["EnemyType"];
+		spawnerData.searchRadius = nodeData["SpawnerData"]["SearchRadius"];
+		spawnerData.spawnRadius = nodeData["SpawnerData"]["SpawnRadius"];
+		spawnerData.maxExistedEnemiesNum = nodeData["SpawnerData"]["MaxExistedEnemiesNum"];
+		spawnerData.maxSpawnedEnemiesNum = nodeData["SpawnerData"]["MaxSpawnedEnemiesNum"];
+		spawnerData.spawnTime = nodeData["SpawnerData"]["SpawnTime"];
+	}
+
+	return spawnerData;
+}
+
+STAIR_TO_NEXTFLOOR_DATA DungeonData::LoadStairData(nlohmann::json_abi_v3_11_3::json nodeData)
+{
+	STAIR_TO_NEXTFLOOR_DATA stairToNextFloorData;
+	if (!nodeData.is_null())
+	{
+		stairToNextFloorData.tileData.position = {
+			nodeData["Position"].at(0),
+			nodeData["Position"].at(1),
+			nodeData["Position"].at(2),
+		};
+		stairToNextFloorData.tileData.angle = {
+			nodeData["Angle"].at(0),
+			nodeData["Angle"].at(1),
+			nodeData["Angle"].at(2),
+		};
+		stairToNextFloorData.tileData.scale = {
+			nodeData["Scale"].at(0),
+			nodeData["Scale"].at(1),
+			nodeData["Scale"].at(2),
+		};
+	}
+	if (!nodeData["TeleporterData"].is_null())
+	{
+		stairToNextFloorData.portalTime = nodeData["TeleporterData"]["PortalTime"];
+		stairToNextFloorData.interactionDistance = nodeData["TeleporterData"]["InteractionDistance"];
+	}
+
+	return stairToNextFloorData;
 }
 
 DungeonData::RoomGenerateSetting DungeonData::LoadRoomGenSetting(RoomType roomType)
@@ -684,6 +861,7 @@ void DungeonData::InitFileNames()
 	m_fileNames.at(FIRST_START) = (char*)("Data/RoomDatas/FirstFloor_Start.json");
 	m_fileNames.at(FIRST_I) = (char*)("Data/RoomDatas/FirstFloor_I.json");
 	m_fileNames.at(FIRST_T) = (char*)("Data/RoomDatas/FirstFloor_T.json");
+	m_fileNames.at(FIRST_T_REVERSE) = (char*)("Data/RoomDatas/FirstFloor_T_Reverse.json");
 	m_fileNames.at(FIRST_FOUNTAIN) = (char*)("Data/RoomDatas/FirstFloor_Fountain.json");
 	m_fileNames.at(FIRST_SPAWNER) = (char*)("Data/RoomDatas/FirstFloor_Spawner.json");
 	m_fileNames.at(FIRST_END) = (char*)("Data/RoomDatas/FirstFloor_End.json");
@@ -695,8 +873,17 @@ void DungeonData::InitFileNames()
 	m_fileNames.at(SECOND_L1) = (char*)("Data/RoomDatas/SecondFloor_L1.json");
 	m_fileNames.at(SECOND_L2) = (char*)("Data/RoomDatas/SecondFloor_L2.json");
 	m_fileNames.at(SECOND_CROSS) = (char*)("Data/RoomDatas/SecondFloor_Cross.json");
+	m_fileNames.at(SECOND_CROSS_REVERSE) = (char*)("Data/RoomDatas/SecondFloor_Cross_Reverse.json");
 	m_fileNames.at(SECOND_END) = (char*)("Data/RoomDatas/SecondFloor_End.json");
 	m_fileNames.at(SECOND_DEAD_END) = (char*)("Data/RoomDatas/SecondFloor_DeadEnd.json");
+
+	// 第三のフロア
+	m_fileNames.at(THIRD_START) = (char*)("Data/RoomDatas/ThirdFloor_Start.json");
+	m_fileNames.at(THIRD_I) = (char*)("Data/RoomDatas/ThirdFloor_I.json");
+	m_fileNames.at(THIRD_T) = (char*)("Data/RoomDatas/ThirdFloor_T.json");
+	m_fileNames.at(THIRD_BARREL) = (char*)("Data/RoomDatas/ThirdFloor_Barrel.json");
+	m_fileNames.at(THIRD_END) = (char*)("Data/RoomDatas/ThirdFloor_Start.json");
+	m_fileNames.at(THIRD_DEAD_END) = (char*)("Data/RoomDatas/ThirdFloor_Start.json");
 
 	// チュートリアルフロア
 	m_fileNames.at(TUTO_START) = (char*)("Data/RoomDatas/TutoFloor_Start.json");

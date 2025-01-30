@@ -60,6 +60,8 @@ public:
 
 	void Update(float elapsedTime) override;
 
+	void DefeatBoss() override;
+
 	void Render() override;
 
 	void RenderDX12() override;
@@ -80,6 +82,10 @@ protected:
 
 	bool isLeader = true;
 
+	std::unique_ptr <Plane> portal;
+
+	std::unique_ptr<WidgetText> floorText;
+
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {
 		"",											// マスク
@@ -94,8 +100,6 @@ protected:
 	float transitionDuration = 2.f;  // 5秒かけて移動
 	int currentSegment = 0;
 	int currentFloor = 0;
-
-	WidgetText* floorText;
 
 	// フレームバッファマネージャー
 	FrameBufferManager* m_frameBuffer;
