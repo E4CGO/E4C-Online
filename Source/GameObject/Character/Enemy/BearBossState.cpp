@@ -24,30 +24,27 @@ namespace EnemyState
 			if (!owner->IsMine()) return;
 			EnemyState::IdleState::Execute(elapsedTime);
 
-			if (!IsWaiting()) // 待機時間終わり
+			uint32_t targetId = owner->GetTarget();
+			owner->UpdateTarget();
+			if (owner->GetTarget() < UINT32_MAX)
 			{
-				for (PlayerCharacter* player : PlayerCharacterManager::Instance().GetAll())
+				if (targetId == UINT32_MAX)
 				{
-					if (XMFLOAT3HorizontalLengthSq(player->GetPosition() - owner->GetPosition()) < 10.0f * 10.0f)
-					{
-						owner->AddHate(player->GetClientId(), 1);
-					}
+					// 
+					EnemyState::StateTransition(owner, ::BearBoss::STATE::ROAR);
 				}
-
-
-				PlayerCharacter* player = owner->GetHighestHateClient();
-				if (player != nullptr)
+				else if (!IsWaiting())
 				{
-					owner->SetTarget(player);
-					EnemyState::StateTransition(owner, ::BearBoss::STATE::ATTACK);
+					// ターゲットに接近
+					EnemyState::StateTransition(owner, ::BearBoss::STATE::FOLLOW);
 				}
-				else
-				{
-
-					owner->SetTarget(nullptr);
-					owner->SetTargetPosition(GetRandomPointInCircleArea(owner->GetPosition(), 10.0f));
-					EnemyState::StateTransition(owner, ::BearBoss::STATE::WANDER);
-				}
+			}
+			else if (!IsWaiting())
+			{
+				// 徘徊
+				owner->SetTarget(nullptr);
+				owner->SetTargetPosition(GetRandomPointInCircleArea(owner->GetPosition(), 5.0f));
+				EnemyState::StateTransition(owner, ::BearBoss::STATE::WANDER);
 			}
 		}
 
@@ -61,6 +58,17 @@ namespace EnemyState
 		{
 			MoveState::Enter();
 			owner->SetAnimation(::BearBoss::ANIMATION::ANIM_WALK_LOOP2, true);
+		}
+
+		// 追跡ステート
+		void FollowState::Enter()
+		{
+			PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById(owner->GetTarget());
+			if (player != nullptr)
+			{
+				m_distance = XMFLOAT3HorizontalLength(player->GetPosition() - owner->GetPosition());
+			}
+			owner->SetAnimation(::BearBoss::ANIM_WALK_LOOP, true);
 		}
 
 		// 攻撃ステート
@@ -103,6 +111,12 @@ namespace EnemyState
 			attackData.hitEndRate = attackArms[1].hitEndRate;
 			owner->MakeAttackCollider(attackData, attackArms[1].capsule, rightArmMatrix);
 		}
+		void AngryAttackState::Enter()
+		{
+			AttackState::Enter();
+			owner->SetAnimation(::BearBoss::ANIMATION::ANIM_PUNCH2, false);
+		}
+
 		void AttackState::Execute(float elapsedTime)
 		{
 			owner->GetCollider(attackArms[0].idx)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
@@ -111,7 +125,7 @@ namespace EnemyState
 			UpdatePunchImpact(elapsedTime);
 
 			PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById(owner->GetTarget());
-			if (player == nullptr)
+			if (player == nullptr || !owner->IsPlayAnimation())
 			{
 				::EnemyState::StateTransition(owner, Enemy::STATE::IDLE);
 			}
@@ -157,7 +171,7 @@ namespace EnemyState
 		// スタンステート
 		void StunState::Enter()
 		{
-			this->ChangeSubState(::BearBoss::STUN_START);
+			this->SetSubState(::BearBoss::STUN_START);
 		}
 		void StunState::Execute(float elapsedTime)
 		{
@@ -212,13 +226,13 @@ namespace EnemyState
 		}
 		void StunEndState::Enter()
 		{
-			owner->SetAnimation(::BearBoss::ANIM_STUN_END, true);
+			owner->SetAnimation(::BearBoss::ANIM_STUN_END, false);
 			// 弱点当たり判定消す
 		}
 		void AngryStunEndState::Enter()
 		{
 			StunEndState::Enter();
-			owner->SetAnimation(::BearBoss::ANIM_STUN_END2, true);
+			owner->SetAnimation(::BearBoss::ANIM_STUN_END2, false);
 		}
 		void StunEndState::Exit()
 		{
@@ -228,33 +242,34 @@ namespace EnemyState
 		// 咆哮ステート
 		void RoarState::Enter()
 		{
-			owner->SetAnimation(::BearBoss::ANIM_ROAR, true);
+			owner->SetAnimation(::BearBoss::ANIM_ROAR, false);
 		}
 		void AngryRoarState::Enter()
 		{
-			owner->SetAnimation(::BearBoss::ANIM_ROAR2, true);
+			owner->SetAnimation(::BearBoss::ANIM_ROAR2, false);
 		}
 		void RoarState::Execute(float elapsedTime)
 		{
 			if (!owner->IsPlayAnimation())
 			{
-				EnemyState::StateTransition(owner, ::Enemy::STATE::IDLE);
+				EnemyState::StateTransition(owner, ::BearBoss::STATE::FOLLOW);
 			}
 		}
 
 		// 形態変更
 		void FormChangeState::Enter()
 		{
-			owner->SetAnimation(::BearBoss::ANIM_CHANGE, true);
+			owner->SetAnimation(::BearBoss::ANIM_CHANGE, false);
+			owner->SetAnimationSpeed(owner->GetAnimationSpeed() * 1.5f);
+			owner->SetMaxMoveSpeed(owner->GetMaxMoveSpeed() * 1.5f);
 			// 怒りのステート登録し直し
 			StateMachine<Enemy>* stateMachine = owner->GetStateMachine();
 			stateMachine->RegisterState(::Enemy::STATE::IDLE, new AngryIdleState(owner));
 			stateMachine->RegisterState(::BearBoss::STATE::WANDER, new AngryMoveState(owner));
-			stateMachine->RegisterState(::BearBoss::STATE::FOLLOW, new FollowState(owner));
-			stateMachine->RegisterState(::BearBoss::STATE::ATTACK, new AttackState(owner));
+			stateMachine->RegisterState(::BearBoss::STATE::FOLLOW, new AngryFollowState(owner));
+			stateMachine->RegisterState(::BearBoss::STATE::ATTACK, new AngryAttackState(owner));
 
 			stateMachine->RegisterState(::BearBoss::STATE::ROAR, new AngryRoarState(owner));
-			stateMachine->RegisterState(::BearBoss::STATE::FORM_CHANGE, new FormChangeState(owner));
 
 			stateMachine->RegisterSubState(::BearBoss::STATE::STUN, ::BearBoss::STUN_STATE::STUN_START, new AngryStunStartState(owner));
 			stateMachine->RegisterSubState(::BearBoss::STATE::STUN, ::BearBoss::STUN_STATE::STUN_LOOP, new AngryStunLoopState(owner));

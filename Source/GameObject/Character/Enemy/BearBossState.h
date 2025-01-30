@@ -60,14 +60,11 @@ namespace EnemyState
 		{
 		public:
 			// コンストラクタ
-			FollowState(Enemy* enemy) : EnemyState::FollowState(enemy, 1.8f, ::BearBoss::STATE::ATTACK) {};
+			FollowState(Enemy* enemy) : EnemyState::FollowState(enemy, 0.0f, ::BearBoss::STATE::ATTACK) {};
 			// デストラクタ
 			~FollowState() {}
 			// ステートに入った時のメソッド
-			virtual void Enter() override
-			{
-				owner->SetAnimation(::BearBoss::ANIM_WALK_LOOP, true);
-			}
+			virtual void Enter() override;
 		};
 		class AngryFollowState : public FollowState
 		{
@@ -79,6 +76,7 @@ namespace EnemyState
 			// ステートに入った時のメソッド
 			void Enter() override
 			{
+				FollowState::Enter();
 				owner->SetAnimation(::BearBoss::ANIM_WALK_LOOP2, true);
 			}
 		};
@@ -92,7 +90,7 @@ namespace EnemyState
 			// デストラクタ
 			~AttackState() {}
 			// ステートに入った時のメソッド
-			void Enter() override;
+			virtual void Enter() override;
 			// ステートで実行するメソッド
 			void Execute(float elapsedTime) override;
 			// ステートから出ていくときのメソッド
@@ -122,7 +120,16 @@ namespace EnemyState
 			const float impact1StartRate = impactFlame1 / maxFlame;
 			const float impact2StartRate = impactFlame2 / maxFlame;
 		};
-
+		class AngryAttackState : public AttackState
+		{
+		public:
+			// コンストラクタ
+			AngryAttackState(Enemy* enemy) : AttackState(enemy) {};
+			// デストラクタ
+			~AngryAttackState() {}
+			// ステートに入った時のメソッド
+			void Enter() override;
+		};
 
 		// スタンステート
 		class StunState : public HierarchicalState<Enemy>

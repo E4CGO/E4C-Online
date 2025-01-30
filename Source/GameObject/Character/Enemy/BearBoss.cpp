@@ -15,6 +15,8 @@ BearBoss::BearBoss(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("
 	moveSpeed = 1.0f;
 	turnSpeed = DirectX::XMConvertToRadians(90);
 
+	SetSearchRange(20.0f);
+
 	// 衝突判定
 	SetMoveCollider({ { 0, radius, 0 }, radius }, Collider::COLLIDER_OBJ::ENEMY);
 	m_pColliders.clear();
