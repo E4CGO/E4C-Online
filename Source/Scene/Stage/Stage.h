@@ -33,6 +33,8 @@ public:
 
 	virtual void Update(float elapsedTime);
 
+	virtual void DefeatBoss() {}
+
 	virtual void Render() = 0;
 
 	virtual void RenderDX12() = 0;

@@ -1,4 +1,4 @@
-//! @file BirdMobState.cpp
+﻿//! @file BirdMobState.cpp
 //! @note
 
 #include "BirdMobState.h"
@@ -78,6 +78,7 @@ namespace EnemyState
 			::EnemyState::MoveState::Execute(elapsedTime);
 		}
 
+		
 		// 攻撃ステート
 		void AttackState::Enter()
 		{

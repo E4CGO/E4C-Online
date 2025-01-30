@@ -79,6 +79,7 @@ public:
 	};
 
 	void OnDamage(const uint16_t& damage) override;
+	void OnDeath() override;
 private:
 	// Phase
 	int m_phase = 0;
