@@ -122,7 +122,7 @@ void StageOpenWorld_E4C::Initialize()
 		models.emplace("flower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Flower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::Foliage));
 
 		models.emplace("portal", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Portal.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
-		models["portal"]->SetPosition({ -34.5f, 4.1f, -44.4f });
+		models["portal"]->SetPosition({ -34.5f, 4.1f, -44.6f });
 		models["portal"]->SetAngle({ 0.0f, 1.5f, 0.0f });
 
 		models.emplace("target1", std::make_unique<ModelObject>("Data/Model/Object/BlockTarget.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));

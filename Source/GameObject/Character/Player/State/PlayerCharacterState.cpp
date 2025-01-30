@@ -218,6 +218,15 @@ namespace PlayerCharacterState
 	}
 	void DeathState::Execute(float elapsedTime)
 	{
+		if (!owner->IsPlayAnimation())
+		{
+			// Respawn
+			owner->SetCurrentHp(100.0f);
+			owner->SetPosition({ 0.0f, 5.0f, 0.0f });
+			owner->GetMoveCollider()->SetEnable(true);
+			for (std::pair<int, Collider*> collider : owner->GetColliders()) collider.second->SetEnable(true);
+			owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
+		}
 	}
 	void DeathState::Exit()
 	{

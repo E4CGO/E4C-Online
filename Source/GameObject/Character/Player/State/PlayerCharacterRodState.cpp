@@ -71,7 +71,16 @@ namespace PlayerCharacterState
 		{
 			owner->SetAnimationSpeed(1.f);
 
-			SetSubState(FIREBALL_STATE::CHARGE_READY);
+			if (owner->IsPlayer())
+			{
+				if (owner->GetMp() <= 10.0f)
+				{
+					owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
+					return;
+				}
+				owner->ModifyMp(-10.0f);
+				SetSubState(FIREBALL_STATE::CHARGE_READY);
+			}
 		}
 		void AttackNormalState::Execute(float elapsedTime)
 		{
@@ -226,15 +235,20 @@ namespace PlayerCharacterState
 		// スキル_1ステート
 		void Skill1State::Enter()
 		{
-			owner->ModifyMp(-50.0f);
-
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_ATTACK_SPECIAL_FIRST, false, 0.1f);
-
-			owner->GetEffectCharge()->Activate();
-			owner->GetEffectCharge()->SetLooping();
-
 			if (owner->IsPlayer())
 			{
+				if (owner->GetMp() <= 50.0f)
+				{
+					owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
+					return;
+				}
+				owner->ModifyMp(-50.0f);
+
+				owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_ATTACK_SPECIAL_FIRST, false, 0.1f);
+
+				owner->GetEffectCharge()->Activate();
+				owner->GetEffectCharge()->SetLooping();
+
 				m_dir = owner->GetTarget() - owner->GetPosition();
 				m_dir = XMFLOAT3Normalize({ m_dir.x, 0, m_dir.z });
 				XMFLOAT3 pos = owner->GetPosition() + XMFLOAT3{ 0.5f * m_dir.x, 1.0f, 0.5f * m_dir.z };
@@ -277,10 +291,20 @@ namespace PlayerCharacterState
 
 		void Skill2State::Enter()
 		{
-			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_ATTACK_SPECIAL_SECOND, false, 0.1f);
+			if (owner->IsPlayer())
+			{
+				if (owner->GetMp() <= 75.0f)
+				{
+					owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
+					return;
+				}
+				owner->ModifyMp(-75.0f);
 
-			owner->GetEffectHealing()->SetObjectPositions(owner->GetPosition(), owner->GetFront());
-			owner->GetEffectHealing()->Activate();
+				owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_ATTACK_SPECIAL_SECOND, false, 0.1f);
+
+				owner->GetEffectHealing()->SetObjectPositions(owner->GetPosition(), owner->GetFront());
+				owner->GetEffectHealing()->Activate();
+			}
 		}
 		void Skill2State::Execute(float elapsedTime)
 		{
