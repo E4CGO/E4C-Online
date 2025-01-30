@@ -36,6 +36,9 @@ public:
 	// 生成した敵が消滅時コールバック
 	void EnemyDestoryCallBack(Enemy* enemy);
 
+	// 生成した敵が全て倒されたか
+	bool IsDefeated();
+
 	void SetId(const uint8_t id) { m_id = id; }
 	uint8_t GetId() { return m_id; };
 public:

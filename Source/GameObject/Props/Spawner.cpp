@@ -101,6 +101,14 @@ void Spawner::EnemyDestoryCallBack(Enemy* enemy)
 	}
 }
 
+bool Spawner::IsDefeated()
+{
+	if (m_maxSpawnedEnemiesNum > -1 &&
+		m_spawnedCountTotal >= m_maxSpawnedEnemiesNum &&
+		m_pSpawnedEnemies.size() == 0) return true;
+	return false;
+}
+
 /**************************************************************************//**
 	 @brief    描画
 	@param[in]    rc
@@ -111,20 +119,18 @@ void Spawner::Render(const RenderContext& rc)
 	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, { 0,1,0 }, m_spawnRadius, 1.5f, { 1,0,0,1 });
 	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, { 0,1,0 }, m_searchRadius, 1.5f, { 1,0,1,1 });
 #endif // DEBUG
-
-
 }
 
 void Spawner::RenderDX12(const RenderContextDX12& rc)
 {
 #ifdef _DEBUG
-	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, { 0,1,0 }, m_spawnRadius, 1.5f, { 1,0,0,1 });
-	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, { 0,1,0 }, m_searchRadius, 1.5f, { 1,0,1,1 });
+	//T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, { 0,1,0 }, m_spawnRadius, 1.5f, { 1,0,0,1 });
+	//T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, { 0,1,0 }, m_searchRadius, 1.5f, { 1,0,1,1 });
 
-	m_cylinderRenderer->SetCylinder(position, { 0,1,0 }, m_spawnRadius, 1.0f, { 1, 0, 0, 0 });
+	m_cylinderRenderer->SetCylinder(position, { 0,1,0 }, m_spawnRadius, 1.0f, { 1.0f, 0.0f, 0.0f, 1.0f });
 	m_cylinderRenderer->Render(rc);
 
-	m_cylinderRenderer->SetCylinder(position, { 0,1,0 }, m_searchRadius, 1.0f, { 1, 0, 0, 0 });
+	m_cylinderRenderer->SetCylinder(position, { 0,1,0 }, m_searchRadius, 1.0f, { 1.0f, 0.0f, 1.0f, 1.0f });
 	m_cylinderRenderer->Render(rc);
 
 #endif // DEBUG

@@ -654,6 +654,7 @@ void DungeonData::InitModelFileDatas()
 	m_modelFileDatas.at(PORTAL).emplace_back("", 0.0f);
 	m_modelFileDatas.at(SPAWNER).emplace_back("", 0.0f);
 	m_modelFileDatas.at(CONNECTPOINT).emplace_back("", 0.0f);
+	m_modelFileDatas.at(ONEWAYWALL).emplace_back("", 0.0f);
 }
 
 void DungeonData::InitCollisionFileDatas()
