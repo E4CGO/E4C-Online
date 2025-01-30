@@ -401,6 +401,7 @@ private:
 	std::unique_ptr<SamplerManager> m_sampler[static_cast<int>(SamplerState::EnumCount)];
 
 	UINT	m_buffer_count = 0;
+	std::mutex m_mutCopyBuffer;
 
 	float m_screen_width;
 	float m_screen_height;
