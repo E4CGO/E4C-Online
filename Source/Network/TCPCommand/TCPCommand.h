@@ -58,6 +58,7 @@ namespace Online
 				delete[] str;
 			}
 			string = "";
+			return true;
 		}
 
 		PlayerCharacter* ReceiveClient()

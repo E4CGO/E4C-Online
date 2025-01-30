@@ -76,6 +76,7 @@ public:
 	void SetFriction(const float friction) { this->friction = friction; }
 	// 最大スピードを取得
 	const float GetMaxMoveSpeed() { return maxMoveSpeed; }
+	void SetMaxMoveSpeed(float speed) { maxMoveSpeed = speed; }
 
 	// 高さを取得
 	float GetHeight() { return height; }

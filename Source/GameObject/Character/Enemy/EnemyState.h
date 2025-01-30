@@ -80,7 +80,7 @@ namespace EnemyState
 		virtual void Execute(float elapsedTime) override;
 		// ステートから出ていくときのメソッド
 		virtual void Exit() override;
-	private:
+	protected:
 		float m_distance;
 		int m_nextState;
 	};
