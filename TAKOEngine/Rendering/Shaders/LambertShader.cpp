@@ -45,7 +45,7 @@ LambertShader::LambertShader(ID3D11Device* device) : ModelShader()
 	// シーン用定数バッファ
 	GpuResourceUtils::CreateConstantBuffer(
 		device,
-		sizeof(::CbScene),
+		sizeof(CbScene),
 		this->m_sceneConstantBuffer.GetAddressOf());
 
 	GpuResourceUtils::CreateConstantBuffer(

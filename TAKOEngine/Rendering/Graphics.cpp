@@ -17,6 +17,7 @@
 #include "TAKOEngine/Rendering/Shaders/HitParticleShader.h"
 #include "TAKOEngine/Rendering/Shaders/CylinderShader.h"
 #include "TAKOEngine/Rendering/Shaders/FoliageShader.h"
+#include "TAKOEngine/Rendering/Shaders/GrassShader.h"
 
 #include "TAKOEngine/Rendering/Shaders/UVScrollShader.h"
 #include "TAKOEngine/Rendering/Shaders/MaskShader.h"
@@ -591,6 +592,7 @@ void Graphics::Initalize(HWND hWnd, UINT buffer_count)
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::HealCircle)] = std::make_unique<HealingShaderdCircleDX12>(m_d3d_device.Get());
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Beam)] = std::make_unique<BeamDX12>(m_d3d_device.Get());
 		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::MagicPlane)] = std::make_unique<MagicPlaneDX12>(m_d3d_device.Get());
+		dx12_modelshaders[static_cast<int>(ModelShaderDX12Id::Grass)] = std::make_unique<GrassShader>(m_d3d_device.Get());
 
 		// スプライトシェーダー生成
 		spriteShaders[static_cast<int>(SpriteShaderId::Default)] = std::make_unique<DefaultSpriteShader>(device.Get());
@@ -834,7 +836,7 @@ void Graphics::Execute()
 // @param[in] camera　カメラ
 // @return    const Descriptor*
 //******************************************************************
-const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera, float timerGlobalTime, float timerGlobalDeltaTime)
+const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera, float timerGlobalTime, float timerGlobalDeltaTime, const RenderContextDX12& rc)
 {
 	LightManager& ligtManager = LightManager::Instance();
 
@@ -1005,6 +1007,22 @@ const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera, floa
 		}
 		}
 	}
+
+	// 草情報
+	cb_scene_data->grass_height_factor              = 0.856f;
+	cb_scene_data->grass_width_factor               = 0.041f;
+	cb_scene_data->grass_curvature                  = 0.6f;
+	cb_scene_data->grass_withered_factor            = 0.194f;
+	cb_scene_data->grass_height_variance            = 0.165f;
+	cb_scene_data->perlin_noise_distribution_factor = 0.178f;
+	cb_scene_data->tesselation_max_subdivision      = 20.0f;
+	cb_scene_data->tesselation_max_distance         = 80.0f;
+	cb_scene_data->grass_specular_color             = { 0.885f, 0.673f, 0.328f, 1.000f };
+
+	cb_scene_data->avatar_position = rc.grassData.position;
+	
+	cb_scene_data->wind_frequency = 22.388f;
+	cb_scene_data->wind_strength = 0.5f;
 
 	return cbv_descriptor;
 }
