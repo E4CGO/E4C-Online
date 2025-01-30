@@ -74,6 +74,7 @@ namespace EnemyState
 			~DeathState() {}
 
 			void Enter() override {
+				EnemyState::DeathState::Enter();
 				owner->SetAnimation(::BirdMob::ANIM_DEATH, false);
 			}
 		};

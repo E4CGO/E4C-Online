@@ -38,22 +38,50 @@ public:
 		ANIM_WALK_START,
 		ANIM_WALK_LOOP,
 		ANIM_PUNCH,
+
+		ANIM_STUN_START,
+		ANIM_STUN_LOOP,
+		ANIM_STUN_END,
+
+		ANIM_ROAR,
+
+		ANIM_CHANGE,
+
+		ANIM_IDLE2,
+		ANIM_WALK_START2,
+		ANIM_WALK_LOOP2,
+		ANIM_PUNCH2,
+
+		ANIM_STUN_START2,
+		ANIM_STUN_LOOP2,
+		ANIM_STUN_END2,
+
+		ANIM_ROAR2,
+
+		ANIM_DEATH,
+	};
+
+	enum STUN_STATE
+	{
+		STUN_START,
+		STUN_LOOP,
+		STUN_END,
 	};
 
 	enum STATE : uint8_t
 	{
 		WANDER = Enemy::STATE::END,
+		FOLLOW,
 		ATTACK,
+		STUN,
+		ROAR,
+		FORM_CHANGE,
 	};
 
-	enum ATTACK_STATE : uint8_t
-	{
-		FOLLOW = 0,
-		PUNCH,
-	};
-
-protected:
-	void UpdateTarget() override;
+	void OnDamage(const uint16_t& damage) override;
+private:
+	// Phase
+	int m_phase = 0;
 };
 
 
@@ -92,7 +120,6 @@ public:
 			}
 		}
 	}
-
 private:
 	float time = 0.0f;
 	const float existTime = 0.5f;
