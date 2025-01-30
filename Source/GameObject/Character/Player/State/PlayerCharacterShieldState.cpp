@@ -13,6 +13,8 @@ namespace PlayerCharacterState
 			owner->SetAnimationSpeed(1.2f);
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SHIELD_GUARD_START, false, 0.05f);
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SHIELD_GUARD_CONTINUE, true);
+			owner->OnSuperArmor();
+			owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_BODY)->SetArmor(15);
 		}
 		void AttackSpecialState::Execute(float elapsedTime)
 		{
@@ -27,6 +29,8 @@ namespace PlayerCharacterState
 		{
 			owner->SetAnimationSpeed(1.0f);
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SHIELD_GUARD_FINISH, false, 0.05f);
+			owner->OffSuperArmor();
+			owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_BODY)->SetArmor(0);
 		}
 	}
 }
