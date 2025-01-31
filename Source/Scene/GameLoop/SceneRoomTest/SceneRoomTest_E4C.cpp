@@ -125,6 +125,11 @@ void SceneRoomTest_E4C::Initialize()
 	nodeDefaultNames.at(TileType::WALL_SQUARES) = "WallSquares";
 	nodeDefaultNames.at(TileType::WELL) = "Well";
 	nodeDefaultNames.at(TileType::ONEWAYWALL) = "OneWayWall";
+	nodeDefaultNames.at(TileType::BED_01A) = "Bed 01a";
+	nodeDefaultNames.at(TileType::CHAIR_01A) = "Chair 01a";
+	nodeDefaultNames.at(TileType::CURTAIN_01A) = "Curtain 01a";
+	nodeDefaultNames.at(TileType::PEN_01A) = "Pen 01a";
+	nodeDefaultNames.at(TileType::PEN_01B) = "Pen 01b";
 
 	//testModel = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
 	//testModel->SetPosition({ 0.0f, 0.0f, 0.0f });
@@ -1217,7 +1222,7 @@ void StairToNextFloorNode::Render(const RenderContext& rc)
 	// 継承元のRender呼び出し
 	ModelObject::Render(rc);
 
-	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, interactionDistance * 2, 1.5f, { 0, 1, 1, 1 });
+	T_GRAPHICS.GetDebugRenderer()->DrawCylinder(position, interactionDistance, 1.5f, { 0, 1, 1, 1 });
 }
 
 Node* StairToNextFloorNode::Duplicate()
