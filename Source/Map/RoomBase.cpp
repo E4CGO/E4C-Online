@@ -684,7 +684,7 @@ void RoomBase::PlaceMapTile(bool isLeader)
 				// ステージの影登録
 				if (modelTile->GetModels().size() > 0)
 				{
-					T_GRAPHICS.GetShadowRenderer()->ModelRegister(modelTile->GetModel(0).get());
+					//T_GRAPHICS.GetShadowRenderer()->ModelRegister(modelTile->GetModel(0).get());
 				}
 
 				// マネージャーに登録
