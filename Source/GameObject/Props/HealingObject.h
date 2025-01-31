@@ -37,6 +37,7 @@ private:
 	const float m_size = 1.0f;
 	const float m_maxActivityTimer = 10.0f;
 	float m_activityTimer = m_maxActivityTimer;
+	float m_healingTimer = 0.0f;
 	float m_maxZoneRadius = 5.0f;
 
 	bool m_isVisibleActive = false;
