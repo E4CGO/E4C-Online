@@ -117,6 +117,7 @@ namespace PlayerCharacterState
 		}
 		void AttackNormalState_Charge::Execute(float elapsedTime)
 		{
+			float HALF_ChargeTime = MAX_ChargeTime * 0.5f;
 			if (owner->IsPlayer())
 			{
 				DirectX::XMFLOAT3 target = owner->GetTarget();
@@ -127,20 +128,26 @@ namespace PlayerCharacterState
 					if (m_chargeTme > MAX_ChargeTime)
 					{
 						owner->GetStateMachine()->ChangeSubState(FIREBALL_STATE::ATTACK_3);
+						owner->ModifyMp(-20.f * MAX_ChargeTime * 0.25f);
 					}
-					else if (m_chargeTme < MAX_ChargeTime * 0.5f)
+					else if (m_chargeTme > HALF_ChargeTime)
 					{
-						owner->GetStateMachine()->ChangeSubState(FIREBALL_STATE::ATTACK_1);
+						owner->GetStateMachine()->ChangeSubState(FIREBALL_STATE::ATTACK_2);
+						owner->ModifyMp(-20.f * HALF_ChargeTime * 0.25f);
 					}
 					else
 					{
-						owner->GetStateMachine()->ChangeSubState(FIREBALL_STATE::ATTACK_2);
+						owner->GetStateMachine()->ChangeSubState(FIREBALL_STATE::ATTACK_1);
+						owner->ModifyMp(-20.f * m_chargeTme * 0.25f);
 					}
 					
-					owner->ModifyMp(-20.0f * m_chargeTme * 0.25f);
+					
 				}
 			}
+			
 			m_chargeTme += elapsedTime;
+			// 移動処理
+			owner->InputMove(elapsedTime*0.25);
 		}
 		// Fireball小攻撃
 		void AttackNormalState_1::Enter()
