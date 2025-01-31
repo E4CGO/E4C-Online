@@ -35,6 +35,7 @@ public:
 		delete m_toTitleButton;
 		delete m_settingsButton;
 		delete m_exitButton;
+		delete m_settingsWindow;
 	};
 
 	void Update(float elapsedTime) override;

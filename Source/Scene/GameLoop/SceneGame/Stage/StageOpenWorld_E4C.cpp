@@ -48,29 +48,26 @@ void StageOpenWorld_E4C::Initialize()
 	PRELOAD.Join("OpenWorldModels");
 
 	PRELOAD.Lock();
-	m_pCharacterGauge = new WidgetPlayerHP();
-	m_pPauseMenu = new WidgetPauseMenu();
-	UI.Register(m_pCharacterGauge);
-	UI.Register(m_pPauseMenu);
 
 	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 1.0f);
 	village_collision = new MapTile("Data/Model/Stage/Terrain_Village_Collision.glb", 1.0f);
+	border_collision = new MapTile("Data/Model/Stage/Terrain_Collision_Border.glb", 1.0f);
 	stage_collision->Update(0);
 	village_collision->Update(0);
+	border_collision->Update(0);
 	stage_collision->SetMoveCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
 	village_collision->SetMoveCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
+	border_collision->SetMoveCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
 
 	MAPTILES.Register(stage_collision);
 	MAPTILES.Register(village_collision);
+	MAPTILES.Register(border_collision);
 	MAPTILES.CreateSpatialIndex(5, 7);
 
 	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
 	teleporter->SetPosition({ -34.0f, 6.0f, -43.5f });
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
 	teleporter->SetVisibility(true);
-
-	//onewayWall = std::make_unique<OneWayWall>(OneWayWall::PlusZ); //引数に通れる方向が必要
-	//onewayWall->SetPosition({ 15.0f, 3.5f, 10.0f });
 
 	Spawner* spawner = new Spawner(ENEMY_TYPE::MOUSE, 10, -1);
 	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
@@ -125,7 +122,7 @@ void StageOpenWorld_E4C::Initialize()
 		models.emplace("flower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Flower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::Foliage));
 
 		models.emplace("portal", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Portal.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
-		models["portal"]->SetPosition({ -34.5f, 4.3f, -45.0f });
+		models["portal"]->SetPosition({ -34.5f, 4.1f, -44.6f });
 		models["portal"]->SetAngle({ 0.0f, 1.5f, 0.0f });
 
 		models.emplace("target1", std::make_unique<ModelObject>("Data/Model/Object/BlockTarget.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
@@ -195,6 +192,11 @@ void StageOpenWorld_E4C::Initialize()
 	Sound::Instance().LoadAudio("Data/Sound/4-Encounter(battle_theme_Overworld_Tutorial).mp3");
 	Sound::Instance().PlayAudio(0);
 
+	m_pCharacterGauge = new WidgetPlayerHP();
+	m_pPauseMenu = new WidgetPauseMenu();
+	UI.Register(m_pCharacterGauge);
+	UI.Register(m_pPauseMenu);
+
 	// ダンジョンの階の再設定
 	// 1階から始める
 	DUNGEONDATA.SetCurrentFloor(1);
@@ -251,7 +253,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	ENEMIES.Update(elapsedTime);
 
 	SpawnerManager::Instance().Update(elapsedTime);
-	//onewayWall->Update(elapsedTime);
 
 	PROJECTILES.Update(elapsedTime);
 
@@ -365,7 +366,6 @@ void StageOpenWorld_E4C::RenderDX12()
 		}
 
 		teleporter->RenderDX12(rc);
-		//onewayWall->RenderDX12(rc);
 		ENEMIES.RenderDX12(rc);
 
 		SpawnerManager::Instance().RenderDX12(rc);

@@ -132,7 +132,7 @@ void Teleporter::Update(float elapsedTime)
 	if (T_GRAPHICS.isDX12Active)
 	{
 		m_portalFrame->SetPosition(position);
-		m_portalFrame->SetScale({ 1.8f, 1.8f, 1.0f });
+		m_portalFrame->SetScale({ 1.6f, 1.6f, 1.0f });
 		m_portalFrame->Update(elapsedTime);
 	}
 }
