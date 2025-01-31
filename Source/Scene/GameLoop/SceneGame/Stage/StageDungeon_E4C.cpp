@@ -265,7 +265,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	UI.Update(elapsedTime);
 
 	// キャラクターの影登録
-	for (auto& model : PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetModels())
+	/*for (auto& model : PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetModels())
 	{
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
 	}
@@ -273,7 +273,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	for (auto& model : PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetModels())
 	{
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
-	}
+	}*/
 
 	m_timer += elapsedTime;
 
