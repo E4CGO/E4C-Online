@@ -49,7 +49,7 @@ namespace Online
 		SEND_DATA* sendData = static_cast<SEND_DATA*>(data);
 
 		std::vector<uint8_t> buffer;
-		CreateHeaderBuffer(buffer, m_cmd, sizeof(sendData));
+		CreateHeaderBuffer(buffer, m_cmd, sizeof(SEND_DATA));
 		U8Buffer::Insert(buffer, sendData->spawnerIndex);
 		U8Buffer::Insert(buffer, sendData->enemyType);
 		U8Buffer::Insert(buffer, sendData->count);
