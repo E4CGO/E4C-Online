@@ -89,7 +89,10 @@ public:
 			item->DrawDebugPrimitive();
 		}
 	}
-
+	void Clear() override {
+		Manager<T>::Clear();
+		removes.clear();
+	}
 protected:
 	std::set<T*> removes;
 };
