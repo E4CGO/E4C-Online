@@ -41,8 +41,6 @@ public:
 
 	// 自分以外全てのプレイヤーを削除
 	void ClearOtherPlayers();
-private:
-	std::mutex m_mut;				// ロック
 };
 
 #endif // ! __INCLUDED_PLAYER_CHARACTER_H__

@@ -10,8 +10,8 @@
 *//***************************************************************************/
 void EnemyManager::Update(float elapsedTime)
 {
-	std::lock_guard<std::mutex> lock(m_mut);
 	ObjectManager<Enemy>::Update(elapsedTime);
+	std::lock_guard<std::mutex> lock(m_mut);
 
 	// エネミー同士の衝突処理
 	size_t size = this->items.size();
@@ -62,7 +62,6 @@ void EnemyManager::Update(float elapsedTime)
 *//***************************************************************************/
 void EnemyManager::Render(const RenderContext& rc)
 {
-	std::lock_guard<std::mutex> lock(m_mut);
 	ObjectManager<Enemy>::Render(rc);
 }
 /**************************************************************************//**
@@ -72,7 +71,6 @@ void EnemyManager::Render(const RenderContext& rc)
 *//***************************************************************************/
 void EnemyManager::RenderDX12(const RenderContextDX12& rc)
 {
-	std::lock_guard<std::mutex> lock(m_mut);
 	ObjectManager<Enemy>::RenderDX12(rc);
 }
 
