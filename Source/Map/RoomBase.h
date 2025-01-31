@@ -6,7 +6,12 @@
 #include "Scene/Stage/Stage.h"
 #include "Network/OnlineController.h"
 
+#include "GameObject/Props/OneWayWall.h"
+#include "GameObject/Props/Spawner.h"
+#include "GameObject/Props/SpawnerManager.h"
+
 #include <vector>
+#include <set>
 
 using namespace ns_RoomData;
 
@@ -36,9 +41,16 @@ public:
 	// ですとら
 	virtual ~RoomBase()
 	{
+		// 子の解放
 		for (RoomBase* room : childs)
 		{
 			if (room != nullptr) delete room;
+		}
+
+		// OneWayRoomの解放
+		for (OneWayWall* oneWayWall : m_oneWayWalls)
+		{
+			if (oneWayWall != nullptr) delete oneWayWall;
 		}
 	}
 
@@ -48,17 +60,48 @@ public:
 	{
 		UpdateTransform();
 
-		for (RoomBase* child : childs)
+		// OneWayWallの更新
+		for (OneWayWall* oneWayWall : m_oneWayWalls)
 		{
-			child->Update(elapsedTime);
+			oneWayWall->Update(elapsedTime);
+		}
+
+		// リストのスポナーから生成される敵が全て倒されたなら
+		bool isAllDefeated = true;
+		for (Spawner* spawner : m_pSpawners)
+		{
+			if (!spawner->IsDefeated()) isAllDefeated = false;
+		}
+		if (isAllDefeated)
+		{
+			// OneWayWallを削除して通行可能に
+			for (auto it = m_oneWayWalls.begin(); it != m_oneWayWalls.end();)
+			{
+				OneWayWall* oneWayWall = *it;
+
+				delete oneWayWall;
+
+				it = m_oneWayWalls.erase(it);
+			}
 		}
 	}
 
 	virtual void Render(const RenderContextDX12 rc)
 	{
-		//// AABBの描画
-		//// radiiは半径なので2倍して直径にしてからSetCubeを行う
-		//// 自身のAABB
+
+	}
+
+	virtual void RenderDX12(const RenderContextDX12 rc)
+	{
+		for (OneWayWall* oneWayWall : m_oneWayWalls)
+		{
+			oneWayWall->RenderDX12(rc);
+		}
+
+#ifdef _DEBUG
+		// AABBの描画
+		// radiiは半径なので2倍して直径にしてからSetCubeを行う
+		// 自身のAABB
 		//{
 		//	DirectX::XMFLOAT3 diameter = {
 		//		m_aabb.radii.x * 2.0f,
@@ -68,7 +111,6 @@ public:
 		//	m_aabbCube->SetCube(m_aabb.position, diameter, { 1.0f, 1.0f, 1.0f, 1.0f });
 		//	m_aabbCube->Render(rc);
 		//}
-
 		//// 子の部屋を生成する時のAABB
 		//for (int i = 0; i < m_debugAABBs.size(); i++)
 		//{
@@ -80,6 +122,7 @@ public:
 		//	m_debugCubes.at(i)->SetCube(m_debugAABBs.at(i).position, diameter, { 1.0f, 0.0f, 0.0f, 1.0f });
 		//	m_debugCubes.at(i)->Render(rc);
 		//}
+#endif // _DEBUG
 	}
 
 	void UpdateTransform();
@@ -226,6 +269,8 @@ public:
 	virtual int DrawDebugGUI(int i = 0);
 
 protected:
+
+
 	DirectX::XMFLOAT3 m_position = { 0.0f, 0.0f, 0.0f };
 	DirectX::XMFLOAT3 m_angle = { 0.0f, 0.0f, 0.0f };
 	DirectX::XMFLOAT3 m_scale = { 1.0f, 1.0f, 1.0f };
@@ -241,9 +286,12 @@ protected:
 	std::unique_ptr<CubeRenderer> m_aabbCube;
 	std::vector<std::unique_ptr<CubeRenderer>> m_debugCubes;
 
-	//std::unique_ptr<CubeRenderer> m_debugCube;
-	//std::unique_ptr<CubeRenderer> m_debugDebugCube;
 	std::vector<AABB> m_debugAABBs;
+
+	// 一方通行の壁
+	std::vector<OneWayWall*> m_oneWayWalls;
+	// 部屋が管理するスポナーのリスト
+	std::set<Spawner*> m_pSpawners;
 
 	//std::vector<TILE_DATA> m_tileDatas;
 	std::vector<TILE_DATA> m_connectPointDatas;

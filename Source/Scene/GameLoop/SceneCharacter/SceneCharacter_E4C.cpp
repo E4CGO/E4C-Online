@@ -43,6 +43,11 @@ void SceneCharacter_E4C::Initialize()
 		//}
 		PRELOAD.Join("CharacterModels");
 	}
+	PRELOAD.Lock();
+	m_background = std::make_unique<ModelObject>("Data/Model/Object/PlaneBG.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_Phong);
+	m_background->SetPosition({ 0.0, 0.0f, -10.0f });
+	m_background->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+	m_background->SetScale({ 20.0f, 20.0f, 1.0f });
 
 	//シャドウマップレンダラ
 	shadowMapRenderer->Initialize();
@@ -88,6 +93,8 @@ void SceneCharacter_E4C::Initialize()
 	stateMachine->RegisterState(STATE::START, new SceneCharacter_E4CState::StartState(this));
 	stateMachine->SetState(STATE::INIT);
 
+	PRELOAD.Unlock();
+
 	// 影初期化
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
 
@@ -132,6 +139,8 @@ void SceneCharacter_E4C::Update(float elapsedTime)
 		character->Update(elapsedTime);
 	}
 
+	m_background->Update(elapsedTime);
+
 #ifdef _DEBUG
 	// カメラ更新
 	cameraController->Update();
@@ -175,9 +184,10 @@ void SceneCharacter_E4C::Render()
 
 	T_TEXT.End();
 
+	DrawSceneGUI();
+
 #ifdef _DEBUG
 	// DebugIMGUI
-	DrawSceneGUI();
 	//shadowMapRenderer->DrawDebugGUI();
 #endif // _DEBUG
 }
@@ -211,12 +221,15 @@ void SceneCharacter_E4C::RenderDX12()
 				rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();
 			}
 
+			m_background->RenderDX12(rc);
+
 			for (auto& it : m_previewCharacters)
 			{
 				if (it != nullptr) {
 					it->RenderDX12(rc);
 				}
 			}
+
 			// レンダーターゲットへの書き込み終了待ち
 			m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
 		}

@@ -5,8 +5,8 @@
 std::shared_ptr<ModelResource> ResourceManager::LoadModelResource(const char* filename)
 {
 	if (strlen(filename) == 0) return nullptr;
-	std::lock_guard<std::mutex> lock(m_mut);
 
+	std::lock_guard<std::mutex> lock(m_mut);
 	// モデル検索
 	ModelMap::iterator it = models.find(filename);
 	if (it != models.end())
@@ -32,8 +32,8 @@ std::shared_ptr<ModelResource> ResourceManager::LoadModelResource(const char* fi
 std::shared_ptr<ModelResource> ResourceManager::LoadModelDX12Resource(const char* filename)
 {
 	if (strlen(filename) == 0) return nullptr;
-	std::lock_guard<std::mutex> lock(m_mut);
 
+	std::lock_guard<std::mutex> lock(m_mut);
 	// モデル検索
 	ModelMap::iterator it = models.find(filename);
 	if (it != models.end())
@@ -59,8 +59,8 @@ std::shared_ptr<ModelResource> ResourceManager::LoadModelDX12Resource(const char
 std::shared_ptr<ModelResource> ResourceManager::LoadModelResourceGLTF(std::string filename)
 {
 	if (filename.size() == 0) return nullptr;
-	std::lock_guard<std::mutex> lock(m_mut);
 
+	std::lock_guard<std::mutex> lock(m_mut);
 	// モデル検索
 	ModelMap::iterator it = models.find(filename);
 	if (it != models.end())

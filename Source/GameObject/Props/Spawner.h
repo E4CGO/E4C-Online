@@ -30,8 +30,14 @@ public:
 	void SetSearchRadius(const float& radius) { m_searchRadius = radius; }
 	// 生成半径を更新
 	void SetSpawnRadius(const float& radius) { m_spawnRadius = radius; }
+	// エネミーが生成されるまでの秒数を設定
+	void SetSpawnTime(const float& time) { m_spawnTime = time; }
+
 	// 生成した敵が消滅時コールバック
 	void EnemyDestoryCallBack(Enemy* enemy);
+
+	// 生成した敵が全て倒されたか
+	bool IsDefeated();
 
 	void SetId(const uint8_t id) { m_id = id; }
 	uint8_t GetId() { return m_id; };

@@ -22,6 +22,7 @@
 
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
+#include "GameObject/Projectile/ProjectileManager.h"
 #include "GameObject/Props/Spawner.h"
 #include "GameObject/Props/SpawnerManager.h"
 #include "GameObject/Props/Teleporter.h"
@@ -31,6 +32,7 @@
 #include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
 
 #include "PreloadManager.h"
+
 static float timer = 0;
 
 void StageDungeon_E4C::GenerateDungeon()
@@ -108,6 +110,7 @@ void StageDungeon_E4C::Initialize()
 	Stage::Initialize(); // デフォルト
 
 	PRELOAD.Join("DungeonModels");
+	PRELOAD.Lock();
 
 	// フレームバッファマネージャー
 	m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
@@ -120,8 +123,10 @@ void StageDungeon_E4C::Initialize()
 
 	// プレイヤー
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
-	player->SetPosition({ 0.0f, 10.0f, 2.0f });
+	player->SetPosition({ 0.0f, 2.0f, 2.0f });
+	player->SetAngle({ 0.0f, 0.0f, 0.0f });
 	player->GetStateMachine()->ChangeState(PlayerCharacter::STATE::IDLE);
+	player->UpdateTransform();
 
 	// カメラ設定
 	Camera* mainCamera = CameraManager::Instance().GetCamera();
@@ -133,9 +138,10 @@ void StageDungeon_E4C::Initialize()
 	);
 	mainCamera->SetLookAt(
 		{ 0, 5.0f, 5.0f },		// 視点
-		player->GetPosition(),			// 注視点
+		player->GetPosition(),	// 注視点
 		{ 0, 0.969f, -0.248f }	// 上ベクトル
 	);
+
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(mainCamera);
 	cameraController->SetEnable(true);
@@ -146,13 +152,12 @@ void StageDungeon_E4C::Initialize()
 	currentFloor = DUNGEONDATA.GetCurrentFloor();
 
 	// テキスト設定
-	floorText = new WidgetText();
+	floorText = std::make_unique<WidgetText>();
 	floorText->SetText(("現在の階：" + std::to_string(currentFloor) + "階").c_str());
 	floorText->SetBorderColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 	floorText->SetBorder(2);
 	floorText->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 	floorText->SetPosition({ 30.0f, 30.0f });
-	UI.Register(floorText);
 
 	GenerateDungeon();
 
@@ -164,30 +169,18 @@ void StageDungeon_E4C::Initialize()
 		// currentFloorが最大階でない場合は階段の行先はStageDungeon
 		if (currentFloor < DUNGEONDATA.GetDungeonGenSetting().maxFloor)
 		{
-			if (room->GetRoomType() == RoomType::FIRST_END ||
-				room->GetRoomType() == RoomType::FIRST_BOSS ||
-				room->GetRoomType() == RoomType::SECOND_END)
+			if (room->GetRoomType() == DUNGEONDATA.GetCurrentFloorGenSetting().endRoomType)
 			{
 				room->PlaceTeleporterTile(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
 			}
 		}
-		// 最大階以上なら階段の行先はStageOpenWorld
-		else
-		{
-			if (room->GetRoomType() == RoomType::FIRST_END ||
-				room->GetRoomType() == RoomType::FIRST_BOSS ||
-				room->GetRoomType() == RoomType::SECOND_END)
-			{
-				room->PlaceTeleporterTile(new StageOpenWorld_E4C(m_pScene), m_pScene->GetOnlineController());
-			}
-		}
+		// 最大階（ボスフロア）はボス撃破関数で階段を配置する
 	}
 
 	// 部屋の当たり判定を設定
 	MAPTILES.CreateSpatialIndex(5, 7);
 
-	//Console::Instance().Open();
-
+	PRELOAD.Unlock();
 	Sound::Instance().InitAudio();
 	Sound::Instance().LoadAudio("Data/Sound/5-Miraculous_Maze(Dungeon).mp3");
 	Sound::Instance().PlayAudio(0);
@@ -200,7 +193,8 @@ void StageDungeon_E4C::Finalize()
 {
 	ENEMIES.Clear();
 	MAPTILES.Clear();
-	UI.Remove(floorText);
+	PROJECTILES.Clear();
+	//UI.Clear();
 	SpawnerManager::Instance().Clear();
 	GameObjectManager::Instance().Clear();
 	Sound::Instance().StopAudio(0);
@@ -211,13 +205,6 @@ void StageDungeon_E4C::Finalize()
 
 void StageDungeon_E4C::Update(float elapsedTime)
 {
-	Online::OnlineController* onlineController = m_pScene->GetOnlineController();
-	if (onlineController->GetState() == Online::OnlineController::STATE::LOGINED)
-	{
-		onlineController->RoomIn();
-		onlineController->BeginSync();
-	}
-
 	// プレイヤーのYが-30.0fより下なら初期位置付近に戻す
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
 	if (player->GetPosition().y < -30.0f)
@@ -228,16 +215,12 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	// ゲームループ内で
 	cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
 	cameraController->Update(elapsedTime);
-
-	// 部屋を全てアップデート
-	rootRoom->Update(elapsedTime);
-
-	PlayerCharacterManager::Instance().Update(elapsedTime);
-	GameObjectManager::Instance().Update(elapsedTime);
-	SpawnerManager::Instance().Update(elapsedTime);
-	ENEMIES.Update(elapsedTime);
-	MAPTILES.Update(elapsedTime);
-	UI.Update(elapsedTime);
+	Online::OnlineController* onlineController = m_pScene->GetOnlineController();
+	if (onlineController->GetState() == Online::OnlineController::STATE::LOGINED)
+	{
+		onlineController->RoomIn();
+		onlineController->BeginSync();
+	}
 
 	if (T_INPUT.KeyDown(VK_MENU))
 	{
@@ -262,6 +245,25 @@ void StageDungeon_E4C::Update(float elapsedTime)
 		T_INPUT.KeepCursorCenter();
 	}
 
+	ENEMIES.Update(elapsedTime);
+	GameObjectManager::Instance().Update(elapsedTime);
+	SpawnerManager::Instance().Update(elapsedTime);
+
+	// 部屋
+	for (RoomBase* room : rootRoom->GetAll()) room->Update(elapsedTime);
+
+	PROJECTILES.Update(elapsedTime);
+
+	PlayerCharacterManager::Instance().Update(elapsedTime);
+
+	MAPTILES.Update(elapsedTime);
+
+	// テキスト
+	floorText->Update(elapsedTime);
+
+	// なんかUIアップデートせんとあかんっぽい(01/27)
+	UI.Update(elapsedTime);
+
 	// キャラクターの影登録
 	for (auto& model : PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetModels())
 	{
@@ -274,6 +276,21 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	}
 
 	m_timer += elapsedTime;
+
+	m_sceneTickTimer = elapsedTime;
+	m_sceneGlobalTimer += elapsedTime;
+}
+
+void StageDungeon_E4C::DefeatBoss()
+{
+	// 部屋のモデルを配置
+	for (RoomBase* room : rootRoom->GetAll())
+	{
+		if (room->GetRoomType() == DUNGEONDATA.GetCurrentFloorGenSetting().endRoomType)
+		{
+			room->PlaceTeleporterTile(new StageOpenWorld_E4C(m_pScene), m_pScene->GetOnlineController());
+		}
+	}
 }
 
 void StageDungeon_E4C::Render()
@@ -295,7 +312,6 @@ void StageDungeon_E4C::Render()
 
 	// 描画
 	PlayerCharacterManager::Instance().Render(rc);
-
 	GameObjectManager::Instance().Render(rc);
 
 	MAPTILES.Render(rc);
@@ -321,38 +337,33 @@ void StageDungeon_E4C::RenderDX12()
 
 		// シャドウマップ
 		{
-			//T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
+			T_GRAPHICS.GetShadowRenderer()->Render(m_frameBuffer);
 			rc.shadowMap.shadow_srv_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSRV();
 			rc.shadowMap.shadow_sampler_descriptor = T_GRAPHICS.GetShadowRenderer()->GetShadowSampler();
 		}
 		// シーン用定数バッファ更新
 		const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
-			CameraManager::Instance().GetCamera(), timer, 0);
+			CameraManager::Instance().GetCamera(), m_sceneGlobalTimer, m_sceneTickTimer, rc);
 
 		// レンダーコンテキスト設定
 		rc.d3d_command_list = m_frameBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
-		// プレイヤー
-		PlayerCharacterManager::Instance().RenderDX12(rc);
-		GameObjectManager::Instance().RenderDX12(rc);
-		SpawnerManager::Instance().RenderDX12(rc);
-		ENEMIES.RenderDX12(rc);
+		// MapTile
 		MAPTILES.RenderDX12(rc);
 
-		for (RoomBase* room : rootRoom->GetAll())
-		{
-			if (room->GetRoomType() == DUNGEONDATA.GetCurrentFloorGenSetting().endRoomType)
-			{
-				room->Render(rc);
-			}
-			else
-			{
-				room->Render(rc);
-			}
+		GameObjectManager::Instance().RenderDX12(rc);
+		ENEMIES.RenderDX12(rc);
 
-			//room->Render(rc);
-		}
+		SpawnerManager::Instance().RenderDX12(rc);
+
+		PROJECTILES.RenderDX12(rc);
+
+		// プレイヤー
+		PlayerCharacterManager::Instance().RenderDX12(rc);
+
+		// 部屋（OneWayWall、DebugCube等）
+		for (RoomBase* room : rootRoom->GetAll()) room->RenderDX12(rc);
 
 		// レンダーターゲットへの書き込み終了待ち
 		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
@@ -367,6 +378,7 @@ void StageDungeon_E4C::RenderDX12()
 	{
 		T_TEXT.BeginDX12();
 
+		floorText->RenderDX12(rc);
 		UI.RenderDX12(rc);
 
 		T_TEXT.EndDX12();
@@ -380,6 +392,7 @@ void StageDungeon_E4C::RenderDX12()
 	}
 
 	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
+
 	T_GRAPHICS.End();
 }
 

@@ -1,4 +1,4 @@
-//! @file BirdMobState.h
+﻿//! @file BirdMobState.h
 //! @note
 
 #ifndef __INCLUDE_BIRD_MOB_STATE_H__
@@ -74,6 +74,7 @@ namespace EnemyState
 			~DeathState() {}
 
 			void Enter() override {
+				EnemyState::DeathState::Enter();
 				owner->SetAnimation(::BirdMob::ANIM_DEATH, false);
 			}
 		};

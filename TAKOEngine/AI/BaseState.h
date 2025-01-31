@@ -59,7 +59,7 @@ public:
 	// サブステート登録
 	virtual void RegisterSubState(int id, State<T>* state)
 	{
-		if (statePool.find(id) == statePool.end()) delete statePool[id];
+		if (statePool.find(id) != statePool.end()) delete statePool[id];
 		// 親ステート登録
 		statePool[id] = state;
 	}

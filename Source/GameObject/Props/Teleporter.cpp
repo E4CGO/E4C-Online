@@ -81,8 +81,10 @@ Teleporter::Teleporter(Stage* stage, Online::OnlineController* onlineController)
 
 	if (T_GRAPHICS.isDX12Active)
 	{
-		m_portalFrame = std::make_unique<PlaneDX12>("Data/Sprites/gear.png", 1.0f, XMFLOAT3{ 0.0f, 0.0f, 0.0f }, 0.0f, 1.0f);
+		m_portalFrame = std::make_unique<PlaneDX12>("Data/Sprites/UI/Game/cross.png", 1.0f, XMFLOAT3{ 0.0f, 0.0f, 0.0f }, 0.0f, 1.0f);
 		m_portalFrame->SetShaderDX12(ModelShaderDX12Id::PortalSquare);
+
+		m_cylinderRenderer = std::make_unique<CylinderRenderer>(T_GRAPHICS.GetDeviceDX12());
 	}
 }
 
@@ -94,7 +96,7 @@ Teleporter::Teleporter(Stage* stage, Online::OnlineController* onlineController)
 void Teleporter::Update(float elapsedTime)
 {
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
-	const float radius = m_interractionDistance * scale.x;
+	const float radius = m_interactionDistance * scale.x;
 	if (player != nullptr && XMFLOAT3LengthSq(player->GetPosition() - (position - DirectX::XMFLOAT3{ 0.0f, 0.5f * scale.y, 0.0f })) < radius * radius)
 	{
 		m_timer += elapsedTime;
@@ -130,6 +132,7 @@ void Teleporter::Update(float elapsedTime)
 	if (T_GRAPHICS.isDX12Active)
 	{
 		m_portalFrame->SetPosition(position);
+		m_portalFrame->SetScale({ 1.6f, 1.6f, 1.0f });
 		m_portalFrame->Update(elapsedTime);
 	}
 }
@@ -172,6 +175,15 @@ void Teleporter::RenderDX12(const RenderContextDX12& rc)
 	{
 		m_portalFrame->RenderDX12(rc);
 	}
+
+#ifdef _DEBUG
+	m_cylinderRenderer->SetCylinder(position,
+		{ 0.0f, 1.0f, 0.0f },
+		m_interactionDistance, 1.0f,
+		{ 0.0f, 1.0f, 1.0f, 1.0f });
+	m_cylinderRenderer->Render(rc);
+
+#endif
 }
 
 /**************************************************************************//**
@@ -214,7 +226,7 @@ Teleporter::~Teleporter()
 void TeleportToOpenworld::Update(float elapsedTime)
 {
 	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
-	const float radius = 0.5f * scale.x;
+	const float radius = m_interactionDistance;
 	if (player != nullptr && XMFLOAT3LengthSq(player->GetPosition() - position) < radius * radius)
 	{
 		m_timer += elapsedTime;

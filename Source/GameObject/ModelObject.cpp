@@ -79,6 +79,9 @@ void ModelObject::LoadModel(const char* filename, float scaling, ModelObject::RE
 	case ModelObject::Foliage:
 		m_dx12_ShaderId = ModelShaderDX12Id::Foliage;
 		break;
+	case ModelObject::Grass:
+		m_dx12_ShaderId = ModelShaderDX12Id::Grass;
+		break;
 	default:
 		break;
 	}
@@ -254,6 +257,8 @@ void ModelObject::Update(float elapsedTime)
 			model->UpdateTransform(transform);
 		}
 	}
+
+	UpdateColliders();
 }
 
 /**************************************************************************//**

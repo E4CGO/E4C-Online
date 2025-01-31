@@ -25,6 +25,12 @@ public:
 		HitResult& result
 	) override;
 
+	bool CollisionVsAABB(
+		AABBCollider* other,
+		DirectX::XMFLOAT3& direction,
+		HitResult& result
+	) override;
+
 	//bool CollisionVsModel(
 	//	Collider*& other,				// モデル
 	//	DirectX::XMFLOAT3& direction,

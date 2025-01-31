@@ -69,6 +69,7 @@ private:
 
 	MapTile* stage_collision = nullptr;
 	MapTile* village_collision = nullptr;
+	MapTile* border_collision = nullptr;
 
 	std::unique_ptr <Teleporter> teleporter;
 

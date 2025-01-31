@@ -15,7 +15,7 @@ WidgetCharacterSelect::WidgetCharacterSelect(SceneCharacter_E4C* scene) : m_pSce
 {
 	const std::vector<PlayerCharacter*>& characters = m_pScene->GetCharacters();
 
-	DirectX::XMFLOAT2 size = { SCREEN_W * 0.2f, SCREEN_H * 0.7f };
+	DirectX::XMFLOAT2 size = { SCREEN_W * 0.3f, SCREEN_H * 0.7f };
 	for (int i = 0; i < characters.size(); i++)
 	{
 		WidgetCharacter* widget = new WidgetCharacter(scene, i, characters.at(i));
@@ -36,13 +36,13 @@ void WidgetCharacterSelect::Update(float elapsedTime)
 {
 	const std::vector<PlayerCharacter*>& characters = m_pScene->GetCharacters();
 
-	float posX = 3.5f;
+	float posX = 3.25f;
 	for (int i = 0; i < characters.size(); i++)
 	{
 		DirectX::XMFLOAT3 position = characters.at(i)->GetScreenPosition();
 
 		m_pCharacterButtons[i]->SetPosition({ position.x - m_pCharacterButtons[i]->GetSize().x * 0.5f, SCREEN_H * 0.1f });
-		posX -= 3.5;
+		posX -= 3.25;
 	}
 	posX = T_GRAPHICS.GetScreenPosition({ posX, 0.0f, 5.0f }).x;
 
@@ -153,7 +153,7 @@ void WidgetCharacter::RenderDX12(const RenderContextDX12& rc)
 		T_TEXT.RenderDX12(
 			FONT_ID::HGpop,
 			Encode::string_to_wstring(m_pCharacter->GetName()),
-			m_position.x + 5.0f, m_position.y + 5.0f
+			m_position.x + 85.0f, m_position.y - 5.0f
 		);
 	}
 }

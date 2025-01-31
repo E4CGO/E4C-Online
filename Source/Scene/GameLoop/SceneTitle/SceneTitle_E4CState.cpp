@@ -19,8 +19,8 @@ void SceneTitle_E4CState::InitState::Enter()
 	if (T_GRAPHICS.isDX12Active)
 	{
 		m_backgroundAnimation = new WidgetStripeAnimation("Data/Sprites/UI/Title/Title_Anim.png",
-			0, 0, SCREEN_W, SCREEN_H,
-			819, 0, 819, 434,
+			0, 0, SCREEN_W + 1, SCREEN_H,
+			819.2, 0, 819.2, 434,
 			20, 0.1f);
 		UI.Register(m_backgroundAnimation);
 	}

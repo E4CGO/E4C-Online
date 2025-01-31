@@ -60,6 +60,8 @@ public:
 
 	void Update(float elapsedTime) override;
 
+	void DefeatBoss() override;
+
 	void Render() override;
 
 	void RenderDX12() override;
@@ -80,6 +82,10 @@ protected:
 
 	bool isLeader = true;
 
+	std::unique_ptr <Plane> portal;
+
+	std::unique_ptr<WidgetText> floorText;
+
 	// Sprite Preload
 	std::unordered_set<const char*> spriteList = {
 		"",											// マスク
@@ -95,15 +101,14 @@ protected:
 	int currentSegment = 0;
 	int currentFloor = 0;
 
-	WidgetText* floorText;
-
 	// フレームバッファマネージャー
 	FrameBufferManager* m_frameBuffer;
 
 	// ポストエフェクト
 	std::unique_ptr<PostprocessingRendererDX12>	postprocessingRenderer = std::make_unique<PostprocessingRendererDX12>();
 
-	std::unique_ptr<ModelObject> instancingModel;
+	float m_sceneGlobalTimer = 0;
+	float m_sceneTickTimer = 0;
 };
 
 #endif // !__INCLUDED_STAGE_DUNGEON_E4C_H__

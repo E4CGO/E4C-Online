@@ -41,7 +41,7 @@ public:
 		ANIM_DAMAGE,
 		ANIM_DIE,
 	};
-
+	void OnWall() override;
 	void Shot();
 	bool IsReloaded() const { return m_isReloaded; }
 	void SetReload(bool reloaded = true);
@@ -50,4 +50,22 @@ private:
 	bool m_isReloaded = false; // リロード済判定
 };
 
+#include "GameObject/Projectile/ProjectileManager.h"
+/**************************************************************************//**
+	@class　CoinBullet
+	@brief	コイン弾丸クラス
+	@par    [説明]
+*//***************************************************************************/
+class CoinBullet : public Projectile
+{
+public:
+	CoinBullet(DirectX::XMFLOAT3 target, Character* owner);
+	~CoinBullet() = default;
+
+	void Update(float elapsedTime) override;
+	void CollisionFunction(Collider* myCol, Collider* otherCol) override;
+private:
+	float m_radius;
+	float m_turnSpeed;
+};
 #endif //!__INCLUDED_PIG_MOB_H__

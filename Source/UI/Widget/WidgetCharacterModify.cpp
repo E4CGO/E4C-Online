@@ -20,6 +20,122 @@ WidgetCharacterModify::WidgetCharacterModify(SceneCharacter_E4C* scene) : m_pSce
 
 	m_pWidgets.clear();
 
+	WidgetInputString* inputName = new WidgetInputString("##InputName", &m_info.name, 20);
+	inputName->SetPosition({ SCREEN_W * 0.5f - (inputName->GetSize().x * 1.0f), SCREEN_H * 0.80f });
+	m_pWidgets.push_back(inputName);
+
+	SetCharacterOptions();
+}
+/**************************************************************************//**
+	@brief		更新処理
+	@param[in]	elapsedTime	経過時間
+*//***************************************************************************/
+void WidgetCharacterModify::Update(float elapsedTime)
+{
+	if (std::memcmp(m_info.pattern, m_infoTemp.pattern, sizeof(m_info.pattern)) != 0) // 更新あり
+	{
+		if (m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::GENDER] != m_infoTemp.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::GENDER])
+		{
+			SetCharacterOptions();
+
+			for (size_t i = 1; i < (PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::NUM); i++)
+			{
+				if (i != PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::GENDER)
+				{
+					m_info.pattern[i] = 0;
+				}
+
+				if (m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::GENDER] == 0)
+				{
+					m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT] = PLAYER_CHARACTER_DATA.WEAPON_PATTERN_MAIN::WEAPON_MAIN_SWORD;
+					m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT] = PLAYER_CHARACTER_DATA.WEAPON_PATTERN_OFFHAND::WEAPON_OFFHAND_SHIELD1;
+				}
+				else
+				{
+					m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT] = PLAYER_CHARACTER_DATA.WEAPON_PATTERN_MAIN::WEAPON_MAIN_ROD;
+					m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT] = PLAYER_CHARACTER_DATA.WEAPON_PATTERN_OFFHAND::WEAPON_OFFHAND_NONE;
+				}
+			}
+		}
+
+		if (m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT] == PLAYER_CHARACTER_DATA.WEAPON_PATTERN_MAIN::WEAPON_MAIN_ROD ||
+			m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT] == PLAYER_CHARACTER_DATA.WEAPON_PATTERN_MAIN::WEAPON_MAIN_ROD2)
+		{
+			m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT] = PLAYER_CHARACTER_DATA.WEAPON_PATTERN_OFFHAND::WEAPON_OFFHAND_NONE;
+		}
+		m_pScene->GetSelectedCharacter()->LoadAppearance(m_info.pattern);
+		m_infoTemp = m_info;
+	}
+	if (m_infoTemp.name != m_info.name.c_str())
+	{
+		m_infoTemp = m_info;
+		m_pScene->GetSelectedCharacter()->SetName(m_info.name.c_str());
+	}
+
+	for (Widget* widget : m_pWidgets)
+	{
+		widget->Update(elapsedTime);
+	}
+
+	for (Widget* widget : m_pWidgetsCharacterOptions)
+	{
+		widget->Update(elapsedTime);
+	}
+}
+/**************************************************************************//**
+	@brief		描画処理
+	@param[in]	rc	レンダーコンテンツ
+*//***************************************************************************/
+void WidgetCharacterModify::Render(const RenderContext& rc)
+{
+	for (Widget* widget : m_pWidgets)
+	{
+		widget->Render(rc);
+	}
+
+	for (Widget* widget : m_pWidgetsCharacterOptions)
+	{
+		widget->Render(rc);
+	}
+}
+/**************************************************************************//**
+	@brief		DX12描画処理
+	@param[in]	rc	レンダーコンテンツ
+*//***************************************************************************/
+void WidgetCharacterModify::RenderDX12(const RenderContextDX12& rc)
+{
+	for (Widget* widget : m_pWidgets)
+	{
+		widget->RenderDX12(rc);
+	}
+
+	for (Widget* widget : m_pWidgetsCharacterOptions)
+	{
+		widget->RenderDX12(rc);
+	}
+}
+/**************************************************************************//**
+	@brief	編集したデータを保存する
+*//***************************************************************************/
+void WidgetCharacterModify::SaveData()
+{
+	PLAYER_CHARACTER_DATA.SetCharacterInfo(
+		m_pScene->GetSelectedCharacterIdx(),
+		m_info
+	);
+}
+
+/**************************************************************************//**
+	@brief
+*//***************************************************************************/
+void WidgetCharacterModify::SetCharacterOptions()
+{
+	for (auto& widget : m_pWidgetsCharacterOptions)
+	{
+		delete widget;
+	}
+	m_pWidgetsCharacterOptions.clear();
+
 	pos = { SCREEN_W * 0.6f, SCREEN_H * 0.1f };
 
 	switch (m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::GENDER])
@@ -40,88 +156,14 @@ WidgetCharacterModify::WidgetCharacterModify(SceneCharacter_E4C* scene) : m_pSce
 			WidgetText* labelWidget = new WidgetText(labels[i]);
 			labelWidget->SetPosition(pos);
 			pos.y += labelWidget->GetSize().y;
-			m_pWidgets.push_back(labelWidget);
+			m_pWidgetsCharacterOptions.push_back(labelWidget);
 
 			WidgetInputInt<uint8_t>* widget = new WidgetInputInt<uint8_t>(&m_info.pattern[i], 0, size - 1);
 			widget->SetPosition(pos);
 			pos.y += widget->GetSize().y;
-			m_pWidgets.push_back(widget);
+			m_pWidgetsCharacterOptions.push_back(widget);
 		}
 	}
-
-	WidgetInputString* inputName = new WidgetInputString("##InputName", &m_info.name, 20);
-	inputName->SetPosition({ SCREEN_W * 0.5f - (inputName->GetSize().x * 1.0f), SCREEN_H * 0.80f });
-	m_pWidgets.push_back(inputName);
-}
-/**************************************************************************//**
-	@brief		更新処理
-	@param[in]	elapsedTime	経過時間
-*//***************************************************************************/
-void WidgetCharacterModify::Update(float elapsedTime)
-{
-	for (Widget* widget : m_pWidgets)
-	{
-		widget->Update(elapsedTime);
-	}
-
-	if (std::memcmp(m_info.pattern, m_infoTemp.pattern, sizeof(m_info.pattern)) != 0) // 更新あり
-	{
-		if (m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::GENDER] != m_infoTemp.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::GENDER])
-		{
-			for (size_t i = 1; i < (PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::NUM); i++)
-			{
-				if (i != PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::GENDER)
-				{
-					m_info.pattern[i] = 0;
-				}
-			}
-		}
-
-		if (m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT] == PLAYER_CHARACTER_DATA.WEAPON_PATTERN_MAIN::WEAPON_MAIN_ROD ||
-			m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::RIGHT_HAND_EQUIPMENT] == PLAYER_CHARACTER_DATA.WEAPON_PATTERN_MAIN::WEAPON_MAIN_ROD2)
-		{
-			m_info.pattern[PLAYER_CHARACTER_DATA.APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT] = PLAYER_CHARACTER_DATA.WEAPON_PATTERN_OFFHAND::WEAPON_OFFHAND_NONE;
-		}
-		m_pScene->GetSelectedCharacter()->LoadAppearance(m_info.pattern);
-		m_infoTemp = m_info;
-	}
-	if (m_infoTemp.name != m_info.name.c_str())
-	{
-		m_infoTemp = m_info;
-		m_pScene->GetSelectedCharacter()->SetName(m_info.name.c_str());
-	}
-}
-/**************************************************************************//**
-	@brief		描画処理
-	@param[in]	rc	レンダーコンテンツ
-*//***************************************************************************/
-void WidgetCharacterModify::Render(const RenderContext& rc)
-{
-	for (Widget* widget : m_pWidgets)
-	{
-		widget->Render(rc);
-	}
-}
-/**************************************************************************//**
-	@brief		DX12描画処理
-	@param[in]	rc	レンダーコンテンツ
-*//***************************************************************************/
-void WidgetCharacterModify::RenderDX12(const RenderContextDX12& rc)
-{
-	for (Widget* widget : m_pWidgets)
-	{
-		widget->RenderDX12(rc);
-	}
-}
-/**************************************************************************//**
-	@brief	編集したデータを保存する
-*//***************************************************************************/
-void WidgetCharacterModify::SaveData()
-{
-	PLAYER_CHARACTER_DATA.SetCharacterInfo(
-		m_pScene->GetSelectedCharacterIdx(),
-		m_info
-	);
 }
 /**************************************************************************//**
 	@brief	デストラクタ
@@ -132,5 +174,12 @@ WidgetCharacterModify::~WidgetCharacterModify()
 	{
 		delete widget;
 	}
+
+	for (auto& widget : m_pWidgetsCharacterOptions)
+	{
+		delete widget;
+		widget = nullptr;
+	}
+	m_pWidgetsCharacterOptions.clear();
 	m_pWidgets.clear();
 }

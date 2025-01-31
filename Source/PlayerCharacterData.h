@@ -48,6 +48,59 @@ public:
 		NUM						// カウント
 	};
 
+
+	enum PATTERN_RESOURCE
+	{
+		NONE,
+		MALE,
+		FEMALE,
+		// 男
+		MALE_SWORD_1,
+		MALE_SWORD_2,
+		MALE_SWORD_3,
+		MALE_ROD_1,
+		MALE_ROD_2,
+		MALE_HAIR_1,
+		MALE_HAIR_2,
+		MALE_HAIR_3,
+		MALE_TOP_1,
+		MALE_TOP_2,
+		MALE_TOP_3,
+		MALE_ARM_1,
+		MALE_ARM_2,
+		MALE_ARM_3,
+		MALE_BOTTOM_1,
+		MALE_BOTTOM_2,
+		MALE_BOTTOM_3,
+		MALE_SHOES_1,
+		MALE_SHOES_2,
+		MALE_SHOES_3,
+		MALE_SHIELD_1,
+		MALE_SHIELD_2,
+		//女
+		FEMALE_SWORD_1,
+		FEMALE_SWORD_2,
+		FEMALE_SWORD_3,
+		FEMALE_ROD_1,
+		FEMALE_ROD_2,
+		FEMALE_HAIR_1,
+		FEMALE_HAIR_2,
+		FEMALE_HAIR_3,
+		FEMALE_HAIR_4,
+		FEMALE_TOP_1,
+		FEMALE_TOP_2,
+		FEMALE_TOP_3,
+		FEMALE_ARM_1,
+		FEMALE_BOTTOM_1,
+		FEMALE_BOTTOM_2,
+		FEMALE_BOTTOM_3,
+		FEMALE_SHOES_1,
+		FEMALE_SHOES_2,
+		FEMALE_SHIELD_1,
+		FEMALE_SHIELD_2,
+
+	};
+
 	enum WEAPON_PATTERN_MAIN : uint8_t
 	{
 		WEAPON_MAIN_SWORD = 0,
@@ -60,9 +113,9 @@ public:
 
 	enum WEAPON_PATTERN_OFFHAND : uint8_t
 	{
-		WEAPON_OFFHAND_NONE = 0,
-		WEAPON_OFFHAND_SHIELD1,
+		WEAPON_OFFHAND_SHIELD1 = 0,
 		WEAPON_OFFHAND_SHIELD2,
+		WEAPON_OFFHAND_NONE,
 		//WEAPON_OFFHAND_SHIELD3,
 	};
 
@@ -193,6 +246,7 @@ private:
 	int m_CurrentSaveState = 0;
 
 	std::unordered_map<uint8_t, std::vector<PlayerCharacterPattern*>> m_pAppearancePatterns;
+	std::unordered_map<uint8_t, PlayerCharacterPattern*> m_pAppearancePatternResource;
 	std::vector<CharacterInfo> m_CharaterInfosData;
 };
 

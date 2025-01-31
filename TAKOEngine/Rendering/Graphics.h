@@ -71,6 +71,7 @@ enum class ModelShaderDX12Id
 	HealCircle,
 	Beam,
 	MagicPlane,
+	Grass,
 
 	EnumCount
 };
@@ -277,7 +278,7 @@ public:
 
 	void FinishDX12();
 
-	const Descriptor* UpdateSceneConstantBuffer(const Camera* camera, float timerGlobalTime, float timerGlobalDeltaTime);
+	const Descriptor* UpdateSceneConstantBuffer(const Camera* camera, float timerGlobalTime, float timerGlobalDeltaTime, const RenderContextDX12& rc = {});
 
 	// テクスチャ読み込み
 	HRESULT LoadTexture(const char* filename, ID3D12Resource** d3d_resource);
@@ -400,6 +401,7 @@ private:
 	std::unique_ptr<SamplerManager> m_sampler[static_cast<int>(SamplerState::EnumCount)];
 
 	UINT	m_buffer_count = 0;
+	std::mutex m_mutCopyBuffer;
 
 	float m_screen_width;
 	float m_screen_height;

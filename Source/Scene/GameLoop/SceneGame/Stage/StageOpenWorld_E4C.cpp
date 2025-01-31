@@ -47,20 +47,21 @@ void StageOpenWorld_E4C::Initialize()
 	}
 	PRELOAD.Join("OpenWorldModels");
 
-	m_pCharacterGauge = new WidgetPlayerHP();
-	m_pPauseMenu = new WidgetPauseMenu();
-	UI.Register(m_pCharacterGauge);
-	UI.Register(m_pPauseMenu);
+	PRELOAD.Lock();
 
 	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 1.0f);
 	village_collision = new MapTile("Data/Model/Stage/Terrain_Village_Collision.glb", 1.0f);
+	border_collision = new MapTile("Data/Model/Stage/Terrain_Collision_Border.glb", 1.0f);
 	stage_collision->Update(0);
 	village_collision->Update(0);
+	border_collision->Update(0);
 	stage_collision->SetMoveCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
 	village_collision->SetMoveCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
+	border_collision->SetMoveCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
 
 	MAPTILES.Register(stage_collision);
 	MAPTILES.Register(village_collision);
+	MAPTILES.Register(border_collision);
 	MAPTILES.CreateSpatialIndex(5, 7);
 
 	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
@@ -68,9 +69,20 @@ void StageOpenWorld_E4C::Initialize()
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
 	teleporter->SetVisibility(true);
 
-	Spawner* spawner = new Spawner(ENEMY_TYPE::PIG, 5, -1);
+	Spawner* spawner = new Spawner(ENEMY_TYPE::MOUSE, 10, -1);
 	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
-	spawner->SetSearchRadius(10.0f);
+	spawner->SetSearchRadius(20.0f);
+	spawner->SetSpawnRadius(20.0f);
+	SpawnerManager::Instance().Register(spawner);
+	spawner = new Spawner(ENEMY_TYPE::CROC, 10, -1);
+	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
+	spawner->SetSearchRadius(20.0f);
+	spawner->SetSpawnRadius(20.0f);
+	SpawnerManager::Instance().Register(spawner);
+	spawner = new Spawner(ENEMY_TYPE::BIRD, 10, -1);
+	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
+	spawner->SetSearchRadius(20.0f);
+	spawner->SetSpawnRadius(20.0f);
 	SpawnerManager::Instance().Register(spawner);
 
 	if (T_GRAPHICS.isDX11Active)
@@ -99,6 +111,7 @@ void StageOpenWorld_E4C::Initialize()
 	if (T_GRAPHICS.isDX12Active)
 	{
 		models.emplace("map", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		//models.emplace("grass", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Collision_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::Grass));
 		models.emplace("village", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Village.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 
 		models.emplace("bush", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Bush.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::Foliage));
@@ -109,28 +122,38 @@ void StageOpenWorld_E4C::Initialize()
 		models.emplace("flower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Flower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::Foliage));
 
 		models.emplace("portal", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Portal.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
-		models["portal"]->SetPosition({ -34.0f, 4.0f, -45.0f });
+		models["portal"]->SetPosition({ -34.5f, 4.1f, -44.6f });
 		models["portal"]->SetAngle({ 0.0f, 1.5f, 0.0f });
 
 		models.emplace("target1", std::make_unique<ModelObject>("Data/Model/Object/BlockTarget.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["target1"]->SetPosition({ -34.9f, 1.8f, 20.4f });
 		models["target1"]->SetAngle({ 0.0f, -0.84f, 0.0f });
+		models["target1"]->SetCollider(0, { {0, 1.5f, 0.2f}, 1.2f }, Collider::COLLIDER_OBJ::ENEMY, models["target1"]->GetTransformAdress());
 		models.emplace("target2", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget1.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["target2"]->SetPosition({ -38.1f, 1.80f, 16.2f });
 		models["target2"]->SetAngle({ 0.0f, -1.0f, 0.0f });
+		models["target2"]->SetCollider(0, { {0, 1.4f, 0}, 0.5f }, Collider::COLLIDER_OBJ::ENEMY, models["target2"]->GetTransformAdress());
 		models.emplace("target3", std::make_unique<ModelObject>("Data/Model/Object/CloseTarget2.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		models["target3"]->SetPosition({ -32.0, 1.80f, 23.4f });
 		models["target3"]->SetAngle({ 0.0f, -1.0f, 0.0f });
+		models["target3"]->SetCollider(0, { {0, 1.4f, 0}, 0.5f }, Collider::COLLIDER_OBJ::ENEMY, models["target3"]->GetTransformAdress());
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 250.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
 		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
 		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
 
-		runningDust1 = std::make_unique<RunningDustDX12>("Data/Sprites/smoke.png", 100.0f,
-			DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),	// position
-			1.0f,			// alpha
-			f_count,	// model_id
-			0);		// age
+		//runningDust1 = std::make_unique<RunningDustDX12>("Data/Sprites/smoke.png", 100.0f,
+		//	DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),	// position
+		//	1.0f,			// alpha
+		//	f_count,	// model_id
+		//	0);		// age
+
+		// 草情報
+		{
+			//m_sprites[2] = std::make_unique<SpriteDX12>(1, "Data/Sprites/distortiontexture.png");
+			//m_sprites[3] = std::make_unique<SpriteDX12>(1, "Data/Sprites/grass.png");
+			//m_sprites[4] = std::make_unique<SpriteDX12>(1, "Data/Sprites/density.png");
+		}
 	}
 
 	// 光
@@ -163,10 +186,16 @@ void StageOpenWorld_E4C::Initialize()
 	cameraController->SetPlayer(player);
 	CURSOR_OFF;
 
+	PRELOAD.Unlock();
 	Sound::Instance().InitAudio();
 	Sound::Instance().LoadAudio("Data/Sound/3-Dreamland(Overworld).mp3");
 	Sound::Instance().LoadAudio("Data/Sound/4-Encounter(battle_theme_Overworld_Tutorial).mp3");
 	Sound::Instance().PlayAudio(0);
+
+	m_pCharacterGauge = new WidgetPlayerHP();
+	m_pPauseMenu = new WidgetPauseMenu();
+	UI.Register(m_pCharacterGauge);
+	UI.Register(m_pPauseMenu);
 
 	// ダンジョンの階の再設定
 	// 1階から始める
@@ -304,11 +333,25 @@ void StageOpenWorld_E4C::RenderDX12()
 		}
 		// シーン用定数バッファ更新
 		const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
-			CameraManager::Instance().GetCamera(), m_sceneGlobalTimer, m_sceneTickTimer);
+			CameraManager::Instance().GetCamera(), m_sceneGlobalTimer, m_sceneTickTimer, rc);
 
-		// レンダーコンテキスト設定
 		rc.d3d_command_list = m_frameBuffer->GetCommandList();
 		rc.scene_cbv_descriptor = scene_cbv_descriptor;
+
+		// 草
+		{
+			//PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
+			//rc.grassData.position.x = player->GetPosition().x;
+			//rc.grassData.position.y = player->GetPosition().y;
+			//rc.grassData.position.z = player->GetPosition().z;
+			//rc.grassData.position.w = 0;
+
+			//// レンダーコンテキスト設定
+
+			//rc.grassData.grass_srv_descriptor = m_sprites[3]->GetDescriptor();
+			//rc.grassData.grass_srv_distortion_descriptor = m_sprites[2]->GetDescriptor();
+			//rc.grassData.grass_srv_density_descriptor = m_sprites[4]->GetDescriptor();
+		}
 
 		// skyBox
 		{
@@ -323,7 +366,6 @@ void StageOpenWorld_E4C::RenderDX12()
 		}
 
 		teleporter->RenderDX12(rc);
-
 		ENEMIES.RenderDX12(rc);
 
 		SpawnerManager::Instance().RenderDX12(rc);

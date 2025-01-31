@@ -5,12 +5,27 @@
 #define __AABB_COLLIDER_H__
 
 #include "Collider.h"
+#include "TAKOEngine/Rendering/DebugRenderer/CubeRenderer.h"
 
 class AABBCollider : public Collider
 {
 public:
 	AABBCollider(uint16_t _objType, DirectX::XMFLOAT4X4* _transform);
 	~AABBCollider() = default;
+
+	//void Update() override;
+
+	bool CollisionVsShpere(
+		SphereCollider* other,
+		DirectX::XMFLOAT3& direction,
+		HitResult& result
+	) override;
+
+	bool CollisionVsCapsule(
+		CapsuleCollider* other,
+		DirectX::XMFLOAT3& direction,
+		HitResult& result
+	) override;
 
 	bool CollisionVsAABB(
 		AABBCollider* other,
@@ -24,9 +39,6 @@ public:
 		HitResult& result
 	) override;
 
-	//DirectX::XMFLOAT3 GetTop() override;
-
-
 	// AABB用パラメータセット
 	void SetParam(const AABB& aabb) override;
 
@@ -37,6 +49,7 @@ public:
 
 private:
 	DirectX::XMFLOAT3 m_radii = { 0.0f, 0.0f, 0.0f };
+	std::unique_ptr<CubeRenderer> m_cube;
 };
 
 #endif // !__AABB_COLLIDER_H__

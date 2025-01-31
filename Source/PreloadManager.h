@@ -35,10 +35,10 @@ private:
 	{
 		RESORUCE_TYPE type;
 		std::unordered_set<std::string> list = {};
-		std::thread thread;
+		bool done = false;
 	};
 private:
-	void LoadThread(const std::string& group);
+	void LoadThread();
 public:
 	void NewGroup(const std::string& group, const RESORUCE_TYPE& type)
 	{
@@ -59,13 +59,27 @@ public:
 	}
 	void Load();
 
+	/**************************************************************************//**
+	 	@brief		ロード完成まで待つ
+		@param[in]	group ロードグループネーム
+	*//***************************************************************************/
 	void Join(std::string group)
 	{
-		if (m_loadList.contains(group) && m_loadList[group].thread.joinable())
+		if (!m_loadList.contains(group)) return; // 存在しないグループ
+		while (!m_loadList[group].done)
 		{
-			m_loadList[group].thread.join();
+			// 処理
+			Sleep(100);
 		}
 	}
+	/**************************************************************************//**
+	 	@brief	ロードロック
+	*//***************************************************************************/
+	void Lock() { m_lock = true; }
+	/**************************************************************************//**
+		@brief	ロードアンロック
+	*//***************************************************************************/
+	void Unlock() { m_lock = false; }
 private:
 	std::unordered_map<std::string, LOAD_GROUP> m_loadList;
 	std::vector<std::string> m_groupOrder;
@@ -73,7 +87,11 @@ private:
 	std::unordered_set<std::shared_ptr<SpriteDX12>> m_spriteD12List;
 	std::unordered_set<std::shared_ptr<ModelResource>> m_modelList;
 	
-	std::mutex m_mtLoading;
+	//std::mutex m_mtLoading;
+	std::thread m_thread;
+
+	bool m_lock = false; // ロックフラグ
+	bool m_flgEnd = false; //エンドフラグ
 };
 
 #define PRELOAD PreloadManager::Instance()

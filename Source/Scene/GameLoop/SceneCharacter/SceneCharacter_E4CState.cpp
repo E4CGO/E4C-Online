@@ -7,6 +7,7 @@
 
 #include "Scene/SceneManager.h"
 #include "Scene/GameLoop/SceneGame/SceneGame_E4C.h"
+#include "PreloadManager.h"
 
 using namespace SceneCharacter_E4CState;
 
@@ -21,14 +22,14 @@ void SceneCharacter_E4CState::InitState::Enter()
 		{ 0.0f, 1.5f, 12.4f }, { 0.0f, 1.5f, 0.73f }, { 0.0f, 1.0f, 0.0f }
 	);
 
-	DirectX::XMFLOAT3 pos = { 3.5f, 0.0f, 5.0f };
+	DirectX::XMFLOAT3 pos = { 3.25f, 0.0f, 5.0f };
 	const std::vector<PlayerCharacterData::CharacterInfo>& infos = PLAYER_CHARACTER_DATA.GetCharacterInfosData();
 	for (const PlayerCharacterData::CharacterInfo& info : infos)
 	{
 		PlayerCharacter* character = new PlayerCharacter(info);
 		character->SetPosition(pos);
 		character->SetKinematic(true);
-		pos.x -= 3.5f;
+		pos.x -= 3.25f;
 		owner->RegisterCharacter(character);
 	}
 
@@ -55,6 +56,7 @@ void SceneCharacter_E4CState::InitState::Exit()
 *//***************************************************************************/
 void SceneCharacter_E4CState::CharacterSelectionState::Enter()
 {
+	PRELOAD.Lock();
 	m_pWidgetCharacterSelect = new WidgetCharacterSelect(owner);
 	UI.Register(m_pWidgetCharacterSelect);
 	for (PlayerCharacter* character : owner->GetCharacters())
@@ -62,16 +64,17 @@ void SceneCharacter_E4CState::CharacterSelectionState::Enter()
 		character->Show();
 	}
 
-	m_pbackground = new WidgetImage("Data/Sprites/UI/Character/BG_holes.png");
-	m_pbackground->SetSize({ SCREEN_W, SCREEN_H });
-	UI.Register(m_pbackground);
-
 	m_cameraOriginPos = CameraManager::Instance().GetCamera()->GetEye();
 	m_cameraOriginFocus = CameraManager::Instance().GetCamera()->GetFocus();
 	m_cameraTimer = 0.0f;
 
+	m_pbackground = new WidgetImage("Data/Sprites/UI/Character/BG_holes.png");
+	m_pbackground->SetSize({ SCREEN_W, SCREEN_H });
+	UI.Register(m_pbackground);
+
 	m_pPauseMenu = new WidgetPauseMenu();
 	UI.Register(m_pPauseMenu);
+	PRELOAD.Unlock();
 }
 /**************************************************************************//**
 	@brief		実行
@@ -117,6 +120,7 @@ void SceneCharacter_E4CState::CharacterSelectionState::Exit()
 *//***************************************************************************/
 void SceneCharacter_E4CState::CharacterCreationState::Enter()
 {
+	PRELOAD.Lock();
 	m_pCharacter = owner->GetSelectedCharacter();
 	std::vector<PlayerCharacter*> characters = owner->GetCharacters();
 	for (PlayerCharacter* character : characters)
@@ -132,6 +136,9 @@ void SceneCharacter_E4CState::CharacterCreationState::Enter()
 	m_pCharaBackground = new WidgetImage("Data/Sprites/UI/Character/bg_w_hole.png");
 	m_pCharaBackground->SetSize({ SCREEN_W, SCREEN_H });
 	UI.Register(m_pCharaBackground);
+
+	m_pWidgetCharacterModify = new WidgetCharacterModify(owner);
+	UI.Register(m_pWidgetCharacterModify);
 
 	m_pCharaText = new WidgetImage("Data/Sprites/UI/Character/CharaCreation.png");
 	m_pCharaText->SetPosition({ SCREEN_H * 0.30f, SCREEN_H * 0.1f });
@@ -149,9 +156,7 @@ void SceneCharacter_E4CState::CharacterCreationState::Enter()
 		});
 	m_pStartBtn->SetPosition({ SCREEN_W * 0.85f, SCREEN_H * 0.90f });
 	UI.Register(m_pStartBtn);
-
-	m_pWidgetCharacterModify = new WidgetCharacterModify(owner);
-	UI.Register(m_pWidgetCharacterModify);
+	PRELOAD.Unlock();
 }
 
 /**************************************************************************//**
