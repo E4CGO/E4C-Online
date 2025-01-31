@@ -81,7 +81,7 @@ Teleporter::Teleporter(Stage* stage, Online::OnlineController* onlineController)
 
 	if (T_GRAPHICS.isDX12Active)
 	{
-		m_portalFrame = std::make_unique<PlaneDX12>("Data/Sprites/gear.png", 1.0f, XMFLOAT3{ 0.0f, 0.0f, 0.0f }, 0.0f, 1.0f);
+		m_portalFrame = std::make_unique<PlaneDX12>("Data/Sprites/UI/Game/cross.png", 1.0f, XMFLOAT3{ 0.0f, 0.0f, 0.0f }, 0.0f, 1.0f);
 		m_portalFrame->SetShaderDX12(ModelShaderDX12Id::PortalSquare);
 
 		m_cylinderRenderer = std::make_unique<CylinderRenderer>(T_GRAPHICS.GetDeviceDX12());
@@ -132,6 +132,7 @@ void Teleporter::Update(float elapsedTime)
 	if (T_GRAPHICS.isDX12Active)
 	{
 		m_portalFrame->SetPosition(position);
+		m_portalFrame->SetScale({ 1.6f, 1.6f, 1.0f });
 		m_portalFrame->Update(elapsedTime);
 	}
 }

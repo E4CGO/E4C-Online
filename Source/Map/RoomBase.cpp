@@ -311,6 +311,8 @@ void RoomBase::GenerateNextRoomAutomatically(
 								Mathf::cmpf(anotherAABB.position.z, m_aabb.position.z)) continue;
 
 							AABB nextRoomAABB = nextRoom.GetAABB();
+							nextRoomAABB.radii.x += 1.0f;
+							nextRoomAABB.radii.z += 1.0f;
 							IntersectionResult result;
 
 							if (Collision::IntersectAABBVsAABB(
@@ -359,6 +361,9 @@ void RoomBase::GenerateNextRoomAutomatically(
 											Mathf::cmpf(anotherAABB.position.z, nextRoom.GetAABB().position.z)) continue;
 
 										AABB endRoomAABB = endRoom.GetAABB();
+										// 少しだけ広げる
+										endRoomAABB.radii.x += 1.0f;
+										endRoomAABB.radii.z += 1.0f;
 										IntersectionResult result;
 
 										if (Collision::IntersectAABBVsAABB(
@@ -599,6 +604,39 @@ void RoomBase::PlaceMapTile(bool isLeader)
 			(TileType)i == TileType::SPAWNER ||
 			(TileType)i == TileType::STAIR_TO_NEXTFLOOR) continue;
 
+		// OneWayWallはちょっと特殊
+		if ((TileType)i == TileType::ONEWAYWALL)
+		{
+			for (const TILE_DATA& tileData : tileDatas.at(i))
+			{
+				OneWayWall::WayDirection direction = OneWayWall::MinusZ;
+
+				// position はワールド座標に変換してから保存する
+				DirectX::XMFLOAT3 oneWayWallPos = tileData.position;
+				oneWayWallPos.y += 4.0f;
+
+				DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&m_transform);
+				DirectX::XMVECTOR ResultWallPos = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&oneWayWallPos), WorldTransform);
+				DirectX::XMFLOAT3 resultWallPos;
+				DirectX::XMStoreFloat3(&resultWallPos, ResultWallPos);
+
+				float degree = DirectX::XMConvertToDegrees(m_angle.y + tileData.angle.y);
+
+				// 360度以内に丸める
+				while (degree >= 360.0f) degree -= 360.0f;
+				while (degree < 0.0f) degree += 360.0f;
+
+				if (degree > 89.9f && degree < 90.1f) direction = OneWayWall::MinusX;
+				if (degree > 179.9f && degree < 180.1f) direction = OneWayWall::PlusZ;
+				if (degree > 269.9f && degree < 270.1f) direction = OneWayWall::PlusX;
+
+				OneWayWall* oneWayWall = new OneWayWall(direction, 4.0f);
+				oneWayWall->SetPosition(resultWallPos);
+				m_oneWayWalls.emplace_back(oneWayWall);
+			}
+			continue;
+		}
+
 		std::vector<FILE_DATA> modelFileDatas;		// 描画用
 		std::vector<FILE_DATA> collisionFileDatas;	// 当たり判定用
 
@@ -707,7 +745,9 @@ void RoomBase::PlaceMapTile(bool isLeader)
 		spawner->SetSpawnRadius(spawnerData.spawnRadius);
 		spawner->SetSpawnTime(spawnerData.spawnTime);
 
-		SpawnerManager::Instance().Register(spawner);
+		// スポナーを生成しつつ自身のリストに登録する
+		m_pSpawners.insert(SpawnerManager::Instance().Register(spawner));
+		//SpawnerManager::Instance().Register(spawner);
 	}
 }
 

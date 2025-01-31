@@ -1,16 +1,19 @@
 ﻿//! @file WidgetMatching.h
-//! @note 
+//! @note
 
 #ifndef __INCLUDE_WIDGET_MATCHING_H__
 #define __INCLUDE_WIDGET_MATCHING_H__
 
-#include "UI/Widget/WidgetButtonText.h"
+#include "UI/Widget/WidgetText.h"
+#include "UI/Widget/WidgetButtonImage.h"
+#include "UI/Widget/WidgetImage.h"
+
 namespace Online {
 	class OnlineController;
 }
 class Teleporter;
 
-class WidgetMatching : public WidgetButtonText
+class WidgetMatching : public WidgetButtonImage
 {
 public:
 	// コンストラクタ
@@ -25,6 +28,8 @@ public:
 	};
 
 	void Update(float elapsedTime);
+
+	void RenderDX12(const RenderContextDX12& rc) override;
 
 	void Callback();
 	void SetMaxPlayerNum(const uint8_t num) { m_maxPlayerNum = num; }
@@ -42,7 +47,13 @@ private:
 
 	const float m_countTime = 5.0f;
 	float m_timer = 0.0f;
+
+	std::shared_ptr<SpriteDX12> m_dungeon;
+	std::shared_ptr<SpriteDX12> m_enter;
+
+	WidgetText* m_matchingText;
+	std::string m_textToRender;
+	float m_textScale;
 };
 
 #endif // !__INCLUDE_WIDGET_MATCHING_H__
-

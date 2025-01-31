@@ -654,6 +654,7 @@ void DungeonData::InitModelFileDatas()
 	m_modelFileDatas.at(PORTAL).emplace_back("", 0.0f);
 	m_modelFileDatas.at(SPAWNER).emplace_back("", 0.0f);
 	m_modelFileDatas.at(CONNECTPOINT).emplace_back("", 0.0f);
+	m_modelFileDatas.at(ONEWAYWALL).emplace_back("", 0.0f);
 }
 
 void DungeonData::InitCollisionFileDatas()
@@ -866,6 +867,7 @@ void DungeonData::InitFileNames()
 	m_fileNames.at(FIRST_SPAWNER) = (char*)("Data/RoomDatas/FirstFloor_Spawner.json");
 	m_fileNames.at(FIRST_END) = (char*)("Data/RoomDatas/FirstFloor_End.json");
 	m_fileNames.at(FIRST_BOSS) = (char*)("Data/RoomDatas/FirstFloor_Boss.json");
+	m_fileNames.at(FIRST_BOSS_ONLINE) = (char*)("Data/RoomDatas/FirstFloor_Boss_Online.json");
 	m_fileNames.at(FIRST_DEAD_END) = (char*)("Data/RoomDatas/FirstFloor_DeadEnd.json");
 
 	// 第二のフロア

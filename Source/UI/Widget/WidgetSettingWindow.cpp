@@ -1,4 +1,4 @@
-﻿//! @file WidgetSettingWindow.cpp
+//! @file WidgetSettingWindow.cpp
 //! @note
 
 #include "UI/Widget/WidgetSettingWindow.h"
@@ -89,12 +89,12 @@ void WidgetSettingWindow::Update(float elapsedTime)
 		return;
 	}
 
-	closeBtn->Update(elapsedTime);
-	saveBtn->Update(elapsedTime);
 	for (Widget*& option : OptionsList)
 	{
 		option->Update(elapsedTime);
 	}
+	saveBtn->Update(elapsedTime);
+	closeBtn->Update(elapsedTime);
 }
 
 void WidgetSettingWindow::Render(const RenderContext& rc)

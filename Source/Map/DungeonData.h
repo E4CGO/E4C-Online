@@ -20,15 +20,16 @@ namespace ns_RoomData
 	// 部屋タイプ
 	enum RoomType : uint8_t
 	{
-		FIRST_START,	// 最初のフロア：最初の部屋
-		FIRST_I,		// 最初のフロア：Ｉ字の部屋
-		FIRST_T,		// 最初のフロア：Ｔ字の部屋
-		FIRST_T_REVERSE,// 最初のフロア：Ｔ字の部屋・反転
-		FIRST_FOUNTAIN,	// 最初のフロア：噴水の部屋
-		FIRST_SPAWNER,	// 最初のフロア：スポナーの部屋
-		FIRST_END,		// 最初のフロア：最後の部屋
-		FIRST_BOSS,		// 最初のフロア：ボス部屋
-		FIRST_DEAD_END,	// 最初のフロア：行き止まり
+		FIRST_START,		// 最初のフロア：最初の部屋
+		FIRST_I,			// 最初のフロア：Ｉ字の部屋
+		FIRST_T,			// 最初のフロア：Ｔ字の部屋
+		FIRST_T_REVERSE,	// 最初のフロア：Ｔ字の部屋・反転
+		FIRST_FOUNTAIN,		// 最初のフロア：噴水の部屋
+		FIRST_SPAWNER,		// 最初のフロア：スポナーの部屋
+		FIRST_END,			// 最初のフロア：最後の部屋
+		FIRST_BOSS,			// 最初のフロア：ボス部屋
+		FIRST_BOSS_ONLINE,	// 最初のフロア：ボス部屋 (オンライン用：スポナーなし)
+		FIRST_DEAD_END,		// 最初のフロア：行き止まり
 
 		SECOND_START,		// 第二のフロア：最初の部屋
 		SECOND_L1,			// 第二のフロア：Ⅼ字の部屋・右向き
@@ -109,6 +110,7 @@ namespace ns_RoomData
 		WALL_PAPER,
 		WALL_SQUARES,
 		WELL,
+		ONEWAYWALL,
 
 		TILETYPE_COUNT
 	};
