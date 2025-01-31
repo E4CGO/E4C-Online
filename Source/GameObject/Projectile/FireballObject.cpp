@@ -124,12 +124,9 @@ void FireballObject::CollisionFunction(Collider* myCol, Collider* otherCol)
 {
 	if (m_power > otherCol->GetArmor())
 	{
-		Character* chara = static_cast<Character*>(otherCol->GetOwner());
-		if (chara->IsGround())
-		{
-			uint16_t damage = m_power - otherCol->GetArmor();
-			chara->OnDamage(damage);
-		}
+		ModelObject* owner = static_cast<ModelObject*>(otherCol->GetOwner());
+		uint16_t damage = m_power - otherCol->GetArmor();
+		owner->OnDamage(damage);
 	}
 
 	myCol->SetEnable(false);
