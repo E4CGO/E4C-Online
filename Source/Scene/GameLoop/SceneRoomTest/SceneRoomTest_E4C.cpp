@@ -155,11 +155,11 @@ void SceneRoomTest_E4C::Update(float elapsedTime)
 	{
 		for (auto& it : NODES.GetAll())
 		{
-			T_GRAPHICS.GetShadowRenderer()->ModelRegister(it->GetModel().get());
+			//T_GRAPHICS.GetShadowRenderer()->ModelRegister(it->GetModel().get());
 			//T_GRAPHICS.GetShadowRenderer()->ModelRegister(it->GetModel().get());
 		}
 
-		T_GRAPHICS.GetShadowRenderer()->ModelRegister(testModel->GetModel().get());
+		//T_GRAPHICS.GetShadowRenderer()->ModelRegister(testModel->GetModel().get());
 	}
 
 	// Delete
