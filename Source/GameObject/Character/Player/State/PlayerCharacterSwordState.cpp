@@ -347,12 +347,12 @@ namespace PlayerCharacterState
 		{
 			if (owner->IsPlayer())
 			{
-				if (owner->GetMp() <= 50.0f)
+				if (owner->GetMp() <= 30.0f)
 				{
 					owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 					return;
 				}
-				owner->ModifyMp(-50.0f);
+				owner->ModifyMp(-30.0f);
 
 				SetSubState(SKILL_1_STATE::ATTACK_START);
 			}
@@ -450,12 +450,12 @@ namespace PlayerCharacterState
 		{
 			if (owner->IsPlayer())
 			{
-				if (owner->GetMp() <= 75.0f)
+				if (owner->GetMp() <= 25.0f)
 				{
 					owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 					return;
 				}
-				owner->ModifyMp(-75.0f);
+				owner->ModifyMp(-25.0f);
 				owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_SPECIAL_SECOND, false, 0.1f);
 				owner->GetEffectZone()->Activate();
 			}
