@@ -70,6 +70,7 @@ namespace PlayerCharacterState
 		void AttackNormalState::Enter()
 		{
 			owner->SetAnimationSpeed(1.f);
+			SetSubState(FIREBALL_STATE::CHARGE_READY);
 
 			if (owner->IsPlayer())
 			{
@@ -79,7 +80,6 @@ namespace PlayerCharacterState
 					return;
 				}
 				owner->ModifyMp(-10.0f);
-				SetSubState(FIREBALL_STATE::CHARGE_READY);
 			}
 		}
 		void AttackNormalState::Execute(float elapsedTime)
