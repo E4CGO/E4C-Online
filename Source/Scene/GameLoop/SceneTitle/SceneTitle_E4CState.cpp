@@ -214,19 +214,17 @@ void SceneTitle_E4CState::ComicState::Execute(float elapsedTime)
 		switch (m_currentImage)
 		{
 		case 1:
-			UI.Clear();
-
 			UI.Register(m_ComicImage2);
 			m_prevImage = m_currentImage;
 			break;
 		case 2:
-
 			UI.Register(m_ComicImage3);
 			m_prevImage = m_currentImage;
+			break;
 		case 3:
-
 			UI.Register(m_StartImage);
 			m_prevImage = m_currentImage;
+			break;
 		}
 	}
 

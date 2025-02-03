@@ -21,11 +21,11 @@ void ZoneObject::Update(float elapsedTime)
 
 	if (m_isVisibleActive)
 	{
-		PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
-		if (XMFLOAT3HorizontalLength((player->GetPosition() - position)) <= m_currentZoneRadius)
-		{
-			player->SetDefenceBuff();
-		}
+		//PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
+		//if (XMFLOAT3HorizontalLength((player->GetPosition() - position)) <= m_currentZoneRadius)
+		//{
+		//	player->SetDefenceBuff();
+		//}
 
 		m_currentActiveTime += elapsedTime;
 		float progress;

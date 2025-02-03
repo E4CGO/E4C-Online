@@ -45,9 +45,9 @@ void StageOpenWorld_E4C::Initialize()
 	{
 		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
 	}
-	PRELOAD.Join("OpenWorldModels");
+	//PRELOAD.Join("OpenWorldModels");
 
-	PRELOAD.Lock();
+	//PRELOAD.Lock();
 
 	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 1.0f);
 	village_collision = new MapTile("Data/Model/Stage/Terrain_Village_Collision.glb", 1.0f);
@@ -69,17 +69,22 @@ void StageOpenWorld_E4C::Initialize()
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
 	teleporter->SetVisibility(true);
 
-	Spawner* spawner = new Spawner(ENEMY_TYPE::MOUSE, 10, -1);
+	Spawner* spawner = new Spawner(ENEMY_TYPE::MOUSE, 2, -1);
 	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
 	spawner->SetSearchRadius(20.0f);
 	spawner->SetSpawnRadius(20.0f);
 	SpawnerManager::Instance().Register(spawner);
-	spawner = new Spawner(ENEMY_TYPE::CROC, 10, -1);
+	spawner = new Spawner(ENEMY_TYPE::CROC, 1, -1);
 	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
 	spawner->SetSearchRadius(20.0f);
 	spawner->SetSpawnRadius(20.0f);
 	SpawnerManager::Instance().Register(spawner);
-	spawner = new Spawner(ENEMY_TYPE::BIRD, 10, -1);
+	spawner = new Spawner(ENEMY_TYPE::BIRD, 2, -1);
+	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
+	spawner->SetSearchRadius(20.0f);
+	spawner->SetSpawnRadius(20.0f);
+	SpawnerManager::Instance().Register(spawner);
+	spawner = new Spawner(ENEMY_TYPE::PIG, 1, -1);
 	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
 	spawner->SetSearchRadius(20.0f);
 	spawner->SetSpawnRadius(20.0f);
@@ -138,6 +143,16 @@ void StageOpenWorld_E4C::Initialize()
 		models["target3"]->SetAngle({ 0.0f, -1.0f, 0.0f });
 		models["target3"]->SetCollider(0, { {0, 1.4f, 0}, 0.5f }, Collider::COLLIDER_OBJ::ENEMY, models["target3"]->GetTransformAdress());
 
+		models.emplace("slime", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMslime_0121.glb", 0.25f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		models["slime"]->SetPosition({ -10.0f, 0.25f, -10.0f });
+		models["slime"]->SetAnimation(7, true);
+
+		modelsInit.emplace("dummyMouse", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMmouse_0117.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		modelsInit.emplace("dummyBird", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMbird_0120.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		modelsInit.emplace("dummyCroc", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMcroc_0120.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		modelsInit.emplace("dummyPig", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMpig_0120.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		modelsInit.emplace("dummyBoss", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMboss_0123.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 250.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
 		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
 		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
@@ -186,7 +201,7 @@ void StageOpenWorld_E4C::Initialize()
 	cameraController->SetPlayer(player);
 	CURSOR_OFF;
 
-	PRELOAD.Unlock();
+	//PRELOAD.Unlock();
 	Sound::Instance().InitAudio();
 	Sound::Instance().LoadAudio("Data/Sound/3-Dreamland(Overworld).mp3");
 	Sound::Instance().LoadAudio("Data/Sound/4-Encounter(battle_theme_Overworld_Tutorial).mp3");

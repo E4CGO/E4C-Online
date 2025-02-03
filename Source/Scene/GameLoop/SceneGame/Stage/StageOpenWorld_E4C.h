@@ -74,6 +74,7 @@ private:
 	std::unique_ptr <Teleporter> teleporter;
 
 	std::unordered_map<std::string, std::unique_ptr<ModelObject>> models;
+	std::unordered_map<std::string, std::unique_ptr<ModelObject>> modelsInit;
 
 	std::unique_ptr<ModelObject> sky;
 
