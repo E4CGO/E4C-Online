@@ -872,6 +872,7 @@ void DungeonData::InitFileNames()
 	m_fileNames.at(FIRST_SPAWNER) = (char*)("Data/RoomDatas/FirstFloor_Spawner.json");
 	m_fileNames.at(FIRST_END) = (char*)("Data/RoomDatas/FirstFloor_End.json");
 	m_fileNames.at(FIRST_BOSS) = (char*)("Data/RoomDatas/FirstFloor_Boss.json");
+	m_fileNames.at(FIRST_BOSS_ONLINE) = (char*)("Data/RoomDatas/FirstFloor_Boss_Online.json");
 	m_fileNames.at(FIRST_DEAD_END) = (char*)("Data/RoomDatas/FirstFloor_DeadEnd.json");
 
 	// 第二のフロア

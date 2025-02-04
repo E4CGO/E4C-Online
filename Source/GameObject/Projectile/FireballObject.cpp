@@ -12,7 +12,7 @@
 FireballObject::FireballObject(PlayerCharacter* owner) : Projectile("Data/Model/Object/arrow.glb", 1.0f, owner)
 {
 	m_radius = 0.5f;
-	m_power = 7;
+	m_power = 10;
 	m_speed = 40.0f;
 	m_existTime = 2.0f;
 	m_chargeTime = 4.0f;
@@ -59,6 +59,7 @@ void FireballObject::Update(float elapsedTime)
 			}
 			else if (player->ReleaseAttackNormal())
 			{
+				m_power = uint16_t(m_power * (m_chargeTime - m_currentTimer));
 				m_isCharge = false;
 				m_currentTimer = m_existTime;
 				m_direction = XMFLOAT3Normalize(player->GetTarget() - position);
@@ -123,12 +124,9 @@ void FireballObject::CollisionFunction(Collider* myCol, Collider* otherCol)
 {
 	if (m_power > otherCol->GetArmor())
 	{
-		Character* chara = static_cast<Character*>(otherCol->GetOwner());
-		if (chara->IsGround())
-		{
-			uint16_t damage = m_power - otherCol->GetArmor();
-			chara->OnDamage(damage);
-		}
+		ModelObject* owner = static_cast<ModelObject*>(otherCol->GetOwner());
+		uint16_t damage = m_power - otherCol->GetArmor();
+		owner->OnDamage(damage);
 	}
 
 	myCol->SetEnable(false);

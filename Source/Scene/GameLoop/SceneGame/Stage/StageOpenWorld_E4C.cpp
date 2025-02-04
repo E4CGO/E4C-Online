@@ -45,23 +45,23 @@ void StageOpenWorld_E4C::Initialize()
 	{
 		spritePreLoad.insert(RESOURCE.LoadSpriteResource(filename));
 	}
-	PRELOAD.Join("OpenWorldModels");
+	//PRELOAD.Join("OpenWorldModels");
 
-	PRELOAD.Lock();
-	m_pCharacterGauge = new WidgetPlayerHP();
-	m_pPauseMenu = new WidgetPauseMenu();
-	UI.Register(m_pCharacterGauge);
-	UI.Register(m_pPauseMenu);
+	//PRELOAD.Lock();
 
 	stage_collision = new MapTile("Data/Model/Stage/Terrain_Collision.glb", 1.0f);
 	village_collision = new MapTile("Data/Model/Stage/Terrain_Village_Collision.glb", 1.0f);
+	border_collision = new MapTile("Data/Model/Stage/Terrain_Collision_Border.glb", 1.0f);
 	stage_collision->Update(0);
 	village_collision->Update(0);
+	border_collision->Update(0);
 	stage_collision->SetMoveCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
 	village_collision->SetMoveCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
+	border_collision->SetMoveCollider(Collider::COLLIDER_TYPE::MAP, Collider::COLLIDER_OBJ::OBSTRUCTION);
 
 	MAPTILES.Register(stage_collision);
 	MAPTILES.Register(village_collision);
+	MAPTILES.Register(border_collision);
 	MAPTILES.CreateSpatialIndex(5, 7);
 
 	teleporter = std::make_unique<Teleporter>(new StageDungeon_E4C(m_pScene), m_pScene->GetOnlineController());
@@ -69,12 +69,25 @@ void StageOpenWorld_E4C::Initialize()
 	teleporter->SetScale({ 5.0f, 10.0f, 1.0f });
 	teleporter->SetVisibility(true);
 
-	//onewayWall = std::make_unique<OneWayWall>(OneWayWall::PlusZ); //引数に通れる方向が必要
-	//onewayWall->SetPosition({ 15.0f, 3.5f, 10.0f });
-
-	Spawner* spawner = new Spawner(ENEMY_TYPE::BEAR_BOSS, 1, -1);
+	Spawner* spawner = new Spawner(ENEMY_TYPE::MOUSE, 2, -1);
 	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
-	spawner->SetSearchRadius(10.0f);
+	spawner->SetSearchRadius(20.0f);
+	spawner->SetSpawnRadius(20.0f);
+	SpawnerManager::Instance().Register(spawner);
+	spawner = new Spawner(ENEMY_TYPE::CROC, 1, -1);
+	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
+	spawner->SetSearchRadius(20.0f);
+	spawner->SetSpawnRadius(20.0f);
+	SpawnerManager::Instance().Register(spawner);
+	spawner = new Spawner(ENEMY_TYPE::BIRD, 2, -1);
+	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
+	spawner->SetSearchRadius(20.0f);
+	spawner->SetSpawnRadius(20.0f);
+	SpawnerManager::Instance().Register(spawner);
+	spawner = new Spawner(ENEMY_TYPE::PIG, 1, -1);
+	spawner->SetPosition({ 15.7f, 4.7f, -42.0f });
+	spawner->SetSearchRadius(20.0f);
+	spawner->SetSpawnRadius(20.0f);
 	SpawnerManager::Instance().Register(spawner);
 
 	if (T_GRAPHICS.isDX11Active)
@@ -114,7 +127,7 @@ void StageOpenWorld_E4C::Initialize()
 		models.emplace("flower", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Flower.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::Foliage));
 
 		models.emplace("portal", std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Portal.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
-		models["portal"]->SetPosition({ -34.0f, 4.0f, -45.0f });
+		models["portal"]->SetPosition({ -34.5f, 4.1f, -44.6f });
 		models["portal"]->SetAngle({ 0.0f, 1.5f, 0.0f });
 
 		models.emplace("target1", std::make_unique<ModelObject>("Data/Model/Object/BlockTarget.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
@@ -130,15 +143,25 @@ void StageOpenWorld_E4C::Initialize()
 		models["target3"]->SetAngle({ 0.0f, -1.0f, 0.0f });
 		models["target3"]->SetCollider(0, { {0, 1.4f, 0}, 0.5f }, Collider::COLLIDER_OBJ::ENEMY, models["target3"]->GetTransformAdress());
 
+		models.emplace("slime", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMslime_0121.glb", 0.25f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		models["slime"]->SetPosition({ -10.0f, 0.25f, -10.0f });
+		models["slime"]->SetAnimation(7, true);
+
+		modelsInit.emplace("dummyMouse", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMmouse_0117.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		modelsInit.emplace("dummyBird", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMbird_0120.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		modelsInit.emplace("dummyCroc", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMcroc_0120.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		modelsInit.emplace("dummyPig", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMpig_0120.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		modelsInit.emplace("dummyBoss", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMboss_0123.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 250.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
 		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
 		m_sprites[1] = std::make_unique<SpriteDX12>(1, L"Data/Model/Stage/skybox.dds");
 
-		runningDust1 = std::make_unique<RunningDustDX12>("Data/Sprites/smoke.png", 100.0f,
-			DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),	// position
-			1.0f,			// alpha
-			f_count,	// model_id
-			0);		// age
+		//runningDust1 = std::make_unique<RunningDustDX12>("Data/Sprites/smoke.png", 100.0f,
+		//	DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),	// position
+		//	1.0f,			// alpha
+		//	f_count,	// model_id
+		//	0);		// age
 
 		// 草情報
 		{
@@ -177,17 +200,21 @@ void StageOpenWorld_E4C::Initialize()
 	cameraController->SetEnable(true);
 	cameraController->SetPlayer(player);
 	CURSOR_OFF;
-	
-	PRELOAD.Unlock();
+
+	//PRELOAD.Unlock();
 	Sound::Instance().InitAudio();
 	Sound::Instance().LoadAudio("Data/Sound/3-Dreamland(Overworld).mp3");
 	Sound::Instance().LoadAudio("Data/Sound/4-Encounter(battle_theme_Overworld_Tutorial).mp3");
 	Sound::Instance().PlayAudio(0);
 
+	m_pCharacterGauge = new WidgetPlayerHP();
+	m_pPauseMenu = new WidgetPauseMenu();
+	UI.Register(m_pCharacterGauge);
+	UI.Register(m_pPauseMenu);
 
 	// ダンジョンの階の再設定
 	// 1階から始める
-	DUNGEONDATA.SetCurrentFloor(1);
+	//DUNGEONDATA.SetCurrentFloor(1);
 
 	// 影初期化
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
@@ -241,7 +268,6 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	ENEMIES.Update(elapsedTime);
 
 	SpawnerManager::Instance().Update(elapsedTime);
-	//onewayWall->Update(elapsedTime);
 
 	PROJECTILES.Update(elapsedTime);
 
@@ -355,7 +381,6 @@ void StageOpenWorld_E4C::RenderDX12()
 		}
 
 		teleporter->RenderDX12(rc);
-		//onewayWall->RenderDX12(rc);
 		ENEMIES.RenderDX12(rc);
 
 		SpawnerManager::Instance().RenderDX12(rc);

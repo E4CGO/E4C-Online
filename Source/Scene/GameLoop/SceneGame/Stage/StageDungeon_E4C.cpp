@@ -181,6 +181,9 @@ void StageDungeon_E4C::Initialize()
 	MAPTILES.CreateSpatialIndex(5, 7);
 
 	PRELOAD.Unlock();
+	Sound::Instance().InitAudio();
+	Sound::Instance().LoadAudio("Data/Sound/5-Miraculous_Maze(Dungeon).mp3");
+	Sound::Instance().PlayAudio(0);
 
 	// 影初期化
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
@@ -262,7 +265,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	UI.Update(elapsedTime);
 
 	// キャラクターの影登録
-	for (auto& model : PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetModels())
+	/*for (auto& model : PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetModels())
 	{
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
 	}
@@ -270,7 +273,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	for (auto& model : PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetModels())
 	{
 		T_GRAPHICS.GetShadowRenderer()->ModelRegister(model.get());
-	}
+	}*/
 
 	m_timer += elapsedTime;
 

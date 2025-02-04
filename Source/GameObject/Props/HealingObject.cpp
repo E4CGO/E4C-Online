@@ -28,11 +28,17 @@ void HealingObject::Update(float elapsedTime)
 {
 	if (m_isVisibleActive)
 	{
-		PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
+		/*PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
 		if (XMFLOAT3HorizontalLength((player->GetPosition() - m_EffectThird->GetPosition())) <= 3.0f * m_size)
 		{
-			player->ModifyHp(10.0f * elapsedTime);
+			if (m_healingTimer > 0.1f)
+			{
+				player->ModifyHp(1);
+				m_healingTimer = 0;
+			}
+			m_healingTimer += elapsedTime;
 		}
+		else m_healingTimer = 0;*/
 
 		m_EffectFirst->Update(elapsedTime);
 		m_EffectSecond->Update(elapsedTime);

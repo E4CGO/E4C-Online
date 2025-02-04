@@ -129,9 +129,9 @@ void PlayerCharacterData::SetMalePatterns()
 	m_pAppearancePatterns[APPEARANCE_PATTERN::EYE_COLOR].push_back(m_pAppearancePatternResource[PATTERN_RESOURCE::MALE_SHOES_2]);
 	m_pAppearancePatterns[APPEARANCE_PATTERN::EYE_COLOR].push_back(m_pAppearancePatternResource[PATTERN_RESOURCE::MALE_SHOES_3]);
 
-	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(m_pAppearancePatternResource[PATTERN_RESOURCE::NONE]);
 	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(m_pAppearancePatternResource[PATTERN_RESOURCE::MALE_SHIELD_1]);
 	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(m_pAppearancePatternResource[PATTERN_RESOURCE::MALE_SHIELD_2]);
+	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(m_pAppearancePatternResource[PATTERN_RESOURCE::NONE]);
 }
 
 void PlayerCharacterData::SetFemalePatterns()
@@ -166,9 +166,9 @@ void PlayerCharacterData::SetFemalePatterns()
 	m_pAppearancePatterns[APPEARANCE_PATTERN::EYE_COLOR].push_back(m_pAppearancePatternResource[PATTERN_RESOURCE::FEMALE_SHOES_1]);
 	m_pAppearancePatterns[APPEARANCE_PATTERN::EYE_COLOR].push_back(m_pAppearancePatternResource[PATTERN_RESOURCE::FEMALE_SHOES_2]);
 	
-	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(m_pAppearancePatternResource[PATTERN_RESOURCE::NONE]);
 	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(m_pAppearancePatternResource[PATTERN_RESOURCE::FEMALE_SHIELD_1]);
 	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(m_pAppearancePatternResource[PATTERN_RESOURCE::FEMALE_SHIELD_2]);
+	m_pAppearancePatterns[APPEARANCE_PATTERN::LEFT_HAND_EQUIPMENT].push_back(m_pAppearancePatternResource[PATTERN_RESOURCE::NONE]);
 }
 
 /**************************************************************************//**

@@ -15,6 +15,7 @@ class ObjectManager : public Manager<T>
 public:
 	virtual void Update(float elapsedTime)
 	{
+		std::lock_guard<std::mutex> lock(Manager<T>::m_mut);
 		for (T* item : removes)
 		{
 			typename std::vector<T*>::iterator it = std::find(this->items.begin(), this->items.end(), item);
@@ -35,6 +36,7 @@ public:
 	}
 	virtual void Render(const RenderContext& rc)
 	{
+		std::lock_guard<std::mutex> lock(Manager<T>::m_mut);
 		for (T* item : this->items)
 		{
 			item->Render(rc);
@@ -43,6 +45,7 @@ public:
 
 	virtual void RenderDX12(const RenderContextDX12& rc)
 	{
+		std::lock_guard<std::mutex> lock(Manager<T>::m_mut);
 		for (T* item : this->items)
 		{
 			item->RenderDX12(rc);
@@ -51,6 +54,7 @@ public:
 
 	void MoveToEnd(T* item)
 	{
+		std::lock_guard<std::mutex> lock(Manager<T>::m_mut);
 		typename std::vector<T*>::iterator it = std::find(this->items.begin(), this->items.end(), item);
 		if (it != this->items.end())
 		{
@@ -66,6 +70,7 @@ public:
 	// リサイズ
 	void Resize(int size)
 	{
+		std::lock_guard<std::mutex> lock(Manager<T>::m_mut);
 		int i = 0;
 		for (T* item : this->items)
 		{
@@ -89,7 +94,11 @@ public:
 			item->DrawDebugPrimitive();
 		}
 	}
-
+	void Clear() override {
+		std::lock_guard<std::mutex> lock(Manager<T>::m_mut);
+		Manager<T>::Clear();
+		removes.clear();
+	}
 protected:
 	std::set<T*> removes;
 };

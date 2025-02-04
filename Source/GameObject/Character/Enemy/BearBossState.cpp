@@ -366,6 +366,10 @@ namespace EnemyState
 			stateMachine->RegisterSubState(::BearBoss::STATE::STUN, ::BearBoss::STUN_STATE::STUN_LOOP, new AngryStunLoopState(owner));
 			stateMachine->RegisterSubState(::BearBoss::STATE::STUN, ::BearBoss::STUN_STATE::STUN_END, new AngryStunEndState(owner));
 			// 当たり判定消し
+			for (auto col : owner->GetColliders())
+			{
+				col.second->SetEnable(false);
+			}
 		}
 		void FormChangeState::Execute(float elapsedTime)
 		{
@@ -377,6 +381,10 @@ namespace EnemyState
 		void FormChangeState::Exit()
 		{
 			// 当たり判定消復活
+			for (auto col : owner->GetColliders())
+			{
+				col.second->SetEnable(true);
+			}
 		}
 	}
 }
