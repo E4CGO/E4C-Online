@@ -777,6 +777,8 @@ void RoomBase::PlaceTeleporterTile(Stage* stage, Online::OnlineController* onlin
 
 			HealingObject* healingObject = new HealingObject();
 			healingObject->SetPosition(resultStairPos);
+			healingObject->SetObjectPositions(resultStairPos, { 0.0f, 0.0f, 0.0f });
+			healingObject->Activate();
 			GameObjectManager::Instance().Register(healingObject);
 		}
 		// ボスフロアならOpenWorldへのテレポーターと階段を配置
@@ -823,6 +825,8 @@ void RoomBase::PlaceTeleporterTile(Stage* stage, Online::OnlineController* onlin
 
 			HealingObject* healingObject = new HealingObject();
 			healingObject->SetPosition(resultStairPos);
+			healingObject->SetObjectPositions(resultStairPos, { 0.0f, 0.0f, 0.0f });
+			healingObject->Activate();
 			GameObjectManager::Instance().Register(healingObject);
 		}
 	}
