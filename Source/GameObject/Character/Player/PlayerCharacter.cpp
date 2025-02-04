@@ -60,9 +60,7 @@ PlayerCharacter::PlayerCharacter(uint32_t id, const char* name, const uint8_t ap
 	// DebugPrimitive用
 	m_sphere = std::make_unique<SphereRenderer>(T_GRAPHICS.GetDeviceDX12());
 
-	m_EffectZone = std::make_unique<ZoneObject>();
 	m_EffectCharge = std::make_unique<ChargeObject>();
-	m_EffectHealing = std::make_unique<HealingObject>();
 }
 
 PlayerCharacter::PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataInfo) : Character()
@@ -91,9 +89,7 @@ PlayerCharacter::PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataI
 
 	// 効果
 	{
-		m_EffectZone = std::make_unique<ZoneObject>();
 		m_EffectCharge = std::make_unique<ChargeObject>();
-		m_EffectHealing = std::make_unique<HealingObject>();
 	}
 }
 
@@ -640,11 +636,8 @@ void PlayerCharacter::Update(float elapsedTime)
 
 		// 効果
 		{
-			m_EffectZone->SetPosition(position);
-			m_EffectZone->Update(elapsedTime);
 			m_EffectCharge->SetPosition(position);
 			m_EffectCharge->Update(elapsedTime);
-			m_EffectHealing->Update(elapsedTime);
 
 			if (m_DefenceBuffTimeoutTimer > 0)
 			{
@@ -718,9 +711,8 @@ void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
 	if (dot < 0.0f) return;
 
 	{
-		m_EffectZone->RenderDX12(rc);
 		m_EffectCharge->RenderDX12(rc);
-		m_EffectHealing->RenderDX12(rc);
+
 	}
 
 #ifdef _DEBUG
@@ -825,14 +817,16 @@ void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
 void PlayerCharacter::OnDamage(const uint16_t& damage)
 {
 	if (hurtCoolTime > 0.0f) return;
-	hp -= damage;
+	uint16_t dmg = damage;
+	if (m_isDefenceBuff)
+	{
+		dmg = damage / 2;
+	}
+	hp -= dmg;
 	hurtCoolTime = 0.5f;
 
 	TPSCamera.Shake(0.2f, 0.5f);
 
-	//float vx = hit.position.x - position.x;
-	//float vz = hit.position.z - position.z;
-	//Turn(1.0f, vx, vz, DirectX::XMConvertToRadians(360));
 	if (hp <= 0)
 	{
 		hp = 0;
@@ -883,7 +877,7 @@ void PlayerCharacter::FaceToCamera()
 {
 	if (!IsPlayer()) return;
 	DirectX::XMFLOAT3 front = CameraManager::Instance().GetCamera()->GetFront();
-	Turn(1.0f, front.x, front.z, turnSpeed);
+	Turn(10.0f, front.x, front.z, turnSpeed);
 }
 
 void PlayerCharacter::TurnByInput()

@@ -203,7 +203,7 @@ void ThridPersonCameraController::AimMode(bool enable)
 	if (enable)
 	{
 		distanceCache = distanceLerp;
-		offsetLerp = { 0.1f, 0.05f };
+		offsetLerp = { 0.05f, 0.02f };
 		distanceLerp = 3.0f;
 
 		CROSS_HAIR.Show();

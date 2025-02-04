@@ -17,7 +17,6 @@ namespace EnemyState
 		{
 			if (owner->IsGround())
 			{
-				if (!owner->IsPlayAnimation());
 				EnemyState::StateTransition(owner, ::BirdMob::STATE::TAKE_OFF);
 				return;
 			}
@@ -78,7 +77,7 @@ namespace EnemyState
 			::EnemyState::MoveState::Execute(elapsedTime);
 		}
 
-		
+
 		// 攻撃ステート
 		void AttackState::Enter()
 		{
@@ -114,7 +113,7 @@ namespace EnemyState
 			owner->Stop();
 			float rate = owner->GetModel()->GetAnimationRate();
 
-			owner->SetAnimationSpeed(1.0f + 2.0 * (1.0 - rate));
+			owner->SetAnimationSpeed(1.0f + 2.0f * (1.0 - rate));
 			owner->SetPosition(Mathf::Lerp(m_startPos, m_targetPos, rate));
 			if (rate >= 1.0f)
 			{

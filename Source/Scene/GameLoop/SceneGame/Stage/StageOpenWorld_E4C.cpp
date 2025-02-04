@@ -19,6 +19,7 @@
 #include "TAKOEngine/Sound/Sound.h"
 
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
+#include "GameObject/GameObjectManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Props/SpawnerManager.h"
 #include "GameObject/Projectile/ProjectileManager.h"
@@ -147,11 +148,11 @@ void StageOpenWorld_E4C::Initialize()
 		models["slime"]->SetPosition({ -10.0f, 0.25f, -10.0f });
 		models["slime"]->SetAnimation(7, true);
 
-		modelsInit.emplace("dummyMouse", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMmouse_0117.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
-		modelsInit.emplace("dummyBird", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMbird_0120.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
-		modelsInit.emplace("dummyCroc", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMcroc_0120.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
-		modelsInit.emplace("dummyPig", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMpig_0120.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
-		modelsInit.emplace("dummyBoss", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMboss_0123.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		//modelsInit.emplace("dummyMouse", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMmouse_0117.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		//modelsInit.emplace("dummyBird", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMbird_0120.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		//modelsInit.emplace("dummyCroc", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMcroc_0120.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		//modelsInit.emplace("dummyPig", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMpig_0120.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
+		//modelsInit.emplace("dummyBoss", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMboss_0123.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 
 		sky = std::make_unique<ModelObject>("Data/Model/Cube/Cube.fbx", 250.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
 		sky->SetShader("Cube", ModelShaderDX12Id::Skydome);
@@ -197,9 +198,7 @@ void StageOpenWorld_E4C::Initialize()
 
 	cameraController = std::make_unique<ThridPersonCameraController>();
 	cameraController->SyncCameraToController(mainCamera);
-	cameraController->SetEnable(true);
 	cameraController->SetPlayer(player);
-	CURSOR_OFF;
 
 	//PRELOAD.Unlock();
 	Sound::Instance().InitAudio();
@@ -218,11 +217,15 @@ void StageOpenWorld_E4C::Initialize()
 
 	// 影初期化
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
+
+	cameraController->SetEnable(true);
+	CURSOR_OFF;
 }
 
 void StageOpenWorld_E4C::Finalize()
 {
 	PROJECTILES.Clear();
+	GameObjectManager::Instance().Clear();
 	Sound::Instance().StopAudio(0);
 	Sound::Instance().Finalize();
 	T_GRAPHICS.GetShadowRenderer()->Finalize();
@@ -230,6 +233,7 @@ void StageOpenWorld_E4C::Finalize()
 
 void StageOpenWorld_E4C::Update(float elapsedTime)
 {
+	if (elapsedTime == 0.0f) return;
 	// ゲームループ内で
 	cameraController->SyncContrllerToCamera(CameraManager::Instance().GetCamera());
 	cameraController->Update(elapsedTime);
@@ -259,6 +263,7 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	}
 	if (cameraController->isEnable())
 	{
+		CURSOR_OFF;
 		T_INPUT.KeepCursorCenter();
 	}
 
@@ -272,6 +277,7 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	PROJECTILES.Update(elapsedTime);
 
 	PlayerCharacterManager::Instance().Update(elapsedTime);
+	GameObjectManager::Instance().Update(elapsedTime);
 
 	for (auto& it : models)
 	{
@@ -321,6 +327,7 @@ void StageOpenWorld_E4C::Render()
 
 	UI.Render(rc);
 
+	GameObjectManager::Instance().Render(rc);
 	// 描画
 	PlayerCharacterManager::Instance().Render(rc);
 	// デバッグレンダラ描画実行
@@ -389,6 +396,7 @@ void StageOpenWorld_E4C::RenderDX12()
 
 		// プレイヤー
 		PlayerCharacterManager::Instance().RenderDX12(rc);
+		GameObjectManager::Instance().RenderDX12(rc);
 
 		// レンダーターゲットへの書き込み終了待ち
 		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));

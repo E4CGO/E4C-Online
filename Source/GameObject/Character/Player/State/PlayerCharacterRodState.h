@@ -84,6 +84,10 @@ namespace PlayerCharacterState
 			void Execute(float elapsedTime) override;
 			// ステートから出ていくときのメソッド
 			void Exit() override;
+
+		private:
+			const float m_slowMoveRate = 0.4f;
+			float m_tempMoveSpeed = 10.0f;
 		};
 		// Fireball攻撃準備
 		class AttackNormalState_Ready : public HierarchicalState<PlayerCharacter>

@@ -3,6 +3,8 @@
 
 #include "PlayerCharacterSwordState.h"
 #include "PlayerCharacterState.h"
+#include "GameObject/GameObjectManager.h"
+#include "GameObject/Props/Zone/DefenceBuffZone.h"
 
 namespace PlayerCharacterState
 {
@@ -137,27 +139,7 @@ namespace PlayerCharacterState
 						owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_2);
 						return;
 					}
-					//if (owner->InputMove(elapsedTime))
-					//{
-					//	owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::MOVE);
-					//}
-					//else if (owner->InputDodge())
-					//{
-					//	owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
-					//}
-					//else if (owner->InputSpecial())
-					//{
-					//	owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
-					//}
-					//else if (owner->InputSkill1())
-					//{
-					//	owner->GetStateMachine()->ChangeState(SKILL_1_STATE::ATTACK_START);
-					//}
-					//else if (owner->InputSkill2())
-					//{
-					//	owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
-					//}
-
+					owner->InputMove(elapsedTime);
 					PlayerTransition(
 						owner,
 						flag_Dodge | flag_Move | flag_AttackS | flag_Skill_1 | flag_Skill_2
@@ -229,27 +211,7 @@ namespace PlayerCharacterState
 						owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_3);
 						return;
 					}
-
-					//if (owner->InputMove(elapsedTime))
-					//{
-					//	owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::MOVE);
-					//}
-					//else if (owner->InputDodge())
-					//{
-					//	owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
-					//}
-					//else if (owner->InputSpecial())
-					//{
-					//	owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
-					//}
-					//else if (owner->InputSkill1())
-					//{
-					//	owner->GetStateMachine()->ChangeState(SKILL_1_STATE::ATTACK_START);
-					//}
-					//else if (owner->InputSkill2())
-					//{
-					//	owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
-					//}
+					owner->InputMove(elapsedTime);
 					PlayerTransition(
 						owner,
 						flag_Dodge | flag_Move | flag_AttackS | flag_Skill_1 | flag_Skill_2
@@ -322,26 +284,7 @@ namespace PlayerCharacterState
 						owner->GetStateMachine()->ChangeSubState(NORMAL_ATTACK_STATE::ATTACK_1);
 						return;
 					}
-					//if (owner->InputMove(elapsedTime))
-					//{
-					//	owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::MOVE);
-					//}
-					//else if (owner->InputDodge())
-					//{
-					//	owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
-					//}
-					//else if (owner->InputSpecial())
-					//{
-					//	owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
-					//}
-					//else if (owner->InputSkill1())
-					//{
-					//	owner->GetStateMachine()->ChangeState(SKILL_1_STATE::ATTACK_START);
-					//}
-					//else if (owner->InputSkill2())
-					//{
-					//	owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
-					//}
+					owner->InputMove(elapsedTime);
 					PlayerTransition(
 						owner,
 						flag_Dodge | flag_Move | flag_AttackS | flag_Skill_1 | flag_Skill_2
@@ -444,18 +387,7 @@ namespace PlayerCharacterState
 			float time = owner->GetModel()->GetCurrentAnimationSeconds();
 			if (2.6f <= time)
 			{
-				//if (owner->InputMove(elapsedTime))
-				//{
-				//	owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::MOVE);
-				//}
-				//else if (owner->InputDodge())
-				//{
-				//	owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
-				//}
-				//else if (owner->InputSpecial())
-				//{
-				//	owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
-				//}
+				owner->InputMove(elapsedTime);
 				PlayerTransition(
 					owner,
 					flag_Dodge | flag_Move | flag_AttackS
@@ -489,11 +421,11 @@ namespace PlayerCharacterState
 					owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 					return;
 				}
-				owner->GetEffectZone()->Activate();
 				owner->ModifyMp(-25.0f);
 			}
+			DefenceBuffZone* zone = new DefenceBuffZone(owner);
+			GameObjectManager::Instance().Register(zone);
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_SPECIAL_SECOND, false, 0.1f);
-			owner->GetEffectZone()->Activate();
 		}
 		void Skill2State::Execute(float elapsedTime)
 		{
@@ -501,18 +433,7 @@ namespace PlayerCharacterState
 
 			if (1.215f <= time)
 			{
-				//if (owner->InputMove(elapsedTime))
-				//{
-				//	owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::MOVE);
-				//}
-				//else if (owner->InputDodge())
-				//{
-				//	owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::DODGE);
-				//}
-				//else if (owner->InputSpecial())
-				//{
-				//	owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
-				//}
+				owner->InputMove(elapsedTime);
 				PlayerTransition(
 					owner,
 					flag_Dodge | flag_Move | flag_AttackS

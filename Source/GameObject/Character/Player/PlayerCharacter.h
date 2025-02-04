@@ -12,9 +12,7 @@
 #include "GameData.h"
 #include "PlayerCharacterData.h"
 #include "TAKOEngine/Rendering/DebugRenderer/SphereRenderer.h"
-#include "Source/GameObject/Props/ZoneObject.h"
 #include "Source/GameObject/Props/ChargeObject.h"
-#include "Source/GameObject/Props/HealingObject.h"
 
 class Enemy;
 
@@ -238,6 +236,9 @@ public:
 	ENERGY_TYPE GetEnergyType() { return m_energyType; }
 	GENDER_TYPE GetGenderType() { return m_genderType; }
 
+	const float GetMoveSpeed() const { return moveSpeed; }
+	void SetMoveSpeed(const float speed) { moveSpeed = speed; }
+
 	// スキルタイマー
 	float GetSkillTimerTime(int idx);
 	float GetSkillTimerRate(int idx);
@@ -258,9 +259,7 @@ public:
 	bool IsTrail() { return m_isTrail; }
 	void SetTrail(bool trail) { m_isTrail = trail; }
 
-	ZoneObject* GetEffectZone() { return m_EffectZone.get(); }
 	ChargeObject* GetEffectCharge() { return m_EffectCharge.get(); }
-	HealingObject* GetEffectHealing() { return m_EffectHealing.get(); }
 
 	// 自機判定
 	bool IsPlayer() { return GAME_DATA.GetClientId() == m_client_id; };
@@ -387,9 +386,7 @@ protected:
 
 	bool m_isTrail = false;
 
-	std::unique_ptr<ZoneObject> m_EffectZone;
 	std::unique_ptr<ChargeObject> m_EffectCharge;
-	std::unique_ptr<HealingObject> m_EffectHealing;
 };
 
 #endif // __INCLUDED_PLAYER_CHARACTER_H__
