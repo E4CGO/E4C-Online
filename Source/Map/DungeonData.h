@@ -1,4 +1,4 @@
-﻿//! @file DungeonData.h
+//! @file DungeonData.h
 //! @note
 
 //#pragma once
@@ -111,6 +111,11 @@ namespace ns_RoomData
 		WALL_SQUARES,
 		WELL,
 		ONEWAYWALL,
+		BED_01A,
+		CHAIR_01A,
+		CURTAIN_01A,
+		PEN_01A,
+		PEN_01B,
 
 		TILETYPE_COUNT
 	};
