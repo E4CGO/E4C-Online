@@ -470,6 +470,22 @@ void ModelObject::MakeAttackCollider(ATTACK_COLLIDER_DATA data, Sphere spherePar
 	m_pColliders[data.idx]->SetParam(sphereParam);
 	COLLISIONS.Register(m_pColliders[data.idx]);
 }
+void ModelObject::MakePlayerNormalAttackCollider(ATTACK_COLLIDER_DATA data, Sphere sphereParam, DirectX::XMFLOAT4X4* transform)
+{
+	m_pColliders[data.idx] = new PlayerNormalAttackSphereCollider(data.power, data.objType, transform, data.hitStartRate, data.hitEndRate);
+	m_pColliders[data.idx]->SetHittableOBJ(data.hittableOBJ);
+	m_pColliders[data.idx]->SetOwner(this);
+	m_pColliders[data.idx]->SetParam(sphereParam);
+	COLLISIONS.Register(m_pColliders[data.idx]);
+}
+void ModelObject::MakePlayerSkill1AttackCollider(ATTACK_COLLIDER_DATA data, Sphere sphereParam, DirectX::XMFLOAT4X4* transform)
+{
+	m_pColliders[data.idx] = new PlayerSkill1AttackSphereCollider(data.power, data.objType, transform, data.hitStartRate, data.hitEndRate);
+	m_pColliders[data.idx]->SetHittableOBJ(data.hittableOBJ);
+	m_pColliders[data.idx]->SetOwner(this);
+	m_pColliders[data.idx]->SetParam(sphereParam);
+	COLLISIONS.Register(m_pColliders[data.idx]);
+}
 /**************************************************************************//**
 	@brief		攻撃判定用コライダー生成
 	@param[in]	power			攻撃力

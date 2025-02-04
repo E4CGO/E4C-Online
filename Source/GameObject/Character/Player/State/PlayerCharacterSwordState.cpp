@@ -15,6 +15,9 @@ namespace PlayerCharacterState
 		{30, PlayerCharacter::COLLIDER_ID::COL_SKILL_1, Collider::COLLIDER_OBJ::PLAYER_ATTACK, Collider::COLLIDER_OBJ::ENEMY, 0.08f, 0.45f, {{0, 0, 0} , 1.5f}}
 		};
 
+		int skill1UseStamina = 30; // ここで変数を定義
+		int skill2UseStamina = 50; // ここで変数を定義
+
 		// 待機用ステート
 		void WaitState::Enter()
 		{
@@ -40,10 +43,21 @@ namespace PlayerCharacterState
 			owner->InputMove(elapsedTime);
 			owner->Jump();
 
-			PlayerTransition(
-				owner,
-				flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2
-			);
+			if (owner->GetMp() > skill2UseStamina)
+			{
+				PlayerTransition(owner,
+					flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2);
+			}
+			else if (owner->GetMp() > skill1UseStamina)
+			{
+				PlayerTransition(owner,
+					flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1);
+			}
+			else
+			{
+				PlayerTransition(owner,
+					flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS);
+			}
 		}
 
 		void IdleState::Exit()
@@ -63,10 +77,23 @@ namespace PlayerCharacterState
 			owner->InputMove(elapsedTime);
 			owner->Jump();
 
-			PlayerTransition(
-				owner,
-				flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2
-			);
+			if (owner->GetMp() > skill2UseStamina)
+			{
+				PlayerTransition(owner,
+					flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2);
+			}
+			else if (owner->GetMp() > skill1UseStamina)
+			{
+				PlayerTransition(
+					owner,
+					flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1);
+			}
+			else
+			{
+				PlayerTransition(
+					owner,
+					flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_AttackN | flag_AttackS);
+			}
 		}
 
 		void MoveState::Exit()
@@ -85,7 +112,7 @@ namespace PlayerCharacterState
 			subState->Execute(elapsedTime);
 
 			// 反重力
-			owner->StopMove();
+			//owner->StopMove();
 
 			if (!owner->IsPlayAnimation()) // 攻撃モーション終わり
 			{
@@ -104,6 +131,11 @@ namespace PlayerCharacterState
 			owner->SetAnimationSpeed(1.0f);
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_COMBO_FIRST, false, 0.1f);
 
+			DirectX::XMFLOAT3 front = owner->GetFront();
+			DirectX::XMFLOAT3 impulse;
+			DirectX::XMStoreFloat3(&impulse, DirectX::XMVectorScale(DirectX::XMLoadFloat3(&front), impulseSpeed));
+			owner->AddImpulse(impulse);
+
 			if (owner->IsPlayer())
 			{
 				XMFLOAT4X4* matrix = owner->GetTransformAdress();
@@ -116,13 +148,17 @@ namespace PlayerCharacterState
 				attackData.hitStartRate = sphereAttacks[0].hitStartRate;
 				attackData.hitEndRate = sphereAttacks[0].hitEndRate;
 
-				owner->MakeAttackCollider(attackData, sphereAttacks[0].sphere, matrix);
+				owner->MakePlayerNormalAttackCollider(attackData, sphereAttacks[0].sphere, matrix);
+
+				owner->FaceToEnemy();
 			}
 		}
 		void AttackNormalState_1::Execute(float elapsedTime)
 		{
 			if (owner->IsPlayer())
 			{
+				
+
 				owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_1)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
 
 				float time = owner->GetModel()->GetCurrentAnimationSeconds();
@@ -147,11 +183,11 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
 					}
-					else if (owner->InputSkill1())
+					else if (owner->InputSkill1() && owner->GetMp() > skill1UseStamina)
 					{
 						owner->GetStateMachine()->ChangeState(SKILL_1_STATE::ATTACK_START);
 					}
-					else if (owner->InputSkill2())
+					else if (owner->InputSkill2() && owner->GetMp() > skill2UseStamina)
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
 					}
@@ -184,6 +220,11 @@ namespace PlayerCharacterState
 			owner->SetAnimationSpeed(1.0f);
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_COMBO_SECOND, false, 0.2f);
 
+			DirectX::XMFLOAT3 front = owner->GetFront();
+			DirectX::XMFLOAT3 impulse;
+			DirectX::XMStoreFloat3(&impulse, DirectX::XMVectorScale(DirectX::XMLoadFloat3(&front), impulseSpeed));
+			owner->AddImpulse(impulse);
+
 			if (owner->IsPlayer())
 			{
 				XMFLOAT4X4* matrix = owner->GetTransformAdress();
@@ -196,7 +237,8 @@ namespace PlayerCharacterState
 				attackData.hitStartRate = sphereAttacks[1].hitStartRate;
 				attackData.hitEndRate = sphereAttacks[1].hitEndRate;
 
-				owner->MakeAttackCollider(attackData, sphereAttacks[1].sphere, matrix);
+				owner->MakePlayerNormalAttackCollider(attackData, sphereAttacks[1].sphere, matrix);
+				owner->FaceToEnemy();
 			}
 		}
 		void AttackNormalState_2::Execute(float elapsedTime)
@@ -204,6 +246,7 @@ namespace PlayerCharacterState
 			float time = owner->GetModel()->GetCurrentAnimationSeconds();
 			if (owner->IsPlayer())
 			{
+				
 				owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_2)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
 
 				if (0.185f <= time && time <= 0.418f)
@@ -227,11 +270,11 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
 					}
-					else if (owner->InputSkill1())
+					else if (owner->InputSkill1() && owner->GetMp() > skill1UseStamina)
 					{
 						owner->GetStateMachine()->ChangeState(SKILL_1_STATE::ATTACK_START);
 					}
-					else if (owner->InputSkill2())
+					else if (owner->InputSkill2() && owner->GetMp() > skill2UseStamina)
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
 					}
@@ -264,6 +307,11 @@ namespace PlayerCharacterState
 			owner->SetAnimationSpeed(0.7f);
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_COMBO_THIRD, false, 0.2f);
 
+			DirectX::XMFLOAT3 front = owner->GetFront();
+			DirectX::XMFLOAT3 impulse;
+			DirectX::XMStoreFloat3(&impulse, DirectX::XMVectorScale(DirectX::XMLoadFloat3(&front), impulseSpeed));
+			owner->AddImpulse(impulse);
+			
 			if (owner->IsPlayer())
 			{
 				XMFLOAT4X4* matrix = &owner->GetModel(0)->FindNode("JOT_C_Hip")->worldTransform;
@@ -276,7 +324,8 @@ namespace PlayerCharacterState
 				attackData.hitStartRate = sphereAttacks[2].hitStartRate;
 				attackData.hitEndRate = sphereAttacks[2].hitEndRate;
 
-				owner->MakeAttackCollider(attackData, sphereAttacks[2].sphere, matrix);
+				owner->MakePlayerNormalAttackCollider(attackData, sphereAttacks[2].sphere, matrix);
+				owner->FaceToEnemy();
 			}
 		}
 		void AttackNormalState_3::Execute(float elapsedTime)
@@ -284,6 +333,7 @@ namespace PlayerCharacterState
 			float time = owner->GetModel()->GetCurrentAnimationSeconds();
 			if (owner->IsPlayer())
 			{
+				
 				owner->GetCollider(PlayerCharacter::COLLIDER_ID::COL_ATTACK_3)->SetCurrentRate(owner->GetModel()->GetAnimationRate());
 
 				if (0.5f <= time && time <= 0.753f)
@@ -307,11 +357,11 @@ namespace PlayerCharacterState
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::ATTACK_SPECIAL);
 					}
-					else if (owner->InputSkill1())
+					else if (owner->InputSkill1() && owner->GetMp() > skill1UseStamina)
 					{
 						owner->GetStateMachine()->ChangeState(SKILL_1_STATE::ATTACK_START);
 					}
-					else if (owner->InputSkill2())
+					else if (owner->InputSkill2() && owner->GetMp() > skill2UseStamina)
 					{
 						owner->GetStateMachine()->ChangeState(PlayerCharacter::STATE::SKILL_2);
 					}
@@ -401,7 +451,7 @@ namespace PlayerCharacterState
 				attackData.hittableOBJ = sphereAttacks[3].hittableOBJ;
 				attackData.hitStartRate = sphereAttacks[3].hitStartRate;
 				attackData.hitEndRate = sphereAttacks[3].hitEndRate;
-				owner->MakeAttackCollider(attackData, sphereAttacks[3].sphere, matrix);
+				owner->MakePlayerSkill1AttackCollider(attackData, sphereAttacks[3].sphere, matrix);
 			}
 		}
 		void Skill1ContinueStart::Execute(float elapsedTime)

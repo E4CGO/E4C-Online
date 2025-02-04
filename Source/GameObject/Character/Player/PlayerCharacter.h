@@ -258,6 +258,8 @@ public:
 	bool IsTrail() { return m_isTrail; }
 	void SetTrail(bool trail) { m_isTrail = trail; }
 
+	void SetHitStop(bool stop) { m_hitStop = stop; }
+
 	ZoneObject* GetEffectZone() { return m_EffectZone.get(); }
 	ChargeObject* GetEffectCharge() { return m_EffectCharge.get(); }
 	HealingObject* GetEffectHealing() { return m_EffectHealing.get(); }
@@ -285,6 +287,8 @@ public:
 	void ImportSyncData(const SYNC_DATA& data);
 
 	static DirectX::XMFLOAT4 GetColorSet(int idx) { return PlayerCharacter::colorSet[idx]; }
+
+	void FaceToEnemy();
 protected:
 	void RegisterCommonState();
 	void UpdateTarget();													// 自機用アイム目標更新
@@ -386,6 +390,10 @@ protected:
 	DirectX::XMFLOAT3 trailPosition[2][MAX_POLYGON];
 
 	bool m_isTrail = false;
+
+	bool m_hitStop = false;
+	float m_stopTimer = 0.f;
+	float m_stopTime = 0.05f;
 
 	std::unique_ptr<ZoneObject> m_EffectZone;
 	std::unique_ptr<ChargeObject> m_EffectCharge;
