@@ -42,6 +42,7 @@ namespace ns_RoomData
 		THIRD_START,		// 第三のフロア：最初の部屋
 		THIRD_I,			// 第三のフロア：Ｉ字の部屋
 		THIRD_T,			// 第三のフロア：Ｔ字の部屋
+		THIRD_T_REVERSE,	// 第三のフロア：Ｔ字の部屋・反転
 		THIRD_BARREL,		// 第三のフロア：タルの部屋
 		THIRD_END,			// 第三のフロア：最後の部屋
 		THIRD_DEAD_END,		// 第三のフロア：行き止まり
@@ -116,6 +117,8 @@ namespace ns_RoomData
 		CURTAIN_01A,
 		PEN_01A,
 		PEN_01B,
+		CHEST_BLUE,
+		CHEST_PINK,
 
 		TILETYPE_COUNT
 	};

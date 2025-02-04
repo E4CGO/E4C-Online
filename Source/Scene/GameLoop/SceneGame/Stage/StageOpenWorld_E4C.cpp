@@ -214,7 +214,7 @@ void StageOpenWorld_E4C::Initialize()
 
 	// ダンジョンの階の再設定
 	// 1階から始める
-	//DUNGEONDATA.SetCurrentFloor(1);
+	DUNGEONDATA.SetCurrentFloor(1);
 
 	// 影初期化
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
