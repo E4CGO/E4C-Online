@@ -176,7 +176,7 @@ namespace PlayerCharacterState
 		}
 
 		// MP消費
-		owner->ModifyMp(-owner->GetMpCost(static_cast<int>(PlayerCharacter::STATE::DODGE)));
+		owner->ModifyMp(-owner->GetMpCost(PlayerCharacter::STATE::DODGE));
 	}
 	void DodgeState::Execute(float elapsedTime)
 	{
