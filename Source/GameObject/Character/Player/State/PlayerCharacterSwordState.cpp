@@ -322,14 +322,7 @@ namespace PlayerCharacterState
 		{
 			if (owner->IsPlayer())
 			{
-				if (owner->GetMp() <= 30.0f)
-				{
-					owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
-					return;
-				}
-				owner->ModifyMp(-30.0f);
-
-				SetSubState(SKILL_1_STATE::ATTACK_START);
+				owner->ModifyMp(-owner->GetMpCost(PlayerCharacter::STATE::SKILL_1));
 			}
 			SetSubState(SKILL_1_STATE::ATTACK_START);
 		}
@@ -416,12 +409,7 @@ namespace PlayerCharacterState
 		{
 			if (owner->IsPlayer())
 			{
-				if (owner->GetMp() <= 25.0f)
-				{
-					owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
-					return;
-				}
-				owner->ModifyMp(-25.0f);
+				owner->ModifyMp(-owner->GetMpCost(PlayerCharacter::STATE::SKILL_2));
 			}
 			DefenceBuffZone* zone = new DefenceBuffZone(owner);
 			GameObjectManager::Instance().Register(zone);

@@ -47,7 +47,7 @@ void ThridPersonCameraController::Update(float elapsedTime)
 
 	if (!TentacleLib::isShowCursor())
 	{
-		if (GAME_SETTING.KeyboardInput)
+		//if (GAME_SETTING.KeyboardInput)
 		{
 			// マウス入力値を使ってカメラ操作する。
 			wheelScroll = T_INPUT.GetMouseScrollY();
@@ -56,13 +56,13 @@ void ThridPersonCameraController::Update(float elapsedTime)
 			moveX = T_INPUT.GetMouseDeltaX() / SCREEN_W * GAME_SETTING.CameraSensitivity;
 			moveY = T_INPUT.GetMouseDeltaY() / SCREEN_H * GAME_SETTING.CameraSensitivity;
 		}
-		else
+		//else
 		{
 			if (T_INPUT.GamePadKeyPress(GAME_PAD_BTN::DPAD_DOWN)) wheelScroll += -1.0f;
 			if (T_INPUT.GamePadKeyPress(GAME_PAD_BTN::DPAD_UP)) wheelScroll += +1.0f;
 
-			moveX = T_INPUT.GetGamePadRAxis().x * 0.01f * GAME_SETTING.CameraSensitivity;
-			moveY = -T_INPUT.GetGamePadRAxis().y * 0.01f * GAME_SETTING.CameraSensitivity;
+			if (T_INPUT.GetGamePadRAxis().x != 0.0f) moveX = T_INPUT.GetGamePadRAxis().x * 0.01f * GAME_SETTING.CameraSensitivity;
+			if (T_INPUT.GetGamePadRAxis().y != 0.0f) moveY = -T_INPUT.GetGamePadRAxis().y * 0.01f * GAME_SETTING.CameraSensitivity;
 		}
 	}
 
@@ -188,7 +188,7 @@ void ThridPersonCameraController::Update(float elapsedTime)
 	DirectX::XMStoreFloat3(&eye, Eye);
 	DirectX::XMStoreFloat3(&up, Up);
 	DirectX::XMStoreFloat3(&right, Right);
-	CameraManager::Instance().GetCamera()->CameraShake(0.1f,0.2f,elapsedTime);
+	CameraManager::Instance().GetCamera()->CameraShake(0.1f, 0.2f, elapsedTime);
 	shakenTarget = { focus + CameraManager::Instance().GetCamera()->GetShakenOffset() };
 	// カメラに設定
 	CameraManager::Instance().GetCamera()->SetLookAt(eye, shakenTarget, DirectX::XMFLOAT3(0, 1, 0));
@@ -219,5 +219,5 @@ void ThridPersonCameraController::AimMode(bool enable)
 
 void ThridPersonCameraController::Imgui()
 {
-	
+
 }

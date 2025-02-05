@@ -55,7 +55,7 @@ BeamObject::BeamObject(PlayerCharacter* owner) : Projectile("Data/Model/Object/E
 *//***************************************************************************/
 void BeamObject::Update(float elapsedTime)
 {
-	PlayerCharacter* player = static_cast<PlayerCharacter*>(m_owner);
+	PlayerCharacter* player = static_cast<PlayerCharacter*>(m_pOwner);
 	
 	// 別のステートに変化すると消える
 	if (player->GetState() != PlayerCharacter::STATE::SKILL_1)
@@ -65,7 +65,7 @@ void BeamObject::Update(float elapsedTime)
 	}
 
 	// 発射時間まで何もしない
-	if (m_owner->GetModel()->GetCurrentAnimationSeconds() < 0.65f) return;
+	if (m_pOwner->GetModel()->GetCurrentAnimationSeconds() < 0.65f) return;
 
 	//SetAngle(player->GetAngle());
 	//RotateAxis({ 0.0f, 1.0f, 0.0f }, XMConvertToRadians(180.0f));
@@ -181,7 +181,7 @@ void BeamObject::RenderDX12(const RenderContextDX12& rc)
 {
 	//m_beam->RenderDX12(rc);
 
-	if (m_owner->GetModel()->GetCurrentAnimationSeconds() > 0.65f)
+	if (m_pOwner->GetModel()->GetCurrentAnimationSeconds() > 0.65f)
 	{
 		ModelObject::RenderDX12(rc);
 	}

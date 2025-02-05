@@ -144,10 +144,6 @@ void StageOpenWorld_E4C::Initialize()
 		models["target3"]->SetAngle({ 0.0f, -1.0f, 0.0f });
 		models["target3"]->SetCollider(0, { {0, 1.4f, 0}, 0.5f }, Collider::COLLIDER_OBJ::ENEMY, models["target3"]->GetTransformAdress());
 
-		models.emplace("slime", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMslime_0121.glb", 0.25f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
-		models["slime"]->SetPosition({ -10.0f, 0.25f, -10.0f });
-		models["slime"]->SetAnimation(7, true);
-
 		//modelsInit.emplace("dummyMouse", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMmouse_0117.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		//modelsInit.emplace("dummyBird", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMbird_0120.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));
 		//modelsInit.emplace("dummyCroc", std::make_unique<ModelObject>("Data/Model/Enemy/MDLANM_ENMcroc_0120.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR));

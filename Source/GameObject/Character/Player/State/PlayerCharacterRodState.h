@@ -121,7 +121,7 @@ namespace PlayerCharacterState
 
 		private:
 			float m_chargeTme = 0.0f;
-			const float MAX_ChargeTime = 4.0f;
+			const float MAX_ChargeTime = 1.5f;
 			uint16_t m_power = 50;
 		};
 		// Fireball小攻撃

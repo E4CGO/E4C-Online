@@ -76,12 +76,7 @@ namespace PlayerCharacterState
 
 			if (owner->IsPlayer())
 			{
-				if (owner->GetMp() <= 10.0f)
-				{
-					owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
-					return;
-				}
-				owner->ModifyMp(-10.0f);
+				owner->ModifyMp(-owner->GetMpCost(PlayerCharacter::STATE::ATTACK_NORMAL));
 
 				m_tempMoveSpeed = owner->GetMoveSpeed();
 				owner->SetMoveSpeed(m_tempMoveSpeed * m_slowMoveRate);
@@ -161,7 +156,7 @@ namespace PlayerCharacterState
 						owner->GetStateMachine()->ChangeSubState(FIREBALL_STATE::ATTACK_2);
 					}
 
-					owner->ModifyMp(-20.0f * m_chargeTme * 0.25f);
+					//owner->ModifyMp(-20.0f * m_chargeTme * 0.25f);
 				}
 			}
 			m_chargeTme += elapsedTime;
@@ -239,7 +234,7 @@ namespace PlayerCharacterState
 				owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 			}
 
-			owner->ModifyMp(-10.0f * elapsedTime);
+			owner->ModifyMp(-owner->GetMpCost(PlayerCharacter::STATE::SKILL_1) * elapsedTime);
 		}
 		void AttackSpecialState::Exit()
 		{
@@ -257,7 +252,7 @@ namespace PlayerCharacterState
 					owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 					return;
 				}
-				owner->ModifyMp(-50.0f);
+				owner->ModifyMp(-owner->GetMpCost(PlayerCharacter::STATE::SKILL_1));
 
 				owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_ATTACK_SPECIAL_FIRST, false, 0.1f);
 
@@ -282,6 +277,8 @@ namespace PlayerCharacterState
 				Projectile* beam = PROJECTILES.Register(new BeamObject(owner));
 				beam->SetPosition(pos);
 				beam->SetAngle(angle);
+
+				owner->Stop();
 			}
 		}
 		void Skill1State::Execute(float elapsedTime)
@@ -313,7 +310,7 @@ namespace PlayerCharacterState
 					owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 					return;
 				}
-				owner->ModifyMp(-75.0f);
+				owner->ModifyMp(-owner->GetMpCost(PlayerCharacter::STATE::SKILL_2));
 
 				owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_ATTACK_SPECIAL_SECOND, false, 0.1f);
 

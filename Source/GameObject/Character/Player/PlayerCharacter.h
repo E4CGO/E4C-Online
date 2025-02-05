@@ -250,7 +250,8 @@ public:
 	void StopMove() { velocity.x = velocity.z = 0.0f; }
 	void StopFall() { velocity.y = -gravity * T_TIMER.Delta() * 60.0f; }
 
-	float GetMpCost(int idx);
+	float GetMpCost(uint8_t idx);
+	void SetMpCost(uint8_t idx, float cost) { mpCost[idx] = cost; }
 
 	//剣ノード取得
 	const iModel::Node* GetSwordTrailNode();
@@ -337,7 +338,7 @@ protected:
 	float dodgeSpeed = 0.0f;
 
 	// MP消費
-	std::unordered_map<int, float> mpCost;
+	std::unordered_map<uint8_t, float> mpCost;
 
 	// スキルクールタイム
 	struct SkillTimer {

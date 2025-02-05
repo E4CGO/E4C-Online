@@ -47,6 +47,13 @@ void WidgetMatching::Update(float elapsedTime)
 	m_matchingText->SetPosition({ SCREEN_W - m_size.x, SCREEN_H - m_size.y });
 
 	WidgetButtonImage::Update(elapsedTime);
+	if (enable)
+	{
+		if (T_INPUT.KeyDown(VK_RETURN) || T_INPUT.GamePadKeyDown(GAME_PAD_BTN::START))
+		{
+			this->Callback();
+		}
+	}
 }
 
 void WidgetMatching::RenderDX12(const RenderContextDX12& rc)
@@ -84,6 +91,7 @@ void WidgetMatching::Callback()
 	else
 	{
 		m_pOnlineController->ReadyMatching();
+		enable = false;
 	}
 }
 

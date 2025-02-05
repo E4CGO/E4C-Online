@@ -8,7 +8,7 @@
 #include "GameObject/Props/Spawner.h"
 #include "GameObject/Props/SpawnerManager.h"
 #include "GameObject/Props/StairToNextFloor.h"
-#include "GameObject/Props/HealingObject.h"
+#include "GameObject/Props/Zone/HealingZone.h"
 #include "MapTile.h"
 #include "MapTileManager.h"
 
@@ -774,12 +774,10 @@ void RoomBase::PlaceTeleporterTile(Stage* stage, Online::OnlineController* onlin
 			stair->SetInteractionDistance(stairData.interactionDistance);
 
 			GameObjectManager::Instance().Register(stair);
-
-			HealingObject* healingObject = new HealingObject();
-			healingObject->SetPosition(resultStairPos);
-			healingObject->SetObjectPositions(resultStairPos, { 0.0f, 0.0f, 0.0f });
-			healingObject->Activate();
-			GameObjectManager::Instance().Register(healingObject);
+			
+			HealingZone* healingZone = new HealingZone(nullptr);
+			healingZone->SetPosition(resultStairPos);
+			GameObjectManager::Instance().Register(healingZone);
 		}
 		// ボスフロアならOpenWorldへのテレポーターと階段を配置
 		else
@@ -823,11 +821,9 @@ void RoomBase::PlaceTeleporterTile(Stage* stage, Online::OnlineController* onlin
 			}
 			GameObjectManager::Instance().Register(modelTile);
 
-			HealingObject* healingObject = new HealingObject();
-			healingObject->SetPosition(resultStairPos);
-			healingObject->SetObjectPositions(resultStairPos, { 0.0f, 0.0f, 0.0f });
-			healingObject->Activate();
-			GameObjectManager::Instance().Register(healingObject);
+			HealingZone* healingZone = new HealingZone(nullptr);
+			healingZone->SetPosition(resultStairPos);
+			GameObjectManager::Instance().Register(healingZone);
 		}
 	}
 }

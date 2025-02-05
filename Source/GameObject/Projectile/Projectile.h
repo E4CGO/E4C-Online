@@ -6,7 +6,7 @@
 class Projectile : public ModelObject
 {
 public:
-	Projectile(const char* filename, float scaling = 1.0f, Character* owner = nullptr) : ModelObject(filename, scaling, ModelObject::DX12), m_owner(owner) {}
+	Projectile(const char* filename, float scaling = 1.0f, Character* owner = nullptr) : ModelObject(filename, scaling, ModelObject::DX12), m_pOwner(owner) {}
 	virtual ~Projectile() = default;
 
 	virtual void Update(float elapsedTime) override;
@@ -19,8 +19,8 @@ public:
 	void SetDirection(DirectX::XMFLOAT3 direction) { m_direction = direction; };
 	void SetSpeed(float speed) { m_speed = speed; };
 	void SetGravity(float gravity) { m_gravity = gravity; }
-	Character* GetOwner() { return m_owner; }
-	void SetOwner(Character* character) { m_owner = character; }
+	Character* GetOwner() { return m_pOwner; }
+	void SetOwner(Character* character) { m_pOwner = character; }
 	void SetPower(uint16_t power) { m_power = power; }
 
 protected:
@@ -41,7 +41,7 @@ protected:
 	float m_speed = 0.0f;
 	float m_gravity = 0.0f;
 
-	Character* m_owner = nullptr;
+	Character* m_pOwner = nullptr;
 
 	uint16_t m_power = 0;
 };
