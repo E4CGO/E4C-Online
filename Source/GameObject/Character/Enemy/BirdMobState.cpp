@@ -57,6 +57,7 @@ namespace EnemyState
 			if (!owner->IsPlayAnimation())
 			{
 				EnemyState::StateTransition(owner, ::BirdMob::STATE::FOLLOW);
+				owner->SetAnimation(::BirdMob::ANIM_IDLE, true);
 			}
 		}
 
@@ -114,8 +115,9 @@ namespace EnemyState
 			owner->Stop();
 			float rate = owner->GetModel()->GetAnimationRate();
 
-			owner->SetAnimationSpeed(1.0f + 2.0 * (1.0 - rate));
-			owner->SetPosition(Mathf::Lerp(m_startPos, m_targetPos, rate));
+			owner->SetAnimationSpeed(1.0f + 2.0f * (1.0f - rate));
+			//owner->SetPosition(Mathf::Lerp(m_startPos, m_targetPos, rate));
+			owner->AddImpulse(m_targetPos - m_startPos);
 			if (rate >= 1.0f)
 			{
 				owner->GetStateMachine()->ChangeSubState(::BirdMob::ATTACK_DIVE);

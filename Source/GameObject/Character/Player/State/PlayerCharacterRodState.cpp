@@ -248,36 +248,53 @@ namespace PlayerCharacterState
 
 				owner->GetEffectCharge()->Activate();
 				owner->GetEffectCharge()->SetLooping();
-
-				m_dir = owner->GetTarget() - owner->GetPosition();
-				m_dir = XMFLOAT3Normalize({ m_dir.x, 0, m_dir.z });
-				XMFLOAT3 pos = owner->GetPosition() + XMFLOAT3{ 0.5f * m_dir.x, 1.0f, 0.5f * m_dir.z };
-				m_dir = XMFLOAT3Normalize(owner->GetTarget() - pos);
-
-				XMFLOAT3 angle{};
-				angle.y = atan2(m_dir.x, m_dir.z);
-				angle.y += DirectX::XM_PI;
-				while (angle.y > DirectX::XM_PI) angle.y -= DirectX::XM_2PI;
-				while (angle.y < -DirectX::XM_PI) angle.y += DirectX::XM_2PI;
-				angle.x = acosf(XMFLOAT3Dot({ 0, 0, 1 }, { 0, m_dir.y, sqrtf(m_dir.x * m_dir.x + m_dir.z * m_dir.z) }));
-				if (m_dir.y < 0.0f)
-				{
-					angle.x = -angle.x;
-				}
-				Projectile* beam = PROJECTILES.Register(new BeamObject(owner));
-				beam->SetPosition(pos);
-				beam->SetAngle(angle);
 			}
 		}
 		void Skill1State::Execute(float elapsedTime)
 		{
 			float time = owner->GetModel()->GetCurrentAnimationSeconds();
-			// 反重力
+
 			owner->StopMove();
 
 			if (owner->IsPlayer())
 			{
-				owner->Turn(elapsedTime, m_dir.x, m_dir.z, owner->GetTurnSpeed());
+				// ビーム発射前
+				if(!m_isShot)
+				{
+					// 角度計算
+					m_dir = owner->GetTarget() - owner->GetPosition();
+					m_dir = XMFLOAT3Normalize({ m_dir.x, 0, m_dir.z });
+					XMFLOAT3 pos = owner->GetPosition() + XMFLOAT3{ 0.5f * m_dir.x, 1.0f, 0.5f * m_dir.z };
+					m_dir = XMFLOAT3Normalize(owner->GetTarget() - pos);
+
+					owner->Turn(elapsedTime, m_dir.x, m_dir.z, owner->GetTurnSpeed());
+
+					// 発射
+					if (owner->GetModel()->GetCurrentAnimationSeconds() > 0.65f)
+					{
+						owner->StopFall();
+						m_isShot = true;
+
+						XMFLOAT3 angle{};
+						angle.y = atan2(m_dir.x, m_dir.z);
+						angle.y += DirectX::XM_PI;
+						while (angle.y > DirectX::XM_PI) angle.y -= DirectX::XM_2PI;
+						while (angle.y < -DirectX::XM_PI) angle.y += DirectX::XM_2PI;
+						angle.x = acosf(XMFLOAT3Dot({ 0, 0, 1 }, { 0, m_dir.y, sqrtf(m_dir.x * m_dir.x + m_dir.z * m_dir.z) }));
+						if (m_dir.y < 0.0f)
+						{
+							angle.x = -angle.x;
+						}
+						Projectile* beam = PROJECTILES.Register(new BeamObject(owner));
+						beam->SetPosition(pos);
+						beam->SetAngle(angle);
+					}
+				}
+				else
+				{
+					// 反重力
+					owner->StopFall();
+				}
 			}
 
 			if (!owner->IsPlayAnimation()) // 攻撃モーション終わり
@@ -287,6 +304,7 @@ namespace PlayerCharacterState
 		}
 		void Skill1State::Exit()
 		{
+			m_isShot = false;
 		}
 
 		void Skill2State::Enter()

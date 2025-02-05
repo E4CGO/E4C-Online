@@ -13,24 +13,11 @@ BeamObject::BeamObject(PlayerCharacter* owner) : Projectile("Data/Model/Object/E
 {
 	SetShader("EffectBeam", ModelShaderDX12Id::Beam);
 
-	//DirectX::XMFLOAT3 startPosition = { owner->GetPosition().x, owner->GetPosition().y + 1.0f, owner->GetPosition().z };
-	//DirectX::XMVECTOR vStartPosition = DirectX::XMLoadFloat3(&startPosition);
-	//DirectX::XMFLOAT3 front = owner->GetFront();
-	//DirectX::XMVECTOR direction = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&front));
-	//direction = DirectX::XMVectorScale(direction, m_distance);
-	//DirectX::XMVECTOR newPosition = XMVectorAdd(vStartPosition, direction);
-	//DirectX::XMStoreFloat3(&position, newPosition);
-
-	//SetAngle(owner->GetAngle());
-	//RotateAxis({ 0.0f, 1.0f, 0.0f }, XMConvertToRadians(180.0f));
-
 	scale.z = 0.0f;
-
 	m_power = 30;
 	m_existTime = 1.5f;
 	m_coolTime = 0.5f;
 	m_currentTimer = m_coolTime;
-	//m_direction = XMFLOAT3Normalize(owner->GetTarget() - position);
 
 	if (owner->IsPlayer())
 	{
@@ -38,15 +25,6 @@ BeamObject::BeamObject(PlayerCharacter* owner) : Projectile("Data/Model/Object/E
 		MakeAttackCollider(m_power, 0, { {}, {0, 0, -1}, m_length * scale.z, m_radius }, Collider::COLLIDER_OBJ::PLAYER_PROJECTILE, Collider::COLLIDER_OBJ::ENEMY, &transform);
 		m_pColliders[0]->SetCollisionFunction([&](Collider* myCol, Collider* otherCol) {CollisionFunction(myCol, otherCol); });
 	}
-	//SetPosition(startPosition);
-
-	//m_beam = std::make_unique<ModelObject>("Data/Model/Object/EffectBeam.glb", 1.0f, ModelObject::DX12, ModelObject::LHS_TOON);
-	//m_beam->SetShader("EffectBeam", ModelShaderDX12Id::HealCylinder);
-
-	//m_beam->SetPosition(startPosition);
-
-	//m_beam->SetAngle(owner->GetAngle());
-	//m_beam->RotateAxis({ 0.0f, 1.0f, 0.0f }, XMConvertToRadians(180.0f));
 }
 
 /**************************************************************************//**
@@ -64,16 +42,9 @@ void BeamObject::Update(float elapsedTime)
 		return;
 	}
 
-	// 発射時間まで何もしない
-	if (m_owner->GetModel()->GetCurrentAnimationSeconds() < 0.65f) return;
-
-	//SetAngle(player->GetAngle());
-	//RotateAxis({ 0.0f, 1.0f, 0.0f }, XMConvertToRadians(180.0f));
-	//RotateAxis({ 1, 0, 0 }, AngleBetweenXMFLOAT3({ 0, 0, 1 }, { 0, m_direction.y, 1 }));
-
+	// 伸びる
 	if (m_isExtend)
 	{
-		//scale.z = 0.5f * (1 + (m_coolTime - m_currentTimer) / m_coolTime);
 		scale.z = (m_coolTime - m_currentTimer) / m_coolTime;
 		if (m_currentTimer < 0.0f)
 		{
@@ -170,19 +141,5 @@ void BeamObject::CollisionFunction(Collider* myCol, Collider* otherCol)
 		uint16_t damage = m_power - otherCol->GetArmor();
 		attack->RegisterHitOthers(owner);
 		owner->OnDamage(damage);
-	}
-}
-
-/**************************************************************************//**
-	@brief		レンダリング
-	@param[in]    rc	レンダリングコンテクスト
-*//***************************************************************************/
-void BeamObject::RenderDX12(const RenderContextDX12& rc)
-{
-	//m_beam->RenderDX12(rc);
-
-	if (m_owner->GetModel()->GetCurrentAnimationSeconds() > 0.65f)
-	{
-		ModelObject::RenderDX12(rc);
 	}
 }

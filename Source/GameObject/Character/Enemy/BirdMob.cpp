@@ -35,7 +35,7 @@ BirdMob::BirdMob(float scaling, ModelObject::RENDER_MODE renderMode) : Enemy("Da
 		stateMachine->RegisterState(::Enemy::STATE::DEATH, new DeathState(this));
 
 		stateMachine->RegisterState(STATE::WANDER, new MoveState(this));
-		stateMachine->RegisterState(STATE::FOLLOW, new EnemyState::FollowState(this, 3.0f, STATE::ATTACK));
+		stateMachine->RegisterState(STATE::FOLLOW, new EnemyState::FollowState(this, 6.0f, STATE::ATTACK));
 
 		stateMachine->RegisterState(STATE::ATTACK, new AttackState(this));
 		stateMachine->RegisterSubState(STATE::ATTACK, ATTACK_STATE::ATTACK_MOVE, new AttackMoveState(this));

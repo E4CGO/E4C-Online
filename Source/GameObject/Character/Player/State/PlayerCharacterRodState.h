@@ -212,7 +212,8 @@ namespace PlayerCharacterState
 			void Exit() override;
 
 		private:
-			DirectX::XMFLOAT3 m_dir;
+			DirectX::XMFLOAT3 m_dir = {0, 0, 0};
+			bool m_isShot = false;
 		};
 
 		class Skill2State : public HierarchicalState<PlayerCharacter>
