@@ -101,6 +101,8 @@ namespace PlayerCharacterState
 		class AttackNormalState_1 : public HierarchicalState<PlayerCharacter>
 		{
 		public:
+
+			float impulseSpeed = 20.f;
 			// コンストラクタ
 			AttackNormalState_1(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
 			// デストラクタ
@@ -116,6 +118,7 @@ namespace PlayerCharacterState
 		class AttackNormalState_2 : public HierarchicalState<PlayerCharacter>
 		{
 		public:
+			float impulseSpeed = 20.f;
 			// コンストラクタ
 			AttackNormalState_2(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
 			// デストラクタ
@@ -131,6 +134,7 @@ namespace PlayerCharacterState
 		class AttackNormalState_3 : public HierarchicalState<PlayerCharacter>
 		{
 		public:
+			float impulseSpeed = 40.f;
 			// コンストラクタ
 			AttackNormalState_3(PlayerCharacter* player) : HierarchicalState<PlayerCharacter>(player) {};
 			// デストラクタ

@@ -65,12 +65,25 @@ public:
 	//始点、終点のポイントを経由して移動するカメラ
 	void Move2PointToCamera(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const DirectX::XMFLOAT3& startFocus, const DirectX::XMFLOAT3& endFocus, float transitionTime, float transitionDuration);
 
-	void CameraShake(float shakeAmplitude,float shakeTime,float elapsedTime);
+	//カメラシェイク
+	void CameraShake(float m_shakeAmplitude, float shakeTime, float elapsedTime);
 
 	// シェイクタイマーリセット用メソッド
 	void ResetShakeTimer() { shakeTimer = 0; }
 	// シェイク開始用メソッド
 	void SetShake(bool shake) { m_shake = shake; }
+
+	//シェイク時間セット
+	void SetShakeTime(float shakeTime) { m_shakeTime = shakeTime; }
+	//シェイク時間取得
+	const float& GetShakeTime()const { return m_shakeTime; }
+	//シェイク振り幅セット
+	void SetShakeAmplitude(float shakeAmplitude) { m_shakeAmplitude = shakeAmplitude; }
+	//シェイク振り幅取得
+	const float& GetShakeAmplitude()const { return m_shakeAmplitude; }
+
+	void ShakeStart(float shakeTime, float shakeAmplitude);
+
 private:
 	DirectX::XMFLOAT4X4 view;
 	DirectX::XMFLOAT4X4 projection;
@@ -94,11 +107,12 @@ private:
 
 
 	DirectX::XMFLOAT3 shakeOffset{};
-	//DirectX::XMFLOAT3 shakenTarget{};
-	float shakeAmplitude; // シェイクの振幅
+
+	float m_shakeAmplitude; // シェイクの振幅
 	DirectX::XMFLOAT3 shakeFrequency; // シェイクの周波数
 	// カメラシェイク用の時間
 	float shakeTimer = 0.0f;
+	float m_shakeTime = 0.f;
 
 	bool m_shake = false;
 };
