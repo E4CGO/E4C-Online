@@ -188,7 +188,7 @@ void ThridPersonCameraController::Update(float elapsedTime)
 	DirectX::XMStoreFloat3(&eye, Eye);
 	DirectX::XMStoreFloat3(&up, Up);
 	DirectX::XMStoreFloat3(&right, Right);
-	CameraManager::Instance().GetCamera()->CameraShake(0.1f,0.2f,elapsedTime);
+	CameraManager::Instance().GetCamera()->CameraShake(CameraManager::Instance().GetCamera()->GetShakeAmplitude(), CameraManager::Instance().GetCamera()->GetShakeTime(), elapsedTime);
 	shakenTarget = { focus + CameraManager::Instance().GetCamera()->GetShakenOffset() };
 	// カメラに設定
 	CameraManager::Instance().GetCamera()->SetLookAt(eye, shakenTarget, DirectX::XMFLOAT3(0, 1, 0));
