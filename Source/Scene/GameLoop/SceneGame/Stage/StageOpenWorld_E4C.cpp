@@ -23,6 +23,7 @@
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Props/SpawnerManager.h"
 #include "GameObject/Projectile/ProjectileManager.h"
+#include "GameObject/Props/Zone/ZoneManager.h"
 
 #include "Map/DungeonData.h"
 
@@ -222,8 +223,10 @@ void StageOpenWorld_E4C::Finalize()
 {
 	PROJECTILES.Clear();
 	GameObjectManager::Instance().Clear();
+	ZoneManager::Instance().Clear();
 	Sound::Instance().StopAudio(0);
 	Sound::Instance().Finalize();
+	UI.Remove(m_pPauseMenu);
 	T_GRAPHICS.GetShadowRenderer()->Finalize();
 }
 
@@ -239,7 +242,7 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 		onlineController->BeginSync();
 	}
 
-	if (T_INPUT.KeyDown(VK_MENU))
+	if (T_INPUT.KeyDown(VK_MENU) || T_INPUT.GamePadKeyDown(GAME_PAD_BTN::BACK))
 	{
 		if (TentacleLib::isShowCursor())
 		{
@@ -252,7 +255,7 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 			CURSOR_ON;
 		}
 	}
-	if (!TentacleLib::isFocus())
+	if (!TentacleLib::isFocus() || m_pPauseMenu->IsActive())
 	{
 		cameraController->SetEnable(false);
 		CURSOR_ON;
@@ -272,8 +275,9 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 
 	PROJECTILES.Update(elapsedTime);
 
-	PlayerCharacterManager::Instance().Update(elapsedTime);
 	GameObjectManager::Instance().Update(elapsedTime);
+	PlayerCharacterManager::Instance().Update(elapsedTime);
+	ZoneManager::Instance().Update(elapsedTime);
 
 	for (auto& it : models)
 	{
@@ -326,6 +330,8 @@ void StageOpenWorld_E4C::Render()
 	GameObjectManager::Instance().Render(rc);
 	// 描画
 	PlayerCharacterManager::Instance().Render(rc);
+
+	ZoneManager::Instance().Render(rc);
 	// デバッグレンダラ描画実行
 
 	T_GRAPHICS.GetDebugRenderer()->Render(T_GRAPHICS.GetDeviceContext(), CameraManager::Instance().GetCamera()->GetView(), CameraManager::Instance().GetCamera()->GetProjection());
@@ -390,9 +396,11 @@ void StageOpenWorld_E4C::RenderDX12()
 
 		PROJECTILES.RenderDX12(rc);
 
+		GameObjectManager::Instance().RenderDX12(rc);
 		// プレイヤー
 		PlayerCharacterManager::Instance().RenderDX12(rc);
-		GameObjectManager::Instance().RenderDX12(rc);
+
+		ZoneManager::Instance().RenderDX12(rc);
 
 		// レンダーターゲットへの書き込み終了待ち
 		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));

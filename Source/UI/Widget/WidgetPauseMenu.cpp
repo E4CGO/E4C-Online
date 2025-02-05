@@ -6,6 +6,7 @@
 #include "Scene/SceneManager.h"
 #include "Scene/GameLoop/SceneTitle/SceneTitle_E4C.h"
 
+
 /**************************************************************************//**
 	@brief	UIの設定
 *//***************************************************************************/
@@ -33,7 +34,7 @@ WidgetPauseMenu::WidgetPauseMenu()
 	// 閉じ
 	m_pauseButton = new WidgetButtonImage("", "Data/Sprites/UI/Game/settings_d.png", "Data/Sprites/UI/Game/settings_h.png", [&](Widget*)
 		{
-			this->isActive = true;
+			this->Trigger();
 		});
 	m_pauseButton->SetSize({ m_pauseButton->GetSize().x * 0.2f * SCREEN_W / 1920.0f, m_pauseButton->GetSize().y * 0.2f * SCREEN_H / 1080.0f });
 	m_pauseButton->SetPosition({ SCREEN_W * 0.95f, SCREEN_H * 0.02f });
@@ -70,6 +71,11 @@ WidgetPauseMenu::WidgetPauseMenu()
 *//***************************************************************************/
 void WidgetPauseMenu::Update(float elapsedTime)
 {
+	if (T_INPUT.KeyDown(VK_ESCAPE) || T_INPUT.GamePadKeyDown(GAME_PAD_BTN::BACK))
+	{
+		this->Trigger();
+	}
+
 	m_pauseButton->Update(elapsedTime);
 
 	if (isActive)

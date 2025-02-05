@@ -44,6 +44,8 @@ public:
 	void RenderDX12(const RenderContextDX12& rc) override;
 
 	bool IsActive() { return isActive; }
+
+	void Trigger() { isActive = !isActive; }
 private:
 	bool isActive = false; // 完結フラグ
 	bool isSettingsActive = false;

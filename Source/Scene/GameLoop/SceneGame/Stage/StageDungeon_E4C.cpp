@@ -23,6 +23,7 @@
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
 #include "GameObject/Character/Enemy/EnemyManager.h"
 #include "GameObject/Projectile/ProjectileManager.h"
+#include "GameObject/Props/Zone/ZoneManager.h"
 #include "GameObject/Props/Spawner.h"
 #include "GameObject/Props/SpawnerManager.h"
 #include "GameObject/Props/Teleporter.h"
@@ -185,6 +186,9 @@ void StageDungeon_E4C::Initialize()
 	Sound::Instance().LoadAudio("Data/Sound/5-Miraculous_Maze(Dungeon).mp3");
 	Sound::Instance().PlayAudio(0);
 
+	m_pPauseMenu = new WidgetPauseMenu();
+	UI.Register(m_pPauseMenu);
+
 	// 影初期化
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
 }
@@ -197,6 +201,7 @@ void StageDungeon_E4C::Finalize()
 	//UI.Clear();
 	SpawnerManager::Instance().Clear();
 	GameObjectManager::Instance().Clear();
+	ZoneManager::Instance().Clear();
 	Sound::Instance().StopAudio(0);
 	Sound::Instance().Finalize();
 
@@ -222,7 +227,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 		onlineController->BeginSync();
 	}
 
-	if (T_INPUT.KeyDown(VK_MENU))
+	if (T_INPUT.KeyDown(VK_MENU) || T_INPUT.GamePadKeyDown(GAME_PAD_BTN::BACK))
 	{
 		if (TentacleLib::isShowCursor())
 		{
@@ -235,7 +240,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 			CURSOR_ON;
 		}
 	}
-	if (!TentacleLib::isFocus())
+	if (!TentacleLib::isFocus() || m_pPauseMenu->IsActive())
 	{
 		cameraController->SetEnable(false);
 		CURSOR_ON;
@@ -255,6 +260,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	PROJECTILES.Update(elapsedTime);
 
 	PlayerCharacterManager::Instance().Update(elapsedTime);
+	ZoneManager::Instance().Update(elapsedTime);
 
 	MAPTILES.Update(elapsedTime);
 
@@ -262,7 +268,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	floorText->Update(elapsedTime);
 
 	// なんかUIアップデートせんとあかんっぽい(01/27)
-	UI.Update(elapsedTime);
+	//UI.Update(elapsedTime);
 
 	// キャラクターの影登録
 	/*for (auto& model : PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetModels())
@@ -313,6 +319,7 @@ void StageDungeon_E4C::Render()
 	// 描画
 	GameObjectManager::Instance().Render(rc);
 	PlayerCharacterManager::Instance().Render(rc);
+	ZoneManager::Instance().Render(rc);
 
 	MAPTILES.Render(rc);
 
@@ -358,12 +365,13 @@ void StageDungeon_E4C::RenderDX12()
 
 		PROJECTILES.RenderDX12(rc);
 
-		// プレイヤー
-		PlayerCharacterManager::Instance().RenderDX12(rc);
-		GameObjectManager::Instance().RenderDX12(rc);
-
 		// 部屋（OneWayWall、DebugCube等）
 		for (RoomBase* room : rootRoom->GetAll()) room->RenderDX12(rc);
+
+		GameObjectManager::Instance().RenderDX12(rc);
+		// プレイヤー
+		PlayerCharacterManager::Instance().RenderDX12(rc);
+		ZoneManager::Instance().RenderDX12(rc);
 
 		// レンダーターゲットへの書き込み終了待ち
 		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));

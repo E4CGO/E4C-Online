@@ -4,7 +4,7 @@
 #include "PlayerCharacterRodState.h"
 #include "PlayerCharacterState.h"
 #include "GameObject/Props/Zone/HealingZone.h"
-#include "GameObject/GameObjectManager.h"
+#include "GameObject/Props/Zone/ZoneManager.h"
 
 namespace PlayerCharacterState
 {
@@ -323,7 +323,7 @@ namespace PlayerCharacterState
 					cosf(owner->GetAngle().y) * 5.0f,
 				};
 				zone->SetPosition(owner->GetPosition() + offset);
-				GameObjectManager::Instance().Register(zone);
+				ZoneManager::Instance().Register(zone);
 			}
 		}
 		void Skill2State::Execute(float elapsedTime)
