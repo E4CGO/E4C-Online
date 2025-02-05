@@ -162,8 +162,6 @@ namespace SceneTitle_E4CState
 
 		WidgetButtonImage* m_pBackBtn = nullptr;
 
-		std::vector<Widget*> m_pNames;
-
 		float timer = 0.0f;
 	};
 

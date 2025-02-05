@@ -214,7 +214,7 @@ void SceneTitle_E4CState::CreditsState::Enter()
 		WidgetText* labelWidget = new WidgetText(team_names_prog[i]);
 		labelWidget->SetPosition(pos);
 		pos.y += labelWidget->GetSize().y;
-		m_pNames.push_back(labelWidget);
+		UI.Register(labelWidget);
 	}
 
 	pos = { SCREEN_W * 0.4f, SCREEN_H * 0.3f };
@@ -224,7 +224,7 @@ void SceneTitle_E4CState::CreditsState::Enter()
 		WidgetText* labelWidget = new WidgetText(team_names_art[i]);
 		labelWidget->SetPosition(pos);
 		pos.y += labelWidget->GetSize().y;
-		m_pNames.push_back(labelWidget);
+		UI.Register(labelWidget);
 	}
 
 	pos = { SCREEN_W * 0.4f, SCREEN_H * 0.6f };
@@ -234,7 +234,7 @@ void SceneTitle_E4CState::CreditsState::Enter()
 		WidgetText* labelWidget = new WidgetText(support_names_art[i]);
 		labelWidget->SetPosition(pos);
 		pos.y += labelWidget->GetSize().y;
-		m_pNames.push_back(labelWidget);
+		UI.Register(labelWidget);
 	}
 
 	pos = { SCREEN_W * 0.75f, SCREEN_H * 0.6f };
@@ -244,12 +244,7 @@ void SceneTitle_E4CState::CreditsState::Enter()
 		WidgetText* labelWidget = new WidgetText(support_names_sound[i]);
 		labelWidget->SetPosition(pos);
 		pos.y += labelWidget->GetSize().y;
-		m_pNames.push_back(labelWidget);
-	}
-
-	for (auto& it : m_pNames)
-	{
-		UI.Register(it);
+		UI.Register(labelWidget);
 	}
 }
 /**************************************************************************//**
