@@ -3,6 +3,9 @@
 
 #include "BearBossState.h"
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
+#include "GameObject/Props/Zone/ZoneManager.h"
+#include "GameObject/Props/Zone/ImpactEffectZone.h"
+
 
 namespace EnemyState
 {
@@ -199,6 +202,13 @@ namespace EnemyState
 					PunchImpact* impact = new PunchImpact(pos, owner);
 					PROJECTILES.Register(impact);
 					impacts[0] = true;
+
+
+					// エフェクト
+					pos.y = owner->GetPosition().y;
+					ImpactEffectZone* zone = new ImpactEffectZone(nullptr);
+					zone->SetPosition(pos);
+					ZoneManager::Instance().Register(zone);
 				}
 			}
 			if (!impacts[1])
@@ -212,6 +222,13 @@ namespace EnemyState
 					PunchImpact* impact = new PunchImpact(pos, owner);
 					PROJECTILES.Register(impact);
 					impacts[1] = true;
+
+
+					// エフェクト
+					pos.y = owner->GetPosition().y;
+					ImpactEffectZone* zone = new ImpactEffectZone(nullptr);
+					zone->SetPosition(pos);
+					ZoneManager::Instance().Register(zone);
 				}
 			}
 		}

@@ -365,13 +365,13 @@ void StageDungeon_E4C::RenderDX12()
 
 		PROJECTILES.RenderDX12(rc);
 
-		// 部屋（OneWayWall、DebugCube等）
-		for (RoomBase* room : rootRoom->GetAll()) room->RenderDX12(rc);
-
 		GameObjectManager::Instance().RenderDX12(rc);
 		// プレイヤー
 		PlayerCharacterManager::Instance().RenderDX12(rc);
 		ZoneManager::Instance().RenderDX12(rc);
+
+		// 部屋（OneWayWall、DebugCube等）
+		for (RoomBase* room : rootRoom->GetAll()) room->RenderDX12(rc);
 
 		// レンダーターゲットへの書き込み終了待ち
 		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
