@@ -1472,6 +1472,8 @@ HRESULT Graphics::CopyImage(const BYTE* pixels, UINT width, UINT height, DXGI_FO
 	d3d_resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 	d3d_resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
+	
+	// リソース生ロック
 	// リソースの生成
 	Microsoft::WRL::ComPtr<ID3D12Resource> d3d_upload_resource;
 	hr = m_d3d_device->CreateCommittedResource(
@@ -1485,6 +1487,7 @@ HRESULT Graphics::CopyImage(const BYTE* pixels, UINT width, UINT height, DXGI_FO
 	{
 		return hr;
 	}
+	// リソース生ロック外し
 
 	// アップロード用バッファにイメージをコピー
 	void* mapped = nullptr;

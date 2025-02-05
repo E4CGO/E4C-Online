@@ -6,8 +6,8 @@
 // 初期化
 void SceneLoading::Initialize()
 {
-	//PRELOAD.Join("SceneLoading.Sprite");
-	//PRELOAD.Lock();
+	PRELOAD.Join("SceneLoading.Sprite");
+	PRELOAD.Lock();
 	if (T_GRAPHICS.isDX12Active)
 	{
 		m_frameBuffer = T_GRAPHICS.GetFrameBufferManager();
@@ -29,9 +29,9 @@ void SceneLoading::Initialize()
 			{ 0, 0.969f, -0.248f }	// 上ベクトル
 		);
 	}
-	//PRELOAD.Unlock();
 
 	thread = new std::thread(LoadingThread, this);
+	PRELOAD.Unlock();
 }
 // 終了化
 void SceneLoading::Finalize()

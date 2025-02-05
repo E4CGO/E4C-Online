@@ -122,7 +122,7 @@ CoinBullet::CoinBullet(DirectX::XMFLOAT3 target, Character* owner) : Projectile(
 void CoinBullet::Update(float elapsedTime)
 {
 	// 衝突判定はオーナーのプレイヤーが計算
-	if (static_cast<PigMob*>(m_owner)->IsMine())
+	if (static_cast<PigMob*>(m_pOwner)->IsMine())
 	{
 		Sphere sphere;
 		sphere.position = position;

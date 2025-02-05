@@ -3,6 +3,8 @@
 
 #include "PlayerCharacterRodState.h"
 #include "PlayerCharacterState.h"
+#include "GameObject/Props/Zone/HealingZone.h"
+#include "GameObject/GameObjectManager.h"
 
 namespace PlayerCharacterState
 {
@@ -74,12 +76,11 @@ namespace PlayerCharacterState
 
 			if (owner->IsPlayer())
 			{
-				if (owner->GetMp() <= 10.0f)
-				{
-					owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
-					return;
-				}
-				owner->ModifyMp(-10.0f);
+				owner->ModifyMp(-owner->GetMpCost(PlayerCharacter::STATE::ATTACK_NORMAL));
+
+				m_tempMoveSpeed = owner->GetMoveSpeed();
+				owner->SetMoveSpeed(m_tempMoveSpeed * m_slowMoveRate);
+				TPSCamera.AimMode(true);
 			}
 		}
 		void AttackNormalState::Execute(float elapsedTime)
@@ -96,7 +97,14 @@ namespace PlayerCharacterState
 		}
 		void AttackNormalState::Exit()
 		{
+			subState->Exit();
 			owner->SetAnimationSpeed(1.0f);
+			if (owner->IsPlayer())
+			{
+				owner->SetMoveSpeed(m_tempMoveSpeed);
+
+				TPSCamera.AimMode(false);
+			}
 		}
 		// Fireball攻撃準備
 		void AttackNormalState_Ready::Enter()
@@ -110,8 +118,9 @@ namespace PlayerCharacterState
 
 			if (owner->IsPlayer())
 			{
+				owner->InputMove(elapsedTime);
 				DirectX::XMFLOAT3 target = owner->GetTarget();
-				owner->FaceToCamera();
+				owner->FaceTo(owner->GetTarget());
 
 				if (owner->ReleaseAttackNormal())
 					owner->GetStateMachine()->ChangeSubState(FIREBALL_STATE::ATTACK_END);
@@ -128,8 +137,9 @@ namespace PlayerCharacterState
 		{
 			if (owner->IsPlayer())
 			{
+				owner->InputMove(elapsedTime);
 				DirectX::XMFLOAT3 target = owner->GetTarget();
-				owner->FaceToCamera();
+				owner->FaceTo(owner->GetTarget());
 
 				if (owner->ReleaseAttackNormal())
 				{
@@ -146,7 +156,7 @@ namespace PlayerCharacterState
 						owner->GetStateMachine()->ChangeSubState(FIREBALL_STATE::ATTACK_2);
 					}
 
-					owner->ModifyMp(-20.0f * m_chargeTme * 0.25f);
+					//owner->ModifyMp(-20.0f * m_chargeTme * 0.25f);
 				}
 			}
 			m_chargeTme += elapsedTime;
@@ -224,7 +234,7 @@ namespace PlayerCharacterState
 				owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 			}
 
-			owner->ModifyMp(-10.0f * elapsedTime);
+			owner->ModifyMp(-owner->GetMpCost(PlayerCharacter::STATE::SKILL_1) * elapsedTime);
 		}
 		void AttackSpecialState::Exit()
 		{
@@ -242,7 +252,7 @@ namespace PlayerCharacterState
 					owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 					return;
 				}
-				owner->ModifyMp(-50.0f);
+				owner->ModifyMp(-owner->GetMpCost(PlayerCharacter::STATE::SKILL_1));
 
 				owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_ATTACK_SPECIAL_FIRST, false, 0.1f);
 
@@ -316,19 +326,27 @@ namespace PlayerCharacterState
 					owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 					return;
 				}
-				owner->ModifyMp(-75.0f);
+				owner->ModifyMp(-owner->GetMpCost(PlayerCharacter::STATE::SKILL_2));
 
 				owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_ATTACK_SPECIAL_SECOND, false, 0.1f);
 
-				owner->GetEffectHealing()->SetObjectPositions(owner->GetPosition(), owner->GetFront());
-				owner->GetEffectHealing()->Activate();
+				// ヒーリングゾーン生成
+				HealingZone* zone = new HealingZone(owner);
+				// 生成位置の計算 (5m先)
+				const DirectX::XMFLOAT3 offset = DirectX::XMFLOAT3{
+					sinf(owner->GetAngle().y) * 5.0f,
+					0.0f,
+					cosf(owner->GetAngle().y) * 5.0f,
+				};
+				zone->SetPosition(owner->GetPosition() + offset);
+				GameObjectManager::Instance().Register(zone);
 			}
 		}
 		void Skill2State::Execute(float elapsedTime)
 		{
 			float time = owner->GetModel()->GetCurrentAnimationSeconds();
 			// 反重力
-			owner->StopMove();
+			owner->StopFall();
 
 			if (!owner->IsPlayAnimation()) // 攻撃モーション終わり
 			{

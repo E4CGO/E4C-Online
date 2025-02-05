@@ -107,6 +107,10 @@ namespace TentacleLib
 	{
 		return GetFocus() == hWnd;
 	}
+	void setFocus()
+	{
+		SetFocus(hWnd);
+	}
 
 	bool isShowCursor()
 	{

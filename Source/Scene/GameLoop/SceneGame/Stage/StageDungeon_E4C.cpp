@@ -311,8 +311,8 @@ void StageDungeon_E4C::Render()
 	LightManager::Instance().PushRenderContext(rc);
 
 	// 描画
-	PlayerCharacterManager::Instance().Render(rc);
 	GameObjectManager::Instance().Render(rc);
+	PlayerCharacterManager::Instance().Render(rc);
 
 	MAPTILES.Render(rc);
 
@@ -352,7 +352,6 @@ void StageDungeon_E4C::RenderDX12()
 		// MapTile
 		MAPTILES.RenderDX12(rc);
 
-		GameObjectManager::Instance().RenderDX12(rc);
 		ENEMIES.RenderDX12(rc);
 
 		SpawnerManager::Instance().RenderDX12(rc);
@@ -361,6 +360,7 @@ void StageDungeon_E4C::RenderDX12()
 
 		// プレイヤー
 		PlayerCharacterManager::Instance().RenderDX12(rc);
+		GameObjectManager::Instance().RenderDX12(rc);
 
 		// 部屋（OneWayWall、DebugCube等）
 		for (RoomBase* room : rootRoom->GetAll()) room->RenderDX12(rc);

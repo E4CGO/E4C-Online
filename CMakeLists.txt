@@ -209,8 +209,6 @@ source_group("Source\\GameObject\\Projectile" FILES ${Source__GameObject__Projec
 set(Source__GameObject__Props
     "Source/GameObject/Props/ChargeObject.cpp"
     "Source/GameObject/Props/ChargeObject.h"
-    "Source/GameObject/Props/HealingObject.cpp"
-    "Source/GameObject/Props/HealingObject.h"
     "Source/GameObject/Props/OneWayWall.cpp"
     "Source/GameObject/Props/OneWayWall.h"
     "Source/GameObject/Props/Spawner.cpp"
@@ -221,8 +219,6 @@ set(Source__GameObject__Props
     "Source/GameObject/Props/StairToNextFloor.h"
     "Source/GameObject/Props/Teleporter.cpp"
     "Source/GameObject/Props/Teleporter.h"
-    "Source/GameObject/Props/ZoneObject.cpp"
-    "Source/GameObject/Props/ZoneObject.h"
 )
 source_group("Source\\GameObject\\Props" FILES ${Source__GameObject__Props})
 
@@ -279,6 +275,16 @@ set(Source__GameObject__Character__Player__State
     "Source/GameObject/Character/Player/State/PlayerCharacterSwordState.h"
 )
 source_group("Source\\GameObject\\Character\\Player\\State" FILES ${Source__GameObject__Character__Player__State})
+
+set(Source__GameObject__Props__Zone
+    "Source/GameObject/Props/Zone/DefenceBuffZone.cpp"
+    "Source/GameObject/Props/Zone/DefenceBuffZone.h"
+    "Source/GameObject/Props/Zone/HealingZone.cpp"
+    "Source/GameObject/Props/Zone/HealingZone.h"
+    "Source/GameObject/Props/Zone/ZoneObject.cpp"
+    "Source/GameObject/Props/Zone/ZoneObject.h"
+)
+source_group("Source\\GameObject\\Props\\Zone" FILES ${Source__GameObject__Props__Zone})
 
 set(Source__Network__TCPCommand
     "Source/Network/TCPCommand/TCPChat.cpp"
@@ -897,6 +903,7 @@ set(ALL_FILES
     ${Source__GameObject__Character__Enemy}
     ${Source__GameObject__Character__Player}
     ${Source__GameObject__Character__Player__State}
+    ${Source__GameObject__Props__Zone}
     ${Source__Network__TCPCommand}
     ${Source__Network__UDPCommand}
     ${Source__Scene__GameLoop}

@@ -104,6 +104,14 @@ void PlayerCharacterPatternSword::Execute(PlayerCharacter* chara)
 		stateMachine->RegisterState(static_cast<int>(PlayerCharacter::STATE::SKILL_2), new Skill2State(chara));
 	}
 	chara->SetEnergyType(PlayerCharacter::ENERGY_TYPE::STAMINA);
+
+	{
+		// MP消費
+		chara->SetMpCost(PlayerCharacter::STATE::ATTACK_NORMAL, 0.0f);
+		chara->SetMpCost(PlayerCharacter::STATE::ATTACK_SPECIAL, 0.0f);
+		chara->SetMpCost(PlayerCharacter::STATE::SKILL_1, 30.0f);
+		chara->SetMpCost(PlayerCharacter::STATE::SKILL_2, 25.0f);
+	}
 }
 
 /**************************************************************************//**
@@ -149,4 +157,12 @@ void PlayerCharacterPatternRod::Execute(PlayerCharacter* chara)
 	}
 
 	chara->SetEnergyType(PlayerCharacter::ENERGY_TYPE::MANA);
+
+	{
+		// MP消費
+		chara->SetMpCost(PlayerCharacter::STATE::ATTACK_NORMAL, 10.0f);
+		chara->SetMpCost(PlayerCharacter::STATE::ATTACK_SPECIAL, 10.0f);
+		chara->SetMpCost(PlayerCharacter::STATE::SKILL_1, 50.0f);
+		chara->SetMpCost(PlayerCharacter::STATE::SKILL_2, 75.0f);
+	}
 }

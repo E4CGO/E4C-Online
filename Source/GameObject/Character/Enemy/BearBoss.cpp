@@ -69,27 +69,27 @@ void BearBoss::OnDamage(const uint16_t& damage)
 		{
 			switch (m_phase)
 			{
-				case 0:
-					if (this->hp < (this->maxHp / 4 * 3)) // HP 75%
-					{
-						EnemyState::StateTransition(this, STATE::STUN);
-						m_phase++;
-					}
-					break;
-				case 1:
-					if (this->hp < (this->maxHp / 4 * 2)) // HP 50%
-					{
-						EnemyState::StateTransition(this, STATE::FORM_CHANGE);
-						m_phase++;
-					}
-					break;
-				case 2:
-					if (this->hp < (this->maxHp / 4))  // HP 25%
-					{
-						EnemyState::StateTransition(this, STATE::STUN);
-						m_phase++;
-					}
-					break;
+			case 0:
+				if (this->hp < (this->maxHp / 4 * 3)) // HP 75%
+				{
+					EnemyState::StateTransition(this, STATE::STUN);
+					m_phase++;
+				}
+				break;
+			case 1:
+				if (this->hp < (this->maxHp / 4 * 2)) // HP 50%
+				{
+					EnemyState::StateTransition(this, STATE::FORM_CHANGE);
+					m_phase++;
+				}
+				break;
+			case 2:
+				if (this->hp < (this->maxHp / 4))  // HP 25%
+				{
+					EnemyState::StateTransition(this, STATE::STUN);
+					m_phase++;
+				}
+				break;
 			}
 		}
 		else

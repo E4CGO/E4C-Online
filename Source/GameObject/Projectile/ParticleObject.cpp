@@ -57,7 +57,7 @@ ParticleObject::ParticleObject(PlayerCharacter* owner) : Projectile("Data/Model/
 *//***************************************************************************/
 void ParticleObject::Update(float elapsedTime)
 {
-	PlayerCharacter* player = static_cast<PlayerCharacter*>(m_owner);
+	PlayerCharacter* player = static_cast<PlayerCharacter*>(m_pOwner);
 
 	// 時間経過でAttackColliderを再生成
 	if (m_currentTimer < 0.0f)

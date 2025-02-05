@@ -17,7 +17,6 @@ namespace EnemyState
 		{
 			if (owner->IsGround())
 			{
-				if (!owner->IsPlayAnimation());
 				EnemyState::StateTransition(owner, ::BirdMob::STATE::TAKE_OFF);
 				return;
 			}
@@ -79,7 +78,7 @@ namespace EnemyState
 			::EnemyState::MoveState::Execute(elapsedTime);
 		}
 
-		
+
 		// 攻撃ステート
 		void AttackState::Enter()
 		{

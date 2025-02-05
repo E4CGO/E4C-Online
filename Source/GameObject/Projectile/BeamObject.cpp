@@ -33,7 +33,7 @@ BeamObject::BeamObject(PlayerCharacter* owner) : Projectile("Data/Model/Object/E
 *//***************************************************************************/
 void BeamObject::Update(float elapsedTime)
 {
-	PlayerCharacter* player = static_cast<PlayerCharacter*>(m_owner);
+	PlayerCharacter* player = static_cast<PlayerCharacter*>(m_pOwner);
 	
 	// 別のステートに変化すると消える
 	if (player->GetState() != PlayerCharacter::STATE::SKILL_1)
