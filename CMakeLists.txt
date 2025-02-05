@@ -281,6 +281,9 @@ set(Source__GameObject__Props__Zone
     "Source/GameObject/Props/Zone/DefenceBuffZone.h"
     "Source/GameObject/Props/Zone/HealingZone.cpp"
     "Source/GameObject/Props/Zone/HealingZone.h"
+    "Source/GameObject/Props/Zone/ImpactEffectZone.cpp"
+    "Source/GameObject/Props/Zone/ImpactEffectZone.h"
+    "Source/GameObject/Props/Zone/ZoneManager.h"
     "Source/GameObject/Props/Zone/ZoneObject.cpp"
     "Source/GameObject/Props/Zone/ZoneObject.h"
 )

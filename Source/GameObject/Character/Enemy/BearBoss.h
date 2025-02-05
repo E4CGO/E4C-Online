@@ -103,6 +103,9 @@ public:
 
 	void RenderDX12(const RenderContextDX12& rc) override
 	{
+#ifdef _DEBUG
+
+
 		if (!m_pColliders.empty())
 		{
 			for (const std::pair<uint8_t, Collider*>& attackCollider : m_pColliders)
@@ -120,6 +123,7 @@ public:
 				attackCollider.second->DrawDebugPrimitive(color);
 			}
 		}
+#endif // _DEBUG
 	}
 private:
 	float time = 0.0f;

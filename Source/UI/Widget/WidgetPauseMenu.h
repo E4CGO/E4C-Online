@@ -15,7 +15,7 @@
 #include "UI/Widget/WidgetText.h"
 #include "UI/Widget/WidgetButtonImage.h"
 #include "UI/Widget/WidgetSettingWindow.h"
-
+#include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
 #include "GameData.h"
 
 /**************************************************************************//**
@@ -27,7 +27,7 @@
 class WidgetPauseMenu : public Widget
 {
 public:
-	WidgetPauseMenu();
+	WidgetPauseMenu(ThridPersonCameraController* cameraController = nullptr);
 	~WidgetPauseMenu()
 	{
 		delete m_pauseButton;
@@ -44,7 +44,11 @@ public:
 	void RenderDX12(const RenderContextDX12& rc) override;
 
 	bool IsActive() { return isActive; }
+
+	void Trigger();
 private:
+	ThridPersonCameraController* m_pCameraController;
+
 	bool isActive = false; // 完結フラグ
 	bool isSettingsActive = false;
 

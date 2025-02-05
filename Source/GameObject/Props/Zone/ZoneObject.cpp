@@ -1,7 +1,6 @@
 #include "ZoneObject.h"
 
-#include "GameObject/GameObjectManager.h"
-//#include "Source/GameObject/Character/Player/PlayerCharacterManager.h"
+#include "GameObject/Props/Zone/ZoneManager.h"
 
 /**************************************************************************//**
 	@brief    モデル設定
@@ -30,6 +29,6 @@ void ZoneObject::Update(float elapsedTime)
 	{
 		// 寿命による自滅
 		m_timer = 0.0f;
-		GameObjectManager::Instance().Remove(this);
+		ZoneManager::Instance().Remove(this);
 	}
 }
