@@ -63,11 +63,7 @@ namespace EnemyState
 		// 追跡ステート
 		void FollowState::Enter()
 		{
-			PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById(owner->GetTarget());
-			if (player != nullptr)
-			{
-				m_distance = XMFLOAT3HorizontalLength(player->GetPosition() - owner->GetPosition());
-			}
+			m_distance = 5.0f;
 			owner->SetAnimation(::BearBoss::ANIM_WALK_LOOP, true);
 		}
 

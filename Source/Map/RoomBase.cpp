@@ -8,6 +8,7 @@
 #include "GameObject/Props/Spawner.h"
 #include "GameObject/Props/SpawnerManager.h"
 #include "GameObject/Props/StairToNextFloor.h"
+#include "GameObject/Props/Zone/HealingZone.h"
 #include "MapTile.h"
 #include "MapTileManager.h"
 
@@ -673,7 +674,7 @@ void RoomBase::PlaceMapTile(bool isLeader)
 					}
 					if (T_GRAPHICS.isDX12Active)
 					{
-						modelTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX12, ModelObject::LHS_TOON);
+						modelTile->LoadModel(data.fileName.c_str(), data.scale, ModelObject::RENDER_MODE::DX12, ModelObject::LHS_PBR);
 					}
 				}
 				modelTile->SetPosition(tileData.position);
@@ -773,6 +774,10 @@ void RoomBase::PlaceTeleporterTile(Stage* stage, Online::OnlineController* onlin
 			stair->SetInteractionDistance(stairData.interactionDistance);
 
 			GameObjectManager::Instance().Register(stair);
+			
+			HealingZone* healingZone = new HealingZone(nullptr);
+			healingZone->SetPosition(resultStairPos);
+			GameObjectManager::Instance().Register(healingZone);
 		}
 		// ボスフロアならOpenWorldへのテレポーターと階段を配置
 		else
@@ -815,6 +820,10 @@ void RoomBase::PlaceTeleporterTile(Stage* stage, Online::OnlineController* onlin
 				T_GRAPHICS.GetShadowRenderer()->ModelRegister(modelTile->GetModel(0).get());
 			}
 			GameObjectManager::Instance().Register(modelTile);
+
+			HealingZone* healingZone = new HealingZone(nullptr);
+			healingZone->SetPosition(resultStairPos);
+			GameObjectManager::Instance().Register(healingZone);
 		}
 	}
 }

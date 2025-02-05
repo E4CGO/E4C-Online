@@ -45,7 +45,7 @@ void SceneTitle_E4CState::InitState::Enter()
 	//}
 
 	m_btnStart = new WidgetButtonImage("", "Data/Sprites/UI/Title/new_d.png", "Data/Sprites/UI/Title/new_h.png", [&](WidgetButton*) {
-		owner->GetStateMachine()->ChangeState(SceneTitle_E4C::STATE::START);
+		owner->GetStateMachine()->ChangeState(SceneTitle_E4C::STATE::COMIC);
 		});
 	m_btnStart->SetPosition({ SCREEN_W * .7f, SCREEN_H * 0.5f });
 	m_btnStart->SetSize({ m_btnStart->GetSize().x * .5f * SCREEN_W / 1920.0f, m_btnStart->GetSize().y * .5f * SCREEN_H / 1080.0f });
@@ -58,12 +58,12 @@ void SceneTitle_E4CState::InitState::Enter()
 	m_btnOption->SetSize({ m_btnOption->GetSize().x * .5f * SCREEN_W / 1920.0f, m_btnOption->GetSize().y * .5f * SCREEN_H / 1080.0f });
 	UI.Register(m_btnOption);
 
-	m_btnCredits = new WidgetButtonImage("", "Data/Sprites/UI/Title/credits_d.png", "Data/Sprites/UI/Title/credits_h.png", [&](WidgetButton*) {
+	/*m_btnCredits = new WidgetButtonImage("", "Data/Sprites/UI/Title/credits_d.png", "Data/Sprites/UI/Title/credits_h.png", [&](WidgetButton*) {
 		owner->GetStateMachine()->ChangeState(SceneTitle_E4C::STATE::CREDITS);
 		});
 	m_btnCredits->SetPosition({ SCREEN_W * .7f, SCREEN_H * 0.5f + m_btnStart->GetSize().y * 1.2f * 2.0f });
 	m_btnCredits->SetSize({ m_btnCredits->GetSize().x * .5f * SCREEN_W / 1920.0f,  m_btnCredits->GetSize().y * .5f * SCREEN_H / 1080.0f });
-	UI.Register(m_btnCredits);
+	UI.Register(m_btnCredits);*/
 
 	m_btnExit = new WidgetButtonImage("", "Data/Sprites/UI/Title/exit_d.png", "Data/Sprites/UI/Title/exit_h.png", [&](WidgetButton*) {
 		owner->GetStateMachine()->ChangeState(SceneTitle_E4C::STATE::EXIT);
@@ -185,4 +185,60 @@ void SceneTitle_E4CState::ExitState::Execute(float elapsedTime)
 void SceneTitle_E4CState::ExitState::Exit()
 {
 	SetCursor(::LoadCursor(NULL, IDC_HAND));
+	UI.Clear();
+}
+
+void SceneTitle_E4CState::ComicState::Enter()
+{
+	UI.Clear();
+	m_ComicImage = new WidgetImage("Data/Sprites/UI/Title/1P-.png");
+	m_ComicImage->SetPosition({ 0,  0 });
+	m_ComicImage->SetSize({ SCREEN_W, SCREEN_H });
+	m_ComicImage2 = new WidgetImage("Data/Sprites/UI/Title/2P.png");
+	m_ComicImage2->SetPosition({ 0,  0 });
+	m_ComicImage2->SetSize({ SCREEN_W, SCREEN_H });
+	m_ComicImage3 = new WidgetImage("Data/Sprites/UI/Title/3P-.png");
+	m_ComicImage3->SetPosition({ 0,  0 });
+	m_ComicImage3->SetSize({ SCREEN_W, SCREEN_H });
+	m_StartImage = new WidgetButtonImage("", "Data/Sprites/UI/Character/start.png", [&](WidgetButton*) {
+		owner->GetStateMachine()->ChangeState(SceneTitle_E4C::STATE::START);
+		});
+	m_StartImage->SetPosition({ SCREEN_W * 0.85f, SCREEN_H * 0.90f });
+	UI.Register(m_ComicImage);
+}
+
+void SceneTitle_E4CState::ComicState::Execute(float elapsedTime)
+{
+	if (m_currentImage != m_prevImage)
+	{
+		switch (m_currentImage)
+		{
+		case 1:
+			UI.Register(m_ComicImage2);
+			m_prevImage = m_currentImage;
+			break;
+		case 2:
+			UI.Register(m_ComicImage3);
+			m_prevImage = m_currentImage;
+			break;
+		case 3:
+			UI.Register(m_StartImage);
+			m_prevImage = m_currentImage;
+			break;
+		}
+	}
+
+	timer -= elapsedTime;
+
+	if (timer <= 0)
+	{
+		timer = 3.0f;
+		m_currentImage++;
+	}
+}
+
+void SceneTitle_E4CState::ComicState::Exit()
+{
+	SetCursor(::LoadCursor(NULL, IDC_HAND));
+	UI.Clear();
 }

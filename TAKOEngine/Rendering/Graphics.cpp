@@ -824,7 +824,7 @@ void Graphics::Execute()
 	T_GRAPHICS.GetD3D112DDeviceContext()->Flush();
 
 	// 画面表示
-	m_dxgi_swap_chain->Present(SyncInterval, SyncInterval == 0 ? DXGI_PRESENT_ALLOW_TEARING : 0);
+	m_dxgi_swap_chain->Present(1, SyncInterval == 0 ? DXGI_PRESENT_DO_NOT_WAIT : 0);
 
 	// コマンド終了まで待つ
 	WaitIdle(m_graphics_queue);
@@ -1009,18 +1009,18 @@ const Descriptor* Graphics::UpdateSceneConstantBuffer(const Camera* camera, floa
 	}
 
 	// 草情報
-	cb_scene_data->grass_height_factor              = 0.856f;
-	cb_scene_data->grass_width_factor               = 0.041f;
-	cb_scene_data->grass_curvature                  = 0.6f;
-	cb_scene_data->grass_withered_factor            = 0.194f;
-	cb_scene_data->grass_height_variance            = 0.165f;
+	cb_scene_data->grass_height_factor = 0.856f;
+	cb_scene_data->grass_width_factor = 0.041f;
+	cb_scene_data->grass_curvature = 0.6f;
+	cb_scene_data->grass_withered_factor = 0.194f;
+	cb_scene_data->grass_height_variance = 0.165f;
 	cb_scene_data->perlin_noise_distribution_factor = 0.178f;
-	cb_scene_data->tesselation_max_subdivision      = 20.0f;
-	cb_scene_data->tesselation_max_distance         = 80.0f;
-	cb_scene_data->grass_specular_color             = { 0.885f, 0.673f, 0.328f, 1.000f };
+	cb_scene_data->tesselation_max_subdivision = 20.0f;
+	cb_scene_data->tesselation_max_distance = 80.0f;
+	cb_scene_data->grass_specular_color = { 0.885f, 0.673f, 0.328f, 1.000f };
 
 	cb_scene_data->avatar_position = rc.grassData.position;
-	
+
 	cb_scene_data->wind_frequency = 22.388f;
 	cb_scene_data->wind_strength = 0.5f;
 
@@ -1472,6 +1472,8 @@ HRESULT Graphics::CopyImage(const BYTE* pixels, UINT width, UINT height, DXGI_FO
 	d3d_resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 	d3d_resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
+	
+	// リソース生ロック
 	// リソースの生成
 	Microsoft::WRL::ComPtr<ID3D12Resource> d3d_upload_resource;
 	hr = m_d3d_device->CreateCommittedResource(
@@ -1485,6 +1487,7 @@ HRESULT Graphics::CopyImage(const BYTE* pixels, UINT width, UINT height, DXGI_FO
 	{
 		return hr;
 	}
+	// リソース生ロック外し
 
 	// アップロード用バッファにイメージをコピー
 	void* mapped = nullptr;

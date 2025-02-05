@@ -326,8 +326,12 @@ void ModelObject::RenderDX12(const RenderContextDX12& rc)
 				shader = T_GRAPHICS.GetModelShaderDX12(currentShaderId);
 			}
 
-			// フラグがfalseの場合はフラスタム外なのでスキップ
-			if (!visibleObjects[culling++]) continue;
+			//ボスはカリングなし
+			if (model->GetModelName() != "MDLANM_ENMboss_0123")
+			{
+				// フラグがfalseの場合はフラスタム外なのでスキップ
+				if (!visibleObjects[culling++]) continue;
+			}
 
 			if (mesh.frame_resources.size() == 0) continue;
 

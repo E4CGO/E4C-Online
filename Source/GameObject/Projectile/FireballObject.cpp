@@ -9,7 +9,7 @@
 	@brief    コンテクスト
 	@param[in]    owner	プレイヤー
 *//***************************************************************************/
-FireballObject::FireballObject(PlayerCharacter* owner) : Projectile("Data/Model/Object/arrow.glb", 1.0f, owner)
+FireballObject::FireballObject(PlayerCharacter* owner) : Projectile("Data/Model/Object/arrow.glb", 1.0f, owner), m_pOwner(owner)
 {
 	m_radius = 0.5f;
 	m_power = 10;
@@ -35,7 +35,7 @@ void FireballObject::Update(float elapsedTime)
 {
 	if(m_isCharge)
 	{
-		PlayerCharacter* player = static_cast<PlayerCharacter*>(m_owner);
+		PlayerCharacter* player = static_cast<PlayerCharacter*>(m_pOwner);
 
 		if (player->IsPlayer())
 		{
@@ -85,7 +85,7 @@ void FireballObject::Update(float elapsedTime)
 		DirectX::XMFLOAT3 velocity = m_direction * m_speed * elapsedTime;
 
 		// 衝突判定はオーナーのプレイヤーが計算
-		if (static_cast<PlayerCharacter*>(m_owner)->IsPlayer())
+		if (static_cast<PlayerCharacter*>(m_pOwner)->IsPlayer())
 		{
 			Capsule sphereCast;
 			sphereCast.position = position;
@@ -128,7 +128,7 @@ void FireballObject::CollisionFunction(Collider* myCol, Collider* otherCol)
 		uint16_t damage = m_power - otherCol->GetArmor();
 		owner->OnDamage(damage);
 	}
-
+	m_pOwner->ModifyMp(10.0f);
 	myCol->SetEnable(false);
 	Destory();
 }

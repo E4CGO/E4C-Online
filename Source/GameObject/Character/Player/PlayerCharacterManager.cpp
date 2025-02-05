@@ -11,7 +11,6 @@
 *//***************************************************************************/
 void PlayerCharacterManager::Update(float elapsedTime)
 {
-	std::lock_guard<std::mutex> lock(m_mut);
 	ObjectManager<PlayerCharacter>::Update(elapsedTime);
 }
 /**************************************************************************//**
@@ -21,7 +20,6 @@ void PlayerCharacterManager::Update(float elapsedTime)
 *//***************************************************************************/
 void PlayerCharacterManager::Render(const RenderContext& rc)
 {
-	std::lock_guard<std::mutex> lock(m_mut);
 	ObjectManager<PlayerCharacter>::Render(rc);
 }
 /**************************************************************************//**
@@ -31,7 +29,6 @@ void PlayerCharacterManager::Render(const RenderContext& rc)
 *//***************************************************************************/
 void PlayerCharacterManager::RenderDX12(const RenderContextDX12& rc)
 {
-	std::lock_guard<std::mutex> lock(m_mut);
 	ObjectManager<PlayerCharacter>::RenderDX12(rc);
 }
 
@@ -51,6 +48,7 @@ PlayerCharacter* PlayerCharacterManager::GetPlayerCharacterById(void)
 *//***************************************************************************/
 PlayerCharacter* PlayerCharacterManager::GetPlayerCharacterById(uint32_t client_id)
 {
+	std::lock_guard<std::mutex> lock(m_mut);
 	for (PlayerCharacter* player : this->items)
 	{
 		if (player->GetClientId() == client_id) return player;
@@ -67,7 +65,6 @@ PlayerCharacter* PlayerCharacterManager::GetPlayerCharacterById(uint32_t client_
 *//***************************************************************************/
 PlayerCharacter* PlayerCharacterManager::UpdatePlayerData(const uint32_t client_id, const char* name, const uint8_t appearance[PlayerCharacterData::APPEARANCE_PATTERN::NUM])
 {
-	std::lock_guard<std::mutex> lock(m_mut);
 	PlayerCharacter* player = GetPlayerCharacterById(client_id);
 	if (player == nullptr)
 	{
@@ -102,8 +99,8 @@ PlayerCharacter* PlayerCharacterManager::UpdatePlayerData(const uint32_t client_
 void PlayerCharacterManager::SyncPlayer(const uint32_t client_id, const PlayerCharacter::SYNC_DATA& data)
 {
 	PlayerCharacter* player = GetPlayerCharacterById(client_id);
-	if (player == nullptr) return;
 	std::lock_guard<std::mutex> lock(m_mut);
+	if (player == nullptr) return;
 	// 補間？
 	player->ImportSyncData(data);
 }
