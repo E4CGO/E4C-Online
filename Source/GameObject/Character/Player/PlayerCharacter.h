@@ -201,6 +201,7 @@ public:
 	bool IsFall() { return velocity.y < -10.0f; }
 
 	void FaceToCamera();
+	void FaceToEnemy();
 	void TurnByInput();
 
 	uint32_t GetClientId() { return m_client_id; }
@@ -259,6 +260,8 @@ public:
 	void SwordTrail();
 	bool IsTrail() { return m_isTrail; }
 	void SetTrail(bool trail) { m_isTrail = trail; }
+
+	void SetHitStop(bool hitstop) { m_hitStop = hitstop; }
 
 	ChargeObject* GetEffectCharge() { return m_EffectCharge.get(); }
 
@@ -386,6 +389,10 @@ protected:
 	DirectX::XMFLOAT3 trailPosition[2][MAX_POLYGON];
 
 	bool m_isTrail = false;
+
+	float m_stopTimer = 0.f;
+	float m_stopTime = 0.05f;
+	bool m_hitStop = false;
 
 	std::unique_ptr<ChargeObject> m_EffectCharge;
 };

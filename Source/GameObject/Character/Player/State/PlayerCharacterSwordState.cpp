@@ -103,6 +103,11 @@ namespace PlayerCharacterState
 			owner->SetAnimationSpeed(1.0f);
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_COMBO_FIRST, false, 0.1f);
 
+			DirectX::XMFLOAT3 front = owner->GetFront();
+			DirectX::XMFLOAT3 impulse;
+			DirectX::XMStoreFloat3(&impulse, DirectX::XMVectorScale(DirectX::XMLoadFloat3(&front), impulseSpeed));
+			owner->AddImpulse(impulse);
+
 			if (owner->IsPlayer())
 			{
 				XMFLOAT4X4* matrix = owner->GetTransformAdress();
@@ -115,7 +120,7 @@ namespace PlayerCharacterState
 				attackData.hitStartRate = sphereAttacks[0].hitStartRate;
 				attackData.hitEndRate = sphereAttacks[0].hitEndRate;
 
-				owner->MakeAttackCollider(attackData, sphereAttacks[0].sphere, matrix);
+				owner->MakePlayerNormalAttackCollider(attackData, sphereAttacks[0].sphere, matrix);
 			}
 		}
 		void AttackNormalState_1::Execute(float elapsedTime)
@@ -175,6 +180,11 @@ namespace PlayerCharacterState
 			owner->SetAnimationSpeed(1.0f);
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_COMBO_SECOND, false, 0.2f);
 
+			DirectX::XMFLOAT3 front = owner->GetFront();
+			DirectX::XMFLOAT3 impulse;
+			DirectX::XMStoreFloat3(&impulse, DirectX::XMVectorScale(DirectX::XMLoadFloat3(&front), impulseSpeed));
+			owner->AddImpulse(impulse);
+
 			if (owner->IsPlayer())
 			{
 				XMFLOAT4X4* matrix = owner->GetTransformAdress();
@@ -187,7 +197,7 @@ namespace PlayerCharacterState
 				attackData.hitStartRate = sphereAttacks[1].hitStartRate;
 				attackData.hitEndRate = sphereAttacks[1].hitEndRate;
 
-				owner->MakeAttackCollider(attackData, sphereAttacks[1].sphere, matrix);
+				owner->MakePlayerNormalAttackCollider(attackData, sphereAttacks[1].sphere, matrix);
 			}
 		}
 		void AttackNormalState_2::Execute(float elapsedTime)
@@ -248,6 +258,11 @@ namespace PlayerCharacterState
 			owner->SetAnimationSpeed(0.7f);
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_COMBO_THIRD, false, 0.2f);
 
+			DirectX::XMFLOAT3 front = owner->GetFront();
+			DirectX::XMFLOAT3 impulse;
+			DirectX::XMStoreFloat3(&impulse, DirectX::XMVectorScale(DirectX::XMLoadFloat3(&front), impulseSpeed));
+			owner->AddImpulse(impulse);
+
 			if (owner->IsPlayer())
 			{
 				XMFLOAT4X4* matrix = &owner->GetModel(0)->FindNode("JOT_C_Hip")->worldTransform;
@@ -260,7 +275,7 @@ namespace PlayerCharacterState
 				attackData.hitStartRate = sphereAttacks[2].hitStartRate;
 				attackData.hitEndRate = sphereAttacks[2].hitEndRate;
 
-				owner->MakeAttackCollider(attackData, sphereAttacks[2].sphere, matrix);
+				owner->MakePlayerNormalAttackCollider(attackData, sphereAttacks[2].sphere, matrix);
 			}
 		}
 		void AttackNormalState_3::Execute(float elapsedTime)
@@ -367,7 +382,7 @@ namespace PlayerCharacterState
 				attackData.hittableOBJ = sphereAttacks[3].hittableOBJ;
 				attackData.hitStartRate = sphereAttacks[3].hitStartRate;
 				attackData.hitEndRate = sphereAttacks[3].hitEndRate;
-				owner->MakeAttackCollider(attackData, sphereAttacks[3].sphere, matrix);
+				owner->MakePlayerSkill1AttackCollider(attackData, sphereAttacks[3].sphere, matrix);
 			}
 		}
 		void Skill1ContinueStart::Execute(float elapsedTime)

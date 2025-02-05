@@ -109,9 +109,7 @@ void PlayerNormalAttackSphereCollider::OnCollision(Collider* other)
 			// 既にヒットした敵には当たらない
 			if (owner == other->GetOwner()) return;
 		}
-		player->SetCurrentMp(playerMp);
-		player->SetHitStop(true);
-
+		
 		if (m_power > other->GetArmor())
 		{
 			uint16_t damage = m_power - other->GetArmor();
@@ -165,7 +163,7 @@ void PlayerSkill1AttackSphereCollider::OnCollision(Collider* other)
 			// 既にヒットした敵には当たらない
 			if (owner == other->GetOwner()) return;
 		}
-
+		
 		if (m_power > other->GetArmor())
 		{
 			uint16_t damage = m_power - other->GetArmor();
