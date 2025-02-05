@@ -82,6 +82,30 @@ namespace SceneTitle_E4CState
 		float timer = 0.0f;
 	};
 
+	class ComicState : public HierarchicalState<SceneTitle_E4C>
+	{
+	public:
+		// コンストラクタ
+		ComicState(SceneTitle_E4C* scene) : HierarchicalState<SceneTitle_E4C>(scene) {};
+		// デストラクタ
+		~ComicState() {}
+		// ステートに入った時のメソッド
+		virtual void Enter() override;
+		// ステートで実行するメソッド
+		void Execute(float elapsedTime) override;
+		// ステートから出ていくときのメソッド
+		void Exit() override;
+	private:
+		float timer = 3.0f;
+		int m_currentImage = 0;
+		int m_prevImage = 0;
+		WidgetImage* m_ComicImage = nullptr;
+		WidgetImage* m_ComicImage2 = nullptr;
+		WidgetImage* m_ComicImage3 = nullptr;
+		WidgetButtonImage* m_StartImage = nullptr;
+		WidgetButtonImage* m_ContinueImage = nullptr;
+	};
+
 	/**************************************************************************//**
 		@class	OptionState
 		@brief	オープションに切り替え
@@ -129,6 +153,15 @@ namespace SceneTitle_E4CState
 		// ステートから出ていくときのメソッド
 		void Exit() override;
 	private:
+
+		WidgetImage* m_pbackground = nullptr;
+		WidgetImage* m_credits = nullptr;
+		WidgetImage* m_prog = nullptr;
+		WidgetImage* m_art = nullptr;
+		WidgetImage* m_sound = nullptr;
+
+		WidgetButtonImage* m_pBackBtn = nullptr;
+
 		float timer = 0.0f;
 	};
 

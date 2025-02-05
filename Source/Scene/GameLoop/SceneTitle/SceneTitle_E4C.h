@@ -45,6 +45,7 @@ public:
 	enum STATE
 	{
 		INIT,
+		COMIC,
 		START,
 		OPTION,
 		CREDITS,

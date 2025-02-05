@@ -31,8 +31,6 @@ public:
 	void RegisterSync(const uint32_t& enemy_id);
 	void RegisterRemove(const uint32_t& enemy_id);
 private:
-	std::mutex m_mut;
-
 	//std::vector<Enemy::SYNC_DATA> m_enemySyncData; // 同期リストk
 	std::set<uint32_t> m_syncEnemies;
 	std::set<uint32_t> m_removeEnemies;

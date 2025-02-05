@@ -1,5 +1,10 @@
-﻿#pragma once
+﻿//! @file Manager.h
+//! @note 
 
+#ifndef __INCLUDE_MANAGER_H__
+#define __INCLUDE_MANAGER_H__
+
+#include <mutex>
 #include <vector>
 
 template<typename T>
@@ -9,6 +14,7 @@ public:
 	// アイテムを登録する
 	virtual T* Register(T* item)
 	{
+		std::lock_guard<std::mutex> lock(m_mut);
 		items.emplace_back(item);
 		return item;
 	}
@@ -48,5 +54,8 @@ public:
 	std::vector<T*>& GetAll() { return items; }
 
 protected:
+	std::mutex m_mut;
 	std::vector<T*> items;
 };
+
+#endif // !__INCLUDE_MANAGER_H__

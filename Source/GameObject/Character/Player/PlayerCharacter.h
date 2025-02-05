@@ -12,9 +12,7 @@
 #include "GameData.h"
 #include "PlayerCharacterData.h"
 #include "TAKOEngine/Rendering/DebugRenderer/SphereRenderer.h"
-#include "Source/GameObject/Props/ZoneObject.h"
 #include "Source/GameObject/Props/ChargeObject.h"
-#include "Source/GameObject/Props/HealingObject.h"
 
 class Enemy;
 
@@ -238,6 +236,9 @@ public:
 	ENERGY_TYPE GetEnergyType() { return m_energyType; }
 	GENDER_TYPE GetGenderType() { return m_genderType; }
 
+	const float GetMoveSpeed() const { return moveSpeed; }
+	void SetMoveSpeed(const float speed) { moveSpeed = speed; }
+
 	// スキルタイマー
 	float GetSkillTimerTime(int idx);
 	float GetSkillTimerRate(int idx);
@@ -249,7 +250,8 @@ public:
 	void StopMove() { velocity.x = velocity.z = 0.0f; }
 	void StopFall() { velocity.y = -gravity * T_TIMER.Delta() * 60.0f; }
 
-	float GetMpCost(int idx);
+	float GetMpCost(uint8_t idx);
+	void SetMpCost(uint8_t idx, float cost) { mpCost[idx] = cost; }
 
 	//剣ノード取得
 	const iModel::Node* GetSwordTrailNode();
@@ -262,7 +264,6 @@ public:
 
 	ZoneObject* GetEffectZone() { return m_EffectZone.get(); }
 	ChargeObject* GetEffectCharge() { return m_EffectCharge.get(); }
-	HealingObject* GetEffectHealing() { return m_EffectHealing.get(); }
 
 	// 自機判定
 	bool IsPlayer() { return GAME_DATA.GetClientId() == m_client_id; };
@@ -342,7 +343,7 @@ protected:
 	float dodgeSpeed = 0.0f;
 
 	// MP消費
-	std::unordered_map<int, float> mpCost;
+	std::unordered_map<uint8_t, float> mpCost;
 
 	// スキルクールタイム
 	struct SkillTimer {
@@ -397,7 +398,6 @@ protected:
 
 	std::unique_ptr<ZoneObject> m_EffectZone;
 	std::unique_ptr<ChargeObject> m_EffectCharge;
-	std::unique_ptr<HealingObject> m_EffectHealing;
 };
 
 #endif // __INCLUDED_PLAYER_CHARACTER_H__

@@ -24,6 +24,7 @@ public:
 
 	void RenderDX12(const RenderContextDX12& rc) override;
 private:
+	PlayerCharacter* m_pOwner;
 	float m_radius = 0.0f;
 	float m_chargeTime = 0.0f;
 	bool m_isCharge = true;	// チャージ中かどうか

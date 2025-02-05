@@ -42,6 +42,7 @@ namespace TentacleLib
 	void Draw();
 
 	bool isFocus();
+	void setFocus();
 	bool isShowCursor();
 
 	static Graphics& graphics = Graphics::Instance();

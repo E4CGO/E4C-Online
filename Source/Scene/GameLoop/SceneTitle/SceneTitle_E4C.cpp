@@ -40,6 +40,7 @@ void SceneTitle_E4C::Initialize()
 	stateMachine = std::make_unique<StateMachine<SceneTitle_E4C>>();
 	stateMachine->RegisterState(STATE::INIT, new SceneTitle_E4CState::InitState(this));
 	stateMachine->RegisterState(STATE::START, new SceneTitle_E4CState::StartState(this));
+	stateMachine->RegisterState(STATE::COMIC, new SceneTitle_E4CState::ComicState(this));
 	stateMachine->RegisterState(STATE::OPTION, new SceneTitle_E4CState::OptionState(this));
 	stateMachine->RegisterState(STATE::CREDITS, new SceneTitle_E4CState::CreditsState(this));
 	stateMachine->RegisterState(STATE::EXIT, new SceneTitle_E4CState::ExitState(this));

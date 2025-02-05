@@ -61,6 +61,7 @@ void SceneGame_E4C::Initialize()
 
 	// STAGE初期化
 	STAGES.Update(0);
+	CURSOR_OFF;
 }
 
 void SceneGame_E4C::Finalize()
