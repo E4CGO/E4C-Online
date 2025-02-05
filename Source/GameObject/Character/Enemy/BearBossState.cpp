@@ -258,8 +258,12 @@ namespace EnemyState
 					XMFLOAT3 angle = MatrixToAngles(R);
 
 					PunchImpact* impact = new PunchImpact(pos, owner);
-					impact->SetAngle(angle);
 					PROJECTILES.Register(impact);
+
+					ImpactEffectZone* zone = new ImpactEffectZone(nullptr);
+					zone->SetPosition(pos);
+					zone->SetAngle(angle);
+					ZoneManager::Instance().Register(zone);
 				}
 			}
 			if (!impacts[1])
@@ -286,9 +290,12 @@ namespace EnemyState
 					XMFLOAT3 angle = MatrixToAngles(R);
 
 					PunchImpact* impact = new PunchImpact(pos, owner);
-					impact->SetAngle(angle);
-
 					PROJECTILES.Register(impact);
+
+					ImpactEffectZone* zone = new ImpactEffectZone(nullptr);
+					zone->SetPosition(pos);
+					zone->SetAngle(angle);
+					ZoneManager::Instance().Register(zone);
 				}
 			}
 
