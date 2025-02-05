@@ -186,7 +186,7 @@ void StageDungeon_E4C::Initialize()
 	Sound::Instance().LoadAudio("Data/Sound/5-Miraculous_Maze(Dungeon).mp3");
 	Sound::Instance().PlayAudio(0);
 
-	m_pPauseMenu = new WidgetPauseMenu();
+	m_pPauseMenu = new WidgetPauseMenu(cameraController.get());
 	UI.Register(m_pPauseMenu);
 
 	// 影初期化

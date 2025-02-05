@@ -204,7 +204,7 @@ void StageOpenWorld_E4C::Initialize()
 	Sound::Instance().PlayAudio(0);
 
 	m_pCharacterGauge = new WidgetPlayerHP();
-	m_pPauseMenu = new WidgetPauseMenu();
+	m_pPauseMenu = new WidgetPauseMenu(cameraController.get());
 	UI.Register(m_pCharacterGauge);
 	UI.Register(m_pPauseMenu);
 

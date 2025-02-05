@@ -10,7 +10,7 @@
 /**************************************************************************//**
 	@brief	UIの設定
 *//***************************************************************************/
-WidgetPauseMenu::WidgetPauseMenu()
+WidgetPauseMenu::WidgetPauseMenu(ThridPersonCameraController* cameraController) : m_pCameraController(cameraController)
 {
 	if (T_GRAPHICS.isDX11Active)
 	{
@@ -145,4 +145,23 @@ void WidgetPauseMenu::RenderDX12(const RenderContextDX12& rc)
 		if (isSettingsActive) m_settingsWindow->RenderDX12(rc);
 	}
 	m_pauseButton->RenderDX12(rc);
+}
+
+void WidgetPauseMenu::Trigger()
+{
+	isActive = !isActive;
+	if (m_pCameraController == nullptr) return;
+	if (!isActive)
+	{
+		// 閉じ
+		m_pCameraController->SetEnable(true);
+		CURSOR_OFF;
+	}
+	else
+	{
+		// 開き
+		m_pCameraController->SetEnable(false);
+		CURSOR_ON;
+	}
+
 }
