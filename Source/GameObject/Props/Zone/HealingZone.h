@@ -16,7 +16,7 @@
 class HealingZone : public ZoneObject
 {
 public:
-	HealingZone(PlayerCharacter* owner, float time = 10.0f,  float radius = 1.0f);
+	HealingZone(PlayerCharacter* owner, float time = 10.0f, float radius = 1.0f);
 	virtual ~HealingZone() override {};
 
 	virtual void Update(float elapsedTime) override;

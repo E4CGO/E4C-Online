@@ -279,6 +279,13 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	PlayerCharacterManager::Instance().Update(elapsedTime);
 	ZoneManager::Instance().Update(elapsedTime);
 
+	// プレイヤーのYが-30.0fより下なら初期位置付近に戻す
+	PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
+	if (player->GetPosition().y < -30.0f)
+	{
+		player->SetPosition({ 0.0f, 1.0f, 1.0f });
+	}
+
 	for (auto& it : models)
 	{
 		it.second->Update(elapsedTime);
