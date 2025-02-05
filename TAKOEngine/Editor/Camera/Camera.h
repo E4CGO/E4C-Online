@@ -66,7 +66,7 @@ public:
 	void Move2PointToCamera(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const DirectX::XMFLOAT3& startFocus, const DirectX::XMFLOAT3& endFocus, float transitionTime, float transitionDuration);
 
 	//カメラシェイク
-	void CameraShake(float m_shakeAmplitude, float shakeTime, float elapsedTime);
+	void CameraShake( float shakeAmplitude, float shakeTime, float elapsedTime);
 
 	// シェイクタイマーリセット用メソッド
 	void ResetShakeTimer() { shakeTimer = 0; }

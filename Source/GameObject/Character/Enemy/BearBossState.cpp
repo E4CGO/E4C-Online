@@ -3,7 +3,7 @@
 
 #include "BearBossState.h"
 #include "GameObject/Character/Player/PlayerCharacterManager.h"
-
+#include "TAKOEngine/Editor/Camera/CameraManager.h"
 namespace EnemyState
 {
 	namespace BearBoss
@@ -199,6 +199,8 @@ namespace EnemyState
 					PunchImpact* impact = new PunchImpact(pos, owner);
 					PROJECTILES.Register(impact);
 					impacts[0] = true;
+					CameraManager::Instance().GetCamera()->ShakeStart(1.5f, 0.1);
+					
 				}
 			}
 			if (!impacts[1])
@@ -212,6 +214,7 @@ namespace EnemyState
 					PunchImpact* impact = new PunchImpact(pos, owner);
 					PROJECTILES.Register(impact);
 					impacts[1] = true;
+					CameraManager::Instance().GetCamera()->ShakeStart(1.5f, 0.1);
 				}
 			}
 		}
@@ -227,6 +230,7 @@ namespace EnemyState
 
 					PunchImpact* impact = new PunchImpact(pos, owner);
 					PROJECTILES.Register(impact);
+					CameraManager::Instance().GetCamera()->ShakeStart(1.5f, 0.1);
 				}
 			}
 			if (!impacts[1])
@@ -239,6 +243,7 @@ namespace EnemyState
 
 					PunchImpact* impact = new PunchImpact(pos, owner);
 					PROJECTILES.Register(impact);
+					CameraManager::Instance().GetCamera()->ShakeStart(1.5f, 0.1);
 				}
 			}
 
