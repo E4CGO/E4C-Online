@@ -153,6 +153,15 @@ namespace SceneTitle_E4CState
 		// ステートから出ていくときのメソッド
 		void Exit() override;
 	private:
+
+		WidgetImage* m_pbackground = nullptr;
+		WidgetImage* m_credits = nullptr;
+		WidgetImage* m_prog = nullptr;
+		WidgetImage* m_art = nullptr;
+		WidgetImage* m_sound = nullptr;
+
+		WidgetButtonImage* m_pBackBtn = nullptr;
+
 		float timer = 0.0f;
 	};
 

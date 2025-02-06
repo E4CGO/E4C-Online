@@ -109,6 +109,9 @@ protected:
 
 	float m_sceneGlobalTimer = 0;
 	float m_sceneTickTimer = 0;
+
+
+	WidgetPauseMenu* m_pPauseMenu;
 };
 
 #endif // !__INCLUDED_STAGE_DUNGEON_E4C_H__

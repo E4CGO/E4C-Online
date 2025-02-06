@@ -3,8 +3,8 @@
 
 #include "PlayerCharacterSwordState.h"
 #include "PlayerCharacterState.h"
-#include "GameObject/GameObjectManager.h"
 #include "GameObject/Props/Zone/DefenceBuffZone.h"
+#include "GameObject/Props/Zone/ZoneManager.h"
 
 namespace PlayerCharacterState
 {
@@ -427,7 +427,7 @@ namespace PlayerCharacterState
 				owner->ModifyMp(-owner->GetMpCost(PlayerCharacter::STATE::SKILL_2));
 			}
 			DefenceBuffZone* zone = new DefenceBuffZone(owner);
-			GameObjectManager::Instance().Register(zone);
+			ZoneManager::Instance().Register(zone);
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_ATTACK_SPECIAL_SECOND, false, 0.1f);
 		}
 		void Skill2State::Execute(float elapsedTime)
