@@ -150,8 +150,8 @@ void StageDungeon_E4C::Initialize()
 	CURSOR_OFF;
 
 	// 現在の階取得
-	currentFloor = DUNGEONDATA.GetCurrentFloor();
-
+	//currentFloor = DUNGEONDATA.GetCurrentFloor();
+	DUNGEONDATA.SetCurrentFloor(DUNGEONDATA.GetDungeonGenSetting().maxFloor);
 	// テキスト設定
 	floorText = std::make_unique<WidgetText>();
 	floorText->SetText(("現在の階：" + std::to_string(currentFloor) + "階").c_str());
