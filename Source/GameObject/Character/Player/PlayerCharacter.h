@@ -262,7 +262,7 @@ public:
 
 	void SetHitStop(bool stop) { m_hitStop = stop; }
 
-	ZoneObject* GetEffectZone() { return m_EffectZone.get(); }
+	//ZoneObject* GetEffectZone() { return m_EffectZone.get(); }
 	ChargeObject* GetEffectCharge() { return m_EffectCharge.get(); }
 
 	// 自機判定
@@ -396,7 +396,7 @@ protected:
 	float m_stopTimer = 0.f;
 	float m_stopTime = 0.05f;
 
-	std::unique_ptr<ZoneObject> m_EffectZone;
+	//std::unique_ptr<ZoneObject> m_EffectZone;
 	std::unique_ptr<ChargeObject> m_EffectCharge;
 };
 
