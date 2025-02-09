@@ -160,6 +160,21 @@ void StageDungeon_E4C::Initialize()
 	floorText->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 	floorText->SetPosition({ 30.0f, 30.0f });
 
+	// 最上階でない場合はチュートリアルフロアの生成
+	if (currentFloor < DUNGEONDATA.GetDungeonGenSetting().maxFloor)
+	{
+		m_roomOrder.emplace_back(RoomType::TUTO_START);
+		m_roomOrder.emplace_back(RoomType::TUTO_NOTHINGROOM);
+		m_roomOrder.emplace_back(RoomType::TUTO_SPAWNERROOM);
+		m_roomOrder.emplace_back(RoomType::TUTO_END);
+	}
+	// 最上階であればボス部屋の生成
+	else
+	{
+		m_roomOrder.emplace_back(RoomType::FIRST_BOSS);
+	}
+
+	// 自動生成ではなく配列に沿った生成を行う
 	GenerateDungeon();
 
 	// 部屋のモデルを配置
