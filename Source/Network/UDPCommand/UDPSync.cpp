@@ -59,6 +59,10 @@ namespace Online
 		{
 			U8Buffer::Insert(buffer, syncData.velocity[i]);
 		}
+		for (int i = 0; i < 3; i++)
+		{
+			U8Buffer::Insert(buffer, syncData.target[i]);
+		}
 		U8Buffer::Insert(buffer, syncData.rotate);
 		U8Buffer::Insert(buffer, syncData.state);
 		U8Buffer::Insert(buffer, syncData.sub_state);

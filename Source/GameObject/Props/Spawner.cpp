@@ -84,7 +84,7 @@ Enemy* Spawner::Spawn()
 	enemy->SetPosition(position + offset);
 	enemy->SetSpawnPosition(position + offset);
 	enemy->SetSpawner(this);
-	m_pSpawnedEnemies.insert(ENEMIES.Register(enemy));
+	m_pSpawnedEnemies.insert(ENEMIES.SoftRegister(enemy));
 
 	return enemy;
 }

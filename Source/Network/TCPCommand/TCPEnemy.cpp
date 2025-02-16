@@ -74,9 +74,8 @@ namespace Online
 					Enemy* enemy = ENEMIES.GetEnemyById(enemyData.enemy_id);
 					if (enemy == nullptr)
 					{
-						enemy = ENEMIES.Register(Enemy::EnemyFactory(enemyData.type));
+						enemy = ENEMIES.SoftRegister(Enemy::EnemyFactory(enemyData.type));
 					}
-
 					enemy->Sync(enemyData);
 				}
 				else

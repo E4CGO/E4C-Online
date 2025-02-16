@@ -45,6 +45,7 @@ void SceneGame_E4C::Initialize()
 	PlayerCharacter* player = PlayerCharacterManager::Instance().UpdatePlayerData(0, info.name.c_str(), info.pattern);
 	player->Show();
 	player->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
+	PlayerCharacterManager::Instance().Update(0);
 
 	STAGES.ChangeStage(new StageOpenWorld_E4C(this));
 
