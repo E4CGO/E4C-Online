@@ -62,6 +62,7 @@ public:
 		uint32_t sync_count_id;
 		float position[3];
 		float velocity[3];
+		float target[3];
 		float rotate;
 		uint8_t state;
 		uint8_t sub_state;

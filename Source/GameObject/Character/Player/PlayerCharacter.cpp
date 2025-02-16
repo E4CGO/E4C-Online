@@ -926,6 +926,9 @@ void PlayerCharacter::GetSyncData(SYNC_DATA& data)
 	data.velocity[0] = velocity.x;
 	data.velocity[1] = velocity.y;
 	data.velocity[2] = velocity.z;
+	data.target[0] = target.x;
+	data.target[1] = target.y;
+	data.target[2] = target.z;
 	data.rotate = angle.y;
 	data.state = static_cast<uint8_t>(stateMachine->GetStateIndex());
 	data.sub_state = static_cast<uint8_t>(stateMachine->GetState()->GetSubStateIndex());
