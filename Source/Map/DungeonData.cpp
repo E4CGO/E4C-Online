@@ -27,7 +27,7 @@ void DungeonData::Initialize()
 
 void DungeonData::InitDungeonGenSetting()
 {
-	m_dungeonGenerateSetting.maxFloor = 4;
+	m_dungeonGenerateSetting.maxFloor = 2;
 }
 
 void DungeonData::InitFloorGenSettings()
@@ -42,27 +42,27 @@ void DungeonData::InitFloorGenSettings()
 	m_floorGenerateSettings.at(0).deadEndRoomType = RoomType::TUTO_DEAD_END;
 
 	// FirstFloor
-	m_floorGenerateSettings.at(1).maxDepth = 4;
-	m_floorGenerateSettings.at(1).startRoomType = RoomType::FIRST_START;
-	m_floorGenerateSettings.at(1).endRoomType = RoomType::FIRST_END;
-	m_floorGenerateSettings.at(1).deadEndRoomType = RoomType::FIRST_DEAD_END;
+	m_floorGenerateSettings.at(1).maxDepth = 5;
+	m_floorGenerateSettings.at(1).startRoomType = RoomType::TUTO_START;
+	m_floorGenerateSettings.at(1).endRoomType = RoomType::TUTO_END;
+	m_floorGenerateSettings.at(1).deadEndRoomType = RoomType::TUTO_DEAD_END;
 
 	// SecondFloor
-	m_floorGenerateSettings.at(2).maxDepth = 3;
-	m_floorGenerateSettings.at(2).startRoomType = RoomType::SECOND_START;
-	m_floorGenerateSettings.at(2).endRoomType = RoomType::SECOND_END;
-	m_floorGenerateSettings.at(2).deadEndRoomType = RoomType::SECOND_DEAD_END;
+	m_floorGenerateSettings.at(2).maxDepth = 5;
+	m_floorGenerateSettings.at(2).startRoomType = RoomType::FIRST_BOSS;
+	m_floorGenerateSettings.at(2).endRoomType = RoomType::FIRST_BOSS;
+	m_floorGenerateSettings.at(2).deadEndRoomType = RoomType::FIRST_DEAD_END;
 
 	// ThirdFloor
-	m_floorGenerateSettings.at(3).maxDepth = 4;
-	m_floorGenerateSettings.at(3).startRoomType = RoomType::THIRD_START;
-	m_floorGenerateSettings.at(3).endRoomType = RoomType::THIRD_END;
-	m_floorGenerateSettings.at(3).deadEndRoomType = RoomType::THIRD_DEAD_END;
+	//m_floorGenerateSettings.at(3).maxDepth = 4;
+	//m_floorGenerateSettings.at(3).startRoomType = RoomType::THIRD_START;
+	//m_floorGenerateSettings.at(3).endRoomType = RoomType::THIRD_END;
+	//m_floorGenerateSettings.at(3).deadEndRoomType = RoomType::THIRD_DEAD_END;
 
 	// BossFloor
 	// endRoomTypeが該当する部屋にテレポーターを配置するため、FIRST_BOSSを両方に適応させる
-	m_floorGenerateSettings.at(4).startRoomType = RoomType::FIRST_BOSS;
-	m_floorGenerateSettings.at(4).endRoomType = RoomType::FIRST_BOSS;
+	//m_floorGenerateSettings.at(4).startRoomType = RoomType::FIRST_BOSS;
+	//m_floorGenerateSettings.at(4).endRoomType = RoomType::FIRST_BOSS;
 }
 
 void DungeonData::InitRoomGenSettings()
