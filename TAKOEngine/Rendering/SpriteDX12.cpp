@@ -658,6 +658,9 @@ void SpriteDX12::Draw(
 		v[i].texcoord.y = texcoords[i].y / m_texture_height;
 	}
 	m_sprite_index++;
+
+	HRESULT hr = frame_resource.d3d_vb_resource->Map(0, nullptr, reinterpret_cast<void**>(&v));
+	frame_resource.d3d_vb_resource->Unmap(0, nullptr);
 }
 
 /**************************************************************************//**
