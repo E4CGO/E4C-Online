@@ -488,6 +488,8 @@ set(TAKOEngine__Physics
 source_group("TAKOEngine\\Physics" FILES ${TAKOEngine__Physics})
 
 set(TAKOEngine__Rendering
+    "TAKOEngine/Rendering/Command.cpp"
+    "TAKOEngine/Rendering/Command.h"
     "TAKOEngine/Rendering/Constant.h"
     "TAKOEngine/Rendering/ConstantBuffer.h"
     "TAKOEngine/Rendering/Cylinder.cpp"

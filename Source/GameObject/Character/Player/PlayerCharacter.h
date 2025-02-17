@@ -62,13 +62,13 @@ public:
 		uint32_t sync_count_id;
 		float position[3];
 		float velocity[3];
+		float target[3];
 		float rotate;
 		uint8_t state;
 		uint8_t sub_state;
 	};
 #pragma pack(pop)
 
-	// KayKit Adventurers
 	enum Animation
 	{
 		ANIM_ROD_IDLE,
@@ -84,6 +84,9 @@ public:
 		ANIM_ROD_ATTACK_SPECIAL_SECOND,
 		ANIM_ROD_HURT,
 		ANIM_ROD_DEATH,
+		ANIM_ROD_JUMP,
+		ANIM_ROD_LANDING,
+		ANIM_ROD_STEP,
 		ANIM_SWORD_IDLE,
 		ANIM_SWORD_MOVE_START,
 		ANIM_SWORD_MOVE_CONTINUE,
@@ -97,7 +100,10 @@ public:
 		ANIM_SHIELD_GUARD_KNOCKBACK_CONTINUE,
 		ANIM_SHIELD_GUARD_FINISH,
 		ANIM_SWORD_HURT,
-		ANIM_SWORD_DEATH
+		ANIM_SWORD_DEATH,
+		ANIM_SWORD_JUMP,
+		ANIM_SWORD_LANDING,
+		ANIM_SWORD_STEP,
 	};
 
 	enum STATE : uint8_t

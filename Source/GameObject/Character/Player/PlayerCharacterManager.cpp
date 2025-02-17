@@ -71,7 +71,7 @@ PlayerCharacter* PlayerCharacterManager::UpdatePlayerData(const uint32_t client_
 		// 新プレイヤー
 		player = new PlayerCharacter(client_id, name, appearance);
 		player->Hide();
-		Register(player);
+		SoftRegister(player);
 		player->GetStateMachine()->ChangeState(PlayerCharacter::STATE::IDLE);
 
 		std::cout << "New PlayerCharacter: " << static_cast<int>(client_id) << std::endl;
