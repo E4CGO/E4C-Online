@@ -648,13 +648,16 @@ void DungeonData::InitModelFileDatas()
 	m_modelFileDatas.at(WALL_PAPER).emplace_back("Data/Model/DungeonAssets/SM_Wall_Paper.glb", 4.0f);
 	m_modelFileDatas.at(WALL_SQUARES).emplace_back("Data/Model/DungeonAssets/SM_Wall_Squares.glb", 4.0f);
 	m_modelFileDatas.at(WELL).emplace_back("Data/Model/DungeonAssets/SM_Well_01a.glb", 4.0f);
-	m_modelFileDatas.at(BED_01A).emplace_back("Data/Model/DungeonAssets/Bed_01a.glb", 4.0f);
-	m_modelFileDatas.at(CHAIR_01A).emplace_back("Data/Model/DungeonAssets/Chair_01a.glb", 4.0f);
-	m_modelFileDatas.at(CURTAIN_01A).emplace_back("Data/Model/DungeonAssets/Curtain_01a.glb", 4.0f);
-	m_modelFileDatas.at(PEN_01A).emplace_back("Data/Model/DungeonAssets/Pen_01a.glb", 4.0f);
-	m_modelFileDatas.at(PEN_01B).emplace_back("Data/Model/DungeonAssets/Pen_01b.glb", 4.0f);
+	m_modelFileDatas.at(BED_01A).emplace_back("Data/Model/DungeonAssets/Bed_01a.glb", 0.04f);
+	m_modelFileDatas.at(CHAIR_01A).emplace_back("Data/Model/DungeonAssets/Chair_01a.glb", 0.04f);
+	m_modelFileDatas.at(CURTAIN_01A).emplace_back("Data/Model/DungeonAssets/Curtain_01a.glb", 0.04f);
+	m_modelFileDatas.at(PEN_01A).emplace_back("Data/Model/DungeonAssets_2/Pen_01a.glb", 0.04f);
+	m_modelFileDatas.at(PEN_01B).emplace_back("Data/Model/DungeonAssets_2/Pen_01b.glb", 0.04f);
 	m_modelFileDatas.at(CHEST_BLUE).emplace_back("Data/Model/DungeonAssets/Blue_Chest.glb", 0.01f);
 	m_modelFileDatas.at(CHEST_PINK).emplace_back("Data/Model/DungeonAssets/Pink_Chest.glb", 0.01f);
+	m_modelFileDatas.at(BALLOON).emplace_back("Data/Model/DungeonAssets_2/ballon1.glb", 0.4f);
+	m_modelFileDatas.at(CAR).emplace_back("Data/Model/DungeonAssets/Car.glb", 0.4f);
+	m_modelFileDatas.at(GEARS).emplace_back("Data/Model/DungeonAssets/Gears.glb", 0.4f);
 
 	// モデルない組～
 	m_modelFileDatas.at(PORTAL).emplace_back("", 0.0f);

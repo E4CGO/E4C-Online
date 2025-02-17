@@ -119,6 +119,9 @@ namespace ns_RoomData
 		PEN_01B,
 		CHEST_BLUE,
 		CHEST_PINK,
+		BALLOON,
+		CAR,
+		GEARS,
 
 		TILETYPE_COUNT
 	};
