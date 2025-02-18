@@ -119,7 +119,7 @@ public:
 		std::vector<Bone> bones;
 
 		DirectX::BoundingBox	localBounds;
-		
+
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_vb_resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_ib_resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource>	d3d_cb_resource;
@@ -354,6 +354,8 @@ public:
 		DirectX::XMFLOAT4X4 matrices[PRIMITIVE_MAX_JOINTS];
 	};
 
+	bool							m_is_ready = false;
+
 	//////////////////////////////////////////////
 
 	// 各種データ取得
@@ -381,6 +383,8 @@ public:
 	const std::vector<Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>>& GetNewTexturesRV() const { return newTextureRV; }
 
 	//////////////////////////////////////////////
+	void SetReady() { m_is_ready = true; }
+	bool IsReady() const { return m_is_ready; }
 
 	// 読み込み
 	void Load(ID3D11Device* device, const char* filename);

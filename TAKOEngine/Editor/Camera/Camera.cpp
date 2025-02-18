@@ -71,6 +71,13 @@ void Camera::CameraShake(float shakeAmplitude, float shakeTime,float elapsedTime
 		shakeTimer = 0;
 	}
 }
+void Camera::ShakeStart(float shakeTime, float shakeAmplitude)
+{
+	CameraManager::Instance().GetCamera()->ResetShakeTimer();
+	CameraManager::Instance().GetCamera()->SetShakeAmplitude(shakeAmplitude);
+	CameraManager::Instance().GetCamera()->SetShakeTime(shakeTime);
+	CameraManager::Instance().GetCamera()->SetShake(true);
+}
 void Camera::MoveTo(const DirectX::XMFLOAT3& eye, const DirectX::XMFLOAT3& focus, float transitiontime, float transitionDuration)
 {
 	// 遷移時間を増加

@@ -16,7 +16,17 @@ public:
 	virtual void Update(float elapsedTime)
 	{
 		std::lock_guard<std::mutex> lock(Manager<T>::m_mut);
-		for (T* item : removes)
+
+		// 安全登録
+		m_mutRegister.lock();
+		for (T* item : m_pRegisters)
+		{
+			this->items.emplace_back(item);
+		}
+		m_pRegisters.clear();
+		m_mutRegister.unlock();
+
+		for (T* item : m_pRemoves)
 		{
 			typename std::vector<T*>::iterator it = std::find(this->items.begin(), this->items.end(), item);
 			if (it != this->items.end())
@@ -25,7 +35,7 @@ public:
 			}
 			delete item;
 		}
-		removes.clear();
+		m_pRemoves.clear();
 
 		size_t size = this->items.size();
 		for (size_t i = 0; i < size; i++)
@@ -65,8 +75,9 @@ public:
 	// アイテムの登録を解除する
 	void Remove(T* item)
 	{
-		removes.insert(item);
+		m_pRemoves.insert(item);
 	}
+
 	// リサイズ
 	void Resize(int size)
 	{
@@ -75,7 +86,7 @@ public:
 		for (T* item : this->items)
 		{
 			i++;
-			if (i > size) removes.insert(item);
+			if (i > size) m_pRemoves.insert(item);
 		}
 	}
 	// デバッグ情報の表示
@@ -97,10 +108,21 @@ public:
 	void Clear() override {
 		std::lock_guard<std::mutex> lock(Manager<T>::m_mut);
 		Manager<T>::Clear();
-		removes.clear();
+		m_pRemoves.clear();
+	}
+
+	T* SoftRegister(T* item)
+	{
+		std::lock_guard<std::mutex> lock(m_mutRegister);
+		m_pRegisters.insert(item);
+		return item;
 	}
 protected:
-	std::set<T*> removes;
+	std::set<T*> m_pRemoves;
+
+	// 安全登録
+	std::set<T*> m_pRegisters;
+	std::mutex m_mutRegister;
 };
 
 #endif // !__INCLUDED_OBJECT_MANAGER__

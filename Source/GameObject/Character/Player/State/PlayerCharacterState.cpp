@@ -109,7 +109,7 @@ namespace PlayerCharacterState
 	// ジャンプステート
 	void JumpState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_MOVE_CONTINUE, false, 0.1f);
+		owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_JUMP, false, 0.1f);
 	}
 	void JumpState::Execute(float elapsedTime)
 	{
@@ -145,7 +145,7 @@ namespace PlayerCharacterState
 	// 着地ステート
 	void LandState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_MOVE_START, false, 0.1f);
+		owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_LANDING, false, 0.1f);
 	}
 	void LandState::Execute(float elapsedTime)
 	{
@@ -166,7 +166,7 @@ namespace PlayerCharacterState
 	// 回避ステート
 	void DodgeState::Enter()
 	{
-		owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_MOVE_CONTINUE, false, 0.0f);
+		owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_STEP, false, 0.0f);
 		owner->SetHurtCoolTime(0.2f);
 
 		// 判定消去
@@ -198,6 +198,7 @@ namespace PlayerCharacterState
 	void HurtState::Enter()
 	{
 		owner->SetAnimation(PlayerCharacter::Animation::ANIM_SWORD_HURT, false, 0.1f);
+		owner->SetTrail(false);
 	}
 	void HurtState::Execute(float elapsedTime)
 	{

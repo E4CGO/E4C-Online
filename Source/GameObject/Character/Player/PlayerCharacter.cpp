@@ -590,6 +590,17 @@ void PlayerCharacter::Update(float elapsedTime)
 {
 	SwordTrail();
 
+	if (m_hitStop)
+	{
+		m_stopTimer += elapsedTime;
+		if (m_stopTimer > m_stopTime)
+		{
+			m_hitStop = false;
+			m_stopTimer = 0;
+		}
+		return;
+	}
+
 	std::lock_guard<std::mutex> lock(m_mut);
 	{
 		ProfileScopedSection_2("input", ImGuiControl::Profiler::Red);
@@ -847,7 +858,30 @@ bool PlayerCharacter::InputMove(float elapsedTime) {
 
 	return(inputDirection.x != 0 && inputDirection.y != 0);//進行ベクトルがゼロベクトルでない場合入力された
 }
+void PlayerCharacter::FaceToEnemy()
+{
+	Enemy* closestEnemy = nullptr; // 一番近い敵を記録
+	float closestDistanceSq = FLT_MAX;
 
+	for (Enemy*& enemy : ENEMIES.GetAll())
+	{
+		float distanceSq = XMFLOAT3LengthSq(this->position - enemy->GetPosition());
+		if (distanceSq < 4.0f)
+		{
+			if (InSight(enemy->GetPosition(), 75.f))
+			{
+				// 今の敵がこれまでの最も近い敵よりも近い場合
+				if (distanceSq < closestDistanceSq)
+				{
+					closestDistanceSq = distanceSq;
+					closestEnemy = enemy;
+
+					FaceTo(closestEnemy->GetPosition());
+				}
+			}
+		}
+	}
+}
 void PlayerCharacter::Jump()
 {
 	if (!isGround) return;
@@ -926,6 +960,9 @@ void PlayerCharacter::GetSyncData(SYNC_DATA& data)
 	data.velocity[0] = velocity.x;
 	data.velocity[1] = velocity.y;
 	data.velocity[2] = velocity.z;
+	data.target[0] = target.x;
+	data.target[1] = target.y;
+	data.target[2] = target.z;
 	data.rotate = angle.y;
 	data.state = static_cast<uint8_t>(stateMachine->GetStateIndex());
 	data.sub_state = static_cast<uint8_t>(stateMachine->GetState()->GetSubStateIndex());

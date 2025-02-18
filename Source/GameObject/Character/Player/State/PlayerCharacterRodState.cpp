@@ -35,14 +35,6 @@ namespace PlayerCharacterState
 			owner->InputMove(elapsedTime);
 			owner->Jump();
 
-			//uint32_t flags = flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_Skill_2;
-			//if (owner->GetMp() > 50.0f)
-			//{
-			//	flags |= flag_AttackS | flag_Skill_1;
-			//}
-
-
-			//PlayerTransition(owner, flags);
 			PlayerTransition(
 				owner,
 				flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2
@@ -66,13 +58,6 @@ namespace PlayerCharacterState
 			owner->InputMove(elapsedTime);
 			owner->Jump();
 
-			//uint32_t flags = flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_AttackN | flag_Skill_2;
-			//if (owner->GetMp() > 50.0f)
-			//{
-			//	flags |= flag_AttackS | flag_Skill_1;
-			//}
-
-			//PlayerTransition(owner, flags);
 			PlayerTransition(
 				owner,
 				flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2

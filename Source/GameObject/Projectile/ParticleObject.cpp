@@ -34,12 +34,6 @@ ParticleObject::ParticleObject(PlayerCharacter* owner) : Projectile("Data/Model/
 		}
 	}
 	
-	//if (owner->IsPlayer())
-	//{
-	//	MakeAttackCollider(m_power, 0, { {}, m_radius }, Collider::COLLIDER_OBJ::PLAYER_PROJECTILE, Collider::COLLIDER_OBJ::ENEMY, &transform);
-	//	m_pColliders[0]->SetCollisionFunction([&](Collider* myCol, Collider* otherCol) {CollisionFunction(myCol, otherCol); });
-	//}
-
 	//SetPosition(startPosition);
 	
 	//if (owner->IsPlayer())
