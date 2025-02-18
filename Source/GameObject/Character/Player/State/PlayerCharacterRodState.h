@@ -198,6 +198,9 @@ namespace PlayerCharacterState
 			void Execute(float elapsedTime) override;
 			// ステートから出ていくときのメソッド
 			void Exit() override;
+		private:
+			const float m_coolTime = 0.8f;
+			float m_timer = 0.0f;
 		};
 
 		// スキル_1 ビーム

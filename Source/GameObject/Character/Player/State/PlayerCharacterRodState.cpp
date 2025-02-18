@@ -35,6 +35,14 @@ namespace PlayerCharacterState
 			owner->InputMove(elapsedTime);
 			owner->Jump();
 
+			//uint32_t flags = flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_Skill_2;
+			//if (owner->GetMp() > 50.0f)
+			//{
+			//	flags |= flag_AttackS | flag_Skill_1;
+			//}
+
+
+			//PlayerTransition(owner, flags);
 			PlayerTransition(
 				owner,
 				flag_Dodge | flag_Jump | flag_Move | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2
@@ -58,6 +66,13 @@ namespace PlayerCharacterState
 			owner->InputMove(elapsedTime);
 			owner->Jump();
 
+			//uint32_t flags = flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_AttackN | flag_Skill_2;
+			//if (owner->GetMp() > 50.0f)
+			//{
+			//	flags |= flag_AttackS | flag_Skill_1;
+			//}
+
+			//PlayerTransition(owner, flags);
 			PlayerTransition(
 				owner,
 				flag_Dodge | flag_Jump | flag_Stop | flag_Fall | flag_AttackN | flag_AttackS | flag_Skill_1 | flag_Skill_2
@@ -218,6 +233,7 @@ namespace PlayerCharacterState
 			owner->SetAnimationSpeed(1.0f);
 			owner->SetAnimation(PlayerCharacter::Animation::ANIM_ROD_CHARGE_CONTINUE, true);
 
+			m_timer = m_coolTime;
 			Projectile* particle = PROJECTILES.Register(new ParticleObject(owner));
 		}
 		void AttackSpecialState::Execute(float elapsedTime)
@@ -234,7 +250,14 @@ namespace PlayerCharacterState
 				owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 			}
 
-			owner->ModifyMp(-owner->GetMpCost(PlayerCharacter::STATE::SKILL_1) * elapsedTime);
+			owner->ModifyMp(-owner->GetMpCost(PlayerCharacter::STATE::ATTACK_SPECIAL) * elapsedTime);
+
+			if (m_timer < 0.0f)
+			{
+				m_timer = m_coolTime;
+				Projectile* particle = PROJECTILES.Register(new ParticleObject(owner));
+			}
+			m_timer -= elapsedTime;
 		}
 		void AttackSpecialState::Exit()
 		{
