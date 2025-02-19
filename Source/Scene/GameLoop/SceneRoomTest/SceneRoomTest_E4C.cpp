@@ -135,6 +135,10 @@ void SceneRoomTest_E4C::Initialize()
 	nodeDefaultNames.at(TileType::BALLOON) = "Balloon";
 	nodeDefaultNames.at(TileType::CAR) = "Car";
 	nodeDefaultNames.at(TileType::GEARS) = "Gears";
+	nodeDefaultNames.at(TileType::LAMP) = "Lamp";
+	nodeDefaultNames.at(TileType::BEAR_TREE) = "BearTree";
+	nodeDefaultNames.at(TileType::BALL) = "Ball";
+	nodeDefaultNames.at(TileType::INSTRUMENT) = "Instrument";
 
 	//testModel = std::make_unique<ModelObject>("Data/Model/Stage/Terrain_Map.glb", 1.0f, ModelObject::RENDER_MODE::DX12, ModelObject::MODEL_TYPE::LHS_PBR);
 	//testModel->SetPosition({ 0.0f, 0.0f, 0.0f });
