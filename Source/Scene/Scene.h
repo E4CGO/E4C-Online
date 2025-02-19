@@ -105,6 +105,7 @@ private:
 	std::unique_ptr<PostprocessingRendererDX12>	postprocessingRenderer = std::make_unique<PostprocessingRendererDX12>();
 
 	float m_timer = 0;
+	bool isShaderReady = false;
 	std::unique_ptr<PlaneDX12> m_loadingPlane;
 	std::unique_ptr<Camera> mainCamera;
 };

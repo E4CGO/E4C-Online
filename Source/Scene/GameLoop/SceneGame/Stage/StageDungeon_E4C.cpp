@@ -295,7 +295,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	floorText->Update(elapsedTime);
 
 	// なんかUIアップデートせんとあかんっぽい(01/27)
-	//UI.Update(elapsedTime);
+	UI.Update(elapsedTime);
 
 	// キャラクターの影登録
 	/*for (auto& model : PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetModels())
