@@ -83,7 +83,6 @@ namespace Online
 					{
 						enemy->Sync(enemyData);
 					}
-					
 				}
 				else
 				{
