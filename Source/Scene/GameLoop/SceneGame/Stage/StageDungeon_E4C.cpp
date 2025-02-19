@@ -159,7 +159,30 @@ void StageDungeon_E4C::Initialize()
 	floorText->SetBorder(2);
 	floorText->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 	floorText->SetPosition({ 30.0f, 30.0f });
+	{
 
+		// 最上階でない場合はチュートリアルフロアの生成
+		// 生成部屋の全削除（同期無視）
+		//m_roomOrder.clear();
+		if (currentFloor < DUNGEONDATA.GetDungeonGenSetting().maxFloor)
+		{
+			// 自動生成を行う
+		}
+		// 最上階であればボス部屋の生成
+		else
+		{
+			if (ONLINE_CONTROLLER->GetState() == Online::State::OFFLINE)
+			{
+				m_roomOrder.emplace_back(RoomType::FIRST_BOSS);
+			}
+			else
+			{
+				m_roomOrder.emplace_back(RoomType::FIRST_BOSS_ONLINE);
+			}
+		}
+	}
+
+	// ダンジョンの生成
 	GenerateDungeon();
 
 	// 部屋のモデルを配置
@@ -268,7 +291,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	floorText->Update(elapsedTime);
 
 	// なんかUIアップデートせんとあかんっぽい(01/27)
-	//UI.Update(elapsedTime);
+	UI.Update(elapsedTime);
 
 	// キャラクターの影登録
 	/*for (auto& model : PlayerCharacterManager::Instance().GetPlayerCharacterById()->GetModels())

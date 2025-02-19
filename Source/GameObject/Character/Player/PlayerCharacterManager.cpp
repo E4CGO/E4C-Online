@@ -49,6 +49,11 @@ PlayerCharacter* PlayerCharacterManager::GetPlayerCharacterById(void)
 PlayerCharacter* PlayerCharacterManager::GetPlayerCharacterById(uint32_t client_id)
 {
 	std::lock_guard<std::mutex> lock(m_mut);
+
+	for (PlayerCharacter* player : m_pRegisters)
+	{
+		if (player->GetClientId() == client_id) return player;
+	}
 	for (PlayerCharacter* player : this->items)
 	{
 		if (player->GetClientId() == client_id) return player;
@@ -99,9 +104,8 @@ PlayerCharacter* PlayerCharacterManager::UpdatePlayerData(const uint32_t client_
 void PlayerCharacterManager::SyncPlayer(const uint32_t client_id, const PlayerCharacter::SYNC_DATA& data)
 {
 	PlayerCharacter* player = GetPlayerCharacterById(client_id);
-	std::lock_guard<std::mutex> lock(m_mut);
 	if (player == nullptr) return;
-	// 補間？
+	std::lock_guard<std::mutex> lock(m_mut);
 	player->ImportSyncData(data);
 }
 
@@ -113,7 +117,6 @@ void PlayerCharacterManager::SyncPlayer(const uint32_t client_id, const PlayerCh
 *//***************************************************************************/
 void PlayerCharacterManager::Remove(const uint32_t client_id)
 {
-	std::lock_guard<std::mutex> lock(m_mut);
 	PlayerCharacter* player = GetPlayerCharacterById(client_id);
 	if (player != nullptr)
 	{
