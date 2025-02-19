@@ -81,6 +81,11 @@ void EnemyManager::RenderDX12(const RenderContextDX12& rc)
 *//***************************************************************************/
 Enemy* EnemyManager::GetEnemyById(const uint32_t& id)
 {
+	for (Enemy* enemy : m_pRegisters)
+	{
+		if (enemy->GetEnemyId() == id) return enemy;
+	}
+
 	for (Enemy*& enemy : items)
 	{
 		if (enemy->GetEnemyId() == id) return enemy;

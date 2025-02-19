@@ -1,4 +1,4 @@
-﻿//! @file AttackCollider.cpp
+//! @file AttackCollider.cpp
 //! @note 
 
 #include "AttackCollider.h"
@@ -47,7 +47,7 @@ void AttackSphereCollider::OnCollision(Collider* other)
 			uint16_t damage = m_power - other->GetArmor();
 			ModelObject* owner = static_cast<ModelObject*>(other->GetOwner());
 			m_hitOthers.emplace_back(owner);
-     
+
 			owner->OnDamage(damage);
 		}
 	}
@@ -110,7 +110,7 @@ void PlayerNormalAttackSphereCollider::OnCollision(Collider* other)
 			if (owner == other->GetOwner()) return;
 		}
 		player->SetCurrentMp(playerMp);
-		player->SetHitStop(true);
+		//player->SetHitStop(true);
 
 		if (m_power > other->GetArmor())
 		{
@@ -126,7 +126,7 @@ void PlayerNormalAttackSphereCollider::OnCollision(Collider* other)
 				playerMp = playerMaxMp;
 			}
 			player->SetCurrentMp(playerMp);
-			player->SetHitStop(true);
+			//player->SetHitStop(true);
 			chara->OnDamage(damage);
 		}
 	}
@@ -174,13 +174,11 @@ void PlayerSkill1AttackSphereCollider::OnCollision(Collider* other)
 
 			// 攻撃がヒットしたらカメラシェイクをリセット
 			CameraManager::Instance().GetCamera()->ShakeStart(0.5f, 0.1f);
-			player->SetHitStop(true);
+			//player->SetHitStop(true);
 			chara->OnDamage(damage);
 		}
 	}
 }
-
-
 
 void AttackCapsuleCollider::OnCollision(Collider* other)
 {
