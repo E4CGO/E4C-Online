@@ -101,10 +101,11 @@ void AABBCollider::DrawDebugGUI()
 void AABBCollider::DrawDebugPrimitive(DirectX::XMFLOAT4 color)
 {
 	if (!m_enable) return;
+	XMFLOAT3 size = m_radii * 2;
 
 	if (T_GRAPHICS.isDX11Active)
 	{
-		T_GRAPHICS.GetDebugRenderer()->DrawCube(m_position, m_radii, color);
+		T_GRAPHICS.GetDebugRenderer()->DrawCube(m_position, size, color);
 	}
 	else
 	{
@@ -113,7 +114,7 @@ void AABBCollider::DrawDebugPrimitive(DirectX::XMFLOAT4 color)
 		rc.d3d_command_list = T_GRAPHICS.GetFrameBufferManager()->GetCommandList();
 
 		// 描画
-		m_cube->SetCube(m_position, m_radii, color);
+		m_cube->SetCube(m_position, size, color);
 		m_cube->Render(rc);
 	}
 }

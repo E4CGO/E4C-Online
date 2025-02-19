@@ -242,8 +242,28 @@ namespace EnemyState
 
 					DirectX::XMFLOAT3 pos = { matrix->_41, matrix->_42 , matrix->_43 };
 
+					DirectX::XMMATRIX M = DirectX::XMLoadFloat4x4(matrix);
+					// オフセット行列抽出
+					DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(M.r[3].m128_f32[0], M.r[3].m128_f32[1], M.r[3].m128_f32[2]);
+
+					// スケール行列抽出
+					DirectX::XMMATRIX S = DirectX::XMMatrixScaling(
+						XMVector3Length(XMVECTOR{ M.r[0].m128_f32[0], M.r[0].m128_f32[1], M.r[0].m128_f32[2] }).m128_f32[0],
+						XMVector3Length(XMVECTOR{ M.r[1].m128_f32[0], M.r[1].m128_f32[1], M.r[1].m128_f32[2] }).m128_f32[0],
+						XMVector3Length(XMVECTOR{ M.r[2].m128_f32[0], M.r[2].m128_f32[1], M.r[2].m128_f32[2] }).m128_f32[0]);
+
+					// 回転行列抽出
+					DirectX::XMMATRIX R = DirectX::XMMatrixInverse(nullptr, S) * M * DirectX::XMMatrixInverse(nullptr, T);
+
+					XMFLOAT3 angle = MatrixToAngles(R);
+
 					PunchImpact* impact = new PunchImpact(pos, owner);
 					PROJECTILES.Register(impact);
+
+					ImpactEffectZone* zone = new ImpactEffectZone(nullptr);
+					zone->SetPosition(pos);
+					zone->SetAngle(angle);
+					ZoneManager::Instance().Register(zone);
 				}
 			}
 			if (!impacts[1])
@@ -254,8 +274,28 @@ namespace EnemyState
 
 					DirectX::XMFLOAT3 pos = { matrix->_41, matrix->_42 , matrix->_43 };
 
+					DirectX::XMMATRIX M = DirectX::XMLoadFloat4x4(matrix);
+					// オフセット行列抽出
+					DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(M.r[3].m128_f32[0], M.r[3].m128_f32[1], M.r[3].m128_f32[2]);
+
+					// スケール行列抽出
+					DirectX::XMMATRIX S = DirectX::XMMatrixScaling(
+						XMVector3Length(XMVECTOR{ M.r[0].m128_f32[0], M.r[0].m128_f32[1], M.r[0].m128_f32[2] }).m128_f32[0],
+						XMVector3Length(XMVECTOR{ M.r[1].m128_f32[0], M.r[1].m128_f32[1], M.r[1].m128_f32[2] }).m128_f32[0],
+						XMVector3Length(XMVECTOR{ M.r[2].m128_f32[0], M.r[2].m128_f32[1], M.r[2].m128_f32[2] }).m128_f32[0]);
+
+					// 回転行列抽出
+					DirectX::XMMATRIX R = DirectX::XMMatrixInverse(nullptr, S) * M * DirectX::XMMatrixInverse(nullptr, T);
+
+					XMFLOAT3 angle = MatrixToAngles(R);
+
 					PunchImpact* impact = new PunchImpact(pos, owner);
 					PROJECTILES.Register(impact);
+
+					ImpactEffectZone* zone = new ImpactEffectZone(nullptr);
+					zone->SetPosition(pos);
+					zone->SetAngle(angle);
+					ZoneManager::Instance().Register(zone);
 				}
 			}
 

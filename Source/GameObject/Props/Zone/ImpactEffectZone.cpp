@@ -40,6 +40,7 @@ void ImpactEffectZone::Update(float elapsedTime)
 	for (int i = 0; i < 2; i++)
 	{
 		m_effect[i]->SetPosition(position);
+		m_effect[i]->SetAngle(angle);
 		m_effect[i]->SetScale({ m_effectRadius[i], 1.0f, m_effectRadius[i] });
 		m_effect[i]->Update(elapsedTime);
 	}
