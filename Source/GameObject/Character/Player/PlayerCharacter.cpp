@@ -588,7 +588,10 @@ const iModel::Node* PlayerCharacter::GetSwordTrailNode()
 }
 void PlayerCharacter::Update(float elapsedTime)
 {
-	SwordTrail();
+	if (PlayerCharacter::GetEnergyType() == PlayerCharacter::ENERGY_TYPE::STAMINA)
+	{
+		SwordTrail();
+	}
 
 	if (m_hitStop)
 	{
@@ -626,9 +629,11 @@ void PlayerCharacter::Update(float elapsedTime)
 				};
 				angle.y = Mathf::LerpRadian(m_tempData.angle, m_tempData.sync_data.rotate, rate);
 			}
+			// Y軸修正
 			if (m_tempData.position.y - position.y > 10.0f)
 			{
 				position.y = m_tempData.position.y;
+				velocity.y = 0.0f;
 			}
 		}
 	}
@@ -710,6 +715,7 @@ void PlayerCharacter::Render(const RenderContext& rc)
 #include "Source/GameObject/Character/Player/State/PlayerCharacterSwordState.h"
 void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
 {
+	if (!m_visible) return;
 	Character::RenderDX12(rc);
 
 	DirectX::XMFLOAT3 front = CameraManager::Instance().GetCamera()->GetFront();

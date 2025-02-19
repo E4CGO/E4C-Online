@@ -135,7 +135,8 @@ public:
 	{
 		PlayerCharacter* result = nullptr;
 		int highestHate = INT_MIN;
-		for (const std::pair<uint32_t, int>client : m_hate)
+		const std::unordered_map<uint32_t, int> hates = m_hate;
+		for (const std::pair<uint32_t, int>& client : hates)
 		{
 			PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById(client.first);
 			if (player == nullptr)
