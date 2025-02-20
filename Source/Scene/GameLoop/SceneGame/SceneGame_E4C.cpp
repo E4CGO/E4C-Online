@@ -75,7 +75,6 @@ void SceneGame_E4C::Finalize()
 	PlayerCharacterManager::Instance().Clear();
 	ENEMIES.Clear();
 	MAPTILES.Clear();
-	PlayerCharacterManager::Instance().Clear();
 	EnemyManager::Instance().Clear();
 	SpawnerManager::Instance().Clear();
 	COLLISIONS.Clear();
