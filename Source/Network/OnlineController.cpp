@@ -304,7 +304,7 @@ namespace Online
 	*//***************************************************************************/
 	void OnlineController::NewRoom(const std::vector<uint8_t>& roomOrder)
 	{
-		if (m_pMatchingUI)
+		if (DungeonData::Instance().GetCurrentFloor() == 1)
 		{
 			Stage* stage = m_pMatchingUI->GetTeleporter()->GetStage();
 			if (auto dungeon = dynamic_cast<StageDungeon_E4C*>(stage))

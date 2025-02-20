@@ -321,11 +321,19 @@ void StageDungeon_E4C::DefeatBoss()
 	// 部屋のモデルを配置
 	for (RoomBase* room : rootRoom->GetAll())
 	{
-		if (room->GetRoomType() == DUNGEONDATA.GetCurrentFloorGenSetting().endRoomType)
+		if (room->GetRoomType() == RoomType::FIRST_BOSS ||
+			room->GetRoomType() == RoomType::FIRST_BOSS_ONLINE)
 		{
 			room->PlaceTeleporterTile(new StageOpenWorld_E4C(m_pScene), m_pScene->GetOnlineController());
 		}
 	}
+	//for (RoomBase* room : rootRoom->GetAll())
+	//{
+	//	if (room->GetRoomType() == DUNGEONDATA.GetCurrentFloorGenSetting().endRoomType)
+	//	{
+	//		room->PlaceTeleporterTile(new StageOpenWorld_E4C(m_pScene), m_pScene->GetOnlineController());
+	//
+	//}
 }
 
 void StageDungeon_E4C::Render()
