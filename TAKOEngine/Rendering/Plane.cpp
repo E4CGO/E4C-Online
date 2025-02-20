@@ -469,7 +469,8 @@ void PlaneDX12::RenderDX12(const RenderContextDX12& rc)
 	// 更新
 	void* mappedData = nullptr;
 	d3d_cbv_resource->Map(0, nullptr, &mappedData);
-	memcpy(mappedData, &mesh.offsetTransforms[0], sizeof(DirectX::XMFLOAT4X4));
+	if (mappedData == nullptr) return;
+	memcpy(mappedData, &transform, sizeof(DirectX::XMFLOAT4X4));
 	d3d_cbv_resource->Unmap(0, nullptr);
 
 	RenderContextDX12 dst_rc = rc;

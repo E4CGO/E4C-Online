@@ -28,6 +28,8 @@ void SceneLoading::Initialize()
 			{ 0.0f, 0.0f, 0.0f },	// 注視点
 			{ 0, 0.969f, -0.248f }	// 上ベクトル
 		);
+
+		isShaderReady = true;
 	}
 
 	thread = new std::thread(LoadingThread, this);
@@ -38,6 +40,7 @@ void SceneLoading::Finalize()
 {
 	if (thread != nullptr)
 	{
+		isShaderReady = false;
 		thread->join();
 		delete thread;
 		thread = nullptr;
@@ -77,39 +80,42 @@ void SceneLoading::RenderDX12()
 {
 	RenderContextDX12 rc;
 
-	T_GRAPHICS.BeginRender();
+	if (isShaderReady)
+	{
+		T_GRAPHICS.BeginRender();
 
-	m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
-	m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
-	m_frameBuffer->Clear(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->WaitUntilToPossibleSetRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->SetRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->Clear(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
 
-	const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
-		mainCamera.get(), m_timer, 0);
+		const Descriptor* scene_cbv_descriptor = T_GRAPHICS.UpdateSceneConstantBuffer(
+			mainCamera.get(), m_timer, 0);
 
-	rc.d3d_command_list = m_frameBuffer->GetCommandList();
-	rc.scene_cbv_descriptor = scene_cbv_descriptor;
+		rc.d3d_command_list = m_frameBuffer->GetCommandList();
+		rc.scene_cbv_descriptor = scene_cbv_descriptor;
 
-	m_loadingPlane->RenderDX12(rc);
+		m_loadingPlane->RenderDX12(rc);
 
-	m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
+		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
 
-	postprocessingRenderer->Render(m_frameBuffer);
+		postprocessingRenderer->Render(m_frameBuffer);
 
-	T_TEXT.BeginDX12();
+		T_TEXT.BeginDX12();
 
-	T_TEXT.RenderDX12(
-		FONT_ID::HGpop,
-		L"Now Loading...",
-		T_GRAPHICS.GetScreenWidth() * 0.95f, T_GRAPHICS.GetScreenHeight() * 0.95f,
-		1.0f, 1.0f, 1.0f, 1.0f,
-		0.0f,
-		FONT_ALIGN::RIGHT
-	);
+		T_TEXT.RenderDX12(
+			FONT_ID::HGpop,
+			L"Now Loading...",
+			T_GRAPHICS.GetScreenWidth() * 0.95f, T_GRAPHICS.GetScreenHeight() * 0.95f,
+			1.0f, 1.0f, 1.0f, 1.0f,
+			0.0f,
+			FONT_ALIGN::RIGHT
+		);
 
-	T_TEXT.EndDX12();
+		T_TEXT.EndDX12();
 
-	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(T_GRAPHICS.GetFrameBufferManager()->GetCommandList());
-	T_GRAPHICS.End();
+		T_GRAPHICS.GetImGUIRenderer()->RenderDX12(T_GRAPHICS.GetFrameBufferManager()->GetCommandList());
+		T_GRAPHICS.End();
+	}
 }
 
 void SceneLoading::LoadingThread(SceneLoading* scene)

@@ -14,7 +14,7 @@ OneWayWall::OneWayWall(WayDirection dir, float scale, const char* filename) : Mo
 {
 	SetScale({ m_Scaling , m_Scaling , 1.0f});
 	angle.y = DirectX::XM_PIDIV2 * static_cast<float>(dir);
-	AABB trigger{ {0, 0, -0.75f}, { m_Scaling * fabsf(cosf(angle.y)) + 0.5f * fabsf(sinf(angle.y)), m_Scaling, 0.5f * fabsf(cosf(angle.y)) + m_Scaling * fabsf(sinf(angle.y)) } };
+	AABB trigger{ {0, 0, -1.0f}, { m_Scaling * fabsf(cosf(angle.y)) + 0.5f * fabsf(sinf(angle.y)), m_Scaling, 0.5f * fabsf(cosf(angle.y)) + m_Scaling * fabsf(sinf(angle.y)) } };
 	AABB wall{ {0, 0, -0.25f}, { m_Scaling * fabsf(cosf(angle.y)) + 0.25f * fabsf(sinf(angle.y)), m_Scaling, 0.25f * fabsf(cosf(angle.y)) + m_Scaling * fabsf(sinf(angle.y))}};
 	//trigger.radii = trigger.radii * 2.0f;
 	//wall.radii = wall.radii * 2.0f;
@@ -37,14 +37,13 @@ OneWayWall::OneWayWall(WayDirection dir, float scale, const char* filename) : Mo
 
 void OneWayWall::Update(float elapsedTime)
 {
-	m_pColliders[1]->SetEnable(true);
-
+	m_pColliders[1]->SetHittableOBJ(Collider::COLLIDER_OBJ::PLAYER | Collider::COLLIDER_OBJ::ENEMY);
 	ModelObject::Update(elapsedTime);
 }
 
 void OneWayWall::CollisionTrigger(Collider* myCol, Collider* otherCol)
 {
-	m_pColliders[1]->SetEnable(false);
+	m_pColliders[1]->SetHittableOBJ(Collider::COLLIDER_OBJ::ENEMY);
 }
 
 void OneWayWall::CollisionWall(Collider* myCol, Collider* otherCol)
@@ -52,5 +51,5 @@ void OneWayWall::CollisionWall(Collider* myCol, Collider* otherCol)
 	HitResult hit;
 	myCol->Collision(otherCol, {}, hit);
 	hit.normal.y = 0;
-	otherCol->GetOwner()->GameObject::SetPosition(otherCol->GetOwner()->GetPosition() - hit.normal * hit.distance);
+	otherCol->GetOwner()->SetPosition(otherCol->GetOwner()->GetPosition() - hit.normal * hit.distance);
 }

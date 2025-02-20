@@ -1,4 +1,4 @@
-	//! @file PlayerCharacter.cpp
+//! @file PlayerCharacter.cpp
 //! @note
 
 #include "PlayerCharacter.h"
@@ -343,104 +343,104 @@ void PlayerCharacter::UpdateInput()
 	//if (GAME_SETTING.KeyboardInput)
 	//{
 		// キーボード
-		if (T_INPUT.KeyPress('W')) input |= Input_Up;
-		if (T_INPUT.KeyPress('S')) input |= Input_Down;
-		if ((input & (Input_Up | Input_Down)) == (Input_Up | Input_Down))
-		{
-			input &= ~(Input_Up | Input_Down);
-		}
-		if (T_INPUT.KeyPress('A')) input |= Input_Left;
-		if (T_INPUT.KeyPress('D')) input |= Input_Right;
-		if ((input & (Input_Left | Input_Right)) == (Input_Left | Input_Right))
-		{
-			input &= ~(Input_Left | Input_Right);
-		}
+	if (T_INPUT.KeyPress('W')) input |= Input_Up;
+	if (T_INPUT.KeyPress('S')) input |= Input_Down;
+	if ((input & (Input_Up | Input_Down)) == (Input_Up | Input_Down))
+	{
+		input &= ~(Input_Up | Input_Down);
+	}
+	if (T_INPUT.KeyPress('A')) input |= Input_Left;
+	if (T_INPUT.KeyPress('D')) input |= Input_Right;
+	if ((input & (Input_Left | Input_Right)) == (Input_Left | Input_Right))
+	{
+		input &= ~(Input_Left | Input_Right);
+	}
 
-		if (T_INPUT.KeyDown(VK_SPACE)) input |= Input_Jump;
-		if (T_INPUT.KeyDown(VK_CONTROL) && mp >= GetMpCost(STATE::DODGE)) input |= Input_Dodge;
+	if (T_INPUT.KeyDown(VK_SPACE)) input |= Input_Jump;
+	if (T_INPUT.KeyDown(VK_CONTROL) && mp >= GetMpCost(STATE::DODGE)) input |= Input_Dodge;
 
-		if (T_INPUT.KeyPress(VK_LBUTTON) && !TentacleLib::isShowCursor() && mp >= GetMpCost(STATE::ATTACK_NORMAL)) input |= Input_Attack_N;
-		if (T_INPUT.KeyPress(VK_RBUTTON) && !TentacleLib::isShowCursor() && mp >= GetMpCost(STATE::ATTACK_SPECIAL)) input |= Input_Attack_S;
+	if (T_INPUT.KeyPress(VK_LBUTTON) && !TentacleLib::isShowCursor() && mp >= GetMpCost(STATE::ATTACK_NORMAL)) input |= Input_Attack_N;
+	if (T_INPUT.KeyPress(VK_RBUTTON) && !TentacleLib::isShowCursor() && mp >= GetMpCost(STATE::ATTACK_SPECIAL)) input |= Input_Attack_S;
 
-		if (
-			T_INPUT.KeyPress('1')
-			&& mp >= GetMpCost(STATE::SKILL_1)
-			&& GetSkillTimerTime(static_cast<int>(STATE::SKILL_1)) == 0.0f
-			) input |= Input_Skill_1;
+	if (
+		T_INPUT.KeyPress('1')
+		&& mp >= GetMpCost(STATE::SKILL_1)
+		&& GetSkillTimerTime(static_cast<int>(STATE::SKILL_1)) == 0.0f
+		) input |= Input_Skill_1;
 
-		if (
-			T_INPUT.KeyPress('2')
-			&& mp >= GetMpCost(STATE::SKILL_2)
-			&& GetSkillTimerTime(static_cast<int>(STATE::SKILL_2)) == 0.0f
-			) input |= Input_Skill_2;
+	if (
+		T_INPUT.KeyPress('2')
+		&& mp >= GetMpCost(STATE::SKILL_2)
+		&& GetSkillTimerTime(static_cast<int>(STATE::SKILL_2)) == 0.0f
+		) input |= Input_Skill_2;
 
-		if (
-			T_INPUT.KeyPress('3')
-			&& mp >= GetMpCost(STATE::SKILL_3)
-			&& GetSkillTimerTime(static_cast<int>(STATE::SKILL_3)) == 0.0f
-			) input |= Input_Skill_3;
+	if (
+		T_INPUT.KeyPress('3')
+		&& mp >= GetMpCost(STATE::SKILL_3)
+		&& GetSkillTimerTime(static_cast<int>(STATE::SKILL_3)) == 0.0f
+		) input |= Input_Skill_3;
 
-		if (
-			T_INPUT.KeyPress('4')
-			&& mp >= GetMpCost(STATE::SKILL_4)
-			&& GetSkillTimerTime(static_cast<int>(STATE::SKILL_4)) == 0.0f
-			) input |= Input_Skill_4;
+	if (
+		T_INPUT.KeyPress('4')
+		&& mp >= GetMpCost(STATE::SKILL_4)
+		&& GetSkillTimerTime(static_cast<int>(STATE::SKILL_4)) == 0.0f
+		) input |= Input_Skill_4;
 
-		if (T_INPUT.KeyUp(VK_LBUTTON)) input |= Input_R_Attack_N;
-		if (T_INPUT.KeyUp(VK_RBUTTON)) input |= Input_R_Attack_S;
-		if (T_INPUT.KeyUp('1')) input |= Input_R_Skill_1;
-		if (T_INPUT.KeyUp('2')) input |= Input_R_Skill_2;
-		if (T_INPUT.KeyUp('3')) input |= Input_R_Skill_3;
-		if (T_INPUT.KeyUp('4')) input |= Input_R_Skill_4;
+	if (T_INPUT.KeyUp(VK_LBUTTON)) input |= Input_R_Attack_N;
+	if (T_INPUT.KeyUp(VK_RBUTTON)) input |= Input_R_Attack_S;
+	if (T_INPUT.KeyUp('1')) input |= Input_R_Skill_1;
+	if (T_INPUT.KeyUp('2')) input |= Input_R_Skill_2;
+	if (T_INPUT.KeyUp('3')) input |= Input_R_Skill_3;
+	if (T_INPUT.KeyUp('4')) input |= Input_R_Skill_4;
 
-		// 入力による移動量計算
-		if (input & Input_Left) ax -= 1.0f;
-		if (input & Input_Right) ax += 1.0f;
-		if (input & Input_Up) ay += 1.0f;
-		if (input & Input_Down) ay -= 1.0f;
+	// 入力による移動量計算
+	if (input & Input_Left) ax -= 1.0f;
+	if (input & Input_Right) ax += 1.0f;
+	if (input & Input_Up) ay += 1.0f;
+	if (input & Input_Down) ay -= 1.0f;
 	//}
 	//else
 	//{
 		// ゲームパッド
-		if (T_INPUT.GamePadKeyDown(GAME_PAD_BTN::A)) input |= Input_Jump;
-		if (T_INPUT.GamePadKeyDown(GAME_PAD_BTN::B) && mp >= GetMpCost(static_cast<int>(STATE::DODGE))) input |= Input_Dodge;
-		
-		if (T_INPUT.GamePadKeyPress(GAME_PAD_BTN::RSHOULDER) && !TentacleLib::isShowCursor() && mp >= GetMpCost(STATE::ATTACK_NORMAL)) input |= Input_Attack_N;
-		if (T_INPUT.GamePadKeyPress(GAME_PAD_BTN::RTRIGGER) && !TentacleLib::isShowCursor() && mp >= GetMpCost(STATE::ATTACK_SPECIAL)) input |= Input_Attack_S;
+	if (T_INPUT.GamePadKeyDown(GAME_PAD_BTN::A)) input |= Input_Jump;
+	if (T_INPUT.GamePadKeyDown(GAME_PAD_BTN::B) && mp >= GetMpCost(static_cast<int>(STATE::DODGE))) input |= Input_Dodge;
 
-		if (
-			T_INPUT.GamePadKeyPress(GAME_PAD_BTN::X)
-			&& mp >= GetMpCost(STATE::SKILL_1)
-			&& GetSkillTimerTime(static_cast<int>(STATE::SKILL_1)) == 0.0f
-			) input |= Input_Skill_1;
+	if (T_INPUT.GamePadKeyPress(GAME_PAD_BTN::RSHOULDER) && !TentacleLib::isShowCursor() && mp >= GetMpCost(STATE::ATTACK_NORMAL)) input |= Input_Attack_N;
+	if (T_INPUT.GamePadKeyPress(GAME_PAD_BTN::RTRIGGER) && !TentacleLib::isShowCursor() && mp >= GetMpCost(STATE::ATTACK_SPECIAL)) input |= Input_Attack_S;
 
-		if (
-			T_INPUT.GamePadKeyPress(GAME_PAD_BTN::LSHOULDER)
-			&& mp >= GetMpCost(STATE::SKILL_2)
-			&& GetSkillTimerTime(static_cast<int>(STATE::SKILL_2)) == 0.0f
-			) input |= Input_Skill_2;
+	if (
+		T_INPUT.GamePadKeyPress(GAME_PAD_BTN::X)
+		&& mp >= GetMpCost(STATE::SKILL_1)
+		&& GetSkillTimerTime(static_cast<int>(STATE::SKILL_1)) == 0.0f
+		) input |= Input_Skill_1;
 
-		if (
-			T_INPUT.GamePadKeyPress(GAME_PAD_BTN::LTRIGGER)
-			&& mp >= GetMpCost(STATE::SKILL_3)
-			&& GetSkillTimerTime(static_cast<int>(STATE::SKILL_3)) == 0.0f
-			) input |= Input_Skill_3;
+	if (
+		T_INPUT.GamePadKeyPress(GAME_PAD_BTN::LSHOULDER)
+		&& mp >= GetMpCost(STATE::SKILL_2)
+		&& GetSkillTimerTime(static_cast<int>(STATE::SKILL_2)) == 0.0f
+		) input |= Input_Skill_2;
 
-		if (
-			T_INPUT.GamePadKeyPress(GAME_PAD_BTN::Y)
-			&& mp >= GetMpCost(STATE::SKILL_4)
-			&& GetSkillTimerTime(static_cast<int>(STATE::SKILL_4)) == 0.0f
-			) input |= Input_Skill_4;
+	if (
+		T_INPUT.GamePadKeyPress(GAME_PAD_BTN::LTRIGGER)
+		&& mp >= GetMpCost(STATE::SKILL_3)
+		&& GetSkillTimerTime(static_cast<int>(STATE::SKILL_3)) == 0.0f
+		) input |= Input_Skill_3;
 
-		if (T_INPUT.GamePadKeyUp(GAME_PAD_BTN::RSHOULDER)) input |= Input_R_Attack_N;
-		if (T_INPUT.GamePadKeyUp(GAME_PAD_BTN::RTRIGGER)) input |= Input_R_Attack_S;
-		if (T_INPUT.GamePadKeyUp(GAME_PAD_BTN::X)) input |= Input_R_Skill_1;
-		if (T_INPUT.GamePadKeyUp(GAME_PAD_BTN::LSHOULDER)) input |= Input_R_Skill_2;
-		if (T_INPUT.GamePadKeyUp(GAME_PAD_BTN::LTRIGGER)) input |= Input_R_Skill_3;
-		if (T_INPUT.GamePadKeyUp(GAME_PAD_BTN::Y)) input |= Input_R_Skill_4;
-		//移動量計算
-		if (T_INPUT.GetGamePadLAxis().x!= 0.0f) ax = T_INPUT.GetGamePadLAxis().x;
-		if (T_INPUT.GetGamePadLAxis().y != 0.0f) ay = T_INPUT.GetGamePadLAxis().y;
+	if (
+		T_INPUT.GamePadKeyPress(GAME_PAD_BTN::Y)
+		&& mp >= GetMpCost(STATE::SKILL_4)
+		&& GetSkillTimerTime(static_cast<int>(STATE::SKILL_4)) == 0.0f
+		) input |= Input_Skill_4;
+
+	if (T_INPUT.GamePadKeyUp(GAME_PAD_BTN::RSHOULDER)) input |= Input_R_Attack_N;
+	if (T_INPUT.GamePadKeyUp(GAME_PAD_BTN::RTRIGGER)) input |= Input_R_Attack_S;
+	if (T_INPUT.GamePadKeyUp(GAME_PAD_BTN::X)) input |= Input_R_Skill_1;
+	if (T_INPUT.GamePadKeyUp(GAME_PAD_BTN::LSHOULDER)) input |= Input_R_Skill_2;
+	if (T_INPUT.GamePadKeyUp(GAME_PAD_BTN::LTRIGGER)) input |= Input_R_Skill_3;
+	if (T_INPUT.GamePadKeyUp(GAME_PAD_BTN::Y)) input |= Input_R_Skill_4;
+	//移動量計算
+	if (T_INPUT.GetGamePadLAxis().x != 0.0f) ax = T_INPUT.GetGamePadLAxis().x;
+	if (T_INPUT.GetGamePadLAxis().y != 0.0f) ay = T_INPUT.GetGamePadLAxis().y;
 	//}
 
 	// カメラ方向とスティックの入力値によって進行方向を計算する
@@ -729,7 +729,6 @@ void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
 
 	{
 		m_EffectCharge->RenderDX12(rc);
-
 	}
 
 #ifdef _DEBUG

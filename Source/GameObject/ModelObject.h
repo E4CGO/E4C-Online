@@ -93,9 +93,10 @@ public:
 
 	// 位置設定
 	virtual void SetPosition(const DirectX::XMFLOAT3& position) override {
-		this->position = position; 
-		if(m_pMoveCollider)
-			m_pMoveCollider->SetPosition(position); 
+		XMFLOAT3 moveVec = position - this->position;
+		this->position += moveVec;
+		if (m_pMoveCollider)
+			m_pMoveCollider->SetPosition(m_pMoveCollider->GetPosition() + moveVec);
 	}
 
 	// 移動用コライダー

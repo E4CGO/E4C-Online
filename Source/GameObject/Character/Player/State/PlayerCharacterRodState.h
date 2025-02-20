@@ -198,6 +198,9 @@ namespace PlayerCharacterState
 			void Execute(float elapsedTime) override;
 			// ステートから出ていくときのメソッド
 			void Exit() override;
+		private:
+			const float m_coolTime = 0.8f;
+			float m_timer = 0.0f;
 		};
 
 		// スキル_1 ビーム
@@ -216,7 +219,8 @@ namespace PlayerCharacterState
 			void Exit() override;
 
 		private:
-			DirectX::XMFLOAT3 m_dir;
+			DirectX::XMFLOAT3 m_dir = {0, 0, 0};
+			bool m_isShot = false;
 		};
 
 		class Skill2State : public HierarchicalState<PlayerCharacter>
