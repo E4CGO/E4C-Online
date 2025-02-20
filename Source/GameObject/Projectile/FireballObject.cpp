@@ -33,14 +33,14 @@ FireballObject::FireballObject(PlayerCharacter* owner) : Projectile("Data/Model/
 *//***************************************************************************/
 void FireballObject::Update(float elapsedTime)
 {
-	if(m_isCharge)
+	if (m_isCharge)
 	{
 		PlayerCharacter* player = static_cast<PlayerCharacter*>(m_pOwner);
 
 		if (player->IsPlayer())
 		{
 			if (player->InputAttackNormal())
-			{				
+			{
 				float s = (m_chargeTime - m_currentTimer) * m_radius * 2 + 0.5f;
 				scale = { s, s, s };
 
@@ -67,7 +67,6 @@ void FireballObject::Update(float elapsedTime)
 		}
 		else
 		{
-
 		}
 
 		// ダメージを受けたら消える
@@ -107,7 +106,7 @@ void FireballObject::Update(float elapsedTime)
 		offsetPos.z = position.z + 0.0f * scale.z;
 		m_fireball->SetPosition(offsetPos);
 		m_fireball->Update(elapsedTime);
-		
+
 		if (m_currentTimer < 0.0f)
 		{
 			Destory();
@@ -137,6 +136,6 @@ void FireballObject::CollisionFunction(Collider* myCol, Collider* otherCol)
 *//***************************************************************************/
 void FireballObject::RenderDX12(const RenderContextDX12& rc)
 {
-	ModelObject::RenderDX12(rc);
+	//ModelObject::RenderDX12(rc);
 	m_fireball->RenderDX12(rc);
 }
