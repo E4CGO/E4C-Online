@@ -216,12 +216,18 @@ void StageDungeon_E4C::Initialize()
 	m_pPauseMenu = new WidgetPauseMenu(cameraController.get());
 	UI.Register(m_pPauseMenu);
 
+	m_pPlayerList = new WidgetPlayers;
+	UI.Register(m_pPlayerList);
+
 	// 影初期化
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
 }
 
 void StageDungeon_E4C::Finalize()
 {
+	UI.Remove(m_pPauseMenu);
+	UI.Remove(m_pPlayerList);
+
 	ENEMIES.Clear();
 	MAPTILES.Clear();
 	PROJECTILES.Clear();
