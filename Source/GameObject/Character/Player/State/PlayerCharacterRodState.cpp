@@ -5,6 +5,7 @@
 #include "PlayerCharacterState.h"
 #include "GameObject/Props/Zone/HealingZone.h"
 #include "GameObject/Props/Zone/ZoneManager.h"
+#include "UI/Widget/WidgetCrosshair.h"
 
 namespace PlayerCharacterState
 {
@@ -81,6 +82,7 @@ namespace PlayerCharacterState
 				m_tempMoveSpeed = owner->GetMoveSpeed();
 				owner->SetMoveSpeed(m_tempMoveSpeed * m_slowMoveRate);
 				TPSCamera.AimMode(true);
+				CROSS_HAIR.SetPosition({ SCREEN_W * 0.5f - CROSS_HAIR.GetSize().x * 0.5f, SCREEN_H * 0.5f - CROSS_HAIR.GetSize().y * 0.5f });
 			}
 		}
 		void AttackNormalState::Execute(float elapsedTime)
