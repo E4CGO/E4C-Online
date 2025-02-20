@@ -163,10 +163,14 @@ void StageDungeon_E4C::Initialize()
 
 		// 最上階でない場合はチュートリアルフロアの生成
 		// 生成部屋の全削除（同期無視）
-		//m_roomOrder.clear();
+		m_roomOrder.clear();
 		if (currentFloor < DUNGEONDATA.GetDungeonGenSetting().maxFloor)
 		{
-			// 自動生成を行う
+			// チュートリアルフロアの生成
+			m_roomOrder.emplace_back(RoomType::TUTO_START);
+			m_roomOrder.emplace_back(RoomType::TUTO_NOTHINGROOM);
+			m_roomOrder.emplace_back(RoomType::TUTO_SPAWNERROOM);
+			m_roomOrder.emplace_back(RoomType::TUTO_END);
 		}
 		// 最上階であればボス部屋の生成
 		else
