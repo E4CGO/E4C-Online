@@ -256,6 +256,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	if (onlineController->GetState() == Online::OnlineController::STATE::LOGINED)
 	{
 		onlineController->RoomIn();
+		onlineController->RequestClients();
 		onlineController->BeginSync();
 	}
 

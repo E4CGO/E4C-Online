@@ -239,6 +239,7 @@ void StageOpenWorld_E4C::Update(float elapsedTime)
 	Online::OnlineController* onlineController = m_pScene->GetOnlineController();
 	if (onlineController->GetState() == Online::OnlineController::STATE::LOGINED)
 	{
+		onlineController->RequestClients();
 		onlineController->BeginSync();
 	}
 

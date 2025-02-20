@@ -34,4 +34,15 @@ namespace Online
 		}
 		return false;
 	}
+	/**************************************************************************//**
+		@brief		クライアントデータ同期要請
+		@param[in]	data 必要ない 
+		@return		成功判定
+	*//***************************************************************************/
+	bool TCPClientData::Send(void* data)
+	{
+		std::vector<uint8_t> buffer;
+		CreateHeaderBuffer(buffer, m_cmd);
+		return m_pcontroller->GetTcpSocket()->Send(buffer.data(), buffer.size()) >= 0;
+	}
 }
