@@ -324,7 +324,7 @@ void StageDungeon_E4C::DefeatBoss()
 		if (room->GetRoomType() == RoomType::FIRST_BOSS ||
 			room->GetRoomType() == RoomType::FIRST_BOSS_ONLINE)
 		{
-			room->PlaceTeleporterTile(new StageOpenWorld_E4C(m_pScene), m_pScene->GetOnlineController());
+			room->PlaceTeleporterTile(nullptr, m_pScene->GetOnlineController());
 		}
 	}
 	//for (RoomBase* room : rootRoom->GetAll())
@@ -332,7 +332,7 @@ void StageDungeon_E4C::DefeatBoss()
 	//	if (room->GetRoomType() == DUNGEONDATA.GetCurrentFloorGenSetting().endRoomType)
 	//	{
 	//		room->PlaceTeleporterTile(new StageOpenWorld_E4C(m_pScene), m_pScene->GetOnlineController());
-	//
+	//	}
 	//}
 }
 
