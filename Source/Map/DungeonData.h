@@ -122,6 +122,10 @@ namespace ns_RoomData
 		BALLOON,
 		CAR,
 		GEARS,
+		LAMP,
+		BEAR_TREE,
+		BALL,
+		INSTRUMENT,
 
 		TILETYPE_COUNT
 	};

@@ -27,42 +27,46 @@ void DungeonData::Initialize()
 
 void DungeonData::InitDungeonGenSetting()
 {
-	m_dungeonGenerateSetting.maxFloor = 2;
+	// 現在のカレントディレクトリを保存しておく
+	char currentDirectory[260];
+	GetCurrentDirectoryA(260, currentDirectory);
+
+	// DungeonData.jsonの読み込み
+	nlohmann::json loadFile;
+	std::ifstream ifs("DungeonData.json");
+	if (ifs.is_open())
+	{
+		ifs >> loadFile;
+		m_dungeonGenerateSetting.maxFloor = loadFile["DungeonGenSetting"]["MaxFloor"];
+		ifs.close();
+	}
+	SetCurrentDirectoryA(currentDirectory);
 }
 
 void DungeonData::InitFloorGenSettings()
 {
-	// 255階くらいまでは一応リサイズしておく
-	m_floorGenerateSettings.resize(255);
+	// 現在のカレントディレクトリを保存しておく
+	char currentDirectory[260];
+	GetCurrentDirectoryA(260, currentDirectory);
 
-	// 将来的にjson読み込みにする
-	m_floorGenerateSettings.at(0).maxDepth = 5;
-	m_floorGenerateSettings.at(0).startRoomType = RoomType::TUTO_START;
-	m_floorGenerateSettings.at(0).endRoomType = RoomType::TUTO_END;
-	m_floorGenerateSettings.at(0).deadEndRoomType = RoomType::TUTO_DEAD_END;
-
-	// FirstFloor
-	m_floorGenerateSettings.at(1).maxDepth = 5;
-	m_floorGenerateSettings.at(1).startRoomType = RoomType::TUTO_START;
-	m_floorGenerateSettings.at(1).endRoomType = RoomType::TUTO_END;
-	m_floorGenerateSettings.at(1).deadEndRoomType = RoomType::TUTO_DEAD_END;
-
-	// SecondFloor
-	m_floorGenerateSettings.at(2).maxDepth = 5;
-	m_floorGenerateSettings.at(2).startRoomType = RoomType::FIRST_BOSS;
-	m_floorGenerateSettings.at(2).endRoomType = RoomType::FIRST_BOSS;
-	m_floorGenerateSettings.at(2).deadEndRoomType = RoomType::FIRST_DEAD_END;
-
-	// ThirdFloor
-	//m_floorGenerateSettings.at(3).maxDepth = 4;
-	//m_floorGenerateSettings.at(3).startRoomType = RoomType::THIRD_START;
-	//m_floorGenerateSettings.at(3).endRoomType = RoomType::THIRD_END;
-	//m_floorGenerateSettings.at(3).deadEndRoomType = RoomType::THIRD_DEAD_END;
-
-	// BossFloor
-	// endRoomTypeが該当する部屋にテレポーターを配置するため、FIRST_BOSSを両方に適応させる
-	//m_floorGenerateSettings.at(4).startRoomType = RoomType::FIRST_BOSS;
-	//m_floorGenerateSettings.at(4).endRoomType = RoomType::FIRST_BOSS;
+	// DungeonData.jsonの読み込み
+	nlohmann::json loadFile;
+	std::ifstream ifs("DungeonData.json");
+	if (ifs.is_open())
+	{
+		ifs >> loadFile;
+		for (nlohmann::json_abi_v3_11_3::json data : loadFile["FloorGenSettings"])
+		{
+			FloorGenerateSetting newSetting;
+			newSetting.maxDepth = data["MaxDepth"];
+			newSetting.startRoomType = data["StartRoomType"];
+			newSetting.endRoomType = data["EndRoomType"];
+			newSetting.deadEndRoomType = data["DeadEndRoomType"];
+			m_floorGenerateSettings.emplace_back(newSetting);
+		}
+		ifs.close();
+	}
+	SetCurrentDirectoryA(currentDirectory);
 }
 
 void DungeonData::InitRoomGenSettings()
@@ -74,6 +78,15 @@ void DungeonData::InitRoomGenSettings()
 	{
 		m_roomGenerateSettings.at((RoomType)i) = LoadRoomGenSetting((RoomType(i)));
 	}
+
+	/*///// Tutorial Floor /////*/
+	m_roomGenerateSettings.at(TUTO_START).placementCandidates.emplace_back(RoomType::TUTO_NOTHINGROOM);
+
+	m_roomGenerateSettings.at(TUTO_NOTHINGROOM).weight = 1;
+	m_roomGenerateSettings.at(TUTO_NOTHINGROOM).placementCandidates.emplace_back(RoomType::TUTO_SPAWNERROOM);
+
+	m_roomGenerateSettings.at(TUTO_SPAWNERROOM).weight = 1;
+	m_roomGenerateSettings.at(TUTO_SPAWNERROOM).placementCandidates.emplace_back(RoomType::TUTO_END);
 
 	/*///// First Floor /////*/
 	m_roomGenerateSettings.at(FIRST_START).placementCandidates.emplace_back(RoomType::FIRST_I);
@@ -179,419 +192,6 @@ void DungeonData::InitRoomGenSettings()
 	m_roomGenerateSettings.at(THIRD_BARREL).placementCandidates.emplace_back(RoomType::THIRD_T_REVERSE);
 	m_roomGenerateSettings.at(THIRD_BARREL).placementCandidates.emplace_back(RoomType::THIRD_I);
 	m_roomGenerateSettings.at(THIRD_BARREL).placementCandidates.emplace_back(RoomType::THIRD_BARREL);
-
-
-
-//	// DEAD_END
-//	{
-//		RoomGenerateSetting setting;
-//		setting.weight = 0;
-//
-//		// ファイルロード
-//		nlohmann::json loadFile;
-//		std::ifstream ifs(m_fileNames.at(DEAD_END));
-//
-//		if (ifs.is_open())
-//		{
-//			ifs >> loadFile;
-//
-//			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
-//			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
-//			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
-//			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
-//			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
-//			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
-//
-//			ifs.close();
-//		}
-//		
-//		m_roomGenerateSettings.at(DEAD_END) = setting;
-//	}
-//
-//	// FIRST_START
-//	{
-//		RoomGenerateSetting setting;
-//		setting.weight = 0;
-//		setting.placementCandidates.emplace_back(RoomType::FIRST_I);
-//		setting.placementCandidates.emplace_back(RoomType::FIRST_T);
-//		setting.placementCandidates.emplace_back(RoomType::FIRST_FOUNTAIN);
-//		setting.placementCandidates.emplace_back(RoomType::FIRST_SPAWNER);
-//
-//		// ファイルロード
-//		nlohmann::json loadFile;
-//		std::ifstream ifs(m_fileNames.at(FIRST_START));
-//		if (ifs.is_open())
-//		{
-//			ifs >> loadFile;
-//			// 接続点データの取り出し
-//			for (const auto& nodeData : loadFile["NodeDatas"])
-//			{
-//				TileType tileType = nodeData["Type"];
-//
-//				if (tileType == CONNECTPOINT)
-//				{
-//					TILE_DATA newConnectPoint;
-//					newConnectPoint.position = {
-//						nodeData["Position"].at(0),
-//						nodeData["Position"].at(1),
-//						nodeData["Position"].at(2)
-//					};
-//					newConnectPoint.angle = {
-//						nodeData["Angle"].at(0),
-//						nodeData["Angle"].at(1),
-//						nodeData["Angle"].at(2)
-//					};
-//					setting.connectPointDatas.emplace_back(newConnectPoint);
-//				}
-//			}
-//			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
-//			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
-//			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
-//			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
-//			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
-//			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
-//			ifs.close();
-//		}
-//		m_roomGenerateSettings.at(FIRST_START) = setting;
-//	}
-//
-//	// FIRST_I
-//	{
-//		RoomGenerateSetting setting;
-//		setting.weight = 20;
-//		setting.placementCandidates.emplace_back(RoomType::FIRST_I);
-//		setting.placementCandidates.emplace_back(RoomType::FIRST_T);
-//		setting.placementCandidates.emplace_back(RoomType::FIRST_FOUNTAIN);
-//		setting.placementCandidates.emplace_back(RoomType::FIRST_SPAWNER);
-//
-//		// ファイルロード
-//		nlohmann::json loadFile;
-//		std::ifstream ifs(m_fileNames.at(FIRST_I));
-//		if (ifs.is_open())
-//		{
-//			ifs >> loadFile;
-//			// 接続点データの取り出し
-//			for (const auto& nodeData : loadFile["NodeDatas"])
-//			{
-//				TileType tileType = nodeData["Type"];
-//
-//				if (tileType == CONNECTPOINT)
-//				{
-//					TILE_DATA newConnectPoint;
-//					newConnectPoint.position = {
-//						nodeData["Position"].at(0),
-//						nodeData["Position"].at(1),
-//						nodeData["Position"].at(2)
-//					};
-//					newConnectPoint.angle = {
-//						nodeData["Angle"].at(0),
-//						nodeData["Angle"].at(1),
-//						nodeData["Angle"].at(2)
-//					};
-//					setting.connectPointDatas.emplace_back(newConnectPoint);
-//				}
-//			}
-//			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
-//			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
-//			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
-//			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
-//			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
-//			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
-//			ifs.close();
-//		}
-//		m_roomGenerateSettings.at(FIRST_I) = setting;
-//	}
-//
-//	// FIRST_T
-//	{
-//		RoomGenerateSetting setting;
-//		setting.weight = 20;
-//		setting.placementCandidates.emplace_back(RoomType::FIRST_I);
-//		setting.placementCandidates.emplace_back(RoomType::FIRST_T);
-//		setting.placementCandidates.emplace_back(RoomType::FIRST_FOUNTAIN);
-//		setting.placementCandidates.emplace_back(RoomType::FIRST_SPAWNER);
-//
-//		// ファイルロード
-//		nlohmann::json loadFile;
-//		std::ifstream ifs(m_fileNames.at(FIRST_T));
-//		if (ifs.is_open())
-//		{
-//			ifs >> loadFile;
-//			// 接続点データの取り出し
-//			for (const auto& nodeData : loadFile["NodeDatas"])
-//			{
-//				TileType tileType = nodeData["Type"];
-//
-//				if (tileType == CONNECTPOINT)
-//				{
-//					TILE_DATA newConnectPoint;
-//					newConnectPoint.position = {
-//						nodeData["Position"].at(0),
-//						nodeData["Position"].at(1),
-//						nodeData["Position"].at(2)
-//					};
-//					newConnectPoint.angle = {
-//						nodeData["Angle"].at(0),
-//						nodeData["Angle"].at(1),
-//						nodeData["Angle"].at(2)
-//					};
-//					setting.connectPointDatas.emplace_back(newConnectPoint);
-//				}
-//			}
-//			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
-//			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
-//			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
-//			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
-//			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
-//			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
-//			ifs.close();
-//		}
-//		m_roomGenerateSettings.at(FIRST_T) = setting;
-//	}
-//
-//	// FIRST_FOUNTAIN
-//	{
-//		RoomGenerateSetting setting;
-//		setting.weight = 10;
-//		setting.placementCandidates.emplace_back(RoomType::FIRST_I);
-//		setting.placementCandidates.emplace_back(RoomType::FIRST_T);
-//		setting.placementCandidates.emplace_back(RoomType::FIRST_SPAWNER);
-//
-//		// ファイルロード
-//		nlohmann::json loadFile;
-//		std::ifstream ifs(m_fileNames.at(FIRST_FOUNTAIN));
-//		if (ifs.is_open())
-//		{
-//			ifs >> loadFile;
-//			// 接続点データの取り出し
-//			for (const auto& nodeData : loadFile["NodeDatas"])
-//			{
-//				TileType tileType = nodeData["Type"];
-//
-//				if (tileType == CONNECTPOINT)
-//				{
-//					TILE_DATA newConnectPoint;
-//					newConnectPoint.position = {
-//						nodeData["Position"].at(0),
-//						nodeData["Position"].at(1),
-//						nodeData["Position"].at(2)
-//					};
-//					newConnectPoint.angle = {
-//						nodeData["Angle"].at(0),
-//						nodeData["Angle"].at(1),
-//						nodeData["Angle"].at(2)
-//					};
-//					setting.connectPointDatas.emplace_back(newConnectPoint);
-//				}
-//			}
-//			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
-//			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
-//			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
-//			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
-//			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
-//			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
-//			ifs.close();
-//		}
-//		m_roomGenerateSettings.at(FIRST_FOUNTAIN) = setting;
-//	}
-//
-//	// FIRST_SPAWNER
-//	{
-//		RoomGenerateSetting setting;
-//		setting.weight = 10;
-//		setting.placementCandidates.emplace_back(RoomType::FIRST_I);
-//		setting.placementCandidates.emplace_back(RoomType::FIRST_T);
-//		setting.placementCandidates.emplace_back(RoomType::FIRST_FOUNTAIN);
-//
-//		// ファイルロード
-//		nlohmann::json loadFile;
-//		std::ifstream ifs(m_fileNames.at(FIRST_SPAWNER));
-//		if (ifs.is_open())
-//		{
-//			ifs >> loadFile;
-//			// 接続点データの取り出し
-//			for (const auto& nodeData : loadFile["NodeDatas"])
-//			{
-//				TileType tileType = nodeData["Type"];
-//
-//				if (tileType == CONNECTPOINT)
-//				{
-//					TILE_DATA newConnectPoint;
-//					newConnectPoint.position = {
-//						nodeData["Position"].at(0),
-//						nodeData["Position"].at(1),
-//						nodeData["Position"].at(2)
-//					};
-//					newConnectPoint.angle = {
-//						nodeData["Angle"].at(0),
-//						nodeData["Angle"].at(1),
-//						nodeData["Angle"].at(2)
-//					};
-//					setting.connectPointDatas.emplace_back(newConnectPoint);
-//				}
-//			}
-//			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
-//			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
-//			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
-//			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
-//			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
-//			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
-//			ifs.close();
-//		}
-//		m_roomGenerateSettings.at(FIRST_SPAWNER) = setting;
-//	}
-//
-//	// FIRST_END
-//	{
-//		RoomGenerateSetting setting;
-//		setting.weight = 5;
-//
-//		// ファイルロード
-//		nlohmann::json loadFile;
-//		std::ifstream ifs(m_fileNames.at(FIRST_END));
-//		if (ifs.is_open())
-//		{
-//			ifs >> loadFile;
-//			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
-//			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
-//			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
-//			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
-//			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
-//			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
-//			ifs.close();
-//		}
-//		m_roomGenerateSettings.at(FIRST_END) = setting;
-//	}
-//
-//	// FIRST_BOSS
-//	{
-//		RoomGenerateSetting setting;
-//		setting.weight = 5;
-//
-//		// ファイルロード
-//		nlohmann::json loadFile;
-//		std::ifstream ifs(m_fileNames.at(FIRST_BOSS));
-//		if (ifs.is_open())
-//		{
-//			ifs >> loadFile;
-//			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
-//			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
-//			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
-//			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
-//			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
-//			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
-//			ifs.close();
-//		}
-//		m_roomGenerateSettings.at(FIRST_BOSS) = setting;
-//	}
-//
-//	// TEST_I
-//	{
-//		RoomGenerateSetting setting;
-//		setting.weight = 10;
-//		setting.placementCandidates.emplace_back(RoomType::TEST_I);
-//		setting.placementCandidates.emplace_back(RoomType::TEST_T);
-//		setting.placementCandidates.emplace_back(RoomType::TEST_X);
-//		//setting.placementCandidates.emplace_back(RoomType::TEST_END);
-//
-//		// ファイルロード
-//		nlohmann::json loadFile;
-//		std::ifstream ifs(m_fileNames.at(TEST_I));
-//		if (ifs.is_open())
-//		{
-//			ifs >> loadFile;
-//			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
-//			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
-//			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
-//			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
-//			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
-//			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
-//			ifs.close();
-//		}
-//		m_roomGenerateSettings.at(TEST_I) = setting;
-//	}
-//
-//	// TEST_T
-//	{
-//		RoomGenerateSetting setting;
-//		setting.weight = 20;
-//		setting.placementCandidates.emplace_back(RoomType::TEST_I);
-//		setting.placementCandidates.emplace_back(RoomType::TEST_T);
-//		setting.placementCandidates.emplace_back(RoomType::TEST_X);
-//		//setting.placementCandidates.emplace_back(RoomType::TEST_END);
-//
-//		// ファイルロード
-//		nlohmann::json loadFile;
-//		std::ifstream ifs(m_fileNames.at(TEST_T));
-//		if (ifs.is_open())
-//		{
-//			ifs >> loadFile;
-//			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
-//			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
-//			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
-//			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
-//			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
-//			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
-//			ifs.close();
-//		}
-//		m_roomGenerateSettings.at(TEST_T) = setting;
-//	}
-//
-//	// TEST_X
-//	{
-//		RoomGenerateSetting setting;
-//		setting.weight = 5;
-//		setting.placementCandidates.emplace_back(RoomType::TEST_I);
-//		setting.placementCandidates.emplace_back(RoomType::TEST_T);
-//		setting.placementCandidates.emplace_back(RoomType::TEST_X);
-//		//setting.placementCandidates.emplace_back(RoomType::TEST_END);
-//
-//		// ファイルロード
-//		nlohmann::json loadFile;
-//		std::ifstream ifs(m_fileNames.at(TEST_X));
-//		if (ifs.is_open())
-//		{
-//			ifs >> loadFile;
-//			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
-//			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
-//			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
-//			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
-//			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
-//			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
-//			ifs.close();
-//		}
-//
-//		m_roomGenerateSettings.at(TEST_X) = setting;
-//	}
-//
-//	// TEST_END
-//	{
-//		RoomGenerateSetting setting;
-//		setting.weight = 5;
-//
-//		// ファイルロード
-//		nlohmann::json loadFile;
-//		std::ifstream ifs(m_fileNames.at(TEST_END));
-//		if (ifs.is_open())
-//		{
-//			ifs >> loadFile;
-//			setting.aabb.position.x = loadFile["RoomSetting"]["AABB"]["Position"].at(0);
-//			setting.aabb.position.y = loadFile["RoomSetting"]["AABB"]["Position"].at(1);
-//			setting.aabb.position.z = loadFile["RoomSetting"]["AABB"]["Position"].at(2);
-//			setting.aabb.radii.x = loadFile["RoomSetting"]["AABB"]["Radii"].at(0);
-//			setting.aabb.radii.y = loadFile["RoomSetting"]["AABB"]["Radii"].at(1);
-//			setting.aabb.radii.z = loadFile["RoomSetting"]["AABB"]["Radii"].at(2);
-//			ifs.close();
-//		}
-//		m_roomGenerateSettings.at(TEST_END) = setting;
-//	}
-//
-//	// TUTO_END
-//	{
-//		RoomGenerateSetting setting;
-//		setting.portalPosition = { 0.0f, 0.0f, 10.0f };
-//		m_roomGenerateSettings.at(TUTO_END) = setting;
-//	}
 }
 
 void DungeonData::InitModelFileDatas()
@@ -658,6 +258,10 @@ void DungeonData::InitModelFileDatas()
 	m_modelFileDatas.at(BALLOON).emplace_back("Data/Model/DungeonAssets_2/ballon1.glb", 0.4f);
 	m_modelFileDatas.at(CAR).emplace_back("Data/Model/DungeonAssets/Car.glb", 0.4f);
 	m_modelFileDatas.at(GEARS).emplace_back("Data/Model/DungeonAssets/Gears.glb", 0.4f);
+	m_modelFileDatas.at(LAMP).emplace_back("Data/Model/DungeonAssets_2/Lamp_01a.glb", 0.01f);
+	m_modelFileDatas.at(BEAR_TREE).emplace_back("Data/Model/DungeonAssets_2/Bear_Tree_01a.glb", 0.01f);
+	m_modelFileDatas.at(BALL).emplace_back("Data/Model/DungeonAssets_2/Ball1.glb", 0.01f);
+	m_modelFileDatas.at(INSTRUMENT).emplace_back("Data/Model/DungeonAssets_2/Instrument.glb", 0.04f);
 
 	// モデルない組～
 	m_modelFileDatas.at(PORTAL).emplace_back("", 0.0f);
@@ -705,6 +309,10 @@ void DungeonData::InitCollisionFileDatas()
 	m_collisionFileDatas.at(WALL_PAPER).emplace_back("Data/Model/DungeonAssets/SM_Wall_Paper.glb", 4.0f);
 	m_collisionFileDatas.at(WALL_SQUARES).emplace_back("Data/Model/DungeonAssets/SM_Wall_Squares.glb", 4.0f);
 	m_collisionFileDatas.at(WELL).emplace_back("Data/Model/DungeonAssets/SM_Well_01a.glb", 4.0f);
+
+	m_collisionFileDatas.at(BED_01A).emplace_back("Data/Model/DungeonAssets/Bed_01a.glb", 0.04f);
+	m_collisionFileDatas.at(CHAIR_01A).emplace_back("Data/Model/DungeonAssets/Chair_01a.glb", 0.04f);
+	m_collisionFileDatas.at(INSTRUMENT).emplace_back("Data/Model/DungeonAssets_2/Instrument.glb", 0.04f);
 }
 
 void DungeonData::InitTileDatas()

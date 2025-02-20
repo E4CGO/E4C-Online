@@ -479,8 +479,16 @@ void RoomBase::GenerateNextRoomAutomatically(
 				// 何も生成できないならば行き止まり用の部屋を生成する
 				else
 				{
-					RoomBase* deadEnd = new RoomBase(this, i, DUNGEONDATA.GetCurrentFloorGenSetting().deadEndRoomType, roomAABBs, isLastRoomGenerated);
-					AddRoom(deadEnd);
+					if (!isLastRoomGenerated)
+					{
+						RoomBase* endRoom = new RoomBase(this, i, DUNGEONDATA.GetCurrentFloorGenSetting().endRoomType, roomAABBs, isLastRoomGenerated);
+						AddRoom(endRoom);
+					}
+					else
+					{
+						RoomBase* deadEnd = new RoomBase(this, i, DUNGEONDATA.GetCurrentFloorGenSetting().deadEndRoomType, roomAABBs, isLastRoomGenerated);
+						AddRoom(deadEnd);
+					}
 				}
 			}
 		}
