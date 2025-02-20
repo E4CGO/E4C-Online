@@ -165,6 +165,7 @@ void StageDungeon_E4C::Initialize()
 		m_roomOrder.clear();
 		if (currentFloor < DUNGEONDATA.GetDungeonGenSetting().maxFloor)
 		{
+			// チュートリアルフロアの生成
 			m_roomOrder.emplace_back(RoomType::TUTO_START);
 			m_roomOrder.emplace_back(RoomType::TUTO_NOTHINGROOM);
 			m_roomOrder.emplace_back(RoomType::TUTO_SPAWNERROOM);
@@ -391,15 +392,17 @@ void StageDungeon_E4C::RenderDX12()
 
 		SpawnerManager::Instance().RenderDX12(rc);
 
+		GameObjectManager::Instance().RenderDX12(rc);
+
 		PROJECTILES.RenderDX12(rc);
 
-		GameObjectManager::Instance().RenderDX12(rc);
 		// プレイヤー
 		PlayerCharacterManager::Instance().RenderDX12(rc);
-		ZoneManager::Instance().RenderDX12(rc);
 
 		// 部屋（OneWayWall、DebugCube等）
 		for (RoomBase* room : rootRoom->GetAll()) room->RenderDX12(rc);
+
+		ZoneManager::Instance().RenderDX12(rc);
 
 		// レンダーターゲットへの書き込み終了待ち
 		m_frameBuffer->WaitUntilFinishDrawingToRenderTarget(T_GRAPHICS.GetFrameBufferDX12(FrameBufferDX12Id::Scene));
