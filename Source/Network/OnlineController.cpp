@@ -319,8 +319,7 @@ namespace Online
 				dungeon->SetRoomOrder(roomOrder);
 				m_pMatchingUI->GetTeleporter()->Teleport();
 
-				PlayerCharacterManager::Instance().ClearOtherPlayers();
-				std::cout << "Clean PlayerCharacterManager" << std::endl;
+				//PlayerCharacterManager::Instance().ClearOtherPlayers();
 				
 				PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
 				player->SetPosition({ 0.0f, 0.0f, 0.0f });
@@ -338,6 +337,7 @@ namespace Online
 				StageDungeon_E4C* newDungeon = new StageDungeon_E4C(dungeon->GetScene());
 				newDungeon->SetRoomOrder(roomOrder);
 
+				//PlayerCharacterManager::Instance().ClearOtherPlayers();
 				PlayerCharacter* player = PlayerCharacterManager::Instance().GetPlayerCharacterById();
 				player->SetPosition({ 0.0f, 0.0f, 0.0f });
 				m_udpCommands[UDP_CMD::SYNC]->Send(nullptr);
