@@ -160,7 +160,6 @@ void StageDungeon_E4C::Initialize()
 	floorText->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 	floorText->SetPosition({ 30.0f, 30.0f });
 	{
-
 		// 最上階でない場合はチュートリアルフロアの生成
 		// 生成部屋の全削除（同期無視）
 		m_roomOrder.clear();
@@ -172,9 +171,9 @@ void StageDungeon_E4C::Initialize()
 			m_roomOrder.emplace_back(RoomType::TUTO_SPAWNERROOM);
 			m_roomOrder.emplace_back(RoomType::TUTO_END);
 		}
-		// 最上階であればボス部屋の生成
 		else
 		{
+			// 最上階であればボス部屋の生成
 			if (ONLINE_CONTROLLER->GetState() == Online::State::OFFLINE)
 			{
 				m_roomOrder.emplace_back(RoomType::FIRST_BOSS);
@@ -216,12 +215,18 @@ void StageDungeon_E4C::Initialize()
 	m_pPauseMenu = new WidgetPauseMenu(cameraController.get());
 	UI.Register(m_pPauseMenu);
 
+	m_pPlayerList = new WidgetPlayers;
+	UI.Register(m_pPlayerList);
+
 	// 影初期化
 	T_GRAPHICS.GetShadowRenderer()->Init(T_GRAPHICS.GetDeviceDX12());
 }
 
 void StageDungeon_E4C::Finalize()
 {
+	UI.Remove(m_pPauseMenu);
+	UI.Remove(m_pPlayerList);
+
 	ENEMIES.Clear();
 	MAPTILES.Clear();
 	PROJECTILES.Clear();
@@ -251,6 +256,7 @@ void StageDungeon_E4C::Update(float elapsedTime)
 	if (onlineController->GetState() == Online::OnlineController::STATE::LOGINED)
 	{
 		onlineController->RoomIn();
+		onlineController->RequestClients();
 		onlineController->BeginSync();
 	}
 
@@ -316,11 +322,19 @@ void StageDungeon_E4C::DefeatBoss()
 	// 部屋のモデルを配置
 	for (RoomBase* room : rootRoom->GetAll())
 	{
-		if (room->GetRoomType() == DUNGEONDATA.GetCurrentFloorGenSetting().endRoomType)
+		if (room->GetRoomType() == RoomType::FIRST_BOSS ||
+			room->GetRoomType() == RoomType::FIRST_BOSS_ONLINE)
 		{
-			room->PlaceTeleporterTile(new StageOpenWorld_E4C(m_pScene), m_pScene->GetOnlineController());
+			room->PlaceTeleporterTile(nullptr, m_pScene->GetOnlineController());
 		}
 	}
+	//for (RoomBase* room : rootRoom->GetAll())
+	//{
+	//	if (room->GetRoomType() == DUNGEONDATA.GetCurrentFloorGenSetting().endRoomType)
+	//	{
+	//		room->PlaceTeleporterTile(new StageOpenWorld_E4C(m_pScene), m_pScene->GetOnlineController());
+	//	}
+	//}
 }
 
 void StageDungeon_E4C::Render()

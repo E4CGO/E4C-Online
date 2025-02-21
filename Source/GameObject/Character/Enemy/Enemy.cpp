@@ -187,9 +187,9 @@ void Enemy::Sync(const Enemy::SYNC_DATA& data)
 {
 	enemy_id = data.enemy_id;
 	enemyType = data.type;
-	position = { data.position[0],data.position[1], data.position[2] };
+	SetPosition({ data.position[0],data.position[1], data.position[2] });
 	m_target = data.target_id;
-	m_TargetPosition = { data.targetPosition[0], data.targetPosition[1], data.targetPosition[2] };
+	SetTargetPosition({ data.targetPosition[0], data.targetPosition[1], data.targetPosition[2] });
 	angle.y = data.rotate;
 	stateMachine->ChangeState(data.state);
 }

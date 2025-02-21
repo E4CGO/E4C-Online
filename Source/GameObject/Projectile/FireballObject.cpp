@@ -12,13 +12,13 @@
 FireballObject::FireballObject(PlayerCharacter* owner) : Projectile("Data/Model/Object/arrow.glb", 1.0f, owner), m_pOwner(owner)
 {
 	m_radius = 0.5f;
-	m_power = 10;
+	m_power = 40;
 	m_speed = 40.0f;
 	m_existTime = 2.0f;
-	m_chargeTime = 4.0f;
+	m_chargeTime = 1.0f;
 	m_currentTimer = m_chargeTime;
 
-	SetMoveCollider({ {0, 0, 0}, m_radius }, Collider::COLLIDER_OBJ::PLAYER_PROJECTILE);
+	SetMoveCollider({ {0, 0, 0}, 0.1f }, Collider::COLLIDER_OBJ::PLAYER_PROJECTILE);
 	m_pColliders.clear();
 
 	m_fireball = std::make_unique<PlaneDX12>("Data/Sprites/fire.png", 1.0f, DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), 0.0f, 1.0f);
@@ -33,18 +33,16 @@ FireballObject::FireballObject(PlayerCharacter* owner) : Projectile("Data/Model/
 *//***************************************************************************/
 void FireballObject::Update(float elapsedTime)
 {
-	if(m_isCharge)
+	if (m_isCharge)
 	{
 		PlayerCharacter* player = static_cast<PlayerCharacter*>(m_pOwner);
 
 		if (player->IsPlayer())
 		{
 			if (player->InputAttackNormal())
-			{				
-				float s = (m_chargeTime - m_currentTimer) * m_radius * 0.5f;
+			{
+				float s = (m_chargeTime - m_currentTimer) * m_radius * 2 + 0.5f;
 				scale = { s, s, s };
-				float radius = m_radius * s;
-				m_pMoveCollider->SetParam({ {}, radius });
 
 				position = player->GetShotPosition();
 				Projectile::Update(elapsedTime);
@@ -59,17 +57,16 @@ void FireballObject::Update(float elapsedTime)
 			}
 			else if (player->ReleaseAttackNormal())
 			{
-				m_power = uint16_t(m_power * (m_chargeTime - m_currentTimer));
+				m_power = uint16_t(m_power * (m_chargeTime - m_currentTimer)) + 10;
 				m_isCharge = false;
 				m_currentTimer = m_existTime;
 				m_direction = XMFLOAT3Normalize(player->GetTarget() - position);
-				MakeAttackCollider(m_power, 0, { {}, m_direction, m_speed, m_radius * scale.x }, Collider::COLLIDER_OBJ::PLAYER_PROJECTILE, Collider::COLLIDER_OBJ::ENEMY, &transform);
+				MakeAttackCollider(m_power, 0, { {}, m_direction, m_speed * elapsedTime, m_radius * scale.x }, Collider::COLLIDER_OBJ::PLAYER_PROJECTILE, Collider::COLLIDER_OBJ::ENEMY, &transform);
 				m_pColliders[0]->SetCollisionFunction([&](Collider* myCol, Collider* otherCol) {CollisionFunction(myCol, otherCol); });
 			}
 		}
 		else
 		{
-
 		}
 
 		// ダメージを受けたら消える
@@ -92,7 +89,7 @@ void FireballObject::Update(float elapsedTime)
 			sphereCast.direction = m_direction;
 			sphereCast.length = m_speed * elapsedTime;
 			sphereCast.radius = m_pMoveCollider->GetSphere().radius;
-			m_pColliders[0]->SetParam({ {}, m_direction, sphereCast.length, sphereCast.radius });
+			m_pColliders[0]->SetParam({ {}, m_direction, sphereCast.length, m_radius * scale.x });
 
 			if (MAPTILES.IntersectCapsuleVsMap(sphereCast))
 			{
@@ -109,7 +106,7 @@ void FireballObject::Update(float elapsedTime)
 		offsetPos.z = position.z + 0.0f * scale.z;
 		m_fireball->SetPosition(offsetPos);
 		m_fireball->Update(elapsedTime);
-		
+
 		if (m_currentTimer < 0.0f)
 		{
 			Destory();

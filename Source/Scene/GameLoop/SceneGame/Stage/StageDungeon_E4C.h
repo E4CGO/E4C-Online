@@ -20,6 +20,7 @@
 #include "Map/RoomBase.h"
 #include "UI/Widget/WidgetText.h"
 #include "Source/UI/Widget/WidgetPlayerHP.h"
+#include "Source/UI/Widget/WidgetPlayers.h"
 #include "Source/UI/Widget/WidgetPauseMenu.h"
 
 #include "TAKOEngine/Editor/Camera/ThridPersonCameraController.h"
@@ -112,6 +113,7 @@ protected:
 
 
 	WidgetPauseMenu* m_pPauseMenu;
+	WidgetPlayers* m_pPlayerList;
 };
 
 #endif // !__INCLUDED_STAGE_DUNGEON_E4C_H__

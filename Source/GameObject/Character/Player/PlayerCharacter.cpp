@@ -69,7 +69,7 @@ PlayerCharacter::PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataI
 	moveSpeed = 10.0f;
 	turnSpeed = DirectX::XMConvertToRadians(720);
 	jumpSpeed = 20.0f;
-	dodgeSpeed = 20.0f;
+	dodgeSpeed = 15.0f;
 
 	stateMachine = new StateMachine<PlayerCharacter>;
 	RegisterCommonState();
@@ -629,9 +629,11 @@ void PlayerCharacter::Update(float elapsedTime)
 				};
 				angle.y = Mathf::LerpRadian(m_tempData.angle, m_tempData.sync_data.rotate, rate);
 			}
+			// Y軸修正
 			if (m_tempData.position.y - position.y > 10.0f)
 			{
 				position.y = m_tempData.position.y;
+				velocity.y = 0.0f;
 			}
 		}
 	}
@@ -713,6 +715,7 @@ void PlayerCharacter::Render(const RenderContext& rc)
 #include "Source/GameObject/Character/Player/State/PlayerCharacterSwordState.h"
 void PlayerCharacter::RenderDX12(const RenderContextDX12& rc)
 {
+	if (!m_visible) return;
 	Character::RenderDX12(rc);
 
 	DirectX::XMFLOAT3 front = CameraManager::Instance().GetCamera()->GetFront();

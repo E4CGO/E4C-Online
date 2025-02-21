@@ -4,8 +4,6 @@
 #ifndef __ONLINE_TCP_CLIENT_DATA_H__
 #define __ONLINE_TCP_CLIENT_DATA_H__
 
-#include <string>
-#include <vector>
 #include "TCPCommand.h"
 
 namespace Online
@@ -28,6 +26,8 @@ namespace Online
 
 		// データ受信
 		bool Receive(size_t size) override;
+		// データ送信
+		bool Send(void* data) override;
 	};
 }
 

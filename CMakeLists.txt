@@ -398,6 +398,8 @@ set(Source__UI__Widget
     "Source/UI/Widget/WidgetPauseMenu.h"
     "Source/UI/Widget/WidgetPlayerHP.cpp"
     "Source/UI/Widget/WidgetPlayerHP.h"
+    "Source/UI/Widget/WidgetPlayers.cpp"
+    "Source/UI/Widget/WidgetPlayers.h"
     "Source/UI/Widget/WidgetSettingWindow.cpp"
     "Source/UI/Widget/WidgetSettingWindow.h"
     "Source/UI/Widget/WidgetStripeAnimation.cpp"

@@ -40,7 +40,11 @@ void EnemyManager::Update(float elapsedTime)
 		std::vector<Enemy::SYNC_DATA> enemiesSyncData;
 		for (const uint32_t& enemy_id : m_syncEnemies)
 		{
-			enemiesSyncData.push_back(GetEnemyById(enemy_id)->SyncData());
+			Enemy* enemy = GetEnemyById(enemy_id);
+			if (enemy != nullptr && enemy->IsMine())
+			{
+				enemiesSyncData.push_back(GetEnemyById(enemy_id)->SyncData());
+			}
 		}
 		ONLINE_CONTROLLER->SyncEnemy(enemiesSyncData);
 
@@ -75,7 +79,7 @@ void EnemyManager::RenderDX12(const RenderContextDX12& rc)
 }
 
 /**************************************************************************//**
- 	@brief		IDでエネミーを取得
+	@brief		IDでエネミーを取得
 	@param[in]	id エネミー
 	@return		エネミー参照ポインタ
 *//***************************************************************************/
@@ -95,7 +99,7 @@ Enemy* EnemyManager::GetEnemyById(const uint32_t& id)
 }
 
 /**************************************************************************//**
- 	@brief		全ての敵にレイキャスト
+	@brief		全ての敵にレイキャスト
 	@param[in]	start	レイの開始座標
 	@param[in]	end		レイの終了座標
 	@param[in]	hit		当たり結果の参照
@@ -121,7 +125,7 @@ bool EnemyManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOA
 }
 
 /**************************************************************************//**
- 	@brief		同期エネミーID登録
+	@brief		同期エネミーID登録
 	@param[in]	enemy_id エネミーID
 *//***************************************************************************/
 void EnemyManager::RegisterSync(const uint32_t& enemy_id)
@@ -129,7 +133,7 @@ void EnemyManager::RegisterSync(const uint32_t& enemy_id)
 	m_syncEnemies.insert(enemy_id);
 }
 /**************************************************************************//**
- 	@brief		削除エネミーID登録
+	@brief		削除エネミーID登録
 	@param[in]	enemy_id エネミーID
 *//***************************************************************************/
 void EnemyManager::RegisterRemove(const uint32_t& enemy_id)

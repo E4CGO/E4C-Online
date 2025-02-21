@@ -156,6 +156,8 @@ namespace Online
 		bool Login();
 		// チャットを送信
 		void Chat(std::string& message);
+		
+		void RequestClients();
 
 		// マッチング開始
 		void StartMatching(WidgetMatching* ui);

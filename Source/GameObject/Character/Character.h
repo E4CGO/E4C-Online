@@ -74,6 +74,7 @@ public:
 	// アクセサ
 	// 摩擦設定
 	void SetFriction(const float friction) { this->friction = friction; }
+	const float GetFriction() const { return this->friction; }
 	// 最大スピードを取得
 	const float GetMaxMoveSpeed() { return maxMoveSpeed; }
 	void SetMaxMoveSpeed(float speed) { maxMoveSpeed = speed; }

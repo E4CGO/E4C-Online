@@ -242,6 +242,13 @@ namespace Online
 		m_tcpCommands[TCP_CMD::CHAT]->Send(&message);
 	}
 
+	/**************************************************************************//**
+	 	@brief	他のプレイヤーを要求する
+	*//***************************************************************************/
+	void OnlineController::RequestClients()
+	{
+		m_tcpCommands[TCP_CMD::CLIENT_DATA]->Send(nullptr);
+	}
 
 	/**************************************************************************//**
 		@brief		マッチング開始
@@ -304,7 +311,7 @@ namespace Online
 	*//***************************************************************************/
 	void OnlineController::NewRoom(const std::vector<uint8_t>& roomOrder)
 	{
-		if (m_pMatchingUI)
+		if (DungeonData::Instance().GetCurrentFloor() == 1)
 		{
 			Stage* stage = m_pMatchingUI->GetTeleporter()->GetStage();
 			if (auto dungeon = dynamic_cast<StageDungeon_E4C*>(stage))
