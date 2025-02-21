@@ -69,7 +69,7 @@ PlayerCharacter::PlayerCharacter(const PlayerCharacterData::CharacterInfo& dataI
 	moveSpeed = 10.0f;
 	turnSpeed = DirectX::XMConvertToRadians(720);
 	jumpSpeed = 20.0f;
-	dodgeSpeed = 20.0f;
+	dodgeSpeed = 15.0f;
 
 	stateMachine = new StateMachine<PlayerCharacter>;
 	RegisterCommonState();

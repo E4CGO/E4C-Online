@@ -136,5 +136,6 @@ void PlayerCharacterManager::ClearOtherPlayers()
 		}
 	}
 	std::erase_if(this->items, [this](const auto& item) { return item->GetClientId() != GAME_DATA.GetClientId(); });
+	std::cout << "Clean PlayerCharacterManager" << std::endl;
 }
 

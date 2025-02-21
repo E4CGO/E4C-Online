@@ -120,6 +120,8 @@ namespace PlayerCharacterState
 		void Execute(float elapsedTime) override;
 		// ステートから出ていくときのメソッド
 		void Exit() override;
+	protected:
+		float m_friction = 0.0f;
 	};
 
 	// 怪我ステートオブジェクト

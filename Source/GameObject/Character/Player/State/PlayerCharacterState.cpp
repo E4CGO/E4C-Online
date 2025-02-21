@@ -174,6 +174,8 @@ namespace PlayerCharacterState
 		{
 			owner->GetColliders()[PlayerCharacter::COLLIDER_ID::COL_BODY]->SetEnable(false);
 		}
+		m_friction = owner->GetFriction();
+		owner->SetFriction(m_friction * 0.25f);
 
 		// MP消費
 		owner->ModifyMp(-owner->GetMpCost(PlayerCharacter::STATE::DODGE));
@@ -184,6 +186,19 @@ namespace PlayerCharacterState
 		{
 			owner->GetStateMachine()->ChangeState(static_cast<int>(PlayerCharacter::STATE::IDLE));
 			owner->StopMove();
+			return;
+		}
+		if (owner->GetModel()->GetAnimationRate() < 0.6f)
+		{
+			owner->StopFall();
+		}
+		else
+		{
+			if (owner->IsPlayer())
+			{
+				owner->GetColliders()[PlayerCharacter::COLLIDER_ID::COL_BODY]->SetEnable(true);
+			}
+			owner->SetFriction(m_friction);
 		}
 	}
 	void DodgeState::Exit()
@@ -192,6 +207,7 @@ namespace PlayerCharacterState
 		{
 			owner->GetColliders()[PlayerCharacter::COLLIDER_ID::COL_BODY]->SetEnable(true);
 		}
+		owner->SetFriction(m_friction);
 	}
 
 	// 怪我
