@@ -115,10 +115,8 @@ void SceneTitle_E4C::RenderDX12()
 		T_TEXT.EndDX12();
 	}
 
-#ifdef _DEBUG
 	DrawSceneGUI();
 	T_GRAPHICS.GetImGUIRenderer()->RenderDX12(m_frameBuffer->GetCommandList());
-#endif
 
 	T_GRAPHICS.End();
 }
