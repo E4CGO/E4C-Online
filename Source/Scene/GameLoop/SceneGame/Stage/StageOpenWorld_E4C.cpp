@@ -221,6 +221,7 @@ void StageOpenWorld_E4C::Initialize()
 
 void StageOpenWorld_E4C::Finalize()
 {
+	PlayerCharacterManager::Instance().ClearOtherPlayers();
 	PROJECTILES.Clear();
 	GameObjectManager::Instance().Clear();
 	ZoneManager::Instance().Clear();

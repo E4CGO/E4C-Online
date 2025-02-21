@@ -231,6 +231,7 @@ void StageDungeon_E4C::Finalize()
 	MAPTILES.Clear();
 	PROJECTILES.Clear();
 	//UI.Clear();
+	PlayerCharacterManager::Instance().ClearOtherPlayers();
 	SpawnerManager::Instance().Clear();
 	GameObjectManager::Instance().Clear();
 	ZoneManager::Instance().Clear();
